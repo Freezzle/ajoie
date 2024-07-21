@@ -1,0 +1,2 @@
+org.springframework.test.context.ContextCustomizerFactory = ch.salon.config.\
+    SqlTestContainersSpringContextCustomizerFactory
