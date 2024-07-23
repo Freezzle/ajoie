@@ -1,0 +1,71 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-salon-heading" data-cy="SalonCreateUpdateHeading" jhiTranslate="salonApp.salon.home.createOrEditLabel">
+        Créer ou éditer un Salon
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="salonApp.salon.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_place" jhiTranslate="salonApp.salon.place">Place</label>
+          <input type="text" class="form-control" name="place" id="field_place" data-cy="place" formControlName="place" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_startingDate" jhiTranslate="salonApp.salon.startingDate">Starting Date</label>
+          <div class="d-flex">
+            <input
+              id="field_startingDate"
+              data-cy="startingDate"
+              type="datetime-local"
+              class="form-control"
+              name="startingDate"
+              formControlName="startingDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_endingDate" jhiTranslate="salonApp.salon.endingDate">Ending Date</label>
+          <div class="d-flex">
+            <input
+              id="field_endingDate"
+              data-cy="endingDate"
+              type="datetime-local"
+              class="form-control"
+              name="endingDate"
+              formControlName="endingDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

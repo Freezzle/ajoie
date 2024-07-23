@@ -1,0 +1,158 @@
+<div>
+  <h2 id="page-heading" data-cy="ExponentHeading">
+    <span jhiTranslate="salonApp.exponent.home.title">Exponents</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="salonApp.exponent.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-exponent"
+        [routerLink]="['/exponent/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="salonApp.exponent.home.createLabel">Créer un nouveau Exponent</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (exponents?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="salonApp.exponent.home.notFound">Aucun Exponent trouvé</span>
+    </div>
+  }
+
+  @if (exponents && exponents.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="email">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.email">Email</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fullName">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.fullName">Full Name</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="phoneNumber">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.phoneNumber">Phone Number</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="website">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.website">Website</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="socialMedia">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.socialMedia">Social Media</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="address">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.address">Address</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="npaLocalite">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.npaLocalite">Npa Localite</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="urlPicture">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.urlPicture">Url Picture</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="comment">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.comment">Comment</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="blocked">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.blocked">Blocked</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (exponent of exponents; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/exponent', exponent.id, 'view']">{{ exponent.id }}</a>
+              </td>
+              <td>{{ exponent.email }}</td>
+              <td>{{ exponent.fullName }}</td>
+              <td>{{ exponent.phoneNumber }}</td>
+              <td>{{ exponent.website }}</td>
+              <td>{{ exponent.socialMedia }}</td>
+              <td>{{ exponent.address }}</td>
+              <td>{{ exponent.npaLocalite }}</td>
+              <td>{{ exponent.urlPicture }}</td>
+              <td>{{ exponent.comment }}</td>
+              <td>{{ exponent.blocked }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/exponent', exponent.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/exponent', exponent.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(exponent)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

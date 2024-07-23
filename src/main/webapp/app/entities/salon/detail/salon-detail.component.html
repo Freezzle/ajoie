@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (salon()) {
+      <div>
+        <h2 data-cy="salonDetailsHeading"><span jhiTranslate="salonApp.salon.detail.title">Salon</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="salonApp.salon.id">Id</span></dt>
+          <dd>
+            <span>{{ salon()!.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.salon.place">Place</span></dt>
+          <dd>
+            <span>{{ salon()!.place }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.salon.startingDate">Starting Date</span></dt>
+          <dd>
+            <span>{{ salon()!.startingDate | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.salon.endingDate">Ending Date</span></dt>
+          <dd>
+            <span>{{ salon()!.endingDate | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/salon', salon()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

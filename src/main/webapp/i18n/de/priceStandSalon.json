@@ -1,0 +1,26 @@
+{
+  "salonApp": {
+    "priceStandSalon": {
+      "home": {
+        "title": "Price Stand Salons",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Price Stand Salon erstellen",
+        "createOrEditLabel": "Price Stand Salon erstellen oder bearbeiten",
+        "notFound": "Keine Price Stand Salons gefunden"
+      },
+      "created": "Price Stand Salon erstellt mit ID {{ param }}",
+      "updated": "Price Stand Salon aktualisiert mit ID {{ param }}",
+      "deleted": "Price Stand Salon gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Price Stand Salon {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Price Stand Salon"
+      },
+      "id": "Id",
+      "price": "Price",
+      "dimension": "Dimension",
+      "salon": "Salon"
+    }
+  }
+}

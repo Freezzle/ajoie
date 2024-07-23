@@ -11,7 +11,22 @@
     <property name="datetimeType" value="datetime" dbms="postgresql"/>
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083401_added_entity_Exponent.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083402_added_entity_DimensionStand.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083403_added_entity_Stand.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083404_added_entity_Billing.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083405_added_entity_Invoice.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083406_added_entity_Salon.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240723192804_added_entity_Conference.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240723192805_added_entity_ConfigurationSalon.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240723192806_added_entity_PriceStandSalon.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20240721083403_added_entity_constraints_Stand.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083404_added_entity_constraints_Billing.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083405_added_entity_constraints_Invoice.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240723192804_added_entity_constraints_Conference.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240723192805_added_entity_constraints_ConfigurationSalon.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240723192806_added_entity_constraints_PriceStandSalon.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

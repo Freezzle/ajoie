@@ -1,0 +1,38 @@
+{
+  "annotations": {
+    "changelogDate": "20240721083405"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "billingDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "paymentMode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "extraInformation",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Invoice",
+  "relationships": [
+    {
+      "otherEntityName": "billing",
+      "relationshipName": "billing",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

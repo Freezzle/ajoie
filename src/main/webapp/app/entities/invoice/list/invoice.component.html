@@ -1,0 +1,123 @@
+<div>
+  <h2 id="page-heading" data-cy="InvoiceHeading">
+    <span jhiTranslate="salonApp.invoice.home.title">Invoices</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="salonApp.invoice.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-invoice"
+        [routerLink]="['/invoice/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="salonApp.invoice.home.createLabel">Créer un nouveau Invoice</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (invoices?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="salonApp.invoice.home.notFound">Aucun Invoice trouvé</span>
+    </div>
+  }
+
+  @if (invoices && invoices.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="amount">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.amount">Amount</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="billingDate">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.billingDate">Billing Date</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="paymentMode">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.paymentMode">Payment Mode</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="extraInformation">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.extraInformation">Extra Information</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="billing.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.billing">Billing</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (invoice of invoices; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/invoice', invoice.id, 'view']">{{ invoice.id }}</a>
+              </td>
+              <td>{{ invoice.amount }}</td>
+              <td>{{ invoice.billingDate | formatMediumDatetime }}</td>
+              <td>{{ invoice.paymentMode }}</td>
+              <td>{{ invoice.extraInformation }}</td>
+              <td>
+                @if (invoice.billing) {
+                  <div>
+                    <a [routerLink]="['/billing', invoice.billing.id, 'view']">{{ invoice.billing.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/invoice', invoice.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/invoice', invoice.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(invoice)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

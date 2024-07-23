@@ -1,0 +1,29 @@
+{
+  "salonApp": {
+    "configurationSalon": {
+      "home": {
+        "title": "Configuration Salons",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Configuration Salon erstellen",
+        "createOrEditLabel": "Configuration Salon erstellen oder bearbeiten",
+        "notFound": "Keine Configuration Salons gefunden"
+      },
+      "created": "Configuration Salon erstellt mit ID {{ param }}",
+      "updated": "Configuration Salon aktualisiert mit ID {{ param }}",
+      "deleted": "Configuration Salon gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Configuration Salon {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Configuration Salon"
+      },
+      "id": "Id",
+      "priceMeal1": "Price Meal 1",
+      "priceMeal2": "Price Meal 2",
+      "priceMeal3": "Price Meal 3",
+      "priceConference": "Price Conference",
+      "priceSharingStand": "Price Sharing Stand",
+      "salon": "Salon"
+    }
+  }
+}

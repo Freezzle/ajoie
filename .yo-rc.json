@@ -16,7 +16,17 @@
     "enableHibernateCache": false,
     "enableSwaggerCodegen": true,
     "enableTranslation": true,
-    "entities": [],
+    "entities": [
+      "Exponent",
+      "DimensionStand",
+      "Stand",
+      "Billing",
+      "Invoice",
+      "Salon",
+      "Conference",
+      "ConfigurationSalon",
+      "PriceStandSalon"
+    ],
     "feignClient": null,
     "jhipsterVersion": "8.6.0",
     "languages": ["fr", "en", "de"],

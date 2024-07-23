@@ -1,0 +1,77 @@
+{
+  "annotations": {
+    "changelogDate": "20240721083403"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "nbMeal1",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "nbMeal2",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "nbMeal3",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "shared",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "nbTable",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "nbChair",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "needElectricity",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "acceptedChart",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Stand",
+  "relationships": [
+    {
+      "otherEntityName": "billing",
+      "otherEntityRelationshipName": "stand",
+      "relationshipName": "billing",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "exponent",
+      "relationshipName": "exponent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "salon",
+      "relationshipName": "salon",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "dimensionStand",
+      "relationshipName": "dimension",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Stand.
+    -->
+    <changeSet id="20240721083403-1" author="jhipster">
+        <createTable tableName="stand">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_meal_1" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_meal_2" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_meal_3" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="shared" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_table" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_chair" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="need_electricity" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="accepted_chart" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="exponent_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="salon_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="dimension_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

@@ -1,0 +1,36 @@
+{
+  "salonApp": {
+    "stand": {
+      "home": {
+        "title": "Stands",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Stand erstellen",
+        "createOrEditLabel": "Stand erstellen oder bearbeiten",
+        "notFound": "Keine Stands gefunden"
+      },
+      "created": "Stand erstellt mit ID {{ param }}",
+      "updated": "Stand aktualisiert mit ID {{ param }}",
+      "deleted": "Stand gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Stand {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Stand"
+      },
+      "id": "Id",
+      "description": "Description",
+      "nbMeal1": "Nb Meal 1",
+      "nbMeal2": "Nb Meal 2",
+      "nbMeal3": "Nb Meal 3",
+      "shared": "Shared",
+      "nbTable": "Nb Table",
+      "nbChair": "Nb Chair",
+      "needElectricity": "Need Electricity",
+      "acceptedChart": "Accepted Chart",
+      "billing": "Billing",
+      "exponent": "Exponent",
+      "salon": "Salon",
+      "dimension": "Dimension"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (billing()) {
+      <div>
+        <h2 data-cy="billingDetailsHeading"><span jhiTranslate="salonApp.billing.detail.title">Billing</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="salonApp.billing.id">Id</span></dt>
+          <dd>
+            <span>{{ billing()!.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.billing.acceptedContract">Accepted Contract</span></dt>
+          <dd>
+            <span>{{ billing()!.acceptedContract }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.billing.needArrangment">Need Arrangment</span></dt>
+          <dd>
+            <span>{{ billing()!.needArrangment }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.billing.isClosed">Is Closed</span></dt>
+          <dd>
+            <span>{{ billing()!.isClosed }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.billing.stand">Stand</span></dt>
+          <dd>
+            @if (billing()!.stand) {
+              <div>
+                <a [routerLink]="['/stand', billing()!.stand?.id, 'view']">{{ billing()!.stand?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/billing', billing()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,30 @@
+{
+  "salonApp": {
+    "salon": {
+      "home": {
+        "title": "Salons",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Salon erstellen",
+        "createOrEditLabel": "Salon erstellen oder bearbeiten",
+        "notFound": "Keine Salons gefunden"
+      },
+      "created": "Salon erstellt mit ID {{ param }}",
+      "updated": "Salon aktualisiert mit ID {{ param }}",
+      "deleted": "Salon gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Salon {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Salon"
+      },
+      "id": "Id",
+      "place": "Place",
+      "startingDate": "Starting Date",
+      "endingDate": "Ending Date",
+      "stand": "Stand",
+      "conference": "Conference",
+      "priceStandSalon": "Price Stand Salon",
+      "configuration": "Configuration"
+    }
+  }
+}

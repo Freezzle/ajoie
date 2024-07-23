@@ -1,0 +1,89 @@
+
+entity Exponent {
+	id UUID
+	email String
+    fullName String
+    phoneNumber String
+    website String
+    socialMedia String
+    address String
+    npaLocalite String
+    urlPicture String
+    comment String
+    blocked Boolean
+}
+
+entity DimensionStand {
+	id UUID
+    dimension String
+}
+
+entity Conference {
+	id UUID
+    title String
+}
+
+entity Stand {
+	id UUID
+    description String
+    nbMeal1 Long
+    nbMeal2 Long
+    nbMeal3 Long
+    shared Boolean
+    nbTable Long
+    nbChair Long
+    needElectricity Boolean
+    acceptedChart Boolean
+}
+
+entity Billing {
+	id UUID
+    acceptedContract Boolean
+    needArrangment Boolean
+    isClosed Boolean
+}
+
+entity Invoice {
+	id UUID
+    amount Double
+    billingDate Instant
+    paymentMode String
+    extraInformation String
+}
+
+entity Salon {
+	id UUID
+    place String
+    startingDate Instant
+    endingDate Instant
+}
+
+entity ConfigurationSalon {
+	id UUID
+	priceMeal1 Long
+    priceMeal2 Long
+    priceMeal3 Long
+    priceConference Long
+    priceSharingStand Long
+}
+
+entity PriceStandSalon {
+	id UUID
+    price Long
+}
+
+relationship OneToOne {
+    ConfigurationSalon{salon} to Salon{configuration}
+	Billing{stand} to Stand{billing}
+}
+
+relationship OneToMany {
+	Exponent to Stand{exponent}
+	Salon to Stand{salon}
+	Salon to Conference{salon}
+	Billing to Invoice{billing}
+    Exponent to Conference{exponent}
+    DimensionStand to PriceStandSalon{dimension}
+    Salon to PriceStandSalon{salon}
+	DimensionStand to Stand{dimension}
+}

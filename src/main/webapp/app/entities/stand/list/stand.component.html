@@ -1,0 +1,189 @@
+<div>
+  <h2 id="page-heading" data-cy="StandHeading">
+    <span jhiTranslate="salonApp.stand.home.title">Stands</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="salonApp.stand.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-stand"
+        [routerLink]="['/stand/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="salonApp.stand.home.createLabel">Créer un nouveau Stand</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (stands?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="salonApp.stand.home.notFound">Aucun Stand trouvé</span>
+    </div>
+  }
+
+  @if (stands && stands.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="description">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.description">Description</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbMeal1">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.nbMeal1">Nb Meal 1</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbMeal2">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.nbMeal2">Nb Meal 2</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbMeal3">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.nbMeal3">Nb Meal 3</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="shared">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.shared">Shared</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbTable">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.nbTable">Nb Table</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbChair">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.nbChair">Nb Chair</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="needElectricity">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.needElectricity">Need Electricity</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="acceptedChart">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.acceptedChart">Accepted Chart</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="exponent.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.exponent">Exponent</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="salon.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.salon">Salon</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dimension.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.dimension">Dimension</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (stand of stands; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/stand', stand.id, 'view']">{{ stand.id }}</a>
+              </td>
+              <td>{{ stand.description }}</td>
+              <td>{{ stand.nbMeal1 }}</td>
+              <td>{{ stand.nbMeal2 }}</td>
+              <td>{{ stand.nbMeal3 }}</td>
+              <td>{{ stand.shared }}</td>
+              <td>{{ stand.nbTable }}</td>
+              <td>{{ stand.nbChair }}</td>
+              <td>{{ stand.needElectricity }}</td>
+              <td>{{ stand.acceptedChart }}</td>
+              <td>
+                @if (stand.exponent) {
+                  <div>
+                    <a [routerLink]="['/exponent', stand.exponent.id, 'view']">{{ stand.exponent.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (stand.salon) {
+                  <div>
+                    <a [routerLink]="['/salon', stand.salon.id, 'view']">{{ stand.salon.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (stand.dimension) {
+                  <div>
+                    <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/stand', stand.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/stand', stand.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(stand)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

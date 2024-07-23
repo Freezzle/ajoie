@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20240723192804"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "title",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Conference",
+  "relationships": [
+    {
+      "otherEntityName": "salon",
+      "relationshipName": "salon",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "exponent",
+      "relationshipName": "exponent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

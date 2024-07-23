@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20240723192806"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "price",
+      "fieldType": "Long"
+    }
+  ],
+  "name": "PriceStandSalon",
+  "relationships": [
+    {
+      "otherEntityName": "dimensionStand",
+      "relationshipName": "dimension",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "salon",
+      "relationshipName": "salon",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

@@ -1,0 +1,70 @@
+{
+  "annotations": {
+    "changelogDate": "20240721083401"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fullName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "website",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "socialMedia",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "address",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "npaLocalite",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "urlPicture",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "comment",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "blocked",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Exponent",
+  "relationships": [
+    {
+      "otherEntityName": "stand",
+      "otherEntityRelationshipName": "exponent",
+      "relationshipName": "stand",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "conference",
+      "otherEntityRelationshipName": "exponent",
+      "relationshipName": "conference",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no"
+}

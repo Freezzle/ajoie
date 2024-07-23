@@ -1,0 +1,26 @@
+{
+  "salonApp": {
+    "dimensionStand": {
+      "home": {
+        "title": "Dimension Stands",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Dimension Stand",
+        "createOrEditLabel": "Create or edit a Dimension Stand",
+        "notFound": "No Dimension Stands found"
+      },
+      "created": "A new Dimension Stand is created with identifier {{ param }}",
+      "updated": "A Dimension Stand is updated with identifier {{ param }}",
+      "deleted": "A Dimension Stand is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Dimension Stand {{ id }}?"
+      },
+      "detail": {
+        "title": "Dimension Stand"
+      },
+      "id": "Id",
+      "dimension": "Dimension",
+      "priceStandSalon": "Price Stand Salon",
+      "stand": "Stand"
+    }
+  }
+}
