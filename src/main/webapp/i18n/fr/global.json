@@ -8,7 +8,16 @@
       "entities": {
         "main": "Entités",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "adminAuthority": "Authority"
+        "adminAuthority": "Authority",
+        "exponent": "Exponent",
+        "dimensionStand": "Dimension Stand",
+        "stand": "Stand",
+        "billing": "Billing",
+        "invoice": "Invoice",
+        "salon": "Salon",
+        "conference": "Conference",
+        "configurationSalon": "Configuration Salon",
+        "priceStandSalon": "Price Stand Salon"
       },
       "account": {
         "main": "Compte",

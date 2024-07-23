@@ -1,0 +1,43 @@
+{
+  "annotations": {
+    "changelogDate": "20240723192805"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "priceMeal1",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "priceMeal2",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "priceMeal3",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "priceConference",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "priceSharingStand",
+      "fieldType": "Long"
+    }
+  ],
+  "name": "ConfigurationSalon",
+  "relationships": [
+    {
+      "otherEntityName": "salon",
+      "otherEntityRelationshipName": "configuration",
+      "relationshipName": "salon",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

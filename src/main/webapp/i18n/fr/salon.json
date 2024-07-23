@@ -1,0 +1,30 @@
+{
+  "salonApp": {
+    "salon": {
+      "home": {
+        "title": "Salons",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Salon",
+        "createOrEditLabel": "Créer ou éditer un Salon",
+        "notFound": "Aucun Salon trouvé"
+      },
+      "created": "Un nouveau Salon a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Salon avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Salon avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Salon {{ id }} ?"
+      },
+      "detail": {
+        "title": "Salon"
+      },
+      "id": "Id",
+      "place": "Place",
+      "startingDate": "Starting Date",
+      "endingDate": "Ending Date",
+      "stand": "Stand",
+      "conference": "Conference",
+      "priceStandSalon": "Price Stand Salon",
+      "configuration": "Configuration"
+    }
+  }
+}

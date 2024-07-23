@@ -1,0 +1,26 @@
+{
+  "salonApp": {
+    "conference": {
+      "home": {
+        "title": "Conferences",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Conference",
+        "createOrEditLabel": "Create or edit a Conference",
+        "notFound": "No Conferences found"
+      },
+      "created": "A new Conference is created with identifier {{ param }}",
+      "updated": "A Conference is updated with identifier {{ param }}",
+      "deleted": "A Conference is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Conference {{ id }}?"
+      },
+      "detail": {
+        "title": "Conference"
+      },
+      "id": "Id",
+      "title": "Title",
+      "salon": "Salon",
+      "exponent": "Exponent"
+    }
+  }
+}

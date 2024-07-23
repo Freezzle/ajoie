@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "changelogDate": "20240721083406"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "place",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "startingDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "endingDate",
+      "fieldType": "Instant"
+    }
+  ],
+  "name": "Salon",
+  "relationships": [
+    {
+      "otherEntityName": "stand",
+      "otherEntityRelationshipName": "salon",
+      "relationshipName": "stand",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "conference",
+      "otherEntityRelationshipName": "salon",
+      "relationshipName": "conference",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "priceStandSalon",
+      "otherEntityRelationshipName": "salon",
+      "relationshipName": "priceStandSalon",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "configurationSalon",
+      "otherEntityRelationshipName": "salon",
+      "relationshipName": "configuration",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

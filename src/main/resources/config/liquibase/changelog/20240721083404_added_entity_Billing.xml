@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Billing.
+    -->
+    <changeSet id="20240721083404-1" author="jhipster">
+        <createTable tableName="billing">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="accepted_contract" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="need_arrangment" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_closed" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="stand_id" type="${uuidType}">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_billing__stand_id" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

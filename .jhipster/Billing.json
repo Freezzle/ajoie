@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "changelogDate": "20240721083404"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "acceptedContract",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "needArrangment",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "isClosed",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Billing",
+  "relationships": [
+    {
+      "otherEntityName": "stand",
+      "otherEntityRelationshipName": "billing",
+      "relationshipName": "stand",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "invoice",
+      "otherEntityRelationshipName": "billing",
+      "relationshipName": "invoice",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no"
+}

@@ -1,0 +1,26 @@
+{
+  "salonApp": {
+    "dimensionStand": {
+      "home": {
+        "title": "DimensionStands",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Dimension Stand",
+        "createOrEditLabel": "Créer ou éditer un Dimension Stand",
+        "notFound": "Aucun Dimension Stand trouvé"
+      },
+      "created": "Un nouveau Dimension Stand a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Dimension Stand avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Dimension Stand avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Dimension Stand {{ id }} ?"
+      },
+      "detail": {
+        "title": "Dimension Stand"
+      },
+      "id": "Id",
+      "dimension": "Dimension",
+      "priceStandSalon": "Price Stand Salon",
+      "stand": "Stand"
+    }
+  }
+}

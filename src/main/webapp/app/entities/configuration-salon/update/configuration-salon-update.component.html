@@ -1,0 +1,114 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-configuration-salon-heading"
+        data-cy="ConfigurationSalonCreateUpdateHeading"
+        jhiTranslate="salonApp.configurationSalon.home.createOrEditLabel"
+      >
+        Créer ou éditer un Configuration Salon
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="salonApp.configurationSalon.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceMeal1" jhiTranslate="salonApp.configurationSalon.priceMeal1">Price Meal 1</label>
+          <input
+            type="number"
+            class="form-control"
+            name="priceMeal1"
+            id="field_priceMeal1"
+            data-cy="priceMeal1"
+            formControlName="priceMeal1"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceMeal2" jhiTranslate="salonApp.configurationSalon.priceMeal2">Price Meal 2</label>
+          <input
+            type="number"
+            class="form-control"
+            name="priceMeal2"
+            id="field_priceMeal2"
+            data-cy="priceMeal2"
+            formControlName="priceMeal2"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceMeal3" jhiTranslate="salonApp.configurationSalon.priceMeal3">Price Meal 3</label>
+          <input
+            type="number"
+            class="form-control"
+            name="priceMeal3"
+            id="field_priceMeal3"
+            data-cy="priceMeal3"
+            formControlName="priceMeal3"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceConference" jhiTranslate="salonApp.configurationSalon.priceConference"
+            >Price Conference</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            name="priceConference"
+            id="field_priceConference"
+            data-cy="priceConference"
+            formControlName="priceConference"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceSharingStand" jhiTranslate="salonApp.configurationSalon.priceSharingStand"
+            >Price Sharing Stand</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            name="priceSharingStand"
+            id="field_priceSharingStand"
+            data-cy="priceSharingStand"
+            formControlName="priceSharingStand"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_salon" jhiTranslate="salonApp.configurationSalon.salon">Salon</label>
+          <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
+            <option [ngValue]="null"></option>
+            @for (salonOption of salonsCollection; track $index) {
+              <option [ngValue]="salonOption">{{ salonOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

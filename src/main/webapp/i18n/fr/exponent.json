@@ -1,0 +1,35 @@
+{
+  "salonApp": {
+    "exponent": {
+      "home": {
+        "title": "Exponents",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Exponent",
+        "createOrEditLabel": "Créer ou éditer un Exponent",
+        "notFound": "Aucun Exponent trouvé"
+      },
+      "created": "Un nouveau Exponent a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Exponent avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Exponent avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Exponent {{ id }} ?"
+      },
+      "detail": {
+        "title": "Exponent"
+      },
+      "id": "Id",
+      "email": "Email",
+      "fullName": "Full Name",
+      "phoneNumber": "Phone Number",
+      "website": "Website",
+      "socialMedia": "Social Media",
+      "address": "Address",
+      "npaLocalite": "Npa Localite",
+      "urlPicture": "Url Picture",
+      "comment": "Comment",
+      "blocked": "Blocked",
+      "stand": "Stand",
+      "conference": "Conference"
+    }
+  }
+}

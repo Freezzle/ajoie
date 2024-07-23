@@ -41,6 +41,23 @@ public class CacheConfiguration {
             createCache(cm, ch.salon.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, ch.salon.repository.UserRepository.USERS_BY_EMAIL_CACHE);
             createCache(cm, ch.salon.domain.Authority.class.getName());
+            createCache(cm, ch.salon.domain.Exponent.class.getName());
+            createCache(cm, ch.salon.domain.Exponent.class.getName() + ".stands");
+            createCache(cm, ch.salon.domain.Exponent.class.getName() + ".conferences");
+            createCache(cm, ch.salon.domain.DimensionStand.class.getName());
+            createCache(cm, ch.salon.domain.DimensionStand.class.getName() + ".priceStandSalons");
+            createCache(cm, ch.salon.domain.DimensionStand.class.getName() + ".stands");
+            createCache(cm, ch.salon.domain.Stand.class.getName());
+            createCache(cm, ch.salon.domain.Billing.class.getName());
+            createCache(cm, ch.salon.domain.Billing.class.getName() + ".invoices");
+            createCache(cm, ch.salon.domain.Invoice.class.getName());
+            createCache(cm, ch.salon.domain.Salon.class.getName());
+            createCache(cm, ch.salon.domain.Salon.class.getName() + ".stands");
+            createCache(cm, ch.salon.domain.Salon.class.getName() + ".conferences");
+            createCache(cm, ch.salon.domain.Salon.class.getName() + ".priceStandSalons");
+            createCache(cm, ch.salon.domain.Conference.class.getName());
+            createCache(cm, ch.salon.domain.ConfigurationSalon.class.getName());
+            createCache(cm, ch.salon.domain.PriceStandSalon.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
