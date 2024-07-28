@@ -1,5 +1,5 @@
 
-entity Exponent {
+entity Exhibitor {
 	id UUID
 	email String
     fullName String
@@ -34,13 +34,11 @@ entity Stand {
     nbChair Long
     needElectricity Boolean
     acceptedChart Boolean
-}
-
-entity Billing {
-	id UUID
     acceptedContract Boolean
     needArrangment Boolean
-    isClosed Boolean
+    isBillingClosed Boolean
+    status String
+    registrationDate Instant
 }
 
 entity Invoice {
@@ -74,15 +72,14 @@ entity PriceStandSalon {
 
 relationship OneToOne {
     ConfigurationSalon{salon} to Salon{configuration}
-	Billing{stand} to Stand{billing}
 }
 
 relationship OneToMany {
-	Exponent to Stand{exponent}
+	Exhibitor to Stand{exhibitor}
 	Salon to Stand{salon}
 	Salon to Conference{salon}
-	Billing to Invoice{billing}
-    Exponent to Conference{exponent}
+	Stand to Invoice{stand}
+    Exhibitor to Conference{exhibitor}
     DimensionStand to PriceStandSalon{dimension}
     Salon to PriceStandSalon{salon}
 	DimensionStand to Stand{dimension}

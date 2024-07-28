@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Added the entity Payment.
+    -->
+    <changeSet id="20240731190749-1" author="jhipster">
+        <createTable tableName="payment">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="amount" type="double">
+                <constraints nullable="false" />
+            </column>
+            <column name="billing_date" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="payment_mode" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="extra_information" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="invoicing_plan_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="payment" columnName="billing_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

@@ -2,7 +2,18 @@ package ch.salon.domain;
 
 import ch.salon.config.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -15,9 +26,6 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 
-/**
- * A user.
- */
 @Entity
 @Table(name = "jhi_user")
 public class User extends AbstractAuditingEntity<Long> implements Serializable {
@@ -223,18 +231,35 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "User{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", activated='" + activated + '\'' +
-            ", langKey='" + langKey + '\'' +
-            ", activationKey='" + activationKey + '\'' +
-            "}";
+        return (
+            "User{" +
+            "login='" +
+            login +
+            '\'' +
+            ", firstName='" +
+            firstName +
+            '\'' +
+            ", lastName='" +
+            lastName +
+            '\'' +
+            ", email='" +
+            email +
+            '\'' +
+            ", imageUrl='" +
+            imageUrl +
+            '\'' +
+            ", activated='" +
+            activated +
+            '\'' +
+            ", langKey='" +
+            langKey +
+            '\'' +
+            ", activationKey='" +
+            activationKey +
+            '\'' +
+            "}"
+        );
     }
 }

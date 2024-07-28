@@ -20,10 +20,6 @@ a:hover {
   cursor: pointer;
 }
 
-.dropdown-item:hover {
-  color: $dropdown-link-hover-color;
-}
-
 /* ==========================================================================
 Browser Upgrade Prompt
 ========================================================================== */
@@ -40,6 +36,12 @@ Generic styles
 
 /* other generic styles */
 
+.jh-global {
+  margin-left: 20%;
+  margin-right: 20%;
+  background-color: #d9def4;
+}
+
 .jh-card {
   padding: 1.5%;
   margin-top: 20px;
@@ -55,21 +57,9 @@ Generic styles
   padding: 10px;
 }
 
-.w-40 {
-  width: 40% !important;
-}
-
-.w-60 {
-  width: 60% !important;
-}
-
 .break {
   white-space: normal;
   word-break: break-all;
-}
-
-.form-control {
-  background-color: #fff;
 }
 
 .readonly {
@@ -92,6 +82,7 @@ Custom alerts for notification
 .alerts {
   .alert {
     text-overflow: ellipsis;
+
     pre {
       background: none;
       border: none;
@@ -100,22 +91,28 @@ Custom alerts for notification
       padding: 0;
       margin: 0;
     }
+
     .popover pre {
       font-size: 10px;
     }
   }
+
   .jhi-toast {
     position: fixed;
     width: 100%;
+
     &.left {
       left: 5px;
     }
+
     &.right {
       right: 5px;
     }
+
     &.top {
       top: 55px;
     }
+
     &.bottom {
       bottom: 55px;
     }
@@ -137,7 +134,7 @@ entity list page css
 }
 
 /* ==========================================================================
-entity detail page css
+entity stats page css
 ========================================================================== */
 .row-md.jh-entity-details {
   display: grid;
@@ -157,6 +154,7 @@ entity detail page css
       white-space: nowrap;
       padding: 0.5em 0;
     }
+
     dd {
       border-bottom: 1px solid #eee;
       padding: 0.5em 0;
@@ -173,6 +171,14 @@ ui bootstrap tweaks
 .carousel,
 .panel-title a {
   cursor: pointer;
+}
+
+a {
+  color: $primary;
+}
+
+a:hover {
+  color: $secondary;
 }
 
 .thread-dump-modal-lock {
@@ -199,12 +205,170 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   transform: rotate(-45deg);
 }
 
-/* navbar.component.scss */
-.navbar {
-  ul.navbar-nav {
-    .nav-item {
-      margin-left: 0.5em;
-    }
-  }
+/******************** SALON STYLES *************************/
+
+/* ALERT */
+
+.alert-warning {
+  color: black;
+  background-color: #f8e6d8;
 }
-/* jhipster-needle-scss-add-main JHipster will add new css style */
+
+/* ICONS */
+
+.blue-icon {
+  color: $primary;
+}
+
+.grey-icon {
+  color: $secondary;
+}
+
+.green-icon {
+  color: $success;
+}
+
+.orange-icon {
+  color: $warning;
+}
+
+.red-icon {
+  color: $danger;
+}
+
+/* ACCORDION */
+
+.accordion-button:not(.collapsed) {
+  background-color: $primary;
+  color: white;
+}
+
+.accordion-button.collapsed {
+  background-color: $secondary;
+  color: white;
+}
+
+/* TABLE */
+.table .thead-primary th {
+  background-color: $primary;
+  color: white;
+}
+
+.table {
+  border: 1px solid rgba($primary, 0.4);
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.table td.go-detail {
+  cursor: pointer;
+}
+
+/* CARD */
+
+.card-header {
+  background-color: $primary;
+  color: white;
+}
+
+.card-body {
+  border: 1px solid $primary;
+}
+
+/* FORM CONTROL */
+
+.form-control {
+  background-color: #ffeccb;
+  border: 1px dashed $primary;
+}
+
+.form-control:disabled {
+  background-color: #fff;
+  border: 1px dashed $secondary;
+}
+
+/* SWITCH CHECKBOX */
+
+.switch {
+  position: relative;
+  width: 50px; /* Taille initiale (sera ajustée selon l'écran) */
+  height: 30px; /* Hauteur de la barre cylindrique */
+  display: inline-block;
+}
+
+.switch-checkbox {
+  display: none;
+}
+
+/* Barre cylindrique */
+
+.switch-label {
+  position: relative;
+  display: block;
+  background-color: $secondary;
+  border-radius: 60px; /* Donne l'effet cylindrique */
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* L'élément qui se déplace dans la barre */
+.switch-btn {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  width: 20px; /* Taille du petit rond */
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+/* Quand le switch est activé */
+.switch-checkbox:checked + .switch-label {
+  background-color: $primary;
+}
+
+/* Déplacement du bouton lorsque activé */
+.switch-checkbox:checked + .switch-label .switch-btn {
+  transform: translate(105%, -50%); /* Déplacement du bouton à droite */
+}
+
+/* LOG EVENT */
+
+.log-container {
+  overflow-y: auto;
+}
+
+.log-row {
+  height: 1.4rem;
+}
+
+/* TABLE SECTION FOR INVOICES */
+
+.table-section {
+}
+
+.table-section-ending {
+  background-color: #555555 !important;
+  color: white !important;
+}
+
+/* ASTERIX REQUIRED */
+
+/* Ajouter un astérisque rouge au label */
+label::after {
+  content: "*";
+  color: $danger;
+  margin-left: 5px;
+  display: none; /* L'astérisque est caché par défaut */
+}
+
+/* Afficher l'astérisque si le field-error contient une erreur */
+div:has(field-error) > label::after {
+  display: inline; /* Afficher l'astérisque rouge */
+}

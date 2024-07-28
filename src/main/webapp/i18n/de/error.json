@@ -1,14 +1,14 @@
 {
   "error": {
-    "title": "Fehlerseite!",
+    "concurrencyFailure": "Un autre utilisateur a modifié ces données en même temps que vous. Vos changements n'ont pas été sauvegardés.",
     "http": {
-      "400": "Ungültige Anfrage.",
-      "403": "Sie haben nicht die nötigen Berechtigungen um diese Seite anzuzeigen.",
-      "404": "Die Seite existiert nicht.",
-      "405": "Die verwendete Anfrage-Methode ist für diese URL nicht erlaubt.",
-      "500": "Interner Serverfehler."
+      "400": "Mauvaise requête.",
+      "403": "Vous n'avez pas les droits pour accéder à cette page.",
+      "404": "La page n'existe pas.",
+      "405": "Le verbe HTTP que vous avez utilisé n'est pas reconnu par cet URL.",
+      "500": "Erreur interne du serveur."
     },
-    "concurrencyFailure": "Ein anderer Benutzer hat diese Daten zeitgleich mit Ihnen geändert. Ihre Änderungen wurden abgelehnt.",
-    "validation": "Validierungsfehler auf dem Server."
+    "title": "Page d'erreur !",
+    "validation": "Erreur de validation côté serveur."
   }
 }

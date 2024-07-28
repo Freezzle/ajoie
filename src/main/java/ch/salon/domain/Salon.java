@@ -1,16 +1,26 @@
 package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-/**
- * A Salon.
- */
 @Entity
 @Table(name = "salon")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -23,35 +33,50 @@ public class Salon implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "place")
+    @Column
+    private Long referenceNumber;
+
+    @NotNull
+    @Column(name = "place", nullable = false)
     private String place;
 
-    @Column(name = "starting_date")
+    @NotNull
+    @Column(name = "starting_date", nullable = false)
     private Instant startingDate;
 
-    @Column(name = "ending_date")
+    @NotNull
+    @Column(name = "ending_date", nullable = false)
     private Instant endingDate;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "salon")
-    @JsonIgnoreProperties(value = { "billing", "exponent", "salon", "dimension" }, allowSetters = true)
-    private Set<Stand> stands = new HashSet<>();
+    @Column(name = "price_meal_1")
+    private Double priceMeal1;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "salon")
-    @JsonIgnoreProperties(value = { "salon", "exponent" }, allowSetters = true)
-    private Set<Conference> conferences = new HashSet<>();
+    @Column(name = "price_meal_2")
+    private Double priceMeal2;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "salon")
-    @JsonIgnoreProperties(value = { "dimension", "salon" }, allowSetters = true)
+    @Column(name = "price_meal_3")
+    private Double priceMeal3;
+
+    @Column(name = "price_conference")
+    private Double priceConference;
+
+    @Column(name = "price_sharing_stand")
+    private Double priceSharingStand;
+
+    @Column(name = "extra_information")
+    private String extraInformation;
+
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL, targetEntity = PriceStandSalon.class)
+    @JoinColumn(name = "salon_id", referencedColumnName = "id")
+    @JsonIgnoreProperties(value = { "dimension" }, allowSetters = true)
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
-
-    @JsonIgnoreProperties(value = { "salon" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "salon")
-    private ConfigurationSalon configuration;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
         return this.id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public Salon id(UUID id) {
@@ -59,12 +84,55 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public static boolean hasDifference(Salon salon1, Salon salon2) {
+        return (
+            (salon1 == null && salon2 != null) ||
+            (salon1 != null && salon2 == null) ||
+            (salon1 != null &&
+                salon2 != null &&
+                (!Objects.equals(salon1.getPriceConference(), salon2.getPriceConference()) ||
+                    !Objects.equals(salon1.getPriceSharingStand(), salon2.getPriceSharingStand()) ||
+                    !Objects.equals(salon1.getPriceMeal1(), salon2.getPriceMeal1()) ||
+                    !Objects.equals(salon1.getPriceMeal2(), salon2.getPriceMeal2()) ||
+                    !Objects.equals(salon1.getPriceMeal3(), salon2.getPriceMeal3()) ||
+                    hasPriceStandChanged(salon1.getPriceStandSalons(), salon2.getPriceStandSalons())))
+        );
+    }
+
+    public static boolean hasPriceStandChanged(Set<PriceStandSalon> oldPrices, Set<PriceStandSalon> newPrices) {
+        Map<UUID, PriceStandSalon> oldPriceMap = oldPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+
+        Map<UUID, PriceStandSalon> newPriceMap = newPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+
+        // Vérification des éléments manquants et des changements de prix
+        for (UUID id : oldPriceMap.keySet()) {
+            PriceStandSalon oldPrice = oldPriceMap.get(id);
+            PriceStandSalon newPrice = newPriceMap.get(id);
+
+            if (newPrice == null) {
+                return true;
+            } else if (oldPrice.getPrice().doubleValue() != newPrice.getPrice().doubleValue()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Long getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(Long referenceNumber) {
+        this.referenceNumber = referenceNumber;
     }
 
     public String getPlace() {
         return this.place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
     }
 
     public Salon place(String place) {
@@ -72,12 +140,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setPlace(String place) {
-        this.place = place;
-    }
-
     public Instant getStartingDate() {
         return this.startingDate;
+    }
+
+    public void setStartingDate(Instant startingDate) {
+        this.startingDate = startingDate;
     }
 
     public Salon startingDate(Instant startingDate) {
@@ -85,12 +153,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setStartingDate(Instant startingDate) {
-        this.startingDate = startingDate;
-    }
-
     public Instant getEndingDate() {
         return this.endingDate;
+    }
+
+    public void setEndingDate(Instant endingDate) {
+        this.endingDate = endingDate;
     }
 
     public Salon endingDate(Instant endingDate) {
@@ -98,69 +166,81 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setEndingDate(Instant endingDate) {
-        this.endingDate = endingDate;
+    public Double getPriceMeal1() {
+        return this.priceMeal1;
     }
 
-    public Set<Stand> getStands() {
-        return this.stands;
+    public void setPriceMeal1(Double priceMeal1) {
+        this.priceMeal1 = priceMeal1;
     }
 
-    public void setStands(Set<Stand> stands) {
-        if (this.stands != null) {
-            this.stands.forEach(i -> i.setSalon(null));
-        }
-        if (stands != null) {
-            stands.forEach(i -> i.setSalon(this));
-        }
-        this.stands = stands;
-    }
-
-    public Salon stands(Set<Stand> stands) {
-        this.setStands(stands);
+    public Salon priceMeal1(Double priceMeal1) {
+        this.setPriceMeal1(priceMeal1);
         return this;
     }
 
-    public Salon addStand(Stand stand) {
-        this.stands.add(stand);
-        stand.setSalon(this);
+    public Double getPriceMeal2() {
+        return this.priceMeal2;
+    }
+
+    public void setPriceMeal2(Double priceMeal2) {
+        this.priceMeal2 = priceMeal2;
+    }
+
+    public Salon priceMeal2(Double priceMeal2) {
+        this.setPriceMeal2(priceMeal2);
         return this;
     }
 
-    public Salon removeStand(Stand stand) {
-        this.stands.remove(stand);
-        stand.setSalon(null);
+    public Double getPriceMeal3() {
+        return this.priceMeal3;
+    }
+
+    public void setPriceMeal3(Double priceMeal3) {
+        this.priceMeal3 = priceMeal3;
+    }
+
+    public Salon priceMeal3(Double priceMeal3) {
+        this.setPriceMeal3(priceMeal3);
         return this;
     }
 
-    public Set<Conference> getConferences() {
-        return this.conferences;
+    public Double getPriceConference() {
+        return this.priceConference;
     }
 
-    public void setConferences(Set<Conference> conferences) {
-        if (this.conferences != null) {
-            this.conferences.forEach(i -> i.setSalon(null));
-        }
-        if (conferences != null) {
-            conferences.forEach(i -> i.setSalon(this));
-        }
-        this.conferences = conferences;
+    public void setPriceConference(Double priceConference) {
+        this.priceConference = priceConference;
     }
 
-    public Salon conferences(Set<Conference> conferences) {
-        this.setConferences(conferences);
+    public Salon priceConference(Double priceConference) {
+        this.setPriceConference(priceConference);
         return this;
     }
 
-    public Salon addConference(Conference conference) {
-        this.conferences.add(conference);
-        conference.setSalon(this);
+    public Double getPriceSharingStand() {
+        return this.priceSharingStand;
+    }
+
+    public void setPriceSharingStand(Double priceSharingStand) {
+        this.priceSharingStand = priceSharingStand;
+    }
+
+    public Salon priceSharingStand(Double priceSharingStand) {
+        this.setPriceSharingStand(priceSharingStand);
         return this;
     }
 
-    public Salon removeConference(Conference conference) {
-        this.conferences.remove(conference);
-        conference.setSalon(null);
+    public String getExtraInformation() {
+        return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
+    }
+
+    public Salon extraInformation(String extraInformation) {
+        this.setExtraInformation(extraInformation);
         return this;
     }
 
@@ -169,12 +249,6 @@ public class Salon implements Serializable {
     }
 
     public void setPriceStandSalons(Set<PriceStandSalon> priceStandSalons) {
-        if (this.priceStandSalons != null) {
-            this.priceStandSalons.forEach(i -> i.setSalon(null));
-        }
-        if (priceStandSalons != null) {
-            priceStandSalons.forEach(i -> i.setSalon(this));
-        }
         this.priceStandSalons = priceStandSalons;
     }
 
@@ -185,32 +259,11 @@ public class Salon implements Serializable {
 
     public Salon addPriceStandSalon(PriceStandSalon priceStandSalon) {
         this.priceStandSalons.add(priceStandSalon);
-        priceStandSalon.setSalon(this);
         return this;
     }
 
     public Salon removePriceStandSalon(PriceStandSalon priceStandSalon) {
         this.priceStandSalons.remove(priceStandSalon);
-        priceStandSalon.setSalon(null);
-        return this;
-    }
-
-    public ConfigurationSalon getConfiguration() {
-        return this.configuration;
-    }
-
-    public void setConfiguration(ConfigurationSalon configurationSalon) {
-        if (this.configuration != null) {
-            this.configuration.setSalon(null);
-        }
-        if (configurationSalon != null) {
-            configurationSalon.setSalon(this);
-        }
-        this.configuration = configurationSalon;
-    }
-
-    public Salon configuration(ConfigurationSalon configurationSalon) {
-        this.setConfiguration(configurationSalon);
         return this;
     }
 
@@ -233,14 +286,38 @@ public class Salon implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Salon{" +
-            "id=" + getId() +
-            ", place='" + getPlace() + "'" +
-            ", startingDate='" + getStartingDate() + "'" +
-            ", endingDate='" + getEndingDate() + "'" +
-            "}";
+        return (
+            "Salon{" +
+            "id=" +
+            getId() +
+            ", referenceNumber='" +
+            getReferenceNumber() +
+            "'" +
+            ", place='" +
+            getPlace() +
+            "'" +
+            ", startingDate='" +
+            getStartingDate() +
+            "'" +
+            ", endingDate='" +
+            getEndingDate() +
+            "'" +
+            ", priceMeal1=" +
+            getPriceMeal1() +
+            ", priceMeal2=" +
+            getPriceMeal2() +
+            ", priceMeal3=" +
+            getPriceMeal3() +
+            ", priceConference=" +
+            getPriceConference() +
+            ", priceSharingStand=" +
+            getPriceSharingStand() +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }

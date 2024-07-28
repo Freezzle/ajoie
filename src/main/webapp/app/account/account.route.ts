@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 
 import activateRoute from './activate/activate.route';
 import passwordRoute from './password/password.route';
@@ -9,13 +9,13 @@ import sessionsRoute from './sessions/sessions.route';
 import settingsRoute from './settings/settings.route';
 
 const accountRoutes: Routes = [
-  activateRoute,
-  passwordRoute,
-  passwordResetFinishRoute,
-  passwordResetInitRoute,
-  registerRoute,
-  sessionsRoute,
-  settingsRoute,
+    activateRoute,
+    passwordRoute,
+    passwordResetFinishRoute,
+    passwordResetInitRoute,
+    registerRoute,
+    sessionsRoute,
+    settingsRoute,
 ];
 
 export default accountRoutes;

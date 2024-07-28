@@ -4,16 +4,17 @@ import ch.salon.domain.Authority;
 import ch.salon.domain.User;
 import ch.salon.service.dto.AdminUserDTO;
 import ch.salon.service.dto.UserDTO;
-import java.util.*;
-import java.util.stream.Collectors;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * Mapper for the entity {@link User} and its DTO called {@link UserDTO}.
- *
+ * <p>
  * Normal mappers are generated using MapStruct, this one is hand-coded as MapStruct
  * support is still in beta, and requires a manual step with an IDE.
  */
@@ -67,14 +68,11 @@ public class UserMapper {
         Set<Authority> authorities = new HashSet<>();
 
         if (authoritiesAsString != null) {
-            authorities = authoritiesAsString
-                .stream()
-                .map(string -> {
-                    Authority auth = new Authority();
-                    auth.setName(string);
-                    return auth;
-                })
-                .collect(Collectors.toSet());
+            authorities = authoritiesAsString.stream().map(string -> {
+                Authority auth = new Authority();
+                auth.setName(string);
+                return auth;
+            }).collect(Collectors.toSet());
         }
 
         return authorities;

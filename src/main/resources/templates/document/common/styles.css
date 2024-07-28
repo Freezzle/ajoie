@@ -1,0 +1,202 @@
+/* GLOBAL */
+body {
+  font-family: sans-serif;
+  font-size: 12px;
+}
+
+@page {
+  @bottom-left {
+    content: element(footer);
+    vertical-align: top;
+    padding-top: 10px;
+  }
+
+  @top-right {
+    content: element(header);
+    vertical-align: bottom;
+    padding-bottom: 10px;
+  }
+
+  margin-top: 3.5cm;
+  margin-left: 2cm;
+  margin-right: 2cm;
+  margin-bottom: 2.5cm;
+
+  size: A4 portrait;
+}
+
+h1 {
+  font-size: 21px;
+}
+
+p {
+  font-size: 12px;
+}
+
+.padding-all-5 {
+  padding: 5px;
+}
+
+.padding-top-5 {
+  padding-top: 5px;
+}
+
+.padding-left-5 {
+  padding-left: 5px;
+}
+
+.padding-right-5 {
+  padding-right: 5px;
+}
+
+.padding-bottom-5 {
+  padding-bottom: 5px;
+}
+
+.top-left {
+  text-align: left;
+  vertical-align: top;
+}
+
+.top-center {
+  text-align: center;
+  vertical-align: top;
+}
+
+.top-right {
+  text-align: right;
+  vertical-align: top;
+}
+
+.center-left {
+  text-align: left;
+  vertical-align: middle;
+}
+
+.center-center {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.center-right {
+  text-align: right;
+  vertical-align: middle;
+}
+
+.bottom-left {
+  text-align: left;
+  vertical-align: bottom;
+}
+
+.bottom-center {
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.bottom-right {
+  text-align: right;
+  vertical-align: bottom;
+}
+
+table {
+  /** border: 0.5px solid #888888; **/
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.width-10 {
+  width: 10%;
+}
+
+.width-15 {
+  width: 15%;
+}
+
+.width-20 {
+  width: 20%;
+}
+
+.width-30 {
+  width: 30%;
+}
+
+.width-40 {
+  width: 40%;
+}
+
+.width-60 {
+  width: 60%;
+}
+
+.width-70 {
+  width: 70%;
+}
+
+.bg {
+  background-color: #cae164;
+}
+
+.border-thin {
+  border: 1px solid #cae164;
+}
+
+.border-grey-thick {
+  border: 2px solid #cccccc;
+}
+
+.page-break {
+  page-break-after: always;
+}
+
+.next-page {
+  page-break-before: always;
+}
+
+@font-face {
+  font-family: 'Bar-Code 39';
+  src: url(Code39.ttf) format('truetype');
+}
+
+/* HEADER */
+
+div.header {
+  /** border: 0.5px solid indianred; **/
+  position: running(header);
+  margin-top: 1cm;
+  height: 3cm;
+}
+
+.header-td-logo {
+  width: 70px;
+}
+
+.header-logo {
+  width: 60px;
+}
+
+/* BODY */
+
+div.body {
+  display: block;
+}
+
+/* FOOTER */
+
+div.footer {
+  margin-top: 0.5cm;
+  position: running(footer);
+  height: 2cm;
+  text-align: center;
+}
+
+#footer-pagenumber:before {
+  content: counter(page);
+}
+
+#footer-pagecount:before {
+  content: counter(pages);
+}
+
+.footer-page-count {
+  text-align: right;
+}

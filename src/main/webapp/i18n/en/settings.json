@@ -1,32 +1,32 @@
 {
   "settings": {
-    "title": "User settings for [<strong>{{username}}</strong>]",
     "form": {
-      "firstname": "First Name",
-      "firstname.placeholder": "Your first name",
-      "lastname": "Last Name",
-      "lastname.placeholder": "Your last name",
-      "language": "Language",
-      "button": "Save"
+      "button": "Sauvegarder",
+      "firstname": "Prénom",
+      "firstname.placeholder": "Votre prénom",
+      "language": "Langue",
+      "lastname": "Nom",
+      "lastname.placeholder": "Votre nom"
     },
     "messages": {
       "error": {
-        "fail": "<strong>An error has occurred!</strong> Settings could not be saved.",
-        "emailexists": "<strong>Email is already in use!</strong> Please choose another one."
+        "emailexists": "<strong>Cet email est déjà utilisé !</strong> Veuillez en choisir un autre.",
+        "fail": "<strong>Une erreur est survenue !</strong> Votre profil n'a pas été sauvegardé."
       },
-      "success": "<strong>Settings saved!</strong>",
+      "success": "<strong>Votre profil a été sauvegardé !</strong>",
       "validate": {
         "firstname": {
-          "required": "Your first name is required.",
-          "minlength": "Your first name is required to be at least 1 character",
-          "maxlength": "Your first name cannot be longer than 50 characters"
+          "maxlength": "Votre prénom ne doit pas comporter plus de 50 caractères.",
+          "minlength": "Votre prénom doit comporter au moins un caractère.",
+          "required": "Votre prénom est requis."
         },
         "lastname": {
-          "required": "Your last name is required.",
-          "minlength": "Your last name is required to be at least 1 character",
-          "maxlength": "Your last name cannot be longer than 50 characters"
+          "maxlength": "Votre nom ne doit pas comporter plus de 50 caractères.",
+          "minlength": "Votre nom doit comporter au moins un caractère.",
+          "required": "Votre nom est requis."
         }
       }
-    }
+    },
+    "title": "Profil de l'utilisateur [<strong>{{username}}</strong>]"
   }
 }

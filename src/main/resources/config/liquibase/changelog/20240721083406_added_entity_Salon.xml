@@ -14,13 +14,34 @@
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="reference_number" type="bigint">
+                <constraints nullable="false" unique="true"/>
+            </column>
             <column name="place" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="false" />
             </column>
             <column name="starting_date" type="${datetimeType}">
-                <constraints nullable="true" />
+                <constraints nullable="false" />
             </column>
             <column name="ending_date" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="price_meal_1" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="price_meal_2" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="price_meal_3" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="price_conference" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="price_sharing_stand" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="extra_information" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->

@@ -1,0 +1,14 @@
+{
+  "payment": {
+    "type": {
+      "list": {
+        "BANK": "Bancaire",
+        "CASH": "Argent comptant",
+        "OTHER": "Autre",
+        "SERVICE": "Service rendu",
+        "null": "Inconnu"
+      },
+      "title": "Type"
+    }
+  }
+}

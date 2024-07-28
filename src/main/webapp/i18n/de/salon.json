@@ -1,30 +1,43 @@
 {
-  "salonApp": {
-    "salon": {
-      "home": {
-        "title": "Salons",
-        "refreshListLabel": "Liste aktualisieren",
-        "createLabel": "Salon erstellen",
-        "createOrEditLabel": "Salon erstellen oder bearbeiten",
-        "notFound": "Keine Salons gefunden"
-      },
-      "created": "Salon erstellt mit ID {{ param }}",
-      "updated": "Salon aktualisiert mit ID {{ param }}",
-      "deleted": "Salon gelöscht mit ID {{ param }}",
-      "delete": {
-        "question": "Soll Salon {{ id }} wirklich dauerhaft gelöscht werden?"
-      },
-      "detail": {
-        "title": "Salon"
-      },
-      "id": "Id",
-      "place": "Place",
-      "startingDate": "Starting Date",
-      "endingDate": "Ending Date",
-      "stand": "Stand",
-      "conference": "Conference",
-      "priceStandSalon": "Price Stand Salon",
-      "configuration": "Configuration"
-    }
+  "salon": {
+    "conferences": "Conférences",
+    "create": "Création d'un nouveau salon",
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer le salon \"{{id}}\" ?"
+    },
+    "edit": "Détail d'un salon",
+    "endingDate": "Date de fin",
+    "extraInformation": "Commentaire",
+    "notFound": "Aucun salon",
+    "participations": "Participations",
+    "place": "Nom du salon",
+    "priceConference": "Conférence",
+    "priceMeal1": "Repas samedi midi",
+    "priceMeal2": "Repas samedi soir",
+    "priceMeal3": "Repas dimanche midi",
+    "priceSharingStand": "Co-exposant du stand",
+    "prices": "Configuration des prix",
+    "referenceNumber": "N° de référence",
+    "stands": "Stands",
+    "startingDate": "Date de début",
+    "statistiques": "Statistiques du salon",
+    "stats": {
+      "billingPaid": "Payé",
+      "billingUnpaid": "Impayé",
+      "billings": "Facturation des participations acceptés",
+      "dimensions": "Dimensions des stands acceptés",
+      "meal1": "Samedi midi",
+      "meal2": "Samedi soir",
+      "meal3": "Dimanche midi",
+      "meals": "Repas des participations acceptés",
+      "standAccepted": "Accepté",
+      "standCanceled": "Annulé",
+      "standInVerification": "En cours",
+      "standRefused": "Refusé",
+      "stands": "Stands",
+      "title": "Statistiques"
+    },
+    "title": "Les salons",
+    "volunteers": "Bénévoles"
   }
 }

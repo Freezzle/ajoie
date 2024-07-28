@@ -15,15 +15,15 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="description" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="website" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="nb_meal_1" type="bigint">
+            <column name="social_media" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="nb_meal_2" type="bigint">
-                <constraints nullable="true" />
-            </column>
-            <column name="nb_meal_3" type="bigint">
+            <column name="url_picture" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <column name="shared" type="boolean">
@@ -38,13 +38,13 @@
             <column name="need_electricity" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="accepted_chart" type="boolean">
+            <column name="status" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="exponent_id" type="${uuidType}">
+            <column name="extra_information" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="salon_id" type="${uuidType}">
+            <column name="participation_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
             <column name="dimension_id" type="${uuidType}">

@@ -1,0 +1,20 @@
+{
+  "authority": {
+    "create": "Création d'une nouvelle authorité",
+    "created": "Une nouvelle authorité a été créé avec l'identifiant {{ param }}",
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer l'authorité {{ id }} ?"
+    },
+    "deleted": "L'authorité avec l'identifiant {{ param }} a été supprimé",
+    "detail": {
+      "title": "Authorité"
+    },
+    "home": {
+      "notFound": "Aucune authorité trouvé",
+      "title": "Authorities"
+    },
+    "name": "Name",
+    "title": "Les authorités",
+    "updated": "Le Authority avec l'identifiant {{ param }} a été mis à jour"
+  }
+}

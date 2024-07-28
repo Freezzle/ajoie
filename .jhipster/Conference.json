@@ -10,20 +10,24 @@
     },
     {
       "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Status",
+      "fieldValues": "REFUSED,CANCELED,IN_VERIFICATION,ACCEPTED"
+    },
+    {
+      "fieldName": "extraInformation",
       "fieldType": "String"
     }
   ],
   "name": "Conference",
   "relationships": [
     {
-      "otherEntityName": "salon",
-      "relationshipName": "salon",
-      "relationshipSide": "right",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityName": "exponent",
-      "relationshipName": "exponent",
+      "otherEntityName": "participation",
+      "relationshipName": "participation",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }

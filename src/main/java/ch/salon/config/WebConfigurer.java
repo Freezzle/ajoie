@@ -1,14 +1,10 @@
 package ch.salon.config;
 
-import static java.net.URLDecoder.decode;
-
-import jakarta.servlet.*;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import jakarta.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.server.*;
+import org.springframework.boot.web.server.WebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +15,12 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import tech.jhipster.config.JHipsterProperties;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+
+import static java.net.URLDecoder.decode;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
@@ -84,7 +86,8 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = jHipsterProperties.getCors();
-        if (!CollectionUtils.isEmpty(config.getAllowedOrigins()) || !CollectionUtils.isEmpty(config.getAllowedOriginPatterns())) {
+        if (!CollectionUtils.isEmpty(config.getAllowedOrigins()) ||
+            !CollectionUtils.isEmpty(config.getAllowedOriginPatterns())) {
             log.debug("Registering CORS filter");
             source.registerCorsConfiguration("/api/**", config);
             source.registerCorsConfiguration("/management/**", config);

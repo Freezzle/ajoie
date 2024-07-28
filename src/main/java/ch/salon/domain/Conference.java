@@ -1,13 +1,21 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
-/**
- * A Conference.
- */
 @Entity
 @Table(name = "conference")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -20,21 +28,27 @@ public class Conference implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "title")
+    @NotNull
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences", "priceStandSalons", "configuration" }, allowSetters = true)
-    private Salon salon;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
+
+    @Column(name = "extra_information")
+    private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences" }, allowSetters = true)
-    private Exponent exponent;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
+    private Participation participation;
 
     public UUID getId() {
         return this.id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public Conference id(UUID id) {
@@ -42,12 +56,12 @@ public class Conference implements Serializable {
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return this.title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Conference title(String title) {
@@ -55,37 +69,52 @@ public class Conference implements Serializable {
         return this;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public Status getStatus() {
+        return this.status;
     }
 
-    public Salon getSalon() {
-        return this.salon;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    public void setSalon(Salon salon) {
-        this.salon = salon;
-    }
-
-    public Conference salon(Salon salon) {
-        this.setSalon(salon);
+    public Conference status(Status status) {
+        this.setStatus(status);
         return this;
     }
 
-    public Exponent getExponent() {
-        return this.exponent;
+    public String getExtraInformation() {
+        return this.extraInformation;
     }
 
-    public void setExponent(Exponent exponent) {
-        this.exponent = exponent;
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
-    public Conference exponent(Exponent exponent) {
-        this.setExponent(exponent);
+    public Conference extraInformation(String extraInformation) {
+        this.setExtraInformation(extraInformation);
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    public Participation getParticipation() {
+        return this.participation;
+    }
+
+    public void setParticipation(Participation participation) {
+        this.participation = participation;
+    }
+
+    public Conference participation(Participation participation) {
+        this.setParticipation(participation);
+        return this;
+    }
+
+    public static boolean hasDifference(Conference conf1, Conference conf2) {
+        return (
+            (conf1 == null && conf2 != null) ||
+            (conf1 != null && conf2 == null) ||
+            (conf1 != null && conf2 != null && (!Objects.equals(conf1.getStatus(), conf2.getStatus())))
+        );
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -104,12 +133,22 @@ public class Conference implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Conference{" +
-            "id=" + getId() +
-            ", title='" + getTitle() + "'" +
-            "}";
+        return (
+            "Conference{" +
+            "id=" +
+            getId() +
+            ", title='" +
+            getTitle() +
+            "'" +
+            ", status='" +
+            getStatus() +
+            "'" +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }

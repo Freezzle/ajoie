@@ -10,20 +10,21 @@
     },
     {
       "fieldName": "price",
-      "fieldType": "Long"
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "PriceStandSalon",
   "relationships": [
     {
-      "otherEntityName": "dimensionStand",
-      "relationshipName": "dimension",
+      "otherEntityName": "salon",
+      "relationshipName": "salon",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
-      "otherEntityName": "salon",
-      "relationshipName": "salon",
+      "otherEntityName": "dimensionStand",
+      "relationshipName": "dimension",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }

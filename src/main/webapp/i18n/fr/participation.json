@@ -1,0 +1,49 @@
+{
+  "participation": {
+    "acceptedChart": "Charte accepté ?",
+    "acceptedContract": "Contrat accepté ?",
+    "billing": {
+      "details": "Détails",
+      "events": "Evénements",
+      "title": "Facturations"
+    },
+    "cannot-show": "No data can be shown during editing a participation",
+    "create": "Création d'une nouvelle participation",
+    "delete": {
+      "question": "Voulez-vous supprimer la participation \"{{fullName}}\""
+    },
+    "edit": "Détail d'une participation",
+    "exhibitor": "Exposant",
+    "extraInformation": "Commentaire",
+    "isBillingClosed": "Cloturée ?",
+    "nbMeal1": "Repas samedi midi",
+    "nbMeal2": "Repas samedi soir",
+    "nbMeal3": "Repas dimanche midi",
+    "needArrangment": "Arrangement ?",
+    "notFound": "Aucune participation",
+    "registrationDate": "Date d'inscription",
+    "status": {
+      "label": "Statut",
+      "list": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "IN_VERIFICATION": "En cours",
+        "REFUSED": "Refusé",
+        "null": " "
+      }
+    },
+    "title": "Les participations",
+    "type": {
+      "list": {
+        "CONFERENCE": "Conférence",
+        "ELECTRICITY": "Electricité",
+        "MEAL1": "Repas",
+        "MEAL2": "Repas",
+        "MEAL3": "Repas",
+        "OTHERS": "Autres",
+        "SHARED": "Partagé",
+        "STAND": "Stand"
+      }
+    }
+  }
+}

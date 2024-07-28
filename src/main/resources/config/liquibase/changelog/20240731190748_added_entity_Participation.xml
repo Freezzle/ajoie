@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Added the entity Participation.
+    -->
+    <changeSet id="20240731190748-1" author="jhipster">
+        <createTable tableName="participation">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="registration_date" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="client_number" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_meal_1" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_meal_2" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="nb_meal_3" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="accepted_chart" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="accepted_contract" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="need_arrangment" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_billing_closed" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="extra_information" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="exhibitor_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="salon_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="participation" columnName="registration_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

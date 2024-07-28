@@ -1,7 +1,8 @@
 package ch.salon.config;
 
-import java.time.Duration;
-import org.ehcache.config.builders.*;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.jsr107.Eh107Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
@@ -9,30 +10,30 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.config.cache.PrefixedKeyGenerator;
+
+import java.time.Duration;
 
 @Configuration
 @EnableCaching
 public class CacheConfiguration {
 
+    private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
     private GitProperties gitProperties;
     private BuildProperties buildProperties;
-    private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
 
     public CacheConfiguration(JHipsterProperties jHipsterProperties) {
         JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
 
         jcacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(
-            CacheConfigurationBuilder.newCacheConfigurationBuilder(
-                Object.class,
-                Object.class,
-                ResourcePoolsBuilder.heap(ehcache.getMaxEntries())
-            )
-                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
-                .build()
-        );
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(Object.class, Object.class,
+                    ResourcePoolsBuilder.heap(
+                        ehcache.getMaxEntries())).withExpiry(
+                    ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
+                .build());
     }
 
     @Bean
@@ -40,24 +41,6 @@ public class CacheConfiguration {
         return cm -> {
             createCache(cm, ch.salon.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, ch.salon.repository.UserRepository.USERS_BY_EMAIL_CACHE);
-            createCache(cm, ch.salon.domain.Authority.class.getName());
-            createCache(cm, ch.salon.domain.Exponent.class.getName());
-            createCache(cm, ch.salon.domain.Exponent.class.getName() + ".stands");
-            createCache(cm, ch.salon.domain.Exponent.class.getName() + ".conferences");
-            createCache(cm, ch.salon.domain.DimensionStand.class.getName());
-            createCache(cm, ch.salon.domain.DimensionStand.class.getName() + ".priceStandSalons");
-            createCache(cm, ch.salon.domain.DimensionStand.class.getName() + ".stands");
-            createCache(cm, ch.salon.domain.Stand.class.getName());
-            createCache(cm, ch.salon.domain.Billing.class.getName());
-            createCache(cm, ch.salon.domain.Billing.class.getName() + ".invoices");
-            createCache(cm, ch.salon.domain.Invoice.class.getName());
-            createCache(cm, ch.salon.domain.Salon.class.getName());
-            createCache(cm, ch.salon.domain.Salon.class.getName() + ".stands");
-            createCache(cm, ch.salon.domain.Salon.class.getName() + ".conferences");
-            createCache(cm, ch.salon.domain.Salon.class.getName() + ".priceStandSalons");
-            createCache(cm, ch.salon.domain.Conference.class.getName());
-            createCache(cm, ch.salon.domain.ConfigurationSalon.class.getName());
-            createCache(cm, ch.salon.domain.PriceStandSalon.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

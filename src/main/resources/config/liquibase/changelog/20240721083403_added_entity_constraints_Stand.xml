@@ -10,18 +10,11 @@
     -->
     <changeSet id="20240721083403-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="exponent_id"
+        <addForeignKeyConstraint baseColumnNames="participation_id"
                                  baseTableName="stand"
-                                 constraintName="fk_stand__exponent_id"
+                                 constraintName="fk_stand__participation_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="exponent"
-                                 />
-
-        <addForeignKeyConstraint baseColumnNames="salon_id"
-                                 baseTableName="stand"
-                                 constraintName="fk_stand__salon_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="salon"
+                                 referencedTableName="participation"
                                  />
 
         <addForeignKeyConstraint baseColumnNames="dimension_id"

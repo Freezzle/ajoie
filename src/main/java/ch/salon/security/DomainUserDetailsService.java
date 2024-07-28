@@ -3,7 +3,8 @@ package ch.salon.security;
 import ch.salon.domain.Authority;
 import ch.salon.domain.User;
 import ch.salon.repository.UserRepository;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +52,14 @@ public class DomainUserDetailsService implements UserDetailsService {
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }
+
         List<SimpleGrantedAuthority> grantedAuthorities = user
             .getAuthorities()
             .stream()
             .map(Authority::getName)
             .map(SimpleGrantedAuthority::new)
             .toList();
+
         return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(), grantedAuthorities);
     }
 }

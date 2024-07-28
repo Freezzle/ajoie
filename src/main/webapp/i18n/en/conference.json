@@ -1,26 +1,24 @@
 {
-  "salonApp": {
-    "conference": {
-      "home": {
-        "title": "Conferences",
-        "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Conference",
-        "createOrEditLabel": "Create or edit a Conference",
-        "notFound": "No Conferences found"
-      },
-      "created": "A new Conference is created with identifier {{ param }}",
-      "updated": "A Conference is updated with identifier {{ param }}",
-      "deleted": "A Conference is deleted with identifier {{ param }}",
-      "delete": {
-        "question": "Are you sure you want to delete Conference {{ id }}?"
-      },
-      "detail": {
-        "title": "Conference"
-      },
-      "id": "Id",
-      "title": "Title",
-      "salon": "Salon",
-      "exponent": "Exponent"
-    }
+  "conference": {
+    "create": "Création d'une nouvelle conférence",
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer la conférence \"{{title}}\" ?"
+    },
+    "description": "Description",
+    "edit": "Détail d'une conférence",
+    "extraInformation": "Commentaire",
+    "notFound": "Aucune conférence",
+    "participation": "Participation",
+    "status": {
+      "label": "Statut",
+      "list": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "IN_VERIFICATION": "En cours",
+        "REFUSED": "Refusé",
+        "null": " "
+      }
+    },
+    "title": "Les conférences"
   }
 }

@@ -15,12 +15,12 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="price" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="salon_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
             <column name="dimension_id" type="${uuidType}">
-                <constraints nullable="true" />
-            </column>
-            <column name="salon_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->

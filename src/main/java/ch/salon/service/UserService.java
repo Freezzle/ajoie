@@ -10,10 +10,17 @@ import ch.salon.security.AuthoritiesConstants;
 import ch.salon.security.SecurityUtils;
 import ch.salon.service.dto.AdminUserDTO;
 import ch.salon.service.dto.UserDTO;
+import ch.salon.service.exception.EmailAlreadyUsedException;
+import ch.salon.service.exception.InvalidPasswordException;
+import ch.salon.service.exception.UsernameAlreadyUsedException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,6 +197,7 @@ public class UserService {
      * Update all information for a specific user, and return the modified user.
      *
      * @param userDTO user to update.
+     *
      * @return updated user.
      */
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
@@ -333,6 +341,7 @@ public class UserService {
 
     /**
      * Gets a list of all the authorities.
+     *
      * @return a list of all the authorities.
      */
     @Transactional(readOnly = true)

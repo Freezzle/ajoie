@@ -1,13 +1,16 @@
 package ch.salon.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * A PriceStandSalon.
- */
 @Entity
 @Table(name = "price_stand_salon")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -20,16 +23,12 @@ public class PriceStandSalon implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "price")
-    private Long price;
+    @NotNull
+    @Column(name = "price", nullable = false)
+    private Double price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "priceStandSalons", "stands" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
     private DimensionStand dimension;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences", "priceStandSalons", "configuration" }, allowSetters = true)
-    private Salon salon;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -37,26 +36,26 @@ public class PriceStandSalon implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public PriceStandSalon id(UUID id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Long getPrice() {
+    public Double getPrice() {
         return this.price;
     }
 
-    public PriceStandSalon price(Long price) {
-        this.setPrice(price);
-        return this;
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
-    public void setPrice(Long price) {
-        this.price = price;
+    public PriceStandSalon price(Double price) {
+        this.setPrice(price);
+        return this;
     }
 
     public DimensionStand getDimension() {
@@ -71,21 +70,6 @@ public class PriceStandSalon implements Serializable {
         this.setDimension(dimensionStand);
         return this;
     }
-
-    public Salon getSalon() {
-        return this.salon;
-    }
-
-    public void setSalon(Salon salon) {
-        this.salon = salon;
-    }
-
-    public PriceStandSalon salon(Salon salon) {
-        this.setSalon(salon);
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
@@ -104,12 +88,8 @@ public class PriceStandSalon implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "PriceStandSalon{" +
-            "id=" + getId() +
-            ", price=" + getPrice() +
-            "}";
+        return "PriceStandSalon{" + "id=" + getId() + ", price=" + getPrice() + "}";
     }
 }

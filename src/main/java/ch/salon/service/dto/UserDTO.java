@@ -1,6 +1,7 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.User;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -66,9 +67,6 @@ public class UserDTO implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "UserDTO{" +
-            "id='" + id + '\'' +
-            ", login='" + login + '\'' +
-            "}";
+        return "UserDTO{" + "id='" + id + '\'' + ", login='" + login + '\'' + "}";
     }
 }
