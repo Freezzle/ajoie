@@ -38,8 +38,6 @@ export class SalonComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  trackId = (_index: number, item: ISalon): string => this.salonService.getSalonIdentifier(item);
-
   ngOnInit(): void {
     combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.paramMap])
       .pipe(

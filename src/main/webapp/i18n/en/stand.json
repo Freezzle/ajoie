@@ -22,7 +22,7 @@
         "title": "Stands"
       },
       "id": "Id",
-      "isBillingClosed": "Paid",
+      "billingClosed": "Paid",
       "nbChair": "Nb Chair",
       "nbMeal1": "Nb Meal 1",
       "nbMeal2": "Nb Meal 2",

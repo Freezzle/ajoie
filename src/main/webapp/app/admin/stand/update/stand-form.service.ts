@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { IStand, NewStand } from '../stand.model';
+import dayjs from 'dayjs/esm';
+import { Dayjs } from 'dayjs';
 
 /**
  * A partial Type with required key is used as form input.
@@ -14,7 +16,23 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type StandFormGroupInput = IStand | PartialWithRequiredKeyOf<NewStand>;
 
-type StandFormDefaults = Pick<NewStand, 'id' | 'shared' | 'needElectricity' | 'acceptedChart' | 'acceptedContract' | 'needArrangment'>;
+type StandFormDefaults = Pick<
+  NewStand,
+  | 'id'
+  | 'shared'
+  | 'needElectricity'
+  | 'acceptedChart'
+  | 'acceptedContract'
+  | 'status'
+  | 'nbMeal1'
+  | 'nbMeal2'
+  | 'nbMeal3'
+  | 'needArrangment'
+  | 'billingClosed'
+  | 'nbTable'
+  | 'nbChair'
+  | 'registrationDate'
+>;
 
 type StandFormGroupContent = {
   id: FormControl<IStand['id'] | NewStand['id']>;
@@ -29,7 +47,9 @@ type StandFormGroupContent = {
   acceptedChart: FormControl<IStand['acceptedChart']>;
   acceptedContract?: FormControl<IStand['acceptedContract']>;
   needArrangment?: FormControl<IStand['needArrangment']>;
-  isBillingClosed?: FormControl<IStand['isBillingClosed']>;
+  status?: FormControl<IStand['status']>;
+  billingClosed?: FormControl<IStand['billingClosed']>;
+  registrationDate?: FormControl<IStand['registrationDate']>;
   exponent: FormControl<IStand['exponent']>;
   salon: FormControl<IStand['salon']>;
   dimension: FormControl<IStand['dimension']>;
@@ -63,7 +83,9 @@ export class StandFormService {
       acceptedChart: new FormControl(standRawValue.acceptedChart),
       acceptedContract: new FormControl(standRawValue.acceptedContract),
       needArrangment: new FormControl(standRawValue.needArrangment),
-      isBillingClosed: new FormControl(standRawValue.isBillingClosed),
+      billingClosed: new FormControl(standRawValue.billingClosed),
+      registrationDate: new FormControl(standRawValue.registrationDate),
+      status: new FormControl(standRawValue.status),
       exponent: new FormControl(standRawValue.exponent),
       salon: new FormControl(standRawValue.salon),
       dimension: new FormControl(standRawValue.dimension),
@@ -88,10 +110,18 @@ export class StandFormService {
     return {
       id: null,
       shared: false,
+      nbMeal1: 0,
+      nbMeal2: 0,
+      nbMeal3: 0,
+      nbTable: 0,
+      nbChair: 0,
       needElectricity: false,
       acceptedChart: false,
       acceptedContract: false,
       needArrangment: false,
+      billingClosed: false,
+      status: 'IN_TREATMENT',
+      registrationDate: dayjs(),
     };
   }
 }

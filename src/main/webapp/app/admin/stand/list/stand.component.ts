@@ -49,8 +49,6 @@ export class StandComponent implements OnInit {
 
   protected state: any;
 
-  trackId = (_index: number, item: IStand): string => this.standService.getStandIdentifier(item);
-
   ngOnInit(): void {
     this.state = history.state;
 

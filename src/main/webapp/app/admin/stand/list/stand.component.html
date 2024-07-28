@@ -6,18 +6,23 @@
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
         </button>
       </span>
 
       <span>
-        <button class="btn btn-info btn-sm" (click)="load()" [disabled]="isLoading">
+        <button class="btn btn-primary btn-sm" (click)="load()" [disabled]="isLoading">
           <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
           <span jhiTranslate="salonApp.stand.home.refreshListLabel">Actualiser</span>
         </button>
 
-        <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-primary btn-sm" [routerLink]="['/admin/stands/new']">
+        <button
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn btn-outline-primary btn-sm"
+          [routerLink]="['/admin/stands/new']"
+        >
           <fa-icon icon="plus"></fa-icon>
           <span jhiTranslate="salonApp.stand.home.createLabel">Créer</span>
         </button>
@@ -59,16 +64,6 @@
             </th>
             <th>
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.acceptedContract">Accepted Contract</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.acceptedChart">Accepted Chart</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
                 <span jhiTranslate="salonApp.stand.dimension">Dimension</span>
               </div>
             </th>
@@ -84,14 +79,14 @@
             </th>
             <th>
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.isBillingClosed">Est payé</span>
+                <span jhiTranslate="salonApp.stand.billingClosed">Est payé</span>
               </div>
             </th>
             <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
-          @for (stand of stands; track trackId) {
+          @for (stand of stands; track $index) {
             <tr data-cy="entityTable">
               <td>
                 @if (stand.exponent) {
@@ -108,15 +103,6 @@
                 ></fa-icon>
               </td>
               <td>
-                <fa-icon
-                  icon="{{ stand.acceptedContract | faIconBoolean }}"
-                  style="{{ stand.acceptedContract | faIconColorBoolean }}"
-                ></fa-icon>
-              </td>
-              <td>
-                <fa-icon icon="{{ stand.acceptedChart | faIconBoolean }}" style="{{ stand.acceptedChart | faIconColorBoolean }}"></fa-icon>
-              </td>
-              <td>
                 @if (stand.dimension) {
                   <div>
                     <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.dimension }}</a>
@@ -126,10 +112,7 @@
               <td>{{ stand.registrationDate | formatMediumDate }}</td>
               <td>{{ stand.status }}</td>
               <td>
-                <fa-icon
-                  icon="{{ stand.isBillingClosed | faIconBoolean }}"
-                  style="{{ stand.isBillingClosed | faIconColorBoolean }}"
-                ></fa-icon>
+                <fa-icon icon="{{ stand.billingClosed | faIconBoolean }}" style="{{ stand.billingClosed | faIconColorBoolean }}"></fa-icon>
               </td>
               <td class="text-end">
                 <div class="btn-group">

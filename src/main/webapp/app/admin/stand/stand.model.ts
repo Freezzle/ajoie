@@ -16,7 +16,7 @@ export interface IStand {
   acceptedChart?: boolean | null;
   acceptedContract?: boolean | null;
   needArrangment?: boolean | null;
-  isBillingClosed?: boolean | null;
+  billingClosed?: boolean | null;
   exponent?: IExponent | null;
   salon?: ISalon | null;
   dimension?: IDimensionStand | null;

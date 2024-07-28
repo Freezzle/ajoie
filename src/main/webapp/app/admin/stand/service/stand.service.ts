@@ -2,10 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
+import dayjs from 'dayjs/esm';
+
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IStand, NewStand } from '../stand.model';
-import dayjs from 'dayjs/esm';
 
 type RestOf<T extends IStand | NewStand> = Omit<T, 'registrationDate'> & {
   registrationDate?: string | null;
@@ -23,14 +24,14 @@ export class StandService {
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/stands');
 
   create(stand: NewStand): Observable<EntityResponseType> {
-    const copy = this.convertDateFromClient(stand);
-    return this.http.post<RestStand>(this.resourceUrl, copy, { observe: 'response' }).pipe(map(res => this.convertResponseFromServer(res)));
+    return this.http
+      .post<RestStand>(this.resourceUrl, stand, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   update(stand: IStand): Observable<EntityResponseType> {
-    const copy = this.convertDateFromClient(stand);
     return this.http
-      .put<RestStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, copy, { observe: 'response' })
+      .put<RestStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand, { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 

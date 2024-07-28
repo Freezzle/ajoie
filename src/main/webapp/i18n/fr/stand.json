@@ -1,8 +1,8 @@
 {
   "salonApp": {
     "stand": {
-      "acceptedChart": "Accepted chart",
-      "acceptedContract": "Accepted contract",
+      "acceptedChart": "Chart accepté ?",
+      "acceptedContract": "Contrat accepté ?",
       "created": "Un nouveau stand a été créé avec l'identifiant {{ param }}",
       "delete": {
         "question": "Êtes-vous certain de vouloir supprimer le stand {{ id }} ?"
@@ -13,7 +13,7 @@
         "title": "Stand"
       },
       "dimension": "Dimension",
-      "exponent": "Exponent",
+      "exponent": "Exposant",
       "home": {
         "createLabel": "Créer un nouveau stand",
         "createOrEditLabel": "Créer ou éditer un stand",
@@ -22,18 +22,18 @@
         "title": "Stands"
       },
       "id": "Id",
-      "isBillingClosed": "Paid",
-      "nbChair": "Nb chair",
-      "nbMeal1": "Nb meal 1",
-      "nbMeal2": "Nb meal 2",
-      "nbMeal3": "Nb meal 3",
+      "billingClosed": "Facturation clôturé ?",
+      "nbChair": "Nb chaise",
       "nbTable": "Nb table",
-      "needArrangment": "Need arrangment",
-      "needElectricity": "Need electricity",
-      "registrationDate": "Registration date",
+      "nbMeal1": "Nb repas samedi midi",
+      "nbMeal2": "Nb repas samedi soir",
+      "nbMeal3": "Nb repas dimanche midi",
+      "needArrangment": "Demande d'arrangement ?",
+      "needElectricity": "Besoin d'electricité ?",
+      "registrationDate": "Date d'inscription",
       "salon": "Salon",
-      "shared": "Shared",
-      "status": "Status",
+      "shared": "Stand partagé ?",
+      "status": "Statut",
       "updated": "Le stand avec l'identifiant {{ param }} a été mis à jour"
     }
   }
