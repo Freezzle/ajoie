@@ -1,35 +1,35 @@
 {
   "salonApp": {
     "exponent": {
-      "home": {
-        "title": "Exponents",
-        "refreshListLabel": "Refresh",
-        "createLabel": "Create a new Exponent",
-        "createOrEditLabel": "Create or edit a Exponent",
-        "notFound": "No Exponents found"
-      },
+      "address": "Address",
+      "blocked": "Blocked",
+      "comment": "Comment",
+      "conference": "Conference",
       "created": "A new Exponent is created with identifier {{ param }}",
-      "updated": "A Exponent is updated with identifier {{ param }}",
-      "deleted": "A Exponent is deleted with identifier {{ param }}",
       "delete": {
         "question": "Are you sure you want to delete Exponent {{ id }}?"
       },
+      "deleted": "A Exponent is deleted with identifier {{ param }}",
       "detail": {
         "title": "Exponent"
       },
-      "id": "Id",
       "email": "Email",
       "fullName": "Full Name",
-      "phoneNumber": "Phone Number",
-      "website": "Website",
-      "socialMedia": "Social Media",
-      "address": "Address",
+      "home": {
+        "createLabel": "Create a new Exponent",
+        "createOrEditLabel": "Create or edit a Exponent",
+        "notFound": "No Exponents found",
+        "refreshListLabel": "Refresh",
+        "title": "Exponents"
+      },
+      "id": "Id",
       "npaLocalite": "Npa Localite",
-      "urlPicture": "Url Picture",
-      "comment": "Comment",
-      "blocked": "Blocked",
+      "phoneNumber": "Phone Number",
+      "socialMedia": "Social Media",
       "stand": "Stand",
-      "conference": "Conference"
+      "updated": "A Exponent is updated with identifier {{ param }}",
+      "urlPicture": "Url Picture",
+      "website": "Website"
     }
   }
 }

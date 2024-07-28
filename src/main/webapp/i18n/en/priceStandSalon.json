@@ -1,26 +1,26 @@
 {
   "salonApp": {
     "priceStandSalon": {
-      "home": {
-        "title": "Price Stand Salons",
-        "refreshListLabel": "Refresh",
-        "createLabel": "Create a new Price Stand Salon",
-        "createOrEditLabel": "Create or edit a Price Stand Salon",
-        "notFound": "No Price Stand Salons found"
-      },
       "created": "A new Price Stand Salon is created with identifier {{ param }}",
-      "updated": "A Price Stand Salon is updated with identifier {{ param }}",
-      "deleted": "A Price Stand Salon is deleted with identifier {{ param }}",
       "delete": {
         "question": "Are you sure you want to delete Price Stand Salon {{ id }}?"
       },
+      "deleted": "A Price Stand Salon is deleted with identifier {{ param }}",
       "detail": {
         "title": "Price Stand Salon"
       },
+      "dimension": "Dimension",
+      "home": {
+        "createLabel": "Create a new Price Stand Salon",
+        "createOrEditLabel": "Create or edit a Price Stand Salon",
+        "notFound": "No Price Stand Salons found",
+        "refreshListLabel": "Refresh",
+        "title": "Price Stand Salons"
+      },
       "id": "Id",
       "price": "Price",
-      "dimension": "Dimension",
-      "salon": "Salon"
+      "salon": "Salon",
+      "updated": "A Price Stand Salon is updated with identifier {{ param }}"
     }
   }
 }

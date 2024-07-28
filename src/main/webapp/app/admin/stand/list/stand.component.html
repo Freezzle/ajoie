@@ -44,42 +44,22 @@
           <tr>
             <th>
               <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.exponent">Exponent</span>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex">
                 <span jhiTranslate="salonApp.stand.description">Description</span>
               </div>
             </th>
             <th>
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbMeal1">Nb Meal 1</span>
+                <span jhiTranslate="salonApp.stand.needArrangment">Need arrangment</span>
               </div>
             </th>
             <th>
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbMeal2">Nb Meal 2</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbMeal3">Nb Meal 3</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.shared">Shared</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbTable">Nb Table</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbChair">Nb Chair</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.needElectricity">Need Electricity</span>
+                <span jhiTranslate="salonApp.stand.acceptedContract">Accepted Contract</span>
               </div>
             </th>
             <th>
@@ -89,17 +69,22 @@
             </th>
             <th>
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.exponent">Exponent</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.salon">Salon</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
                 <span jhiTranslate="salonApp.stand.dimension">Dimension</span>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.registrationDate">Registration date</span>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.status">Status</span>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.isBillingClosed">Est payé</span>
               </div>
             </th>
             <th scope="col"></th>
@@ -109,29 +94,27 @@
           @for (stand of stands; track trackId) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/stand', stand.id, 'view']">{{ stand.description }}</a>
-              </td>
-              <td>{{ stand.nbMeal1 }}</td>
-              <td>{{ stand.nbMeal2 }}</td>
-              <td>{{ stand.nbMeal3 }}</td>
-              <td>{{ stand.shared }}</td>
-              <td>{{ stand.nbTable }}</td>
-              <td>{{ stand.nbChair }}</td>
-              <td>{{ stand.needElectricity }}</td>
-              <td>{{ stand.acceptedChart }}</td>
-              <td>
                 @if (stand.exponent) {
                   <div>
                     <a [routerLink]="['/exponent', stand.exponent.id, 'view']">{{ stand.exponent.fullName }}</a>
                   </div>
                 }
               </td>
+              <td>{{ stand.description }}</td>
               <td>
-                @if (stand.salon) {
-                  <div>
-                    <a [routerLink]="['/salon', stand.salon.id, 'view']">{{ stand.salon.place }}</a>
-                  </div>
-                }
+                <fa-icon
+                  icon="{{ stand.needArrangment | faIconBoolean }}"
+                  style="{{ stand.needArrangment | faIconColorBoolean }}"
+                ></fa-icon>
+              </td>
+              <td>
+                <fa-icon
+                  icon="{{ stand.acceptedContract | faIconBoolean }}"
+                  style="{{ stand.acceptedContract | faIconColorBoolean }}"
+                ></fa-icon>
+              </td>
+              <td>
+                <fa-icon icon="{{ stand.acceptedChart | faIconBoolean }}" style="{{ stand.acceptedChart | faIconColorBoolean }}"></fa-icon>
               </td>
               <td>
                 @if (stand.dimension) {
@@ -139,6 +122,14 @@
                     <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.dimension }}</a>
                   </div>
                 }
+              </td>
+              <td>{{ stand.registrationDate | formatMediumDate }}</td>
+              <td>{{ stand.status }}</td>
+              <td>
+                <fa-icon
+                  icon="{{ stand.isBillingClosed | faIconBoolean }}"
+                  style="{{ stand.isBillingClosed | faIconColorBoolean }}"
+                ></fa-icon>
               </td>
               <td class="text-end">
                 <div class="btn-group">

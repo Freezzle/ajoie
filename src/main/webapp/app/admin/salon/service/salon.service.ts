@@ -6,7 +6,8 @@ import dayjs from 'dayjs/esm';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { ISalon, NewSalon } from '../salon.model';
+import { ISalon, ISalonStats, NewSalon } from '../salon.model';
+import { isPresent } from '../../../core/util/operators';
 
 type RestOf<T extends ISalon | NewSalon> = Omit<T, 'startingDate' | 'endingDate'> & {
   startingDate?: string | null;
@@ -41,6 +42,10 @@ export class SalonService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  stats(id: string): Observable<HttpResponse<ISalonStats>> {
+    return this.http.get<ISalonStats>(`${this.resourceUrl}/${id}/stats`, { observe: 'response' });
+  }
+
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
     return this.http
@@ -54,6 +59,26 @@ export class SalonService {
 
   getSalonIdentifier(salon: Pick<ISalon, 'id'>): string {
     return salon.id;
+  }
+
+  addSalonToCollectionIfMissing<Type extends Pick<ISalon, 'id'>>(
+    salonCollection: Type[],
+    ...salonsToCheck: (Type | null | undefined)[]
+  ): Type[] {
+    const salons: Type[] = salonsToCheck.filter(isPresent);
+    if (salons.length > 0) {
+      const salonCollectionIdentifiers = salonCollection.map(salonItem => this.getSalonIdentifier(salonItem));
+      const salonsToAdd = salons.filter(salonItem => {
+        const salonIdentifier = this.getSalonIdentifier(salonItem);
+        if (salonCollectionIdentifiers.includes(salonIdentifier)) {
+          return false;
+        }
+        salonCollectionIdentifiers.push(salonIdentifier);
+        return true;
+      });
+      return [...salonsToAdd, ...salonCollection];
+    }
+    return salonCollection;
   }
 
   compareSalon(o1: Pick<ISalon, 'id'> | null, o2: Pick<ISalon, 'id'> | null): boolean {

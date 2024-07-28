@@ -1,26 +1,26 @@
 {
   "salonApp": {
     "dimensionStand": {
-      "home": {
-        "title": "Dimension Stands",
-        "refreshListLabel": "Aktualisieren",
-        "createLabel": "Dimension Stand erstellen",
-        "createOrEditLabel": "Dimension Stand erstellen oder bearbeiten",
-        "notFound": "Keine Dimension Stands gefunden"
-      },
       "created": "Dimension Stand erstellt mit ID {{ param }}",
-      "updated": "Dimension Stand aktualisiert mit ID {{ param }}",
-      "deleted": "Dimension Stand gelöscht mit ID {{ param }}",
       "delete": {
         "question": "Soll Dimension Stand {{ id }} wirklich dauerhaft gelöscht werden?"
       },
+      "deleted": "Dimension Stand gelöscht mit ID {{ param }}",
       "detail": {
         "title": "Dimension Stand"
       },
-      "id": "Id",
       "dimension": "Dimension",
+      "home": {
+        "createLabel": "Dimension Stand erstellen",
+        "createOrEditLabel": "Dimension Stand erstellen oder bearbeiten",
+        "notFound": "Keine Dimension Stands gefunden",
+        "refreshListLabel": "Aktualisieren",
+        "title": "Dimension Stands"
+      },
+      "id": "Id",
       "priceStandSalon": "Price Stand Salon",
-      "stand": "Stand"
+      "stand": "Stand",
+      "updated": "Dimension Stand aktualisiert mit ID {{ param }}"
     }
   }
 }

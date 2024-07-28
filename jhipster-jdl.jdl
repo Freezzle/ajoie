@@ -36,7 +36,9 @@ entity Stand {
     acceptedChart Boolean
     acceptedContract Boolean
     needArrangment Boolean
-    isClosed Boolean
+    isBillingClosed Boolean
+    status String
+    registrationDate Instant
 }
 
 entity Invoice {

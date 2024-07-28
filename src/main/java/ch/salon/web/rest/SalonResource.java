@@ -1,15 +1,22 @@
 package ch.salon.web.rest;
 
+import ch.salon.domain.DimensionStand;
 import ch.salon.domain.Salon;
+import ch.salon.domain.Stand;
+import ch.salon.domain.StandStatus;
+import ch.salon.repository.DimensionStandRepository;
 import ch.salon.repository.SalonRepository;
+import ch.salon.repository.StandRepository;
+import ch.salon.web.rest.dto.DimensionStats;
+import ch.salon.web.rest.dto.SalonStats;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,8 +43,18 @@ public class SalonResource {
 
     private final SalonRepository salonRepository;
 
-    public SalonResource(SalonRepository salonRepository) {
+    private final StandRepository standRepository;
+
+    private final DimensionStandRepository dimensionStandRepository;
+
+    public SalonResource(
+        SalonRepository salonRepository,
+        StandRepository standRepository,
+        DimensionStandRepository dimensionStandRepository
+    ) {
         this.salonRepository = salonRepository;
+        this.standRepository = standRepository;
+        this.dimensionStandRepository = dimensionStandRepository;
     }
 
     @PostMapping("")
@@ -71,6 +88,53 @@ public class SalonResource {
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, salon.getId().toString()))
             .body(salon);
+    }
+
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<SalonStats> statsSalon(@PathVariable(value = "id", required = false) final UUID id) {
+        log.debug("REST request to get stats from Salon : {}", id);
+
+        List<Stand> allStands = this.standRepository.findAllStandsBySalon_Id(id);
+
+        SalonStats stats = new SalonStats();
+        List<Stand> standsValidated = allStands.stream().filter(stand -> stand.getStatus() == StandStatus.VALIDATED).toList();
+
+        stats.setNbStandValidated(standsValidated.stream().filter(stand -> stand.getStatus() == StandStatus.VALIDATED).count());
+        stats.setNbStandIntreatment(allStands.stream().filter(stand -> stand.getStatus() == StandStatus.IN_TREATMENT).count());
+        stats.setNbStandRefused(allStands.stream().filter(stand -> stand.getStatus() == StandStatus.REFUSED).count());
+
+        stats.setNbMealSaturdayMidday(standsValidated.stream().map(Stand::getNbMeal1).reduce(0L, Long::sum));
+        stats.setNbMealSaturdayEvening(standsValidated.stream().map(Stand::getNbMeal2).reduce(0L, Long::sum));
+        stats.setNbMealSundayMidday(standsValidated.stream().map(Stand::getNbMeal3).reduce(0L, Long::sum));
+
+        stats.setNbStandValidatedPaid(standsValidated.stream().filter(Stand::getBillingClosed).count());
+        stats.setNbStandValidatedUnpaid(standsValidated.stream().filter(stand -> !stand.getBillingClosed()).count());
+
+        Map<String, Long> dimensions = new HashMap<>();
+        for (Stand stand : standsValidated) {
+            if (stand.getDimension() != null) {
+                String keyDimension = stand.getDimension().getDimension();
+
+                if (StringUtils.isNotBlank(keyDimension)) {
+                    dimensions.putIfAbsent(keyDimension, 0L);
+                    dimensions.computeIfPresent(keyDimension, (key, val) -> val + 1);
+                } else {
+                    dimensions.putIfAbsent("Unknown", 0L);
+                    dimensions.computeIfPresent("Unknown", (key, val) -> val + 1);
+                }
+            } else {
+                dimensions.putIfAbsent("Not_Affected", 0L);
+                dimensions.computeIfPresent("Not_Affected", (key, val) -> val + 1);
+            }
+        }
+
+        for (Map.Entry<String, Long> entry : dimensions.entrySet()) {
+            stats.getDimensionStats().add(new DimensionStats(entry.getKey(), entry.getValue()));
+        }
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(stats);
     }
 
     @GetMapping("")

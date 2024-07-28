@@ -1,27 +1,27 @@
 {
   "salonApp": {
     "invoice": {
-      "home": {
-        "title": "Invoices",
-        "refreshListLabel": "Aktualisieren",
-        "createLabel": "Invoice erstellen",
-        "createOrEditLabel": "Invoice erstellen oder bearbeiten",
-        "notFound": "Keine Invoices gefunden"
-      },
+      "amount": "Amount",
+      "billingDate": "Billing Date",
       "created": "Invoice erstellt mit ID {{ param }}",
-      "updated": "Invoice aktualisiert mit ID {{ param }}",
-      "deleted": "Invoice gelöscht mit ID {{ param }}",
       "delete": {
         "question": "Soll Invoice {{ id }} wirklich dauerhaft gelöscht werden?"
       },
+      "deleted": "Invoice gelöscht mit ID {{ param }}",
       "detail": {
-        "title": "Invoice"
+        "title": "Rechnung"
+      },
+      "extraInformation": "Extra Information",
+      "home": {
+        "createLabel": "Invoice erstellen",
+        "createOrEditLabel": "Invoice erstellen oder bearbeiten",
+        "notFound": "Keine Invoices gefunden",
+        "refreshListLabel": "Aktualisieren",
+        "title": "Invoices"
       },
       "id": "Id",
-      "amount": "Amount",
-      "billingDate": "Billing Date",
       "paymentMode": "Payment Mode",
-      "extraInformation": "Extra Information"
+      "updated": "Invoice aktualisiert mit ID {{ param }}"
     }
   }
 }

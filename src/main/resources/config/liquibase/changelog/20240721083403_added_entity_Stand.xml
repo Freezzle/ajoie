@@ -47,7 +47,13 @@
             <column name="need_arrangment" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="is_closed" type="boolean">
+            <column name="is_billing_closed" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="registration_date" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
             <column name="exponent_id" type="${uuidType}">

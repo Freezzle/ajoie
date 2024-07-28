@@ -1,6 +1,6 @@
 {
   "error": {
-    "title": "Fehlerseite!",
+    "concurrencyFailure": "Ein anderer Benutzer hat diese Daten zeitgleich mit Ihnen geändert. Ihre Änderungen wurden abgelehnt.",
     "http": {
       "400": "Ungültige Anfrage.",
       "403": "Sie haben nicht die nötigen Berechtigungen um diese Seite anzuzeigen.",
@@ -8,7 +8,7 @@
       "405": "Die verwendete Anfrage-Methode ist für diese URL nicht erlaubt.",
       "500": "Interner Serverfehler."
     },
-    "concurrencyFailure": "Ein anderer Benutzer hat diese Daten zeitgleich mit Ihnen geändert. Ihre Änderungen wurden abgelehnt.",
+    "title": "Fehlerseite!",
     "validation": "Validierungsfehler auf dem Server."
   }
 }

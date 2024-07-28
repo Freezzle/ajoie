@@ -1,31 +1,31 @@
 {
   "userManagement": {
-    "home": {
-      "title": "Users",
-      "refreshListLabel": "Refresh",
-      "createLabel": "Create a new user",
-      "createOrEditLabel": "Create or edit a user"
-    },
+    "activated": "Activated",
     "created": "A new user is created with identifier {{ param }}",
-    "updated": "A user is updated with identifier {{ param }}",
-    "deleted": "A user is deleted with identifier {{ param }}",
+    "createdBy": "Created by",
+    "createdDate": "Created date",
+    "deactivated": "Deactivated",
     "delete": {
       "question": "Are you sure you want to delete user {{ login }}?"
     },
+    "deleted": "A user is deleted with identifier {{ param }}",
     "detail": {
       "title": "User"
     },
-    "login": "Login",
-    "firstName": "First name",
-    "lastName": "Last name",
     "email": "Email",
-    "activated": "Activated",
-    "deactivated": "Deactivated",
-    "profiles": "Profiles",
+    "firstName": "First name",
+    "home": {
+      "createLabel": "Create a new user",
+      "createOrEditLabel": "Create or edit a user",
+      "refreshListLabel": "Refresh",
+      "title": "Users"
+    },
     "langKey": "Language",
-    "createdBy": "Created by",
-    "createdDate": "Created date",
     "lastModifiedBy": "Modified by",
-    "lastModifiedDate": "Modified date"
+    "lastModifiedDate": "Modified date",
+    "lastName": "Last name",
+    "login": "Login",
+    "profiles": "Profiles",
+    "updated": "A user is updated with identifier {{ param }}"
   }
 }

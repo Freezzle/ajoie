@@ -1,11 +1,10 @@
 {
   "login": {
-    "title": "Sign in",
     "form": {
+      "button": "Sign in",
       "password": "Password",
       "password.placeholder": "Your password",
-      "rememberme": "Remember me",
-      "button": "Sign in"
+      "rememberme": "Remember me"
     },
     "messages": {
       "error": {
@@ -14,6 +13,7 @@
     },
     "password": {
       "forgot": "Did you forget your password?"
-    }
+    },
+    "title": "Sign in"
   }
 }

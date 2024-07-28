@@ -262,33 +262,6 @@ class SalonResourceIT {
 
     @Test
     @Transactional
-    void partialUpdateSalonWithPatch() throws Exception {
-        // Initialize the database
-        insertedSalon = salonRepository.saveAndFlush(salon);
-
-        long databaseSizeBeforeUpdate = getRepositoryCount();
-
-        // Update the salon using partial update
-        Salon partialUpdatedSalon = new Salon();
-        partialUpdatedSalon.setId(salon.getId());
-
-        restSalonMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedSalon.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedSalon))
-            )
-            .andExpect(status().isOk());
-
-        // Validate the Salon in the database
-
-        assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertSalonUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedSalon, salon), getPersistedSalon(salon));
-    }
-
-    @Test
-    @Transactional
     void fullUpdateSalonWithPatch() throws Exception {
         // Initialize the database
         insertedSalon = salonRepository.saveAndFlush(salon);

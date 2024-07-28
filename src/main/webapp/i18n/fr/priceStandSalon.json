@@ -1,26 +1,26 @@
 {
   "salonApp": {
     "priceStandSalon": {
-      "home": {
-        "title": "PriceStandSalons",
-        "refreshListLabel": "Actualiser",
-        "createLabel": "Créer un nouveau Price Stand Salon",
-        "createOrEditLabel": "Créer ou éditer un Price Stand Salon",
-        "notFound": "Aucun Price Stand Salon trouvé"
-      },
       "created": "Un nouveau Price Stand Salon a été créé avec l'identifiant {{ param }}",
-      "updated": "Le Price Stand Salon avec l'identifiant {{ param }} a été mis à jour",
-      "deleted": "Le Price Stand Salon avec l'identifiant {{ param }} a été supprimé",
       "delete": {
         "question": "Êtes-vous certain de vouloir supprimer le Price Stand Salon {{ id }} ?"
       },
+      "deleted": "Le Price Stand Salon avec l'identifiant {{ param }} a été supprimé",
       "detail": {
         "title": "Price Stand Salon"
       },
+      "dimension": "Dimension",
+      "home": {
+        "createLabel": "Créer un nouveau Price Stand Salon",
+        "createOrEditLabel": "Créer ou éditer un Price Stand Salon",
+        "notFound": "Aucun Price Stand Salon trouvé",
+        "refreshListLabel": "Actualiser",
+        "title": "PriceStandSalons"
+      },
       "id": "Id",
       "price": "Price",
-      "dimension": "Dimension",
-      "salon": "Salon"
+      "salon": "Salon",
+      "updated": "Le Price Stand Salon avec l'identifiant {{ param }} a été mis à jour"
     }
   }
 }

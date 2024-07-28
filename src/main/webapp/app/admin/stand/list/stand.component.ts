@@ -12,6 +12,8 @@ import { IStand } from '../stand.model';
 import { EntityArrayResponseType, StandService } from '../service/stand.service';
 import { StandDeleteDialogComponent } from '../delete/stand-delete-dialog.component';
 import { Location } from '@angular/common';
+import FaIconBooleanPipe from '../../../shared/pipe/fa-icon-boolean.pipe';
+import FaIconColorBooleanPipe from '../../../shared/pipe/fa-icon-color-boolean.pipe';
 
 @Component({
   standalone: true,
@@ -26,6 +28,8 @@ import { Location } from '@angular/common';
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    FaIconBooleanPipe,
+    FaIconColorBooleanPipe,
   ],
 })
 export class StandComponent implements OnInit {

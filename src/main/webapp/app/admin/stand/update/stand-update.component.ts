@@ -9,8 +9,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IExponent } from 'app/entities/exponent/exponent.model';
 import { ExponentService } from 'app/entities/exponent/service/exponent.service';
-import { ISalon } from 'app/entities/salon/salon.model';
-import { SalonService } from 'app/entities/salon/service/salon.service';
+import { ISalon } from 'app/admin/salon/salon.model';
+import { SalonService } from 'app/admin/salon/service/salon.service';
 import { IDimensionStand } from 'app/entities/dimension-stand/dimension-stand.model';
 import { DimensionStandService } from 'app/entities/dimension-stand/service/dimension-stand.service';
 import { StandService } from '../service/stand.service';

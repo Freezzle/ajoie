@@ -1,35 +1,40 @@
 {
   "salonApp": {
     "stand": {
-      "home": {
-        "title": "Stands",
-        "refreshListLabel": "Refresh",
-        "createLabel": "Create a new Stand",
-        "createOrEditLabel": "Create or edit a Stand",
-        "notFound": "No Stands found"
-      },
+      "acceptedChart": "Accepted Chart",
+      "acceptedContract": "Accepted contract",
       "created": "A new Stand is created with identifier {{ param }}",
-      "updated": "A Stand is updated with identifier {{ param }}",
-      "deleted": "A Stand is deleted with identifier {{ param }}",
       "delete": {
         "question": "Are you sure you want to delete Stand {{ id }}?"
       },
+      "deleted": "A Stand is deleted with identifier {{ param }}",
+      "description": "Description",
       "detail": {
         "title": "Stand"
       },
+      "dimension": "Dimension",
+      "exponent": "Exponent",
+      "home": {
+        "createLabel": "Create a new Stand",
+        "createOrEditLabel": "Create or edit a Stand",
+        "notFound": "No Stands found",
+        "refreshListLabel": "Refresh",
+        "title": "Stands"
+      },
       "id": "Id",
-      "description": "Description",
+      "isBillingClosed": "Paid",
+      "nbChair": "Nb Chair",
       "nbMeal1": "Nb Meal 1",
       "nbMeal2": "Nb Meal 2",
       "nbMeal3": "Nb Meal 3",
-      "shared": "Shared",
       "nbTable": "Nb Table",
-      "nbChair": "Nb Chair",
+      "needArrangment": "Need arrangment",
       "needElectricity": "Need Electricity",
-      "acceptedChart": "Accepted Chart",
-      "exponent": "Exponent",
+      "registrationDate": "Registration date",
       "salon": "Salon",
-      "dimension": "Dimension"
+      "shared": "Shared",
+      "status": "Status",
+      "updated": "A Stand is updated with identifier {{ param }}"
     }
   }
 }

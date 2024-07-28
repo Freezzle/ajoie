@@ -43,6 +43,18 @@
     {
       "fieldName": "acceptedChart",
       "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "acceptedContract",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "needArrangment",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "isBillingClosed",
+      "fieldType": "Boolean"
     }
   ],
   "name": "Stand",
@@ -71,6 +83,13 @@
       "relationshipName": "dimension",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "invoice",
+      "otherEntityRelationshipName": "stand",
+      "relationshipName": "invoice",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
     }
   ],
   "searchEngine": "no"

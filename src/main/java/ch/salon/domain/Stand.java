@@ -3,6 +3,7 @@ package ch.salon.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -55,8 +56,15 @@ public class Stand implements Serializable {
     @Column(name = "need_arrangment")
     private Boolean needArrangment;
 
-    @Column(name = "is_closed")
-    private Boolean isClosed;
+    @Column(name = "is_billing_closed")
+    private Boolean isBillingClosed;
+
+    @Column(name = "registration_date")
+    private Instant registrationDate;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private StandStatus status;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stand")
     @JsonIgnoreProperties(value = { "billing" }, allowSetters = true)
@@ -122,6 +130,14 @@ public class Stand implements Serializable {
     public Stand nbMeal2(Long nbMeal2) {
         this.setNbMeal2(nbMeal2);
         return this;
+    }
+
+    public Instant getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Instant registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public void setNbMeal2(Long nbMeal2) {
@@ -271,21 +287,24 @@ public class Stand implements Serializable {
         this.needArrangment = needArrangment;
     }
 
-    public Boolean getIsClosed() {
-        return this.isClosed;
+    public Boolean getBillingClosed() {
+        return isBillingClosed;
     }
 
-    public Stand isClosed(Boolean isClosed) {
-        this.setIsClosed(isClosed);
-        return this;
-    }
-
-    public void setIsClosed(Boolean isClosed) {
-        this.isClosed = isClosed;
+    public void setBillingClosed(Boolean billingClosed) {
+        isBillingClosed = billingClosed;
     }
 
     public Set<Invoice> getInvoices() {
         return this.invoices;
+    }
+
+    public StandStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(StandStatus status) {
+        this.status = status;
     }
 
     public void setInvoices(Set<Invoice> invoices) {
@@ -350,7 +369,8 @@ public class Stand implements Serializable {
             ", acceptedChart='" + getAcceptedChart() + "'" +
             ", acceptedContract='" + getAcceptedContract() + "'" +
             ", needArrangment='" + getNeedArrangment() + "'" +
-            ", isClosed='" + getIsClosed() + "'" +
+            ", isBillingClosed='" + getBillingClosed() + "'" +
+            ", status='" + getStatus() + "'" +
             "}";
     }
 }

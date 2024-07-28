@@ -1,27 +1,27 @@
 {
   "salonApp": {
     "invoice": {
-      "home": {
-        "title": "Invoices",
-        "refreshListLabel": "Refresh",
-        "createLabel": "Create a new Invoice",
-        "createOrEditLabel": "Create or edit a Invoice",
-        "notFound": "No Invoices found"
-      },
+      "amount": "Amount",
+      "billingDate": "Billing Date",
       "created": "A new Invoice is created with identifier {{ param }}",
-      "updated": "A Invoice is updated with identifier {{ param }}",
-      "deleted": "A Invoice is deleted with identifier {{ param }}",
       "delete": {
         "question": "Are you sure you want to delete Invoice {{ id }}?"
       },
+      "deleted": "A Invoice is deleted with identifier {{ param }}",
       "detail": {
         "title": "Invoice"
       },
+      "extraInformation": "Extra Information",
+      "home": {
+        "createLabel": "Create a new Invoice",
+        "createOrEditLabel": "Create or edit a Invoice",
+        "notFound": "No Invoices found",
+        "refreshListLabel": "Refresh",
+        "title": "Invoices"
+      },
       "id": "Id",
-      "amount": "Amount",
-      "billingDate": "Billing Date",
       "paymentMode": "Payment Mode",
-      "extraInformation": "Extra Information"
+      "updated": "A Invoice is updated with identifier {{ param }}"
     }
   }
 }

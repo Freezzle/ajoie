@@ -29,7 +29,7 @@ type StandFormGroupContent = {
   acceptedChart: FormControl<IStand['acceptedChart']>;
   acceptedContract?: FormControl<IStand['acceptedContract']>;
   needArrangment?: FormControl<IStand['needArrangment']>;
-  isClosed?: FormControl<IStand['isClosed']>;
+  isBillingClosed?: FormControl<IStand['isBillingClosed']>;
   exponent: FormControl<IStand['exponent']>;
   salon: FormControl<IStand['salon']>;
   dimension: FormControl<IStand['dimension']>;
@@ -63,7 +63,7 @@ export class StandFormService {
       acceptedChart: new FormControl(standRawValue.acceptedChart),
       acceptedContract: new FormControl(standRawValue.acceptedContract),
       needArrangment: new FormControl(standRawValue.needArrangment),
-      isClosed: new FormControl(standRawValue.isClosed),
+      isBillingClosed: new FormControl(standRawValue.isBillingClosed),
       exponent: new FormControl(standRawValue.exponent),
       salon: new FormControl(standRawValue.salon),
       dimension: new FormControl(standRawValue.dimension),
