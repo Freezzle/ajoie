@@ -1,6 +1,5 @@
 package ch.salon.domain;
 
-import static ch.salon.domain.BillingTestSamples.*;
 import static ch.salon.domain.DimensionStandTestSamples.*;
 import static ch.salon.domain.ExponentTestSamples.*;
 import static ch.salon.domain.SalonTestSamples.*;
@@ -24,20 +23,6 @@ class StandTest {
 
         stand2 = getStandSample2();
         assertThat(stand1).isNotEqualTo(stand2);
-    }
-
-    @Test
-    void billingTest() {
-        Stand stand = getStandRandomSampleGenerator();
-        Billing billingBack = getBillingRandomSampleGenerator();
-
-        stand.setBilling(billingBack);
-        assertThat(stand.getBilling()).isEqualTo(billingBack);
-        assertThat(billingBack.getStand()).isEqualTo(stand);
-
-        stand.billing(null);
-        assertThat(stand.getBilling()).isNull();
-        assertThat(billingBack.getStand()).isNull();
     }
 
     @Test

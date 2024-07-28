@@ -8,13 +8,6 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="salonApp.invoice.id">Id</label>
-            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
         <div class="mb-3">
           <label class="form-label" for="field_amount" jhiTranslate="salonApp.invoice.amount">Amount</label>
           <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
@@ -26,11 +19,11 @@
             <input
               id="field_billingDate"
               data-cy="billingDate"
-              type="datetime-local"
+              type="date"
               class="form-control"
               name="billingDate"
               formControlName="billingDate"
-              placeholder="YYYY-MM-DD HH:mm"
+              placeholder="YYYY-MM-DD"
             />
           </div>
         </div>
@@ -57,23 +50,6 @@
             data-cy="extraInformation"
             formControlName="extraInformation"
           />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_billing" jhiTranslate="salonApp.invoice.billing">Billing</label>
-          <select
-            class="form-control"
-            id="field_billing"
-            data-cy="billing"
-            name="billing"
-            formControlName="billing"
-            [compareWith]="compareBilling"
-          >
-            <option [ngValue]="null"></option>
-            @for (billingOption of billingsSharedCollection; track $index) {
-              <option [ngValue]="billingOption">{{ billingOption.id }}</option>
-            }
-          </select>
         </div>
       </div>
 

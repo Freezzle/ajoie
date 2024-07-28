@@ -3,6 +3,8 @@ package ch.salon.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -47,9 +49,18 @@ public class Stand implements Serializable {
     @Column(name = "accepted_chart")
     private Boolean acceptedChart;
 
-    @JsonIgnoreProperties(value = { "stand", "invoices" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "stand")
-    private Billing billing;
+    @Column(name = "accepted_contract")
+    private Boolean acceptedContract;
+
+    @Column(name = "need_arrangment")
+    private Boolean needArrangment;
+
+    @Column(name = "is_closed")
+    private Boolean isClosed;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stand")
+    @JsonIgnoreProperties(value = { "billing" }, allowSetters = true)
+    private Set<Invoice> invoices = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "stands", "conferences" }, allowSetters = true)
@@ -195,25 +206,6 @@ public class Stand implements Serializable {
         this.acceptedChart = acceptedChart;
     }
 
-    public Billing getBilling() {
-        return this.billing;
-    }
-
-    public void setBilling(Billing billing) {
-        if (this.billing != null) {
-            this.billing.setStand(null);
-        }
-        if (billing != null) {
-            billing.setStand(this);
-        }
-        this.billing = billing;
-    }
-
-    public Stand billing(Billing billing) {
-        this.setBilling(billing);
-        return this;
-    }
-
     public Exponent getExponent() {
         return this.exponent;
     }
@@ -253,6 +245,76 @@ public class Stand implements Serializable {
         return this;
     }
 
+    public Boolean getAcceptedContract() {
+        return this.acceptedContract;
+    }
+
+    public Stand acceptedContract(Boolean acceptedContract) {
+        this.setAcceptedContract(acceptedContract);
+        return this;
+    }
+
+    public void setAcceptedContract(Boolean acceptedContract) {
+        this.acceptedContract = acceptedContract;
+    }
+
+    public Boolean getNeedArrangment() {
+        return this.needArrangment;
+    }
+
+    public Stand needArrangment(Boolean needArrangment) {
+        this.setNeedArrangment(needArrangment);
+        return this;
+    }
+
+    public void setNeedArrangment(Boolean needArrangment) {
+        this.needArrangment = needArrangment;
+    }
+
+    public Boolean getIsClosed() {
+        return this.isClosed;
+    }
+
+    public Stand isClosed(Boolean isClosed) {
+        this.setIsClosed(isClosed);
+        return this;
+    }
+
+    public void setIsClosed(Boolean isClosed) {
+        this.isClosed = isClosed;
+    }
+
+    public Set<Invoice> getInvoices() {
+        return this.invoices;
+    }
+
+    public void setInvoices(Set<Invoice> invoices) {
+        if (this.invoices != null) {
+            this.invoices.forEach(i -> i.setStand(null));
+        }
+        if (invoices != null) {
+            invoices.forEach(i -> i.setStand(this));
+        }
+        this.invoices = invoices;
+    }
+
+    public Stand invoices(Set<Invoice> invoices) {
+        this.setInvoices(invoices);
+        return this;
+    }
+
+    public Stand addInvoice(Invoice invoice) {
+        this.invoices.add(invoice);
+        invoice.setStand(this);
+        return this;
+    }
+
+    public Stand removeInvoice(Invoice invoice) {
+        this.invoices.remove(invoice);
+        invoice.setStand(null);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -286,6 +348,9 @@ public class Stand implements Serializable {
             ", nbChair=" + getNbChair() +
             ", needElectricity='" + getNeedElectricity() + "'" +
             ", acceptedChart='" + getAcceptedChart() + "'" +
+            ", acceptedContract='" + getAcceptedContract() + "'" +
+            ", needArrangment='" + getNeedArrangment() + "'" +
+            ", isClosed='" + getIsClosed() + "'" +
             "}";
     }
 }

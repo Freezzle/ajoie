@@ -30,5 +30,11 @@
                                  referencedColumnNames="id"
                                  referencedTableName="dimension_stand"
                                  />
+        <addForeignKeyConstraint baseColumnNames="stand_id"
+                                 baseTableName="invoice"
+                                 constraintName="fk_invoice__stand_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="stand"
+        />
     </changeSet>
 </databaseChangeLog>

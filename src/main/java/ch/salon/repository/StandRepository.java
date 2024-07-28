@@ -1,6 +1,8 @@
 package ch.salon.repository;
 
 import ch.salon.domain.Stand;
+import ch.salon.web.rest.StandResource;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
@@ -10,4 +12,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface StandRepository extends JpaRepository<Stand, UUID> {}
+public interface StandRepository extends JpaRepository<Stand, UUID> {
+    List<Stand> findAllStandsBySalon_Id(UUID idSalon);
+}

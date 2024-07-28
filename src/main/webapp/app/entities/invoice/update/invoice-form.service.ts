@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import dayjs from 'dayjs/esm';
-import { DATE_TIME_FORMAT } from 'app/config/input.constants';
+import { DATE_FORMAT } from 'app/config/input.constants';
 import { IInvoice, NewInvoice } from '../invoice.model';
 
 /**
@@ -35,7 +35,6 @@ type InvoiceFormGroupContent = {
   billingDate: FormControl<InvoiceFormRawValue['billingDate']>;
   paymentMode: FormControl<InvoiceFormRawValue['paymentMode']>;
   extraInformation: FormControl<InvoiceFormRawValue['extraInformation']>;
-  billing: FormControl<InvoiceFormRawValue['billing']>;
 };
 
 export type InvoiceFormGroup = FormGroup<InvoiceFormGroupContent>;
@@ -59,7 +58,6 @@ export class InvoiceFormService {
       billingDate: new FormControl(invoiceRawValue.billingDate),
       paymentMode: new FormControl(invoiceRawValue.paymentMode),
       extraInformation: new FormControl(invoiceRawValue.extraInformation),
-      billing: new FormControl(invoiceRawValue.billing),
     });
   }
 
@@ -89,7 +87,7 @@ export class InvoiceFormService {
   private convertInvoiceRawValueToInvoice(rawInvoice: InvoiceFormRawValue | NewInvoiceFormRawValue): IInvoice | NewInvoice {
     return {
       ...rawInvoice,
-      billingDate: dayjs(rawInvoice.billingDate, DATE_TIME_FORMAT),
+      billingDate: dayjs(rawInvoice.billingDate, DATE_FORMAT),
     };
   }
 
@@ -98,7 +96,7 @@ export class InvoiceFormService {
   ): InvoiceFormRawValue | PartialWithRequiredKeyOf<NewInvoiceFormRawValue> {
     return {
       ...invoice,
-      billingDate: invoice.billingDate ? invoice.billingDate.format(DATE_TIME_FORMAT) : undefined,
+      billingDate: invoice.billingDate ? invoice.billingDate.format(DATE_FORMAT) : undefined,
     };
   }
 }

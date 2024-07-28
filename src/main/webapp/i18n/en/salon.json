@@ -3,7 +3,7 @@
     "salon": {
       "home": {
         "title": "Salons",
-        "refreshListLabel": "Refresh list",
+        "refreshListLabel": "Refresh",
         "createLabel": "Create a new Salon",
         "createOrEditLabel": "Create or edit a Salon",
         "notFound": "No Salons found"

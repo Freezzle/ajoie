@@ -53,7 +53,7 @@ public class Exponent implements Serializable {
     private Boolean blocked;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "exponent")
-    @JsonIgnoreProperties(value = { "billing", "exponent", "salon", "dimension" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "exponent", "salon", "dimension" }, allowSetters = true)
     private Set<Stand> stands = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "exponent")

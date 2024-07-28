@@ -13,10 +13,6 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="salonApp.configurationSalon.id">Id</span></dt>
-          <dd>
-            <span>{{ configurationSalon()!.id }}</span>
-          </dd>
           <dt><span jhiTranslate="salonApp.configurationSalon.priceMeal1">Price Meal 1</span></dt>
           <dd>
             <span>{{ configurationSalon()!.priceMeal1 }}</span>
@@ -41,7 +37,9 @@
           <dd>
             @if (configurationSalon()!.salon) {
               <div>
-                <a [routerLink]="['/salon', configurationSalon()!.salon?.id, 'view']">{{ configurationSalon()!.salon?.id }}</a>
+                <a [routerLink]="['/salon', configurationSalon()!.salon?.id, 'view']">{{
+                  configurationSalon()!.salon?.place + ' ' + (configurationSalon()!.salon?.startingDate | formatMediumDate)
+                }}</a>
               </div>
             }
           </dd>

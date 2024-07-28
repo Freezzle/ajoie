@@ -34,10 +34,6 @@ entity Stand {
     nbChair Long
     needElectricity Boolean
     acceptedChart Boolean
-}
-
-entity Billing {
-	id UUID
     acceptedContract Boolean
     needArrangment Boolean
     isClosed Boolean
@@ -74,14 +70,13 @@ entity PriceStandSalon {
 
 relationship OneToOne {
     ConfigurationSalon{salon} to Salon{configuration}
-	Billing{stand} to Stand{billing}
 }
 
 relationship OneToMany {
 	Exponent to Stand{exponent}
 	Salon to Stand{salon}
 	Salon to Conference{salon}
-	Billing to Invoice{billing}
+	Stand to Invoice{stand}
     Exponent to Conference{exponent}
     DimensionStand to PriceStandSalon{dimension}
     Salon to PriceStandSalon{salon}

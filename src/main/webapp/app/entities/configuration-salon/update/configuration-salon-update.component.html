@@ -12,13 +12,6 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="salonApp.configurationSalon.id">Id</label>
-            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
         <div class="mb-3">
           <label class="form-label" for="field_priceMeal1" jhiTranslate="salonApp.configurationSalon.priceMeal1">Price Meal 1</label>
           <input
@@ -88,7 +81,7 @@
           <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
             <option [ngValue]="null"></option>
             @for (salonOption of salonsCollection; track $index) {
-              <option [ngValue]="salonOption">{{ salonOption.id }}</option>
+              <option [ngValue]="salonOption">{{ salonOption.place + ' ' + (salonOption?.startingDate | formatMediumDate) }}</option>
             }
           </select>
         </div>

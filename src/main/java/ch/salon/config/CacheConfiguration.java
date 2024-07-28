@@ -48,8 +48,7 @@ public class CacheConfiguration {
             createCache(cm, ch.salon.domain.DimensionStand.class.getName() + ".priceStandSalons");
             createCache(cm, ch.salon.domain.DimensionStand.class.getName() + ".stands");
             createCache(cm, ch.salon.domain.Stand.class.getName());
-            createCache(cm, ch.salon.domain.Billing.class.getName());
-            createCache(cm, ch.salon.domain.Billing.class.getName() + ".invoices");
+            createCache(cm, ch.salon.domain.Stand.class.getName() + ".invoices");
             createCache(cm, ch.salon.domain.Invoice.class.getName());
             createCache(cm, ch.salon.domain.Salon.class.getName());
             createCache(cm, ch.salon.domain.Salon.class.getName() + ".stands");

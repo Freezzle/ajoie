@@ -11,10 +11,6 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="salonApp.conference.id">Id</span></dt>
-          <dd>
-            <span>{{ conference()!.id }}</span>
-          </dd>
           <dt><span jhiTranslate="salonApp.conference.title">Title</span></dt>
           <dd>
             <span>{{ conference()!.title }}</span>
@@ -23,7 +19,9 @@
           <dd>
             @if (conference()!.salon) {
               <div>
-                <a [routerLink]="['/salon', conference()!.salon?.id, 'view']">{{ conference()!.salon?.id }}</a>
+                <a [routerLink]="['/salon', conference()!.salon?.id, 'view']">{{
+                  conference()!.salon?.place + ' ' + (conference()!.salon?.startingDate | formatMediumDate)
+                }}</a>
               </div>
             }
           </dd>
@@ -31,7 +29,7 @@
           <dd>
             @if (conference()!.exponent) {
               <div>
-                <a [routerLink]="['/exponent', conference()!.exponent?.id, 'view']">{{ conference()!.exponent?.id }}</a>
+                <a [routerLink]="['/exponent', conference()!.exponent?.id, 'view']">{{ conference()!.exponent?.fullName }}</a>
               </div>
             }
           </dd>

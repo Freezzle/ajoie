@@ -3,7 +3,7 @@
     "dimensionStand": {
       "home": {
         "title": "Dimension Stands",
-        "refreshListLabel": "Liste aktualisieren",
+        "refreshListLabel": "Aktualisieren",
         "createLabel": "Dimension Stand erstellen",
         "createOrEditLabel": "Dimension Stand erstellen oder bearbeiten",
         "notFound": "Keine Dimension Stands gefunden"

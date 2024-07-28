@@ -30,7 +30,7 @@ public class DimensionStand implements Serializable {
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dimension")
-    @JsonIgnoreProperties(value = { "billing", "exponent", "salon", "dimension" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "exponent", "salon", "dimension" }, allowSetters = true)
     private Set<Stand> stands = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

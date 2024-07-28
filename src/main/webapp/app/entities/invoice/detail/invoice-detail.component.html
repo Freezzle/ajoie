@@ -11,10 +11,6 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="salonApp.invoice.id">Id</span></dt>
-          <dd>
-            <span>{{ invoice()!.id }}</span>
-          </dd>
           <dt><span jhiTranslate="salonApp.invoice.amount">Amount</span></dt>
           <dd>
             <span>{{ invoice()!.amount }}</span>
@@ -30,14 +26,6 @@
           <dt><span jhiTranslate="salonApp.invoice.extraInformation">Extra Information</span></dt>
           <dd>
             <span>{{ invoice()!.extraInformation }}</span>
-          </dd>
-          <dt><span jhiTranslate="salonApp.invoice.billing">Billing</span></dt>
-          <dd>
-            @if (invoice()!.billing) {
-              <div>
-                <a [routerLink]="['/billing', invoice()!.billing?.id, 'view']">{{ invoice()!.billing?.id }}</a>
-              </div>
-            }
           </dd>
         </dl>
 

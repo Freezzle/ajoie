@@ -3,7 +3,7 @@
     "stand": {
       "home": {
         "title": "Stands",
-        "refreshListLabel": "Actualiser la liste",
+        "refreshListLabel": "Actualiser",
         "createLabel": "Créer un nouveau Stand",
         "createOrEditLabel": "Créer ou éditer un Stand",
         "notFound": "Aucun Stand trouvé"
@@ -27,7 +27,6 @@
       "nbChair": "Nb Chair",
       "needElectricity": "Need Electricity",
       "acceptedChart": "Accepted Chart",
-      "billing": "Billing",
       "exponent": "Exponent",
       "salon": "Salon",
       "dimension": "Dimension"

@@ -1,0 +1,168 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-stand-heading" data-cy="StandCreateUpdateHeading" jhiTranslate="salonApp.stand.home.createOrEditLabel">
+        Créer ou éditer un Stand
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_description" jhiTranslate="salonApp.stand.description">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nbMeal1" jhiTranslate="salonApp.stand.nbMeal1">Nb Meal 1</label>
+          <input type="number" class="form-control" name="nbMeal1" id="field_nbMeal1" data-cy="nbMeal1" formControlName="nbMeal1" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nbMeal2" jhiTranslate="salonApp.stand.nbMeal2">Nb Meal 2</label>
+          <input type="number" class="form-control" name="nbMeal2" id="field_nbMeal2" data-cy="nbMeal2" formControlName="nbMeal2" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nbMeal3" jhiTranslate="salonApp.stand.nbMeal3">Nb Meal 3</label>
+          <input type="number" class="form-control" name="nbMeal3" id="field_nbMeal3" data-cy="nbMeal3" formControlName="nbMeal3" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_shared" jhiTranslate="salonApp.stand.shared">Shared</label>
+          <input type="checkbox" class="form-check" name="shared" id="field_shared" data-cy="shared" formControlName="shared" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nbTable" jhiTranslate="salonApp.stand.nbTable">Nb Table</label>
+          <input type="number" class="form-control" name="nbTable" id="field_nbTable" data-cy="nbTable" formControlName="nbTable" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nbChair" jhiTranslate="salonApp.stand.nbChair">Nb Chair</label>
+          <input type="number" class="form-control" name="nbChair" id="field_nbChair" data-cy="nbChair" formControlName="nbChair" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_needElectricity" jhiTranslate="salonApp.stand.needElectricity">Need Electricity</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="needElectricity"
+            id="field_needElectricity"
+            data-cy="needElectricity"
+            formControlName="needElectricity"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_acceptedChart" jhiTranslate="salonApp.stand.acceptedChart">Accepted Chart</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="acceptedChart"
+            id="field_acceptedChart"
+            data-cy="acceptedChart"
+            formControlName="acceptedChart"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_exponent" jhiTranslate="salonApp.stand.exponent">Exponent</label>
+          <select
+            class="form-control"
+            id="field_exponent"
+            data-cy="exponent"
+            name="exponent"
+            formControlName="exponent"
+            [compareWith]="compareExponent"
+          >
+            <option [ngValue]="null"></option>
+            @for (exponentOption of exponentsSharedCollection; track $index) {
+              <option [ngValue]="exponentOption">{{ exponentOption.fullName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_salon" jhiTranslate="salonApp.stand.salon">Salon</label>
+          <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
+            <option [ngValue]="null"></option>
+            @for (salonOption of salonsSharedCollection; track $index) {
+              <option [ngValue]="salonOption">{{ salonOption.place + ' ' + (salonOption.startingDate | formatMediumDate) }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dimension" jhiTranslate="salonApp.stand.dimension">Dimension</label>
+          <select
+            class="form-control"
+            id="field_dimension"
+            data-cy="dimension"
+            name="dimension"
+            formControlName="dimension"
+            [compareWith]="compareDimensionStand"
+          >
+            <option [ngValue]="null"></option>
+            @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
+              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_acceptedContract" jhiTranslate="salonApp.billing.acceptedContract">Accepted Contract</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="acceptedContract"
+            id="field_acceptedContract"
+            data-cy="acceptedContract"
+            formControlName="acceptedContract"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_needArrangment" jhiTranslate="salonApp.billing.needArrangment">Need Arrangment</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="needArrangment"
+            id="field_needArrangment"
+            data-cy="needArrangment"
+            formControlName="needArrangment"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_isClosed" jhiTranslate="salonApp.billing.isClosed">Is Closed</label>
+          <input type="checkbox" class="form-check" name="isClosed" id="field_isClosed" data-cy="isClosed" formControlName="isClosed" />
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

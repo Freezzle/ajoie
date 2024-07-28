@@ -3,7 +3,7 @@
     "configurationSalon": {
       "home": {
         "title": "ConfigurationSalons",
-        "refreshListLabel": "Actualiser la liste",
+        "refreshListLabel": "Actualiser",
         "createLabel": "Créer un nouveau Configuration Salon",
         "createOrEditLabel": "Créer ou éditer un Configuration Salon",
         "notFound": "Aucun Configuration Salon trouvé"

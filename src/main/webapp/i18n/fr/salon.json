@@ -2,9 +2,9 @@
   "salonApp": {
     "salon": {
       "home": {
-        "title": "Salons",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Salon",
+        "title": "Liste des salons",
+        "refreshListLabel": "Actualiser",
+        "createLabel": "Créer",
         "createOrEditLabel": "Créer ou éditer un Salon",
         "notFound": "Aucun Salon trouvé"
       },
@@ -19,12 +19,12 @@
       },
       "id": "Id",
       "place": "Place",
-      "startingDate": "Starting Date",
-      "endingDate": "Ending Date",
+      "startingDate": "Date de début",
+      "endingDate": "Date de fin",
       "stand": "Stand",
-      "conference": "Conference",
-      "priceStandSalon": "Price Stand Salon",
-      "configuration": "Configuration"
+      "conference": "Conférence",
+      "priceStandSalon": "Prix des stands du salon",
+      "configuration": "Configuration du salon"
     }
   }
 }

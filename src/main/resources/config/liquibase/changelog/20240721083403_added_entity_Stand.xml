@@ -41,6 +41,15 @@
             <column name="accepted_chart" type="boolean">
                 <constraints nullable="true" />
             </column>
+            <column name="accepted_contract" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="need_arrangment" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_closed" type="boolean">
+                <constraints nullable="true" />
+            </column>
             <column name="exponent_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>

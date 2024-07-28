@@ -11,9 +11,9 @@
       <p
         id="jhi-delete-priceStandSalon-heading"
         jhiTranslate="salonApp.priceStandSalon.delete.question"
-        [translateValues]="{ id: priceStandSalon.id }"
+        [translateValues]="{ id: priceStandSalon.price + ' ' + priceStandSalon.dimension }"
       >
-        Êtes-vous certain de vouloir supprimer le Price Stand Salon {{ priceStandSalon.id }} ?
+        Êtes-vous certain de vouloir supprimer le Price Stand Salon {{ priceStandSalon.price + ' ' + priceStandSalon.dimension }} ?
       </p>
     </div>
 

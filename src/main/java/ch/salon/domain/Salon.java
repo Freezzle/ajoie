@@ -33,7 +33,7 @@ public class Salon implements Serializable {
     private Instant endingDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "salon")
-    @JsonIgnoreProperties(value = { "billing", "exponent", "salon", "dimension" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "invoices", "exponent", "salon", "dimension" }, allowSetters = true)
     private Set<Stand> stands = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "salon")

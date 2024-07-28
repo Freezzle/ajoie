@@ -11,10 +11,6 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="salonApp.stand.id">Id</span></dt>
-          <dd>
-            <span>{{ stand()!.id }}</span>
-          </dd>
           <dt><span jhiTranslate="salonApp.stand.description">Description</span></dt>
           <dd>
             <span>{{ stand()!.description }}</span>
@@ -55,7 +51,7 @@
           <dd>
             @if (stand()!.exponent) {
               <div>
-                <a [routerLink]="['/exponent', stand()!.exponent?.id, 'view']">{{ stand()!.exponent?.id }}</a>
+                <a [routerLink]="['/exponent', stand()!.exponent?.id, 'view']">{{ stand()!.exponent?.fullName }}</a>
               </div>
             }
           </dd>
@@ -63,7 +59,7 @@
           <dd>
             @if (stand()!.salon) {
               <div>
-                <a [routerLink]="['/salon', stand()!.salon?.id, 'view']">{{ stand()!.salon?.id }}</a>
+                <a [routerLink]="['/salon', stand()!.salon?.id, 'view']">{{ stand()!.salon?.place }}</a>
               </div>
             }
           </dd>
@@ -71,7 +67,7 @@
           <dd>
             @if (stand()!.dimension) {
               <div>
-                <a [routerLink]="['/dimension-stand', stand()!.dimension?.id, 'view']">{{ stand()!.dimension?.id }}</a>
+                <a [routerLink]="['/dimension-stand', stand()!.dimension?.id, 'view']">{{ stand()!.dimension?.dimension }}</a>
               </div>
             }
           </dd>

@@ -12,6 +12,21 @@ const routes: Routes = [
     loadComponent: () => import('./docs/docs.component'),
     title: 'global.menu.admin.apidocs',
   },
+  {
+    path: 'authorities',
+    data: { pageTitle: 'salonApp.adminAuthority.home.title' },
+    loadChildren: () => import('./authority/authority.routes'),
+  },
+  {
+    path: 'salons',
+    data: { pageTitle: 'salonApp.salon.home.title' },
+    loadChildren: () => import('./salon/salon.routes'),
+  },
+  {
+    path: 'stands',
+    data: { pageTitle: 'salonApp.salon.home.title' },
+    loadChildren: () => import('./stand/stand.routes'),
+  },
   /* jhipster-needle-add-admin-route - JHipster will add admin routes here */
 ];
 

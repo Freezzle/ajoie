@@ -35,13 +35,6 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.conference.id">Id</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="title">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.conference.title">Title</span>
@@ -68,20 +61,21 @@
           @for (conference of conferences; track trackId) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/conference', conference.id, 'view']">{{ conference.id }}</a>
+                <a [routerLink]="['/conference', conference.id, 'view']">{{ conference.title }}</a>
               </td>
-              <td>{{ conference.title }}</td>
               <td>
                 @if (conference.salon) {
                   <div>
-                    <a [routerLink]="['/salon', conference.salon.id, 'view']">{{ conference.salon.id }}</a>
+                    <a [routerLink]="['/salon', conference.salon.id, 'view']">{{
+                      conference.salon.place + ' ' + (conference.salon.startingDate | formatMediumDate)
+                    }}</a>
                   </div>
                 }
               </td>
               <td>
                 @if (conference.exponent) {
                   <div>
-                    <a [routerLink]="['/exponent', conference.exponent.id, 'view']">{{ conference.exponent.id }}</a>
+                    <a [routerLink]="['/exponent', conference.exponent.id, 'view']">{{ conference.exponent.fullName }}</a>
                   </div>
                 }
               </td>

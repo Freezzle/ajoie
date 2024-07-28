@@ -8,13 +8,6 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="salonApp.conference.id">Id</label>
-            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
         <div class="mb-3">
           <label class="form-label" for="field_title" jhiTranslate="salonApp.conference.title">Title</label>
           <input type="text" class="form-control" name="title" id="field_title" data-cy="title" formControlName="title" />
@@ -25,7 +18,7 @@
           <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
             <option [ngValue]="null"></option>
             @for (salonOption of salonsSharedCollection; track $index) {
-              <option [ngValue]="salonOption">{{ salonOption.id }}</option>
+              <option [ngValue]="salonOption">{{ salonOption.place + ' ' + (salonOption.startingDate | formatMediumDate) }}</option>
             }
           </select>
         </div>
@@ -42,7 +35,7 @@
           >
             <option [ngValue]="null"></option>
             @for (exponentOption of exponentsSharedCollection; track $index) {
-              <option [ngValue]="exponentOption">{{ exponentOption.id }}</option>
+              <option [ngValue]="exponentOption">{{ exponentOption.fullName }}</option>
             }
           </select>
         </div>

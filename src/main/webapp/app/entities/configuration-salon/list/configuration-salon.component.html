@@ -35,13 +35,6 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.configurationSalon.id">Id</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="priceMeal1">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.configurationSalon.priceMeal1">Price Meal 1</span>
@@ -89,9 +82,6 @@
         <tbody>
           @for (configurationSalon of configurationSalons; track trackId) {
             <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/configuration-salon', configurationSalon.id, 'view']">{{ configurationSalon.id }}</a>
-              </td>
               <td>{{ configurationSalon.priceMeal1 }}</td>
               <td>{{ configurationSalon.priceMeal2 }}</td>
               <td>{{ configurationSalon.priceMeal3 }}</td>
@@ -99,9 +89,7 @@
               <td>{{ configurationSalon.priceSharingStand }}</td>
               <td>
                 @if (configurationSalon.salon) {
-                  <div>
-                    <a [routerLink]="['/salon', configurationSalon.salon.id, 'view']">{{ configurationSalon.salon.id }}</a>
-                  </div>
+                  <div>{{ configurationSalon.salon.place + ' ' + (configurationSalon.salon.startingDate | formatMediumDate) }}</div>
                 }
               </td>
               <td class="text-end">

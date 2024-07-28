@@ -35,13 +35,6 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exponent.id">Id</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="email">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.exponent.email">Email</span>
@@ -118,9 +111,6 @@
         <tbody>
           @for (exponent of exponents; track trackId) {
             <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/exponent', exponent.id, 'view']">{{ exponent.id }}</a>
-              </td>
               <td>{{ exponent.email }}</td>
               <td>{{ exponent.fullName }}</td>
               <td>{{ exponent.phoneNumber }}</td>

@@ -3,7 +3,7 @@
     "priceStandSalon": {
       "home": {
         "title": "PriceStandSalons",
-        "refreshListLabel": "Actualiser la liste",
+        "refreshListLabel": "Actualiser",
         "createLabel": "Créer un nouveau Price Stand Salon",
         "createOrEditLabel": "Créer ou éditer un Price Stand Salon",
         "notFound": "Aucun Price Stand Salon trouvé"

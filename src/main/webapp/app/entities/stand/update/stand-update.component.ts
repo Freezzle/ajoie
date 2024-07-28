@@ -16,12 +16,13 @@ import { DimensionStandService } from 'app/entities/dimension-stand/service/dime
 import { StandService } from '../service/stand.service';
 import { IStand } from '../stand.model';
 import { StandFormService, StandFormGroup } from './stand-form.service';
+import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 
 @Component({
   standalone: true,
   selector: 'jhi-stand-update',
   templateUrl: './stand-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, FormatMediumDatePipe],
 })
 export class StandUpdateComponent implements OnInit {
   isSaving = false;

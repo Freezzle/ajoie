@@ -7,8 +7,6 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IBilling } from 'app/entities/billing/billing.model';
-import { BillingService } from 'app/entities/billing/service/billing.service';
 import { IInvoice } from '../invoice.model';
 import { InvoiceService } from '../service/invoice.service';
 import { InvoiceFormService, InvoiceFormGroup } from './invoice-form.service';
@@ -23,17 +21,12 @@ export class InvoiceUpdateComponent implements OnInit {
   isSaving = false;
   invoice: IInvoice | null = null;
 
-  billingsSharedCollection: IBilling[] = [];
-
   protected invoiceService = inject(InvoiceService);
   protected invoiceFormService = inject(InvoiceFormService);
-  protected billingService = inject(BillingService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: InvoiceFormGroup = this.invoiceFormService.createInvoiceFormGroup();
-
-  compareBilling = (o1: IBilling | null, o2: IBilling | null): boolean => this.billingService.compareBilling(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ invoice }) => {
@@ -82,18 +75,7 @@ export class InvoiceUpdateComponent implements OnInit {
   protected updateForm(invoice: IInvoice): void {
     this.invoice = invoice;
     this.invoiceFormService.resetForm(this.editForm, invoice);
-
-    this.billingsSharedCollection = this.billingService.addBillingToCollectionIfMissing<IBilling>(
-      this.billingsSharedCollection,
-      invoice.billing,
-    );
   }
 
-  protected loadRelationshipsOptions(): void {
-    this.billingService
-      .query()
-      .pipe(map((res: HttpResponse<IBilling[]>) => res.body ?? []))
-      .pipe(map((billings: IBilling[]) => this.billingService.addBillingToCollectionIfMissing<IBilling>(billings, this.invoice?.billing)))
-      .subscribe((billings: IBilling[]) => (this.billingsSharedCollection = billings));
-  }
+  protected loadRelationshipsOptions(): void {}
 }

@@ -35,13 +35,6 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.id">Id</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="description">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.stand.description">Description</span>
@@ -130,9 +123,8 @@
           @for (stand of stands; track trackId) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/stand', stand.id, 'view']">{{ stand.id }}</a>
+                <a [routerLink]="['/stand', stand.id, 'view']">{{ stand.description }}</a>
               </td>
-              <td>{{ stand.description }}</td>
               <td>{{ stand.nbMeal1 }}</td>
               <td>{{ stand.nbMeal2 }}</td>
               <td>{{ stand.nbMeal3 }}</td>
@@ -144,21 +136,21 @@
               <td>
                 @if (stand.exponent) {
                   <div>
-                    <a [routerLink]="['/exponent', stand.exponent.id, 'view']">{{ stand.exponent.id }}</a>
+                    <a [routerLink]="['/exponent', stand.exponent.id, 'view']">{{ stand.exponent.fullName }}</a>
                   </div>
                 }
               </td>
               <td>
                 @if (stand.salon) {
                   <div>
-                    <a [routerLink]="['/salon', stand.salon.id, 'view']">{{ stand.salon.id }}</a>
+                    <a [routerLink]="['/salon', stand.salon.id, 'view']">{{ stand.salon.place }}</a>
                   </div>
                 }
               </td>
               <td>
                 @if (stand.dimension) {
                   <div>
-                    <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.id }}</a>
+                    <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.dimension }}</a>
                   </div>
                 }
               </td>

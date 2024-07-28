@@ -1,7 +1,7 @@
 package ch.salon.domain;
 
-import static ch.salon.domain.BillingTestSamples.*;
 import static ch.salon.domain.InvoiceTestSamples.*;
+import static ch.salon.domain.StandTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.salon.web.rest.TestUtil;
@@ -26,12 +26,12 @@ class InvoiceTest {
     @Test
     void billingTest() {
         Invoice invoice = getInvoiceRandomSampleGenerator();
-        Billing billingBack = getBillingRandomSampleGenerator();
+        Stand standBack = getStandRandomSampleGenerator();
 
-        invoice.setBilling(billingBack);
-        assertThat(invoice.getBilling()).isEqualTo(billingBack);
+        invoice.setStand(standBack);
+        assertThat(invoice.getStand()).isEqualTo(standBack);
 
-        invoice.billing(null);
-        assertThat(invoice.getBilling()).isNull();
+        invoice.stand(null);
+        assertThat(invoice.getStand()).isNull();
     }
 }

@@ -2,11 +2,6 @@ import { Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'authority',
-    data: { pageTitle: 'salonApp.adminAuthority.home.title' },
-    loadChildren: () => import('./admin/authority/authority.routes'),
-  },
-  {
     path: 'exponent',
     data: { pageTitle: 'salonApp.exponent.home.title' },
     loadChildren: () => import('./exponent/exponent.routes'),
@@ -20,11 +15,6 @@ const routes: Routes = [
     path: 'stand',
     data: { pageTitle: 'salonApp.stand.home.title' },
     loadChildren: () => import('./stand/stand.routes'),
-  },
-  {
-    path: 'billing',
-    data: { pageTitle: 'salonApp.billing.home.title' },
-    loadChildren: () => import('./billing/billing.routes'),
   },
   {
     path: 'invoice',

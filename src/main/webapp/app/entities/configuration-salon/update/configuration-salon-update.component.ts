@@ -12,12 +12,13 @@ import { SalonService } from 'app/entities/salon/service/salon.service';
 import { IConfigurationSalon } from '../configuration-salon.model';
 import { ConfigurationSalonService } from '../service/configuration-salon.service';
 import { ConfigurationSalonFormService, ConfigurationSalonFormGroup } from './configuration-salon-form.service';
+import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 
 @Component({
   standalone: true,
   selector: 'jhi-configuration-salon-update',
   templateUrl: './configuration-salon-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, FormatMediumDatePipe],
 })
 export class ConfigurationSalonUpdateComponent implements OnInit {
   isSaving = false;

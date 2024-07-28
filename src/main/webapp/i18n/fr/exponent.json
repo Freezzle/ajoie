@@ -3,7 +3,7 @@
     "exponent": {
       "home": {
         "title": "Exponents",
-        "refreshListLabel": "Actualiser la liste",
+        "refreshListLabel": "Actualiser",
         "createLabel": "Créer un nouveau Exponent",
         "createOrEditLabel": "Créer ou éditer un Exponent",
         "notFound": "Aucun Exponent trouvé"

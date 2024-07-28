@@ -3,7 +3,7 @@
     "adminAuthority": {
       "home": {
         "title": "Authorities",
-        "refreshListLabel": "Liste aktualisieren",
+        "refreshListLabel": "Aktualisieren",
         "createLabel": "Authority erstellen",
         "createOrEditLabel": "Authority erstellen oder bearbeiten",
         "notFound": "Keine Authorities gefunden"

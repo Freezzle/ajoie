@@ -3,7 +3,7 @@
     "conference": {
       "home": {
         "title": "Conferences",
-        "refreshListLabel": "Refresh list",
+        "refreshListLabel": "Refresh",
         "createLabel": "Create a new Conference",
         "createOrEditLabel": "Create or edit a Conference",
         "notFound": "No Conferences found"

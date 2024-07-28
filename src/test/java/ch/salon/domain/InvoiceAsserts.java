@@ -62,6 +62,6 @@ public class InvoiceAsserts {
     public static void assertInvoiceUpdatableRelationshipsEquals(Invoice expected, Invoice actual) {
         assertThat(expected)
             .as("Verify Invoice relationships")
-            .satisfies(e -> assertThat(e.getBilling()).as("check billing").isEqualTo(actual.getBilling()));
+            .satisfies(e -> assertThat(e.getStand()).as("check billing").isEqualTo(actual.getStand()));
     }
 }

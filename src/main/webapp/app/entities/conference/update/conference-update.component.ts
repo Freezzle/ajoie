@@ -14,12 +14,13 @@ import { ExponentService } from 'app/entities/exponent/service/exponent.service'
 import { ConferenceService } from '../service/conference.service';
 import { IConference } from '../conference.model';
 import { ConferenceFormService, ConferenceFormGroup } from './conference-form.service';
+import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 
 @Component({
   standalone: true,
   selector: 'jhi-conference-update',
   templateUrl: './conference-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, FormatMediumDatePipe],
 })
 export class ConferenceUpdateComponent implements OnInit {
   isSaving = false;

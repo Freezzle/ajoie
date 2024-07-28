@@ -3,7 +3,7 @@
     "invoice": {
       "home": {
         "title": "Invoices",
-        "refreshListLabel": "Actualiser la liste",
+        "refreshListLabel": "Actualiser",
         "createLabel": "Créer un nouveau Invoice",
         "createOrEditLabel": "Créer ou éditer un Invoice",
         "notFound": "Aucun Invoice trouvé"
@@ -21,8 +21,7 @@
       "amount": "Amount",
       "billingDate": "Billing Date",
       "paymentMode": "Payment Mode",
-      "extraInformation": "Extra Information",
-      "billing": "Billing"
+      "extraInformation": "Extra Information"
     }
   }
 }

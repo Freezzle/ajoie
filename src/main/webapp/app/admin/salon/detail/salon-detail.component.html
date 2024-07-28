@@ -1,0 +1,172 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (salon()) {
+      <div>
+        <h2 data-cy="salonDetailsHeading">
+          <span
+            >Détail du salon de {{ salon()!.place }} ({{ salon()!.startingDate | formatMediumDate }} -
+            {{ salon()!.endingDate | formatMediumDate }})</span
+          >
+        </h2>
+
+        <hr />
+
+        <div class="d-flex justify-content-between mt-3">
+          <span>
+            <button type="submit" (click)="previousState()" class="btn btn-info btn-sm" data-cy="entityDetailsBackButton">
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+            </button>
+          </span>
+
+          <div>
+            <a
+              [routerLink]="['/admin/stands']"
+              [state]="{ idSalon: salon()!.id }"
+              class="btn btn-info btn-sm"
+              data-cy="entityDetailsButton"
+            >
+              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline">Stands</span>
+            </a>
+
+            <a [routerLink]="['/admin/benevoles', salon()!.id, 'list']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline">Bénévoles</span>
+            </a>
+          </div>
+        </div>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+      </div>
+
+      <div class="form-2-container section-container section-container-gray-bg container row">
+        <div class="col form-2-box wow fadeInUp">
+          <div class="row">
+            <div class="col-4">
+              <!-- MENU DES STANDS FIELDSET -->
+              <fieldset class="form-group border p-3 form-1-box">
+                <legend class="w-auto px-2">Les stands</legend>
+                <div class="row">
+                  <div class="col-4 align-content-center">Validés</div>
+                  <div class="col-2">
+                    <button class="btn btn-success">
+                      <span>5</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                  <div class="col-4 align-content-center">En cours</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>9</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                  <div class="col-4 align-content-center">Refusés</div>
+                  <div class="col-2">
+                    <button class="btn btn-warning">
+                      <span>3</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="col-4">
+              <!-- FACTURATION DES STANDS VALIDES -->
+              <fieldset class="form-group border p-3 form-1-box">
+                <legend class="w-auto px-2">Facturation des stands validés</legend>
+                <div class="row">
+                  <div class="col-4 align-content-center">Payés</div>
+                  <div class="col-2">
+                    <button class="btn btn-success">
+                      <span>3</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                  <div class="col-4 align-content-center">Impayés</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>1</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="col-4">
+              <!-- REPAS COMMANDES PAR STANDS VALIDES -->
+              <fieldset class="form-group border p-3 form-1-box">
+                <legend class="w-auto px-2">Repas des stands validés</legend>
+                <div class="row">
+                  <div class="col-4 align-content-center">Samedi midi</div>
+                  <div class="col-2">
+                    <button class="btn btn-success">
+                      <span>4</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                  <div class="col-4 align-content-center">Samedi soir</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>1</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                  <div class="col-4 align-content-center">Dimanche midi</div>
+                  <div class="col-2">
+                    <button class="btn btn-warning">
+                      <span>5</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4">
+              <!-- DIMENSIONS DES STANDS VALIDES -->
+              <fieldset class="form-group border p-3 form-1-box">
+                <legend class="w-auto px-2">Dimensions des stands validés</legend>
+                <div class="row">
+                  <div class="col-4 align-content-center">2m x 2m</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>2</span>
+                    </button>
+                  </div>
+                  <div class="col-4 align-content-center">2m x 2,5m</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>2</span>
+                    </button>
+                  </div>
+                  <div class="col-4 align-content-center">2m x 3m</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>1</span>
+                    </button>
+                  </div>
+                  <div class="col-4 align-content-center">2m x 4m</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>0</span>
+                    </button>
+                  </div>
+                  <div class="col-4 align-content-center">3m x 4m</div>
+                  <div class="col-2">
+                    <button class="btn btn-info">
+                      <span>0</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

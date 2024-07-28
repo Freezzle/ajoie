@@ -34,8 +34,8 @@ public class Invoice implements Serializable {
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stand", "invoices" }, allowSetters = true)
-    private Billing billing;
+    @JsonIgnoreProperties(value = { "exponent", "salon", "dimension", "invoices" }, allowSetters = true)
+    private Stand stand;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -104,16 +104,16 @@ public class Invoice implements Serializable {
         this.extraInformation = extraInformation;
     }
 
-    public Billing getBilling() {
-        return this.billing;
+    public Stand getStand() {
+        return this.stand;
     }
 
-    public void setBilling(Billing billing) {
-        this.billing = billing;
+    public void setStand(Stand stand) {
+        this.stand = stand;
     }
 
-    public Invoice billing(Billing billing) {
-        this.setBilling(billing);
+    public Invoice stand(Stand stand) {
+        this.setStand(stand);
         return this;
     }
 
