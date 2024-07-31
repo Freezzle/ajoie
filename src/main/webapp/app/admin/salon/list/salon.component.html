@@ -17,6 +17,10 @@
           <span jhiTranslate="salonApp.salon.home.refreshListLabel">Actualiser</span>
         </button>
 
+        <button class="btn btn-primary btn-sm" (click)="generate()" [disabled]="isLoading">
+          <span>Générer</span>
+        </button>
+
         <button
           id="jh-create-entity"
           data-cy="entityCreateButton"
@@ -48,19 +52,13 @@
         <thead>
           <tr>
             <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.salon.place">Place</span>
-              </div>
+              <span jhiTranslate="salonApp.salon.place">Place</span>
             </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.salon.startingDate">Starting Date</span>
-              </div>
+            <th class="text-center">
+              <span jhiTranslate="salonApp.salon.startingDate">Starting Date</span>
             </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.salon.endingDate">Ending Date</span>
-              </div>
+            <th class="text-center">
+              <span jhiTranslate="salonApp.salon.endingDate">Ending Date</span>
             </th>
             <th></th>
           </tr>
@@ -69,8 +67,8 @@
           @for (salon of salons; track $index) {
             <tr data-cy="entityTable">
               <td>{{ salon.place }}</td>
-              <td>{{ salon.startingDate | formatMediumDate }}</td>
-              <td>{{ salon.endingDate | formatMediumDate }}</td>
+              <td class="text-center">{{ salon.startingDate | formatMediumDate }}</td>
+              <td class="text-center">{{ salon.endingDate | formatMediumDate }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/admin/salons', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

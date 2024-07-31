@@ -84,64 +84,6 @@ describe('Stand Service', () => {
       expect(expectedResult).toBe(expected);
     });
 
-    describe('addStandToCollectionIfMissing', () => {
-      it('should add a Stand to an empty array', () => {
-        const stand: IStand = sampleWithRequiredData;
-        expectedResult = service.addStandToCollectionIfMissing([], stand);
-        expect(expectedResult).toHaveLength(1);
-        expect(expectedResult).toContain(stand);
-      });
-
-      it('should not add a Stand to an array that contains it', () => {
-        const stand: IStand = sampleWithRequiredData;
-        const standCollection: IStand[] = [
-          {
-            ...stand,
-          },
-          sampleWithPartialData,
-        ];
-        expectedResult = service.addStandToCollectionIfMissing(standCollection, stand);
-        expect(expectedResult).toHaveLength(2);
-      });
-
-      it("should add a Stand to an array that doesn't contain it", () => {
-        const stand: IStand = sampleWithRequiredData;
-        const standCollection: IStand[] = [sampleWithPartialData];
-        expectedResult = service.addStandToCollectionIfMissing(standCollection, stand);
-        expect(expectedResult).toHaveLength(2);
-        expect(expectedResult).toContain(stand);
-      });
-
-      it('should add only unique Stand to an array', () => {
-        const standArray: IStand[] = [sampleWithRequiredData, sampleWithPartialData, sampleWithFullData];
-        const standCollection: IStand[] = [sampleWithRequiredData];
-        expectedResult = service.addStandToCollectionIfMissing(standCollection, ...standArray);
-        expect(expectedResult).toHaveLength(3);
-      });
-
-      it('should accept varargs', () => {
-        const stand: IStand = sampleWithRequiredData;
-        const stand2: IStand = sampleWithPartialData;
-        expectedResult = service.addStandToCollectionIfMissing([], stand, stand2);
-        expect(expectedResult).toHaveLength(2);
-        expect(expectedResult).toContain(stand);
-        expect(expectedResult).toContain(stand2);
-      });
-
-      it('should accept null and undefined values', () => {
-        const stand: IStand = sampleWithRequiredData;
-        expectedResult = service.addStandToCollectionIfMissing([], null, stand, undefined);
-        expect(expectedResult).toHaveLength(1);
-        expect(expectedResult).toContain(stand);
-      });
-
-      it('should return initial array if no Stand is added', () => {
-        const standCollection: IStand[] = [sampleWithRequiredData];
-        expectedResult = service.addStandToCollectionIfMissing(standCollection, undefined, null);
-        expect(expectedResult).toEqual(standCollection);
-      });
-    });
-
     describe('compareStand', () => {
       it('Should return true if both entities are null', () => {
         const entity1 = null;

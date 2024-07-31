@@ -70,6 +70,10 @@ export class SalonComponent implements OnInit {
     });
   }
 
+  generate(): void {
+    this.salonService.generate().subscribe();
+  }
+
   previousState(): void {
     window.history.back();
   }

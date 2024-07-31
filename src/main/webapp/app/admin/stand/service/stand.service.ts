@@ -7,6 +7,7 @@ import dayjs from 'dayjs/esm';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IStand, NewStand } from '../stand.model';
+import { RestSalon } from '../../salon/service/salon.service';
 
 type RestOf<T extends IStand | NewStand> = Omit<T, 'registrationDate'> & {
   registrationDate?: string | null;
@@ -20,23 +21,24 @@ export type EntityArrayResponseType = HttpResponse<IStand[]>;
 export class StandService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/stands');
 
   create(stand: NewStand): Observable<EntityResponseType> {
-    return this.http
-      .post<RestStand>(this.resourceUrl, stand, { observe: 'response' })
-      .pipe(map(res => this.convertResponseFromServer(res)));
+    const copy = this.convertDateFromClient(stand);
+    return this.http.post<RestSalon>(this.resourceUrl, copy, { observe: 'response' }).pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   update(stand: IStand): Observable<EntityResponseType> {
+    const copy = this.convertDateFromClient(stand);
     return this.http
-      .put<RestStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand, { observe: 'response' })
+      .put<RestStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, copy, { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   find(id: string): Observable<EntityResponseType> {
-    return this.http.get<IStand>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    return this.http
+      .get<RestStand>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {

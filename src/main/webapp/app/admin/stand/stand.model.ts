@@ -21,7 +21,7 @@ export interface IStand {
   salon?: ISalon | null;
   dimension?: IDimensionStand | null;
   registrationDate?: dayjs.Dayjs | null;
-  status: string | null;
+  status?: string | null;
 }
 
 export type NewStand = Omit<IStand, 'id'> & { id: null };

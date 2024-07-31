@@ -5,20 +5,9 @@ import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { ISalon, NewSalon } from '../salon.model';
 
-/**
- * A partial Type with required key is used as form input.
- */
 type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>> & { id: T['id'] };
-
-/**
- * Type for createFormGroup and resetForm argument.
- * It accepts ISalon for edit and NewSalonFormGroupInput for create.
- */
 type SalonFormGroupInput = ISalon | PartialWithRequiredKeyOf<NewSalon>;
 
-/**
- * Type that converts some properties for forms.
- */
 type FormValueOf<T extends ISalon | NewSalon> = Omit<T, 'startingDate' | 'endingDate'> & {
   startingDate?: string | null;
   endingDate?: string | null;

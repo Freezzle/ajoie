@@ -48,39 +48,25 @@
         <thead>
           <tr>
             <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.exponent">Exponent</span>
-              </div>
+              <span jhiTranslate="salonApp.stand.exponent">Exponent</span>
             </th>
             <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.description">Description</span>
-              </div>
+              <span jhiTranslate="salonApp.stand.description">Description</span>
+            </th>
+            <th class="text-center">
+              <span jhiTranslate="salonApp.stand.needArrangment">Need arrangment</span>
             </th>
             <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.needArrangment">Need arrangment</span>
-              </div>
+              <span jhiTranslate="salonApp.stand.dimension">Dimension</span>
             </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.dimension">Dimension</span>
-              </div>
+            <th class="text-center">
+              <span jhiTranslate="salonApp.stand.registrationDate">Registration date</span>
             </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.registrationDate">Registration date</span>
-              </div>
+            <th class="text-center">
+              <span jhiTranslate="salonApp.stand.status">Status</span>
             </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.status">Status</span>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.billingClosed">Est payé</span>
-              </div>
+            <th class="text-center">
+              <span jhiTranslate="salonApp.stand.billingClosed">Est payé</span>
             </th>
             <th scope="col"></th>
           </tr>
@@ -96,7 +82,7 @@
                 }
               </td>
               <td>{{ stand.description }}</td>
-              <td>
+              <td class="text-center">
                 <fa-icon
                   icon="{{ stand.needArrangment | faIconBoolean }}"
                   style="{{ stand.needArrangment | faIconColorBoolean }}"
@@ -109,9 +95,9 @@
                   </div>
                 }
               </td>
-              <td>{{ stand.registrationDate | formatMediumDate }}</td>
-              <td>{{ stand.status }}</td>
-              <td>
+              <td class="text-center">{{ stand.registrationDate | formatMediumDate }}</td>
+              <td class="text-center">{{ stand.status }}</td>
+              <td class="text-center">
                 <fa-icon icon="{{ stand.billingClosed | faIconBoolean }}" style="{{ stand.billingClosed | faIconColorBoolean }}"></fa-icon>
               </td>
               <td class="text-end">
