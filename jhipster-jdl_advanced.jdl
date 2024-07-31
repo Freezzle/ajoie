@@ -1,0 +1,100 @@
+
+entity Exponent {
+	id UUID
+    fullName String
+	email String
+    phoneNumber String
+    address String
+    npaLocalite String
+    extraInformation String
+}
+
+entity DimensionStand {
+	id UUID
+    dimension String
+}
+
+entity Conference {
+	id UUID
+    title String
+    status String
+    extraInformation String
+}
+
+entity Participation {
+	id UUID
+    registrationDate Instant
+    nbMeal1 Long
+    nbMeal2 Long
+    nbMeal3 Long
+    acceptedChart Boolean
+    acceptedContract Boolean
+    needArrangment Boolean
+    isBillingClosed Boolean
+    status String
+    extraInformation String
+}
+
+entity Stand {
+	id UUID
+    description String
+    website String
+    socialMedia String
+    urlPicture String
+    shared Boolean
+    nbTable Long
+    nbChair Long
+    needElectricity Boolean
+    status String
+    extraInformation String
+}
+
+entity Invoice {
+	id UUID
+    generationDate Instant
+    label String
+    defaultAmount Double
+    customAmount Double
+    quantity Long
+    total Double
+    lock Boolean
+    extraInformation String
+}
+
+entity Payment {
+	id UUID
+    amount Double
+    billingDate Instant
+    paymentMode String
+    extraInformation String
+}
+
+entity Salon {
+	id UUID
+    place String
+    startingDate Instant
+    endingDate Instant
+    priceMeal1 Long
+    priceMeal2 Long
+    priceMeal3 Long
+    priceConference Long
+    priceSharingStand Long
+    extraInformation String
+}
+
+entity PriceStandSalon {
+	id UUID
+    price Long
+}
+
+relationship OneToMany {
+	Exponent to Participation{exponent}
+    Participation to Conference{participation}
+    Participation to Payment{participation}
+    Participation to Invoice{participation}
+    Participation to Stand{participation}
+	Salon to Participation{salon}
+    Salon to PriceStandSalon{salon}
+    DimensionStand to PriceStandSalon{dimension}
+	DimensionStand to Stand{dimension}
+}
