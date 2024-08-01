@@ -1,31 +1,31 @@
 {
   "userManagement": {
-    "activated": "Activé",
+    "home": {
+      "title": "Utilisateurs",
+      "refreshListLabel": "Actualiser la liste",
+      "createLabel": "Créer un nouvel utilisateur",
+      "createOrEditLabel": "Créer ou éditer un utilisateur"
+    },
     "created": "L'utilisateur {{ param }} a été créé.",
-    "createdBy": "Créé par",
-    "createdDate": "Créé le",
-    "deactivated": "Désactivé",
+    "updated": "L'utilisateur {{ param }} a été mis à jour.",
+    "deleted": "L'utilisateur {{ param }} a été supprimé.",
     "delete": {
       "question": "Etes-vous certain de vouloir supprimer l'utilisateur {{ login }} ?"
     },
-    "deleted": "L'utilisateur {{ param }} a été supprimé.",
     "detail": {
       "title": "Utilisateur"
     },
-    "email": "Email",
-    "firstName": "Prénom",
-    "home": {
-      "createLabel": "Créer un nouvel utilisateur",
-      "createOrEditLabel": "Créer ou éditer un utilisateur",
-      "refreshListLabel": "Actualiser",
-      "title": "Utilisateurs"
-    },
-    "langKey": "Langue",
-    "lastModifiedBy": "Modifié par",
-    "lastModifiedDate": "Modifié le",
-    "lastName": "Nom",
     "login": "Login",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "activated": "Activé",
+    "deactivated": "Désactivé",
     "profiles": "Droits",
-    "updated": "L'utilisateur {{ param }} a été mis à jour."
+    "langKey": "Langue",
+    "createdBy": "Créé par",
+    "createdDate": "Créé le",
+    "lastModifiedBy": "Modifié par",
+    "lastModifiedDate": "Modifié le"
   }
 }

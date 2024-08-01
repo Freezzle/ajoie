@@ -19,8 +19,9 @@ type ConferenceFormDefaults = Pick<NewConference, 'id'>;
 type ConferenceFormGroupContent = {
   id: FormControl<IConference['id'] | NewConference['id']>;
   title: FormControl<IConference['title']>;
-  salon: FormControl<IConference['salon']>;
-  exponent: FormControl<IConference['exponent']>;
+  status: FormControl<IConference['status']>;
+  extraInformation: FormControl<IConference['extraInformation']>;
+  participation: FormControl<IConference['participation']>;
 };
 
 export type ConferenceFormGroup = FormGroup<ConferenceFormGroupContent>;
@@ -40,9 +41,12 @@ export class ConferenceFormService {
           validators: [Validators.required],
         },
       ),
-      title: new FormControl(conferenceRawValue.title),
-      salon: new FormControl(conferenceRawValue.salon),
-      exponent: new FormControl(conferenceRawValue.exponent),
+      title: new FormControl(conferenceRawValue.title, {
+        validators: [Validators.required],
+      }),
+      status: new FormControl(conferenceRawValue.status),
+      extraInformation: new FormControl(conferenceRawValue.extraInformation),
+      participation: new FormControl(conferenceRawValue.participation),
     });
   }
 

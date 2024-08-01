@@ -3,6 +3,8 @@ package ch.salon.web.rest;
 import ch.salon.domain.DimensionStand;
 import ch.salon.repository.DimensionStandRepository;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -47,7 +49,8 @@ public class DimensionStandResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<DimensionStand> createDimensionStand(@RequestBody DimensionStand dimensionStand) throws URISyntaxException {
+    public ResponseEntity<DimensionStand> createDimensionStand(@Valid @RequestBody DimensionStand dimensionStand)
+        throws URISyntaxException {
         log.debug("REST request to save DimensionStand : {}", dimensionStand);
         if (dimensionStand.getId() != null) {
             throw new BadRequestAlertException("A new dimensionStand cannot already have an ID", ENTITY_NAME, "idexists");
@@ -71,7 +74,7 @@ public class DimensionStandResource {
     @PutMapping("/{id}")
     public ResponseEntity<DimensionStand> updateDimensionStand(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody DimensionStand dimensionStand
+        @Valid @RequestBody DimensionStand dimensionStand
     ) throws URISyntaxException {
         log.debug("REST request to update DimensionStand : {}, {}", id, dimensionStand);
         if (dimensionStand.getId() == null) {
@@ -105,7 +108,7 @@ public class DimensionStandResource {
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<DimensionStand> partialUpdateDimensionStand(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody DimensionStand dimensionStand
+        @NotNull @RequestBody DimensionStand dimensionStand
     ) throws URISyntaxException {
         log.debug("REST request to partial update DimensionStand partially : {}, {}", id, dimensionStand);
         if (dimensionStand.getId() == null) {

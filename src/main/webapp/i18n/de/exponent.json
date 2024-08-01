@@ -1,35 +1,30 @@
 {
   "salonApp": {
     "exponent": {
-      "address": "Address",
-      "blocked": "Blocked",
-      "comment": "Comment",
-      "conference": "Conference",
+      "home": {
+        "title": "Exponents",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Exponent erstellen",
+        "createOrEditLabel": "Exponent erstellen oder bearbeiten",
+        "notFound": "Keine Exponents gefunden"
+      },
       "created": "Exponent erstellt mit ID {{ param }}",
+      "updated": "Exponent aktualisiert mit ID {{ param }}",
+      "deleted": "Exponent gelöscht mit ID {{ param }}",
       "delete": {
         "question": "Soll Exponent {{ id }} wirklich dauerhaft gelöscht werden?"
       },
-      "deleted": "Exponent gelöscht mit ID {{ param }}",
       "detail": {
         "title": "Exponent"
       },
-      "email": "Email",
-      "fullName": "Full Name",
-      "home": {
-        "createLabel": "Exponent erstellen",
-        "createOrEditLabel": "Exponent erstellen oder bearbeiten",
-        "notFound": "Keine Exponents gefunden",
-        "refreshListLabel": "Aktualisieren",
-        "title": "Exponents"
-      },
       "id": "Id",
-      "npaLocalite": "Npa Localite",
+      "fullName": "Full Name",
+      "email": "Email",
       "phoneNumber": "Phone Number",
-      "socialMedia": "Social Media",
-      "stand": "Stand",
-      "updated": "Exponent aktualisiert mit ID {{ param }}",
-      "urlPicture": "Url Picture",
-      "website": "Website"
+      "address": "Address",
+      "npaLocalite": "Npa Localite",
+      "extraInformation": "Extra Information",
+      "participation": "Participation"
     }
   }
 }

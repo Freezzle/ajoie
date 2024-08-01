@@ -9,13 +9,14 @@ public class SalonStats implements Serializable {
     private long nbStandValidated = 0;
     private long nbStandInTreatment = 0;
     private long nbStandRefused = 0;
+    private long nbStandCanceled = 0;
 
     private long nbMealSaturdayMidday = 0;
     private long nbMealSaturdayEvening = 0;
     private long nbMealSundayMidday = 0;
 
-    private long nbStandValidatedPaid = 0;
-    private long nbStandValidatedUnpaid = 0;
+    private long nbParticipationAcceptedPaid = 0;
+    private long nbParticipationAcceptedUnpaid = 0;
 
     private List<DimensionStats> dimensionStats = new ArrayList<>();
 
@@ -79,19 +80,27 @@ public class SalonStats implements Serializable {
         this.nbStandInTreatment = nbStandInTreatment;
     }
 
-    public long getNbStandValidatedPaid() {
-        return nbStandValidatedPaid;
+    public long getNbParticipationAcceptedPaid() {
+        return nbParticipationAcceptedPaid;
     }
 
-    public void setNbStandValidatedPaid(long nbStandValidatedPaid) {
-        this.nbStandValidatedPaid = nbStandValidatedPaid;
+    public void setNbParticipationAcceptedPaid(long nbParticipationAcceptedPaid) {
+        this.nbParticipationAcceptedPaid = nbParticipationAcceptedPaid;
     }
 
-    public long getNbStandValidatedUnpaid() {
-        return nbStandValidatedUnpaid;
+    public long getNbParticipationAcceptedUnpaid() {
+        return nbParticipationAcceptedUnpaid;
     }
 
-    public void setNbStandValidatedUnpaid(long nbStandValidatedUnpaid) {
-        this.nbStandValidatedUnpaid = nbStandValidatedUnpaid;
+    public void setNbParticipationAcceptedUnpaid(long nbParticipationAcceptedUnpaid) {
+        this.nbParticipationAcceptedUnpaid = nbParticipationAcceptedUnpaid;
+    }
+
+    public long getNbStandCanceled() {
+        return nbStandCanceled;
+    }
+
+    public void setNbStandCanceled(long nbStandCanceled) {
+        this.nbStandCanceled = nbStandCanceled;
     }
 }

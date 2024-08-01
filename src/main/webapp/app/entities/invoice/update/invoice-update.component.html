@@ -8,36 +8,70 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_amount" jhiTranslate="salonApp.invoice.amount">Amount</label>
-          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
-        </div>
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="salonApp.invoice.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
 
         <div class="mb-3">
-          <label class="form-label" for="field_billingDate" jhiTranslate="salonApp.invoice.billingDate">Billing Date</label>
+          <label class="form-label" for="field_generationDate" jhiTranslate="salonApp.invoice.generationDate">Generation Date</label>
           <div class="d-flex">
             <input
-              id="field_billingDate"
-              data-cy="billingDate"
-              type="date"
+              id="field_generationDate"
+              data-cy="generationDate"
+              type="datetime-local"
               class="form-control"
-              name="billingDate"
-              formControlName="billingDate"
-              placeholder="YYYY-MM-DD"
+              name="generationDate"
+              formControlName="generationDate"
+              placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_paymentMode" jhiTranslate="salonApp.invoice.paymentMode">Payment Mode</label>
+          <label class="form-label" for="field_label" jhiTranslate="salonApp.invoice.label">Label</label>
+          <input type="text" class="form-control" name="label" id="field_label" data-cy="label" formControlName="label" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_defaultAmount" jhiTranslate="salonApp.invoice.defaultAmount">Default Amount</label>
           <input
-            type="text"
+            type="number"
             class="form-control"
-            name="paymentMode"
-            id="field_paymentMode"
-            data-cy="paymentMode"
-            formControlName="paymentMode"
+            name="defaultAmount"
+            id="field_defaultAmount"
+            data-cy="defaultAmount"
+            formControlName="defaultAmount"
           />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_customAmount" jhiTranslate="salonApp.invoice.customAmount">Custom Amount</label>
+          <input
+            type="number"
+            class="form-control"
+            name="customAmount"
+            id="field_customAmount"
+            data-cy="customAmount"
+            formControlName="customAmount"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_quantity" jhiTranslate="salonApp.invoice.quantity">Quantity</label>
+          <input type="number" class="form-control" name="quantity" id="field_quantity" data-cy="quantity" formControlName="quantity" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_total" jhiTranslate="salonApp.invoice.total">Total</label>
+          <input type="number" class="form-control" name="total" id="field_total" data-cy="total" formControlName="total" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_lock" jhiTranslate="salonApp.invoice.lock">Lock</label>
+          <input type="checkbox" class="form-check" name="lock" id="field_lock" data-cy="lock" formControlName="lock" />
         </div>
 
         <div class="mb-3">
@@ -50,6 +84,23 @@
             data-cy="extraInformation"
             formControlName="extraInformation"
           />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_participation" jhiTranslate="salonApp.invoice.participation">Participation</label>
+          <select
+            class="form-control"
+            id="field_participation"
+            data-cy="participation"
+            name="participation"
+            formControlName="participation"
+            [compareWith]="compareParticipation"
+          >
+            <option [ngValue]="null"></option>
+            @for (participationOption of participationsSharedCollection; track $index) {
+              <option [ngValue]="participationOption">{{ participationOption.id }}</option>
+            }
+          </select>
         </div>
       </div>
 

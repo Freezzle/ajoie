@@ -22,6 +22,26 @@
         <div class="mb-3">
           <label class="form-label" for="field_price" jhiTranslate="salonApp.priceStandSalon.price">Price</label>
           <input type="number" class="form-control" name="price" id="field_price" data-cy="price" formControlName="price" />
+          @if (editForm.get('price')!.invalid && (editForm.get('price')!.dirty || editForm.get('price')!.touched)) {
+            <div>
+              @if (editForm.get('price')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('price')?.errors?.number" jhiTranslate="entity.validation.number"
+                >Ce champ doit être un nombre.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_salon" jhiTranslate="salonApp.priceStandSalon.salon">Salon</label>
+          <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
+            <option [ngValue]="null"></option>
+            @for (salonOption of salonsSharedCollection; track $index) {
+              <option [ngValue]="salonOption">{{ salonOption.id }}</option>
+            }
+          </select>
         </div>
 
         <div class="mb-3">
@@ -36,17 +56,7 @@
           >
             <option [ngValue]="null"></option>
             @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
-              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_salon" jhiTranslate="salonApp.priceStandSalon.salon">Salon</label>
-          <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
-            <option [ngValue]="null"></option>
-            @for (salonOption of salonsSharedCollection; track $index) {
-              <option [ngValue]="salonOption">{{ salonOption.place }}</option>
+              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.id }}</option>
             }
           </select>
         </div>

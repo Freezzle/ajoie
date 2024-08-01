@@ -11,27 +11,27 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="salonApp.priceStandSalon.id">Id</span></dt>
+          <dd>
+            <span>{{ priceStandSalon()!.id }}</span>
+          </dd>
           <dt><span jhiTranslate="salonApp.priceStandSalon.price">Price</span></dt>
           <dd>
             <span>{{ priceStandSalon()!.price }}</span>
-          </dd>
-          <dt><span jhiTranslate="salonApp.priceStandSalon.dimension">Dimension</span></dt>
-          <dd>
-            @if (priceStandSalon()!.dimension) {
-              <div>
-                <a [routerLink]="['/dimension-stand', priceStandSalon()!.dimension?.id, 'view']">{{
-                  priceStandSalon()!.dimension?.dimension
-                }}</a>
-              </div>
-            }
           </dd>
           <dt><span jhiTranslate="salonApp.priceStandSalon.salon">Salon</span></dt>
           <dd>
             @if (priceStandSalon()!.salon) {
               <div>
-                <a [routerLink]="['/salon', priceStandSalon()!.salon?.id, 'view']">{{
-                  priceStandSalon()!.salon?.place + ' ' + (priceStandSalon()!.salon?.startingDate | formatMediumDate)
-                }}</a>
+                <a [routerLink]="['/salon', priceStandSalon()!.salon?.id, 'view']">{{ priceStandSalon()!.salon?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="salonApp.priceStandSalon.dimension">Dimension</span></dt>
+          <dd>
+            @if (priceStandSalon()!.dimension) {
+              <div>
+                <a [routerLink]="['/dimension-stand', priceStandSalon()!.dimension?.id, 'view']">{{ priceStandSalon()!.dimension?.id }}</a>
               </div>
             }
           </dd>

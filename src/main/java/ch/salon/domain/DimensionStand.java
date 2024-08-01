@@ -2,6 +2,7 @@ package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,15 +23,16 @@ public class DimensionStand implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "dimension")
+    @NotNull
+    @Column(name = "dimension", nullable = false)
     private String dimension;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dimension")
-    @JsonIgnoreProperties(value = { "dimension", "salon" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "salon", "dimension" }, allowSetters = true)
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dimension")
-    @JsonIgnoreProperties(value = { "exponent", "salon", "dimension" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "participation", "dimension" }, allowSetters = true)
     private Set<Stand> stands = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

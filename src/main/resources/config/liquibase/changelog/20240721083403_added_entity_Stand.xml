@@ -15,15 +15,15 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="description" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="website" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="nb_meal_1" type="bigint">
+            <column name="social_media" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="nb_meal_2" type="bigint">
-                <constraints nullable="true" />
-            </column>
-            <column name="nb_meal_3" type="bigint">
+            <column name="url_picture" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <column name="shared" type="boolean">
@@ -38,28 +38,13 @@
             <column name="need_electricity" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="accepted_chart" type="boolean">
-                <constraints nullable="true" />
-            </column>
-            <column name="accepted_contract" type="boolean">
-                <constraints nullable="true" />
-            </column>
-            <column name="need_arrangment" type="boolean">
-                <constraints nullable="true" />
-            </column>
-            <column name="is_billing_closed" type="boolean">
-                <constraints nullable="true" />
-            </column>
             <column name="status" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="registration_date" type="${datetimeType}">
+            <column name="extra_information" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="exponent_id" type="${uuidType}">
-                <constraints nullable="true" />
-            </column>
-            <column name="salon_id" type="${uuidType}">
+            <column name="participation_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
             <column name="dimension_id" type="${uuidType}">
@@ -70,4 +55,33 @@
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20240721083403-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/stand.csv"
+                  separator=";"
+                  tableName="stand"
+                  usePreparedStatements="true">
+            <column name="id" type="${uuidType}"/>
+            <column name="description" type="string"/>
+            <column name="website" type="string"/>
+            <column name="social_media" type="string"/>
+            <column name="url_picture" type="string"/>
+            <column name="shared" type="boolean"/>
+            <column name="nb_table" type="numeric"/>
+            <column name="nb_chair" type="numeric"/>
+            <column name="need_electricity" type="boolean"/>
+            <column name="status" type="string"/>
+            <column name="extra_information" type="string"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
 </databaseChangeLog>

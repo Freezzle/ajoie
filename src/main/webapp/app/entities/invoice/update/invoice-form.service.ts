@@ -19,22 +19,27 @@ type InvoiceFormGroupInput = IInvoice | PartialWithRequiredKeyOf<NewInvoice>;
 /**
  * Type that converts some properties for forms.
  */
-type FormValueOf<T extends IInvoice | NewInvoice> = Omit<T, 'billingDate'> & {
-  billingDate?: string | null;
+type FormValueOf<T extends IInvoice | NewInvoice> = Omit<T, 'generationDate'> & {
+  generationDate?: string | null;
 };
 
 type InvoiceFormRawValue = FormValueOf<IInvoice>;
 
 type NewInvoiceFormRawValue = FormValueOf<NewInvoice>;
 
-type InvoiceFormDefaults = Pick<NewInvoice, 'id' | 'billingDate'>;
+type InvoiceFormDefaults = Pick<NewInvoice, 'id' | 'generationDate' | 'lock'>;
 
 type InvoiceFormGroupContent = {
   id: FormControl<InvoiceFormRawValue['id'] | NewInvoice['id']>;
-  amount: FormControl<InvoiceFormRawValue['amount']>;
-  billingDate: FormControl<InvoiceFormRawValue['billingDate']>;
-  paymentMode: FormControl<InvoiceFormRawValue['paymentMode']>;
+  generationDate: FormControl<InvoiceFormRawValue['generationDate']>;
+  label: FormControl<InvoiceFormRawValue['label']>;
+  defaultAmount: FormControl<InvoiceFormRawValue['defaultAmount']>;
+  customAmount: FormControl<InvoiceFormRawValue['customAmount']>;
+  quantity: FormControl<InvoiceFormRawValue['quantity']>;
+  total: FormControl<InvoiceFormRawValue['total']>;
+  lock: FormControl<InvoiceFormRawValue['lock']>;
   extraInformation: FormControl<InvoiceFormRawValue['extraInformation']>;
+  participation: FormControl<InvoiceFormRawValue['participation']>;
 };
 
 export type InvoiceFormGroup = FormGroup<InvoiceFormGroupContent>;
@@ -54,10 +59,15 @@ export class InvoiceFormService {
           validators: [Validators.required],
         },
       ),
-      amount: new FormControl(invoiceRawValue.amount),
-      billingDate: new FormControl(invoiceRawValue.billingDate),
-      paymentMode: new FormControl(invoiceRawValue.paymentMode),
+      generationDate: new FormControl(invoiceRawValue.generationDate),
+      label: new FormControl(invoiceRawValue.label),
+      defaultAmount: new FormControl(invoiceRawValue.defaultAmount),
+      customAmount: new FormControl(invoiceRawValue.customAmount),
+      quantity: new FormControl(invoiceRawValue.quantity),
+      total: new FormControl(invoiceRawValue.total),
+      lock: new FormControl(invoiceRawValue.lock),
       extraInformation: new FormControl(invoiceRawValue.extraInformation),
+      participation: new FormControl(invoiceRawValue.participation),
     });
   }
 
@@ -80,14 +90,15 @@ export class InvoiceFormService {
 
     return {
       id: null,
-      billingDate: currentTime,
+      generationDate: currentTime,
+      lock: false,
     };
   }
 
   private convertInvoiceRawValueToInvoice(rawInvoice: InvoiceFormRawValue | NewInvoiceFormRawValue): IInvoice | NewInvoice {
     return {
       ...rawInvoice,
-      billingDate: dayjs(rawInvoice.billingDate, DATE_FORMAT),
+      generationDate: dayjs(rawInvoice.generationDate, DATE_FORMAT),
     };
   }
 
@@ -96,7 +107,7 @@ export class InvoiceFormService {
   ): InvoiceFormRawValue | PartialWithRequiredKeyOf<NewInvoiceFormRawValue> {
     return {
       ...invoice,
-      billingDate: invoice.billingDate ? invoice.billingDate.format(DATE_FORMAT) : undefined,
+      generationDate: invoice.generationDate ? invoice.generationDate.format(DATE_FORMAT) : undefined,
     };
   }
 }

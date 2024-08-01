@@ -1,6 +1,7 @@
 package ch.salon.web.rest;
 
 import ch.salon.domain.*;
+import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.*;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.io.FileReader;
@@ -67,19 +68,22 @@ public class ImportationResource {
     private final ExponentRepository exponentRepository;
     private final ConferenceRepository conferenceRepository;
     private final DimensionStandRepository dimensionStandRepository;
+    private final ParticipationRepository participationRepository;
 
     public ImportationResource(
         SalonRepository salonRepository,
         StandRepository standRepository,
         ExponentRepository exponentRepository,
         ConferenceRepository conferenceRepository,
-        DimensionStandRepository dimensionStandRepository
+        DimensionStandRepository dimensionStandRepository,
+        ParticipationRepository participationRepository
     ) {
         this.salonRepository = salonRepository;
         this.standRepository = standRepository;
         this.exponentRepository = exponentRepository;
         this.conferenceRepository = conferenceRepository;
         this.dimensionStandRepository = dimensionStandRepository;
+        this.participationRepository = participationRepository;
     }
 
     @PostMapping("")
@@ -115,16 +119,20 @@ public class ImportationResource {
             DimensionStand dimension4x2Stand = new DimensionStand();
             dimension4x2Stand.setDimension("4 m x 2 m");
             dimensionStandRepository.save(dimension4x2Stand);
+            DimensionStand dimensionAutres = new DimensionStand();
+            dimensionAutres.setDimension("Autres");
+            dimensionStandRepository.save(dimensionAutres);
 
             List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
 
-            boolean isFirstLine = true;
+            int index = 0;
             for (CSVRecord csvRecord : csvParser) {
-                if (isFirstLine) {
-                    isFirstLine = false;
-
+                if (index == 0) {
+                    index++;
                     continue;
                 }
+
+                System.out.println("Line number : " + index);
 
                 String standRegistrationDate = csvRecord.get(STAND_REGISTRATION_DATE);
                 // To stop the process
@@ -137,9 +145,6 @@ public class ImportationResource {
                 String exponentAddress = csvRecord.get(EXPONENT_ADDRESS);
                 String exponentNpaLocalite = csvRecord.get(EXPONENT_NPA_LOCALITE);
                 String exponentPhone = csvRecord.get(EXPONENT_PHONE_NUMBER);
-                String exponentWebsite = csvRecord.get(EXPONENT_WEBSITE);
-                String exponentSocialMedia = csvRecord.get(EXPONENT_SOCIAL_MEDIA);
-                String exponentUrlPicture = csvRecord.get(EXPONENT_URL_PICTURE);
 
                 Exponent currentExponent = new Exponent();
                 currentExponent.setEmail(sub(exponentEmail));
@@ -147,56 +152,70 @@ public class ImportationResource {
                 currentExponent.setAddress(sub(exponentAddress));
                 currentExponent.setNpaLocalite(sub(exponentNpaLocalite));
                 currentExponent.setPhoneNumber(exponentPhone);
-                currentExponent.setWebsite(sub(exponentWebsite));
                 currentExponent.setPhoneNumber(exponentPhone);
-                currentExponent.setSocialMedia(sub(exponentSocialMedia));
-                currentExponent.setUrlPicture(sub(exponentUrlPicture));
                 currentExponent = exponentRepository.save(currentExponent);
 
+                String participationMeal1 = csvRecord.get(STAND_MEAL_1);
+                String participationMeal2 = csvRecord.get(STAND_MEAL_2);
+                String participationMeal3 = csvRecord.get(STAND_MEAL_3);
+                String participationAcceptedContract = csvRecord.get(STAND_ACCEPTED_CONTRACT);
+                String participationArrangment = csvRecord.get(STAND_ARRANGMENT);
+                String participationAcceptedChart = csvRecord.get(STAND_ACCEPTED_CHART);
+
+                Participation currentParticipation = new Participation();
+                currentParticipation.setSalon(currentSalon);
+                currentParticipation.setExponent(currentExponent);
+                currentParticipation.setInvoices(new HashSet<>());
+                currentParticipation.setPayments(new HashSet<>());
+                currentParticipation.setConferences(new HashSet<>());
+                currentParticipation.setStands(new HashSet<>());
+                currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim()));
+                currentParticipation.setNbMeal2(Long.parseLong(participationMeal2.trim()));
+                currentParticipation.setNbMeal3(Long.parseLong(participationMeal3.trim()));
+                currentParticipation.setAcceptedContract(participationAcceptedContract.contains("accepte"));
+                currentParticipation.setNeedArrangment(participationArrangment.contains("arrangement"));
+                currentParticipation.setAcceptedChart(participationAcceptedChart.contains("accepte"));
+                currentParticipation.setRegistrationDate(Instant.now());
+                currentParticipation.setStatus(Status.IN_VERIFICATION);
+                currentParticipation.setIsBillingClosed(false);
+                currentParticipation = participationRepository.save(currentParticipation);
+
                 String standDescription = csvRecord.get(STAND_DESCRIPTION);
-                String standMeal1 = csvRecord.get(STAND_MEAL_1);
-                String standMeal2 = csvRecord.get(STAND_MEAL_2);
-                String standMeal3 = csvRecord.get(STAND_MEAL_3);
                 String standDimension = csvRecord.get(STAND_DIMENSION);
                 String standSharing = csvRecord.get(STAND_SHARING);
                 String standNbTable = csvRecord.get(STAND_NB_TABLE);
                 String standNbChair = csvRecord.get(STAND_NB_CHAIR);
                 String standElectricity = csvRecord.get(STAND_ELECTRICITY);
-                String standAcceptedContract = csvRecord.get(STAND_ACCEPTED_CONTRACT);
-                String standArrangment = csvRecord.get(STAND_ARRANGMENT);
-                String standAcceptedChart = csvRecord.get(STAND_ACCEPTED_CHART);
+                String standWebsite = csvRecord.get(EXPONENT_WEBSITE);
+                String standSocialMedia = csvRecord.get(EXPONENT_SOCIAL_MEDIA);
+                String standUrlPicture = csvRecord.get(EXPONENT_URL_PICTURE);
 
                 Stand currentStand = new Stand();
+                currentStand.setParticipation(currentParticipation);
                 currentStand.setDescription(sub(standDescription));
-                currentStand.setNbMeal1(Long.parseLong(standMeal1.trim()));
-                currentStand.setNbMeal2(Long.parseLong(standMeal2.trim()));
-                currentStand.setNbMeal3(Long.parseLong(standMeal3.trim()));
+                currentStand.setWebsite(sub(standWebsite));
+                currentStand.setSocialMedia(sub(standSocialMedia));
+                currentStand.setUrlPicture(sub(standUrlPicture));
                 currentStand.setDimension(findDimension(dimensionStands, standDimension));
                 currentStand.setShared(standSharing.equalsIgnoreCase("oui"));
                 currentStand.setNbTable(standNbTable.contains("Aucune") ? 0 : Long.parseLong(standNbTable.substring(0, 1)));
                 currentStand.setNbChair(standNbChair.contains("Aucune") ? 0 : Long.parseLong(standNbChair.substring(0, 1)));
                 currentStand.setNeedElectricity(standElectricity.equalsIgnoreCase("oui"));
-                currentStand.setAcceptedContract(standAcceptedContract.contains("accepte"));
-                currentStand.setNeedArrangment(standArrangment.contains("arrangement"));
-                currentStand.setAcceptedChart(standAcceptedChart.contains("accepte"));
-                currentStand.setInvoices(new HashSet<>());
-                currentStand.setSalon(currentSalon);
-                currentStand.setRegistrationDate(Instant.now());
-                currentStand.setStatus(StandStatus.IN_TREATMENT);
-                currentStand.setBillingClosed(false);
-                currentStand.setExponent(currentExponent);
+                currentStand.setStatus(Status.IN_VERIFICATION);
                 currentStand = standRepository.save(currentStand);
 
                 String conferenceDescription = csvRecord.get(CONFERENCE_DESCRIPTION);
                 String standConference = csvRecord.get(STAND_CONFERENCE);
 
-                if (standConference.contains("oui")) {
+                if (standConference.equalsIgnoreCase("oui")) {
                     Conference currentConference = new Conference();
-                    currentConference.setSalon(currentSalon);
-                    currentConference.setExponent(currentExponent);
+                    currentConference.setParticipation(currentParticipation);
                     currentConference.setTitle(sub(conferenceDescription));
+                    currentConference.setStatus(Status.IN_VERIFICATION);
                     currentConference = conferenceRepository.save(currentConference);
                 }
+
+                index++;
             }
         } catch (IOException e) {}
 

@@ -35,6 +35,13 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.stand.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col" jhiSortBy="description">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.stand.description">Description</span>
@@ -42,23 +49,23 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="nbMeal1">
+            <th scope="col" jhiSortBy="website">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbMeal1">Nb Meal 1</span>
+                <span jhiTranslate="salonApp.stand.website">Website</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="nbMeal2">
+            <th scope="col" jhiSortBy="socialMedia">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbMeal2">Nb Meal 2</span>
+                <span jhiTranslate="salonApp.stand.socialMedia">Social Media</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="nbMeal3">
+            <th scope="col" jhiSortBy="urlPicture">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.nbMeal3">Nb Meal 3</span>
+                <span jhiTranslate="salonApp.stand.urlPicture">Url Picture</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -91,22 +98,23 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="acceptedChart">
+            <th scope="col" jhiSortBy="status">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.acceptedChart">Accepted Chart</span>
+                <span jhiTranslate="salonApp.stand.status">Status</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="exponent.id">
+            <th scope="col" jhiSortBy="extraInformation">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.exponent">Exponent</span>
+                <span jhiTranslate="salonApp.stand.extraInformation">Extra Information</span>
+
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="salon.id">
+            <th scope="col" jhiSortBy="participation.id">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.stand.salon">Salon</span>
+                <span jhiTranslate="salonApp.stand.participation">Participation</span>
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -123,34 +131,35 @@
           @for (stand of stands; track trackId) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/stand', stand.id, 'view']">{{ stand.description }}</a>
+                <a [routerLink]="['/stand', stand.id, 'view']">{{ stand.id }}</a>
               </td>
-              <td>{{ stand.nbMeal1 }}</td>
-              <td>{{ stand.nbMeal2 }}</td>
-              <td>{{ stand.nbMeal3 }}</td>
+              <td>{{ stand.description }}</td>
+              <td>{{ stand.website }}</td>
+              <td>{{ stand.socialMedia }}</td>
+              <td>{{ stand.urlPicture }}</td>
               <td>{{ stand.shared }}</td>
               <td>{{ stand.nbTable }}</td>
               <td>{{ stand.nbChair }}</td>
               <td>{{ stand.needElectricity }}</td>
-              <td>{{ stand.acceptedChart }}</td>
-              <td>
-                @if (stand.exponent) {
-                  <div>
-                    <a [routerLink]="['/exponent', stand.exponent.id, 'view']">{{ stand.exponent.fullName }}</a>
-                  </div>
-                }
+              <td [jhiTranslate]="'salonApp.Status.' + (stand.status ?? 'null')">
+                {{
+                  { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                    stand.status ?? 'null'
+                  ]
+                }}
               </td>
+              <td>{{ stand.extraInformation }}</td>
               <td>
-                @if (stand.salon) {
+                @if (stand.participation) {
                   <div>
-                    <a [routerLink]="['/salon', stand.salon.id, 'view']">{{ stand.salon.place }}</a>
+                    <a [routerLink]="['/participation', stand.participation.id, 'view']">{{ stand.participation.id }}</a>
                   </div>
                 }
               </td>
               <td>
                 @if (stand.dimension) {
                   <div>
-                    <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.dimension }}</a>
+                    <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.id }}</a>
                   </div>
                 }
               </td>

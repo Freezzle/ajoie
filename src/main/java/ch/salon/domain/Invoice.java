@@ -21,21 +21,33 @@ public class Invoice implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "amount")
-    private Double amount;
+    @Column(name = "generation_date")
+    private Instant generationDate;
 
-    @Column(name = "billing_date")
-    private Instant billingDate;
+    @Column(name = "label")
+    private String label;
 
-    @Column(name = "payment_mode")
-    private String paymentMode;
+    @Column(name = "default_amount")
+    private Double defaultAmount;
+
+    @Column(name = "custom_amount")
+    private Double customAmount;
+
+    @Column(name = "quantity")
+    private Long quantity;
+
+    @Column(name = "total")
+    private Double total;
+
+    @Column(name = "lock")
+    private Boolean lock;
 
     @Column(name = "extra_information")
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "exponent", "salon", "dimension", "invoices" }, allowSetters = true)
-    private Stand stand;
+    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
+    private Participation participation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -52,43 +64,95 @@ public class Invoice implements Serializable {
         this.id = id;
     }
 
-    public Double getAmount() {
-        return this.amount;
+    public Instant getGenerationDate() {
+        return this.generationDate;
     }
 
-    public Invoice amount(Double amount) {
-        this.setAmount(amount);
+    public Invoice generationDate(Instant generationDate) {
+        this.setGenerationDate(generationDate);
         return this;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
+    public void setGenerationDate(Instant generationDate) {
+        this.generationDate = generationDate;
     }
 
-    public Instant getBillingDate() {
-        return this.billingDate;
+    public String getLabel() {
+        return this.label;
     }
 
-    public Invoice billingDate(Instant billingDate) {
-        this.setBillingDate(billingDate);
+    public Invoice label(String label) {
+        this.setLabel(label);
         return this;
     }
 
-    public void setBillingDate(Instant billingDate) {
-        this.billingDate = billingDate;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
-    public String getPaymentMode() {
-        return this.paymentMode;
+    public Double getDefaultAmount() {
+        return this.defaultAmount;
     }
 
-    public Invoice paymentMode(String paymentMode) {
-        this.setPaymentMode(paymentMode);
+    public Invoice defaultAmount(Double defaultAmount) {
+        this.setDefaultAmount(defaultAmount);
         return this;
     }
 
-    public void setPaymentMode(String paymentMode) {
-        this.paymentMode = paymentMode;
+    public void setDefaultAmount(Double defaultAmount) {
+        this.defaultAmount = defaultAmount;
+    }
+
+    public Double getCustomAmount() {
+        return this.customAmount;
+    }
+
+    public Invoice customAmount(Double customAmount) {
+        this.setCustomAmount(customAmount);
+        return this;
+    }
+
+    public void setCustomAmount(Double customAmount) {
+        this.customAmount = customAmount;
+    }
+
+    public Long getQuantity() {
+        return this.quantity;
+    }
+
+    public Invoice quantity(Long quantity) {
+        this.setQuantity(quantity);
+        return this;
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
+    }
+
+    public Double getTotal() {
+        return this.total;
+    }
+
+    public Invoice total(Double total) {
+        this.setTotal(total);
+        return this;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    public Boolean getLock() {
+        return this.lock;
+    }
+
+    public Invoice lock(Boolean lock) {
+        this.setLock(lock);
+        return this;
+    }
+
+    public void setLock(Boolean lock) {
+        this.lock = lock;
     }
 
     public String getExtraInformation() {
@@ -104,16 +168,16 @@ public class Invoice implements Serializable {
         this.extraInformation = extraInformation;
     }
 
-    public Stand getStand() {
-        return this.stand;
+    public Participation getParticipation() {
+        return this.participation;
     }
 
-    public void setStand(Stand stand) {
-        this.stand = stand;
+    public void setParticipation(Participation participation) {
+        this.participation = participation;
     }
 
-    public Invoice stand(Stand stand) {
-        this.setStand(stand);
+    public Invoice participation(Participation participation) {
+        this.setParticipation(participation);
         return this;
     }
 
@@ -141,9 +205,13 @@ public class Invoice implements Serializable {
     public String toString() {
         return "Invoice{" +
             "id=" + getId() +
-            ", amount=" + getAmount() +
-            ", billingDate='" + getBillingDate() + "'" +
-            ", paymentMode='" + getPaymentMode() + "'" +
+            ", generationDate='" + getGenerationDate() + "'" +
+            ", label='" + getLabel() + "'" +
+            ", defaultAmount=" + getDefaultAmount() +
+            ", customAmount=" + getCustomAmount() +
+            ", quantity=" + getQuantity() +
+            ", total=" + getTotal() +
+            ", lock='" + getLock() + "'" +
             ", extraInformation='" + getExtraInformation() + "'" +
             "}";
     }

@@ -1,15 +1,15 @@
 {
   "sessions": {
-    "messages": {
-      "error": "<strong>Es ist ein Fehler aufgetreten!</strong> Die Sitzung konnte nicht geschlossen werden.",
-      "success": "<strong>Sitzung wurde geschlossen!</strong>"
-    },
+    "title": "Aktive Sitzungen für [<strong>{{username}}</strong>]",
     "table": {
-      "button": "Schließen",
-      "date": "Datum",
       "ipaddress": "IP Adresse",
-      "useragent": "User Agent"
+      "useragent": "User Agent",
+      "date": "Datum",
+      "button": "Schließen"
     },
-    "title": "Aktive Sitzungen für [<strong>{{username}}</strong>]"
+    "messages": {
+      "success": "<strong>Sitzung wurde geschlossen!</strong>",
+      "error": "<strong>Es ist ein Fehler aufgetreten!</strong> Die Sitzung konnte nicht geschlossen werden."
+    }
   }
 }

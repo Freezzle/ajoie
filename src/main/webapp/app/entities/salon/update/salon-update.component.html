@@ -8,9 +8,23 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="salonApp.salon.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
         <div class="mb-3">
           <label class="form-label" for="field_place" jhiTranslate="salonApp.salon.place">Place</label>
           <input type="text" class="form-control" name="place" id="field_place" data-cy="place" formControlName="place" />
+          @if (editForm.get('place')!.invalid && (editForm.get('place')!.dirty || editForm.get('place')!.touched)) {
+            <div>
+              @if (editForm.get('place')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -19,13 +33,26 @@
             <input
               id="field_startingDate"
               data-cy="startingDate"
-              type="date"
+              type="datetime-local"
               class="form-control"
               name="startingDate"
               formControlName="startingDate"
-              placeholder="YYYY-MM-DD"
+              placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
+          @if (editForm.get('startingDate')!.invalid && (editForm.get('startingDate')!.dirty || editForm.get('startingDate')!.touched)) {
+            <div>
+              @if (editForm.get('startingDate')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('startingDate')?.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >Ce champ doit être une date et une heure.</small
+              >
+            </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -34,13 +61,100 @@
             <input
               id="field_endingDate"
               data-cy="endingDate"
-              type="date"
+              type="datetime-local"
               class="form-control"
               name="endingDate"
               formControlName="endingDate"
-              placeholder="YYYY-MM-DD"
+              placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
+          @if (editForm.get('endingDate')!.invalid && (editForm.get('endingDate')!.dirty || editForm.get('endingDate')!.touched)) {
+            <div>
+              @if (editForm.get('endingDate')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('endingDate')?.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >Ce champ doit être une date et une heure.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceMeal1" jhiTranslate="salonApp.salon.priceMeal1">Price Meal 1</label>
+          <input
+            type="number"
+            class="form-control"
+            name="priceMeal1"
+            id="field_priceMeal1"
+            data-cy="priceMeal1"
+            formControlName="priceMeal1"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceMeal2" jhiTranslate="salonApp.salon.priceMeal2">Price Meal 2</label>
+          <input
+            type="number"
+            class="form-control"
+            name="priceMeal2"
+            id="field_priceMeal2"
+            data-cy="priceMeal2"
+            formControlName="priceMeal2"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceMeal3" jhiTranslate="salonApp.salon.priceMeal3">Price Meal 3</label>
+          <input
+            type="number"
+            class="form-control"
+            name="priceMeal3"
+            id="field_priceMeal3"
+            data-cy="priceMeal3"
+            formControlName="priceMeal3"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceConference" jhiTranslate="salonApp.salon.priceConference">Price Conference</label>
+          <input
+            type="number"
+            class="form-control"
+            name="priceConference"
+            id="field_priceConference"
+            data-cy="priceConference"
+            formControlName="priceConference"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_priceSharingStand" jhiTranslate="salonApp.salon.priceSharingStand"
+            >Price Sharing Stand</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            name="priceSharingStand"
+            id="field_priceSharingStand"
+            data-cy="priceSharingStand"
+            formControlName="priceSharingStand"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_extraInformation" jhiTranslate="salonApp.salon.extraInformation">Extra Information</label>
+          <input
+            type="text"
+            class="form-control"
+            name="extraInformation"
+            id="field_extraInformation"
+            data-cy="extraInformation"
+            formControlName="extraInformation"
+          />
         </div>
       </div>
 

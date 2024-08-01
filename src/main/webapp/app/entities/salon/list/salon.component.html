@@ -5,6 +5,7 @@
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="salonApp.salon.home.refreshListLabel">Actualiser la liste</span>
       </button>
 
       <button
@@ -14,6 +15,7 @@
         [routerLink]="['/salon/new']"
       >
         <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="salonApp.salon.home.createLabel">Créer un nouveau Salon</span>
       </button>
     </div>
   </h2>
@@ -33,6 +35,13 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.salon.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col" jhiSortBy="place">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.salon.place">Place</span>
@@ -54,6 +63,48 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="priceMeal1">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.salon.priceMeal1">Price Meal 1</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priceMeal2">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.salon.priceMeal2">Price Meal 2</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priceMeal3">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.salon.priceMeal3">Price Meal 3</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priceConference">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.salon.priceConference">Price Conference</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priceSharingStand">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.salon.priceSharingStand">Price Sharing Stand</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="extraInformation">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.salon.extraInformation">Extra Information</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -61,10 +112,17 @@
           @for (salon of salons; track trackId) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/salon', salon.id, 'view']">{{ salon.place }}</a>
+                <a [routerLink]="['/salon', salon.id, 'view']">{{ salon.id }}</a>
               </td>
+              <td>{{ salon.place }}</td>
               <td>{{ salon.startingDate | formatMediumDatetime }}</td>
               <td>{{ salon.endingDate | formatMediumDatetime }}</td>
+              <td>{{ salon.priceMeal1 }}</td>
+              <td>{{ salon.priceMeal2 }}</td>
+              <td>{{ salon.priceMeal3 }}</td>
+              <td>{{ salon.priceConference }}</td>
+              <td>{{ salon.priceSharingStand }}</td>
+              <td>{{ salon.extraInformation }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/salon', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

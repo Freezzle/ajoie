@@ -14,20 +14,16 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type ExponentFormGroupInput = IExponent | PartialWithRequiredKeyOf<NewExponent>;
 
-type ExponentFormDefaults = Pick<NewExponent, 'id' | 'blocked'>;
+type ExponentFormDefaults = Pick<NewExponent, 'id'>;
 
 type ExponentFormGroupContent = {
   id: FormControl<IExponent['id'] | NewExponent['id']>;
-  email: FormControl<IExponent['email']>;
   fullName: FormControl<IExponent['fullName']>;
+  email: FormControl<IExponent['email']>;
   phoneNumber: FormControl<IExponent['phoneNumber']>;
-  website: FormControl<IExponent['website']>;
-  socialMedia: FormControl<IExponent['socialMedia']>;
   address: FormControl<IExponent['address']>;
   npaLocalite: FormControl<IExponent['npaLocalite']>;
-  urlPicture: FormControl<IExponent['urlPicture']>;
-  comment: FormControl<IExponent['comment']>;
-  blocked: FormControl<IExponent['blocked']>;
+  extraInformation: FormControl<IExponent['extraInformation']>;
 };
 
 export type ExponentFormGroup = FormGroup<ExponentFormGroupContent>;
@@ -47,16 +43,16 @@ export class ExponentFormService {
           validators: [Validators.required],
         },
       ),
-      email: new FormControl(exponentRawValue.email),
-      fullName: new FormControl(exponentRawValue.fullName),
+      fullName: new FormControl(exponentRawValue.fullName, {
+        validators: [Validators.required],
+      }),
+      email: new FormControl(exponentRawValue.email, {
+        validators: [Validators.required],
+      }),
       phoneNumber: new FormControl(exponentRawValue.phoneNumber),
-      website: new FormControl(exponentRawValue.website),
-      socialMedia: new FormControl(exponentRawValue.socialMedia),
       address: new FormControl(exponentRawValue.address),
       npaLocalite: new FormControl(exponentRawValue.npaLocalite),
-      urlPicture: new FormControl(exponentRawValue.urlPicture),
-      comment: new FormControl(exponentRawValue.comment),
-      blocked: new FormControl(exponentRawValue.blocked),
+      extraInformation: new FormControl(exponentRawValue.extraInformation),
     });
   }
 
@@ -77,7 +73,6 @@ export class ExponentFormService {
   private getFormDefaults(): ExponentFormDefaults {
     return {
       id: null,
-      blocked: false,
     };
   }
 }

@@ -10,18 +10,18 @@
     -->
     <changeSet id="20240723192806-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="dimension_id"
-                                 baseTableName="price_stand_salon"
-                                 constraintName="fk_price_stand_salon__dimension_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="dimension_stand"
-                                 />
-
         <addForeignKeyConstraint baseColumnNames="salon_id"
                                  baseTableName="price_stand_salon"
                                  constraintName="fk_price_stand_salon__salon_id"
                                  referencedColumnNames="id"
                                  referencedTableName="salon"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="dimension_id"
+                                 baseTableName="price_stand_salon"
+                                 constraintName="fk_price_stand_salon__dimension_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="dimension_stand"
                                  />
     </changeSet>
 </databaseChangeLog>

@@ -8,14 +8,35 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_email" jhiTranslate="salonApp.exponent.email">Email</label>
-          <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
-        </div>
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="salonApp.exponent.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
 
         <div class="mb-3">
           <label class="form-label" for="field_fullName" jhiTranslate="salonApp.exponent.fullName">Full Name</label>
           <input type="text" class="form-control" name="fullName" id="field_fullName" data-cy="fullName" formControlName="fullName" />
+          @if (editForm.get('fullName')!.invalid && (editForm.get('fullName')!.dirty || editForm.get('fullName')!.touched)) {
+            <div>
+              @if (editForm.get('fullName')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_email" jhiTranslate="salonApp.exponent.email">Email</label>
+          <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
+          @if (editForm.get('email')!.invalid && (editForm.get('email')!.dirty || editForm.get('email')!.touched)) {
+            <div>
+              @if (editForm.get('email')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -27,23 +48,6 @@
             id="field_phoneNumber"
             data-cy="phoneNumber"
             formControlName="phoneNumber"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_website" jhiTranslate="salonApp.exponent.website">Website</label>
-          <input type="text" class="form-control" name="website" id="field_website" data-cy="website" formControlName="website" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_socialMedia" jhiTranslate="salonApp.exponent.socialMedia">Social Media</label>
-          <input
-            type="text"
-            class="form-control"
-            name="socialMedia"
-            id="field_socialMedia"
-            data-cy="socialMedia"
-            formControlName="socialMedia"
           />
         </div>
 
@@ -65,25 +69,15 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_urlPicture" jhiTranslate="salonApp.exponent.urlPicture">Url Picture</label>
+          <label class="form-label" for="field_extraInformation" jhiTranslate="salonApp.exponent.extraInformation">Extra Information</label>
           <input
             type="text"
             class="form-control"
-            name="urlPicture"
-            id="field_urlPicture"
-            data-cy="urlPicture"
-            formControlName="urlPicture"
+            name="extraInformation"
+            id="field_extraInformation"
+            data-cy="extraInformation"
+            formControlName="extraInformation"
           />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_comment" jhiTranslate="salonApp.exponent.comment">Comment</label>
-          <input type="text" class="form-control" name="comment" id="field_comment" data-cy="comment" formControlName="comment" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_blocked" jhiTranslate="salonApp.exponent.blocked">Blocked</label>
-          <input type="checkbox" class="form-check" name="blocked" id="field_blocked" data-cy="blocked" formControlName="blocked" />
         </div>
       </div>
 

@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "changelogDate": "20240731190749"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "billingDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "paymentMode",
+      "fieldType": "Mode",
+      "fieldValues": "BANK,CASH,SERVICE,OTHER"
+    },
+    {
+      "fieldName": "extraInformation",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Payment",
+  "relationships": [
+    {
+      "otherEntityName": "participation",
+      "relationshipName": "participation",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

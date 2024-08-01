@@ -1,40 +1,35 @@
 {
   "salonApp": {
     "stand": {
-      "acceptedChart": "Accepted Chart",
-      "acceptedContract": "Accepted contract",
+      "home": {
+        "title": "Stands",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Stand erstellen",
+        "createOrEditLabel": "Stand erstellen oder bearbeiten",
+        "notFound": "Keine Stands gefunden"
+      },
       "created": "Stand erstellt mit ID {{ param }}",
+      "updated": "Stand aktualisiert mit ID {{ param }}",
+      "deleted": "Stand gelöscht mit ID {{ param }}",
       "delete": {
         "question": "Soll Stand {{ id }} wirklich dauerhaft gelöscht werden?"
       },
-      "deleted": "Stand gelöscht mit ID {{ param }}",
-      "description": "Description",
       "detail": {
         "title": "Stand"
       },
-      "dimension": "Dimension",
-      "exponent": "Exponent",
-      "home": {
-        "createLabel": "Stand erstellen",
-        "createOrEditLabel": "Stand erstellen oder bearbeiten",
-        "notFound": "Keine Stands gefunden",
-        "refreshListLabel": "Aktualisieren",
-        "title": "Stands"
-      },
       "id": "Id",
-      "billingClosed": "Paid",
-      "nbChair": "Nb Chair",
-      "nbMeal1": "Nb Meal 1",
-      "nbMeal2": "Nb Meal 2",
-      "nbMeal3": "Nb Meal 3",
-      "nbTable": "Nb Table",
-      "needArrangment": "Need arrangment",
-      "needElectricity": "Need Electricity",
-      "registrationDate": "Registration date",
-      "salon": "Salon",
+      "description": "Description",
+      "website": "Website",
+      "socialMedia": "Social Media",
+      "urlPicture": "Url Picture",
       "shared": "Shared",
+      "nbTable": "Nb Table",
+      "nbChair": "Nb Chair",
+      "needElectricity": "Need Electricity",
       "status": "Status",
-      "updated": "Stand aktualisiert mit ID {{ param }}"
+      "extraInformation": "Extra Information",
+      "participation": "Participation",
+      "dimension": "Dimension"
     }
   }
 }

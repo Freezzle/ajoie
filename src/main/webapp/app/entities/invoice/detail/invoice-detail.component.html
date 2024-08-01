@@ -11,21 +11,49 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="salonApp.invoice.amount">Amount</span></dt>
+          <dt><span jhiTranslate="salonApp.invoice.id">Id</span></dt>
           <dd>
-            <span>{{ invoice()!.amount }}</span>
+            <span>{{ invoice()!.id }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.invoice.billingDate">Billing Date</span></dt>
+          <dt><span jhiTranslate="salonApp.invoice.generationDate">Generation Date</span></dt>
           <dd>
-            <span>{{ invoice()!.billingDate | formatMediumDatetime }}</span>
+            <span>{{ invoice()!.generationDate | formatMediumDatetime }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.invoice.paymentMode">Payment Mode</span></dt>
+          <dt><span jhiTranslate="salonApp.invoice.label">Label</span></dt>
           <dd>
-            <span>{{ invoice()!.paymentMode }}</span>
+            <span>{{ invoice()!.label }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.invoice.defaultAmount">Default Amount</span></dt>
+          <dd>
+            <span>{{ invoice()!.defaultAmount }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.invoice.customAmount">Custom Amount</span></dt>
+          <dd>
+            <span>{{ invoice()!.customAmount }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.invoice.quantity">Quantity</span></dt>
+          <dd>
+            <span>{{ invoice()!.quantity }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.invoice.total">Total</span></dt>
+          <dd>
+            <span>{{ invoice()!.total }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.invoice.lock">Lock</span></dt>
+          <dd>
+            <span>{{ invoice()!.lock }}</span>
           </dd>
           <dt><span jhiTranslate="salonApp.invoice.extraInformation">Extra Information</span></dt>
           <dd>
             <span>{{ invoice()!.extraInformation }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.invoice.participation">Participation</span></dt>
+          <dd>
+            @if (invoice()!.participation) {
+              <div>
+                <a [routerLink]="['/participation', invoice()!.participation?.id, 'view']">{{ invoice()!.participation?.id }}</a>
+              </div>
+            }
           </dd>
         </dl>
 

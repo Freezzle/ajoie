@@ -35,6 +35,12 @@ type SalonFormGroupContent = {
   place: FormControl<SalonFormRawValue['place']>;
   startingDate: FormControl<SalonFormRawValue['startingDate']>;
   endingDate: FormControl<SalonFormRawValue['endingDate']>;
+  priceMeal1: FormControl<SalonFormRawValue['priceMeal1']>;
+  priceMeal2: FormControl<SalonFormRawValue['priceMeal2']>;
+  priceMeal3: FormControl<SalonFormRawValue['priceMeal3']>;
+  priceConference: FormControl<SalonFormRawValue['priceConference']>;
+  priceSharingStand: FormControl<SalonFormRawValue['priceSharingStand']>;
+  extraInformation: FormControl<SalonFormRawValue['extraInformation']>;
 };
 
 export type SalonFormGroup = FormGroup<SalonFormGroupContent>;
@@ -54,9 +60,21 @@ export class SalonFormService {
           validators: [Validators.required],
         },
       ),
-      place: new FormControl(salonRawValue.place),
-      startingDate: new FormControl(salonRawValue.startingDate),
-      endingDate: new FormControl(salonRawValue.endingDate),
+      place: new FormControl(salonRawValue.place, {
+        validators: [Validators.required],
+      }),
+      startingDate: new FormControl(salonRawValue.startingDate, {
+        validators: [Validators.required],
+      }),
+      endingDate: new FormControl(salonRawValue.endingDate, {
+        validators: [Validators.required],
+      }),
+      priceMeal1: new FormControl(salonRawValue.priceMeal1),
+      priceMeal2: new FormControl(salonRawValue.priceMeal2),
+      priceMeal3: new FormControl(salonRawValue.priceMeal3),
+      priceConference: new FormControl(salonRawValue.priceConference),
+      priceSharingStand: new FormControl(salonRawValue.priceSharingStand),
+      extraInformation: new FormControl(salonRawValue.extraInformation),
     });
   }
 

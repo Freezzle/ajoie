@@ -35,23 +35,58 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="amount">
+            <th scope="col" jhiSortBy="id">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.invoice.amount">Amount</span>
+                <span jhiTranslate="salonApp.invoice.id">Id</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="billingDate">
+            <th scope="col" jhiSortBy="generationDate">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.invoice.billingDate">Billing Date</span>
+                <span jhiTranslate="salonApp.invoice.generationDate">Generation Date</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="paymentMode">
+            <th scope="col" jhiSortBy="label">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.invoice.paymentMode">Payment Mode</span>
+                <span jhiTranslate="salonApp.invoice.label">Label</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="defaultAmount">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.defaultAmount">Default Amount</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="customAmount">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.customAmount">Custom Amount</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="quantity">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.quantity">Quantity</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="total">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.total">Total</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="lock">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.lock">Lock</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -63,16 +98,36 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="participation.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.invoice.participation">Participation</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
           @for (invoice of invoices; track trackId) {
             <tr data-cy="entityTable">
-              <td>{{ invoice.amount }}</td>
-              <td>{{ invoice.billingDate | formatMediumDatetime }}</td>
-              <td>{{ invoice.paymentMode }}</td>
+              <td>
+                <a [routerLink]="['/invoice', invoice.id, 'view']">{{ invoice.id }}</a>
+              </td>
+              <td>{{ invoice.generationDate | formatMediumDatetime }}</td>
+              <td>{{ invoice.label }}</td>
+              <td>{{ invoice.defaultAmount }}</td>
+              <td>{{ invoice.customAmount }}</td>
+              <td>{{ invoice.quantity }}</td>
+              <td>{{ invoice.total }}</td>
+              <td>{{ invoice.lock }}</td>
               <td>{{ invoice.extraInformation }}</td>
+              <td>
+                @if (invoice.participation) {
+                  <div>
+                    <a [routerLink]="['/participation', invoice.participation.id, 'view']">{{ invoice.participation.id }}</a>
+                  </div>
+                }
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/invoice', invoice.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

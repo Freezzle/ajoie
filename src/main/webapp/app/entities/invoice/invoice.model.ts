@@ -1,13 +1,17 @@
 import dayjs from 'dayjs/esm';
-import { IStand } from '../../admin/stand/stand.model';
+import { IParticipation } from 'app/entities/participation/participation.model';
 
 export interface IInvoice {
   id: string;
-  amount?: number | null;
-  billingDate?: dayjs.Dayjs | null;
-  paymentMode?: string | null;
+  generationDate?: dayjs.Dayjs | null;
+  label?: string | null;
+  defaultAmount?: number | null;
+  customAmount?: number | null;
+  quantity?: number | null;
+  total?: number | null;
+  lock?: boolean | null;
   extraInformation?: string | null;
-  stand?: IStand | null;
+  participation?: IParticipation | null;
 }
 
 export type NewInvoice = Omit<IInvoice, 'id'> & { id: null };

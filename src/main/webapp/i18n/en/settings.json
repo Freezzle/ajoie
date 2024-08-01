@@ -1,32 +1,32 @@
 {
   "settings": {
+    "title": "User settings for [<strong>{{username}}</strong>]",
     "form": {
-      "button": "Save",
       "firstname": "First Name",
       "firstname.placeholder": "Your first name",
-      "language": "Language",
       "lastname": "Last Name",
-      "lastname.placeholder": "Your last name"
+      "lastname.placeholder": "Your last name",
+      "language": "Language",
+      "button": "Save"
     },
     "messages": {
       "error": {
-        "emailexists": "<strong>Email is already in use!</strong> Please choose another one.",
-        "fail": "<strong>An error has occurred!</strong> Settings could not be saved."
+        "fail": "<strong>An error has occurred!</strong> Settings could not be saved.",
+        "emailexists": "<strong>Email is already in use!</strong> Please choose another one."
       },
       "success": "<strong>Settings saved!</strong>",
       "validate": {
         "firstname": {
-          "maxlength": "Your first name cannot be longer than 50 characters",
+          "required": "Your first name is required.",
           "minlength": "Your first name is required to be at least 1 character",
-          "required": "Your first name is required."
+          "maxlength": "Your first name cannot be longer than 50 characters"
         },
         "lastname": {
-          "maxlength": "Your last name cannot be longer than 50 characters",
+          "required": "Your last name is required.",
           "minlength": "Your last name is required to be at least 1 character",
-          "required": "Your last name is required."
+          "maxlength": "Your last name cannot be longer than 50 characters"
         }
       }
-    },
-    "title": "User settings for [<strong>{{username}}</strong>]"
+    }
   }
 }

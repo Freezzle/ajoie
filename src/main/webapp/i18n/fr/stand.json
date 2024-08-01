@@ -1,40 +1,35 @@
 {
   "salonApp": {
     "stand": {
-      "acceptedChart": "Chart accepté ?",
-      "acceptedContract": "Contrat accepté ?",
-      "created": "Un nouveau stand a été créé avec l'identifiant {{ param }}",
-      "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le stand {{ id }} ?"
+      "home": {
+        "title": "Stands",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Stand",
+        "createOrEditLabel": "Créer ou éditer un Stand",
+        "notFound": "Aucun Stand trouvé"
       },
-      "deleted": "Le stand avec l'identifiant {{ param }} a été supprimé",
-      "description": "Description",
+      "created": "Un nouveau Stand a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Stand avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Stand avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Stand {{ id }} ?"
+      },
       "detail": {
         "title": "Stand"
       },
-      "dimension": "Dimension",
-      "exponent": "Exposant",
-      "home": {
-        "createLabel": "Créer un nouveau stand",
-        "createOrEditLabel": "Créer ou éditer un stand",
-        "notFound": "Aucun stand trouvé",
-        "refreshListLabel": "Actualiser",
-        "title": "Stands"
-      },
       "id": "Id",
-      "billingClosed": "Facturation clôturé ?",
-      "nbChair": "Nb chaise",
-      "nbTable": "Nb table",
-      "nbMeal1": "Nb repas samedi midi",
-      "nbMeal2": "Nb repas samedi soir",
-      "nbMeal3": "Nb repas dimanche midi",
-      "needArrangment": "Demande d'arrangement ?",
-      "needElectricity": "Besoin d'electricité ?",
-      "registrationDate": "Date d'inscription",
-      "salon": "Salon",
-      "shared": "Stand partagé ?",
-      "status": "Statut",
-      "updated": "Le stand avec l'identifiant {{ param }} a été mis à jour"
+      "description": "Description",
+      "website": "Website",
+      "socialMedia": "Social Media",
+      "urlPicture": "Url Picture",
+      "shared": "Shared",
+      "nbTable": "Nb Table",
+      "nbChair": "Nb Chair",
+      "needElectricity": "Need Electricity",
+      "status": "Status",
+      "extraInformation": "Extra Information",
+      "participation": "Participation",
+      "dimension": "Dimension"
     }
   }
 }

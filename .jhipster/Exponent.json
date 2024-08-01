@@ -9,23 +9,17 @@
       "fieldType": "UUID"
     },
     {
-      "fieldName": "email",
-      "fieldType": "String"
+      "fieldName": "fullName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "fullName",
-      "fieldType": "String"
+      "fieldName": "email",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "phoneNumber",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "website",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "socialMedia",
       "fieldType": "String"
     },
     {
@@ -37,31 +31,16 @@
       "fieldType": "String"
     },
     {
-      "fieldName": "urlPicture",
+      "fieldName": "extraInformation",
       "fieldType": "String"
-    },
-    {
-      "fieldName": "comment",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "blocked",
-      "fieldType": "Boolean"
     }
   ],
   "name": "Exponent",
   "relationships": [
     {
-      "otherEntityName": "stand",
+      "otherEntityName": "participation",
       "otherEntityRelationshipName": "exponent",
-      "relationshipName": "stand",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    },
-    {
-      "otherEntityName": "conference",
-      "otherEntityRelationshipName": "exponent",
-      "relationshipName": "conference",
+      "relationshipName": "participation",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }

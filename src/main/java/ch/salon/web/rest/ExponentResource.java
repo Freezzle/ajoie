@@ -3,6 +3,8 @@ package ch.salon.web.rest;
 import ch.salon.domain.Exponent;
 import ch.salon.repository.ExponentRepository;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -47,7 +49,7 @@ public class ExponentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<Exponent> createExponent(@RequestBody Exponent exponent) throws URISyntaxException {
+    public ResponseEntity<Exponent> createExponent(@Valid @RequestBody Exponent exponent) throws URISyntaxException {
         log.debug("REST request to save Exponent : {}", exponent);
         if (exponent.getId() != null) {
             throw new BadRequestAlertException("A new exponent cannot already have an ID", ENTITY_NAME, "idexists");
@@ -71,7 +73,7 @@ public class ExponentResource {
     @PutMapping("/{id}")
     public ResponseEntity<Exponent> updateExponent(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody Exponent exponent
+        @Valid @RequestBody Exponent exponent
     ) throws URISyntaxException {
         log.debug("REST request to update Exponent : {}, {}", id, exponent);
         if (exponent.getId() == null) {
@@ -105,7 +107,7 @@ public class ExponentResource {
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Exponent> partialUpdateExponent(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody Exponent exponent
+        @NotNull @RequestBody Exponent exponent
     ) throws URISyntaxException {
         log.debug("REST request to partial update Exponent partially : {}, {}", id, exponent);
         if (exponent.getId() == null) {
@@ -122,20 +124,14 @@ public class ExponentResource {
         Optional<Exponent> result = exponentRepository
             .findById(exponent.getId())
             .map(existingExponent -> {
-                if (exponent.getEmail() != null) {
-                    existingExponent.setEmail(exponent.getEmail());
-                }
                 if (exponent.getFullName() != null) {
                     existingExponent.setFullName(exponent.getFullName());
                 }
+                if (exponent.getEmail() != null) {
+                    existingExponent.setEmail(exponent.getEmail());
+                }
                 if (exponent.getPhoneNumber() != null) {
                     existingExponent.setPhoneNumber(exponent.getPhoneNumber());
-                }
-                if (exponent.getWebsite() != null) {
-                    existingExponent.setWebsite(exponent.getWebsite());
-                }
-                if (exponent.getSocialMedia() != null) {
-                    existingExponent.setSocialMedia(exponent.getSocialMedia());
                 }
                 if (exponent.getAddress() != null) {
                     existingExponent.setAddress(exponent.getAddress());
@@ -143,14 +139,8 @@ public class ExponentResource {
                 if (exponent.getNpaLocalite() != null) {
                     existingExponent.setNpaLocalite(exponent.getNpaLocalite());
                 }
-                if (exponent.getUrlPicture() != null) {
-                    existingExponent.setUrlPicture(exponent.getUrlPicture());
-                }
-                if (exponent.getComment() != null) {
-                    existingExponent.setComment(exponent.getComment());
-                }
-                if (exponent.getBlocked() != null) {
-                    existingExponent.setBlocked(exponent.getBlocked());
+                if (exponent.getExtraInformation() != null) {
+                    existingExponent.setExtraInformation(exponent.getExtraInformation());
                 }
 
                 return existingExponent;

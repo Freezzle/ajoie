@@ -10,19 +10,20 @@
     },
     {
       "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "website",
       "fieldType": "String"
     },
     {
-      "fieldName": "nbMeal1",
-      "fieldType": "Long"
+      "fieldName": "socialMedia",
+      "fieldType": "String"
     },
     {
-      "fieldName": "nbMeal2",
-      "fieldType": "Long"
-    },
-    {
-      "fieldName": "nbMeal3",
-      "fieldType": "Long"
+      "fieldName": "urlPicture",
+      "fieldType": "String"
     },
     {
       "fieldName": "shared",
@@ -41,40 +42,20 @@
       "fieldType": "Boolean"
     },
     {
-      "fieldName": "acceptedChart",
-      "fieldType": "Boolean"
+      "fieldName": "status",
+      "fieldType": "Status",
+      "fieldValues": "REFUSED,CANCELED,IN_VERIFICATION,ACCEPTED"
     },
     {
-      "fieldName": "acceptedContract",
-      "fieldType": "Boolean"
-    },
-    {
-      "fieldName": "needArrangment",
-      "fieldType": "Boolean"
-    },
-    {
-      "fieldName": "isBillingClosed",
-      "fieldType": "Boolean"
+      "fieldName": "extraInformation",
+      "fieldType": "String"
     }
   ],
   "name": "Stand",
   "relationships": [
     {
-      "otherEntityName": "billing",
-      "otherEntityRelationshipName": "stand",
-      "relationshipName": "billing",
-      "relationshipSide": "right",
-      "relationshipType": "one-to-one"
-    },
-    {
-      "otherEntityName": "exponent",
-      "relationshipName": "exponent",
-      "relationshipSide": "right",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityName": "salon",
-      "relationshipName": "salon",
+      "otherEntityName": "participation",
+      "relationshipName": "participation",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
@@ -83,13 +64,6 @@
       "relationshipName": "dimension",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityName": "invoice",
-      "otherEntityRelationshipName": "stand",
-      "relationshipName": "invoice",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
     }
   ],
   "searchEngine": "no"

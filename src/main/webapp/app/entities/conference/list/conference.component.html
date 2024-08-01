@@ -35,6 +35,13 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.conference.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col" jhiSortBy="title">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.conference.title">Title</span>
@@ -42,15 +49,23 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="salon.id">
+            <th scope="col" jhiSortBy="status">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.conference.salon">Salon</span>
+                <span jhiTranslate="salonApp.conference.status">Status</span>
+
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="exponent.id">
+            <th scope="col" jhiSortBy="extraInformation">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.conference.exponent">Exponent</span>
+                <span jhiTranslate="salonApp.conference.extraInformation">Extra Information</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="participation.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.conference.participation">Participation</span>
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -61,21 +76,21 @@
           @for (conference of conferences; track trackId) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/conference', conference.id, 'view']">{{ conference.title }}</a>
+                <a [routerLink]="['/conference', conference.id, 'view']">{{ conference.id }}</a>
               </td>
-              <td>
-                @if (conference.salon) {
-                  <div>
-                    <a [routerLink]="['/salon', conference.salon.id, 'view']">{{
-                      conference.salon.place + ' ' + (conference.salon.startingDate | formatMediumDate)
-                    }}</a>
-                  </div>
-                }
+              <td>{{ conference.title }}</td>
+              <td [jhiTranslate]="'salonApp.Status.' + (conference.status ?? 'null')">
+                {{
+                  { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                    conference.status ?? 'null'
+                  ]
+                }}
               </td>
+              <td>{{ conference.extraInformation }}</td>
               <td>
-                @if (conference.exponent) {
+                @if (conference.participation) {
                   <div>
-                    <a [routerLink]="['/exponent', conference.exponent.id, 'view']">{{ conference.exponent.fullName }}</a>
+                    <a [routerLink]="['/participation', conference.participation.id, 'view']">{{ conference.participation.id }}</a>
                   </div>
                 }
               </td>

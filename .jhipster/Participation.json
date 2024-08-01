@@ -1,0 +1,97 @@
+{
+  "annotations": {
+    "changelogDate": "20240731190748"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "registrationDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "nbMeal1",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "nbMeal2",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "nbMeal3",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "acceptedChart",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "acceptedContract",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "needArrangment",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "isBillingClosed",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Status",
+      "fieldValues": "REFUSED,CANCELED,IN_VERIFICATION,ACCEPTED"
+    },
+    {
+      "fieldName": "extraInformation",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Participation",
+  "relationships": [
+    {
+      "otherEntityName": "conference",
+      "otherEntityRelationshipName": "participation",
+      "relationshipName": "conference",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "payment",
+      "otherEntityRelationshipName": "participation",
+      "relationshipName": "payment",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "invoice",
+      "otherEntityRelationshipName": "participation",
+      "relationshipName": "invoice",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "stand",
+      "otherEntityRelationshipName": "participation",
+      "relationshipName": "stand",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "exponent",
+      "relationshipName": "exponent",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "salon",
+      "relationshipName": "salon",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

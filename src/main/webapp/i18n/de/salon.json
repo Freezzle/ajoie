@@ -1,30 +1,35 @@
 {
   "salonApp": {
     "salon": {
-      "conference": "Conference",
-      "configuration": "Configuration",
+      "home": {
+        "title": "Salons",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Salon erstellen",
+        "createOrEditLabel": "Salon erstellen oder bearbeiten",
+        "notFound": "Keine Salons gefunden"
+      },
       "created": "Salon erstellt mit ID {{ param }}",
+      "updated": "Salon aktualisiert mit ID {{ param }}",
+      "deleted": "Salon gelöscht mit ID {{ param }}",
       "delete": {
         "question": "Soll Salon {{ id }} wirklich dauerhaft gelöscht werden?"
       },
-      "deleted": "Salon gelöscht mit ID {{ param }}",
       "detail": {
         "title": "Salon"
       },
-      "endingDate": "Ending Date",
-      "home": {
-        "createLabel": "Salon erstellen",
-        "createOrEditLabel": "Salon erstellen oder bearbeiten",
-        "notFound": "Keine Salons gefunden",
-        "refreshListLabel": "Aktualisieren",
-        "title": "Salons"
-      },
       "id": "Id",
       "place": "Place",
-      "priceStandSalon": "Price Stand Salon",
-      "stand": "Stand",
       "startingDate": "Starting Date",
-      "updated": "Salon aktualisiert mit ID {{ param }}"
+      "endingDate": "Ending Date",
+      "priceMeal1": "Price Meal 1",
+      "priceMeal2": "Price Meal 2",
+      "priceMeal3": "Price Meal 3",
+      "priceConference": "Price Conference",
+      "priceSharingStand": "Price Sharing Stand",
+      "extraInformation": "Extra Information",
+      "participation": "Participation",
+      "priceStandSalon": "Price Stand Salon",
+      "configuration": "Configuration"
     }
   }
 }

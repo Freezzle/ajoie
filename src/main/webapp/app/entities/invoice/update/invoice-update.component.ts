@@ -7,6 +7,8 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { IParticipation } from 'app/entities/participation/participation.model';
+import { ParticipationService } from 'app/entities/participation/service/participation.service';
 import { IInvoice } from '../invoice.model';
 import { InvoiceService } from '../service/invoice.service';
 import { InvoiceFormService, InvoiceFormGroup } from './invoice-form.service';
@@ -21,12 +23,18 @@ export class InvoiceUpdateComponent implements OnInit {
   isSaving = false;
   invoice: IInvoice | null = null;
 
+  participationsSharedCollection: IParticipation[] = [];
+
   protected invoiceService = inject(InvoiceService);
   protected invoiceFormService = inject(InvoiceFormService);
+  protected participationService = inject(ParticipationService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: InvoiceFormGroup = this.invoiceFormService.createInvoiceFormGroup();
+
+  compareParticipation = (o1: IParticipation | null, o2: IParticipation | null): boolean =>
+    this.participationService.compareParticipation(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ invoice }) => {
@@ -75,7 +83,22 @@ export class InvoiceUpdateComponent implements OnInit {
   protected updateForm(invoice: IInvoice): void {
     this.invoice = invoice;
     this.invoiceFormService.resetForm(this.editForm, invoice);
+
+    this.participationsSharedCollection = this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
+      this.participationsSharedCollection,
+      invoice.participation,
+    );
   }
 
-  protected loadRelationshipsOptions(): void {}
+  protected loadRelationshipsOptions(): void {
+    this.participationService
+      .query()
+      .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
+      .pipe(
+        map((participations: IParticipation[]) =>
+          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.invoice?.participation),
+        ),
+      )
+      .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
+  }
 }

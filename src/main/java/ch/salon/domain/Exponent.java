@@ -2,6 +2,7 @@ package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,20 +23,16 @@ public class Exponent implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "full_name")
+    @NotNull
+    @Column(name = "full_name", nullable = false)
     private String fullName;
+
+    @NotNull
+    @Column(name = "email", nullable = false)
+    private String email;
 
     @Column(name = "phone_number")
     private String phoneNumber;
-
-    @Column(name = "website")
-    private String website;
-
-    @Column(name = "social_media")
-    private String socialMedia;
 
     @Column(name = "address")
     private String address;
@@ -43,22 +40,12 @@ public class Exponent implements Serializable {
     @Column(name = "npa_localite")
     private String npaLocalite;
 
-    @Column(name = "url_picture")
-    private String urlPicture;
-
-    @Column(name = "comment")
-    private String comment;
-
-    @Column(name = "blocked")
-    private Boolean blocked;
+    @Column(name = "extra_information")
+    private String extraInformation;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "exponent")
-    @JsonIgnoreProperties(value = { "exponent", "salon", "dimension" }, allowSetters = true)
-    private Set<Stand> stands = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "exponent")
-    @JsonIgnoreProperties(value = { "salon", "exponent" }, allowSetters = true)
-    private Set<Conference> conferences = new HashSet<>();
+    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
+    private Set<Participation> participations = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -75,19 +62,6 @@ public class Exponent implements Serializable {
         this.id = id;
     }
 
-    public String getEmail() {
-        return this.email;
-    }
-
-    public Exponent email(String email) {
-        this.setEmail(email);
-        return this;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getFullName() {
         return this.fullName;
     }
@@ -101,6 +75,19 @@ public class Exponent implements Serializable {
         this.fullName = fullName;
     }
 
+    public String getEmail() {
+        return this.email;
+    }
+
+    public Exponent email(String email) {
+        this.setEmail(email);
+        return this;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPhoneNumber() {
         return this.phoneNumber;
     }
@@ -112,32 +99,6 @@ public class Exponent implements Serializable {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getWebsite() {
-        return this.website;
-    }
-
-    public Exponent website(String website) {
-        this.setWebsite(website);
-        return this;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    public String getSocialMedia() {
-        return this.socialMedia;
-    }
-
-    public Exponent socialMedia(String socialMedia) {
-        this.setSocialMedia(socialMedia);
-        return this;
-    }
-
-    public void setSocialMedia(String socialMedia) {
-        this.socialMedia = socialMedia;
     }
 
     public String getAddress() {
@@ -166,104 +127,47 @@ public class Exponent implements Serializable {
         this.npaLocalite = npaLocalite;
     }
 
-    public String getUrlPicture() {
-        return this.urlPicture;
+    public String getExtraInformation() {
+        return this.extraInformation;
     }
 
-    public Exponent urlPicture(String urlPicture) {
-        this.setUrlPicture(urlPicture);
+    public Exponent extraInformation(String extraInformation) {
+        this.setExtraInformation(extraInformation);
         return this;
     }
 
-    public void setUrlPicture(String urlPicture) {
-        this.urlPicture = urlPicture;
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
-    public String getComment() {
-        return this.comment;
+    public Set<Participation> getParticipations() {
+        return this.participations;
     }
 
-    public Exponent comment(String comment) {
-        this.setComment(comment);
-        return this;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Boolean getBlocked() {
-        return this.blocked;
-    }
-
-    public Exponent blocked(Boolean blocked) {
-        this.setBlocked(blocked);
-        return this;
-    }
-
-    public void setBlocked(Boolean blocked) {
-        this.blocked = blocked;
-    }
-
-    public Set<Stand> getStands() {
-        return this.stands;
-    }
-
-    public void setStands(Set<Stand> stands) {
-        if (this.stands != null) {
-            this.stands.forEach(i -> i.setExponent(null));
+    public void setParticipations(Set<Participation> participations) {
+        if (this.participations != null) {
+            this.participations.forEach(i -> i.setExponent(null));
         }
-        if (stands != null) {
-            stands.forEach(i -> i.setExponent(this));
+        if (participations != null) {
+            participations.forEach(i -> i.setExponent(this));
         }
-        this.stands = stands;
+        this.participations = participations;
     }
 
-    public Exponent stands(Set<Stand> stands) {
-        this.setStands(stands);
+    public Exponent participations(Set<Participation> participations) {
+        this.setParticipations(participations);
         return this;
     }
 
-    public Exponent addStand(Stand stand) {
-        this.stands.add(stand);
-        stand.setExponent(this);
+    public Exponent addParticipation(Participation participation) {
+        this.participations.add(participation);
+        participation.setExponent(this);
         return this;
     }
 
-    public Exponent removeStand(Stand stand) {
-        this.stands.remove(stand);
-        stand.setExponent(null);
-        return this;
-    }
-
-    public Set<Conference> getConferences() {
-        return this.conferences;
-    }
-
-    public void setConferences(Set<Conference> conferences) {
-        if (this.conferences != null) {
-            this.conferences.forEach(i -> i.setExponent(null));
-        }
-        if (conferences != null) {
-            conferences.forEach(i -> i.setExponent(this));
-        }
-        this.conferences = conferences;
-    }
-
-    public Exponent conferences(Set<Conference> conferences) {
-        this.setConferences(conferences);
-        return this;
-    }
-
-    public Exponent addConference(Conference conference) {
-        this.conferences.add(conference);
-        conference.setExponent(this);
-        return this;
-    }
-
-    public Exponent removeConference(Conference conference) {
-        this.conferences.remove(conference);
-        conference.setExponent(null);
+    public Exponent removeParticipation(Participation participation) {
+        this.participations.remove(participation);
+        participation.setExponent(null);
         return this;
     }
 
@@ -291,16 +195,12 @@ public class Exponent implements Serializable {
     public String toString() {
         return "Exponent{" +
             "id=" + getId() +
-            ", email='" + getEmail() + "'" +
             ", fullName='" + getFullName() + "'" +
+            ", email='" + getEmail() + "'" +
             ", phoneNumber='" + getPhoneNumber() + "'" +
-            ", website='" + getWebsite() + "'" +
-            ", socialMedia='" + getSocialMedia() + "'" +
             ", address='" + getAddress() + "'" +
             ", npaLocalite='" + getNpaLocalite() + "'" +
-            ", urlPicture='" + getUrlPicture() + "'" +
-            ", comment='" + getComment() + "'" +
-            ", blocked='" + getBlocked() + "'" +
+            ", extraInformation='" + getExtraInformation() + "'" +
             "}";
     }
 }

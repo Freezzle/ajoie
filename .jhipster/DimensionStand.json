@@ -10,7 +10,8 @@
     },
     {
       "fieldName": "dimension",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "DimensionStand",

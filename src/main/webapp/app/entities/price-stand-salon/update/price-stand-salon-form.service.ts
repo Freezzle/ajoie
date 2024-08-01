@@ -19,8 +19,8 @@ type PriceStandSalonFormDefaults = Pick<NewPriceStandSalon, 'id'>;
 type PriceStandSalonFormGroupContent = {
   id: FormControl<IPriceStandSalon['id'] | NewPriceStandSalon['id']>;
   price: FormControl<IPriceStandSalon['price']>;
-  dimension: FormControl<IPriceStandSalon['dimension']>;
   salon: FormControl<IPriceStandSalon['salon']>;
+  dimension: FormControl<IPriceStandSalon['dimension']>;
 };
 
 export type PriceStandSalonFormGroup = FormGroup<PriceStandSalonFormGroupContent>;
@@ -40,9 +40,11 @@ export class PriceStandSalonFormService {
           validators: [Validators.required],
         },
       ),
-      price: new FormControl(priceStandSalonRawValue.price),
-      dimension: new FormControl(priceStandSalonRawValue.dimension),
+      price: new FormControl(priceStandSalonRawValue.price, {
+        validators: [Validators.required],
+      }),
       salon: new FormControl(priceStandSalonRawValue.salon),
+      dimension: new FormControl(priceStandSalonRawValue.dimension),
     });
   }
 

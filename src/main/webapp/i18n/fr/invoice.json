@@ -1,27 +1,32 @@
 {
   "salonApp": {
     "invoice": {
-      "amount": "Amount",
-      "billingDate": "Billing Date",
+      "home": {
+        "title": "Invoices",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Invoice",
+        "createOrEditLabel": "Créer ou éditer un Invoice",
+        "notFound": "Aucun Invoice trouvé"
+      },
       "created": "Un nouveau Invoice a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Invoice avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Invoice avec l'identifiant {{ param }} a été supprimé",
       "delete": {
         "question": "Êtes-vous certain de vouloir supprimer le Invoice {{ id }} ?"
       },
-      "deleted": "Le Invoice avec l'identifiant {{ param }} a été supprimé",
       "detail": {
-        "title": "Facture"
-      },
-      "extraInformation": "Extra Information",
-      "home": {
-        "createLabel": "Créer un nouveau Invoice",
-        "createOrEditLabel": "Créer ou éditer un Invoice",
-        "notFound": "Aucun Invoice trouvé",
-        "refreshListLabel": "Actualiser",
-        "title": "Invoices"
+        "title": "Invoice"
       },
       "id": "Id",
-      "paymentMode": "Payment Mode",
-      "updated": "Le Invoice avec l'identifiant {{ param }} a été mis à jour"
+      "generationDate": "Generation Date",
+      "label": "Label",
+      "defaultAmount": "Default Amount",
+      "customAmount": "Custom Amount",
+      "quantity": "Quantity",
+      "total": "Total",
+      "lock": "Lock",
+      "extraInformation": "Extra Information",
+      "participation": "Participation"
     }
   }
 }

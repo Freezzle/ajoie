@@ -11,21 +11,25 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="salonApp.stand.id">Id</span></dt>
+          <dd>
+            <span>{{ stand()!.id }}</span>
+          </dd>
           <dt><span jhiTranslate="salonApp.stand.description">Description</span></dt>
           <dd>
             <span>{{ stand()!.description }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.stand.nbMeal1">Nb Meal 1</span></dt>
+          <dt><span jhiTranslate="salonApp.stand.website">Website</span></dt>
           <dd>
-            <span>{{ stand()!.nbMeal1 }}</span>
+            <span>{{ stand()!.website }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.stand.nbMeal2">Nb Meal 2</span></dt>
+          <dt><span jhiTranslate="salonApp.stand.socialMedia">Social Media</span></dt>
           <dd>
-            <span>{{ stand()!.nbMeal2 }}</span>
+            <span>{{ stand()!.socialMedia }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.stand.nbMeal3">Nb Meal 3</span></dt>
+          <dt><span jhiTranslate="salonApp.stand.urlPicture">Url Picture</span></dt>
           <dd>
-            <span>{{ stand()!.nbMeal3 }}</span>
+            <span>{{ stand()!.urlPicture }}</span>
           </dd>
           <dt><span jhiTranslate="salonApp.stand.shared">Shared</span></dt>
           <dd>
@@ -43,23 +47,23 @@
           <dd>
             <span>{{ stand()!.needElectricity }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.stand.acceptedChart">Accepted Chart</span></dt>
+          <dt><span jhiTranslate="salonApp.stand.status">Status</span></dt>
           <dd>
-            <span>{{ stand()!.acceptedChart }}</span>
+            <span [jhiTranslate]="'salonApp.Status.' + (stand()!.status ?? 'null')">{{
+              { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                stand()!.status ?? 'null'
+              ]
+            }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.stand.exponent">Exponent</span></dt>
+          <dt><span jhiTranslate="salonApp.stand.extraInformation">Extra Information</span></dt>
           <dd>
-            @if (stand()!.exponent) {
-              <div>
-                <a [routerLink]="['/exponent', stand()!.exponent?.id, 'view']">{{ stand()!.exponent?.fullName }}</a>
-              </div>
-            }
+            <span>{{ stand()!.extraInformation }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.stand.salon">Salon</span></dt>
+          <dt><span jhiTranslate="salonApp.stand.participation">Participation</span></dt>
           <dd>
-            @if (stand()!.salon) {
+            @if (stand()!.participation) {
               <div>
-                <a [routerLink]="['/salon', stand()!.salon?.id, 'view']">{{ stand()!.salon?.place }}</a>
+                <a [routerLink]="['/participation', stand()!.participation?.id, 'view']">{{ stand()!.participation?.id }}</a>
               </div>
             }
           </dd>
@@ -67,7 +71,7 @@
           <dd>
             @if (stand()!.dimension) {
               <div>
-                <a [routerLink]="['/dimension-stand', stand()!.dimension?.id, 'view']">{{ stand()!.dimension?.dimension }}</a>
+                <a [routerLink]="['/dimension-stand', stand()!.dimension?.id, 'view']">{{ stand()!.dimension?.id }}</a>
               </div>
             }
           </dd>

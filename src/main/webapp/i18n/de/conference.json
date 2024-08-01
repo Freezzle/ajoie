@@ -1,26 +1,27 @@
 {
   "salonApp": {
     "conference": {
+      "home": {
+        "title": "Conferences",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Conference erstellen",
+        "createOrEditLabel": "Conference erstellen oder bearbeiten",
+        "notFound": "Keine Conferences gefunden"
+      },
       "created": "Conference erstellt mit ID {{ param }}",
+      "updated": "Conference aktualisiert mit ID {{ param }}",
+      "deleted": "Conference gelöscht mit ID {{ param }}",
       "delete": {
         "question": "Soll Conference {{ id }} wirklich dauerhaft gelöscht werden?"
       },
-      "deleted": "Conference gelöscht mit ID {{ param }}",
       "detail": {
         "title": "Conference"
       },
-      "exponent": "Exponent",
-      "home": {
-        "createLabel": "Conference erstellen",
-        "createOrEditLabel": "Conference erstellen oder bearbeiten",
-        "notFound": "Keine Conferences gefunden",
-        "refreshListLabel": "Aktualisieren",
-        "title": "Conferences"
-      },
       "id": "Id",
-      "salon": "Salon",
       "title": "Title",
-      "updated": "Conference aktualisiert mit ID {{ param }}"
+      "status": "Status",
+      "extraInformation": "Extra Information",
+      "participation": "Participation"
     }
   }
 }

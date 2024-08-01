@@ -14,21 +14,21 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type StandFormGroupInput = IStand | PartialWithRequiredKeyOf<NewStand>;
 
-type StandFormDefaults = Pick<NewStand, 'id' | 'shared' | 'needElectricity' | 'acceptedChart'>;
+type StandFormDefaults = Pick<NewStand, 'id' | 'shared' | 'needElectricity'>;
 
 type StandFormGroupContent = {
   id: FormControl<IStand['id'] | NewStand['id']>;
   description: FormControl<IStand['description']>;
-  nbMeal1: FormControl<IStand['nbMeal1']>;
-  nbMeal2: FormControl<IStand['nbMeal2']>;
-  nbMeal3: FormControl<IStand['nbMeal3']>;
+  website: FormControl<IStand['website']>;
+  socialMedia: FormControl<IStand['socialMedia']>;
+  urlPicture: FormControl<IStand['urlPicture']>;
   shared: FormControl<IStand['shared']>;
   nbTable: FormControl<IStand['nbTable']>;
   nbChair: FormControl<IStand['nbChair']>;
   needElectricity: FormControl<IStand['needElectricity']>;
-  acceptedChart: FormControl<IStand['acceptedChart']>;
-  exponent: FormControl<IStand['exponent']>;
-  salon: FormControl<IStand['salon']>;
+  status: FormControl<IStand['status']>;
+  extraInformation: FormControl<IStand['extraInformation']>;
+  participation: FormControl<IStand['participation']>;
   dimension: FormControl<IStand['dimension']>;
 };
 
@@ -49,17 +49,19 @@ export class StandFormService {
           validators: [Validators.required],
         },
       ),
-      description: new FormControl(standRawValue.description),
-      nbMeal1: new FormControl(standRawValue.nbMeal1),
-      nbMeal2: new FormControl(standRawValue.nbMeal2),
-      nbMeal3: new FormControl(standRawValue.nbMeal3),
+      description: new FormControl(standRawValue.description, {
+        validators: [Validators.required],
+      }),
+      website: new FormControl(standRawValue.website),
+      socialMedia: new FormControl(standRawValue.socialMedia),
+      urlPicture: new FormControl(standRawValue.urlPicture),
       shared: new FormControl(standRawValue.shared),
       nbTable: new FormControl(standRawValue.nbTable),
       nbChair: new FormControl(standRawValue.nbChair),
       needElectricity: new FormControl(standRawValue.needElectricity),
-      acceptedChart: new FormControl(standRawValue.acceptedChart),
-      exponent: new FormControl(standRawValue.exponent),
-      salon: new FormControl(standRawValue.salon),
+      status: new FormControl(standRawValue.status),
+      extraInformation: new FormControl(standRawValue.extraInformation),
+      participation: new FormControl(standRawValue.participation),
       dimension: new FormControl(standRawValue.dimension),
     });
   }
@@ -83,7 +85,6 @@ export class StandFormService {
       id: null,
       shared: false,
       needElectricity: false,
-      acceptedChart: false,
     };
   }
 }

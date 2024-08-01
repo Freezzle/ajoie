@@ -3,6 +3,8 @@ package ch.salon.web.rest;
 import ch.salon.domain.PriceStandSalon;
 import ch.salon.repository.PriceStandSalonRepository;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -47,7 +49,8 @@ public class PriceStandSalonResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<PriceStandSalon> createPriceStandSalon(@RequestBody PriceStandSalon priceStandSalon) throws URISyntaxException {
+    public ResponseEntity<PriceStandSalon> createPriceStandSalon(@Valid @RequestBody PriceStandSalon priceStandSalon)
+        throws URISyntaxException {
         log.debug("REST request to save PriceStandSalon : {}", priceStandSalon);
         if (priceStandSalon.getId() != null) {
             throw new BadRequestAlertException("A new priceStandSalon cannot already have an ID", ENTITY_NAME, "idexists");
@@ -71,7 +74,7 @@ public class PriceStandSalonResource {
     @PutMapping("/{id}")
     public ResponseEntity<PriceStandSalon> updatePriceStandSalon(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody PriceStandSalon priceStandSalon
+        @Valid @RequestBody PriceStandSalon priceStandSalon
     ) throws URISyntaxException {
         log.debug("REST request to update PriceStandSalon : {}, {}", id, priceStandSalon);
         if (priceStandSalon.getId() == null) {
@@ -105,7 +108,7 @@ public class PriceStandSalonResource {
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<PriceStandSalon> partialUpdatePriceStandSalon(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody PriceStandSalon priceStandSalon
+        @NotNull @RequestBody PriceStandSalon priceStandSalon
     ) throws URISyntaxException {
         log.debug("REST request to partial update PriceStandSalon partially : {}, {}", id, priceStandSalon);
         if (priceStandSalon.getId() == null) {

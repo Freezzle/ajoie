@@ -9,16 +9,32 @@
       "fieldType": "UUID"
     },
     {
-      "fieldName": "amount",
-      "fieldType": "Double"
-    },
-    {
-      "fieldName": "billingDate",
+      "fieldName": "generationDate",
       "fieldType": "Instant"
     },
     {
-      "fieldName": "paymentMode",
+      "fieldName": "label",
       "fieldType": "String"
+    },
+    {
+      "fieldName": "defaultAmount",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "customAmount",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "quantity",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "total",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "lock",
+      "fieldType": "Boolean"
     },
     {
       "fieldName": "extraInformation",
@@ -28,8 +44,8 @@
   "name": "Invoice",
   "relationships": [
     {
-      "otherEntityName": "billing",
-      "relationshipName": "billing",
+      "otherEntityName": "participation",
+      "relationshipName": "participation",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }

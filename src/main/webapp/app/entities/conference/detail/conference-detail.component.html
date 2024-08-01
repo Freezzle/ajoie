@@ -11,25 +11,31 @@
         <jhi-alert></jhi-alert>
 
         <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="salonApp.conference.id">Id</span></dt>
+          <dd>
+            <span>{{ conference()!.id }}</span>
+          </dd>
           <dt><span jhiTranslate="salonApp.conference.title">Title</span></dt>
           <dd>
             <span>{{ conference()!.title }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.conference.salon">Salon</span></dt>
+          <dt><span jhiTranslate="salonApp.conference.status">Status</span></dt>
           <dd>
-            @if (conference()!.salon) {
-              <div>
-                <a [routerLink]="['/salon', conference()!.salon?.id, 'view']">{{
-                  conference()!.salon?.place + ' ' + (conference()!.salon?.startingDate | formatMediumDate)
-                }}</a>
-              </div>
-            }
+            <span [jhiTranslate]="'salonApp.Status.' + (conference()!.status ?? 'null')">{{
+              { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                conference()!.status ?? 'null'
+              ]
+            }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.conference.exponent">Exponent</span></dt>
+          <dt><span jhiTranslate="salonApp.conference.extraInformation">Extra Information</span></dt>
           <dd>
-            @if (conference()!.exponent) {
+            <span>{{ conference()!.extraInformation }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.conference.participation">Participation</span></dt>
+          <dd>
+            @if (conference()!.participation) {
               <div>
-                <a [routerLink]="['/exponent', conference()!.exponent?.id, 'view']">{{ conference()!.exponent?.fullName }}</a>
+                <a [routerLink]="['/participation', conference()!.participation?.id, 'view']">{{ conference()!.participation?.id }}</a>
               </div>
             }
           </dd>

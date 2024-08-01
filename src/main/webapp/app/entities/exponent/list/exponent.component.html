@@ -35,9 +35,9 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="email">
+            <th scope="col" jhiSortBy="id">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.exponent.email">Email</span>
+                <span jhiTranslate="salonApp.exponent.id">Id</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -49,23 +49,16 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="email">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.exponent.email">Email</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col" jhiSortBy="phoneNumber">
               <div class="d-flex">
                 <span jhiTranslate="salonApp.exponent.phoneNumber">Phone Number</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="website">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exponent.website">Website</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="socialMedia">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exponent.socialMedia">Social Media</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -84,23 +77,9 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="urlPicture">
+            <th scope="col" jhiSortBy="extraInformation">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.exponent.urlPicture">Url Picture</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="comment">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exponent.comment">Comment</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="blocked">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exponent.blocked">Blocked</span>
+                <span jhiTranslate="salonApp.exponent.extraInformation">Extra Information</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -111,16 +90,15 @@
         <tbody>
           @for (exponent of exponents; track trackId) {
             <tr data-cy="entityTable">
-              <td>{{ exponent.email }}</td>
+              <td>
+                <a [routerLink]="['/exponent', exponent.id, 'view']">{{ exponent.id }}</a>
+              </td>
               <td>{{ exponent.fullName }}</td>
+              <td>{{ exponent.email }}</td>
               <td>{{ exponent.phoneNumber }}</td>
-              <td>{{ exponent.website }}</td>
-              <td>{{ exponent.socialMedia }}</td>
               <td>{{ exponent.address }}</td>
               <td>{{ exponent.npaLocalite }}</td>
-              <td>{{ exponent.urlPicture }}</td>
-              <td>{{ exponent.comment }}</td>
-              <td>{{ exponent.blocked }}</td>
+              <td>{{ exponent.extraInformation }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/exponent', exponent.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

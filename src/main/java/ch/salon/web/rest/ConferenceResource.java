@@ -3,6 +3,8 @@ package ch.salon.web.rest;
 import ch.salon.domain.Conference;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -47,7 +49,7 @@ public class ConferenceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<Conference> createConference(@RequestBody Conference conference) throws URISyntaxException {
+    public ResponseEntity<Conference> createConference(@Valid @RequestBody Conference conference) throws URISyntaxException {
         log.debug("REST request to save Conference : {}", conference);
         if (conference.getId() != null) {
             throw new BadRequestAlertException("A new conference cannot already have an ID", ENTITY_NAME, "idexists");
@@ -71,7 +73,7 @@ public class ConferenceResource {
     @PutMapping("/{id}")
     public ResponseEntity<Conference> updateConference(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody Conference conference
+        @Valid @RequestBody Conference conference
     ) throws URISyntaxException {
         log.debug("REST request to update Conference : {}, {}", id, conference);
         if (conference.getId() == null) {
@@ -105,7 +107,7 @@ public class ConferenceResource {
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Conference> partialUpdateConference(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody Conference conference
+        @NotNull @RequestBody Conference conference
     ) throws URISyntaxException {
         log.debug("REST request to partial update Conference partially : {}, {}", id, conference);
         if (conference.getId() == null) {
@@ -124,6 +126,12 @@ public class ConferenceResource {
             .map(existingConference -> {
                 if (conference.getTitle() != null) {
                     existingConference.setTitle(conference.getTitle());
+                }
+                if (conference.getStatus() != null) {
+                    existingConference.setStatus(conference.getStatus());
+                }
+                if (conference.getExtraInformation() != null) {
+                    existingConference.setExtraInformation(conference.getExtraInformation());
                 }
 
                 return existingConference;

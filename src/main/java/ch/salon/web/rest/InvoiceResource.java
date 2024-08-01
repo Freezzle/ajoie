@@ -120,14 +120,26 @@ public class InvoiceResource {
         Optional<Invoice> result = invoiceRepository
             .findById(invoice.getId())
             .map(existingInvoice -> {
-                if (invoice.getAmount() != null) {
-                    existingInvoice.setAmount(invoice.getAmount());
+                if (invoice.getGenerationDate() != null) {
+                    existingInvoice.setGenerationDate(invoice.getGenerationDate());
                 }
-                if (invoice.getBillingDate() != null) {
-                    existingInvoice.setBillingDate(invoice.getBillingDate());
+                if (invoice.getLabel() != null) {
+                    existingInvoice.setLabel(invoice.getLabel());
                 }
-                if (invoice.getPaymentMode() != null) {
-                    existingInvoice.setPaymentMode(invoice.getPaymentMode());
+                if (invoice.getDefaultAmount() != null) {
+                    existingInvoice.setDefaultAmount(invoice.getDefaultAmount());
+                }
+                if (invoice.getCustomAmount() != null) {
+                    existingInvoice.setCustomAmount(invoice.getCustomAmount());
+                }
+                if (invoice.getQuantity() != null) {
+                    existingInvoice.setQuantity(invoice.getQuantity());
+                }
+                if (invoice.getTotal() != null) {
+                    existingInvoice.setTotal(invoice.getTotal());
+                }
+                if (invoice.getLock() != null) {
+                    existingInvoice.setLock(invoice.getLock());
                 }
                 if (invoice.getExtraInformation() != null) {
                     existingInvoice.setExtraInformation(invoice.getExtraInformation());

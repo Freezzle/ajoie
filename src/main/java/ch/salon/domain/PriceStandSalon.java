@@ -2,6 +2,7 @@ package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -20,16 +21,17 @@ public class PriceStandSalon implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "price")
+    @NotNull
+    @Column(name = "price", nullable = false)
     private Long price;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "participations", "priceStandSalons", "configuration" }, allowSetters = true)
+    private Salon salon;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "priceStandSalons", "stands" }, allowSetters = true)
     private DimensionStand dimension;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences", "priceStandSalons", "configuration" }, allowSetters = true)
-    private Salon salon;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -59,19 +61,6 @@ public class PriceStandSalon implements Serializable {
         this.price = price;
     }
 
-    public DimensionStand getDimension() {
-        return this.dimension;
-    }
-
-    public void setDimension(DimensionStand dimensionStand) {
-        this.dimension = dimensionStand;
-    }
-
-    public PriceStandSalon dimension(DimensionStand dimensionStand) {
-        this.setDimension(dimensionStand);
-        return this;
-    }
-
     public Salon getSalon() {
         return this.salon;
     }
@@ -82,6 +71,19 @@ public class PriceStandSalon implements Serializable {
 
     public PriceStandSalon salon(Salon salon) {
         this.setSalon(salon);
+        return this;
+    }
+
+    public DimensionStand getDimension() {
+        return this.dimension;
+    }
+
+    public void setDimension(DimensionStand dimensionStand) {
+        this.dimension = dimensionStand;
+    }
+
+    public PriceStandSalon dimension(DimensionStand dimensionStand) {
+        this.setDimension(dimensionStand);
         return this;
     }
 

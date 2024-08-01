@@ -38,7 +38,9 @@ export class DimensionStandFormService {
           validators: [Validators.required],
         },
       ),
-      dimension: new FormControl(dimensionStandRawValue.dimension),
+      dimension: new FormControl(dimensionStandRawValue.dimension, {
+        validators: [Validators.required],
+      }),
     });
   }
 

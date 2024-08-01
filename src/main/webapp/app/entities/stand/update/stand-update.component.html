@@ -8,6 +8,13 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="salonApp.stand.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
         <div class="mb-3">
           <label class="form-label" for="field_description" jhiTranslate="salonApp.stand.description">Description</label>
           <input
@@ -18,21 +25,42 @@
             data-cy="description"
             formControlName="description"
           />
+          @if (editForm.get('description')!.invalid && (editForm.get('description')!.dirty || editForm.get('description')!.touched)) {
+            <div>
+              @if (editForm.get('description')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbMeal1" jhiTranslate="salonApp.stand.nbMeal1">Nb Meal 1</label>
-          <input type="number" class="form-control" name="nbMeal1" id="field_nbMeal1" data-cy="nbMeal1" formControlName="nbMeal1" />
+          <label class="form-label" for="field_website" jhiTranslate="salonApp.stand.website">Website</label>
+          <input type="text" class="form-control" name="website" id="field_website" data-cy="website" formControlName="website" />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbMeal2" jhiTranslate="salonApp.stand.nbMeal2">Nb Meal 2</label>
-          <input type="number" class="form-control" name="nbMeal2" id="field_nbMeal2" data-cy="nbMeal2" formControlName="nbMeal2" />
+          <label class="form-label" for="field_socialMedia" jhiTranslate="salonApp.stand.socialMedia">Social Media</label>
+          <input
+            type="text"
+            class="form-control"
+            name="socialMedia"
+            id="field_socialMedia"
+            data-cy="socialMedia"
+            formControlName="socialMedia"
+          />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbMeal3" jhiTranslate="salonApp.stand.nbMeal3">Nb Meal 3</label>
-          <input type="number" class="form-control" name="nbMeal3" id="field_nbMeal3" data-cy="nbMeal3" formControlName="nbMeal3" />
+          <label class="form-label" for="field_urlPicture" jhiTranslate="salonApp.stand.urlPicture">Url Picture</label>
+          <input
+            type="text"
+            class="form-control"
+            name="urlPicture"
+            id="field_urlPicture"
+            data-cy="urlPicture"
+            formControlName="urlPicture"
+          />
         </div>
 
         <div class="mb-3">
@@ -63,40 +91,40 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_acceptedChart" jhiTranslate="salonApp.stand.acceptedChart">Accepted Chart</label>
-          <input
-            type="checkbox"
-            class="form-check"
-            name="acceptedChart"
-            id="field_acceptedChart"
-            data-cy="acceptedChart"
-            formControlName="acceptedChart"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_exponent" jhiTranslate="salonApp.stand.exponent">Exponent</label>
-          <select
-            class="form-control"
-            id="field_exponent"
-            data-cy="exponent"
-            name="exponent"
-            formControlName="exponent"
-            [compareWith]="compareExponent"
-          >
-            <option [ngValue]="null"></option>
-            @for (exponentOption of exponentsSharedCollection; track $index) {
-              <option [ngValue]="exponentOption">{{ exponentOption.fullName }}</option>
+          <label class="form-label" for="field_status" jhiTranslate="salonApp.stand.status">Status</label>
+          <select class="form-control" name="status" formControlName="status" id="field_status" data-cy="status">
+            <option [ngValue]="null">{{ 'salonApp.Status.null' | translate }}</option>
+            @for (status of statusValues; track $index) {
+              <option [value]="status">{{ 'salonApp.Status.' + status | translate }}</option>
             }
           </select>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_salon" jhiTranslate="salonApp.stand.salon">Salon</label>
-          <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
+          <label class="form-label" for="field_extraInformation" jhiTranslate="salonApp.stand.extraInformation">Extra Information</label>
+          <input
+            type="text"
+            class="form-control"
+            name="extraInformation"
+            id="field_extraInformation"
+            data-cy="extraInformation"
+            formControlName="extraInformation"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_participation" jhiTranslate="salonApp.stand.participation">Participation</label>
+          <select
+            class="form-control"
+            id="field_participation"
+            data-cy="participation"
+            name="participation"
+            formControlName="participation"
+            [compareWith]="compareParticipation"
+          >
             <option [ngValue]="null"></option>
-            @for (salonOption of salonsSharedCollection; track $index) {
-              <option [ngValue]="salonOption">{{ salonOption.place + ' ' + (salonOption.startingDate | formatMediumDate) }}</option>
+            @for (participationOption of participationsSharedCollection; track $index) {
+              <option [ngValue]="participationOption">{{ participationOption.id }}</option>
             }
           </select>
         </div>
@@ -113,7 +141,7 @@
           >
             <option [ngValue]="null"></option>
             @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
-              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
+              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.id }}</option>
             }
           </select>
         </div>

@@ -1,26 +1,27 @@
 {
   "salonApp": {
     "conference": {
+      "home": {
+        "title": "Conferences",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Conference",
+        "createOrEditLabel": "Créer ou éditer un Conference",
+        "notFound": "Aucun Conference trouvé"
+      },
       "created": "Un nouveau Conference a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Conference avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Conference avec l'identifiant {{ param }} a été supprimé",
       "delete": {
         "question": "Êtes-vous certain de vouloir supprimer le Conference {{ id }} ?"
       },
-      "deleted": "Le Conference avec l'identifiant {{ param }} a été supprimé",
       "detail": {
         "title": "Conference"
       },
-      "exponent": "Exponent",
-      "home": {
-        "createLabel": "Créer un nouveau Conference",
-        "createOrEditLabel": "Créer ou éditer un Conference",
-        "notFound": "Aucun Conference trouvé",
-        "refreshListLabel": "Actualiser",
-        "title": "Conferences"
-      },
       "id": "Id",
-      "salon": "Salon",
       "title": "Title",
-      "updated": "Le Conference avec l'identifiant {{ param }} a été mis à jour"
+      "status": "Status",
+      "extraInformation": "Extra Information",
+      "participation": "Participation"
     }
   }
 }

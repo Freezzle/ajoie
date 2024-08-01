@@ -1,11 +1,10 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -23,17 +22,18 @@ public class Stand implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "description")
+    @NotNull
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "nb_meal_1")
-    private Long nbMeal1;
+    @Column(name = "website")
+    private String website;
 
-    @Column(name = "nb_meal_2")
-    private Long nbMeal2;
+    @Column(name = "social_media")
+    private String socialMedia;
 
-    @Column(name = "nb_meal_3")
-    private Long nbMeal3;
+    @Column(name = "url_picture")
+    private String urlPicture;
 
     @Column(name = "shared")
     private Boolean shared;
@@ -47,36 +47,16 @@ public class Stand implements Serializable {
     @Column(name = "need_electricity")
     private Boolean needElectricity;
 
-    @Column(name = "accepted_chart")
-    private Boolean acceptedChart;
-
-    @Column(name = "accepted_contract")
-    private Boolean acceptedContract;
-
-    @Column(name = "need_arrangment")
-    private Boolean needArrangment;
-
-    @Column(name = "is_billing_closed")
-    private Boolean isBillingClosed;
-
-    @Column(name = "registration_date")
-    private Instant registrationDate;
-
-    @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private StandStatus status;
+    @Column(name = "status")
+    private Status status;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stand")
-    @JsonIgnoreProperties(value = { "billing" }, allowSetters = true)
-    private Set<Invoice> invoices = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences" }, allowSetters = true)
-    private Exponent exponent;
+    @Column(name = "extra_information")
+    private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences", "priceStandSalons", "configuration" }, allowSetters = true)
-    private Salon salon;
+    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
+    private Participation participation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "priceStandSalons", "stands" }, allowSetters = true)
@@ -110,51 +90,43 @@ public class Stand implements Serializable {
         this.description = description;
     }
 
-    public Long getNbMeal1() {
-        return this.nbMeal1;
+    public String getWebsite() {
+        return this.website;
     }
 
-    public Stand nbMeal1(Long nbMeal1) {
-        this.setNbMeal1(nbMeal1);
+    public Stand website(String website) {
+        this.setWebsite(website);
         return this;
     }
 
-    public void setNbMeal1(Long nbMeal1) {
-        this.nbMeal1 = nbMeal1;
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
-    public Long getNbMeal2() {
-        return this.nbMeal2;
+    public String getSocialMedia() {
+        return this.socialMedia;
     }
 
-    public Stand nbMeal2(Long nbMeal2) {
-        this.setNbMeal2(nbMeal2);
+    public Stand socialMedia(String socialMedia) {
+        this.setSocialMedia(socialMedia);
         return this;
     }
 
-    public Instant getRegistrationDate() {
-        return registrationDate;
+    public void setSocialMedia(String socialMedia) {
+        this.socialMedia = socialMedia;
     }
 
-    public void setRegistrationDate(Instant registrationDate) {
-        this.registrationDate = registrationDate;
+    public String getUrlPicture() {
+        return this.urlPicture;
     }
 
-    public void setNbMeal2(Long nbMeal2) {
-        this.nbMeal2 = nbMeal2;
-    }
-
-    public Long getNbMeal3() {
-        return this.nbMeal3;
-    }
-
-    public Stand nbMeal3(Long nbMeal3) {
-        this.setNbMeal3(nbMeal3);
+    public Stand urlPicture(String urlPicture) {
+        this.setUrlPicture(urlPicture);
         return this;
     }
 
-    public void setNbMeal3(Long nbMeal3) {
-        this.nbMeal3 = nbMeal3;
+    public void setUrlPicture(String urlPicture) {
+        this.urlPicture = urlPicture;
     }
 
     public Boolean getShared() {
@@ -209,42 +181,42 @@ public class Stand implements Serializable {
         this.needElectricity = needElectricity;
     }
 
-    public Boolean getAcceptedChart() {
-        return this.acceptedChart;
+    public Status getStatus() {
+        return this.status;
     }
 
-    public Stand acceptedChart(Boolean acceptedChart) {
-        this.setAcceptedChart(acceptedChart);
+    public Stand status(Status status) {
+        this.setStatus(status);
         return this;
     }
 
-    public void setAcceptedChart(Boolean acceptedChart) {
-        this.acceptedChart = acceptedChart;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    public Exponent getExponent() {
-        return this.exponent;
+    public String getExtraInformation() {
+        return this.extraInformation;
     }
 
-    public void setExponent(Exponent exponent) {
-        this.exponent = exponent;
-    }
-
-    public Stand exponent(Exponent exponent) {
-        this.setExponent(exponent);
+    public Stand extraInformation(String extraInformation) {
+        this.setExtraInformation(extraInformation);
         return this;
     }
 
-    public Salon getSalon() {
-        return this.salon;
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
-    public void setSalon(Salon salon) {
-        this.salon = salon;
+    public Participation getParticipation() {
+        return this.participation;
     }
 
-    public Stand salon(Salon salon) {
-        this.setSalon(salon);
+    public void setParticipation(Participation participation) {
+        this.participation = participation;
+    }
+
+    public Stand participation(Participation participation) {
+        this.setParticipation(participation);
         return this;
     }
 
@@ -258,79 +230,6 @@ public class Stand implements Serializable {
 
     public Stand dimension(DimensionStand dimensionStand) {
         this.setDimension(dimensionStand);
-        return this;
-    }
-
-    public Boolean getAcceptedContract() {
-        return this.acceptedContract;
-    }
-
-    public Stand acceptedContract(Boolean acceptedContract) {
-        this.setAcceptedContract(acceptedContract);
-        return this;
-    }
-
-    public void setAcceptedContract(Boolean acceptedContract) {
-        this.acceptedContract = acceptedContract;
-    }
-
-    public Boolean getNeedArrangment() {
-        return this.needArrangment;
-    }
-
-    public Stand needArrangment(Boolean needArrangment) {
-        this.setNeedArrangment(needArrangment);
-        return this;
-    }
-
-    public void setNeedArrangment(Boolean needArrangment) {
-        this.needArrangment = needArrangment;
-    }
-
-    public Boolean getBillingClosed() {
-        return isBillingClosed;
-    }
-
-    public void setBillingClosed(Boolean billingClosed) {
-        isBillingClosed = billingClosed;
-    }
-
-    public Set<Invoice> getInvoices() {
-        return this.invoices;
-    }
-
-    public StandStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(StandStatus status) {
-        this.status = status;
-    }
-
-    public void setInvoices(Set<Invoice> invoices) {
-        if (this.invoices != null) {
-            this.invoices.forEach(i -> i.setStand(null));
-        }
-        if (invoices != null) {
-            invoices.forEach(i -> i.setStand(this));
-        }
-        this.invoices = invoices;
-    }
-
-    public Stand invoices(Set<Invoice> invoices) {
-        this.setInvoices(invoices);
-        return this;
-    }
-
-    public Stand addInvoice(Invoice invoice) {
-        this.invoices.add(invoice);
-        invoice.setStand(this);
-        return this;
-    }
-
-    public Stand removeInvoice(Invoice invoice) {
-        this.invoices.remove(invoice);
-        invoice.setStand(null);
         return this;
     }
 
@@ -359,18 +258,15 @@ public class Stand implements Serializable {
         return "Stand{" +
             "id=" + getId() +
             ", description='" + getDescription() + "'" +
-            ", nbMeal1=" + getNbMeal1() +
-            ", nbMeal2=" + getNbMeal2() +
-            ", nbMeal3=" + getNbMeal3() +
+            ", website='" + getWebsite() + "'" +
+            ", socialMedia='" + getSocialMedia() + "'" +
+            ", urlPicture='" + getUrlPicture() + "'" +
             ", shared='" + getShared() + "'" +
             ", nbTable=" + getNbTable() +
             ", nbChair=" + getNbChair() +
             ", needElectricity='" + getNeedElectricity() + "'" +
-            ", acceptedChart='" + getAcceptedChart() + "'" +
-            ", acceptedContract='" + getAcceptedContract() + "'" +
-            ", needArrangment='" + getNeedArrangment() + "'" +
-            ", isBillingClosed='" + getBillingClosed() + "'" +
             ", status='" + getStatus() + "'" +
+            ", extraInformation='" + getExtraInformation() + "'" +
             "}";
     }
 }

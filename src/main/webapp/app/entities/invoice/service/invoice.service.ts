@@ -11,8 +11,8 @@ import { IInvoice, NewInvoice } from '../invoice.model';
 
 export type PartialUpdateInvoice = Partial<IInvoice> & Pick<IInvoice, 'id'>;
 
-type RestOf<T extends IInvoice | NewInvoice> = Omit<T, 'billingDate'> & {
-  billingDate?: string | null;
+type RestOf<T extends IInvoice | NewInvoice> = Omit<T, 'generationDate'> & {
+  generationDate?: string | null;
 };
 
 export type RestInvoice = RestOf<IInvoice>;
@@ -100,14 +100,14 @@ export class InvoiceService {
   protected convertDateFromClient<T extends IInvoice | NewInvoice | PartialUpdateInvoice>(invoice: T): RestOf<T> {
     return {
       ...invoice,
-      billingDate: invoice.billingDate?.toJSON() ?? null,
+      generationDate: invoice.generationDate?.toJSON() ?? null,
     };
   }
 
   protected convertDateFromServer(restInvoice: RestInvoice): IInvoice {
     return {
       ...restInvoice,
-      billingDate: restInvoice.billingDate ? dayjs(restInvoice.billingDate) : undefined,
+      generationDate: restInvoice.generationDate ? dayjs(restInvoice.generationDate) : undefined,
     };
   }
 

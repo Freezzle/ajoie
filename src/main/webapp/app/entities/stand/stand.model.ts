@@ -1,20 +1,20 @@
-import { IExponent } from 'app/entities/exponent/exponent.model';
-import { ISalon } from 'app/entities/salon/salon.model';
+import { IParticipation } from 'app/entities/participation/participation.model';
 import { IDimensionStand } from 'app/entities/dimension-stand/dimension-stand.model';
+import { Status } from 'app/entities/enumerations/status.model';
 
 export interface IStand {
   id: string;
   description?: string | null;
-  nbMeal1?: number | null;
-  nbMeal2?: number | null;
-  nbMeal3?: number | null;
+  website?: string | null;
+  socialMedia?: string | null;
+  urlPicture?: string | null;
   shared?: boolean | null;
   nbTable?: number | null;
   nbChair?: number | null;
   needElectricity?: boolean | null;
-  acceptedChart?: boolean | null;
-  exponent?: IExponent | null;
-  salon?: ISalon | null;
+  status?: keyof typeof Status | null;
+  extraInformation?: string | null;
+  participation?: IParticipation | null;
   dimension?: IDimensionStand | null;
 }
 

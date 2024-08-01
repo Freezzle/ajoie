@@ -7,40 +7,36 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ISalon } from 'app/entities/salon/salon.model';
-import { SalonService } from 'app/entities/salon/service/salon.service';
-import { IExponent } from 'app/entities/exponent/exponent.model';
-import { ExponentService } from 'app/entities/exponent/service/exponent.service';
+import { IParticipation } from 'app/entities/participation/participation.model';
+import { ParticipationService } from 'app/entities/participation/service/participation.service';
+import { Status } from 'app/entities/enumerations/status.model';
 import { ConferenceService } from '../service/conference.service';
 import { IConference } from '../conference.model';
 import { ConferenceFormService, ConferenceFormGroup } from './conference-form.service';
-import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 
 @Component({
   standalone: true,
   selector: 'jhi-conference-update',
   templateUrl: './conference-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, FormatMediumDatePipe],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule],
 })
 export class ConferenceUpdateComponent implements OnInit {
   isSaving = false;
   conference: IConference | null = null;
+  statusValues = Object.keys(Status);
 
-  salonsSharedCollection: ISalon[] = [];
-  exponentsSharedCollection: IExponent[] = [];
+  participationsSharedCollection: IParticipation[] = [];
 
   protected conferenceService = inject(ConferenceService);
   protected conferenceFormService = inject(ConferenceFormService);
-  protected salonService = inject(SalonService);
-  protected exponentService = inject(ExponentService);
+  protected participationService = inject(ParticipationService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ConferenceFormGroup = this.conferenceFormService.createConferenceFormGroup();
 
-  compareSalon = (o1: ISalon | null, o2: ISalon | null): boolean => this.salonService.compareSalon(o1, o2);
-
-  compareExponent = (o1: IExponent | null, o2: IExponent | null): boolean => this.exponentService.compareExponent(o1, o2);
+  compareParticipation = (o1: IParticipation | null, o2: IParticipation | null): boolean =>
+    this.participationService.compareParticipation(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ conference }) => {
@@ -90,28 +86,21 @@ export class ConferenceUpdateComponent implements OnInit {
     this.conference = conference;
     this.conferenceFormService.resetForm(this.editForm, conference);
 
-    this.salonsSharedCollection = this.salonService.addSalonToCollectionIfMissing<ISalon>(this.salonsSharedCollection, conference.salon);
-    this.exponentsSharedCollection = this.exponentService.addExponentToCollectionIfMissing<IExponent>(
-      this.exponentsSharedCollection,
-      conference.exponent,
+    this.participationsSharedCollection = this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
+      this.participationsSharedCollection,
+      conference.participation,
     );
   }
 
   protected loadRelationshipsOptions(): void {
-    this.salonService
+    this.participationService
       .query()
-      .pipe(map((res: HttpResponse<ISalon[]>) => res.body ?? []))
-      .pipe(map((salons: ISalon[]) => this.salonService.addSalonToCollectionIfMissing<ISalon>(salons, this.conference?.salon)))
-      .subscribe((salons: ISalon[]) => (this.salonsSharedCollection = salons));
-
-    this.exponentService
-      .query()
-      .pipe(map((res: HttpResponse<IExponent[]>) => res.body ?? []))
+      .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
-        map((exponents: IExponent[]) =>
-          this.exponentService.addExponentToCollectionIfMissing<IExponent>(exponents, this.conference?.exponent),
+        map((participations: IParticipation[]) =>
+          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.conference?.participation),
         ),
       )
-      .subscribe((exponents: IExponent[]) => (this.exponentsSharedCollection = exponents));
+      .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
   }
 }

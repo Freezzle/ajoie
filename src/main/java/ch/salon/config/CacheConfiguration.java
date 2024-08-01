@@ -55,8 +55,15 @@ public class CacheConfiguration {
             createCache(cm, ch.salon.domain.Salon.class.getName() + ".conferences");
             createCache(cm, ch.salon.domain.Salon.class.getName() + ".priceStandSalons");
             createCache(cm, ch.salon.domain.Conference.class.getName());
-            createCache(cm, ch.salon.domain.ConfigurationSalon.class.getName());
             createCache(cm, ch.salon.domain.PriceStandSalon.class.getName());
+            createCache(cm, ch.salon.domain.Exponent.class.getName() + ".participations");
+            createCache(cm, ch.salon.domain.Salon.class.getName() + ".participations");
+            createCache(cm, ch.salon.domain.Participation.class.getName());
+            createCache(cm, ch.salon.domain.Participation.class.getName() + ".conferences");
+            createCache(cm, ch.salon.domain.Participation.class.getName() + ".payments");
+            createCache(cm, ch.salon.domain.Participation.class.getName() + ".invoices");
+            createCache(cm, ch.salon.domain.Participation.class.getName() + ".stands");
+            createCache(cm, ch.salon.domain.Payment.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

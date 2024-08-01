@@ -35,16 +35,17 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="price">
+            <th scope="col" jhiSortBy="id">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.priceStandSalon.price">Price</span>
+                <span jhiTranslate="salonApp.priceStandSalon.id">Id</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="dimension.id">
+            <th scope="col" jhiSortBy="price">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.priceStandSalon.dimension">Dimension</span>
+                <span jhiTranslate="salonApp.priceStandSalon.price">Price</span>
+
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -54,28 +55,33 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="dimension.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.priceStandSalon.dimension">Dimension</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
           @for (priceStandSalon of priceStandSalons; track trackId) {
             <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/price-stand-salon', priceStandSalon.id, 'view']">{{ priceStandSalon.id }}</a>
+              </td>
               <td>{{ priceStandSalon.price }}</td>
               <td>
-                @if (priceStandSalon.dimension) {
+                @if (priceStandSalon.salon) {
                   <div>
-                    <a [routerLink]="['/dimension-stand', priceStandSalon.dimension.id, 'view']">{{
-                      priceStandSalon.dimension.dimension
-                    }}</a>
+                    <a [routerLink]="['/salon', priceStandSalon.salon.id, 'view']">{{ priceStandSalon.salon.id }}</a>
                   </div>
                 }
               </td>
               <td>
-                @if (priceStandSalon.salon) {
+                @if (priceStandSalon.dimension) {
                   <div>
-                    <a [routerLink]="['/salon', priceStandSalon.salon.id, 'view']">{{
-                      priceStandSalon.salon.place + ' ' + (priceStandSalon.salon.startingDate | formatMediumDate)
-                    }}</a>
+                    <a [routerLink]="['/dimension-stand', priceStandSalon.dimension.id, 'view']">{{ priceStandSalon.dimension.id }}</a>
                   </div>
                 }
               </td>

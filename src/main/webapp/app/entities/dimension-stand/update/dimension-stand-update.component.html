@@ -11,9 +11,24 @@
 
       <div>
         <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="salonApp.dimensionStand.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
         <div class="mb-3">
           <label class="form-label" for="field_dimension" jhiTranslate="salonApp.dimensionStand.dimension">Dimension</label>
           <input type="text" class="form-control" name="dimension" id="field_dimension" data-cy="dimension" formControlName="dimension" />
+          @if (editForm.get('dimension')!.invalid && (editForm.get('dimension')!.dirty || editForm.get('dimension')!.touched)) {
+            <div>
+              @if (editForm.get('dimension')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
         </div>
       </div>
 

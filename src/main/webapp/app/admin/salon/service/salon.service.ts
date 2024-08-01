@@ -22,6 +22,7 @@ export type EntityArrayResponseType = HttpResponse<ISalon[]>;
 export class SalonService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
+
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/salons');
 
   create(salon: NewSalon): Observable<EntityResponseType> {

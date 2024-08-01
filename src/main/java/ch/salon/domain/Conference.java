@@ -1,7 +1,9 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -20,16 +22,20 @@ public class Conference implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "title")
+    @NotNull
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences", "priceStandSalons", "configuration" }, allowSetters = true)
-    private Salon salon;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
+
+    @Column(name = "extra_information")
+    private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "stands", "conferences" }, allowSetters = true)
-    private Exponent exponent;
+    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
+    private Participation participation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -59,29 +65,42 @@ public class Conference implements Serializable {
         this.title = title;
     }
 
-    public Salon getSalon() {
-        return this.salon;
+    public Status getStatus() {
+        return this.status;
     }
 
-    public void setSalon(Salon salon) {
-        this.salon = salon;
-    }
-
-    public Conference salon(Salon salon) {
-        this.setSalon(salon);
+    public Conference status(Status status) {
+        this.setStatus(status);
         return this;
     }
 
-    public Exponent getExponent() {
-        return this.exponent;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    public void setExponent(Exponent exponent) {
-        this.exponent = exponent;
+    public String getExtraInformation() {
+        return this.extraInformation;
     }
 
-    public Conference exponent(Exponent exponent) {
-        this.setExponent(exponent);
+    public Conference extraInformation(String extraInformation) {
+        this.setExtraInformation(extraInformation);
+        return this;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
+    }
+
+    public Participation getParticipation() {
+        return this.participation;
+    }
+
+    public void setParticipation(Participation participation) {
+        this.participation = participation;
+    }
+
+    public Conference participation(Participation participation) {
+        this.setParticipation(participation);
         return this;
     }
 
@@ -110,6 +129,8 @@ public class Conference implements Serializable {
         return "Conference{" +
             "id=" + getId() +
             ", title='" + getTitle() + "'" +
+            ", status='" + getStatus() + "'" +
+            ", extraInformation='" + getExtraInformation() + "'" +
             "}";
     }
 }

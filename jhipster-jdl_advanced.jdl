@@ -1,8 +1,8 @@
 
 entity Exponent {
 	id UUID
-    fullName String
-	email String
+    fullName String required
+	email String required
     phoneNumber String
     address String
     npaLocalite String
@@ -11,14 +11,21 @@ entity Exponent {
 
 entity DimensionStand {
 	id UUID
-    dimension String
+    dimension String required
 }
 
 entity Conference {
 	id UUID
-    title String
-    status String
+    title String required
+    status Status
     extraInformation String
+}
+
+enum Status {
+	REFUSED,
+    CANCELED,
+    IN_VERIFICATION,
+    ACCEPTED
 }
 
 entity Participation {
@@ -31,13 +38,13 @@ entity Participation {
     acceptedContract Boolean
     needArrangment Boolean
     isBillingClosed Boolean
-    status String
+    status Status
     extraInformation String
 }
 
 entity Stand {
 	id UUID
-    description String
+    description String required
     website String
     socialMedia String
     urlPicture String
@@ -45,7 +52,7 @@ entity Stand {
     nbTable Long
     nbChair Long
     needElectricity Boolean
-    status String
+    status Status
     extraInformation String
 }
 
@@ -61,19 +68,26 @@ entity Invoice {
     extraInformation String
 }
 
+enum Mode {
+	BANK,
+    CASH,
+    SERVICE,
+    OTHER
+}
+
 entity Payment {
 	id UUID
-    amount Double
-    billingDate Instant
-    paymentMode String
+    amount Double required
+    billingDate Instant required
+    paymentMode Mode
     extraInformation String
 }
 
 entity Salon {
 	id UUID
-    place String
-    startingDate Instant
-    endingDate Instant
+    place String required
+    startingDate Instant required
+    endingDate Instant required
     priceMeal1 Long
     priceMeal2 Long
     priceMeal3 Long
@@ -84,7 +98,7 @@ entity Salon {
 
 entity PriceStandSalon {
 	id UUID
-    price Long
+    price Long required
 }
 
 relationship OneToMany {
