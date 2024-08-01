@@ -137,7 +137,7 @@
           >
             <option [ngValue]="null"></option>
             @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
-              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.id }}</option>
+              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
             }
           </select>
         </div>

@@ -1,0 +1,125 @@
+<div>
+  <h2 id="page-heading" data-cy="PaymentHeading">
+    <span jhiTranslate="salonApp.payment.home.title">Payments</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="common.refresh">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-payment"
+        [routerLink]="['/payment/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="salonApp.payment.home.createLabel">Créer un nouveau Payment</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (payments?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="salonApp.payment.home.notFound">Aucun Payment trouvé</span>
+    </div>
+  }
+
+  @if (payments && payments.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.payment.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="amount">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.payment.amount">Amount</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="billingDate">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.payment.billingDate">Billing Date</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="paymentMode">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.payment.paymentMode">Payment Mode</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="extraInformation">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.payment.extraInformation">Extra Information</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="participation.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.payment.participation">Participation</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (payment of payments; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/payment', payment.id, 'view']">{{ payment.id }}</a>
+              </td>
+              <td>{{ payment.amount }}</td>
+              <td>{{ payment.billingDate | formatMediumDatetime }}</td>
+              <td [jhiTranslate]="'salonApp.Mode.' + (payment.paymentMode ?? 'null')">
+                {{ { null: '', BANK: 'BANK', CASH: 'CASH', SERVICE: 'SERVICE', OTHER: 'OTHER' }[payment.paymentMode ?? 'null'] }}
+              </td>
+              <td>{{ payment.extraInformation }}</td>
+              <td>
+                @if (payment.participation) {
+                  <div>
+                    <a [routerLink]="['/participation', payment.participation.id, 'view']">{{ payment.participation.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/payment', payment.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/payment', payment.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(payment)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

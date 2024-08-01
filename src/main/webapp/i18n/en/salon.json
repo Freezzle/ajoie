@@ -1,0 +1,36 @@
+{
+  "salon": {
+    "benevoles": "Bénévoles du salon",
+    "conferences": "Conférences du salon",
+    "create": "Création d'un nouveau salon",
+    "edit": "Modification d'un salon",
+    "endingDate": "Date de fin",
+    "extraInformation": "Information complémentaire",
+    "notFound": "Aucun salon trouvé",
+    "participations": "Participations du salon",
+    "place": "Salon",
+    "priceConference": "Prix d'une conférence",
+    "priceMeal1": "Prix samedi midi",
+    "priceMeal2": "Prix samedi soir",
+    "priceMeal3": "Prix dimanche midi",
+    "priceSharingStand": "Prix du partage d'un stand",
+    "stands": "Stands du salon",
+    "startingDate": "Date de début",
+    "stats": {
+      "billingPaid": "Payé",
+      "billingUnpaid": "Impayé",
+      "billings": "Facturation des participations acceptés",
+      "dimensions": "Dimensions des stands acceptés",
+      "meal1": "Samedi midi",
+      "meal2": "Samedi soir",
+      "meal3": "Dimanche midi",
+      "meals": "Repas des participations acceptés",
+      "standAccepted": "Accepté",
+      "standCanceled": "Annulé",
+      "standInVerification": "En cours",
+      "standRefused": "Refusé",
+      "stands": "Stands"
+    },
+    "title": "Les salons"
+  }
+}

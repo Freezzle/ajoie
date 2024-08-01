@@ -52,7 +52,7 @@
               <span jhiTranslate="stand.dimension">Dimension</span>
             </th>
             <th class="text-center">
-              <span jhiTranslate="stand.status">Status</span>
+              <span jhiTranslate="stand.status.label">Status</span>
             </th>
             <th scope="col"></th>
           </tr>
@@ -68,7 +68,7 @@
                   </div>
                 }
               </td>
-              <td class="text-center">{{ stand.status }}</td>
+              <td class="text-center">{{ 'stand.status.list.' + stand.status | translate }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/admin/stands', stand.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

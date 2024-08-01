@@ -1,0 +1,190 @@
+<div>
+  <h2 id="page-heading" data-cy="ParticipationHeading">
+    <span jhiTranslate="salonApp.participation.home.title">Participations</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="common.refresh">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-participation"
+        [routerLink]="['/participation/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="salonApp.participation.home.createLabel">Créer un nouveau Participation</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (participations?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="salonApp.participation.home.notFound">Aucun Participation trouvé</span>
+    </div>
+  }
+
+  @if (participations && participations.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="registrationDate">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.registrationDate">Registration Date</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbMeal1">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.nbMeal1">Nb Meal 1</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbMeal2">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.nbMeal2">Nb Meal 2</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nbMeal3">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.nbMeal3">Nb Meal 3</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="acceptedChart">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.acceptedChart">Accepted Chart</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="acceptedContract">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.acceptedContract">Accepted Contract</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="needArrangment">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.needArrangment">Need Arrangment</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="isBillingClosed">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.isBillingClosed">Is Billing Closed</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="status">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.status">Status</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="extraInformation">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.extraInformation">Extra Information</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="exponent.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.exponent">Exponent</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="salon.id">
+              <div class="d-flex">
+                <span jhiTranslate="salonApp.participation.salon">Salon</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (participation of participations; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/participation', participation.id, 'view']">{{ participation.id }}</a>
+              </td>
+              <td>{{ participation.registrationDate | formatMediumDatetime }}</td>
+              <td>{{ participation.nbMeal1 }}</td>
+              <td>{{ participation.nbMeal2 }}</td>
+              <td>{{ participation.nbMeal3 }}</td>
+              <td>{{ participation.acceptedChart }}</td>
+              <td>{{ participation.acceptedContract }}</td>
+              <td>{{ participation.needArrangment }}</td>
+              <td>{{ participation.isBillingClosed }}</td>
+              <td [jhiTranslate]="'salonApp.Status.' + (participation.status ?? 'null')">
+                {{
+                  { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                    participation.status ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ participation.extraInformation }}</td>
+              <td>
+                @if (participation.exponent) {
+                  <div>
+                    <a [routerLink]="['/exponent', participation.exponent.id, 'view']">{{ participation.exponent.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (participation.salon) {
+                  <div>
+                    <a [routerLink]="['/salon', participation.salon.id, 'view']">{{ participation.salon.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/participation', participation.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/participation', participation.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(participation)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

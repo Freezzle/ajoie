@@ -1,0 +1,9 @@
+export enum Status {
+  REFUSED = 'REFUSED',
+
+  CANCELED = 'CANCELED',
+
+  IN_VERIFICATION = 'IN_VERIFICATION',
+
+  ACCEPTED = 'ACCEPTED',
+}

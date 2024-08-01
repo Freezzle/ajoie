@@ -1,0 +1,90 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (participation()) {
+      <div>
+        <h2 data-cy="participationDetailsHeading"><span jhiTranslate="salonApp.participation.detail.title">Participation</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="salonApp.participation.id">Id</span></dt>
+          <dd>
+            <span>{{ participation()!.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.registrationDate">Registration Date</span></dt>
+          <dd>
+            <span>{{ participation()!.registrationDate | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.nbMeal1">Nb Meal 1</span></dt>
+          <dd>
+            <span>{{ participation()!.nbMeal1 }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.nbMeal2">Nb Meal 2</span></dt>
+          <dd>
+            <span>{{ participation()!.nbMeal2 }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.nbMeal3">Nb Meal 3</span></dt>
+          <dd>
+            <span>{{ participation()!.nbMeal3 }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.acceptedChart">Accepted Chart</span></dt>
+          <dd>
+            <span>{{ participation()!.acceptedChart }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.acceptedContract">Accepted Contract</span></dt>
+          <dd>
+            <span>{{ participation()!.acceptedContract }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.needArrangment">Need Arrangment</span></dt>
+          <dd>
+            <span>{{ participation()!.needArrangment }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.isBillingClosed">Is Billing Closed</span></dt>
+          <dd>
+            <span>{{ participation()!.isBillingClosed }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.status">Status</span></dt>
+          <dd>
+            <span [jhiTranslate]="'salonApp.Status.' + (participation()!.status ?? 'null')">{{
+              { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                participation()!.status ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.extraInformation">Extra Information</span></dt>
+          <dd>
+            <span>{{ participation()!.extraInformation }}</span>
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.exponent">Exponent</span></dt>
+          <dd>
+            @if (participation()!.exponent) {
+              <div>
+                <a [routerLink]="['/exponent', participation()!.exponent?.id, 'view']">{{ participation()!.exponent?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="salonApp.participation.salon">Salon</span></dt>
+          <dd>
+            @if (participation()!.salon) {
+              <div>
+                <a [routerLink]="['/salon', participation()!.salon?.id, 'view']">{{ participation()!.salon?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/participation', participation()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>
