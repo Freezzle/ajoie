@@ -33,6 +33,13 @@ export class SalonDetailComponent implements OnInit {
     );
   }
 
+  generate(): void {
+    const queryObject: any = {
+      idSalon: this.salon()!.id,
+    };
+    this.salonService.generate(queryObject).subscribe();
+  }
+
   previousState(): void {
     window.history.back();
   }

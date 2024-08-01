@@ -54,8 +54,13 @@ export class SalonService {
       .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
-  generate(): Observable<any> {
-    return this.http.post<any>(this.applicationConfigService.getEndpointFor('api/importation'), {});
+  generate(req: any): Observable<any> {
+    const options = createRequestOption(req);
+    return this.http.post<any>(
+      this.applicationConfigService.getEndpointFor('api/importation'),
+      {},
+      { params: options, observe: 'response' },
+    );
   }
 
   delete(id: string): Observable<HttpResponse<{}>> {

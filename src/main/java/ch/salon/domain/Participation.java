@@ -71,7 +71,7 @@ public class Participation implements Serializable {
     @JsonIgnoreProperties(value = { "participation", "dimension" }, allowSetters = true)
     private Set<Stand> stands = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "participations" }, allowSetters = true)
     private Exponent exponent;
 

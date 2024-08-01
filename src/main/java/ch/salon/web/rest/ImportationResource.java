@@ -87,7 +87,7 @@ public class ImportationResource {
     }
 
     @PostMapping("")
-    public ResponseEntity<Invoice> importation() throws URISyntaxException {
+    public ResponseEntity<Invoice> importation(@RequestParam(name = "idSalon", required = false) String idSalon) throws URISyntaxException {
         try (
             Reader reader = new FileReader(
                 "E:\\ajoiedumieuxvivre\\src\\main\\java\\ch\\salon\\importation\\formulaire_2024.csv",
@@ -95,35 +95,33 @@ public class ImportationResource {
             );
             CSVParser csvParser = new CSVParser(reader, CSVFormat.EXCEL.withDelimiter(';'))
         ) {
-            Salon currentSalon = new Salon();
-            currentSalon.setStartingDate(Instant.now());
-            currentSalon.setEndingDate(Instant.now().plus(1, ChronoUnit.DAYS));
-            currentSalon.setPlace("Important : Ajoie de mieux vivre " + currentSalon.getEndingDate().toString());
-            currentSalon = salonRepository.save(currentSalon);
-
-            DimensionStand dimension2x2Stand = new DimensionStand();
-            dimension2x2Stand.setDimension("2 m x 2 m");
-            dimensionStandRepository.save(dimension2x2Stand);
-            DimensionStand dimension25x2Stand = new DimensionStand();
-            dimension25x2Stand.setDimension("2.5 m x 2 m");
-            dimensionStandRepository.save(dimension25x2Stand);
-            DimensionStand dimension25Cotex2Stand = new DimensionStand();
-            dimension25Cotex2Stand.setDimension("2.5 m x 2 m (possible de vendre des deux côtés)");
-            dimensionStandRepository.save(dimension25Cotex2Stand);
-            DimensionStand dimension3x2Stand = new DimensionStand();
-            dimension3x2Stand.setDimension("3 m x 2 m");
-            dimensionStandRepository.save(dimension3x2Stand);
-            DimensionStand dimension3x25Stand = new DimensionStand();
-            dimension3x25Stand.setDimension("3 m x 2.5 m");
-            dimensionStandRepository.save(dimension3x25Stand);
-            DimensionStand dimension4x2Stand = new DimensionStand();
-            dimension4x2Stand.setDimension("4 m x 2 m");
-            dimensionStandRepository.save(dimension4x2Stand);
-            DimensionStand dimensionAutres = new DimensionStand();
-            dimensionAutres.setDimension("Autres");
-            dimensionStandRepository.save(dimensionAutres);
+            Salon currentSalon = salonRepository.findById(UUID.fromString(idSalon)).orElseThrow();
 
             List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
+            if (dimensionStands == null || dimensionStands.isEmpty()) {
+                DimensionStand dimension2x2Stand = new DimensionStand();
+                dimension2x2Stand.setDimension("2 m x 2 m");
+                dimensionStandRepository.save(dimension2x2Stand);
+                DimensionStand dimension25x2Stand = new DimensionStand();
+                dimension25x2Stand.setDimension("2.5 m x 2 m");
+                dimensionStandRepository.save(dimension25x2Stand);
+                DimensionStand dimension25Cotex2Stand = new DimensionStand();
+                dimension25Cotex2Stand.setDimension("2.5 m x 2 m (possible de vendre des deux côtés)");
+                dimensionStandRepository.save(dimension25Cotex2Stand);
+                DimensionStand dimension3x2Stand = new DimensionStand();
+                dimension3x2Stand.setDimension("3 m x 2 m");
+                dimensionStandRepository.save(dimension3x2Stand);
+                DimensionStand dimension3x25Stand = new DimensionStand();
+                dimension3x25Stand.setDimension("3 m x 2.5 m");
+                dimensionStandRepository.save(dimension3x25Stand);
+                DimensionStand dimension4x2Stand = new DimensionStand();
+                dimension4x2Stand.setDimension("4 m x 2 m");
+                dimensionStandRepository.save(dimension4x2Stand);
+                DimensionStand dimensionAutres = new DimensionStand();
+                dimensionAutres.setDimension("Autres");
+                dimensionStandRepository.save(dimensionAutres);
+                dimensionStands = dimensionStandRepository.findAll();
+            }
 
             int index = 0;
             for (CSVRecord csvRecord : csvParser) {
@@ -224,7 +222,17 @@ public class ImportationResource {
 
     private DimensionStand findDimension(List<DimensionStand> dimensions, String dimension) {
         System.out.println(dimension);
-        return dimensions.stream().filter(dim -> dimension.contains(dim.getDimension())).findFirst().orElseThrow();
+        return dimensions
+            .stream()
+            .filter(dim -> dimension.contains(dim.getDimension()))
+            .findFirst()
+            .orElseGet(() -> {
+                DimensionStand newDimensionStand = new DimensionStand();
+                newDimensionStand.setDimension(sub(dimension));
+                DimensionStand saved = dimensionStandRepository.save(newDimensionStand);
+                dimensions.add(newDimensionStand);
+                return newDimensionStand;
+            });
     }
 
     private String sub(String chaine) {
