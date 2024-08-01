@@ -179,24 +179,26 @@ public class SalonResource {
     public ResponseEntity<SalonStats> statsSalon(@PathVariable(value = "id", required = false) final UUID id) {
         log.debug("REST request to get stats from Salon : {}", id);
 
-        List<Participation> allParticipations = this.participationRepository.findAllParticipationsBySalon_Id(id);
+        List<Participation> allParticipations = this.participationRepository.findBySalonId(id);
 
         SalonStats stats = new SalonStats();
+
         List<Stand> standsAccepted = allParticipations
             .stream()
             .map(Participation::getStands)
             .flatMap(Collection::stream)
             .filter(stand -> stand.getStatus() == Status.ACCEPTED)
             .toList();
+
+        stats.setNbStandAccepted(standsAccepted.stream().filter(stand -> stand.getStatus() == Status.ACCEPTED).count());
+        stats.setNbStandInVerification(allParticipations.stream().filter(stand -> stand.getStatus() == Status.IN_VERIFICATION).count());
+        stats.setNbStandRefused(allParticipations.stream().filter(stand -> stand.getStatus() == Status.REFUSED).count());
+        stats.setNbStandCanceled(allParticipations.stream().filter(stand -> stand.getStatus() == Status.CANCELED).count());
+
         List<Participation> participationsAccepted = allParticipations
             .stream()
             .filter(participation -> participation.getStatus() == Status.ACCEPTED)
             .toList();
-
-        stats.setNbStandValidated(standsAccepted.stream().filter(stand -> stand.getStatus() == Status.ACCEPTED).count());
-        stats.setNbStandIntreatment(allParticipations.stream().filter(stand -> stand.getStatus() == Status.IN_VERIFICATION).count());
-        stats.setNbStandRefused(allParticipations.stream().filter(stand -> stand.getStatus() == Status.REFUSED).count());
-        stats.setNbStandCanceled(allParticipations.stream().filter(stand -> stand.getStatus() == Status.CANCELED).count());
 
         stats.setNbMealSaturdayMidday(participationsAccepted.stream().map(Participation::getNbMeal1).reduce(0L, Long::sum));
         stats.setNbMealSaturdayEvening(participationsAccepted.stream().map(Participation::getNbMeal2).reduce(0L, Long::sum));

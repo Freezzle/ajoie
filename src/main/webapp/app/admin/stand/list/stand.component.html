@@ -1,20 +1,20 @@
 <div>
   <h2 id="page-heading" data-cy="StandHeading">
-    <span jhiTranslate="salonApp.stand.home.title">Stands</span>
+    <span jhiTranslate="stand.title">Les stands</span>
 
     <hr />
 
     <div class="d-flex justify-content-between mt-3">
       <span>
         <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
         </button>
       </span>
 
       <span>
         <button class="btn btn-primary btn-sm" (click)="load()" [disabled]="isLoading">
           <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-          <span jhiTranslate="salonApp.stand.home.refreshListLabel">Actualiser</span>
+          <span jhiTranslate="common.refresh">Actualiser</span>
         </button>
 
         <button
@@ -24,7 +24,7 @@
           [routerLink]="['/admin/stands/new']"
         >
           <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="salonApp.stand.home.createLabel">Créer</span>
+          <span jhiTranslate="common.create">Créer</span>
         </button>
       </span>
     </div>
@@ -34,11 +34,9 @@
 
   <jhi-alert-error></jhi-alert-error>
 
-  <jhi-alert></jhi-alert>
-
   @if (stands?.length === 0) {
     <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="salonApp.stand.home.notFound">Aucun Stand trouvé</span>
+      <span jhiTranslate="stand.notFound">Aucun Stand trouvé</span>
     </div>
   }
 
@@ -48,25 +46,13 @@
         <thead>
           <tr>
             <th>
-              <span jhiTranslate="salonApp.stand.exponent">Exponent</span>
+              <span jhiTranslate="stand.description">Description</span>
             </th>
             <th>
-              <span jhiTranslate="salonApp.stand.description">Description</span>
+              <span jhiTranslate="stand.dimension">Dimension</span>
             </th>
             <th class="text-center">
-              <span jhiTranslate="salonApp.stand.needArrangment">Need arrangment</span>
-            </th>
-            <th>
-              <span jhiTranslate="salonApp.stand.dimension">Dimension</span>
-            </th>
-            <th class="text-center">
-              <span jhiTranslate="salonApp.stand.registrationDate">Registration date</span>
-            </th>
-            <th class="text-center">
-              <span jhiTranslate="salonApp.stand.status">Status</span>
-            </th>
-            <th class="text-center">
-              <span jhiTranslate="salonApp.stand.billingClosed">Est payé</span>
+              <span jhiTranslate="stand.status">Status</span>
             </th>
             <th scope="col"></th>
           </tr>
@@ -74,20 +60,7 @@
         <tbody>
           @for (stand of stands; track $index) {
             <tr data-cy="entityTable">
-              <td>
-                @if (stand.exponent) {
-                  <div>
-                    <a [routerLink]="['/exponent', stand.exponent.id, 'view']">{{ stand.exponent.fullName }}</a>
-                  </div>
-                }
-              </td>
               <td>{{ stand.description }}</td>
-              <td class="text-center">
-                <fa-icon
-                  icon="{{ stand.needArrangment | faIconBoolean }}"
-                  style="{{ stand.needArrangment | faIconColorBoolean }}"
-                ></fa-icon>
-              </td>
               <td>
                 @if (stand.dimension) {
                   <div>
@@ -95,26 +68,22 @@
                   </div>
                 }
               </td>
-              <td class="text-center">{{ stand.registrationDate | formatMediumDate }}</td>
               <td class="text-center">{{ stand.status }}</td>
-              <td class="text-center">
-                <fa-icon icon="{{ stand.billingClosed | faIconBoolean }}" style="{{ stand.billingClosed | faIconColorBoolean }}"></fa-icon>
-              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/admin/stands', stand.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
                   </a>
 
                   <a [routerLink]="['/admin/stands', stand.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
                     <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
                   </a>
 
                   <button type="submit" (click)="delete(stand)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
                   </button>
                 </div>
               </td>

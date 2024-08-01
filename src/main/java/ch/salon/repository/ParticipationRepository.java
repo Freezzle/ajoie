@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface ParticipationRepository extends JpaRepository<Participation, UUID> {
-    List<Participation> findAllParticipationsBySalon_Id(UUID idSalon);
+    List<Participation> findBySalonId(UUID idSalon);
 }

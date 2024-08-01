@@ -1,31 +1,30 @@
 {
   "userManagement": {
-    "home": {
-      "title": "Benutzer",
-      "refreshListLabel": "Refresh list",
-      "createLabel": "Neuen Benutzer erstellen",
-      "createOrEditLabel": "Benutzer erstellen oder bearbeiten"
-    },
-    "created": "Ein neuer Benutzer wurde mit ID {{ param }} erstellt",
-    "updated": "Ein Benutzer mit ID {{ param }} wurde geändert",
-    "deleted": "Ein Benutzer mit ID {{ param }} wurde gelöscht",
+    "activated": "Activé",
+    "created": "L'utilisateur {{ param }} a été créé.",
+    "createdBy": "Créé par",
+    "createdDate": "Créé le",
+    "deactivated": "Désactivé",
     "delete": {
-      "question": "Sind Sie sicher, dass Sie den Benutzer {{ login }} löschen möchten?"
+      "question": "Etes-vous certain de vouloir supprimer l'utilisateur {{ login }} ?"
     },
+    "deleted": "L'utilisateur {{ param }} a été supprimé.",
     "detail": {
-      "title": "Benutzer"
+      "title": "Utilisateur"
     },
-    "login": "Login",
-    "firstName": "Vorname",
-    "lastName": "Nachname",
     "email": "Email",
-    "activated": "Aktiv",
-    "deactivated": "Deaktiviert",
-    "profiles": "Profile",
-    "langKey": "Sprache",
-    "createdBy": "Erstellt von",
-    "createdDate": "Erstellt am",
-    "lastModifiedBy": "Bearbeitet von",
-    "lastModifiedDate": "Zuletzt bearbeitet"
+    "firstName": "Prénom",
+    "home": {
+      "createLabel": "Créer un nouvel utilisateur",
+      "createOrEditLabel": "Créer ou éditer un utilisateur",
+      "title": "Utilisateurs"
+    },
+    "langKey": "Langue",
+    "lastModifiedBy": "Modifié par",
+    "lastModifiedDate": "Modifié le",
+    "lastName": "Nom",
+    "login": "Login",
+    "profiles": "Droits",
+    "updated": "L'utilisateur {{ param }} a été mis à jour."
   }
 }

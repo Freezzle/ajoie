@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="loadAll()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="userManagement.home.refreshListLabel">Actualiser la liste</span>
+        <span jhiTranslate="common.refresh">Actualiser la liste</span>
       </button>
       <button class="btn btn-primary jh-create-entity" [routerLink]="['./new']">
         <fa-icon icon="plus"></fa-icon> <span jhiTranslate="userManagement.home.createLabel">Créer un nouvel utilisateur</span>
@@ -81,7 +81,7 @@
                 <div class="btn-group">
                   <button type="submit" [routerLink]="['./', user.login, 'view']" class="btn btn-info btn-sm">
                     <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
                   </button>
 
                   <button
@@ -91,7 +91,7 @@
                     class="btn btn-primary btn-sm"
                   >
                     <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
                   </button>
 
                   <button
@@ -101,7 +101,7 @@
                     [disabled]="!currentAccount() || currentAccount()?.login === user.login"
                   >
                     <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
                   </button>
                 </div>
               </td>

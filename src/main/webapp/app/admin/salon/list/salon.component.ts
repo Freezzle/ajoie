@@ -39,15 +39,9 @@ export class SalonComponent implements OnInit {
   protected ngZone = inject(NgZone);
 
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.paramMap])
-      .pipe(
-        tap(([queryparams, params]) => {
-          if (!this.salons || this.salons.length === 0) {
-            this.load();
-          }
-        }),
-      )
-      .subscribe();
+    if (!this.salons || this.salons.length === 0) {
+      this.load();
+    }
   }
 
   delete(salon: ISalon): void {

@@ -1,0 +1,30 @@
+{
+  "common": {
+    "addblob": "Ajouter blob",
+    "addimage": "Ajouter image",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "edit": "Editer",
+    "generate": "Générer",
+    "open": "Ouvrir",
+    "refresh": "Actualiser",
+    "save": "Sauvegarder",
+    "show": "Show {{otherEntity}}",
+    "validation": {
+      "datetimelocal": "Ce champ doit être une date et une heure.",
+      "max": "Ce champ doit être inférieur à {{max}}.",
+      "maxbytes": "Ce champ doit être inférieur à {{max}} bytes.",
+      "maxlength": "Ce champ doit faire moins de {{max}} caractères.",
+      "min": "Ce champ doit être supérieur à {{min}}.",
+      "minbytes": "Ce champ doit être supérieur à {{min}} bytes.",
+      "minlength": "Ce champ doit faire au minimum {{min}} caractères.",
+      "number": "Ce champ doit être un nombre.",
+      "pattern": "Ce champ doit suivre l'expression régulière {{pattern}}.",
+      "patternLogin": "Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.",
+      "required": "Ce champ est obligatoire."
+    },
+    "view": "Voir"
+  }
+}

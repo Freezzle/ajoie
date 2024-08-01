@@ -1,15 +1,18 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-stand-heading" data-cy="StandCreateUpdateHeading" jhiTranslate="salonApp.stand.home.createOrEditLabel">
-        Créer ou éditer un Stand
+      <h2 id="jhi-stand-create-heading" *ngIf="stand?.id" data-cy="StandCreateUpdateHeading" jhiTranslate="stand.edit">
+        Modification d'un stand
+      </h2>
+      <h2 id="jhi-stand-update-heading" *ngIf="!stand?.id" data-cy="StandCreateUpdateHeading" jhiTranslate="stand.create">
+        Création d'un nouveau stand
       </h2>
 
       <div>
         <jhi-alert-error></jhi-alert-error>
 
         <div class="mb-3">
-          <label class="form-label" for="field_description" jhiTranslate="salonApp.stand.description">Description</label>
+          <label class="form-label" for="field_description" jhiTranslate="stand.description">Description</label>
           <input
             type="text"
             class="form-control"
@@ -18,40 +21,61 @@
             data-cy="description"
             formControlName="description"
           />
+          @if (editForm.get('description')!.invalid && (editForm.get('description')!.dirty || editForm.get('description')!.touched)) {
+            <div>
+              @if (editForm.get('description')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbMeal1" jhiTranslate="salonApp.stand.nbMeal1">Nb Meal 1</label>
-          <input type="number" class="form-control" name="nbMeal1" id="field_nbMeal1" data-cy="nbMeal1" formControlName="nbMeal1" />
+          <label class="form-label" for="field_website" jhiTranslate="stand.website">Website</label>
+          <input type="text" class="form-control" name="website" id="field_website" data-cy="website" formControlName="website" />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbMeal2" jhiTranslate="salonApp.stand.nbMeal2">Nb Meal 2</label>
-          <input type="number" class="form-control" name="nbMeal2" id="field_nbMeal2" data-cy="nbMeal2" formControlName="nbMeal2" />
+          <label class="form-label" for="field_socialMedia" jhiTranslate="stand.socialMedia">Social Media</label>
+          <input
+            type="text"
+            class="form-control"
+            name="socialMedia"
+            id="field_socialMedia"
+            data-cy="socialMedia"
+            formControlName="socialMedia"
+          />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbMeal3" jhiTranslate="salonApp.stand.nbMeal3">Nb Meal 3</label>
-          <input type="number" class="form-control" name="nbMeal3" id="field_nbMeal3" data-cy="nbMeal3" formControlName="nbMeal3" />
+          <label class="form-label" for="field_urlPicture" jhiTranslate="stand.urlPicture">Url Picture</label>
+          <input
+            type="text"
+            class="form-control"
+            name="urlPicture"
+            id="field_urlPicture"
+            data-cy="urlPicture"
+            formControlName="urlPicture"
+          />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_shared" jhiTranslate="salonApp.stand.shared">Shared</label>
+          <label class="form-label" for="field_shared" jhiTranslate="stand.shared">Shared</label>
           <input type="checkbox" class="form-check" name="shared" id="field_shared" data-cy="shared" formControlName="shared" />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbTable" jhiTranslate="salonApp.stand.nbTable">Nb Table</label>
+          <label class="form-label" for="field_nbTable" jhiTranslate="stand.nbTable">Nb Table</label>
           <input type="number" class="form-control" name="nbTable" id="field_nbTable" data-cy="nbTable" formControlName="nbTable" />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_nbChair" jhiTranslate="salonApp.stand.nbChair">Nb Chair</label>
+          <label class="form-label" for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
           <input type="number" class="form-control" name="nbChair" id="field_nbChair" data-cy="nbChair" formControlName="nbChair" />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_needElectricity" jhiTranslate="salonApp.stand.needElectricity">Need Electricity</label>
+          <label class="form-label" for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
           <input
             type="checkbox"
             class="form-check"
@@ -63,46 +87,46 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_acceptedChart" jhiTranslate="salonApp.stand.acceptedChart">Accepted Chart</label>
+          <label class="form-label" for="field_status" jhiTranslate="stand.status.label">Status</label>
+          <select class="form-control" name="status" formControlName="status" id="field_status" data-cy="status">
+            <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
+            @for (status of statusValues; track $index) {
+              <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_extraInformation" jhiTranslate="stand.extraInformation">Extra Information</label>
           <input
-            type="checkbox"
-            class="form-check"
-            name="acceptedChart"
-            id="field_acceptedChart"
-            data-cy="acceptedChart"
-            formControlName="acceptedChart"
+            type="text"
+            class="form-control"
+            name="extraInformation"
+            id="field_extraInformation"
+            data-cy="extraInformation"
+            formControlName="extraInformation"
           />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_exponent" jhiTranslate="salonApp.stand.exponent">Exponent</label>
+          <label class="form-label" for="field_participation" jhiTranslate="stand.participation">Participation</label>
           <select
             class="form-control"
-            id="field_exponent"
-            data-cy="exponent"
-            name="exponent"
-            formControlName="exponent"
-            [compareWith]="compareExponent"
+            id="field_participation"
+            data-cy="participation"
+            name="participation"
+            formControlName="participation"
+            [compareWith]="compareParticipation"
           >
             <option [ngValue]="null"></option>
-            @for (exponentOption of exponentsSharedCollection; track $index) {
-              <option [ngValue]="exponentOption">{{ exponentOption.fullName }}</option>
+            @for (participationOption of participationsSharedCollection; track $index) {
+              <option [ngValue]="participationOption">{{ participationOption.id }}</option>
             }
           </select>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_salon" jhiTranslate="salonApp.stand.salon">Salon</label>
-          <select class="form-control" id="field_salon" data-cy="salon" name="salon" formControlName="salon" [compareWith]="compareSalon">
-            <option [ngValue]="null"></option>
-            @for (salonOption of salonsSharedCollection; track $index) {
-              <option [ngValue]="salonOption">{{ salonOption.place + ' ' + (salonOption.startingDate | formatMediumDate) }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dimension" jhiTranslate="salonApp.stand.dimension">Dimension</label>
+          <label class="form-label" for="field_dimension" jhiTranslate="stand.dimension">Dimension</label>
           <select
             class="form-control"
             id="field_dimension"
@@ -113,51 +137,15 @@
           >
             <option [ngValue]="null"></option>
             @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
-              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
+              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.id }}</option>
             }
           </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_acceptedContract" jhiTranslate="salonApp.stand.acceptedContract">Accepted Contract</label>
-          <input
-            type="checkbox"
-            class="form-check"
-            name="acceptedContract"
-            id="field_acceptedContract"
-            data-cy="acceptedContract"
-            formControlName="acceptedContract"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_needArrangment" jhiTranslate="salonApp.stand.needArrangment">Need Arrangment</label>
-          <input
-            type="checkbox"
-            class="form-check"
-            name="needArrangment"
-            id="field_needArrangment"
-            data-cy="needArrangment"
-            formControlName="needArrangment"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_billingClosed" jhiTranslate="salonApp.stand.billingClosed">Is billing closed</label>
-          <input
-            type="checkbox"
-            class="form-check"
-            name="billingClosed"
-            id="field_billingClosed"
-            data-cy="billingClosed"
-            formControlName="billingClosed"
-          />
         </div>
       </div>
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
         </button>
 
         <button
@@ -167,7 +155,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
         </button>
       </div>
     </form>

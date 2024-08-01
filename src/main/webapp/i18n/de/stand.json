@@ -1,35 +1,29 @@
 {
-  "salonApp": {
-    "stand": {
-      "home": {
-        "title": "Stands",
-        "refreshListLabel": "Liste aktualisieren",
-        "createLabel": "Stand erstellen",
-        "createOrEditLabel": "Stand erstellen oder bearbeiten",
-        "notFound": "Keine Stands gefunden"
-      },
-      "created": "Stand erstellt mit ID {{ param }}",
-      "updated": "Stand aktualisiert mit ID {{ param }}",
-      "deleted": "Stand gelöscht mit ID {{ param }}",
-      "delete": {
-        "question": "Soll Stand {{ id }} wirklich dauerhaft gelöscht werden?"
-      },
-      "detail": {
-        "title": "Stand"
-      },
-      "id": "Id",
-      "description": "Description",
-      "website": "Website",
-      "socialMedia": "Social Media",
-      "urlPicture": "Url Picture",
-      "shared": "Shared",
-      "nbTable": "Nb Table",
-      "nbChair": "Nb Chair",
-      "needElectricity": "Need Electricity",
-      "status": "Status",
-      "extraInformation": "Extra Information",
-      "participation": "Participation",
-      "dimension": "Dimension"
-    }
+  "stand": {
+    "create": "Création d'un nouveau stand",
+    "description": "Description",
+    "dimension": "Dimension",
+    "edit": "Modification d'un stand",
+    "extraInformation": "Information complémentaire",
+    "nbChair": "Nombre de chaises",
+    "nbTable": "Nombre de tables",
+    "needElectricity": "Avec électricité ?",
+    "notFound": "Aucun stand trouvé",
+    "participation": "Participation",
+    "shared": "Partagé ?",
+    "socialMedia": "Social / Média",
+    "status": {
+      "label": "Statut",
+      "list": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "IN_VERIFICATION": "En cours",
+        "REFUSED": "Refusé",
+        "null": ""
+      }
+    },
+    "title": "Les stands",
+    "urlPicture": "Url de l'image",
+    "website": "Site internet"
   }
 }

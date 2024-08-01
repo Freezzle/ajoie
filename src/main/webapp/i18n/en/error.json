@@ -1,14 +1,14 @@
 {
   "error": {
-    "title": "Error page!",
+    "concurrencyFailure": "Un autre utilisateur a modifié ces données en même temps que vous. Vos changements n'ont pas été sauvegardés.",
     "http": {
-      "400": "Bad request.",
-      "403": "You are not authorized to access this page.",
-      "404": "The page does not exist.",
-      "405": "The HTTP verb you used is not supported for this URL.",
-      "500": "Internal server error."
+      "400": "Mauvaise requête.",
+      "403": "Vous n'avez pas les droits pour accéder à cette page.",
+      "404": "La page n'existe pas.",
+      "405": "Le verbe HTTP que vous avez utilisé n'est pas reconnu par cet URL.",
+      "500": "Erreur interne du serveur."
     },
-    "concurrencyFailure": "Another user modified this data at the same time as you. Your changes were rejected.",
-    "validation": "Validation error on the server."
+    "title": "Page d'erreur !",
+    "validation": "Erreur de validation côté serveur."
   }
 }

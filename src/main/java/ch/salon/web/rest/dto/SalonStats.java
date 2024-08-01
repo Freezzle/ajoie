@@ -24,7 +24,7 @@ public class SalonStats implements Serializable {
         return nbStandValidated;
     }
 
-    public void setNbStandValidated(long nbStandValidated) {
+    public void setNbStandAccepted(long nbStandValidated) {
         this.nbStandValidated = nbStandValidated;
     }
 
@@ -32,7 +32,7 @@ public class SalonStats implements Serializable {
         return nbStandInTreatment;
     }
 
-    public void setNbStandIntreatment(long nbStandInTreatment) {
+    public void setNbStandInVerification(long nbStandInTreatment) {
         this.nbStandInTreatment = nbStandInTreatment;
     }
 

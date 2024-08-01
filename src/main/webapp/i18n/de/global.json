@@ -1,156 +1,124 @@
 {
-  "global": {
-    "title": "Salon",
-    "browsehappy": "Sie benutzen einen <strong>veralteten</strong> Browser. Bitte <a href=\"http://browsehappy.com/?locale=de/\">aktualisieren Sie Ihren Browser</a>, um die Benutzerfreundlichkeit zu erhöhen.",
-    "menu": {
-      "home": "Startseite",
-      "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
-      "entities": {
-        "main": "Entitäten",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "exponent": "Exponent",
-        "dimensionStand": "Dimension Stand",
-        "stand": "Stand",
-        "invoice": "Invoice",
-        "salon": "Salon",
-        "conference": "Conference",
-        "priceStandSalon": "Price Stand Salon",
-        "participation": "Participation",
-        "payment": "Payment"
-      },
-      "account": {
-        "main": "Zugang",
-        "settings": "Einstellungen",
-        "password": "Passwort",
-        "sessions": "Sitzungen",
-        "login": "Anmelden",
-        "logout": "Abmelden",
-        "register": "Registrierung"
-      },
-      "admin": {
-        "main": "Administration",
-        "userManagement": "Benutzerverwaltung",
-        "tracker": "Benutzer Aktivitäten",
-        "metrics": "Metriken",
-        "health": "Status",
-        "configuration": "Konfiguration",
-        "logs": "Protokoll",
-        "apidocs": "API",
-        "database": "Datenbank",
-        "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
-      },
-      "language": "Sprache"
-    },
-    "form": {
-      "username.label": "Benutzername",
-      "username.placeholder": "Ihr Benutzername",
-      "currentpassword.label": "Aktuelles Passwort",
-      "currentpassword.placeholder": "Aktuelles Passwort",
-      "newpassword.label": "Neues Passwort",
-      "newpassword.placeholder": "Neues Passwort",
-      "confirmpassword.label": "Neues Passwort bestätigen",
-      "confirmpassword.placeholder": "Bestätigen Sie Ihr neues Passwort",
-      "email.label": "Email Adresse",
-      "email.placeholder": "Ihre Email Adresse"
-    },
-    "messages": {
-      "info": {
-        "authenticated": {
-          "prefix": "Wenn Sie sich ",
-          "link": "anmelden",
-          "suffix": " möchten, versuchen Sie es mit <br/>- Administrator (Name=\"admin\" und Passwort=\"admin\")<br/>- Benutzer (Name=\"user\" und Passwort=\"user\")."
-        },
-        "register": {
-          "noaccount": "Sie haben noch keinen Zugang?",
-          "link": "Registrieren Sie sich"
-        }
-      },
-      "error": {
-        "dontmatch": "Das bestätigte Passwort entspricht nicht dem neuen Passwort!"
-      },
-      "validate": {
-        "newpassword": {
-          "required": "Ein neues Passwort wird benötigt.",
-          "minlength": "Das neue Passwort muss mindestens 4 Zeichen lang sein",
-          "maxlength": "Das neue Passwort darf nicht länger als 50 Zeichen sein",
-          "strength": "Passwortstärke:"
-        },
-        "confirmpassword": {
-          "required": "Sie müssen das Passwort bestätigen.",
-          "minlength": "Das bestätigte Passwort muss mindestens 4 Zeichen lang sein",
-          "maxlength": "Das bestätigte Passwort darf nicht länger als 50 Zeichen sein"
-        },
-        "email": {
-          "required": "Ihre Email Adresse wird benötigt.",
-          "invalid": "Ihre Email Adresse ist ungültig.",
-          "minlength": "Ihre Email Adresse muss mindestens 5 Zeichen lang sein",
-          "maxlength": "Ihre Email Adresse darf nicht länger als 50 Zeichen sein"
-        }
-      }
-    },
-    "field": {
-      "id": "ID"
-    },
-    "ribbon": {
-      "dev": "Entwicklung"
-    },
-    "item-count": "Ergebnis {{first}} - {{second}} von {{total}} Elemente."
-  },
   "entity": {
-    "action": {
-      "addblob": "Blob hinzufügen",
-      "addimage": "Bild hinzufügen",
-      "back": "Zurück",
-      "cancel": "Abbrechen",
-      "delete": "Löschen",
-      "edit": "Bearbeiten",
-      "open": "Öffnen",
-      "save": "Speichern",
-      "view": "Details",
-      "show": "Zeige {{otherEntity}}"
-    },
-    "detail": {
-      "field": "Feld",
-      "value": "Wert"
-    },
-    "delete": {
-      "title": "Löschen bestätigen"
-    },
-    "validation": {
-      "required": "Dieses Feld wird benötigt.",
-      "minlength": "Dieses Feld muss mind. {{min}} Zeichen lang sein.",
-      "maxlength": "Dieses Feld darf max. {{max}} Zeichen lang sein.",
-      "min": "Dieses Feld muss mind. {{min}} sein.",
-      "max": "Dieses Feld darf max. {{max}} sein.",
-      "minbytes": "Dieses Feld sollte mehr als {{min}} bytes haben.",
-      "maxbytes": "Dieses Feld sollte nicht mehr als {{max}} bytes haben.",
-      "pattern": "Dieses Feld muss das Muster {{pattern}} erfüllen.",
-      "number": "Dieses Feld muss eine Zahl sein.",
-      "datetimelocal": "Dieses Feld muss eine Datums- und Zeitangabe enthalten.",
-      "patternLogin": "Dieses Feld darf nur Buchstaben, Ziffern und E-Mail-Adressen enthalten."
-    },
     "filters": {
-      "set": "Folgende Filter sind gesetzt",
-      "clear": "Filter entfernen",
-      "clearAll": "Alle Filter entfernen"
+      "clear": "Clear filter",
+      "clearAll": "Clear all filters",
+      "set": "Following filters are set"
     }
   },
   "error": {
-    "internalServerError": "Interner Serverfehler",
-    "server.not.reachable": "Server ist nicht erreichbar",
-    "url.not.found": "Nicht gefunden",
-    "NotNull": "Feld {{fieldName}} kann nicht leer sein!",
-    "Size": "Feld {{fieldName}} erfüllt nicht die minimalen/maximalen Voraussetzungen!",
-    "userexists": "Benutzername bereits vergeben!",
-    "emailexists": "Email wird bereits verwendet!",
-    "idexists": "Ein neuer {{entityName}} kann noch keine ID haben",
-    "idnull": "Ungültige ID",
-    "idinvalid": "Ungültige ID",
-    "idnotfound": "ID konnte nicht gefunden werden",
+    "NotNull": "Le champ {{fieldName}} ne peut pas être vide !",
+    "Size": "Le champ {{fieldName}} ne respecte pas les critères minimum et maximum !",
+    "emailexists": "Email déjà utilisé !",
     "file": {
-      "could.not.extract": "Datei konnte nicht extrahiert werden",
-      "not.image": "Es wird erwartet, dass die Datei ein Bild ist. Die Datei ist jedoch vom Typ \"{{ fileType }}\""
-    }
+      "could.not.extract": "Impossible d'extraire le fichier",
+      "not.image": "Le fichier doit être une image et non du type \"{{ fileType }}\""
+    },
+    "idexists": "Une nouvelle entité {{entityName}} ne peut pas avoir d'identifiant !",
+    "idinvalid": "Invalid Id",
+    "idnotfound": "ID cannot be found",
+    "idnull": "Identifiant invalide",
+    "internalServerError": "Erreur interne du serveur",
+    "server.not.reachable": "Serveur inaccessible",
+    "url.not.found": "Non trouvé",
+    "userexists": "Login déjà utilisé !"
   },
-  "footer": "Dies ist Ihre Fußzeile"
+  "footer": "Ceci est votre pied de page",
+  "global": {
+    "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
+    "field": {
+      "id": "ID"
+    },
+    "form": {
+      "confirmpassword.label": "Confirmation du nouveau mot de passe",
+      "confirmpassword.placeholder": "Confirmation du nouveau mot de passe",
+      "currentpassword.label": "Mot de passe actuel",
+      "currentpassword.placeholder": "Mot de passe actuel",
+      "email.label": "Email",
+      "email.placeholder": "Votre email",
+      "newpassword.label": "Nouveau mot de passe",
+      "newpassword.placeholder": "Nouveau mot de passe",
+      "username.label": "Nom d'utilisateur",
+      "username.placeholder": "Votre nom d'utilisateur"
+    },
+    "item-count": "Affichage {{first}} - {{second}} de {{total}} items.",
+    "menu": {
+      "account": {
+        "login": "S'authentifier",
+        "logout": "Déconnexion",
+        "main": "Compte",
+        "password": "Mot de passe",
+        "register": "Créer un compte",
+        "sessions": "Sessions",
+        "settings": "Profil"
+      },
+      "admin": {
+        "apidocs": "API",
+        "configuration": "Configuration",
+        "database": "Base de données",
+        "health": "Diagnostics",
+        "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)",
+        "logs": "Logs",
+        "main": "Administration",
+        "metrics": "Métriques",
+        "tracker": "Suivi des utilisateurs",
+        "userManagement": "Gestion des utilisateurs"
+      },
+      "entities": {
+        "conference": "Conférences",
+        "dimensionStand": "Dimensions",
+        "exponent": "Exposants",
+        "invoice": "Factures",
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
+        "main": "Entités",
+        "participation": "Participations",
+        "payment": "Paiements",
+        "priceStandSalon": "Prix des dimensions",
+        "salon": "Salons",
+        "stand": "Stands"
+      },
+      "home": "Accueil",
+      "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
+      "language": "Langue"
+    },
+    "messages": {
+      "error": {
+        "dontmatch": "Le nouveau mot de passe et sa confirmation ne sont pas égaux !"
+      },
+      "info": {
+        "authenticated": {
+          "link": "connecter",
+          "prefix": "Si vous voulez vous ",
+          "suffix": ", vous pouvez utiliser les comptes par défaut : <br/> - Administrateur (nom d'utilisateur=\"admin\" et mot de passe =\"admin\") <br/> - Utilisateur (nom d'utilisateur=\"user\" et mot de passe =\"user\")."
+        },
+        "register": {
+          "link": "Créer un compte",
+          "noaccount": "Vous n'avez pas encore de compte ?"
+        }
+      },
+      "validate": {
+        "confirmpassword": {
+          "maxlength": "Votre confirmation du mot de passe ne doit pas comporter plus de 50 caractères.",
+          "minlength": "Votre confirmation du mot de passe doit comporter au moins 4 caractères.",
+          "required": "Votre confirmation du mot de passe est requise."
+        },
+        "email": {
+          "invalid": "Votre email n'est pas valide.",
+          "maxlength": "Votre email ne doit pas comporter plus de 50 caractères.",
+          "minlength": "Votre email doit comporter au moins 5 caractères.",
+          "required": "Votre email est requis."
+        },
+        "newpassword": {
+          "maxlength": "Votre mot de passe ne doit pas comporter plus de 50 caractères.",
+          "minlength": "Votre mot de passe doit comporter au moins 4 caractères.",
+          "required": "Votre mot de passe est requis.",
+          "strength": "Robustesse du mot de passe :"
+        }
+      }
+    },
+    "ribbon": {
+      "dev": "Développement"
+    },
+    "title": "Salon"
+  }
 }

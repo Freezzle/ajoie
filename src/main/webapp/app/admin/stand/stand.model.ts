@@ -1,27 +1,21 @@
-import { IExponent } from 'app/entities/exponent/exponent.model';
-import { ISalon } from 'app/entities/salon/salon.model';
 import { IDimensionStand } from 'app/entities/dimension-stand/dimension-stand.model';
-import dayjs from 'dayjs/esm';
+import { Status } from '../../entities/enumerations/status.model';
+import { IParticipation } from '../../entities/participation/participation.model';
 
 export interface IStand {
   id: string;
   description?: string | null;
-  nbMeal1?: number | null;
-  nbMeal2?: number | null;
-  nbMeal3?: number | null;
+  website?: string | null;
+  socialMedia?: string | null;
+  urlPicture?: string | null;
   shared?: boolean | null;
   nbTable?: number | null;
   nbChair?: number | null;
   needElectricity?: boolean | null;
-  acceptedChart?: boolean | null;
-  acceptedContract?: boolean | null;
-  needArrangment?: boolean | null;
-  billingClosed?: boolean | null;
-  exponent?: IExponent | null;
-  salon?: ISalon | null;
+  status?: keyof typeof Status | null;
+  extraInformation?: string | null;
+  participation?: IParticipation | null;
   dimension?: IDimensionStand | null;
-  registrationDate?: dayjs.Dayjs | null;
-  status?: string | null;
 }
 
 export type NewStand = Omit<IStand, 'id'> & { id: null };

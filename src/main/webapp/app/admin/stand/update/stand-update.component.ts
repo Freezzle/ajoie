@@ -17,6 +17,9 @@ import { StandService } from '../service/stand.service';
 import { IStand } from '../stand.model';
 import { StandFormService, StandFormGroup } from './stand-form.service';
 import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
+import { Status } from '../../../entities/enumerations/status.model';
+import { IParticipation } from '../../../entities/participation/participation.model';
+import { ParticipationService } from '../../../entities/participation/service/participation.service';
 
 @Component({
   standalone: true,
@@ -27,24 +30,22 @@ import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 export class StandUpdateComponent implements OnInit {
   isSaving = false;
   stand: IStand | null = null;
+  statusValues = Object.keys(Status);
 
-  exponentsSharedCollection: IExponent[] = [];
-  salonsSharedCollection: ISalon[] = [];
+  participationsSharedCollection: IParticipation[] = [];
   dimensionStandsSharedCollection: IDimensionStand[] = [];
 
   protected standService = inject(StandService);
   protected standFormService = inject(StandFormService);
-  protected exponentService = inject(ExponentService);
-  protected salonService = inject(SalonService);
+  protected participationService = inject(ParticipationService);
   protected dimensionStandService = inject(DimensionStandService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: StandFormGroup = this.standFormService.createStandFormGroup();
 
-  compareExponent = (o1: IExponent | null, o2: IExponent | null): boolean => this.exponentService.compareExponent(o1, o2);
-
-  compareSalon = (o1: ISalon | null, o2: ISalon | null): boolean => this.salonService.compareSalon(o1, o2);
+  compareParticipation = (o1: IParticipation | null, o2: IParticipation | null): boolean =>
+    this.participationService.compareParticipation(o1, o2);
 
   compareDimensionStand = (o1: IDimensionStand | null, o2: IDimensionStand | null): boolean =>
     this.dimensionStandService.compareDimensionStand(o1, o2);
@@ -97,13 +98,10 @@ export class StandUpdateComponent implements OnInit {
     this.stand = stand;
     this.standFormService.resetForm(this.editForm, stand);
 
-    this.exponentsSharedCollection = this.exponentService.addExponentToCollectionIfMissing<IExponent>(
-      this.exponentsSharedCollection,
-      stand.exponent,
+    this.participationsSharedCollection = this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
+      this.participationsSharedCollection,
+      stand.participation,
     );
-
-    this.salonsSharedCollection = this.salonService.addSalonToCollectionIfMissing<ISalon>(this.salonsSharedCollection, stand.salon);
-
     this.dimensionStandsSharedCollection = this.dimensionStandService.addDimensionStandToCollectionIfMissing<IDimensionStand>(
       this.dimensionStandsSharedCollection,
       stand.dimension,
@@ -111,19 +109,15 @@ export class StandUpdateComponent implements OnInit {
   }
 
   protected loadRelationshipsOptions(): void {
-    this.exponentService
+    this.participationService
       .query()
-      .pipe(map((res: HttpResponse<IExponent[]>) => res.body ?? []))
+      .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
-        map((exponents: IExponent[]) => this.exponentService.addExponentToCollectionIfMissing<IExponent>(exponents, this.stand?.exponent)),
+        map((participations: IParticipation[]) =>
+          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.stand?.participation),
+        ),
       )
-      .subscribe((exponents: IExponent[]) => (this.exponentsSharedCollection = exponents));
-
-    this.salonService
-      .query()
-      .pipe(map((res: HttpResponse<ISalon[]>) => res.body ?? []))
-      .pipe(map((salons: ISalon[]) => this.salonService.addSalonToCollectionIfMissing<ISalon>(salons, this.stand?.salon)))
-      .subscribe((salons: ISalon[]) => (this.salonsSharedCollection = salons));
+      .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
 
     this.dimensionStandService
       .query()

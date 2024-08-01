@@ -1,24 +1,24 @@
 {
   "register": {
-    "title": "Registrierung",
     "form": {
-      "button": "Registrieren"
+      "button": "Enregistrement"
     },
     "messages": {
+      "error": {
+        "emailexists": "<strong>Cet email est déjà utilisé !</strong> Veuillez en choisir un autre.",
+        "fail": "<strong>Compte non créé !</strong> Merci d'essayer à nouveau plus tard.",
+        "userexists": "<strong>Ce compte utilisateur existe déjà !</strong> Veuillez en choisir un autre."
+      },
+      "success": "<strong>Compte enregistré !</strong> Merci de vérifier votre email de confirmation.",
       "validate": {
         "login": {
-          "required": "Ihr Benutzername wird benötigt.",
-          "minlength": "Ihr Benutzername muss mindestens ein Zeichen lang sein.",
-          "maxlength": "Ihr Benutzername darf nicht länger als 50 Zeichen sein.",
-          "pattern": "Ihr Benutzername ist ungültig."
+          "maxlength": "Votre nom d'utilisateur ne peut pas contenir plus de 50 caractères.",
+          "minlength": "Votre nom d'utilisateur doit contenir plus d'un caractère.",
+          "pattern": "Votre nom d'utilisateur est invalide.",
+          "required": "Votre nom d'utilisateur est obligatoire."
         }
-      },
-      "success": "<strong>Registrierung gespeichert!</strong> Bitte überprüfen Sie Ihre E-Mails für die Bestätigung.",
-      "error": {
-        "fail": "<strong>Registrierung fehlgeschlagen!</strong> Bitte versuchen Sie es später nochmal.",
-        "userexists": "<strong>Benutzername bereits vergeben!</strong> Bitte wählen Sie einen anderen aus.",
-        "emailexists": "<strong>E-Mail-Adresse wird bereits verwendet!</strong> Bitte wählen Sie eine andere aus."
       }
-    }
+    },
+    "title": "Création de compte utilisateur"
   }
 }

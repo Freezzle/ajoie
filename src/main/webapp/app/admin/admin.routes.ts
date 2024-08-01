@@ -19,12 +19,12 @@ const routes: Routes = [
   },
   {
     path: 'salons',
-    data: { pageTitle: 'salonApp.salon.home.title' },
+    data: { pageTitle: 'salon.title' },
     loadChildren: () => import('./salon/salon.routes'),
   },
   {
     path: 'stands',
-    data: { pageTitle: 'salonApp.salon.home.title' },
+    data: { pageTitle: 'salon.title' },
     loadChildren: () => import('./stand/stand.routes'),
   },
   /* jhipster-needle-add-admin-route - JHipster will add admin routes here */

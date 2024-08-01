@@ -23,7 +23,7 @@ const routes: Routes = [
   },
   {
     path: 'salon',
-    data: { pageTitle: 'salonApp.salon.home.title' },
+    data: { pageTitle: 'salon.title' },
     loadChildren: () => import('./salon/salon.routes'),
   },
   {

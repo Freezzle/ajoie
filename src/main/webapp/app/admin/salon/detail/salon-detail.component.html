@@ -11,38 +11,50 @@
         <div class="d-flex justify-content-between mt-3">
           <span>
             <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
             </button>
           </span>
 
           <div>
+            <a
+              [routerLink]="['/admin/participations']"
+              [state]="{ idSalon: salon()!.id }"
+              class="btn btn-primary btn-sm"
+              data-cy="entityDetailsButton"
+            >
+              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.participations">Participations du salon</span>
+            </a>
+
             <a
               [routerLink]="['/admin/stands']"
               [state]="{ idSalon: salon()!.id }"
               class="btn btn-primary btn-sm"
               data-cy="entityDetailsButton"
             >
-              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline">Stands</span>
+              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.stands">Stands du salon</span>
             </a>
 
-            <a [routerLink]="['/admin/confrences', salon()!.id, 'list']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
-              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline">Conférences</span>
+            <a
+              [routerLink]="['/admin/conferences']"
+              [state]="{ idSalon: salon()!.id }"
+              class="btn btn-primary btn-sm"
+              data-cy="entityDetailsButton"
+            >
+              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.conferences">Conférences du salon</span>
             </a>
 
-            <a [routerLink]="['/admin/benevoles', salon()!.id, 'list']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
-              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline">Bénévoles</span>
-            </a>
-
-            <a [routerLink]="['/admin/facturations', salon()!.id, 'list']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
-              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline">Facturations</span>
+            <a
+              [routerLink]="['/admin/conferences']"
+              [state]="{ idSalon: salon()!.id }"
+              class="btn btn-primary btn-sm"
+              data-cy="entityDetailsButton"
+            >
+              <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.benevoles">Bénévoles du salon</span>
             </a>
           </div>
         </div>
 
         <hr />
-
-        <jhi-alert-error></jhi-alert-error>
-        <jhi-alert></jhi-alert>
       </div>
 
       <div class="form-2-container section-container section-container-gray-bg container row" *ngIf="stats$ | async; let stats">
@@ -51,23 +63,30 @@
             <div class="col-4">
               <!-- MENU DES STANDS FIELDSET -->
               <fieldset class="form-group border p-3 form-1-box">
-                <legend class="w-auto px-2">Les stands</legend>
+                <legend class="w-auto px-2" jhiTranslate="salon.stats.stands">Les stands</legend>
                 <div class="row">
-                  <div class="col-4 align-content-center">Validés</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.standAccepted">Accepté</div>
                   <div class="col-2">
                     <button class="btn btn-success">
                       <span>{{ stats.nbStandValidated }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
-                  <div class="col-4 align-content-center">En cours</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.standInVerification">En cours</div>
                   <div class="col-2">
                     <button class="btn btn-warning">
                       <span>{{ stats.nbStandInTreatment }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
-                  <div class="col-4 align-content-center">Refusés</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.standRefused">Refusé</div>
+                  <div class="col-2">
+                    <button class="btn btn-danger">
+                      <span>{{ stats.nbStandRefused }}</span>
+                    </button>
+                  </div>
+                  <div class="col-6">&nbsp;</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.standCanceled">Annulé</div>
                   <div class="col-2">
                     <button class="btn btn-danger">
                       <span>{{ stats.nbStandRefused }}</span>
@@ -80,16 +99,16 @@
             <div class="col-4">
               <!-- FACTURATION DES STANDS VALIDES -->
               <fieldset class="form-group border p-3 form-1-box">
-                <legend class="w-auto px-2">Facturation des stands validés</legend>
+                <legend class="w-auto px-2" jhiTranslate="salon.stats.billings">Facturation des participations acceptés</legend>
                 <div class="row">
-                  <div class="col-4 align-content-center">Payés</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingPaid">Payé</div>
                   <div class="col-2">
                     <button class="btn btn-success">
                       <span>{{ stats.nbStandValidatedPaid }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
-                  <div class="col-4 align-content-center">Impayés</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingUnpaid">Impayé</div>
                   <div class="col-2">
                     <button class="btn btn-warning">
                       <span>{{ stats.nbStandValidatedUnpaid }}</span>
@@ -102,23 +121,23 @@
             <div class="col-4">
               <!-- REPAS COMMANDES PAR STANDS VALIDES -->
               <fieldset class="form-group border p-3 form-1-box">
-                <legend class="w-auto px-2">Repas des stands validés</legend>
+                <legend class="w-auto px-2" jhiTranslate="salon.stats.meals">Repas des participations acceptés</legend>
                 <div class="row">
-                  <div class="col-4 align-content-center">Samedi midi</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal1">Samedi midi</div>
                   <div class="col-2">
                     <button class="btn btn-secondary">
                       <span>{{ stats.nbMealSaturdayMidday }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
-                  <div class="col-4 align-content-center">Samedi soir</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal2">Samedi soir</div>
                   <div class="col-2">
                     <button class="btn btn-secondary">
                       <span>{{ stats.nbMealSaturdayEvening }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
-                  <div class="col-4 align-content-center">Dimanche midi</div>
+                  <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal3">Dimanche midi</div>
                   <div class="col-2">
                     <button class="btn btn-secondary">
                       <span>{{ stats.nbMealSundayMidday }}</span>
@@ -133,7 +152,7 @@
             <div class="col-4">
               <!-- DIMENSIONS DES STANDS VALIDES -->
               <fieldset class="form-group border p-3 form-1-box">
-                <legend class="w-auto px-2">Dimensions des stands validés</legend>
+                <legend class="w-auto px-2" jhiTranslate="salon.stats.dimensions">Dimensions des stands acceptés</legend>
                 <div class="row">
                   @for (dimension of stats.dimensionStats; track $index) {
                     <div class="col-4 align-content-center">{{ dimension['dimension'] }}</div>

@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="salonApp.priceStandSalon.home.refreshListLabel">Actualiser la liste</span>
+        <span jhiTranslate="common.refresh">Actualiser la liste</span>
       </button>
 
       <button
@@ -93,7 +93,7 @@
                     data-cy="entityDetailsButton"
                   >
                     <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
                   </a>
 
                   <a
@@ -102,12 +102,12 @@
                     data-cy="entityEditButton"
                   >
                     <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
                   </a>
 
                   <button type="submit" (click)="delete(priceStandSalon)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
                   </button>
                 </div>
               </td>

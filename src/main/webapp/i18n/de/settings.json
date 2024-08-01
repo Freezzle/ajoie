@@ -1,32 +1,32 @@
 {
   "settings": {
-    "title": "Einstellungen für Benutzer [<strong>{{username}}</strong>]",
     "form": {
-      "firstname": "Vorname",
-      "firstname.placeholder": "Ihr Vorname",
-      "lastname": "Nachname",
-      "lastname.placeholder": "Ihr Nachname",
-      "language": "Sprache",
-      "button": "Speichern"
+      "button": "Sauvegarder",
+      "firstname": "Prénom",
+      "firstname.placeholder": "Votre prénom",
+      "language": "Langue",
+      "lastname": "Nom",
+      "lastname.placeholder": "Votre nom"
     },
     "messages": {
       "error": {
-        "fail": "<strong>Es ist ein Fehler aufgetreten!</strong> Die Einstellungen konnten nicht gespeichert werden.",
-        "emailexists": "<strong>Email wird bereits verwendet!</strong> Bitte wählen Sie eine andere aus."
+        "emailexists": "<strong>Cet email est déjà utilisé !</strong> Veuillez en choisir un autre.",
+        "fail": "<strong>Une erreur est survenue !</strong> Votre profil n'a pas été sauvegardé."
       },
-      "success": "<strong>Einstellungen wurden gespeichert!</strong>",
+      "success": "<strong>Votre profil a été sauvegardé !</strong>",
       "validate": {
         "firstname": {
-          "required": "Ihr Vorname wird benötigt.",
-          "minlength": "Ihr Vorname muss mindestens 1 Zeichen lang sein",
-          "maxlength": "Ihr Vorname darf nicht länger als 50 Zeichen sein"
+          "maxlength": "Votre prénom ne doit pas comporter plus de 50 caractères.",
+          "minlength": "Votre prénom doit comporter au moins un caractère.",
+          "required": "Votre prénom est requis."
         },
         "lastname": {
-          "required": "Ihr Nachname wird benötigt.",
-          "minlength": "Ihr Nachname muss mindestens 1 Zeichen lang sein",
-          "maxlength": "Ihr Nachname darf nicht länger als 50 Zeichen sein"
+          "maxlength": "Votre nom ne doit pas comporter plus de 50 caractères.",
+          "minlength": "Votre nom doit comporter au moins un caractère.",
+          "required": "Votre nom est requis."
         }
       }
-    }
+    },
+    "title": "Profil de l'utilisateur [<strong>{{username}}</strong>]"
   }
 }

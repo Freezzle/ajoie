@@ -5,54 +5,33 @@ import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { IStand, NewStand } from '../stand.model';
 
+/**
+ * A partial Type with required key is used as form input.
+ */
 type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>> & { id: T['id'] };
+
+/**
+ * Type for createFormGroup and resetForm argument.
+ * It accepts IStand for edit and NewStandFormGroupInput for create.
+ */
 type StandFormGroupInput = IStand | PartialWithRequiredKeyOf<NewStand>;
 
-type FormValueOf<T extends IStand | NewStand> = Omit<T, 'registrationDate'> & {
-  registrationDate?: string | null;
-};
-
-type StandFormRawValue = FormValueOf<IStand>;
-
-type NewStandFormRawValue = FormValueOf<NewStand>;
-
-type StandFormDefaults = Pick<
-  NewStand,
-  | 'id'
-  | 'shared'
-  | 'needElectricity'
-  | 'acceptedChart'
-  | 'acceptedContract'
-  | 'status'
-  | 'nbMeal1'
-  | 'nbMeal2'
-  | 'nbMeal3'
-  | 'needArrangment'
-  | 'billingClosed'
-  | 'nbTable'
-  | 'nbChair'
-  | 'registrationDate'
->;
+type StandFormDefaults = Pick<NewStand, 'id' | 'shared' | 'needElectricity'>;
 
 type StandFormGroupContent = {
-  id: FormControl<StandFormRawValue['id'] | NewStand['id']>;
-  description: FormControl<StandFormRawValue['description']>;
-  nbMeal1: FormControl<StandFormRawValue['nbMeal1']>;
-  nbMeal2: FormControl<StandFormRawValue['nbMeal2']>;
-  nbMeal3: FormControl<StandFormRawValue['nbMeal3']>;
-  shared: FormControl<StandFormRawValue['shared']>;
-  nbTable: FormControl<StandFormRawValue['nbTable']>;
-  nbChair: FormControl<StandFormRawValue['nbChair']>;
-  needElectricity: FormControl<StandFormRawValue['needElectricity']>;
-  acceptedChart: FormControl<StandFormRawValue['acceptedChart']>;
-  acceptedContract: FormControl<StandFormRawValue['acceptedContract']>;
-  needArrangment: FormControl<StandFormRawValue['needArrangment']>;
-  status: FormControl<StandFormRawValue['status']>;
-  billingClosed: FormControl<StandFormRawValue['billingClosed']>;
-  registrationDate: FormControl<StandFormRawValue['registrationDate']>;
-  exponent: FormControl<StandFormRawValue['exponent']>;
-  salon: FormControl<StandFormRawValue['salon']>;
-  dimension: FormControl<StandFormRawValue['dimension']>;
+  id: FormControl<IStand['id'] | NewStand['id']>;
+  description: FormControl<IStand['description']>;
+  website: FormControl<IStand['website']>;
+  socialMedia: FormControl<IStand['socialMedia']>;
+  urlPicture: FormControl<IStand['urlPicture']>;
+  shared: FormControl<IStand['shared']>;
+  nbTable: FormControl<IStand['nbTable']>;
+  nbChair: FormControl<IStand['nbChair']>;
+  needElectricity: FormControl<IStand['needElectricity']>;
+  status: FormControl<IStand['status']>;
+  extraInformation: FormControl<IStand['extraInformation']>;
+  participation: FormControl<IStand['participation']>;
+  dimension: FormControl<IStand['dimension']>;
 };
 
 export type StandFormGroup = FormGroup<StandFormGroupContent>;
@@ -60,10 +39,10 @@ export type StandFormGroup = FormGroup<StandFormGroupContent>;
 @Injectable({ providedIn: 'root' })
 export class StandFormService {
   createStandFormGroup(stand: StandFormGroupInput = { id: null }): StandFormGroup {
-    const standRawValue = this.convertStandToStandRawValue({
+    const standRawValue = {
       ...this.getFormDefaults(),
       ...stand,
-    });
+    };
     return new FormGroup<StandFormGroupContent>({
       id: new FormControl(
         { value: standRawValue.id, disabled: true },
@@ -72,32 +51,29 @@ export class StandFormService {
           validators: [Validators.required],
         },
       ),
-      description: new FormControl(standRawValue.description),
-      nbMeal1: new FormControl(standRawValue.nbMeal1),
-      nbMeal2: new FormControl(standRawValue.nbMeal2),
-      nbMeal3: new FormControl(standRawValue.nbMeal3),
+      description: new FormControl(standRawValue.description, {
+        validators: [Validators.required],
+      }),
+      website: new FormControl(standRawValue.website),
+      socialMedia: new FormControl(standRawValue.socialMedia),
+      urlPicture: new FormControl(standRawValue.urlPicture),
       shared: new FormControl(standRawValue.shared),
       nbTable: new FormControl(standRawValue.nbTable),
       nbChair: new FormControl(standRawValue.nbChair),
       needElectricity: new FormControl(standRawValue.needElectricity),
-      acceptedChart: new FormControl(standRawValue.acceptedChart),
-      acceptedContract: new FormControl(standRawValue.acceptedContract),
-      needArrangment: new FormControl(standRawValue.needArrangment),
       status: new FormControl(standRawValue.status),
-      billingClosed: new FormControl(standRawValue.billingClosed),
-      registrationDate: new FormControl(standRawValue.registrationDate),
-      exponent: new FormControl(standRawValue.exponent),
-      salon: new FormControl(standRawValue.salon),
+      extraInformation: new FormControl(standRawValue.extraInformation),
+      participation: new FormControl(standRawValue.participation),
       dimension: new FormControl(standRawValue.dimension),
     });
   }
 
   getStand(form: StandFormGroup): IStand | NewStand {
-    return this.convertStandRawValueToStand(form.getRawValue() as StandFormRawValue | NewStandFormRawValue);
+    return form.getRawValue() as IStand | NewStand;
   }
 
   resetForm(form: StandFormGroup, stand: StandFormGroupInput): void {
-    const standRawValue = this.convertStandToStandRawValue({ ...this.getFormDefaults(), ...stand });
+    const standRawValue = { ...this.getFormDefaults(), ...stand };
     form.reset(
       {
         ...standRawValue,
@@ -107,39 +83,10 @@ export class StandFormService {
   }
 
   private getFormDefaults(): StandFormDefaults {
-    const currentTime = dayjs();
-
     return {
       id: null,
       shared: false,
-      nbMeal1: 0,
-      nbMeal2: 0,
-      nbMeal3: 0,
-      nbTable: 0,
-      nbChair: 0,
       needElectricity: false,
-      acceptedChart: false,
-      acceptedContract: false,
-      needArrangment: false,
-      billingClosed: false,
-      status: 'IN_TREATMENT',
-      registrationDate: currentTime,
-    };
-  }
-
-  private convertStandRawValueToStand(rawStand: StandFormRawValue | NewStandFormRawValue): IStand | NewStand {
-    return {
-      ...rawStand,
-      registrationDate: dayjs(rawStand.registrationDate, DATE_FORMAT),
-    };
-  }
-
-  private convertStandToStandRawValue(
-    stand: IStand | (Partial<NewStand> & StandFormDefaults),
-  ): StandFormRawValue | PartialWithRequiredKeyOf<NewStandFormRawValue> {
-    return {
-      ...stand,
-      registrationDate: stand.registrationDate ? stand.registrationDate.format(DATE_FORMAT) : undefined,
     };
   }
 }

@@ -1,19 +1,19 @@
 {
   "login": {
-    "title": "Anmeldung",
     "form": {
-      "password": "Passwort",
-      "password.placeholder": "Ihr Passwort",
-      "rememberme": "Automatische Anmeldung",
-      "button": "Anmelden"
+      "button": "Connexion",
+      "password": "Mot de passe",
+      "password.placeholder": "Votre mot de passe",
+      "rememberme": "Garder la session ouverte"
     },
     "messages": {
       "error": {
-        "authentication": "<strong>Anmeldung fehlgeschlagen!</strong> Überprüfen Sie bitte Ihre Angaben und versuchen Sie es erneut."
+        "authentication": "<strong>Erreur d'authentification !</strong> Veuillez vérifier vos identifiants de connexion."
       }
     },
     "password": {
-      "forgot": "Sie haben Ihr Passwort vergessen?"
-    }
+      "forgot": "Avez-vous oublié votre mot de passe ?"
+    },
+    "title": "Authentification"
   }
 }

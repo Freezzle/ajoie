@@ -54,11 +54,11 @@
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
         </button>
 
         <button type="button" [routerLink]="['/salon', salon()!.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
         </button>
       </div>
     }

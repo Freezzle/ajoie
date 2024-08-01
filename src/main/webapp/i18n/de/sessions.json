@@ -1,15 +1,15 @@
 {
   "sessions": {
-    "title": "Aktive Sitzungen für [<strong>{{username}}</strong>]",
-    "table": {
-      "ipaddress": "IP Adresse",
-      "useragent": "User Agent",
-      "date": "Datum",
-      "button": "Schließen"
-    },
     "messages": {
-      "success": "<strong>Sitzung wurde geschlossen!</strong>",
-      "error": "<strong>Es ist ein Fehler aufgetreten!</strong> Die Sitzung konnte nicht geschlossen werden."
-    }
+      "error": "<strong>Une erreur est survenue !</strong> La session ne peut pas être invalidée.",
+      "success": "<strong>La session a été invalidée !</strong>"
+    },
+    "table": {
+      "button": "Invalider",
+      "date": "Date",
+      "ipaddress": "Adresse IP",
+      "useragent": "User Agent"
+    },
+    "title": "Sessions actives de [<strong>{{username}}</strong>]"
   }
 }

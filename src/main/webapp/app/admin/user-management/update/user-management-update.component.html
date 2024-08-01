@@ -17,17 +17,17 @@
         @if (editForm.get('login')!.invalid && (editForm.get('login')!.dirty || editForm.get('login')!.touched)) {
           <div>
             @if (editForm.get('login')?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
             }
 
             @if (editForm.get('login')?.errors?.maxlength) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+              <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '50' }"
                 >Ce champ doit faire moins de 50 caractères.</small
               >
             }
 
             @if (editForm.get('login')?.errors?.pattern) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.patternLogin"
+              <small class="form-text text-danger" jhiTranslate="common.validation.patternLogin"
                 >Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.</small
               >
             }
@@ -42,7 +42,7 @@
         @if (editForm.get('firstName')!.invalid && (editForm.get('firstName')!.dirty || editForm.get('firstName')!.touched)) {
           <div>
             @if (editForm.get('firstName')?.errors?.maxlength) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+              <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '50' }"
                 >Ce champ doit faire moins de 50 caractères.</small
               >
             }
@@ -57,7 +57,7 @@
         @if (editForm.get('lastName')!.invalid && (editForm.get('lastName')!.dirty || editForm.get('lastName')!.touched)) {
           <div>
             @if (editForm.get('lastName')?.errors?.maxlength) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
+              <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '50' }"
                 >Ce champ doit faire moins de 50 caractères.</small
               >
             }
@@ -72,17 +72,17 @@
         @if (editForm.get('email')!.invalid && (editForm.get('email')!.dirty || editForm.get('email')!.touched)) {
           <div>
             @if (editForm.get('email')?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
             }
 
             @if (editForm.get('email')?.errors?.maxlength) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '100' }"
+              <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '100' }"
                 >Ce champ doit faire moins de 100 caractères.</small
               >
             }
 
             @if (editForm.get('email')?.errors?.minlength) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: '5' }"
+              <small class="form-text text-danger" jhiTranslate="common.validation.minlength" [translateValues]="{ min: '5' }"
                 >Ce champ doit faire au minimum 5 caractères.</small
               >
             }
@@ -130,11 +130,11 @@
         </select>
       </div>
       <button type="button" class="btn btn-secondary" (click)="previousState()">
-        <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
       </button>
 
       <button type="submit" [disabled]="editForm.invalid || isSaving()" class="btn btn-primary">
-        <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
       </button>
     </form>
   </div>

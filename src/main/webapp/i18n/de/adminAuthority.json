@@ -1,23 +1,22 @@
 {
   "salonApp": {
     "adminAuthority": {
-      "created": "Authority erstellt mit ID {{ param }}",
+      "created": "Une nouvelle authorité a été créé avec l'identifiant {{ param }}",
       "delete": {
-        "question": "Soll Authority {{ id }} wirklich dauerhaft gelöscht werden?"
+        "question": "Êtes-vous certain de vouloir supprimer l'authorité {{ id }} ?"
       },
-      "deleted": "Authority gelöscht mit ID {{ param }}",
+      "deleted": "L'authorité avec l'identifiant {{ param }} a été supprimé",
       "detail": {
-        "title": "Authority"
+        "title": "Authorité"
       },
       "home": {
-        "createLabel": "Authority erstellen",
-        "createOrEditLabel": "Authority erstellen oder bearbeiten",
-        "notFound": "Keine Authorities gefunden",
-        "refreshListLabel": "Aktualisieren",
+        "createLabel": "Créer une nouvelle authorité",
+        "createOrEditLabel": "Créer ou éditer une authorité",
+        "notFound": "Aucune authorité trouvé",
         "title": "Authorities"
       },
       "name": "Name",
-      "updated": "Authority aktualisiert mit ID {{ param }}"
+      "updated": "Le Authority avec l'identifiant {{ param }} a été mis à jour"
     }
   }
 }

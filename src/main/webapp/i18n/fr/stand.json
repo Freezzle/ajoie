@@ -1,35 +1,29 @@
 {
-  "salonApp": {
-    "stand": {
-      "home": {
-        "title": "Stands",
-        "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Stand",
-        "createOrEditLabel": "Créer ou éditer un Stand",
-        "notFound": "Aucun Stand trouvé"
-      },
-      "created": "Un nouveau Stand a été créé avec l'identifiant {{ param }}",
-      "updated": "Le Stand avec l'identifiant {{ param }} a été mis à jour",
-      "deleted": "Le Stand avec l'identifiant {{ param }} a été supprimé",
-      "delete": {
-        "question": "Êtes-vous certain de vouloir supprimer le Stand {{ id }} ?"
-      },
-      "detail": {
-        "title": "Stand"
-      },
-      "id": "Id",
-      "description": "Description",
-      "website": "Website",
-      "socialMedia": "Social Media",
-      "urlPicture": "Url Picture",
-      "shared": "Shared",
-      "nbTable": "Nb Table",
-      "nbChair": "Nb Chair",
-      "needElectricity": "Need Electricity",
-      "status": "Status",
-      "extraInformation": "Extra Information",
-      "participation": "Participation",
-      "dimension": "Dimension"
-    }
+  "stand": {
+    "create": "Création d'un nouveau stand",
+    "description": "Description",
+    "dimension": "Dimension",
+    "edit": "Modification d'un stand",
+    "extraInformation": "Information complémentaire",
+    "nbChair": "Nombre de chaises",
+    "nbTable": "Nombre de tables",
+    "needElectricity": "Avec électricité ?",
+    "notFound": "Aucun stand trouvé",
+    "participation": "Participation",
+    "shared": "Partagé ?",
+    "socialMedia": "Social / Média",
+    "status": {
+      "label": "Statut",
+      "list": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "IN_VERIFICATION": "En cours",
+        "REFUSED": "Refusé",
+        "null": ""
+      }
+    },
+    "title": "Les stands",
+    "urlPicture": "Url de l'image",
+    "website": "Site internet"
   }
 }

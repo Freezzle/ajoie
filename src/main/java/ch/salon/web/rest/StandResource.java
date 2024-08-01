@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -169,8 +170,12 @@ public class StandResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of stands in body.
      */
     @GetMapping("")
-    public List<Stand> getAllStands() {
+    public List<Stand> getAllStands(@RequestParam(name = "idSalon", required = false) String idSalon) {
         log.debug("REST request to get all Stands");
+
+        if (StringUtils.isNotBlank(idSalon)) {
+            return standRepository.findByParticipationSalonId(UUID.fromString(idSalon));
+        }
         return standRepository.findAll();
     }
 
