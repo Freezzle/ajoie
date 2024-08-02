@@ -1,0 +1,106 @@
+<div>
+  <h2 id="page-heading" data-cy="ConferenceHeading">
+    <span jhiTranslate="conference.title">Les conférences</span>
+
+    <hr />
+
+    <div class="d-flex justify-content-between mt-3">
+      <span>
+        <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+        </button>
+      </span>
+
+      <span>
+        <button class="btn btn-primary btn-sm" (click)="load()" [disabled]="isLoading">
+          <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+          <span jhiTranslate="common.refresh">Actualiser</span>
+        </button>
+
+        <button
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn btn-outline-primary btn-sm"
+          [routerLink]="['/admin/conferences/new']"
+        >
+          <fa-icon icon="plus"></fa-icon>
+          <span jhiTranslate="common.create">Créer</span>
+        </button>
+      </span>
+    </div>
+
+    <hr />
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  @if (conferences?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="conference.notFound">Aucun Conference trouvé</span>
+    </div>
+  }
+
+  @if (conferences && conferences.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="conference.participation">Participation</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="conference.title">Title</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="conference.status.label">Status</span>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (conference of conferences; track $index) {
+            <tr data-cy="entityTable">
+              <td>
+                @if (conference.participation) {
+                  <div>{{ conference.participation.exponent?.fullName }}</div>
+                }
+              </td>
+              <td>{{ conference.title }}</td>
+              <td [jhiTranslate]="'conference.status.list.' + (conference.status ?? 'null')">
+                {{
+                  { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                    conference.status ?? 'null'
+                  ]
+                }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/admin/conferences', conference.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/admin/conferences', conference.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(conference)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

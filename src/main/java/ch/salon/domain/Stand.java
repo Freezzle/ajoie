@@ -54,11 +54,11 @@ public class Stand implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "salon" }, allowSetters = true)
     private Participation participation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "priceStandSalons", "stands" }, allowSetters = true)
     private DimensionStand dimension;
 

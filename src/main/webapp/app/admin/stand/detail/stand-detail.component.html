@@ -73,11 +73,13 @@
           </dd>
           <dt><span jhiTranslate="stand.status.label">Status</span></dt>
           <dd>
-            <span [jhiTranslate]="'stand.status.list.' + (stand()!.status ?? 'null')">{{
-              { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
-                stand()!.status ?? 'null'
-              ]
-            }}</span>
+            <span [jhiTranslate]="'stand.status.list.' + (stand()!.status ?? 'null')">
+              {{
+                { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                  stand()!.status ?? 'null'
+                ]
+              }}</span
+            >
           </dd>
           <dt><span jhiTranslate="stand.extraInformation">Information complémentaire</span></dt>
           <dd>

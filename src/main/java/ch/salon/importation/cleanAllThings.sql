@@ -7,3 +7,5 @@ DELETE FROM invoice;
 DELETE FROM participation;
 DELETE FROM exponent;
 DELETE FROM salon;
+
+INSERT INTO dimension_stand ()

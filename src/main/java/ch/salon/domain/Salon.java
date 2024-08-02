@@ -37,19 +37,19 @@ public class Salon implements Serializable {
     private Instant endingDate;
 
     @Column(name = "price_meal_1")
-    private Long priceMeal1;
+    private Double priceMeal1;
 
     @Column(name = "price_meal_2")
-    private Long priceMeal2;
+    private Double priceMeal2;
 
     @Column(name = "price_meal_3")
-    private Long priceMeal3;
+    private Double priceMeal3;
 
     @Column(name = "price_conference")
-    private Long priceConference;
+    private Double priceConference;
 
     @Column(name = "price_sharing_stand")
-    private Long priceSharingStand;
+    private Double priceSharingStand;
 
     @Column(name = "extra_information")
     private String extraInformation;
@@ -116,68 +116,68 @@ public class Salon implements Serializable {
         this.endingDate = endingDate;
     }
 
-    public Long getPriceMeal1() {
+    public Double getPriceMeal1() {
         return this.priceMeal1;
     }
 
-    public Salon priceMeal1(Long priceMeal1) {
+    public Salon priceMeal1(Double priceMeal1) {
         this.setPriceMeal1(priceMeal1);
         return this;
     }
 
-    public void setPriceMeal1(Long priceMeal1) {
+    public void setPriceMeal1(Double priceMeal1) {
         this.priceMeal1 = priceMeal1;
     }
 
-    public Long getPriceMeal2() {
+    public Double getPriceMeal2() {
         return this.priceMeal2;
     }
 
-    public Salon priceMeal2(Long priceMeal2) {
+    public Salon priceMeal2(Double priceMeal2) {
         this.setPriceMeal2(priceMeal2);
         return this;
     }
 
-    public void setPriceMeal2(Long priceMeal2) {
+    public void setPriceMeal2(Double priceMeal2) {
         this.priceMeal2 = priceMeal2;
     }
 
-    public Long getPriceMeal3() {
+    public Double getPriceMeal3() {
         return this.priceMeal3;
     }
 
-    public Salon priceMeal3(Long priceMeal3) {
+    public Salon priceMeal3(Double priceMeal3) {
         this.setPriceMeal3(priceMeal3);
         return this;
     }
 
-    public void setPriceMeal3(Long priceMeal3) {
+    public void setPriceMeal3(Double priceMeal3) {
         this.priceMeal3 = priceMeal3;
     }
 
-    public Long getPriceConference() {
+    public Double getPriceConference() {
         return this.priceConference;
     }
 
-    public Salon priceConference(Long priceConference) {
+    public Salon priceConference(Double priceConference) {
         this.setPriceConference(priceConference);
         return this;
     }
 
-    public void setPriceConference(Long priceConference) {
+    public void setPriceConference(Double priceConference) {
         this.priceConference = priceConference;
     }
 
-    public Long getPriceSharingStand() {
+    public Double getPriceSharingStand() {
         return this.priceSharingStand;
     }
 
-    public Salon priceSharingStand(Long priceSharingStand) {
+    public Salon priceSharingStand(Double priceSharingStand) {
         this.setPriceSharingStand(priceSharingStand);
         return this;
     }
 
-    public void setPriceSharingStand(Long priceSharingStand) {
+    public void setPriceSharingStand(Double priceSharingStand) {
         this.priceSharingStand = priceSharingStand;
     }
 

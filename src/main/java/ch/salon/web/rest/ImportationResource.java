@@ -3,6 +3,7 @@ package ch.salon.web.rest;
 import ch.salon.domain.*;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.*;
+import ch.salon.service.InvoiceService;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -69,6 +70,8 @@ public class ImportationResource {
     private final ConferenceRepository conferenceRepository;
     private final DimensionStandRepository dimensionStandRepository;
     private final ParticipationRepository participationRepository;
+    private final InvoiceService invoiceService;
+    private final PriceStandSalonRepository priceStandRepository;
 
     public ImportationResource(
         SalonRepository salonRepository,
@@ -76,7 +79,9 @@ public class ImportationResource {
         ExponentRepository exponentRepository,
         ConferenceRepository conferenceRepository,
         DimensionStandRepository dimensionStandRepository,
-        ParticipationRepository participationRepository
+        ParticipationRepository participationRepository,
+        InvoiceService invoiceService,
+        PriceStandSalonRepository priceStandRepository
     ) {
         this.salonRepository = salonRepository;
         this.standRepository = standRepository;
@@ -84,6 +89,8 @@ public class ImportationResource {
         this.conferenceRepository = conferenceRepository;
         this.dimensionStandRepository = dimensionStandRepository;
         this.participationRepository = participationRepository;
+        this.invoiceService = invoiceService;
+        this.priceStandRepository = priceStandRepository;
     }
 
     @PostMapping("")
@@ -99,27 +106,70 @@ public class ImportationResource {
 
             List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
             if (dimensionStands == null || dimensionStands.isEmpty()) {
+                // TODO : A supprimer plus tard
                 DimensionStand dimension2x2Stand = new DimensionStand();
                 dimension2x2Stand.setDimension("2 m x 2 m");
-                dimensionStandRepository.save(dimension2x2Stand);
+                dimension2x2Stand = dimensionStandRepository.save(dimension2x2Stand);
+                PriceStandSalon dimension2x2PriceStand = new PriceStandSalon();
+                dimension2x2PriceStand.setSalon(currentSalon);
+                dimension2x2PriceStand.setPrice(260.0);
+                dimension2x2PriceStand.setDimension(dimension2x2Stand);
+                priceStandRepository.save(dimension2x2PriceStand);
+
                 DimensionStand dimension25x2Stand = new DimensionStand();
                 dimension25x2Stand.setDimension("2.5 m x 2 m");
-                dimensionStandRepository.save(dimension25x2Stand);
+                dimension25x2Stand = dimensionStandRepository.save(dimension25x2Stand);
+                PriceStandSalon dimension25x2PriceStand = new PriceStandSalon();
+                dimension25x2PriceStand.setSalon(currentSalon);
+                dimension25x2PriceStand.setPrice(300.0);
+                dimension25x2PriceStand.setDimension(dimension25x2Stand);
+                priceStandRepository.save(dimension25x2PriceStand);
+
                 DimensionStand dimension25Cotex2Stand = new DimensionStand();
                 dimension25Cotex2Stand.setDimension("2.5 m x 2 m (possible de vendre des deux côtés)");
-                dimensionStandRepository.save(dimension25Cotex2Stand);
+                dimension25Cotex2Stand = dimensionStandRepository.save(dimension25Cotex2Stand);
+                PriceStandSalon dimension25Cotex2PriceStand = new PriceStandSalon();
+                dimension25Cotex2PriceStand.setSalon(currentSalon);
+                dimension25Cotex2PriceStand.setPrice(350.0);
+                dimension25Cotex2PriceStand.setDimension(dimension25Cotex2Stand);
+                priceStandRepository.save(dimension25Cotex2PriceStand);
+
                 DimensionStand dimension3x2Stand = new DimensionStand();
                 dimension3x2Stand.setDimension("3 m x 2 m");
-                dimensionStandRepository.save(dimension3x2Stand);
+                dimension3x2Stand = dimensionStandRepository.save(dimension3x2Stand);
+                PriceStandSalon dimension3x2PriceStand = new PriceStandSalon();
+                dimension3x2PriceStand.setSalon(currentSalon);
+                dimension3x2PriceStand.setPrice(350.0);
+                dimension3x2PriceStand.setDimension(dimension3x2Stand);
+                priceStandRepository.save(dimension3x2PriceStand);
+
                 DimensionStand dimension3x25Stand = new DimensionStand();
                 dimension3x25Stand.setDimension("3 m x 2.5 m");
-                dimensionStandRepository.save(dimension3x25Stand);
+                dimension3x25Stand = dimensionStandRepository.save(dimension3x25Stand);
+                PriceStandSalon dimension3x25PriceStand = new PriceStandSalon();
+                dimension3x25PriceStand.setSalon(currentSalon);
+                dimension3x25PriceStand.setPrice(400.0);
+                dimension3x25PriceStand.setDimension(dimension3x25Stand);
+                priceStandRepository.save(dimension3x25PriceStand);
+
                 DimensionStand dimension4x2Stand = new DimensionStand();
                 dimension4x2Stand.setDimension("4 m x 2 m");
-                dimensionStandRepository.save(dimension4x2Stand);
+                dimension4x2Stand = dimensionStandRepository.save(dimension4x2Stand);
+                PriceStandSalon dimension4x2PriceStand = new PriceStandSalon();
+                dimension4x2PriceStand.setSalon(currentSalon);
+                dimension4x2PriceStand.setPrice(480.0);
+                dimension4x2PriceStand.setDimension(dimension4x2Stand);
+                priceStandRepository.save(dimension4x2PriceStand);
+
                 DimensionStand dimensionAutres = new DimensionStand();
                 dimensionAutres.setDimension("Autres");
-                dimensionStandRepository.save(dimensionAutres);
+                dimensionAutres = dimensionStandRepository.save(dimensionAutres);
+                PriceStandSalon dimensionPriceAutres = new PriceStandSalon();
+                dimensionPriceAutres.setSalon(currentSalon);
+                dimensionPriceAutres.setPrice(500.0);
+                dimensionPriceAutres.setDimension(dimensionAutres);
+                priceStandRepository.save(dimension4x2PriceStand);
+
                 dimensionStands = dimensionStandRepository.findAll();
             }
 
@@ -163,10 +213,6 @@ public class ImportationResource {
                 Participation currentParticipation = new Participation();
                 currentParticipation.setSalon(currentSalon);
                 currentParticipation.setExponent(currentExponent);
-                currentParticipation.setInvoices(new HashSet<>());
-                currentParticipation.setPayments(new HashSet<>());
-                currentParticipation.setConferences(new HashSet<>());
-                currentParticipation.setStands(new HashSet<>());
                 currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim()));
                 currentParticipation.setNbMeal2(Long.parseLong(participationMeal2.trim()));
                 currentParticipation.setNbMeal3(Long.parseLong(participationMeal3.trim()));
@@ -176,7 +222,6 @@ public class ImportationResource {
                 currentParticipation.setRegistrationDate(Instant.now());
                 currentParticipation.setStatus(Status.IN_VERIFICATION);
                 currentParticipation.setIsBillingClosed(false);
-                currentParticipation = participationRepository.save(currentParticipation);
 
                 String standDescription = csvRecord.get(STAND_DESCRIPTION);
                 String standDimension = csvRecord.get(STAND_DIMENSION);
@@ -189,7 +234,6 @@ public class ImportationResource {
                 String standUrlPicture = csvRecord.get(EXPONENT_URL_PICTURE);
 
                 Stand currentStand = new Stand();
-                currentStand.setParticipation(currentParticipation);
                 currentStand.setDescription(sub(standDescription));
                 currentStand.setWebsite(sub(standWebsite));
                 currentStand.setSocialMedia(sub(standSocialMedia));
@@ -200,7 +244,8 @@ public class ImportationResource {
                 currentStand.setNbChair(standNbChair.contains("Aucune") ? 0 : Long.parseLong(standNbChair.substring(0, 1)));
                 currentStand.setNeedElectricity(standElectricity.equalsIgnoreCase("oui"));
                 currentStand.setStatus(Status.IN_VERIFICATION);
-                currentStand = standRepository.save(currentStand);
+                currentParticipation.addStand(currentStand);
+                standRepository.save(currentStand);
 
                 String conferenceDescription = csvRecord.get(CONFERENCE_DESCRIPTION);
                 String standConference = csvRecord.get(STAND_CONFERENCE);
@@ -210,9 +255,13 @@ public class ImportationResource {
                     currentConference.setParticipation(currentParticipation);
                     currentConference.setTitle(sub(conferenceDescription));
                     currentConference.setStatus(Status.IN_VERIFICATION);
-                    currentConference = conferenceRepository.save(currentConference);
+                    currentParticipation.addConference(currentConference);
+                    conferenceRepository.save(currentConference);
                 }
 
+                currentParticipation = participationRepository.save(currentParticipation);
+
+                invoiceService.generateInvoices(currentParticipation.getId());
                 index++;
             }
         } catch (IOException e) {}

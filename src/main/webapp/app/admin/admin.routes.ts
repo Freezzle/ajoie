@@ -27,6 +27,16 @@ const routes: Routes = [
     data: { pageTitle: 'salon.title' },
     loadChildren: () => import('./stand/stand.routes'),
   },
+  {
+    path: 'conferences',
+    data: { pageTitle: 'conference.title' },
+    loadChildren: () => import('./conference/conference.routes'),
+  },
+  {
+    path: 'participations',
+    data: { pageTitle: 'participation.title' },
+    loadChildren: () => import('./participation/participation.routes'),
+  },
   /* jhipster-needle-add-admin-route - JHipster will add admin routes here */
 ];
 

@@ -17,6 +17,9 @@
             <column name="generation_date" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="label" type="varchar(255)">
                 <constraints nullable="true" />
             </column>

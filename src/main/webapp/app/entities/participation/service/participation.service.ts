@@ -69,6 +69,10 @@ export class ParticipationService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  generateInvoices(id: string): Observable<HttpResponse<{}>> {
+    return this.http.patch(`${this.resourceUrl}/${id}/invoices`, {}, { observe: 'response' });
+  }
+
   getParticipationIdentifier(participation: Pick<IParticipation, 'id'>): string {
     return participation.id;
   }

@@ -38,8 +38,8 @@ public class Payment implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "salon" }, allowSetters = true)
     private Participation participation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

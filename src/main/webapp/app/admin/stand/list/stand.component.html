@@ -45,6 +45,9 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr>
+            <th class="text-center">
+              <span jhiTranslate="stand.participation">Participation</span>
+            </th>
             <th>
               <span jhiTranslate="stand.description">Description</span>
             </th>
@@ -60,12 +63,15 @@
         <tbody>
           @for (stand of stands; track $index) {
             <tr data-cy="entityTable">
+              <td>
+                @if (stand.participation) {
+                  <div>{{ stand.participation.exponent?.fullName }}</div>
+                }
+              </td>
               <td>{{ stand.description }}</td>
               <td>
                 @if (stand.dimension) {
-                  <div>
-                    <a [routerLink]="['/dimension-stand', stand.dimension.id, 'view']">{{ stand.dimension.dimension }}</a>
-                  </div>
+                  <div>{{ stand.dimension.dimension }}</div>
                 }
               </td>
               <td class="text-center">{{ 'stand.status.list.' + stand.status | translate }}</td>

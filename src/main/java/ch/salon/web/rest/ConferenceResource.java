@@ -1,7 +1,11 @@
 package ch.salon.web.rest;
 
 import ch.salon.domain.Conference;
+import ch.salon.domain.Invoice;
 import ch.salon.repository.ConferenceRepository;
+import ch.salon.repository.InvoiceRepository;
+import ch.salon.repository.ParticipationRepository;
+import ch.salon.service.InvoiceService;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +59,9 @@ public class ConferenceResource {
         if (conference.getId() != null) {
             throw new BadRequestAlertException("A new conference cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         conference = conferenceRepository.save(conference);
+
         return ResponseEntity.created(new URI("/api/conferences/" + conference.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, conference.getId().toString()))
             .body(conference);
@@ -150,8 +157,12 @@ public class ConferenceResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of conferences in body.
      */
     @GetMapping("")
-    public List<Conference> getAllConferences() {
+    public List<Conference> getAllConferences(@RequestParam(name = "idSalon", required = false) String idSalon) {
         log.debug("REST request to get all Conferences");
+
+        if (StringUtils.isNotBlank(idSalon)) {
+            return conferenceRepository.findByParticipationSalonId(UUID.fromString(idSalon));
+        }
         return conferenceRepository.findAll();
     }
 

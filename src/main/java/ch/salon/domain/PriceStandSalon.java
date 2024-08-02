@@ -23,13 +23,13 @@ public class PriceStandSalon implements Serializable {
 
     @NotNull
     @Column(name = "price", nullable = false)
-    private Long price;
+    private Double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "participations", "priceStandSalons", "configuration" }, allowSetters = true)
     private Salon salon;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "priceStandSalons", "stands" }, allowSetters = true)
     private DimensionStand dimension;
 
@@ -48,16 +48,16 @@ public class PriceStandSalon implements Serializable {
         this.id = id;
     }
 
-    public Long getPrice() {
+    public Double getPrice() {
         return this.price;
     }
 
-    public PriceStandSalon price(Long price) {
+    public PriceStandSalon price(Double price) {
         this.setPrice(price);
         return this;
     }
 
-    public void setPrice(Long price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

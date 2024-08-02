@@ -1,7 +1,10 @@
 package ch.salon.web.rest;
 
+import ch.salon.domain.Invoice;
 import ch.salon.domain.Participation;
+import ch.salon.repository.InvoiceRepository;
 import ch.salon.repository.ParticipationRepository;
+import ch.salon.service.InvoiceService;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,9 +37,17 @@ public class ParticipationResource {
     private String applicationName;
 
     private final ParticipationRepository participationRepository;
+    private final InvoiceRepository invoiceRepository;
+    private final InvoiceService invoiceService;
 
-    public ParticipationResource(ParticipationRepository participationRepository) {
+    public ParticipationResource(
+        ParticipationRepository participationRepository,
+        InvoiceService invoiceService,
+        InvoiceRepository invoiceRepository
+    ) {
         this.participationRepository = participationRepository;
+        this.invoiceService = invoiceService;
+        this.invoiceRepository = invoiceRepository;
     }
 
     /**
@@ -56,6 +67,18 @@ public class ParticipationResource {
         return ResponseEntity.created(new URI("/api/participations/" + participation.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, participation.getId().toString()))
             .body(participation);
+    }
+
+    @PatchMapping("/{id}/invoices")
+    public void generateInvoices(@PathVariable(value = "id") final UUID id) {
+        log.debug("REST request to get all Participations");
+        invoiceService.generateInvoices(id);
+    }
+
+    @GetMapping("/{id}/invoices")
+    public List<Invoice> getInvoices(@PathVariable(value = "id") final UUID id) {
+        log.debug("REST request to get all Participations");
+        return invoiceRepository.findByParticipationId(id);
     }
 
     /**
@@ -94,7 +117,7 @@ public class ParticipationResource {
     /**
      * {@code PATCH  /participations/:id} : Partial updates given fields of an existing participation, field will ignore if it is null
      *
-     * @param id the id of the participation to save.
+     * @param id            the id of the participation to save.
      * @param participation the participation to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated participation,
      * or with status {@code 400 (Bad Request)} if the participation is not valid,
@@ -169,8 +192,11 @@ public class ParticipationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of participations in body.
      */
     @GetMapping("")
-    public List<Participation> getAllParticipations() {
+    public List<Participation> getAllParticipations(@RequestParam(name = "idSalon", required = false) String idSalon) {
         log.debug("REST request to get all Participations");
+        if (idSalon != null) {
+            return participationRepository.findBySalonId(UUID.fromString(idSalon));
+        }
         return participationRepository.findAll();
     }
 

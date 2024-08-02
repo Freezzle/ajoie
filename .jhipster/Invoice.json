@@ -13,6 +13,11 @@
       "fieldType": "Instant"
     },
     {
+      "fieldName": "type",
+      "fieldType": "Type",
+      "fieldValues": "CONFERENCE,STAND,SHARED,MEAL,ELECTRICITY,OTHERS"
+    },
+    {
       "fieldName": "label",
       "fieldType": "String"
     },

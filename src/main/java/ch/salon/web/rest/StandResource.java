@@ -2,6 +2,7 @@ package ch.salon.web.rest;
 
 import ch.salon.domain.Stand;
 import ch.salon.repository.StandRepository;
+import ch.salon.service.InvoiceService;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -56,6 +57,7 @@ public class StandResource {
             throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "idexists");
         }
         stand = standRepository.save(stand);
+
         return ResponseEntity.created(new URI("/api/stands/" + stand.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, stand.getId().toString()))
             .body(stand);

@@ -19,7 +19,7 @@
         "CANCELED": "Annulé",
         "IN_VERIFICATION": "En cours",
         "REFUSED": "Refusé",
-        "null": ""
+        "null": " "
       }
     },
     "title": "Les stands",

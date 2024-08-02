@@ -1,5 +1,7 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.Status;
+import ch.salon.domain.enumeration.Type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -24,6 +26,10 @@ public class Invoice implements Serializable {
     @Column(name = "generation_date")
     private Instant generationDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private Type type;
+
     @Column(name = "label")
     private String label;
 
@@ -45,8 +51,8 @@ public class Invoice implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "salon" }, allowSetters = true)
     private Participation participation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -181,6 +187,14 @@ public class Invoice implements Serializable {
         return this;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -206,6 +220,7 @@ public class Invoice implements Serializable {
         return "Invoice{" +
             "id=" + getId() +
             ", generationDate='" + getGenerationDate() + "'" +
+            ", type='" + getType() + "'" +
             ", label='" + getLabel() + "'" +
             ", defaultAmount=" + getDefaultAmount() +
             ", customAmount=" + getCustomAmount() +

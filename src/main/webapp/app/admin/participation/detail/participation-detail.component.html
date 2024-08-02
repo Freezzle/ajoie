@@ -1,0 +1,146 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (participation()) {
+      <div>
+        <h2 data-cy="participationDetailsHeading">
+          <span>Détail de la participation</span>
+        </h2>
+
+        <hr />
+
+        <div class="d-flex justify-content-between mt-3">
+          <span>
+            <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+            </button>
+          </span>
+          <button class="btn btn-primary btn-sm" (click)="generate()">
+            <span jhiTranslate="common.generate">Générer</span>
+          </button>
+        </div>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="participation.exponent">Exponent</span></dt>
+          <dd>
+            @if (participation()!.exponent) {
+              <div>{{ participation()!.exponent?.fullName }}</div>
+            }
+          </dd>
+          <dt><span jhiTranslate="participation.registrationDate">Registration Date</span></dt>
+          <dd>
+            <span>{{ participation()!.registrationDate | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="participation.isBillingClosed">Is Billing Closed</span></dt>
+          <dd>
+            <span>{{ participation()!.isBillingClosed }}</span>
+          </dd>
+          <dt><span jhiTranslate="participation.status.label">Status</span></dt>
+          <dd>
+            <span [jhiTranslate]="'participation.status.list.' + (participation()!.status ?? 'null')">{{
+              {
+                null: '',
+                REFUSED: 'REFUSED',
+                CANCELED: 'CANCELED',
+                IN_VERIFICATION: 'IN_VERIFICATION',
+                ACCEPTED: 'ACCEPTED',
+              }[participation()!.status ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="participation.extraInformation">Extra Information</span></dt>
+          <dd>
+            <span>{{ participation()!.extraInformation }}</span>
+          </dd>
+        </dl>
+
+        <fieldset class="form-group border p-3 form-1-box">
+          <legend class="w-auto px-2">Facturation</legend>
+          <div class="table-responsive table-entities" id="entities">
+            <table class="table table-striped" aria-describedby="page-heading">
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <div class="d-flex">
+                      <span>Verrouillé ?</span>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div class="d-flex">
+                      <span>Type</span>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div class="d-flex">
+                      <span>Libellé</span>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div class="d-flex">
+                      <span>Montant configuration</span>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div class="d-flex">
+                      <span>Montant réel</span>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div class="d-flex">
+                      <span>Quantité</span>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div class="d-flex">
+                      <span>Total</span>
+                    </div>
+                  </th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (invoice of invoices$ | async; track $index) {
+                  <tr data-cy="entityTable">
+                    <td>
+                      <fa-icon icon="{{ invoice.lock | faIconBoolean }}" style="{{ invoice.lock | faIconColorBoolean }}"></fa-icon>
+                    </td>
+                    <td>{{ invoice.type }}</td>
+                    <td>{{ invoice.label }}</td>
+                    <td>{{ invoice.defaultAmount }}</td>
+                    <td>{{ invoice.customAmount }}</td>
+                    <td>{{ invoice.quantity }}</td>
+                    <td>{{ invoice.total }}</td>
+                    <td>
+                      <a [routerLink]="['/admin/invoices', invoice.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                        <fa-icon icon="eye"></fa-icon>
+                        <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                      </a>
+
+                      <a [routerLink]="['/admin/invoices', invoice.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                        <fa-icon icon="pencil-alt"></fa-icon>
+                        <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                      </a>
+
+                      <button type="submit" (click)="deleteInvoice(invoice)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                        <fa-icon icon="times"></fa-icon>
+                        <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+                <tr data-cy="entityTable" *ngIf="invoices$ | async; let invoices">
+                  <td>Résultat</td>
+                  <td>&nbsp;</td>
+                  <td>-</td>
+                  <td>{{ totalDefault(invoices) }}</td>
+                  <td>{{ totalCustom(invoices) }}</td>
+                  <td>&nbsp;</td>
+                  <td>{{ total(invoices) }}</td>
+                  <td>&nbsp;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
+      </div>
+    }
+  </div>
+</div>

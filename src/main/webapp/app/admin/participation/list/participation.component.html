@@ -1,0 +1,126 @@
+<div>
+  <h2 id="page-heading" data-cy="ParticipationHeading">
+    <span jhiTranslate="participation.title">Les participations</span>
+
+    <hr />
+
+    <div class="d-flex justify-content-between mt-3">
+      <span>
+        <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+        </button>
+      </span>
+
+      <span>
+        <button class="btn btn-primary btn-sm" (click)="load()" [disabled]="isLoading">
+          <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+          <span jhiTranslate="common.refresh">Actualiser</span>
+        </button>
+
+        <button
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn btn-outline-primary btn-sm"
+          [routerLink]="['/admin/participations/new']"
+        >
+          <fa-icon icon="plus"></fa-icon>
+          <span jhiTranslate="common.create">Créer</span>
+        </button>
+      </span>
+    </div>
+
+    <hr />
+  </h2>
+
+  @if (participations?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="participation.notFound">Aucun Participation trouvé</span>
+    </div>
+  }
+
+  @if (participations && participations.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="participation.exponent">Exposant</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="participation.registrationDate">Date d'inscription</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="participation.needArrangment">Avec arrangement ?</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="participation.isBillingClosed">Facturation clos ?</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="participation.status.label">Statut</span>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (participation of participations; track $index) {
+            <tr data-cy="entityTable">
+              <td>
+                @if (participation.exponent) {
+                  <div>
+                    <a [routerLink]="['/exponent', participation.exponent.id, 'view']">{{ participation.exponent.fullName }}</a>
+                  </div>
+                }
+              </td>
+              <td>{{ participation.registrationDate | formatMediumDate }}</td>
+              <td>{{ participation.needArrangment }}</td>
+              <td>{{ participation.isBillingClosed }}</td>
+              <td [jhiTranslate]="'participation.status.list.' + (participation.status ?? 'null')">
+                {{
+                  { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                    participation.status ?? 'null'
+                  ]
+                }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/admin/participations', participation.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/admin/participations', participation.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(participation)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

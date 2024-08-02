@@ -1,0 +1,52 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (conference()) {
+      <div>
+        <h2 data-cy="conferenceDetailsHeading"><span jhiTranslate="salonApp.conference.detail.title">Détail d'une conférence</span></h2>
+
+        <hr />
+
+        <div class="d-flex justify-content-between mt-3">
+          <span>
+            <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+            </button>
+          </span>
+        </div>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="conference.title">Title</span></dt>
+          <dd>
+            <span>{{ conference()!.title }}</span>
+          </dd>
+          <dt><span jhiTranslate="conference.status.label">Status</span></dt>
+          <dd>
+            <span [jhiTranslate]="'conference.status.list.' + (conference()!.status ?? 'null')">{{
+              { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
+                conference()!.status ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="conference.extraInformation">Extra Information</span></dt>
+          <dd>
+            <span>{{ conference()!.extraInformation }}</span>
+          </dd>
+          <dt><span jhiTranslate="conference.participation">Participation</span></dt>
+          <dd>
+            @if (conference()!.participation) {
+              <div>
+                <a [routerLink]="['/participation', conference()!.participation?.id, 'view']">{{ conference()!.participation?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+      </div>
+    }
+  </div>
+</div>
