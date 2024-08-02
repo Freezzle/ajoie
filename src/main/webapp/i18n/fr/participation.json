@@ -1,0 +1,28 @@
+{
+  "participation": {
+    "acceptedChart": "Charte accepté ?",
+    "acceptedContract": "Contrat accepté ?",
+    "create": "Création d'une nouvelle participation",
+    "edit": "Modification d'une participation",
+    "exponent": "Exposant",
+    "extraInformation": "Information complémentaire",
+    "isBillingClosed": "Facturation clos ?",
+    "nbMeal1": "Repas samedi midi",
+    "nbMeal2": "Repas samedi soir",
+    "nbMeal3": "Repas dimanche midi",
+    "needArrangment": "Avec arrangement ?",
+    "notFouind": "Aucune participation trouvé",
+    "registrationDate": "Date d'inscription",
+    "status": {
+      "label": "Statut",
+      "list": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "IN_VERIFICATION": "En cours",
+        "REFUSED": "Refusé",
+        "null": " "
+      }
+    },
+    "title": "Les participations"
+  }
+}

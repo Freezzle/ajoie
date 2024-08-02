@@ -1,0 +1,20 @@
+{
+  "conference": {
+    "create": "Création d'une nouvelle conférence",
+    "edit": "Modification d'une conférence",
+    "extraInformation": "Information complémentaire",
+    "notFound": "Aucune conférence trouvé",
+    "participation": "Participation",
+    "status": {
+      "label": "Statut",
+      "list": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "IN_VERIFICATION": "En cours",
+        "REFUSED": "Refusé",
+        "null": " "
+      }
+    },
+    "title": "Les conférences"
+  }
+}
