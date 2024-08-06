@@ -15,6 +15,7 @@
     <include file="config/liquibase/changelog/20240721083402_added_entity_DimensionStand.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240721083403_added_entity_Stand.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240721083405_added_entity_Invoice.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240721083405_added_entity_InvoicingPlan.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240721083406_added_entity_Salon.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240723192804_added_entity_Conference.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240723192806_added_entity_PriceStandSalon.xml" relativeToChangelogFile="false"/>

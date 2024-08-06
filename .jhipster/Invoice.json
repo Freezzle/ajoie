@@ -9,6 +9,10 @@
       "fieldType": "UUID"
     },
     {
+      "fieldName": "referenceId",
+      "fieldType": "UUID"
+    },
+    {
       "fieldName": "generationDate",
       "fieldType": "Instant"
     },
@@ -49,8 +53,8 @@
   "name": "Invoice",
   "relationships": [
     {
-      "otherEntityName": "participation",
-      "relationshipName": "participation",
+      "otherEntityName": "invoicingPlan",
+      "relationshipName": "invoicingPlan",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }

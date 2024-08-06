@@ -13,4 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ParticipationRepository extends JpaRepository<Participation, UUID> {
     List<Participation> findBySalonId(UUID idSalon);
+
+    @Query("SELECT MAX(p.clientNumber) FROM Participation p")
+    String findMaxClientNumber();
 }

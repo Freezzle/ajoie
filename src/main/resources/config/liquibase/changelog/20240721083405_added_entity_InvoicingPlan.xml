@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity InvoicingPlan.
+    -->
+    <changeSet id="20240721083405-1" author="jhipster">
+        <createTable tableName="invoicing_plan">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="generation_date" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="billing_number" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="has_been_sent" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="participation_id" type="${uuidType}">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="invoicing_plan" columnName="generation_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+</databaseChangeLog>

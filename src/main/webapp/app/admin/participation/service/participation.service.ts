@@ -10,6 +10,8 @@ import { createRequestOption } from 'app/core/request/request-util';
 import { IParticipation, NewParticipation } from '../participation.model';
 import { IInvoice } from '../../../entities/invoice/invoice.model';
 import { InvoiceService } from '../../../entities/invoice/service/invoice.service';
+import { IPayment } from '../../../entities/payment/payment.model';
+import { IInvoicingPlan } from '../../../entities/invoice/invoicing-plan.model';
 
 export type PartialUpdateParticipation = Partial<IParticipation> & Pick<IParticipation, 'id'>;
 
@@ -26,8 +28,10 @@ export type PartialUpdateRestParticipation = RestOf<PartialUpdateParticipation>;
 export type EntityResponseType = HttpResponse<IParticipation>;
 export type EntityArrayResponseType = HttpResponse<IParticipation[]>;
 
-export type InvoiceArrayResponseType = HttpResponse<IInvoice[]>;
-export type RestInvoice = RestOf<IInvoice>;
+export type InvoiceArrayResponseType = HttpResponse<IInvoicingPlan[]>;
+export type PaymentArrayResponseType = HttpResponse<IPayment[]>;
+export type RestInvoice = RestOf<IInvoicingPlan>;
+export type RestPayment = RestOf<IPayment>;
 
 @Injectable({ providedIn: 'root' })
 export class ParticipationService {
@@ -74,12 +78,40 @@ export class ParticipationService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  getInvoices(id: string): Observable<InvoiceArrayResponseType> {
-    return this.http.get<RestInvoice[]>(`${this.resourceUrl}/${id}/invoices`, { observe: 'response' });
+  getInvoicingPlans(id: string): Observable<InvoiceArrayResponseType> {
+    const queryObject: any = {
+      idParticipation: id,
+    };
+
+    return this.http.get<RestInvoice[]>(this.applicationConfigService.getEndpointFor('api/invoicing-plans'), {
+      params: queryObject,
+      observe: 'response',
+    });
+  }
+
+  getPayments(id: string): Observable<PaymentArrayResponseType> {
+    const queryObject: any = {
+      idParticipation: id,
+    };
+
+    return this.http.get<RestPayment[]>(this.applicationConfigService.getEndpointFor('api/payments'), {
+      params: queryObject,
+      observe: 'response',
+    });
   }
 
   generateInvoices(id: string): Observable<HttpResponse<{}>> {
-    return this.http.patch(`${this.resourceUrl}/${id}/invoices`, {}, { observe: 'response' });
+    const queryObject: any = {
+      idParticipation: id,
+    };
+    return this.http.patch(
+      this.applicationConfigService.getEndpointFor('api/invoicing-plans/generation'),
+      {},
+      {
+        params: queryObject,
+        observe: 'response',
+      },
+    );
   }
 
   getParticipationIdentifier(participation: Pick<IParticipation, 'id'>): string {

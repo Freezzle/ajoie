@@ -61,7 +61,32 @@
 
         <div class="mb-3">
           <label class="form-label" for="field_shared" jhiTranslate="stand.shared">Shared</label>
-          <input type="checkbox" class="form-check" name="shared" id="field_shared" data-cy="shared" formControlName="shared" />
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              name="shared"
+              data-cy="shared"
+              formControlName="shared"
+              id="field_shared"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              name="needElectricity"
+              data-cy="needElectricity"
+              formControlName="needElectricity"
+              id="field_needElectricity"
+            />
+          </div>
         </div>
 
         <div class="mb-3">
@@ -72,18 +97,6 @@
         <div class="mb-3">
           <label class="form-label" for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
           <input type="number" class="form-control" name="nbChair" id="field_nbChair" data-cy="nbChair" formControlName="nbChair" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
-          <input
-            type="checkbox"
-            class="form-check"
-            name="needElectricity"
-            id="field_needElectricity"
-            data-cy="needElectricity"
-            formControlName="needElectricity"
-          />
         </div>
 
         <div class="mb-3">

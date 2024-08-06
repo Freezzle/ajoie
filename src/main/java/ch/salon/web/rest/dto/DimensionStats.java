@@ -1,6 +1,8 @@
 package ch.salon.web.rest.dto;
 
-public class DimensionStats {
+import java.io.Serializable;
+
+public class DimensionStats implements Serializable {
 
     private String dimension = "";
     private long nb = 0;

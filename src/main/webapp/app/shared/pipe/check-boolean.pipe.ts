@@ -4,10 +4,10 @@ import dayjs from 'dayjs/esm';
 
 @Pipe({
   standalone: true,
-  name: 'faIconColorBoolean',
+  name: 'checkBool',
 })
-export default class FaIconColorBooleanPipe implements PipeTransform {
+export default class CheckBoolPipe implements PipeTransform {
   transform(value: boolean | null | undefined): string {
-    return value ? 'color:Green' : 'color:Tomato';
+    return value ? 'circle' : 'circle';
   }
 }

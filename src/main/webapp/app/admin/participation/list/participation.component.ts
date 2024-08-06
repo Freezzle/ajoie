@@ -11,6 +11,10 @@ import { SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigati
 import { IParticipation } from '../participation.model';
 import { EntityArrayResponseType, ParticipationService } from '../service/participation.service';
 import { ParticipationDeleteDialogComponent } from '../delete/participation-delete-dialog.component';
+import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
+import StatusPipe from '../../../shared/pipe/status.pipe';
+import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
+import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 
 @Component({
   standalone: true,
@@ -25,6 +29,10 @@ import { ParticipationDeleteDialogComponent } from '../delete/participation-dele
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    ColorStatusPipe,
+    StatusPipe,
+    CheckBoolPipe,
+    ColorBoolPipe,
   ],
 })
 export class ParticipationComponent implements OnInit {

@@ -26,6 +26,9 @@ public class Invoice implements Serializable {
     @Column(name = "generation_date")
     private Instant generationDate;
 
+    @Column(name = "reference_id")
+    private UUID referenceId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private Type type;
@@ -50,10 +53,6 @@ public class Invoice implements Serializable {
 
     @Column(name = "extra_information")
     private String extraInformation;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "salon" }, allowSetters = true)
-    private Participation participation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -174,25 +173,20 @@ public class Invoice implements Serializable {
         this.extraInformation = extraInformation;
     }
 
-    public Participation getParticipation() {
-        return this.participation;
-    }
-
-    public void setParticipation(Participation participation) {
-        this.participation = participation;
-    }
-
-    public Invoice participation(Participation participation) {
-        this.setParticipation(participation);
-        return this;
-    }
-
     public Type getType() {
         return type;
     }
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public UUID getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(UUID referenceId) {
+        this.referenceId = referenceId;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -219,6 +213,7 @@ public class Invoice implements Serializable {
     public String toString() {
         return "Invoice{" +
             "id=" + getId() +
+            ", referenceId=" + getReferenceId() +
             ", generationDate='" + getGenerationDate() + "'" +
             ", type='" + getType() + "'" +
             ", label='" + getLabel() + "'" +

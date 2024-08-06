@@ -39,7 +39,7 @@ type InvoiceFormGroupContent = {
   total: FormControl<InvoiceFormRawValue['total']>;
   lock: FormControl<InvoiceFormRawValue['lock']>;
   extraInformation: FormControl<InvoiceFormRawValue['extraInformation']>;
-  participation: FormControl<InvoiceFormRawValue['participation']>;
+  invoicingPlan: FormControl<InvoiceFormRawValue['invoicingPlan']>;
 };
 
 export type InvoiceFormGroup = FormGroup<InvoiceFormGroupContent>;
@@ -67,7 +67,7 @@ export class InvoiceFormService {
       total: new FormControl(invoiceRawValue.total),
       lock: new FormControl(invoiceRawValue.lock),
       extraInformation: new FormControl(invoiceRawValue.extraInformation),
-      participation: new FormControl(invoiceRawValue.participation),
+      invoicingPlan: new FormControl(invoiceRawValue.invoicingPlan),
     });
   }
 

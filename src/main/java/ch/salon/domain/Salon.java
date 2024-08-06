@@ -54,12 +54,9 @@ public class Salon implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "salon")
-    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
-    private Set<Participation> participations = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "salon")
-    @JsonIgnoreProperties(value = { "salon", "dimension" }, allowSetters = true)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL, targetEntity = PriceStandSalon.class)
+    @JoinColumn(name = "salon_id", referencedColumnName = "id")
+    @JsonIgnoreProperties(value = { "dimension" }, allowSetters = true)
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -194,48 +191,11 @@ public class Salon implements Serializable {
         this.extraInformation = extraInformation;
     }
 
-    public Set<Participation> getParticipations() {
-        return this.participations;
-    }
-
-    public void setParticipations(Set<Participation> participations) {
-        if (this.participations != null) {
-            this.participations.forEach(i -> i.setSalon(null));
-        }
-        if (participations != null) {
-            participations.forEach(i -> i.setSalon(this));
-        }
-        this.participations = participations;
-    }
-
-    public Salon participations(Set<Participation> participations) {
-        this.setParticipations(participations);
-        return this;
-    }
-
-    public Salon addParticipation(Participation participation) {
-        this.participations.add(participation);
-        participation.setSalon(this);
-        return this;
-    }
-
-    public Salon removeParticipation(Participation participation) {
-        this.participations.remove(participation);
-        participation.setSalon(null);
-        return this;
-    }
-
     public Set<PriceStandSalon> getPriceStandSalons() {
         return this.priceStandSalons;
     }
 
     public void setPriceStandSalons(Set<PriceStandSalon> priceStandSalons) {
-        if (this.priceStandSalons != null) {
-            this.priceStandSalons.forEach(i -> i.setSalon(null));
-        }
-        if (priceStandSalons != null) {
-            priceStandSalons.forEach(i -> i.setSalon(this));
-        }
         this.priceStandSalons = priceStandSalons;
     }
 
@@ -246,13 +206,11 @@ public class Salon implements Serializable {
 
     public Salon addPriceStandSalon(PriceStandSalon priceStandSalon) {
         this.priceStandSalons.add(priceStandSalon);
-        priceStandSalon.setSalon(this);
         return this;
     }
 
     public Salon removePriceStandSalon(PriceStandSalon priceStandSalon) {
         this.priceStandSalons.remove(priceStandSalon);
-        priceStandSalon.setSalon(null);
         return this;
     }
 

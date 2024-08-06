@@ -25,12 +25,7 @@ public class PriceStandSalon implements Serializable {
     @Column(name = "price", nullable = false)
     private Double price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "participations", "priceStandSalons", "configuration" }, allowSetters = true)
-    private Salon salon;
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = { "priceStandSalons", "stands" }, allowSetters = true)
     private DimensionStand dimension;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -59,19 +54,6 @@ public class PriceStandSalon implements Serializable {
 
     public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public Salon getSalon() {
-        return this.salon;
-    }
-
-    public void setSalon(Salon salon) {
-        this.salon = salon;
-    }
-
-    public PriceStandSalon salon(Salon salon) {
-        this.setSalon(salon);
-        return this;
     }
 
     public DimensionStand getDimension() {

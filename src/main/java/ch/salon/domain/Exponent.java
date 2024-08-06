@@ -43,10 +43,6 @@ public class Exponent implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "exponent")
-    @JsonIgnoreProperties(value = { "conferences", "payments", "invoices", "stands", "exponent", "salon" }, allowSetters = true)
-    private Set<Participation> participations = new HashSet<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
@@ -138,37 +134,6 @@ public class Exponent implements Serializable {
 
     public void setExtraInformation(String extraInformation) {
         this.extraInformation = extraInformation;
-    }
-
-    public Set<Participation> getParticipations() {
-        return this.participations;
-    }
-
-    public void setParticipations(Set<Participation> participations) {
-        if (this.participations != null) {
-            this.participations.forEach(i -> i.setExponent(null));
-        }
-        if (participations != null) {
-            participations.forEach(i -> i.setExponent(this));
-        }
-        this.participations = participations;
-    }
-
-    public Exponent participations(Set<Participation> participations) {
-        this.setParticipations(participations);
-        return this;
-    }
-
-    public Exponent addParticipation(Participation participation) {
-        this.participations.add(participation);
-        participation.setExponent(this);
-        return this;
-    }
-
-    public Exponent removeParticipation(Participation participation) {
-        this.participations.remove(participation);
-        participation.setExponent(null);
-        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

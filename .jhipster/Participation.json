@@ -13,6 +13,10 @@
       "fieldType": "Instant"
     },
     {
+      "fieldName": "clientNumber",
+      "fieldType": "String"
+    },
+    {
       "fieldName": "nbMeal1",
       "fieldType": "Long"
     },
@@ -67,9 +71,9 @@
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "invoice",
+      "otherEntityName": "invoicingPlan",
       "otherEntityRelationshipName": "participation",
-      "relationshipName": "invoice",
+      "relationshipName": "invoicingPlan",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },

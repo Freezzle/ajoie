@@ -45,19 +45,19 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr>
-            <th class="text-center">
+            <th class="col-auto">
               <span jhiTranslate="stand.participation">Participation</span>
             </th>
-            <th>
+            <th class="col-7">
               <span jhiTranslate="stand.description">Description</span>
             </th>
-            <th>
+            <th class="col-auto">
               <span jhiTranslate="stand.dimension">Dimension</span>
             </th>
-            <th class="text-center">
-              <span jhiTranslate="stand.status.label">Status</span>
+            <th class="col-auto text-center">
+              <span jhiTranslate="stand.status.label">Statut</span>
             </th>
-            <th scope="col"></th>
+            <th class="col-auto">&nbsp;</th>
           </tr>
         </thead>
         <tbody>
@@ -65,7 +65,11 @@
             <tr data-cy="entityTable">
               <td>
                 @if (stand.participation) {
-                  <div>{{ stand.participation.exponent?.fullName }}</div>
+                  <div>
+                    <a [routerLink]="['/admin/exponents', stand.participation.exponent?.id, 'view']">{{
+                      stand.participation.exponent?.fullName
+                    }}</a>
+                  </div>
                 }
               </td>
               <td>{{ stand.description }}</td>
@@ -74,7 +78,13 @@
                   <div>{{ stand.dimension.dimension }}</div>
                 }
               </td>
-              <td class="text-center">{{ 'stand.status.list.' + stand.status | translate }}</td>
+              <td class="text-center">
+                <fa-icon
+                  icon="{{ stand.status | status }}"
+                  class="{{ stand.status | colorStatus }}"
+                  title="{{ 'stand.status.list.' + stand.status | translate }}"
+                ></fa-icon>
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/admin/stands', stand.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

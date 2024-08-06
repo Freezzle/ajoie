@@ -45,22 +45,10 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="conference.participation">Participation</span>
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="conference.title">Title</span>
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="conference.status.label">Status</span>
-              </div>
-            </th>
-            <th scope="col"></th>
+            <th class="col-auto"><span jhiTranslate="conference.participation">Participation</span></th>
+            <th class="col-8"><span jhiTranslate="conference.title">Title</span></th>
+            <th class="col-auto text-center"><span jhiTranslate="conference.status.label">Status</span></th>
+            <th class="col-auto">&nbsp;</th>
           </tr>
         </thead>
         <tbody>
@@ -68,16 +56,20 @@
             <tr data-cy="entityTable">
               <td>
                 @if (conference.participation) {
-                  <div>{{ conference.participation.exponent?.fullName }}</div>
+                  <div>
+                    <a [routerLink]="['/admin/exponents', conference.participation.exponent?.id, 'view']">{{
+                      conference.participation.exponent?.fullName
+                    }}</a>
+                  </div>
                 }
               </td>
               <td>{{ conference.title }}</td>
-              <td [jhiTranslate]="'conference.status.list.' + (conference.status ?? 'null')">
-                {{
-                  { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
-                    conference.status ?? 'null'
-                  ]
-                }}
+              <td class="text-center">
+                <fa-icon
+                  icon="{{ conference.status | status }}"
+                  class="{{ conference.status | colorStatus }}"
+                  title="{{ 'conference.status.list.' + conference.status | translate }}"
+                ></fa-icon>
               </td>
               <td class="text-end">
                 <div class="btn-group">

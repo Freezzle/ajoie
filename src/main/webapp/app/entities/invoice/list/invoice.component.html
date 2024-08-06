@@ -100,7 +100,7 @@
             </th>
             <th scope="col" jhiSortBy="participation.id">
               <div class="d-flex">
-                <span jhiTranslate="salonApp.invoice.participation">Participation</span>
+                <span jhiTranslate="salonApp.invoice.invoicingPlan">InvoicingPlan</span>
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -122,9 +122,9 @@
               <td>{{ invoice.lock }}</td>
               <td>{{ invoice.extraInformation }}</td>
               <td>
-                @if (invoice.participation) {
+                @if (invoice.invoicingPlan) {
                   <div>
-                    <a [routerLink]="['/participation', invoice.participation.id, 'view']">{{ invoice.participation.id }}</a>
+                    <a [routerLink]="['/invoicingPlan', invoice.invoicingPlan.id, 'view']">{{ invoice.invoicingPlan.id }}</a>
                   </div>
                 }
               </td>

@@ -12,8 +12,10 @@ import { IStand } from '../stand.model';
 import { EntityArrayResponseType, StandService } from '../service/stand.service';
 import { StandDeleteDialogComponent } from '../delete/stand-delete-dialog.component';
 import { Location } from '@angular/common';
-import FaIconBooleanPipe from '../../../shared/pipe/fa-icon-boolean.pipe';
-import FaIconColorBooleanPipe from '../../../shared/pipe/fa-icon-color-boolean.pipe';
+import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
+import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
+import StatusPipe from '../../../shared/pipe/status.pipe';
+import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 
 @Component({
   standalone: true,
@@ -28,8 +30,8 @@ import FaIconColorBooleanPipe from '../../../shared/pipe/fa-icon-color-boolean.p
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
-    FaIconBooleanPipe,
-    FaIconColorBooleanPipe,
+    StatusPipe,
+    ColorStatusPipe,
   ],
 })
 export class StandComponent implements OnInit {

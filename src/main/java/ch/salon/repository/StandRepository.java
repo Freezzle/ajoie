@@ -14,4 +14,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StandRepository extends JpaRepository<Stand, UUID> {
     List<Stand> findByParticipationSalonId(UUID salonId);
+    List<Stand> findByParticipationId(UUID participationId);
 }

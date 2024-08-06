@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -23,6 +24,9 @@ public class Participation implements Serializable {
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @Column(name = "client_number")
+    private String clientNumber;
 
     @Column(name = "registration_date")
     private Instant registrationDate;
@@ -55,28 +59,11 @@ public class Participation implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "participation")
-    @JsonIgnoreProperties(value = { "participation" }, allowSetters = true)
-    private Set<Conference> conferences = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "participation")
-    @JsonIgnoreProperties(value = { "participation" }, allowSetters = true)
-    private Set<Payment> payments = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "participation")
-    @JsonIgnoreProperties(value = { "participation" }, allowSetters = true)
-    private Set<Invoice> invoices = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "participation")
-    @JsonIgnoreProperties(value = { "participation", "dimension" }, allowSetters = true)
-    private Set<Stand> stands = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = { "participations" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Exponent exponent;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "participations", "priceStandSalons", "configuration" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "priceStandSalons" }, allowSetters = true)
     private Salon salon;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -224,130 +211,6 @@ public class Participation implements Serializable {
         this.extraInformation = extraInformation;
     }
 
-    public Set<Conference> getConferences() {
-        return this.conferences;
-    }
-
-    public void setConferences(Set<Conference> conferences) {
-        if (this.conferences != null) {
-            this.conferences.forEach(i -> i.setParticipation(null));
-        }
-        if (conferences != null) {
-            conferences.forEach(i -> i.setParticipation(this));
-        }
-        this.conferences = conferences;
-    }
-
-    public Participation conferences(Set<Conference> conferences) {
-        this.setConferences(conferences);
-        return this;
-    }
-
-    public Participation addConference(Conference conference) {
-        this.conferences.add(conference);
-        conference.setParticipation(this);
-        return this;
-    }
-
-    public Participation removeConference(Conference conference) {
-        this.conferences.remove(conference);
-        conference.setParticipation(null);
-        return this;
-    }
-
-    public Set<Payment> getPayments() {
-        return this.payments;
-    }
-
-    public void setPayments(Set<Payment> payments) {
-        if (this.payments != null) {
-            this.payments.forEach(i -> i.setParticipation(null));
-        }
-        if (payments != null) {
-            payments.forEach(i -> i.setParticipation(this));
-        }
-        this.payments = payments;
-    }
-
-    public Participation payments(Set<Payment> payments) {
-        this.setPayments(payments);
-        return this;
-    }
-
-    public Participation addPayment(Payment payment) {
-        this.payments.add(payment);
-        payment.setParticipation(this);
-        return this;
-    }
-
-    public Participation removePayment(Payment payment) {
-        this.payments.remove(payment);
-        payment.setParticipation(null);
-        return this;
-    }
-
-    public Set<Invoice> getInvoices() {
-        return this.invoices;
-    }
-
-    public void setInvoices(Set<Invoice> invoices) {
-        if (this.invoices != null) {
-            this.invoices.forEach(i -> i.setParticipation(null));
-        }
-        if (invoices != null) {
-            invoices.forEach(i -> i.setParticipation(this));
-        }
-        this.invoices = invoices;
-    }
-
-    public Participation invoices(Set<Invoice> invoices) {
-        this.setInvoices(invoices);
-        return this;
-    }
-
-    public Participation addInvoice(Invoice invoice) {
-        this.invoices.add(invoice);
-        invoice.setParticipation(this);
-        return this;
-    }
-
-    public Participation removeInvoice(Invoice invoice) {
-        this.invoices.remove(invoice);
-        invoice.setParticipation(null);
-        return this;
-    }
-
-    public Set<Stand> getStands() {
-        return this.stands;
-    }
-
-    public void setStands(Set<Stand> stands) {
-        if (this.stands != null) {
-            this.stands.forEach(i -> i.setParticipation(null));
-        }
-        if (stands != null) {
-            stands.forEach(i -> i.setParticipation(this));
-        }
-        this.stands = stands;
-    }
-
-    public Participation stands(Set<Stand> stands) {
-        this.setStands(stands);
-        return this;
-    }
-
-    public Participation addStand(Stand stand) {
-        this.stands.add(stand);
-        stand.setParticipation(this);
-        return this;
-    }
-
-    public Participation removeStand(Stand stand) {
-        this.stands.remove(stand);
-        stand.setParticipation(null);
-        return this;
-    }
-
     public Exponent getExponent() {
         return this.exponent;
     }
@@ -372,6 +235,14 @@ public class Participation implements Serializable {
     public Participation salon(Salon salon) {
         this.setSalon(salon);
         return this;
+    }
+
+    public String getClientNumber() {
+        return clientNumber;
+    }
+
+    public void setClientNumber(String clientNumber) {
+        this.clientNumber = clientNumber;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -399,6 +270,7 @@ public class Participation implements Serializable {
         return "Participation{" +
             "id=" + getId() +
             ", registrationDate='" + getRegistrationDate() + "'" +
+            ", clientNumber='" + getClientNumber() + "'" +
             ", nbMeal1=" + getNbMeal1() +
             ", nbMeal2=" + getNbMeal2() +
             ", nbMeal3=" + getNbMeal3() +

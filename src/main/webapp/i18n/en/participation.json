@@ -23,6 +23,16 @@
         "null": " "
       }
     },
-    "title": "Les participations"
+    "title": "Les participations",
+    "type": {
+      "list": {
+        "CONFERENCE": "Conférence",
+        "ELECTRICITY": "Electricité",
+        "MEAL": "Repas",
+        "OTHERS": "Autres",
+        "SHARED": "Partagé",
+        "STAND": "Stand"
+      }
+    }
   }
 }

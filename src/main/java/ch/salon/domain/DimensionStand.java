@@ -27,14 +27,6 @@ public class DimensionStand implements Serializable {
     @Column(name = "dimension", nullable = false)
     private String dimension;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dimension")
-    @JsonIgnoreProperties(value = { "salon", "dimension" }, allowSetters = true)
-    private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dimension")
-    @JsonIgnoreProperties(value = { "participation", "dimension" }, allowSetters = true)
-    private Set<Stand> stands = new HashSet<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
@@ -61,68 +53,6 @@ public class DimensionStand implements Serializable {
 
     public void setDimension(String dimension) {
         this.dimension = dimension;
-    }
-
-    public Set<PriceStandSalon> getPriceStandSalons() {
-        return this.priceStandSalons;
-    }
-
-    public void setPriceStandSalons(Set<PriceStandSalon> priceStandSalons) {
-        if (this.priceStandSalons != null) {
-            this.priceStandSalons.forEach(i -> i.setDimension(null));
-        }
-        if (priceStandSalons != null) {
-            priceStandSalons.forEach(i -> i.setDimension(this));
-        }
-        this.priceStandSalons = priceStandSalons;
-    }
-
-    public DimensionStand priceStandSalons(Set<PriceStandSalon> priceStandSalons) {
-        this.setPriceStandSalons(priceStandSalons);
-        return this;
-    }
-
-    public DimensionStand addPriceStandSalon(PriceStandSalon priceStandSalon) {
-        this.priceStandSalons.add(priceStandSalon);
-        priceStandSalon.setDimension(this);
-        return this;
-    }
-
-    public DimensionStand removePriceStandSalon(PriceStandSalon priceStandSalon) {
-        this.priceStandSalons.remove(priceStandSalon);
-        priceStandSalon.setDimension(null);
-        return this;
-    }
-
-    public Set<Stand> getStands() {
-        return this.stands;
-    }
-
-    public void setStands(Set<Stand> stands) {
-        if (this.stands != null) {
-            this.stands.forEach(i -> i.setDimension(null));
-        }
-        if (stands != null) {
-            stands.forEach(i -> i.setDimension(this));
-        }
-        this.stands = stands;
-    }
-
-    public DimensionStand stands(Set<Stand> stands) {
-        this.setStands(stands);
-        return this;
-    }
-
-    public DimensionStand addStand(Stand stand) {
-        this.stands.add(stand);
-        stand.setDimension(this);
-        return this;
-    }
-
-    public DimensionStand removeStand(Stand stand) {
-        this.stands.remove(stand);
-        stand.setDimension(null);
-        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

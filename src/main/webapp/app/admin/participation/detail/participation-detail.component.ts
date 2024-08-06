@@ -6,15 +6,17 @@ import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'ap
 import { IParticipation } from '../participation.model';
 import { ParticipationService } from '../service/participation.service';
 import { IInvoice } from '../../../entities/invoice/invoice.model';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, map, Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
-import { ISalonStats } from '../../salon/salon.model';
 import { InvoiceService } from '../../../entities/invoice/service/invoice.service';
-import { LANGUAGES } from '../../../config/language.constants';
 import { FormsModule } from '@angular/forms';
-import FaIconBooleanPipe from '../../../shared/pipe/fa-icon-boolean.pipe';
-import FaIconColorBooleanPipe from '../../../shared/pipe/fa-icon-color-boolean.pipe';
+import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
+import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
+import { IPayment } from '../../../entities/payment/payment.model';
+import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
+import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
+import { IInvoicingPlan } from '../../../entities/invoice/invoicing-plan.model';
 
 @Component({
   standalone: true,
@@ -27,21 +29,26 @@ import FaIconColorBooleanPipe from '../../../shared/pipe/fa-icon-color-boolean.p
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
     FormsModule,
-    FaIconBooleanPipe,
-    FaIconColorBooleanPipe,
+    CheckBoolPipe,
+    ColorBoolPipe,
+    ColorLockBooleanPipe,
+    LockBooleanPipe,
   ],
 })
 export class ParticipationDetailComponent implements OnInit {
   participation = input<IParticipation | null>(null);
 
   invoices$: Observable<IInvoice[]> | undefined;
+  payments$: Observable<IPayment[]> | undefined;
+  active = 'detail';
 
   protected participationService = inject(ParticipationService);
 
-  protected invoiceService = inject(InvoiceService);
+  protected invoicingPlanService = inject(InvoiceService);
 
   ngOnInit(): void {
     this.loadInvoices();
+    this.loadPayments();
   }
 
   previousState(): void {
@@ -55,10 +62,12 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   deleteInvoice(invoice: IInvoice): void {
-    this.invoiceService.delete(invoice.id).subscribe(() => {
+    this.invoicingPlanService.delete(invoice.id).subscribe(() => {
       this.loadInvoices();
     });
   }
+
+  deletePayment(payment: IPayment): void {}
 
   totalDefault(invoices: IInvoice[]): number {
     return (
@@ -68,25 +77,42 @@ export class ParticipationDetailComponent implements OnInit {
     );
   }
 
-  totalCustom(invoices: IInvoice[]): number {
-    return (
-      invoices
-        .map(invoice => invoice.customAmount)
-        .reduce((previousValue, defaultAmount) => 0 + (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
-    );
-  }
-
-  total(invoices: IInvoice[]): number {
+  totalInvoices(invoices: IInvoice[]): number {
     return (
       invoices.map(invoice => invoice.total).reduce((previousValue, defaultAmount) => 0 + (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
     );
   }
 
+  totalPayments(payments: IPayment[]): number {
+    return (
+      payments.map(payment => payment.amount).reduce((previousValue, defaultAmount) => 0 + (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
+    );
+  }
+
   loadInvoices(): void {
-    this.invoices$ = this.participationService.getInvoices(this.participation()!.id).pipe(
-      mergeMap((invoices: HttpResponse<IInvoice[]>) => {
-        if (invoices.body) {
-          return of(invoices.body);
+    this.invoices$ = this.participationService.getInvoicingPlans(this.participation()!.id).pipe(
+      mergeMap((invoicingPlans: HttpResponse<IInvoicingPlan[]>) => {
+        if (invoicingPlans.body) {
+          const invoicingPlan = invoicingPlans.body.reduce((max, current) =>
+            current.billingNumber && max.billingNumber ? (current.billingNumber > max.billingNumber ? current : max) : current,
+          );
+          if (invoicingPlan.invoices) {
+            return of(invoicingPlan.invoices);
+          } else {
+            return EMPTY;
+          }
+        } else {
+          return EMPTY;
+        }
+      }),
+    );
+  }
+
+  loadPayments(): void {
+    this.payments$ = this.participationService.getPayments(this.participation()!.id).pipe(
+      mergeMap((payments: HttpResponse<IPayment[]>) => {
+        if (payments.body) {
+          return of(payments.body);
         }
         return EMPTY;
       }),

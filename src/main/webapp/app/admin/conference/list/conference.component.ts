@@ -10,12 +10,23 @@ import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IConference } from '../conference.model';
 import { EntityArrayResponseType, ConferenceService } from '../service/conference.service';
 import { ConferenceDeleteDialogComponent } from '../delete/conference-delete-dialog.component';
+import StatusPipe from '../../../shared/pipe/status.pipe';
+import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 
 @Component({
   standalone: true,
   selector: 'jhi-conference',
   templateUrl: './conference.component.html',
-  imports: [RouterModule, FormsModule, SharedModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
+  imports: [
+    RouterModule,
+    FormsModule,
+    SharedModule,
+    DurationPipe,
+    FormatMediumDatetimePipe,
+    FormatMediumDatePipe,
+    StatusPipe,
+    ColorStatusPipe,
+  ],
 })
 export class ConferenceComponent implements OnInit {
   subscription: Subscription | null = null;

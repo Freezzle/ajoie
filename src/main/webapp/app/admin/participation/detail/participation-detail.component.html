@@ -8,7 +8,7 @@
 
         <hr />
 
-        <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-between mt-2">
           <span>
             <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
               <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
@@ -19,123 +19,178 @@
           </button>
         </div>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="participation.exponent">Exponent</span></dt>
-          <dd>
-            @if (participation()!.exponent) {
-              <div>{{ participation()!.exponent?.fullName }}</div>
-            }
-          </dd>
-          <dt><span jhiTranslate="participation.registrationDate">Registration Date</span></dt>
-          <dd>
-            <span>{{ participation()!.registrationDate | formatMediumDate }}</span>
-          </dd>
-          <dt><span jhiTranslate="participation.isBillingClosed">Is Billing Closed</span></dt>
-          <dd>
-            <span>{{ participation()!.isBillingClosed }}</span>
-          </dd>
-          <dt><span jhiTranslate="participation.status.label">Status</span></dt>
-          <dd>
-            <span [jhiTranslate]="'participation.status.list.' + (participation()!.status ?? 'null')">{{
-              {
-                null: '',
-                REFUSED: 'REFUSED',
-                CANCELED: 'CANCELED',
-                IN_VERIFICATION: 'IN_VERIFICATION',
-                ACCEPTED: 'ACCEPTED',
-              }[participation()!.status ?? 'null']
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="participation.extraInformation">Extra Information</span></dt>
-          <dd>
-            <span>{{ participation()!.extraInformation }}</span>
-          </dd>
-        </dl>
+        <hr />
 
         <fieldset class="form-group border p-3 form-1-box">
-          <legend class="w-auto px-2">Facturation</legend>
-          <div class="table-responsive table-entities" id="entities">
+          <legend class="w-auto px-2">Détail</legend>
+          <div class="row">
+            <div class="col-sm-2 fw-bold" jhiTranslate="participation.exponent">Exposant</div>
+            <div class="col-sm-4">{{ participation()!.exponent?.fullName }}</div>
+
+            <div class="col-sm-2 fw-bold" jhiTranslate="participation.registrationDate">Date d'inscription</div>
+            <div class="col-sm-4">{{ participation()!.registrationDate | formatMediumDate }}</div>
+
+            <div class="col-sm-2 fw-bold" jhiTranslate="participation.isBillingClosed">Facturation clos ?</div>
+            <div class="col-sm-4">{{ participation()!.isBillingClosed }}</div>
+
+            <div class="col-sm-2 fw-bold" jhiTranslate="participation.status.label">Statut</div>
+            <div class="col-sm-4" jhiTranslate="{{ 'participation.status.list.' + (participation()!.status ?? 'null') }}">
+              {{
+                {
+                  null: '',
+                  REFUSED: 'REFUSED',
+                  CANCELED: 'CANCELED',
+                  IN_VERIFICATION: 'IN_VERIFICATION',
+                  ACCEPTED: 'ACCEPTED',
+                }[participation()!.status ?? 'null']
+              }}
+            </div>
+            <div class="col-sm-3 fw-bold" jhiTranslate="participation.extraInformation">Information complémentaire</div>
+            <div class="col-sm-9">{{ participation()!.extraInformation }}</div>
+          </div>
+        </fieldset>
+
+        <br />
+
+        <fieldset class="form-group border p-3 form-1-box">
+          <legend class="w-auto px-2">Factures</legend>
+          <div class="table-responsive table-entities" id="entities-invoices">
             <table class="table table-striped" aria-describedby="page-heading">
               <thead>
                 <tr>
-                  <th scope="col">
-                    <div class="d-flex">
-                      <span>Verrouillé ?</span>
-                    </div>
-                  </th>
-                  <th scope="col">
-                    <div class="d-flex">
-                      <span>Type</span>
-                    </div>
-                  </th>
-                  <th scope="col">
-                    <div class="d-flex">
-                      <span>Libellé</span>
-                    </div>
-                  </th>
-                  <th scope="col">
-                    <div class="d-flex">
-                      <span>Montant configuration</span>
-                    </div>
-                  </th>
-                  <th scope="col">
-                    <div class="d-flex">
-                      <span>Montant réel</span>
-                    </div>
-                  </th>
-                  <th scope="col">
-                    <div class="d-flex">
-                      <span>Quantité</span>
-                    </div>
-                  </th>
-                  <th scope="col">
-                    <div class="d-flex">
-                      <span>Total</span>
-                    </div>
-                  </th>
-                  <th scope="col"></th>
+                  <th class="col-auto text-center"><span>Verrouillé ?</span></th>
+                  <th class="col-auto"><span>Type</span></th>
+                  <th class="col-2"><span>Libellé</span></th>
+                  <th class="col-auto text-center"><span>Montant configuration</span></th>
+                  <th class="col-auto text-center"><span>Montant</span></th>
+                  <th class="col-auto text-center"><span>Quantité</span></th>
+                  <th class="col-auto text-center"><span>Total</span></th>
+                  <th class="col-1 text-center"><span>Extra info</span></th>
+                  <th class="col-2">&nbsp;</th>
                 </tr>
               </thead>
-              <tbody>
-                @for (invoice of invoices$ | async; track $index) {
-                  <tr data-cy="entityTable">
-                    <td>
-                      <fa-icon icon="{{ invoice.lock | faIconBoolean }}" style="{{ invoice.lock | faIconColorBoolean }}"></fa-icon>
-                    </td>
-                    <td>{{ invoice.type }}</td>
-                    <td>{{ invoice.label }}</td>
-                    <td>{{ invoice.defaultAmount }}</td>
-                    <td>{{ invoice.customAmount }}</td>
-                    <td>{{ invoice.quantity }}</td>
-                    <td>{{ invoice.total }}</td>
-                    <td>
-                      <a [routerLink]="['/admin/invoices', invoice.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                        <fa-icon icon="eye"></fa-icon>
-                        <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
-                      </a>
-
-                      <a [routerLink]="['/admin/invoices', invoice.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                        <fa-icon icon="pencil-alt"></fa-icon>
-                        <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
-                      </a>
-
-                      <button type="submit" (click)="deleteInvoice(invoice)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                        <fa-icon icon="times"></fa-icon>
-                        <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
-                      </button>
-                    </td>
+              <tbody *ngIf="invoices$ | async; let invoices">
+                @if (!invoices.length) {
+                  <tr>
+                    <td colspan="9"><span>Aucune facture trouvé</span></td>
                   </tr>
                 }
-                <tr data-cy="entityTable" *ngIf="invoices$ | async; let invoices">
-                  <td>Résultat</td>
-                  <td>&nbsp;</td>
-                  <td>-</td>
-                  <td>{{ totalDefault(invoices) }}</td>
-                  <td>{{ totalCustom(invoices) }}</td>
-                  <td>&nbsp;</td>
-                  <td>{{ total(invoices) }}</td>
-                  <td>&nbsp;</td>
+                @if (invoices.length) {
+                  @for (invoice of invoices; track $index) {
+                    <tr data-cy="entityTable">
+                      <td class="text-center">
+                        <fa-icon icon="{{ invoice.lock | lockBoolean }}" size="lg" class="{{ invoice.lock | colorLockBoolean }}"></fa-icon>
+                      </td>
+                      <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
+                      <td>{{ invoice.label }}</td>
+                      <td class="text-center">{{ invoice.defaultAmount | currency: 'CHF' }}</td>
+                      <td class="text-center">{{ invoice.customAmount | currency: 'CHF' }}</td>
+                      <td class="text-center">{{ invoice.quantity }}</td>
+                      <td class="text-center">{{ invoice.total | currency: 'CHF' }}</td>
+                      <td>{{ invoice.extraInformation }}</td>
+                      <td class="text-end">
+                        <div class="btn-group">
+                          <a
+                            [routerLink]="['/admin/invoices', invoice.id, 'view']"
+                            class="btn btn-info btn-sm"
+                            data-cy="entityDetailsButton"
+                          >
+                            <fa-icon icon="eye" title="{{ 'common.view' | translate }}"></fa-icon>
+                          </a>
+
+                          <a
+                            [routerLink]="['/admin/invoices', invoice.id, 'edit']"
+                            class="btn btn-primary btn-sm"
+                            data-cy="entityEditButton"
+                          >
+                            <fa-icon icon="pencil-alt" title="{{ 'common.edit' | translate }}"></fa-icon>
+                          </a>
+
+                          <button type="submit" (click)="deleteInvoice(invoice)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                            <fa-icon icon="times" title="{{ 'common.delete' | translate }}"></fa-icon>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                  <tr data-cy="entityTable">
+                    <td class="fw-bold">Résultat</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td class="text-center fw-bold">{{ totalDefault(invoices) | currency: 'CHF' }}</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td class="text-center fw-bold">{{ totalInvoices(invoices) | currency: 'CHF' }}</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
+
+        <br />
+
+        <fieldset class="form-group border p-3 form-1-box">
+          <legend class="w-auto px-2">Paiements</legend>
+          <div class="table-responsive table-entities" id="entities-payments">
+            <table class="table table-striped" aria-describedby="page-heading">
+              <thead>
+                <tr>
+                  <th class="col-2 text-center"><span>Date</span></th>
+                  <th class="col-1 text-center"><span>Mode</span></th>
+                  <th class="col-1 text-center"><span>Montant</span></th>
+                  <th class="col-auto text-center"><span>Extra info</span></th>
+                  <th class="col-2">&nbsp;</th>
                 </tr>
+              </thead>
+              <tbody *ngIf="payments$ | async; let payments">
+                @if (!payments.length) {
+                  <tr>
+                    <td colspan="5"><span>Aucun paiement trouvé</span></td>
+                  </tr>
+                }
+                @if (payments.length) {
+                  @for (payment of payments; track $index) {
+                    <tr data-cy="entityTable">
+                      <td class="text-center">{{ payment.billingDate | formatMediumDate }}</td>
+                      <td class="text-center">{{ payment.paymentMode }}</td>
+                      <td class="text-center">{{ payment.amount | currency: 'CHF' }}</td>
+                      <td class="text-center">{{ payment.extraInformation }}</td>
+                      <td class="text-end">
+                        <div class="btn-group">
+                          <a
+                            [routerLink]="['/admin/payments', payment.id, 'view']"
+                            class="btn btn-info btn-sm"
+                            data-cy="entityDetailsButton"
+                          >
+                            <fa-icon icon="eye" title="{{ 'common.view' | translate }}"></fa-icon>
+                          </a>
+
+                          <a
+                            [routerLink]="['/admin/payments', payment.id, 'edit']"
+                            class="btn btn-primary btn-sm"
+                            data-cy="entityEditButton"
+                          >
+                            <fa-icon icon="pencil-alt" title="{{ 'common.edit' | translate }}"></fa-icon>
+                          </a>
+
+                          <button type="submit" (click)="deletePayment(payment)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                            <fa-icon icon="times" title="{{ 'common.delete' | translate }}"></fa-icon>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                  <tr data-cy="entityTable">
+                    <td class="fw-bold">Résultat</td>
+                    <td>&nbsp;</td>
+                    <td class="text-center fw-bold">{{ totalPayments(payments) | currency: 'CHF' }}</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>

@@ -47,11 +47,11 @@
           <dd>
             <span>{{ invoice()!.extraInformation }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.invoice.participation">Participation</span></dt>
+          <dt><span jhiTranslate="salonApp.invoice.invoicingPlan">InvoicingPlan</span></dt>
           <dd>
-            @if (invoice()!.participation) {
+            @if (invoice()!.invoicingPlan) {
               <div>
-                <a [routerLink]="['/participation', invoice()!.participation?.id, 'view']">{{ invoice()!.participation?.id }}</a>
+                <a [routerLink]="['/invoicingPlan', invoice()!.invoicingPlan?.id, 'view']">{{ invoice()!.invoicingPlan?.id }}</a>
               </div>
             }
           </dd>

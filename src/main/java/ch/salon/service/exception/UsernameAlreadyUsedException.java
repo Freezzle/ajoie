@@ -1,4 +1,4 @@
-package ch.salon.service;
+package ch.salon.service.exception;
 
 public class UsernameAlreadyUsedException extends RuntimeException {
 

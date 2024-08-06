@@ -1,4 +1,5 @@
 import dayjs from 'dayjs/esm';
+import { IDimensionStand } from '../../entities/dimension-stand/dimension-stand.model';
 
 export interface ISalon {
   id: string;
@@ -11,9 +12,18 @@ export interface ISalon {
   priceConference?: number | null;
   priceSharingStand?: number | null;
   extraInformation?: string | null;
+  priceStandSalons?: IPriceStandSalon[] | null;
 }
 
 export type NewSalon = Omit<ISalon, 'id'> & { id: null };
+
+export interface IPriceStandSalon {
+  id: string;
+  price?: number | null;
+  dimension?: IDimensionStand | null;
+}
+
+export type NewPriceStandSalon = Omit<IPriceStandSalon, 'id'> & { id: null };
 
 export interface ISalonStats {
   nbStandValidated: 0;
@@ -24,8 +34,8 @@ export interface ISalonStats {
   nbMealSaturdayEvening: 0;
   nbMealSundayMidday: 0;
 
-  nbStandValidatedPaid: 0;
-  nbStandValidatedUnpaid: 0;
+  nbParticipationAcceptedPaid: 0;
+  nbParticipationAcceptedUnpaid: 0;
 
   dimensionStats: [];
 }

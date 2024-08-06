@@ -23,6 +23,10 @@ export class SalonDetailComponent implements OnInit {
   protected salonService = inject(SalonService);
 
   ngOnInit(): void {
+    this.loadStats();
+  }
+
+  loadStats(): void {
     this.stats$ = this.salonService.stats(this.salon()!.id).pipe(
       mergeMap((stats: HttpResponse<ISalonStats>) => {
         if (stats.body) {
@@ -37,7 +41,9 @@ export class SalonDetailComponent implements OnInit {
     const queryObject: any = {
       idSalon: this.salon()!.id,
     };
-    this.salonService.generate(queryObject).subscribe();
+    this.salonService.generate(queryObject).subscribe(() => {
+      this.loadStats();
+    });
   }
 
   previousState(): void {

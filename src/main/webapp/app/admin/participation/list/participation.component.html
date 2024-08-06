@@ -43,32 +43,14 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="participation.exponent">Exposant</span>
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="participation.registrationDate">Date d'inscription</span>
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="participation.needArrangment">Avec arrangement ?</span>
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="participation.isBillingClosed">Facturation clos ?</span>
-              </div>
-            </th>
-            <th scope="col">
-              <div class="d-flex">
-                <span jhiTranslate="participation.status.label">Statut</span>
-              </div>
-            </th>
-            <th scope="col"></th>
+            <th class="col-auto"><span jhiTranslate="participation.exponent">Exposant</span></th>
+            <th class="col-1 text-center"><span jhiTranslate="participation.registrationDate">Date d'inscription</span></th>
+            <th class="col-auto text-center"><span jhiTranslate="participation.needArrangment">Avec arrangement ?</span></th>
+            <th class="col-auto text-center"><span jhiTranslate="participation.acceptedChart">Charte accepté ?</span></th>
+            <th class="col-auto text-center"><span jhiTranslate="participation.acceptedContract">Contrat accepté ?</span></th>
+            <th class="col-auto text-center"><span jhiTranslate="participation.isBillingClosed">Facturation clos ?</span></th>
+            <th class="col-auto text-center"><span jhiTranslate="participation.status.label">Statut</span></th>
+            <th class="col-auto">&nbsp;</th>
           </tr>
         </thead>
         <tbody>
@@ -77,19 +59,36 @@
               <td>
                 @if (participation.exponent) {
                   <div>
-                    <a [routerLink]="['/exponent', participation.exponent.id, 'view']">{{ participation.exponent.fullName }}</a>
+                    <a [routerLink]="['/admin/exponents', participation.exponent.id, 'view']">{{ participation.exponent.fullName }}</a>
                   </div>
                 }
               </td>
-              <td>{{ participation.registrationDate | formatMediumDate }}</td>
-              <td>{{ participation.needArrangment }}</td>
-              <td>{{ participation.isBillingClosed }}</td>
-              <td [jhiTranslate]="'participation.status.list.' + (participation.status ?? 'null')">
-                {{
-                  { null: '', REFUSED: 'REFUSED', CANCELED: 'CANCELED', IN_VERIFICATION: 'IN_VERIFICATION', ACCEPTED: 'ACCEPTED' }[
-                    participation.status ?? 'null'
-                  ]
-                }}
+              <td class="text-center">{{ participation.registrationDate | formatMediumDate }}</td>
+              <td class="text-center">{{ participation.needArrangment }}</td>
+              <td class="text-center">
+                <fa-icon
+                  icon="{{ participation.acceptedChart | checkBool }}"
+                  class="{{ participation.acceptedChart | colorBool }}"
+                ></fa-icon>
+              </td>
+              <td class="text-center">
+                <fa-icon
+                  icon="{{ participation.acceptedContract | checkBool }}"
+                  class="{{ participation.acceptedContract | colorBool }}"
+                ></fa-icon>
+              </td>
+              <td class="text-center">
+                <fa-icon
+                  icon="{{ participation.isBillingClosed | checkBool }}"
+                  class="{{ participation.isBillingClosed | colorBool }}"
+                ></fa-icon>
+              </td>
+              <td class="text-center">
+                <fa-icon
+                  icon="{{ participation.status | status }}"
+                  class="{{ participation.status | colorStatus }}"
+                  title="{{ 'participation.status.list.' + participation.status | translate }}"
+                ></fa-icon>
               </td>
               <td class="text-end">
                 <div class="btn-group">

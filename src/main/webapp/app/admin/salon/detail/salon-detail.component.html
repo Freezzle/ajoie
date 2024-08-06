@@ -60,8 +60,8 @@
         <hr />
       </div>
 
-      <div class="form-2-container section-container section-container-gray-bg container row" *ngIf="stats$ | async; let stats">
-        <div class="col form-2-box wow fadeInUp">
+      <div class="row" *ngIf="stats$ | async; let stats">
+        <div class="col form-2-box">
           <div class="row">
             <div class="col-4">
               <!-- MENU DES STANDS FIELDSET -->
@@ -70,28 +70,28 @@
                 <div class="row">
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.standAccepted">Accepté</div>
                   <div class="col-2">
-                    <button class="btn btn-success">
+                    <button class="btn btn-success" style="width: 80px; font-size: 16px">
                       <span>{{ stats.nbStandValidated }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.standInVerification">En cours</div>
                   <div class="col-2">
-                    <button class="btn btn-warning">
+                    <button class="btn btn-warning" style="width: 80px; font-size: 16px">
                       <span>{{ stats.nbStandInTreatment }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.standRefused">Refusé</div>
                   <div class="col-2">
-                    <button class="btn btn-danger">
+                    <button class="btn btn-danger" style="width: 80px; font-size: 16px">
                       <span>{{ stats.nbStandRefused }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.standCanceled">Annulé</div>
                   <div class="col-2">
-                    <button class="btn btn-danger">
+                    <button class="btn btn-danger" style="width: 80px; font-size: 16px">
                       <span>{{ stats.nbStandRefused }}</span>
                     </button>
                   </div>
@@ -106,15 +106,15 @@
                 <div class="row">
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingPaid">Payé</div>
                   <div class="col-2">
-                    <button class="btn btn-success">
-                      <span>{{ stats.nbStandValidatedPaid }}</span>
+                    <button class="btn btn-success" style="width: 80px; font-size: 16px">
+                      <span>{{ stats.nbParticipationAcceptedPaid }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingUnpaid">Impayé</div>
                   <div class="col-2">
-                    <button class="btn btn-warning">
-                      <span>{{ stats.nbStandValidatedUnpaid }}</span>
+                    <button class="btn btn-warning" style="width: 80px; font-size: 16px">
+                      <span>{{ stats.nbParticipationAcceptedUnpaid }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
@@ -128,21 +128,21 @@
                 <div class="row">
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal1">Samedi midi</div>
                   <div class="col-2">
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
                       <span>{{ stats.nbMealSaturdayMidday }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal2">Samedi soir</div>
                   <div class="col-2">
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
                       <span>{{ stats.nbMealSaturdayEvening }}</span>
                     </button>
                   </div>
                   <div class="col-6">&nbsp;</div>
                   <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal3">Dimanche midi</div>
                   <div class="col-2">
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
                       <span>{{ stats.nbMealSundayMidday }}</span>
                     </button>
                   </div>

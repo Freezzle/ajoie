@@ -25,7 +25,7 @@ export class InvoiceUpdateComponent implements OnInit {
 
   participationsSharedCollection: IParticipation[] = [];
 
-  protected invoiceService = inject(InvoiceService);
+  protected invoicingPlanService = inject(InvoiceService);
   protected invoiceFormService = inject(InvoiceFormService);
   protected participationService = inject(ParticipationService);
   protected activatedRoute = inject(ActivatedRoute);
@@ -55,9 +55,9 @@ export class InvoiceUpdateComponent implements OnInit {
     this.isSaving = true;
     const invoice = this.invoiceFormService.getInvoice(this.editForm);
     if (invoice.id !== null) {
-      this.subscribeToSaveResponse(this.invoiceService.update(invoice));
+      this.subscribeToSaveResponse(this.invoicingPlanService.update(invoice));
     } else {
-      this.subscribeToSaveResponse(this.invoiceService.create(invoice));
+      this.subscribeToSaveResponse(this.invoicingPlanService.create(invoice));
     }
   }
 
@@ -86,7 +86,7 @@ export class InvoiceUpdateComponent implements OnInit {
 
     this.participationsSharedCollection = this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
       this.participationsSharedCollection,
-      invoice.participation,
+      invoice.invoicingPlan,
     );
   }
 
@@ -96,7 +96,7 @@ export class InvoiceUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) =>
-          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.invoice?.participation),
+          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.invoice?.invoicingPlan),
         ),
       )
       .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));

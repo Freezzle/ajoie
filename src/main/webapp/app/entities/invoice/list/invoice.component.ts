@@ -35,13 +35,13 @@ export class InvoiceComponent implements OnInit {
   sortState = sortStateSignal({});
 
   public router = inject(Router);
-  protected invoiceService = inject(InvoiceService);
+  protected invoicingPlanService = inject(InvoiceService);
   protected activatedRoute = inject(ActivatedRoute);
   protected sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  trackId = (_index: number, item: IInvoice): string => this.invoiceService.getInvoiceIdentifier(item);
+  trackId = (_index: number, item: IInvoice): string => this.invoicingPlanService.getInvoiceIdentifier(item);
 
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
@@ -103,7 +103,7 @@ export class InvoiceComponent implements OnInit {
     const queryObject: any = {
       sort: this.sortService.buildSortParam(this.sortState()),
     };
-    return this.invoiceService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.invoicingPlanService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(sortState: SortState): void {

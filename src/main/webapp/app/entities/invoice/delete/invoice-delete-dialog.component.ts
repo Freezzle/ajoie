@@ -15,7 +15,7 @@ import { InvoiceService } from '../service/invoice.service';
 export class InvoiceDeleteDialogComponent {
   invoice?: IInvoice;
 
-  protected invoiceService = inject(InvoiceService);
+  protected invoicingPlanService = inject(InvoiceService);
   protected activeModal = inject(NgbActiveModal);
 
   cancel(): void {
@@ -23,7 +23,7 @@ export class InvoiceDeleteDialogComponent {
   }
 
   confirmDelete(id: string): void {
-    this.invoiceService.delete(id).subscribe(() => {
+    this.invoicingPlanService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);
     });
   }
