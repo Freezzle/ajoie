@@ -86,7 +86,7 @@ export class InvoiceUpdateComponent implements OnInit {
 
     this.participationsSharedCollection = this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
       this.participationsSharedCollection,
-      invoice.invoicingPlan,
+      null,
     );
   }
 
@@ -96,7 +96,7 @@ export class InvoiceUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) =>
-          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.invoice?.invoicingPlan),
+          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, null),
         ),
       )
       .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));

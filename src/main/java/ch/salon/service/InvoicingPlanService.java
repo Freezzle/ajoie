@@ -7,6 +7,7 @@ import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,19 +20,22 @@ public class InvoicingPlanService {
     private final InvoicingPlanRepository invoicingPlanRepository;
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
+    private final MessageSource messageSource;
 
     public InvoicingPlanService(
         SalonRepository salonRepository,
         ParticipationRepository participationRepository,
         InvoicingPlanRepository invoicingPlanRepository,
         StandRepository standRepository,
-        ConferenceRepository conferenceRepository
+        ConferenceRepository conferenceRepository,
+        MessageSource messageSource
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
         this.invoicingPlanRepository = invoicingPlanRepository;
         this.standRepository = standRepository;
         this.conferenceRepository = conferenceRepository;
+        this.messageSource = messageSource;
     }
 
     public UUID create(InvoicingPlan invoicingPlan) {
@@ -46,6 +50,7 @@ public class InvoicingPlanService {
         if (invoicingPlan.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
         if (!Objects.equals(id, invoicingPlan.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
@@ -57,10 +62,42 @@ public class InvoicingPlanService {
         return invoicingPlanRepository.save(invoicingPlan);
     }
 
+    public void send(UUID idInvoicingPlan) {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository
+            .findById(idInvoicingPlan)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        // TODO : SEND BILLING BY MAIL
+        invoicingPlan.setHasBeenSent(true);
+        invoicingPlanRepository.save(invoicingPlan);
+    }
+
+    public void switchLock(UUID idInvoicingPlan, UUID idInvoice) {
+        if (idInvoicingPlan == null || idInvoice == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository
+            .findById(idInvoicingPlan)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        Invoice invoiceFound = invoicingPlan
+            .getInvoices()
+            .stream()
+            .filter(invoice -> invoice.getId().equals(idInvoice))
+            .findFirst()
+            .orElseThrow();
+        invoiceFound.setLock(!invoiceFound.getLock());
+        invoicingPlanRepository.save(invoicingPlan);
+    }
+
     public List<InvoicingPlan> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
             List<InvoicingPlan> invoicingPlans = invoicingPlanRepository.findByParticipationId(UUID.fromString(idParticipation));
-            invoicingPlans.sort(Comparator.comparing(InvoicingPlan::getBillingNumber));
+            invoicingPlans.sort(Comparator.comparing(InvoicingPlan::getBillingNumber).reversed());
             return invoicingPlans;
         }
 
@@ -81,125 +118,179 @@ public class InvoicingPlanService {
         }
 
         Participation participation = participationRepository.findById(UUID.fromString(idParticipation)).orElseThrow();
-
         if (participation.getIsBillingClosed()) {
             return;
         }
 
-        List<InvoicingPlan> invoicings = invoicingPlanRepository.findByParticipationId(participation.getId());
+        final InvoicingPlan lastPlan = invoicingPlanRepository
+            .findByParticipationId(participation.getId())
+            .stream()
+            .max(Comparator.comparing(InvoicingPlan::getBillingNumber))
+            .orElse(null);
 
-        final InvoicingPlan invoicingPlanToCreate = new InvoicingPlan();
-        if (invoicings != null && !invoicings.isEmpty()) {
-            InvoicingPlan lastPlan = invoicings
-                .stream()
-                .max(Comparator.comparingInt(invoicing -> Integer.parseInt(invoicing.getBillingNumber())))
-                .orElseThrow();
-            invoicingPlanToCreate.setBillingNumber(incrementBillingNumber(lastPlan.getBillingNumber()));
+        InvoicingPlan currentInvoicingPlan;
+        Set<Invoice> lockedInvoices = new HashSet<>();
+
+        if (lastPlan == null) {
+            currentInvoicingPlan = new InvoicingPlan();
+            currentInvoicingPlan.setParticipation(participation);
+            currentInvoicingPlan.setBillingNumber(participation.getClientNumber() + "-" + "001");
+        } else if (lastPlan.isHasBeenSent()) {
+            currentInvoicingPlan = new InvoicingPlan();
+            currentInvoicingPlan.setParticipation(participation);
+            currentInvoicingPlan.setBillingNumber(incrementBillingNumber(lastPlan.getBillingNumber()));
+            copyLockedInvoices(lastPlan, lockedInvoices);
         } else {
-            invoicingPlanToCreate.setBillingNumber(participation.getClientNumber() + "-" + "001");
+            currentInvoicingPlan = lastPlan;
+            copyLockedInvoices(lastPlan, lockedInvoices);
         }
 
-        invoicingPlanToCreate.setParticipation(participation);
-        invoicingPlanToCreate.setInvoices(new HashSet<>());
-        invoicingPlanToCreate.setGenerationDate(Instant.now());
-        invoicingPlanToCreate.setHasBeenSent(false);
+        currentInvoicingPlan.setGenerationDate(Instant.now());
 
         Salon salon = salonRepository.findById(participation.getSalon().getId()).orElseThrow();
 
-        standRepository
-            .findByParticipationId(participation.getId())
-            .forEach(stand -> {
-                if (stand.getDimension() != null) {
-                    Double priceStandSalon = salon
-                        .getPriceStandSalons()
-                        .stream()
-                        .filter(priceStand -> priceStand.getDimension().getId().equals(stand.getDimension().getId()))
-                        .findFirst()
-                        .map(PriceStandSalon::getPrice)
-                        .orElse((double) 0);
+        List<Stand> stands = standRepository.findByParticipationId(participation.getId());
+        removeObsoleteStandInvoices(lockedInvoices, stands);
+        stands.forEach(stand -> processStand(stand, salon, lockedInvoices));
 
-                    createInvoice(
-                        invoicingPlanToCreate,
-                        stand.getId(),
-                        Type.STAND,
-                        stand.getDimension().getDimension(),
-                        1L,
-                        priceStandSalon
-                    );
-                }
+        List<Conference> conferences = conferenceRepository.findByParticipationId(participation.getId());
+        removeObsoleteConferenceInvoices(lockedInvoices, conferences);
+        conferences.forEach(conference -> processConference(conference, salon, lockedInvoices));
 
-                if (stand.getShared()) {
-                    createInvoice(
-                        invoicingPlanToCreate,
-                        stand.getId(),
-                        Type.SHARED,
-                        stand.getDimension().getDimension(),
-                        1L,
-                        salon.getPriceSharingStand() != null ? salon.getPriceSharingStand() : 0
-                    );
-                }
-            });
+        processMeals(participation, salon, lockedInvoices);
 
-        conferenceRepository
-            .findByParticipationId(participation.getId())
-            .forEach(conference -> {
-                createInvoice(
-                    invoicingPlanToCreate,
-                    conference.getId(),
-                    Type.CONFERENCE,
-                    conference.getTitle(),
-                    1L,
-                    salon.getPriceConference() != null ? salon.getPriceConference() : 0
-                );
-            });
+        currentInvoicingPlan.getInvoices().clear();
+        lockedInvoices.forEach(currentInvoicingPlan::addInvoice);
 
-        Long meal1 = participation.getNbMeal1();
-        if (meal1 != null && meal1 > 0) {
-            createInvoice(
-                invoicingPlanToCreate,
-                null,
-                Type.MEAL,
-                "Samedi midi",
-                meal1,
-                salon.getPriceMeal1() != null ? salon.getPriceMeal1() : 0
-            );
-        }
-
-        Long meal2 = participation.getNbMeal2();
-        if (meal2 != null && meal2 > 0) {
-            createInvoice(
-                invoicingPlanToCreate,
-                null,
-                Type.MEAL,
-                "Samedi soir",
-                meal2,
-                salon.getPriceMeal2() != null ? salon.getPriceMeal2() : 0
-            );
-        }
-
-        Long meal3 = participation.getNbMeal3();
-        if (meal3 != null && meal3 > 0) {
-            createInvoice(
-                invoicingPlanToCreate,
-                null,
-                Type.MEAL,
-                "Samedi soir",
-                meal3,
-                salon.getPriceMeal3() != null ? salon.getPriceMeal3() : 0
-            );
-        }
-
-        invoicingPlanRepository.save(invoicingPlanToCreate);
+        invoicingPlanRepository.save(currentInvoicingPlan);
     }
 
-    private void createInvoice(
-        InvoicingPlan invoicingPlan,
+    private void copyLockedInvoices(InvoicingPlan plan, Set<Invoice> lockedInvoices) {
+        plan
+            .getInvoices()
+            .forEach(invoice -> {
+                if (invoice.getLock()) {
+                    lockedInvoices.add(new Invoice(invoice));
+                }
+            });
+    }
+
+    private void removeObsoleteStandInvoices(Set<Invoice> lockedInvoices, List<Stand> stands) {
+        lockedInvoices.removeIf(
+            invoice ->
+                (invoice.getType() == Type.STAND || invoice.getType() == Type.SHARED) &&
+                stands.stream().map(Stand::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
+        );
+    }
+
+    private void processStand(Stand stand, Salon salon, Set<Invoice> lockedInvoices) {
+        Double defaultPrice = stand.getDimension() == null
+            ? 0
+            : salon
+                .getPriceStandSalons()
+                .stream()
+                .filter(priceStand -> priceStand.getDimension().getId().equals(stand.getDimension().getId()))
+                .findFirst()
+                .map(PriceStandSalon::getPrice)
+                .orElse(0.0);
+
+        updateOrCreateInvoice(
+            lockedInvoices,
+            stand.getId(),
+            Type.STAND,
+            stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
+            1L,
+            defaultPrice
+        );
+
+        if (stand.getShared()) {
+            updateOrCreateInvoice(
+                lockedInvoices,
+                stand.getId(),
+                Type.SHARED,
+                stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
+                1L,
+                salon.getPriceSharingStand()
+            );
+        }
+    }
+
+    private void removeObsoleteConferenceInvoices(Set<Invoice> lockedInvoices, List<Conference> conferences) {
+        lockedInvoices.removeIf(
+            invoice ->
+                invoice.getType() == Type.CONFERENCE &&
+                conferences.stream().map(Conference::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
+        );
+    }
+
+    private void processConference(Conference conference, Salon salon, Set<Invoice> lockedInvoices) {
+        updateOrCreateInvoice(lockedInvoices, conference.getId(), Type.CONFERENCE, conference.getTitle(), 1L, salon.getPriceConference());
+    }
+
+    private void processMeals(Participation participation, Salon salon, Set<Invoice> lockedInvoices) {
+        processMeal(
+            Type.MEAL1,
+            participation.getNbMeal1(),
+            messageSource.getMessage("saturday.midday", null, Locale.FRENCH),
+            salon.getPriceMeal1(),
+            lockedInvoices
+        );
+        processMeal(
+            Type.MEAL2,
+            participation.getNbMeal2(),
+            messageSource.getMessage("saturday.evening", null, Locale.FRENCH),
+            salon.getPriceMeal2(),
+            lockedInvoices
+        );
+        processMeal(
+            Type.MEAL3,
+            participation.getNbMeal3(),
+            messageSource.getMessage("sunday.midday", null, Locale.FRENCH),
+            salon.getPriceMeal3(),
+            lockedInvoices
+        );
+    }
+
+    private void processMeal(Type type, Long mealCount, String description, Double price, Set<Invoice> lockedInvoices) {
+        if (mealCount != null && mealCount > 0) {
+            Invoice invoiceMealLocked = lockedInvoices
+                .stream()
+                .filter(invoice -> invoice.getType() == type && invoice.getLock())
+                .findFirst()
+                .orElse(null);
+            if (invoiceMealLocked != null) {
+                invoiceMealLocked.setDefaultAmount(price);
+                invoiceMealLocked.setQuantity(mealCount);
+                invoiceMealLocked.setTotal(invoiceMealLocked.getCustomAmount() * mealCount);
+            } else {
+                lockedInvoices.add(createInvoice(null, type, description, mealCount, price));
+            }
+        } else {
+            lockedInvoices.removeIf(invoice -> invoice.getType() == type);
+        }
+    }
+
+    private void updateOrCreateInvoice(
+        Set<Invoice> lockedInvoices,
         UUID referenceId,
         Type type,
-        String label,
+        String description,
         Long quantity,
         Double defaultAmount
     ) {
+        Invoice lockedInvoice = lockedInvoices
+            .stream()
+            .filter(invoice -> invoice.getType() == type && invoice.getReferenceId().equals(referenceId))
+            .findFirst()
+            .orElse(null);
+        if (lockedInvoice != null) {
+            lockedInvoice.setDefaultAmount(defaultAmount);
+        } else {
+            lockedInvoices.add(createInvoice(referenceId, type, description, quantity, defaultAmount));
+        }
+    }
+
+    private Invoice createInvoice(UUID referenceId, Type type, String label, Long quantity, Double defaultAmount) {
         Invoice invoice = new Invoice();
         invoice.setReferenceId(referenceId);
         invoice.setLock(false);
@@ -210,14 +301,16 @@ public class InvoicingPlanService {
         invoice.setDefaultAmount(defaultAmount);
         invoice.setCustomAmount(defaultAmount);
         invoice.setTotal(defaultAmount * quantity);
-        invoicingPlan.addInvoice(invoice);
+
+        return invoice;
     }
 
     private String incrementBillingNumber(String billingNumber) {
         // Séparer les deux parties
         String[] parts = billingNumber.split("-");
-        String prefix = parts[0];
-        String numberPart = parts[1];
+        String prefix1 = parts[0];
+        String prefix2 = parts[1];
+        String numberPart = parts[2];
 
         // Convertir la partie numérique après le tiret en entier
         int number = Integer.parseInt(numberPart);
@@ -229,7 +322,7 @@ public class InvoicingPlanService {
         String newNumberPart = String.format("%03d", number);
 
         // Assembler le nouveau numéro
-        return prefix + "-" + newNumberPart;
+        return prefix1 + "-" + prefix2 + "-" + newNumberPart;
     }
 
     private String sub(String chaine) {

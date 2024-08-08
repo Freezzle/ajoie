@@ -3,6 +3,7 @@ import { IDimensionStand } from '../../entities/dimension-stand/dimension-stand.
 
 export interface ISalon {
   id: string;
+  referenceNumber?: number | null;
   place?: string | null;
   startingDate?: dayjs.Dayjs | null;
   endingDate?: dayjs.Dayjs | null;

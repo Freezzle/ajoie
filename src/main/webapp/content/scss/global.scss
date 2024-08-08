@@ -324,3 +324,22 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .green-icon {
   color: darkseagreen;
 }
+
+.card-header {
+  background-color: #2b4f74;
+  color: white;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #2b4f74;
+  color: white;
+}
+
+.accordion-button.collapsed {
+  background-color: #2c6e89;
+  color: white;
+}
+
+.card-body {
+  border: 1px solid #2b4f74;
+}

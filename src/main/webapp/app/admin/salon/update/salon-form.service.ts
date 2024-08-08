@@ -21,6 +21,7 @@ type SalonFormDefaults = Pick<NewSalon, 'id' | 'startingDate' | 'endingDate'>;
 
 type SalonFormGroupContent = {
   id: FormControl<SalonFormRawValue['id'] | NewSalon['id']>;
+  referenceNumber: FormControl<SalonFormRawValue['referenceNumber']>;
   place: FormControl<SalonFormRawValue['place']>;
   startingDate: FormControl<SalonFormRawValue['startingDate']>;
   endingDate: FormControl<SalonFormRawValue['endingDate']>;
@@ -49,6 +50,9 @@ export class SalonFormService {
           validators: [Validators.required],
         },
       ),
+      referenceNumber: new FormControl(salonRawValue.referenceNumber, {
+        validators: [Validators.required],
+      }),
       place: new FormControl(salonRawValue.place, {
         validators: [Validators.required],
       }),

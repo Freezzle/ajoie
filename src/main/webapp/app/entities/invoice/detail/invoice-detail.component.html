@@ -47,14 +47,6 @@
           <dd>
             <span>{{ invoice()!.extraInformation }}</span>
           </dd>
-          <dt><span jhiTranslate="salonApp.invoice.invoicingPlan">InvoicingPlan</span></dt>
-          <dd>
-            @if (invoice()!.invoicingPlan) {
-              <div>
-                <a [routerLink]="['/invoicingPlan', invoice()!.invoicingPlan?.id, 'view']">{{ invoice()!.invoicingPlan?.id }}</a>
-              </div>
-            }
-          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

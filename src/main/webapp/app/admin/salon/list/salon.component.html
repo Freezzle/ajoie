@@ -47,6 +47,7 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr>
+            <th><span jhiTranslate="salon.referenceNumber">N° de référence</span></th>
             <th><span jhiTranslate="salon.place">Place</span></th>
             <th class="text-center"><span jhiTranslate="salon.startingDate">Starting Date</span></th>
             <th class="text-center"><span jhiTranslate="salon.endingDate">Ending Date</span></th>
@@ -56,6 +57,7 @@
         <tbody>
           @for (salon of salons; track $index) {
             <tr data-cy="entityTable">
+              <td>{{ salon.referenceNumber }}</td>
               <td>{{ salon.place }}</td>
               <td class="text-center">{{ salon.startingDate | formatMediumDate }}</td>
               <td class="text-center">{{ salon.endingDate | formatMediumDate }}</td>

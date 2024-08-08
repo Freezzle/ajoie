@@ -70,6 +70,19 @@ public class InvoicingPlanResource {
         invoicingPlanService.generateInvoicingPlan(idParticipation);
     }
 
+    @PatchMapping("{id}/send")
+    public void switchLock(@PathVariable(value = "id", required = false) final UUID id) {
+        invoicingPlanService.send(id);
+    }
+
+    @PatchMapping("{id}/invoices/{idInvoice}/lock")
+    public void switchLock(
+        @PathVariable(value = "id", required = false) final UUID id,
+        @PathVariable(name = "idInvoice", required = false) UUID idInvoice
+    ) {
+        invoicingPlanService.switchLock(id, idInvoice);
+    }
+
     @GetMapping("")
     public List<InvoicingPlan> getAllInvoicingPlans(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all InvoicingPlans");

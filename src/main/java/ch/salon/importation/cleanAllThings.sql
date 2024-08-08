@@ -4,7 +4,7 @@ DELETE FROM price_stand_salon;
 DELETE FROM dimension_stand;
 DELETE FROM payment;
 DELETE FROM invoice;
-DELETE FROM invoice_plan;
+DELETE FROM invoicing_plan;
 DELETE FROM participation;
 DELETE FROM exponent;
 DELETE FROM salon;

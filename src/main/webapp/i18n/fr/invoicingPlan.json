@@ -1,0 +1,8 @@
+{
+  "invoicingPlan": {
+    "hasBeenSent": "Facture envoyé ?",
+    "notSent": "Facture non envoyé",
+    "send": "Envoyer facture",
+    "sent": "Facture envoyé"
+  }
+}

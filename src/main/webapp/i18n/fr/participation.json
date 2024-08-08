@@ -28,7 +28,9 @@
       "list": {
         "CONFERENCE": "Conférence",
         "ELECTRICITY": "Electricité",
-        "MEAL": "Repas",
+        "MEAL1": "Repas",
+        "MEAL2": "Repas",
+        "MEAL3": "Repas",
         "OTHERS": "Autres",
         "SHARED": "Partagé",
         "STAND": "Stand"

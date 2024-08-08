@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
 import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
-import { IParticipation } from '../participation.model';
+import { IInvoicingPlan, IParticipation } from '../participation.model';
 import { ParticipationService } from '../service/participation.service';
 import { IInvoice } from '../../../entities/invoice/invoice.model';
 import { EMPTY, map, Observable, of } from 'rxjs';
@@ -16,7 +16,7 @@ import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import { IPayment } from '../../../entities/payment/payment.model';
 import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
 import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
-import { IInvoicingPlan } from '../../../entities/invoice/invoicing-plan.model';
+import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
 
 @Component({
   standalone: true,
@@ -33,12 +33,13 @@ import { IInvoicingPlan } from '../../../entities/invoice/invoicing-plan.model';
     ColorBoolPipe,
     ColorLockBooleanPipe,
     LockBooleanPipe,
+    SendBooleanPipe,
   ],
 })
 export class ParticipationDetailComponent implements OnInit {
   participation = input<IParticipation | null>(null);
 
-  invoices$: Observable<IInvoice[]> | undefined;
+  invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
   payments$: Observable<IPayment[]> | undefined;
   active = 'detail';
 
@@ -57,6 +58,18 @@ export class ParticipationDetailComponent implements OnInit {
 
   generate(): void {
     this.participationService.generateInvoices(this.participation()!.id).subscribe(() => {
+      this.loadInvoices();
+    });
+  }
+
+  switchLock(idInvoicingPlan: string, idInvoice: string): void {
+    this.participationService.switchLock(idInvoicingPlan, idInvoice).subscribe(() => {
+      this.loadInvoices();
+    });
+  }
+
+  sendInvoicingPlan(idInvoicingPlan: string): void {
+    this.participationService.sendInvoicingPlan(idInvoicingPlan).subscribe(() => {
       this.loadInvoices();
     });
   }
@@ -90,17 +103,10 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   loadInvoices(): void {
-    this.invoices$ = this.participationService.getInvoicingPlans(this.participation()!.id).pipe(
+    this.invoicingPlans$ = this.participationService.getInvoicingPlans(this.participation()!.id).pipe(
       mergeMap((invoicingPlans: HttpResponse<IInvoicingPlan[]>) => {
         if (invoicingPlans.body) {
-          const invoicingPlan = invoicingPlans.body.reduce((max, current) =>
-            current.billingNumber && max.billingNumber ? (current.billingNumber > max.billingNumber ? current : max) : current,
-          );
-          if (invoicingPlan.invoices) {
-            return of(invoicingPlan.invoices);
-          } else {
-            return EMPTY;
-          }
+          return of(invoicingPlans.body);
         } else {
           return EMPTY;
         }

@@ -9,6 +9,10 @@
       "fieldType": "UUID"
     },
     {
+      "fieldName": "referenceNumber",
+      "fieldType": "Long"
+    },
+    {
       "fieldName": "place",
       "fieldType": "String",
       "fieldValidateRules": ["required"]

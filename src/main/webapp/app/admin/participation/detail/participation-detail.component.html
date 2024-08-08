@@ -14,187 +14,276 @@
               <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
             </button>
           </span>
-          <button class="btn btn-primary btn-sm" (click)="generate()">
-            <span jhiTranslate="common.generate">Générer</span>
-          </button>
         </div>
 
         <hr />
 
-        <fieldset class="form-group border p-3 form-1-box">
-          <legend class="w-auto px-2">Détail</legend>
-          <div class="row">
-            <div class="col-sm-2 fw-bold" jhiTranslate="participation.exponent">Exposant</div>
-            <div class="col-sm-4">{{ participation()!.exponent?.fullName }}</div>
+        <div class="card">
+          <h5 class="card-header">Détail</h5>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-2 fw-bold" jhiTranslate="participation.exponent">Exposant</div>
+              <div class="col-sm-4">{{ participation()!.exponent?.fullName }}</div>
 
-            <div class="col-sm-2 fw-bold" jhiTranslate="participation.registrationDate">Date d'inscription</div>
-            <div class="col-sm-4">{{ participation()!.registrationDate | formatMediumDate }}</div>
+              <div class="col-sm-2 fw-bold" jhiTranslate="participation.registrationDate">Date d'inscription</div>
+              <div class="col-sm-4">{{ participation()!.registrationDate | formatMediumDate }}</div>
 
-            <div class="col-sm-2 fw-bold" jhiTranslate="participation.isBillingClosed">Facturation clos ?</div>
-            <div class="col-sm-4">{{ participation()!.isBillingClosed }}</div>
+              <div class="col-sm-2 fw-bold" jhiTranslate="participation.isBillingClosed">Facturation clos ?</div>
+              <div class="col-sm-4">{{ participation()!.isBillingClosed }}</div>
 
-            <div class="col-sm-2 fw-bold" jhiTranslate="participation.status.label">Statut</div>
-            <div class="col-sm-4" jhiTranslate="{{ 'participation.status.list.' + (participation()!.status ?? 'null') }}">
-              {{
-                {
-                  null: '',
-                  REFUSED: 'REFUSED',
-                  CANCELED: 'CANCELED',
-                  IN_VERIFICATION: 'IN_VERIFICATION',
-                  ACCEPTED: 'ACCEPTED',
-                }[participation()!.status ?? 'null']
-              }}
+              <div class="col-sm-2 fw-bold" jhiTranslate="participation.status.label">Statut</div>
+              <div class="col-sm-4" jhiTranslate="{{ 'participation.status.list.' + (participation()!.status ?? 'null') }}">
+                {{
+                  {
+                    null: '',
+                    REFUSED: 'REFUSED',
+                    CANCELED: 'CANCELED',
+                    IN_VERIFICATION: 'IN_VERIFICATION',
+                    ACCEPTED: 'ACCEPTED',
+                  }[participation()!.status ?? 'null']
+                }}
+              </div>
+              <div class="col-sm-3 fw-bold" jhiTranslate="participation.extraInformation">Information complémentaire</div>
+              <div class="col-sm-9">{{ participation()!.extraInformation }}</div>
             </div>
-            <div class="col-sm-3 fw-bold" jhiTranslate="participation.extraInformation">Information complémentaire</div>
-            <div class="col-sm-9">{{ participation()!.extraInformation }}</div>
           </div>
-        </fieldset>
+        </div>
 
         <br />
 
-        <fieldset class="form-group border p-3 form-1-box">
-          <legend class="w-auto px-2">Factures</legend>
-          <div class="table-responsive table-entities" id="entities-invoices">
-            <table class="table table-striped" aria-describedby="page-heading">
-              <thead>
-                <tr>
-                  <th class="col-auto text-center"><span>Verrouillé ?</span></th>
-                  <th class="col-auto"><span>Type</span></th>
-                  <th class="col-2"><span>Libellé</span></th>
-                  <th class="col-auto text-center"><span>Montant configuration</span></th>
-                  <th class="col-auto text-center"><span>Montant</span></th>
-                  <th class="col-auto text-center"><span>Quantité</span></th>
-                  <th class="col-auto text-center"><span>Total</span></th>
-                  <th class="col-1 text-center"><span>Extra info</span></th>
-                  <th class="col-2">&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody *ngIf="invoices$ | async; let invoices">
-                @if (!invoices.length) {
-                  <tr>
-                    <td colspan="9"><span>Aucune facture trouvé</span></td>
-                  </tr>
-                }
-                @if (invoices.length) {
-                  @for (invoice of invoices; track $index) {
-                    <tr data-cy="entityTable">
-                      <td class="text-center">
-                        <fa-icon icon="{{ invoice.lock | lockBoolean }}" size="lg" class="{{ invoice.lock | colorLockBoolean }}"></fa-icon>
-                      </td>
-                      <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
-                      <td>{{ invoice.label }}</td>
-                      <td class="text-center">{{ invoice.defaultAmount | currency: 'CHF' }}</td>
-                      <td class="text-center">{{ invoice.customAmount | currency: 'CHF' }}</td>
-                      <td class="text-center">{{ invoice.quantity }}</td>
-                      <td class="text-center">{{ invoice.total | currency: 'CHF' }}</td>
-                      <td>{{ invoice.extraInformation }}</td>
-                      <td class="text-end">
-                        <div class="btn-group">
-                          <a
-                            [routerLink]="['/admin/invoices', invoice.id, 'view']"
-                            class="btn btn-info btn-sm"
-                            data-cy="entityDetailsButton"
-                          >
-                            <fa-icon icon="eye" title="{{ 'common.view' | translate }}"></fa-icon>
-                          </a>
-
-                          <a
-                            [routerLink]="['/admin/invoices', invoice.id, 'edit']"
-                            class="btn btn-primary btn-sm"
-                            data-cy="entityEditButton"
-                          >
-                            <fa-icon icon="pencil-alt" title="{{ 'common.edit' | translate }}"></fa-icon>
-                          </a>
-
-                          <button type="submit" (click)="deleteInvoice(invoice)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                            <fa-icon icon="times" title="{{ 'common.delete' | translate }}"></fa-icon>
-                          </button>
+        <div class="card">
+          <h5 class="card-header">Facturations</h5>
+          <div class="card-body">
+            <div class="col" *ngIf="!participation()?.isBillingClosed">
+              <div class="d-flex justify-content-end mb-3">
+                <div>
+                  <button class="btn btn-primary btn-sm" (click)="generate()">
+                    <span jhiTranslate="common.refresh">Rafraichir</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive table-entities" id="entities-invoices">
+              <div class="accordion" id="facturations">
+                @for (invoicingPlan of invoicingPlans$ | async; track $index) {
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" [id]="'heading' + $index">
+                      <button
+                        class="accordion-button"
+                        [ngClass]="{ collapsed: $index != 0 }"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        [attr.data-bs-target]="'#collapse' + $index"
+                        aria-expanded="true"
+                        [attr.aria-controls]="'collapse' + $index"
+                      >
+                        <div class="col">
+                          <div class="row">
+                            <div class="col-4 text-left">{{ invoicingPlan.billingNumber }}</div>
+                            <div class="col-4 text-center">{{ invoicingPlan.generationDate | formatMediumDate }}</div>
+                            <div class="col-4 pe-5 text-end">
+                              <fa-icon
+                                icon="{{ invoicingPlan.hasBeenSent | sendBoolean }}"
+                                size="lg"
+                                [title]="(invoicingPlan.hasBeenSent ? 'invoicingPlan.sent' : 'invoicingPlan.notSent') | translate"
+                                class="{{ invoicingPlan.hasBeenSent | colorBool }}"
+                              ></fa-icon>
+                            </div>
+                          </div>
                         </div>
-                      </td>
-                    </tr>
-                  }
-                  <tr data-cy="entityTable">
-                    <td class="fw-bold">Résultat</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                    <td class="text-center fw-bold">{{ totalDefault(invoices) | currency: 'CHF' }}</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                    <td class="text-center fw-bold">{{ totalInvoices(invoices) | currency: 'CHF' }}</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                  </tr>
+                      </button>
+                    </h2>
+                    <div
+                      [id]="'collapse' + $index"
+                      class="accordion-collapse collapse"
+                      [ngClass]="{ show: $index == 0 }"
+                      [attr.aria-labelledby]="'heading' + $index"
+                      data-bs-parent="#facturations"
+                    >
+                      <div class="col" *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed">
+                        <div class="d-flex justify-content-end mt-3 me-3">
+                          <div>
+                            <button class="btn btn-warning btn-sm" (click)="sendInvoicingPlan(invoicingPlan.id)">
+                              <span jhiTranslate="invoicingPlan.send">Envoyer facture</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="accordion-body">
+                        <table class="table table-striped" aria-describedby="page-heading">
+                          <thead>
+                            <tr>
+                              <th class="col-auto text-center"><span>Verrouillé ?</span></th>
+                              <th class="col-auto"><span>Type</span></th>
+                              <th class="col-2"><span>Libellé</span></th>
+                              <th class="col-auto text-center"><span>Montant configuration</span></th>
+                              <th class="col-auto text-center"><span>Montant</span></th>
+                              <th class="col-auto text-center"><span>Quantité</span></th>
+                              <th class="col-auto text-center"><span>Total</span></th>
+                              <th class="col-1 text-center"><span>Extra info</span></th>
+                              <th class="col-2">&nbsp;</th>
+                            </tr>
+                          </thead>
+                          <tbody *ngIf="invoicingPlan.invoices; let invoices">
+                            @if (!invoices.length) {
+                              <tr>
+                                <td colspan="9"><span>Aucune facture trouvé</span></td>
+                              </tr>
+                            }
+                            @if (invoices.length) {
+                              @for (invoice of invoices; track $index) {
+                                <tr data-cy="entityTable">
+                                  <td class="text-center" *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed">
+                                    <fa-icon
+                                      icon="{{ invoice.lock | lockBoolean }}"
+                                      size="lg"
+                                      class="{{ invoice.lock | colorLockBoolean }}"
+                                      (click)="switchLock(invoicingPlan.id, invoice.id)"
+                                    ></fa-icon>
+                                  </td>
+                                  <td class="text-center" *ngIf="invoicingPlan.hasBeenSent || participation()?.isBillingClosed">
+                                    <fa-icon
+                                      icon="{{ invoice.lock | lockBoolean }}"
+                                      size="lg"
+                                      class="{{ invoice.lock | colorLockBoolean }}"
+                                      disabled
+                                    ></fa-icon>
+                                  </td>
+                                  <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
+                                  <td>{{ invoice.label }}</td>
+                                  <td class="text-center">{{ invoice.defaultAmount | currency: 'CHF' }}</td>
+                                  <td class="text-center">{{ invoice.customAmount | currency: 'CHF' }}</td>
+                                  <td class="text-center">{{ invoice.quantity }}</td>
+                                  <td class="text-center">{{ invoice.total | currency: 'CHF' }}</td>
+                                  <td>{{ invoice.extraInformation }}</td>
+                                  <td class="text-end">
+                                    <div class="btn-group">
+                                      <a
+                                        [routerLink]="['/admin/invoices', invoice.id, 'view']"
+                                        class="btn btn-info btn-sm"
+                                        data-cy="entityDetailsButton"
+                                        *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed"
+                                      >
+                                        <fa-icon icon="eye" title="{{ 'common.view' | translate }}"></fa-icon>
+                                      </a>
+
+                                      <a
+                                        [routerLink]="['/admin/invoices', invoice.id, 'edit']"
+                                        class="btn btn-primary btn-sm"
+                                        data-cy="entityEditButton"
+                                        *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed"
+                                      >
+                                        <fa-icon icon="pencil-alt" title="{{ 'common.edit' | translate }}"></fa-icon>
+                                      </a>
+
+                                      <button
+                                        type="submit"
+                                        (click)="deleteInvoice(invoice)"
+                                        class="btn btn-danger btn-sm"
+                                        data-cy="entityDeleteButton"
+                                        *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed"
+                                      >
+                                        <fa-icon icon="times" title="{{ 'common.delete' | translate }}"></fa-icon>
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              }
+                              <tr data-cy="entityTable">
+                                <td class="fw-bold">Résultat</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td class="text-center fw-bold">{{ totalDefault(invoices) | currency: 'CHF' }}</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td class="text-center fw-bold">{{ totalInvoices(invoices) | currency: 'CHF' }}</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
                 }
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
-        </fieldset>
+        </div>
 
         <br />
 
-        <fieldset class="form-group border p-3 form-1-box">
-          <legend class="w-auto px-2">Paiements</legend>
-          <div class="table-responsive table-entities" id="entities-payments">
-            <table class="table table-striped" aria-describedby="page-heading">
-              <thead>
-                <tr>
-                  <th class="col-2 text-center"><span>Date</span></th>
-                  <th class="col-1 text-center"><span>Mode</span></th>
-                  <th class="col-1 text-center"><span>Montant</span></th>
-                  <th class="col-auto text-center"><span>Extra info</span></th>
-                  <th class="col-2">&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody *ngIf="payments$ | async; let payments">
-                @if (!payments.length) {
+        <div class="card">
+          <h5 class="card-header">Paiements</h5>
+          <div class="card-body">
+            <div class="table-responsive table-entities" id="entities-payments">
+              <table class="table table-striped" aria-describedby="page-heading">
+                <thead>
                   <tr>
-                    <td colspan="5"><span>Aucun paiement trouvé</span></td>
+                    <th class="col-2 text-center"><span>Date</span></th>
+                    <th class="col-1 text-center"><span>Mode</span></th>
+                    <th class="col-1 text-center"><span>Montant</span></th>
+                    <th class="col-auto text-center"><span>Extra info</span></th>
+                    <th class="col-2">&nbsp;</th>
                   </tr>
-                }
-                @if (payments.length) {
-                  @for (payment of payments; track $index) {
-                    <tr data-cy="entityTable">
-                      <td class="text-center">{{ payment.billingDate | formatMediumDate }}</td>
-                      <td class="text-center">{{ payment.paymentMode }}</td>
-                      <td class="text-center">{{ payment.amount | currency: 'CHF' }}</td>
-                      <td class="text-center">{{ payment.extraInformation }}</td>
-                      <td class="text-end">
-                        <div class="btn-group">
-                          <a
-                            [routerLink]="['/admin/payments', payment.id, 'view']"
-                            class="btn btn-info btn-sm"
-                            data-cy="entityDetailsButton"
-                          >
-                            <fa-icon icon="eye" title="{{ 'common.view' | translate }}"></fa-icon>
-                          </a>
-
-                          <a
-                            [routerLink]="['/admin/payments', payment.id, 'edit']"
-                            class="btn btn-primary btn-sm"
-                            data-cy="entityEditButton"
-                          >
-                            <fa-icon icon="pencil-alt" title="{{ 'common.edit' | translate }}"></fa-icon>
-                          </a>
-
-                          <button type="submit" (click)="deletePayment(payment)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                            <fa-icon icon="times" title="{{ 'common.delete' | translate }}"></fa-icon>
-                          </button>
-                        </div>
-                      </td>
+                </thead>
+                <tbody *ngIf="payments$ | async; let payments">
+                  @if (!payments.length) {
+                    <tr>
+                      <td colspan="5"><span>Aucun paiement trouvé</span></td>
                     </tr>
                   }
-                  <tr data-cy="entityTable">
-                    <td class="fw-bold">Résultat</td>
-                    <td>&nbsp;</td>
-                    <td class="text-center fw-bold">{{ totalPayments(payments) | currency: 'CHF' }}</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+                  @if (payments.length) {
+                    @for (payment of payments; track $index) {
+                      <tr data-cy="entityTable">
+                        <td class="text-center">{{ payment.billingDate | formatMediumDate }}</td>
+                        <td class="text-center">{{ payment.paymentMode }}</td>
+                        <td class="text-center">{{ payment.amount | currency: 'CHF' }}</td>
+                        <td class="text-center">{{ payment.extraInformation }}</td>
+                        <td class="text-end">
+                          <div class="btn-group">
+                            <a
+                              [routerLink]="['/admin/payments', payment.id, 'view']"
+                              class="btn btn-info btn-sm"
+                              data-cy="entityDetailsButton"
+                            >
+                              <fa-icon icon="eye" title="{{ 'common.view' | translate }}"></fa-icon>
+                            </a>
+
+                            <a
+                              [routerLink]="['/admin/payments', payment.id, 'edit']"
+                              class="btn btn-primary btn-sm"
+                              data-cy="entityEditButton"
+                            >
+                              <fa-icon icon="pencil-alt" title="{{ 'common.edit' | translate }}"></fa-icon>
+                            </a>
+
+                            <button
+                              type="submit"
+                              (click)="deletePayment(payment)"
+                              class="btn btn-danger btn-sm"
+                              data-cy="entityDeleteButton"
+                            >
+                              <fa-icon icon="times" title="{{ 'common.delete' | translate }}"></fa-icon>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                    <tr data-cy="entityTable">
+                      <td class="fw-bold">Résultat</td>
+                      <td>&nbsp;</td>
+                      <td class="text-center fw-bold">{{ totalPayments(payments) | currency: 'CHF' }}</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
-        </fieldset>
+        </div>
       </div>
     }
   </div>

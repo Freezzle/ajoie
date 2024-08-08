@@ -199,7 +199,9 @@ public class ImportationResource {
                 String participationAcceptedChart = csvRecord.get(STAND_ACCEPTED_CHART);
 
                 Participation currentParticipation = new Participation();
-                currentParticipation.setClientNumber(incrementClientNumber(participationRepository.findMaxClientNumber()));
+                currentParticipation.setClientNumber(
+                    currentSalon.getReferenceNumber() + "-" + incrementClientNumber(participationRepository.findMaxClientNumber())
+                );
                 currentParticipation.setSalon(currentSalon);
                 currentParticipation.setExponent(currentExponent);
                 currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim()));
@@ -272,10 +274,10 @@ public class ImportationResource {
     }
 
     private String incrementClientNumber(String clientNumber) {
-        int number = 0;
+        int number = 100;
         if (clientNumber != null) {
             // Convertir la partie numérique après le tiret en entier
-            number = Integer.parseInt(clientNumber);
+            number = Integer.parseInt(clientNumber.split("-")[1]);
         }
 
         // Incrémenter le nombre

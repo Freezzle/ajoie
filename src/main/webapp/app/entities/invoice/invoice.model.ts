@@ -1,6 +1,5 @@
 import dayjs from 'dayjs/esm';
 import { Type } from '../enumerations/type.model';
-import { IInvoicingPlan } from './invoicing-plan.model';
 
 export interface IInvoice {
   id: string;
@@ -13,7 +12,6 @@ export interface IInvoice {
   total?: number | null;
   lock?: boolean | null;
   extraInformation?: string | null;
-  invoicingPlan?: IInvoicingPlan | null;
 }
 
 export type NewInvoice = Omit<IInvoice, 'id'> & { id: null };

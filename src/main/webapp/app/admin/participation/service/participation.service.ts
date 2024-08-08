@@ -7,11 +7,8 @@ import dayjs from 'dayjs/esm';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IParticipation, NewParticipation } from '../participation.model';
-import { IInvoice } from '../../../entities/invoice/invoice.model';
-import { InvoiceService } from '../../../entities/invoice/service/invoice.service';
+import { IInvoicingPlan, IParticipation, NewParticipation } from '../participation.model';
 import { IPayment } from '../../../entities/payment/payment.model';
-import { IInvoicingPlan } from '../../../entities/invoice/invoicing-plan.model';
 
 export type PartialUpdateParticipation = Partial<IParticipation> & Pick<IParticipation, 'id'>;
 
@@ -109,6 +106,26 @@ export class ParticipationService {
       {},
       {
         params: queryObject,
+        observe: 'response',
+      },
+    );
+  }
+
+  switchLock(idInvoicingPlan: string, idInvoice: string): Observable<HttpResponse<{}>> {
+    return this.http.patch(
+      this.applicationConfigService.getEndpointFor(`api/invoicing-plans/${idInvoicingPlan}/invoices/${idInvoice}/lock`),
+      {},
+      {
+        observe: 'response',
+      },
+    );
+  }
+
+  sendInvoicingPlan(idInvoicingPlan: string): Observable<HttpResponse<{}>> {
+    return this.http.patch(
+      this.applicationConfigService.getEndpointFor(`api/invoicing-plans/${idInvoicingPlan}/send`),
+      {},
+      {
         observe: 'response',
       },
     );

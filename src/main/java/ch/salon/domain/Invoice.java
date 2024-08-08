@@ -24,7 +24,7 @@ public class Invoice implements Serializable {
     private UUID id;
 
     @Column(name = "generation_date")
-    private Instant generationDate;
+    private Instant generationDate = Instant.now();
 
     @Column(name = "reference_id")
     private UUID referenceId;
@@ -55,6 +55,22 @@ public class Invoice implements Serializable {
     private String extraInformation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Invoice() {}
+
+    public Invoice(Invoice invoice) {
+        this.id = null;
+        this.generationDate = Instant.now();
+        this.referenceId = invoice.getReferenceId();
+        this.type = invoice.getType();
+        this.label = invoice.getLabel();
+        this.quantity = invoice.getQuantity();
+        this.defaultAmount = invoice.getDefaultAmount();
+        this.customAmount = invoice.getCustomAmount();
+        this.lock = invoice.getLock();
+        this.total = invoice.getTotal();
+        this.extraInformation = invoice.getExtraInformation();
+    }
 
     public UUID getId() {
         return this.id;

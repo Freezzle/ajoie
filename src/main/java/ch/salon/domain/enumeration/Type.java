@@ -4,7 +4,9 @@ public enum Type {
     STAND,
     SHARED,
     CONFERENCE,
-    MEAL,
+    MEAL1,
+    MEAL2,
+    MEAL3,
     ELECTRICITY,
     OTHERS,
 }

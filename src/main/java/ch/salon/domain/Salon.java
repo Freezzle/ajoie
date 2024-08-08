@@ -24,6 +24,9 @@ public class Salon implements Serializable {
     @Column(name = "id")
     private UUID id;
 
+    @Column
+    private Long referenceNumber;
+
     @NotNull
     @Column(name = "place", nullable = false)
     private String place;
@@ -72,6 +75,14 @@ public class Salon implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public Long getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(Long referenceNumber) {
+        this.referenceNumber = referenceNumber;
     }
 
     public String getPlace() {
@@ -238,6 +249,7 @@ public class Salon implements Serializable {
     public String toString() {
         return "Salon{" +
             "id=" + getId() +
+            ", referenceNumber='" + getReferenceNumber() + "'" +
             ", place='" + getPlace() + "'" +
             ", startingDate='" + getStartingDate() + "'" +
             ", endingDate='" + getEndingDate() + "'" +

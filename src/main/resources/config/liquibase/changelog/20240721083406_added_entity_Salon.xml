@@ -14,6 +14,9 @@
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="reference_number" type="bigint">
+                <constraints nullable="false" unique="true"/>
+            </column>
             <column name="place" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
