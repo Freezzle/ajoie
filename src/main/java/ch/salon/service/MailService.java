@@ -48,19 +48,15 @@ public class MailService {
         this.templateEngine = templateEngine;
     }
 
-    public void sendInvoiceMail(Salon salon, Exponent exponent, InvoicingPlan invoicingPlan) {
-        log.debug("Sending invoice email to '{}'", exponent.getEmail());
+    @Async
+    public void sendCreationEmail(User user) {
+        log.debug("Sending creation email to '{}'", user.getEmail());
 
-        Context context = new Context(Locale.FRENCH);
-        context.setVariable("salon", salon.getPlace());
-        context.setVariable("billingNumber", invoicingPlan.getBillingNumber());
-        context.setVariable("fullName", exponent.getFullName());
-        context.setVariable("startDate", DateUtils.instantToIso(salon.getStartingDate()));
-        context.setVariable("endDate", DateUtils.instantToIso(salon.getEndingDate()));
+        Context context = new Context(Locale.forLanguageTag(user.getLangKey()));
+        context.setVariable(USER, user);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
 
-        Object[] args = { invoicingPlan.getBillingNumber(), salon.getPlace() };
-
-        this.sendEmailFromTemplateSync(context, exponent.getEmail(), INVOICE_EMAIL, args);
+        this.sendEmailFromTemplateSync(context, user.getEmail(), CREATION_ACCOUNT_EMAIL, null);
     }
 
     @Async
@@ -75,17 +71,6 @@ public class MailService {
     }
 
     @Async
-    public void sendCreationEmail(User user) {
-        log.debug("Sending creation email to '{}'", user.getEmail());
-
-        Context context = new Context(Locale.forLanguageTag(user.getLangKey()));
-        context.setVariable(USER, user);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
-
-        this.sendEmailFromTemplateSync(context, user.getEmail(), CREATION_ACCOUNT_EMAIL, null);
-    }
-
-    @Async
     public void sendPasswordResetMail(User user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
 
@@ -94,6 +79,21 @@ public class MailService {
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
 
         this.sendEmailFromTemplateSync(context, user.getEmail(), REST_PASSWORD_EMAIL, null);
+    }
+
+    public void sendInvoiceMail(Salon salon, Exponent exponent, InvoicingPlan invoicingPlan) {
+        log.debug("Sending invoice email to '{}'", exponent.getEmail());
+
+        Context context = new Context(Locale.FRENCH);
+        context.setVariable("salon", salon.getPlace());
+        context.setVariable("billingNumber", invoicingPlan.getBillingNumber());
+        context.setVariable("fullName", exponent.getFullName());
+        context.setVariable("startDate", DateUtils.instantToIso(salon.getStartingDate()));
+        context.setVariable("endDate", DateUtils.instantToIso(salon.getEndingDate()));
+
+        Object[] args = { invoicingPlan.getBillingNumber(), salon.getPlace() };
+
+        this.sendEmailFromTemplateSync(context, exponent.getEmail(), INVOICE_EMAIL, args);
     }
 
     private void sendEmailFromTemplateSync(Context context, String emailto, EmailTemplateEnum template, Object[] argsSubject) {
