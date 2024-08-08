@@ -1,0 +1,21 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+  <head>
+    <title th:text="#{email.invoice.title(${billingNumber}, ${salon})}">{1} - #{0}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    <p th:text="#{email.invoice.greeting(${fullName})}">Cher {0}</p>
+    <p th:utext="#{email.invoice.text1(${salon}, ${startDate}, ${endDate})}">
+      Nous nous réjouissons de te compter parmi nous au salon <b>{0}</b> qui se déroulera du <b>{1}</b> au <b>{2}</b> !
+    </p>
+    <br />
+    <p th:utext="#{email.invoice.text2(${billingNumber})}">
+      En pièce jointe, tu trouveras ta facture <b>#{0}</b> selon les prestations que tu nous as transmis lors de ton inscription.
+    </p>
+    <br />
+    <p th:text="#{email.invoice.text3}">
+      N’hésite pas à nous contacter si tu as la moindre question et en attendant, nous te souhaitons une belle semaine !
+    </p>
+  </body>
+</html>

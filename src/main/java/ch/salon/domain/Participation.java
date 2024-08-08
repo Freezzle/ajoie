@@ -59,7 +59,7 @@ public class Participation implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Exponent exponent;
 
     @ManyToOne(fetch = FetchType.LAZY)

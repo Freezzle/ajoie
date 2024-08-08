@@ -37,7 +37,7 @@ public class InvoicingPlan implements Serializable {
     @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
     private Set<Invoice> invoices = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "exponent", "salon" }, allowSetters = true)
     private Participation participation;
 

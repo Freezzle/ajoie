@@ -21,6 +21,7 @@ public class InvoicingPlanService {
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
     private final MessageSource messageSource;
+    private final MailService mailService;
 
     public InvoicingPlanService(
         SalonRepository salonRepository,
@@ -28,7 +29,8 @@ public class InvoicingPlanService {
         InvoicingPlanRepository invoicingPlanRepository,
         StandRepository standRepository,
         ConferenceRepository conferenceRepository,
-        MessageSource messageSource
+        MessageSource messageSource,
+        MailService mailService
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
@@ -36,6 +38,7 @@ public class InvoicingPlanService {
         this.standRepository = standRepository;
         this.conferenceRepository = conferenceRepository;
         this.messageSource = messageSource;
+        this.mailService = mailService;
     }
 
     public UUID create(InvoicingPlan invoicingPlan) {
@@ -70,7 +73,12 @@ public class InvoicingPlanService {
         InvoicingPlan invoicingPlan = invoicingPlanRepository
             .findById(idInvoicingPlan)
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-        // TODO : SEND BILLING BY MAIL
+
+        Salon salon = invoicingPlan.getParticipation().getSalon();
+        Exponent exponent = invoicingPlan.getParticipation().getExponent();
+
+        mailService.sendInvoiceMail(salon, exponent, invoicingPlan);
+
         invoicingPlan.setHasBeenSent(true);
         invoicingPlanRepository.save(invoicingPlan);
     }

@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link ch.salon.domain.Authority}.
- */
 @RestController
 @RequestMapping("/api/authorities")
 @Transactional
@@ -39,13 +36,6 @@ public class AuthorityResource {
         this.authorityRepository = authorityRepository;
     }
 
-    /**
-     * {@code POST  /authorities} : Create a new authority.
-     *
-     * @param authority the authority to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new authority, or with status {@code 400 (Bad Request)} if the authority has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority) throws URISyntaxException {
@@ -59,11 +49,6 @@ public class AuthorityResource {
             .body(authority);
     }
 
-    /**
-     * {@code GET  /authorities} : get all the authorities.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of authorities in body.
-     */
     @GetMapping("")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public List<Authority> getAllAuthorities() {
@@ -71,12 +56,6 @@ public class AuthorityResource {
         return authorityRepository.findAll();
     }
 
-    /**
-     * {@code GET  /authorities/:id} : get the "id" authority.
-     *
-     * @param id the id of the authority to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the authority, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Authority> getAuthority(@PathVariable("id") String id) {
@@ -85,12 +64,6 @@ public class AuthorityResource {
         return ResponseUtil.wrapOrNotFound(authority);
     }
 
-    /**
-     * {@code DELETE  /authorities/:id} : delete the "id" authority.
-     *
-     * @param id the id of the authority to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteAuthority(@PathVariable("id") String id) {
