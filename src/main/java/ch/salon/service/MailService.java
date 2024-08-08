@@ -1,19 +1,14 @@
 package ch.salon.service;
 
-import static ch.salon.service.enums.EmailTemplateEnum.*;
+import static ch.salon.service.enumeration.EmailTemplateEnum.*;
 
 import ch.salon.domain.*;
-import ch.salon.service.enums.EmailTemplateEnum;
+import ch.salon.service.enumeration.EmailTemplateEnum;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

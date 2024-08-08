@@ -1,4 +1,4 @@
-package ch.salon.service.enums;
+package ch.salon.service.enumeration;
 
 public enum EmailTemplateEnum {
     CREATION_ACCOUNT_EMAIL("mail/creationEmail", "email.creation.title"),
