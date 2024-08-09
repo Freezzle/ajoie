@@ -2,9 +2,9 @@ package ch.salon.web.rest;
 
 import static ch.salon.service.SalonService.ENTITY_NAME;
 
-import ch.salon.domain.Salon;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.SalonService;
+import ch.salon.service.dto.SalonDTO;
 import ch.salon.web.rest.dto.SalonStats;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -45,7 +45,7 @@ public class SalonResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Salon> createSalon(@Valid @RequestBody Salon salon) throws URISyntaxException {
+    public ResponseEntity<SalonDTO> createSalon(@Valid @RequestBody SalonDTO salon) throws URISyntaxException {
         log.debug("REST request to save Salon : {}", salon);
 
         UUID id = salonService.create(salon);
@@ -57,8 +57,10 @@ public class SalonResource {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Salon> updateSalon(@PathVariable(value = "id", required = false) final UUID id, @Valid @RequestBody Salon salon)
-        throws URISyntaxException {
+    public ResponseEntity<SalonDTO> updateSalon(
+        @PathVariable(value = "id", required = false) final UUID id,
+        @Valid @RequestBody SalonDTO salon
+    ) throws URISyntaxException {
         log.debug("REST request to update Salon : {}, {}", id, salon);
 
         salon = salonService.update(id, salon);
@@ -82,7 +84,7 @@ public class SalonResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<Salon> getAllSalons() {
+    public List<SalonDTO> getAllSalons() {
         log.debug("REST request to get all Salons");
 
         return salonService.findAll();
@@ -90,7 +92,7 @@ public class SalonResource {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Salon> getSalon(@PathVariable("id") UUID id) {
+    public ResponseEntity<SalonDTO> getSalon(@PathVariable("id") UUID id) {
         log.debug("REST request to get Salon : {}", id);
         return ResponseUtil.wrapOrNotFound(salonService.get(id));
     }

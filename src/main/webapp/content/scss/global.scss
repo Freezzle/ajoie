@@ -75,6 +75,7 @@ Generic styles
 
 .form-control {
   background-color: #fff;
+  border: 1px dashed $primary;
 }
 
 .readonly {
@@ -342,8 +343,4 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 .card-body {
   border: 1px solid #2b4f74;
-}
-
-.form-control {
-  border: 1px dashed $primary;
 }

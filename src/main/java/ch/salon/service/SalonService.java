@@ -8,6 +8,9 @@ import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
+import ch.salon.service.dto.SalonDTO;
+import ch.salon.service.mapper.PriceStandMapper;
+import ch.salon.service.mapper.SalonMapper;
 import ch.salon.web.rest.dto.DimensionStats;
 import ch.salon.web.rest.dto.SalonStats;
 import ch.salon.web.rest.errors.BadRequestAlertException;
@@ -17,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -42,15 +46,15 @@ public class SalonService {
         this.conferenceRepository = conferenceRepository;
     }
 
-    public UUID create(Salon salon) {
+    public UUID create(SalonDTO salon) {
         if (salon.getId() != null) {
             throw new BadRequestAlertException("A new salon cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return salonRepository.save(salon).getId();
+        return salonRepository.save(SalonMapper.INSTANCE.toEntity(salon)).getId();
     }
 
-    public Salon update(final UUID id, Salon salon) {
+    public SalonDTO update(final UUID id, SalonDTO salon) {
         if (salon.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -65,18 +69,20 @@ public class SalonService {
         }
 
         if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
-            salon.setPriceStandSalons(salonFound.getPriceStandSalons());
+            salon.setPriceStandSalons(
+                salonFound.getPriceStandSalons().stream().map(PriceStandMapper.INSTANCE::toDto).collect(Collectors.toSet())
+            );
         }
 
-        return salonRepository.save(salon);
+        return SalonMapper.INSTANCE.toDto(salonRepository.save(SalonMapper.INSTANCE.toEntity(salon)));
     }
 
-    public List<Salon> findAll() {
-        return salonRepository.findAll();
+    public List<SalonDTO> findAll() {
+        return salonRepository.findAll().stream().map(SalonMapper.INSTANCE::toDto).toList();
     }
 
-    public Optional<Salon> get(UUID id) {
-        return salonRepository.findById(id);
+    public Optional<SalonDTO> get(UUID id) {
+        return salonRepository.findById(id).map(SalonMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {

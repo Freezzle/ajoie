@@ -1,7 +1,8 @@
 package ch.salon.service;
 
-import ch.salon.domain.Conference;
 import ch.salon.repository.ConferenceRepository;
+import ch.salon.service.dto.ConferenceDTO;
+import ch.salon.service.mapper.ConferenceMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Objects;
@@ -21,15 +22,15 @@ public class ConferenceService {
         this.conferenceRepository = conferenceRepository;
     }
 
-    public UUID create(Conference conference) {
+    public UUID create(ConferenceDTO conference) {
         if (conference.getId() != null) {
             throw new BadRequestAlertException("A new conference cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return conferenceRepository.save(conference).getId();
+        return conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference)).getId();
     }
 
-    public Conference update(final UUID id, Conference conference) {
+    public ConferenceDTO update(final UUID id, ConferenceDTO conference) {
         if (conference.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -41,21 +42,29 @@ public class ConferenceService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return conferenceRepository.save(conference);
+        return ConferenceMapper.INSTANCE.toDto(conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference)));
     }
 
-    public List<Conference> findAll(String idSalon, String idParticipation) {
+    public List<ConferenceDTO> findAll(String idSalon, String idParticipation) {
         if (StringUtils.isNotBlank(idSalon)) {
-            return conferenceRepository.findByParticipationSalonId(UUID.fromString(idSalon));
+            return conferenceRepository
+                .findByParticipationSalonId(UUID.fromString(idSalon))
+                .stream()
+                .map(ConferenceMapper.INSTANCE::toDto)
+                .toList();
         } else if (StringUtils.isNotBlank(idParticipation)) {
-            return conferenceRepository.findByParticipationId(UUID.fromString(idParticipation));
+            return conferenceRepository
+                .findByParticipationId(UUID.fromString(idParticipation))
+                .stream()
+                .map(ConferenceMapper.INSTANCE::toDto)
+                .toList();
         }
 
         throw new IllegalStateException("No filter given");
     }
 
-    public Optional<Conference> get(UUID id) {
-        return conferenceRepository.findById(id);
+    public Optional<ConferenceDTO> get(UUID id) {
+        return conferenceRepository.findById(id).map(ConferenceMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {

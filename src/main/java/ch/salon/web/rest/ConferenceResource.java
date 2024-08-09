@@ -2,9 +2,9 @@ package ch.salon.web.rest;
 
 import static ch.salon.service.ConferenceService.ENTITY_NAME;
 
-import ch.salon.domain.Conference;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ConferenceService;
+import ch.salon.service.dto.ConferenceDTO;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,7 +45,7 @@ public class ConferenceResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Conference> createConference(@Valid @RequestBody Conference conference) throws URISyntaxException {
+    public ResponseEntity<ConferenceDTO> createConference(@Valid @RequestBody ConferenceDTO conference) throws URISyntaxException {
         log.debug("REST request to save Conference : {}", conference);
 
         UUID id = conferenceService.create(conference);
@@ -57,9 +57,9 @@ public class ConferenceResource {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Conference> updateConference(
+    public ResponseEntity<ConferenceDTO> updateConference(
         @PathVariable(value = "id", required = false) final UUID id,
-        @Valid @RequestBody Conference conference
+        @Valid @RequestBody ConferenceDTO conference
     ) throws URISyntaxException {
         log.debug("REST request to update Conference : {}, {}", id, conference);
 
@@ -72,7 +72,7 @@ public class ConferenceResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<Conference> getAllConferences(
+    public List<ConferenceDTO> getAllConferences(
         @RequestParam(name = "idSalon", required = false) String idSalon,
         @RequestParam(name = "idParticipation", required = false) String idParticipation
     ) {
@@ -83,7 +83,7 @@ public class ConferenceResource {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Conference> getConference(@PathVariable("id") UUID id) {
+    public ResponseEntity<ConferenceDTO> getConference(@PathVariable("id") UUID id) {
         log.debug("REST request to get Conference : {}", id);
 
         return ResponseUtil.wrapOrNotFound(conferenceService.get(id));

@@ -67,7 +67,7 @@
               <td>
                 @if (stand.participation) {
                   <div>
-                    <a [routerLink]="['/admin/exponents', stand.participation.exponent?.id, 'view']">{{
+                    <a [routerLink]="['/admin/participations', stand.participation.id, 'view']">{{
                       stand.participation.exponent?.fullName
                     }}</a>
                   </div>

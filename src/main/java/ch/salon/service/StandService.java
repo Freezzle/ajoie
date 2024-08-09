@@ -1,7 +1,8 @@
 package ch.salon.service;
 
-import ch.salon.domain.Stand;
 import ch.salon.repository.StandRepository;
+import ch.salon.service.dto.StandDTO;
+import ch.salon.service.mapper.StandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Objects;
@@ -21,15 +22,15 @@ public class StandService {
         this.standRepository = standRepository;
     }
 
-    public UUID create(Stand stand) {
+    public UUID create(StandDTO stand) {
         if (stand.getId() != null) {
             throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return standRepository.save(stand).getId();
+        return standRepository.save(StandMapper.INSTANCE.toEntity(stand)).getId();
     }
 
-    public Stand update(final UUID id, Stand stand) {
+    public StandDTO update(final UUID id, StandDTO stand) {
         if (stand.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -41,21 +42,25 @@ public class StandService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return standRepository.save(stand);
+        return StandMapper.INSTANCE.toDto(standRepository.save(StandMapper.INSTANCE.toEntity(stand)));
     }
 
-    public List<Stand> findAll(String idSalon, String idParticipation) {
+    public List<StandDTO> findAll(String idSalon, String idParticipation) {
         if (StringUtils.isNotBlank(idSalon)) {
-            return standRepository.findByParticipationSalonId(UUID.fromString(idSalon));
+            return standRepository.findByParticipationSalonId(UUID.fromString(idSalon)).stream().map(StandMapper.INSTANCE::toDto).toList();
         } else if (StringUtils.isNotBlank(idParticipation)) {
-            return standRepository.findByParticipationId(UUID.fromString(idParticipation));
+            return standRepository
+                .findByParticipationId(UUID.fromString(idParticipation))
+                .stream()
+                .map(StandMapper.INSTANCE::toDto)
+                .toList();
         }
 
         throw new IllegalStateException("No filter given");
     }
 
-    public Optional<Stand> get(UUID id) {
-        return standRepository.findById(id);
+    public Optional<StandDTO> get(UUID id) {
+        return standRepository.findById(id).map(StandMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {

@@ -2,9 +2,9 @@ package ch.salon.web.rest;
 
 import static ch.salon.service.StandService.ENTITY_NAME;
 
-import ch.salon.domain.Stand;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.StandService;
+import ch.salon.service.dto.StandDTO;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -46,7 +46,7 @@ public class StandResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Stand> createStand(@Valid @RequestBody Stand stand) throws URISyntaxException {
+    public ResponseEntity<StandDTO> createStand(@Valid @RequestBody StandDTO stand) throws URISyntaxException {
         log.debug("REST request to save Stand : {}", stand);
         if (stand.getId() != null) {
             throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "idexists");
@@ -60,7 +60,10 @@ public class StandResource {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Stand> updateStand(@PathVariable(value = "id", required = false) final UUID id, @Valid @RequestBody Stand stand) {
+    public ResponseEntity<StandDTO> updateStand(
+        @PathVariable(value = "id", required = false) final UUID id,
+        @Valid @RequestBody StandDTO stand
+    ) {
         log.debug("REST request to update Stand : {}, {}", id, stand);
 
         stand = standService.update(id, stand);
@@ -72,7 +75,7 @@ public class StandResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<Stand> getAllStands(
+    public List<StandDTO> getAllStands(
         @RequestParam(name = "idSalon", required = false) String idSalon,
         @RequestParam(name = "idParticipation", required = false) String idParticipation
     ) {
@@ -83,7 +86,7 @@ public class StandResource {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Stand> getStand(@PathVariable("id") UUID id) {
+    public ResponseEntity<StandDTO> getStand(@PathVariable("id") UUID id) {
         log.debug("REST request to get Stand : {}", id);
 
         return ResponseUtil.wrapOrNotFound(standService.get(id));

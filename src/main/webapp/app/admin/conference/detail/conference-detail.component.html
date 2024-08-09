@@ -41,7 +41,9 @@
           <dd>
             @if (conference()!.participation) {
               <div>
-                <a [routerLink]="['/participation', conference()!.participation?.id, 'view']">{{ conference()!.participation?.id }}</a>
+                <a [routerLink]="['/participation', conference()!.participation?.id, 'view']">{{
+                  conference()!.participation?.exponent?.fullName
+                }}</a>
               </div>
             }
           </dd>
