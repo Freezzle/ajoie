@@ -2,12 +2,17 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -72,17 +77,21 @@ public class Participation implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Participation id(UUID id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public Instant getRegistrationDate() {
         return this.registrationDate;
+    }
+
+    public void setRegistrationDate(Instant registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public Participation registrationDate(Instant registrationDate) {
@@ -90,12 +99,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setRegistrationDate(Instant registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
     public Long getNbMeal1() {
         return this.nbMeal1;
+    }
+
+    public void setNbMeal1(Long nbMeal1) {
+        this.nbMeal1 = nbMeal1;
     }
 
     public Participation nbMeal1(Long nbMeal1) {
@@ -103,12 +112,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setNbMeal1(Long nbMeal1) {
-        this.nbMeal1 = nbMeal1;
-    }
-
     public Long getNbMeal2() {
         return this.nbMeal2;
+    }
+
+    public void setNbMeal2(Long nbMeal2) {
+        this.nbMeal2 = nbMeal2;
     }
 
     public Participation nbMeal2(Long nbMeal2) {
@@ -116,12 +125,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setNbMeal2(Long nbMeal2) {
-        this.nbMeal2 = nbMeal2;
-    }
-
     public Long getNbMeal3() {
         return this.nbMeal3;
+    }
+
+    public void setNbMeal3(Long nbMeal3) {
+        this.nbMeal3 = nbMeal3;
     }
 
     public Participation nbMeal3(Long nbMeal3) {
@@ -129,12 +138,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setNbMeal3(Long nbMeal3) {
-        this.nbMeal3 = nbMeal3;
-    }
-
     public Boolean getAcceptedChart() {
         return this.acceptedChart;
+    }
+
+    public void setAcceptedChart(Boolean acceptedChart) {
+        this.acceptedChart = acceptedChart;
     }
 
     public Participation acceptedChart(Boolean acceptedChart) {
@@ -142,12 +151,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setAcceptedChart(Boolean acceptedChart) {
-        this.acceptedChart = acceptedChart;
-    }
-
     public Boolean getAcceptedContract() {
         return this.acceptedContract;
+    }
+
+    public void setAcceptedContract(Boolean acceptedContract) {
+        this.acceptedContract = acceptedContract;
     }
 
     public Participation acceptedContract(Boolean acceptedContract) {
@@ -155,12 +164,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setAcceptedContract(Boolean acceptedContract) {
-        this.acceptedContract = acceptedContract;
-    }
-
     public Boolean getNeedArrangment() {
         return this.needArrangment;
+    }
+
+    public void setNeedArrangment(Boolean needArrangment) {
+        this.needArrangment = needArrangment;
     }
 
     public Participation needArrangment(Boolean needArrangment) {
@@ -168,12 +177,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setNeedArrangment(Boolean needArrangment) {
-        this.needArrangment = needArrangment;
-    }
-
     public Boolean getIsBillingClosed() {
         return this.isBillingClosed;
+    }
+
+    public void setIsBillingClosed(Boolean isBillingClosed) {
+        this.isBillingClosed = isBillingClosed;
     }
 
     public Participation isBillingClosed(Boolean isBillingClosed) {
@@ -181,12 +190,12 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setIsBillingClosed(Boolean isBillingClosed) {
-        this.isBillingClosed = isBillingClosed;
-    }
-
     public Status getStatus() {
         return this.status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public Participation status(Status status) {
@@ -194,21 +203,17 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public String getExtraInformation() {
         return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
     public Participation extraInformation(String extraInformation) {
         this.setExtraInformation(extraInformation);
         return this;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
     }
 
     public Exponent getExponent() {
@@ -268,18 +273,18 @@ public class Participation implements Serializable {
     @Override
     public String toString() {
         return "Participation{" +
-            "id=" + getId() +
-            ", registrationDate='" + getRegistrationDate() + "'" +
-            ", clientNumber='" + getClientNumber() + "'" +
-            ", nbMeal1=" + getNbMeal1() +
-            ", nbMeal2=" + getNbMeal2() +
-            ", nbMeal3=" + getNbMeal3() +
-            ", acceptedChart='" + getAcceptedChart() + "'" +
-            ", acceptedContract='" + getAcceptedContract() + "'" +
-            ", needArrangment='" + getNeedArrangment() + "'" +
-            ", isBillingClosed='" + getIsBillingClosed() + "'" +
-            ", status='" + getStatus() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" +
-            "}";
+               "id=" + getId() +
+               ", registrationDate='" + getRegistrationDate() + "'" +
+               ", clientNumber='" + getClientNumber() + "'" +
+               ", nbMeal1=" + getNbMeal1() +
+               ", nbMeal2=" + getNbMeal2() +
+               ", nbMeal3=" + getNbMeal3() +
+               ", acceptedChart='" + getAcceptedChart() + "'" +
+               ", acceptedContract='" + getAcceptedContract() + "'" +
+               ", needArrangment='" + getNeedArrangment() + "'" +
+               ", isBillingClosed='" + getIsBillingClosed() + "'" +
+               ", status='" + getStatus() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" +
+               "}";
     }
 }

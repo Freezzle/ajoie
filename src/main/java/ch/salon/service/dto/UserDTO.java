@@ -67,8 +67,8 @@ public class UserDTO implements Serializable {
     @Override
     public String toString() {
         return "UserDTO{" +
-            "id='" + id + '\'' +
-            ", login='" + login + '\'' +
-            "}";
+               "id='" + id + '\'' +
+               ", login='" + login + '\'' +
+               "}";
     }
 }

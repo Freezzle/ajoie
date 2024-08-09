@@ -1,11 +1,12 @@
 package ch.salon.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -49,17 +50,21 @@ public class Exponent implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Exponent id(UUID id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getFullName() {
         return this.fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public Exponent fullName(String fullName) {
@@ -67,12 +72,12 @@ public class Exponent implements Serializable {
         return this;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
     public String getEmail() {
         return this.email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Exponent email(String email) {
@@ -80,12 +85,12 @@ public class Exponent implements Serializable {
         return this;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPhoneNumber() {
         return this.phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Exponent phoneNumber(String phoneNumber) {
@@ -93,12 +98,12 @@ public class Exponent implements Serializable {
         return this;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     public String getAddress() {
         return this.address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Exponent address(String address) {
@@ -106,12 +111,12 @@ public class Exponent implements Serializable {
         return this;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getNpaLocalite() {
         return this.npaLocalite;
+    }
+
+    public void setNpaLocalite(String npaLocalite) {
+        this.npaLocalite = npaLocalite;
     }
 
     public Exponent npaLocalite(String npaLocalite) {
@@ -119,21 +124,17 @@ public class Exponent implements Serializable {
         return this;
     }
 
-    public void setNpaLocalite(String npaLocalite) {
-        this.npaLocalite = npaLocalite;
-    }
-
     public String getExtraInformation() {
         return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
     public Exponent extraInformation(String extraInformation) {
         this.setExtraInformation(extraInformation);
         return this;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -159,13 +160,13 @@ public class Exponent implements Serializable {
     @Override
     public String toString() {
         return "Exponent{" +
-            "id=" + getId() +
-            ", fullName='" + getFullName() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", phoneNumber='" + getPhoneNumber() + "'" +
-            ", address='" + getAddress() + "'" +
-            ", npaLocalite='" + getNpaLocalite() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" +
-            "}";
+               "id=" + getId() +
+               ", fullName='" + getFullName() + "'" +
+               ", email='" + getEmail() + "'" +
+               ", phoneNumber='" + getPhoneNumber() + "'" +
+               ", address='" + getAddress() + "'" +
+               ", npaLocalite='" + getNpaLocalite() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" +
+               "}";
     }
 }

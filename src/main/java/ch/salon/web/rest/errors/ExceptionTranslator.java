@@ -48,11 +48,10 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private static final String MESSAGE_KEY = "message";
     private static final String PATH_KEY = "path";
     private static final boolean CASUAL_CHAIN_ENABLED = false;
+    private final Environment env;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final Environment env;
 
     public ExceptionTranslator(Environment env) {
         this.env = env;
@@ -73,7 +72,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         HttpStatusCode statusCode,
         WebRequest request
     ) {
-        body = body == null ? wrapAndCustomizeProblem((Throwable) ex, (NativeWebRequest) request) : body;
+        body = body == null ? wrapAndCustomizeProblem(ex, (NativeWebRequest) request) : body;
         return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
 
@@ -82,24 +81,30 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private ProblemDetailWithCause getProblemDetailWithCause(Throwable ex) {
-        if (ex instanceof UsernameAlreadyUsedException) return (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
-        if (
-            ex instanceof ch.salon.service.exception.EmailAlreadyUsedException
-        ) return (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
-        if (
-            ex instanceof ch.salon.service.exception.InvalidPasswordException
-        ) return (ProblemDetailWithCause) new InvalidPasswordException().getBody();
+        if (ex instanceof UsernameAlreadyUsedException) {
+            return (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
+        }
+        if (ex instanceof ch.salon.service.exception.EmailAlreadyUsedException) {
+            return (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
+        }
+        if (ex instanceof ch.salon.service.exception.InvalidPasswordException) {
+            return (ProblemDetailWithCause) new InvalidPasswordException().getBody();
+        }
 
-        if (
-            ex instanceof ErrorResponseException exp && exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause
-        ) return problemDetailWithCause;
+        if (ex instanceof ErrorResponseException exp && exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause) {
+            return problemDetailWithCause;
+        }
         return ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
     }
 
     protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, NativeWebRequest request) {
-        if (problem.getStatus() <= 0) problem.setStatus(toStatus(err));
+        if (problem.getStatus() <= 0) {
+            problem.setStatus(toStatus(err));
+        }
 
-        if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
+        if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) {
+            problem.setType(getMappedType(err));
+        }
 
         // higher precedence to Custom/ResponseStatus types
         String title = extractTitle(err, problem.getStatus());
@@ -114,17 +119,23 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         }
 
         Map<String, Object> problemProperties = problem.getProperties();
-        if (problemProperties == null || !problemProperties.containsKey(MESSAGE_KEY)) problem.setProperty(
-            MESSAGE_KEY,
-            getMappedMessageKey(err) != null ? getMappedMessageKey(err) : "error.http." + problem.getStatus()
-        );
+        if (problemProperties == null || !problemProperties.containsKey(MESSAGE_KEY)) {
+            problem.setProperty(
+                MESSAGE_KEY,
+                getMappedMessageKey(err) != null ? getMappedMessageKey(err) : "error.http." + problem.getStatus()
+            );
+        }
 
-        if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) problem.setProperty(PATH_KEY, getPathValue(request));
+        if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) {
+            problem.setProperty(PATH_KEY, getPathValue(request));
+        }
 
         if (
             (err instanceof MethodArgumentNotValidException fieldException) &&
             (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
-        ) problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
+        ) {
+            problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
+        }
 
         problem.setCause(buildCause(err.getCause(), request).orElse(null));
 
@@ -163,7 +174,9 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private HttpStatus toStatus(final Throwable throwable) {
         // Let the ErrorResponse take this responsibility
-        if (throwable instanceof ErrorResponse err) return HttpStatus.valueOf(err.getBody().getStatus());
+        if (throwable instanceof ErrorResponse err) {
+            return HttpStatus.valueOf(err.getBody().getStatus());
+        }
 
         return Optional.ofNullable(getMappedStatus(throwable)).orElse(
             Optional.ofNullable(resolveResponseStatus(throwable)).map(ResponseStatus::value).orElse(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -180,7 +193,9 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private URI getMappedType(Throwable err) {
-        if (err instanceof MethodArgumentNotValidException) return ErrorConstants.CONSTRAINT_VIOLATION_TYPE;
+        if (err instanceof MethodArgumentNotValidException) {
+            return ErrorConstants.CONSTRAINT_VIOLATION_TYPE;
+        }
         return ErrorConstants.DEFAULT_TYPE;
     }
 
@@ -194,30 +209,46 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private String getCustomizedTitle(Throwable err) {
-        if (err instanceof MethodArgumentNotValidException) return "Method argument not valid";
+        if (err instanceof MethodArgumentNotValidException) {
+            return "Method argument not valid";
+        }
         return null;
     }
 
     private String getCustomizedErrorDetails(Throwable err) {
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
         if (activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)) {
-            if (err instanceof HttpMessageConversionException) return "Unable to convert http message";
-            if (err instanceof DataAccessException) return "Failure during data access";
-            if (containsPackageName(err.getMessage())) return "Unexpected runtime exception";
+            if (err instanceof HttpMessageConversionException) {
+                return "Unable to convert http message";
+            }
+            if (err instanceof DataAccessException) {
+                return "Failure during data access";
+            }
+            if (containsPackageName(err.getMessage())) {
+                return "Unexpected runtime exception";
+            }
         }
         return err.getCause() != null ? err.getCause().getMessage() : err.getMessage();
     }
 
     private HttpStatus getMappedStatus(Throwable err) {
         // Where we disagree with Spring defaults
-        if (err instanceof AccessDeniedException) return HttpStatus.FORBIDDEN;
-        if (err instanceof ConcurrencyFailureException) return HttpStatus.CONFLICT;
-        if (err instanceof BadCredentialsException) return HttpStatus.UNAUTHORIZED;
+        if (err instanceof AccessDeniedException) {
+            return HttpStatus.FORBIDDEN;
+        }
+        if (err instanceof ConcurrencyFailureException) {
+            return HttpStatus.CONFLICT;
+        }
+        if (err instanceof BadCredentialsException) {
+            return HttpStatus.UNAUTHORIZED;
+        }
         return null;
     }
 
     private URI getPathValue(NativeWebRequest request) {
-        if (request == null) return URI.create("about:blank");
+        if (request == null) {
+            return URI.create("about:blank");
+        }
         return URI.create(extractURI(request));
     }
 

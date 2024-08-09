@@ -1,20 +1,30 @@
 package ch.salon.web.rest;
 
-import static ch.salon.service.SalonService.*;
+import static ch.salon.service.SalonService.ENTITY_NAME;
 
 import ch.salon.domain.Salon;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.SalonService;
 import ch.salon.web.rest.dto.SalonStats;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -24,17 +34,17 @@ import tech.jhipster.web.util.ResponseUtil;
 public class SalonResource {
 
     private static final Logger log = LoggerFactory.getLogger(SalonResource.class);
+    private final SalonService salonService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final SalonService salonService;
 
     public SalonResource(SalonService salonService) {
         this.salonService = salonService;
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Salon> createSalon(@Valid @RequestBody Salon salon) throws URISyntaxException {
         log.debug("REST request to save Salon : {}", salon);
 
@@ -46,6 +56,7 @@ public class SalonResource {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Salon> updateSalon(@PathVariable(value = "id", required = false) final UUID id, @Valid @RequestBody Salon salon)
         throws URISyntaxException {
         log.debug("REST request to update Salon : {}, {}", id, salon);
@@ -58,6 +69,7 @@ public class SalonResource {
     }
 
     @GetMapping("/{id}/stats")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<SalonStats> getStats(@PathVariable(value = "id", required = false) final UUID id) {
         log.debug("REST request to get stats from Salon : {}", id);
 
@@ -69,6 +81,7 @@ public class SalonResource {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<Salon> getAllSalons() {
         log.debug("REST request to get all Salons");
 
@@ -76,12 +89,14 @@ public class SalonResource {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Salon> getSalon(@PathVariable("id") UUID id) {
         log.debug("REST request to get Salon : {}", id);
         return ResponseUtil.wrapOrNotFound(salonService.get(id));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteSalon(@PathVariable("id") UUID id) {
         log.debug("REST request to delete Salon : {}", id);
 

@@ -1,8 +1,9 @@
 package ch.salon.web.rest;
 
-import static ch.salon.service.StandService.*;
+import static ch.salon.service.StandService.ENTITY_NAME;
 
 import ch.salon.domain.Stand;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.StandService;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -14,8 +15,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -25,17 +35,17 @@ import tech.jhipster.web.util.ResponseUtil;
 public class StandResource {
 
     private static final Logger log = LoggerFactory.getLogger(StandResource.class);
+    private final StandService standService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final StandService standService;
 
     public StandResource(StandService standService) {
         this.standService = standService;
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Stand> createStand(@Valid @RequestBody Stand stand) throws URISyntaxException {
         log.debug("REST request to save Stand : {}", stand);
         if (stand.getId() != null) {
@@ -49,6 +59,7 @@ public class StandResource {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Stand> updateStand(@PathVariable(value = "id", required = false) final UUID id, @Valid @RequestBody Stand stand) {
         log.debug("REST request to update Stand : {}, {}", id, stand);
 
@@ -60,6 +71,7 @@ public class StandResource {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<Stand> getAllStands(
         @RequestParam(name = "idSalon", required = false) String idSalon,
         @RequestParam(name = "idParticipation", required = false) String idParticipation
@@ -70,6 +82,7 @@ public class StandResource {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Stand> getStand(@PathVariable("id") UUID id) {
         log.debug("REST request to get Stand : {}", id);
 
@@ -77,6 +90,7 @@ public class StandResource {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteStand(@PathVariable("id") UUID id) {
         log.debug("REST request to delete Stand : {}", id);
 

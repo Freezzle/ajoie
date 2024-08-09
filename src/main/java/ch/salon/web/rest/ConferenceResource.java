@@ -3,6 +3,7 @@ package ch.salon.web.rest;
 import static ch.salon.service.ConferenceService.ENTITY_NAME;
 
 import ch.salon.domain.Conference;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ConferenceService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -13,8 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -24,17 +34,17 @@ import tech.jhipster.web.util.ResponseUtil;
 public class ConferenceResource {
 
     private static final Logger log = LoggerFactory.getLogger(ConferenceResource.class);
+    private final ConferenceService conferenceService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final ConferenceService conferenceService;
 
     public ConferenceResource(ConferenceService conferenceService) {
         this.conferenceService = conferenceService;
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Conference> createConference(@Valid @RequestBody Conference conference) throws URISyntaxException {
         log.debug("REST request to save Conference : {}", conference);
 
@@ -46,6 +56,7 @@ public class ConferenceResource {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Conference> updateConference(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody Conference conference
@@ -60,6 +71,7 @@ public class ConferenceResource {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<Conference> getAllConferences(
         @RequestParam(name = "idSalon", required = false) String idSalon,
         @RequestParam(name = "idParticipation", required = false) String idParticipation
@@ -70,6 +82,7 @@ public class ConferenceResource {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Conference> getConference(@PathVariable("id") UUID id) {
         log.debug("REST request to get Conference : {}", id);
 
@@ -77,6 +90,7 @@ public class ConferenceResource {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteConference(@PathVariable("id") UUID id) {
         log.debug("REST request to delete Conference : {}", id);
 

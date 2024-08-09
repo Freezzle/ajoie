@@ -2,7 +2,11 @@ package ch.salon.service;
 
 import static ch.salon.domain.enumeration.TemplateEmail.*;
 
-import ch.salon.domain.*;
+import ch.salon.domain.DateUtils;
+import ch.salon.domain.Exponent;
+import ch.salon.domain.InvoicingPlan;
+import ch.salon.domain.Salon;
+import ch.salon.domain.User;
 import ch.salon.domain.enumeration.TemplateEmail;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

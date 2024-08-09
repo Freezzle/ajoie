@@ -1,6 +1,8 @@
 package ch.salon.service;
 
-import ch.salon.domain.*;
+import ch.salon.domain.Participation;
+import ch.salon.domain.Salon;
+import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.ParticipationRepository;
@@ -9,7 +11,12 @@ import ch.salon.repository.StandRepository;
 import ch.salon.web.rest.dto.DimensionStats;
 import ch.salon.web.rest.dto.SalonStats;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

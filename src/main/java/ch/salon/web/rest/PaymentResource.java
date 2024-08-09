@@ -3,6 +3,7 @@ package ch.salon.web.rest;
 import static ch.salon.service.PaymentService.ENTITY_NAME;
 
 import ch.salon.domain.Payment;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.PaymentService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -13,8 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -24,17 +34,17 @@ import tech.jhipster.web.util.ResponseUtil;
 public class PaymentResource {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentResource.class);
+    private final PaymentService paymentService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final PaymentService paymentService;
 
     public PaymentResource(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Payment> createPayment(@Valid @RequestBody Payment payment) throws URISyntaxException {
         log.debug("REST request to save Payment : {}", payment);
 
@@ -46,6 +56,7 @@ public class PaymentResource {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Payment> updatePayment(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody Payment payment
@@ -60,6 +71,7 @@ public class PaymentResource {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<Payment> getAllPayments(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all Payments");
 
@@ -67,6 +79,7 @@ public class PaymentResource {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Payment> getPayment(@PathVariable("id") UUID id) {
         log.debug("REST request to get Payment : {}", id);
 
@@ -74,6 +87,7 @@ public class PaymentResource {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deletePayment(@PathVariable("id") UUID id) {
         log.debug("REST request to delete Payment : {}", id);
 

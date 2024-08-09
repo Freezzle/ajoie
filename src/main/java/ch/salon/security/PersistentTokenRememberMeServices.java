@@ -7,14 +7,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.rememberme.*;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.CookieTheftException;
+import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.stereotype.Service;
 import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.security.PersistentTokenCache;
@@ -55,7 +59,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     private static final int TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * TOKEN_VALIDITY_DAYS;
 
-    private static final long UPGRADED_TOKEN_VALIDITY_MILLIS = 5000l;
+    private static final long UPGRADED_TOKEN_VALIDITY_MILLIS = 5000L;
 
     private final PersistentTokenCache<UpgradedRememberMeToken> upgradedTokenCache;
 
@@ -140,8 +144,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
      * The standard Spring Security implementations are too basic: they invalidate all tokens for the
      * current user, so when he logs out from one browser, all his other sessions are destroyed.
      *
-     * @param request the request.
-     * @param response the response.
+     * @param request        the request.
+     * @param response       the response.
      * @param authentication the authentication.
      */
     @Override

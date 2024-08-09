@@ -3,7 +3,10 @@ package ch.salon.service.dto;
 import ch.salon.config.Constants;
 import ch.salon.domain.Authority;
 import ch.salon.domain.User;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
@@ -179,18 +182,18 @@ public class AdminUserDTO implements Serializable {
     @Override
     public String toString() {
         return "AdminUserDTO{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", activated=" + activated +
-            ", langKey='" + langKey + '\'' +
-            ", createdBy=" + createdBy +
-            ", createdDate=" + createdDate +
-            ", lastModifiedBy='" + lastModifiedBy + '\'' +
-            ", lastModifiedDate=" + lastModifiedDate +
-            ", authorities=" + authorities +
-            "}";
+               "login='" + login + '\'' +
+               ", firstName='" + firstName + '\'' +
+               ", lastName='" + lastName + '\'' +
+               ", email='" + email + '\'' +
+               ", imageUrl='" + imageUrl + '\'' +
+               ", activated=" + activated +
+               ", langKey='" + langKey + '\'' +
+               ", createdBy=" + createdBy +
+               ", createdDate=" + createdDate +
+               ", lastModifiedBy='" + lastModifiedBy + '\'' +
+               ", lastModifiedDate=" + lastModifiedDate +
+               ", authorities=" + authorities +
+               "}";
     }
 }

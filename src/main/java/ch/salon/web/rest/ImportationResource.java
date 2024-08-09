@@ -1,8 +1,21 @@
 package ch.salon.web.rest;
 
-import ch.salon.domain.*;
+import ch.salon.domain.Conference;
+import ch.salon.domain.DimensionStand;
+import ch.salon.domain.Exponent;
+import ch.salon.domain.Invoice;
+import ch.salon.domain.Participation;
+import ch.salon.domain.PriceStandSalon;
+import ch.salon.domain.Salon;
+import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.repository.*;
+import ch.salon.repository.ConferenceRepository;
+import ch.salon.repository.DimensionStandRepository;
+import ch.salon.repository.ExponentRepository;
+import ch.salon.repository.ParticipationRepository;
+import ch.salon.repository.SalonRepository;
+import ch.salon.repository.StandRepository;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,7 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -20,8 +34,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for managing {@link Invoice}.
@@ -55,10 +73,6 @@ public class ImportationResource {
     private static final int STAND_ARRANGMENT = 19;
     private static final int STAND_ACCEPTED_CHART = 20;
     private static final int EXPONENT_URL_PICTURE = 21;
-
-    @Value("${jhipster.clientApp.name}")
-    private String applicationName;
-
     private final SalonRepository salonRepository;
     private final StandRepository standRepository;
     private final ExponentRepository exponentRepository;
@@ -66,6 +80,9 @@ public class ImportationResource {
     private final DimensionStandRepository dimensionStandRepository;
     private final ParticipationRepository participationRepository;
     private final InvoicingPlanService invoiceService;
+
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     public ImportationResource(
         SalonRepository salonRepository,
@@ -86,6 +103,7 @@ public class ImportationResource {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> importation(@RequestParam(name = "idSalon", required = false) String idSalon) throws URISyntaxException {
         try (
             Reader reader = new FileReader(

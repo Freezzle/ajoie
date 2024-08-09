@@ -1,9 +1,13 @@
 package ch.salon.domain;
 
-import ch.salon.domain.enumeration.Status;
 import ch.salon.domain.enumeration.Type;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -76,17 +80,21 @@ public class Invoice implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Invoice id(UUID id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public Instant getGenerationDate() {
         return this.generationDate;
+    }
+
+    public void setGenerationDate(Instant generationDate) {
+        this.generationDate = generationDate;
     }
 
     public Invoice generationDate(Instant generationDate) {
@@ -94,12 +102,12 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public void setGenerationDate(Instant generationDate) {
-        this.generationDate = generationDate;
-    }
-
     public String getLabel() {
         return this.label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public Invoice label(String label) {
@@ -107,12 +115,12 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public Double getDefaultAmount() {
         return this.defaultAmount;
+    }
+
+    public void setDefaultAmount(Double defaultAmount) {
+        this.defaultAmount = defaultAmount;
     }
 
     public Invoice defaultAmount(Double defaultAmount) {
@@ -120,12 +128,12 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public void setDefaultAmount(Double defaultAmount) {
-        this.defaultAmount = defaultAmount;
-    }
-
     public Double getCustomAmount() {
         return this.customAmount;
+    }
+
+    public void setCustomAmount(Double customAmount) {
+        this.customAmount = customAmount;
     }
 
     public Invoice customAmount(Double customAmount) {
@@ -133,12 +141,12 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public void setCustomAmount(Double customAmount) {
-        this.customAmount = customAmount;
-    }
-
     public Long getQuantity() {
         return this.quantity;
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
     }
 
     public Invoice quantity(Long quantity) {
@@ -146,12 +154,12 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public void setQuantity(Long quantity) {
-        this.quantity = quantity;
-    }
-
     public Double getTotal() {
         return this.total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
     }
 
     public Invoice total(Double total) {
@@ -159,12 +167,12 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public void setTotal(Double total) {
-        this.total = total;
-    }
-
     public Boolean getLock() {
         return this.lock;
+    }
+
+    public void setLock(Boolean lock) {
+        this.lock = lock;
     }
 
     public Invoice lock(Boolean lock) {
@@ -172,21 +180,17 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public void setLock(Boolean lock) {
-        this.lock = lock;
-    }
-
     public String getExtraInformation() {
         return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
     public Invoice extraInformation(String extraInformation) {
         this.setExtraInformation(extraInformation);
         return this;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
     }
 
     public Type getType() {
@@ -228,17 +232,17 @@ public class Invoice implements Serializable {
     @Override
     public String toString() {
         return "Invoice{" +
-            "id=" + getId() +
-            ", referenceId=" + getReferenceId() +
-            ", generationDate='" + getGenerationDate() + "'" +
-            ", type='" + getType() + "'" +
-            ", label='" + getLabel() + "'" +
-            ", defaultAmount=" + getDefaultAmount() +
-            ", customAmount=" + getCustomAmount() +
-            ", quantity=" + getQuantity() +
-            ", total=" + getTotal() +
-            ", lock='" + getLock() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" +
-            "}";
+               "id=" + getId() +
+               ", referenceId=" + getReferenceId() +
+               ", generationDate='" + getGenerationDate() + "'" +
+               ", type='" + getType() + "'" +
+               ", label='" + getLabel() + "'" +
+               ", defaultAmount=" + getDefaultAmount() +
+               ", customAmount=" + getCustomAmount() +
+               ", quantity=" + getQuantity() +
+               ", total=" + getTotal() +
+               ", lock='" + getLock() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" +
+               "}";
     }
 }

@@ -23,8 +23,6 @@ public abstract class AbstractAuditingEntity<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public abstract T getId();
-
     @CreatedBy
     @Column(name = "created_by", nullable = false, length = 50, updatable = false)
     private String createdBy;
@@ -40,6 +38,8 @@ public abstract class AbstractAuditingEntity<T> implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date")
     private Instant lastModifiedDate = Instant.now();
+
+    public abstract T getId();
 
     public String getCreatedBy() {
         return createdBy;

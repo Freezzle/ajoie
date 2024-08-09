@@ -25,12 +25,12 @@ public class LiquibaseConfiguration {
 
     private final Environment env;
 
+    @Value("${application.liquibase.async-start:true}")
+    private Boolean asyncStart;
+
     public LiquibaseConfiguration(Environment env) {
         this.env = env;
     }
-
-    @Value("${application.liquibase.async-start:true}")
-    private Boolean asyncStart;
 
     @Bean
     public SpringLiquibase liquibase(

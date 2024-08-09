@@ -1,7 +1,11 @@
 package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
@@ -116,11 +120,11 @@ public class PersistentToken implements Serializable {
     @Override
     public String toString() {
         return "PersistentToken{" +
-            "series='" + series + '\'' +
-            ", tokenValue='" + tokenValue + '\'' +
-            ", tokenDate=" + tokenDate +
-            ", ipAddress='" + ipAddress + '\'' +
-            ", userAgent='" + userAgent + '\'' +
-            "}";
+               "series='" + series + '\'' +
+               ", tokenValue='" + tokenValue + '\'' +
+               ", tokenDate=" + tokenDate +
+               ", ipAddress='" + ipAddress + '\'' +
+               ", userAgent='" + userAgent + '\'' +
+               "}";
     }
 }

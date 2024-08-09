@@ -2,8 +2,16 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -48,17 +56,21 @@ public class Payment implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Payment id(UUID id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public Double getAmount() {
         return this.amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
 
     public Payment amount(Double amount) {
@@ -66,12 +78,12 @@ public class Payment implements Serializable {
         return this;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
     public Instant getBillingDate() {
         return this.billingDate;
+    }
+
+    public void setBillingDate(Instant billingDate) {
+        this.billingDate = billingDate;
     }
 
     public Payment billingDate(Instant billingDate) {
@@ -79,12 +91,12 @@ public class Payment implements Serializable {
         return this;
     }
 
-    public void setBillingDate(Instant billingDate) {
-        this.billingDate = billingDate;
-    }
-
     public Mode getPaymentMode() {
         return this.paymentMode;
+    }
+
+    public void setPaymentMode(Mode paymentMode) {
+        this.paymentMode = paymentMode;
     }
 
     public Payment paymentMode(Mode paymentMode) {
@@ -92,21 +104,17 @@ public class Payment implements Serializable {
         return this;
     }
 
-    public void setPaymentMode(Mode paymentMode) {
-        this.paymentMode = paymentMode;
-    }
-
     public String getExtraInformation() {
         return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
     public Payment extraInformation(String extraInformation) {
         this.setExtraInformation(extraInformation);
         return this;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
     }
 
     public Participation getParticipation() {
@@ -145,11 +153,11 @@ public class Payment implements Serializable {
     @Override
     public String toString() {
         return "Payment{" +
-            "id=" + getId() +
-            ", amount=" + getAmount() +
-            ", billingDate='" + getBillingDate() + "'" +
-            ", paymentMode='" + getPaymentMode() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" +
-            "}";
+               "id=" + getId() +
+               ", amount=" + getAmount() +
+               ", billingDate='" + getBillingDate() + "'" +
+               ", paymentMode='" + getPaymentMode() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" +
+               "}";
     }
 }

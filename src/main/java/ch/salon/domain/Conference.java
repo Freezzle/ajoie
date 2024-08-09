@@ -2,8 +2,16 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -43,17 +51,21 @@ public class Conference implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Conference id(UUID id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return this.title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Conference title(String title) {
@@ -61,12 +73,12 @@ public class Conference implements Serializable {
         return this;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public Status getStatus() {
         return this.status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public Conference status(Status status) {
@@ -74,21 +86,17 @@ public class Conference implements Serializable {
         return this;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public String getExtraInformation() {
         return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
     public Conference extraInformation(String extraInformation) {
         this.setExtraInformation(extraInformation);
         return this;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
     }
 
     public Participation getParticipation() {
@@ -127,10 +135,10 @@ public class Conference implements Serializable {
     @Override
     public String toString() {
         return "Conference{" +
-            "id=" + getId() +
-            ", title='" + getTitle() + "'" +
-            ", status='" + getStatus() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" +
-            "}";
+               "id=" + getId() +
+               ", title='" + getTitle() + "'" +
+               ", status='" + getStatus() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" +
+               "}";
     }
 }

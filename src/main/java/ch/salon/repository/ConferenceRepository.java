@@ -1,10 +1,9 @@
 package ch.salon.repository;
 
 import ch.salon.domain.Conference;
-import ch.salon.domain.Stand;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -14,5 +13,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConferenceRepository extends JpaRepository<Conference, UUID> {
     List<Conference> findByParticipationSalonId(UUID salonId);
+
     List<Conference> findByParticipationId(UUID participationId);
 }

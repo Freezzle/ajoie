@@ -1,11 +1,12 @@
 package ch.salon.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -33,26 +34,26 @@ public class DimensionStand implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public DimensionStand id(UUID id) {
         this.setId(id);
         return this;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getDimension() {
         return this.dimension;
     }
 
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
+    }
+
     public DimensionStand dimension(String dimension) {
         this.setDimension(dimension);
         return this;
-    }
-
-    public void setDimension(String dimension) {
-        this.dimension = dimension;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -78,8 +79,8 @@ public class DimensionStand implements Serializable {
     @Override
     public String toString() {
         return "DimensionStand{" +
-            "id=" + getId() +
-            ", dimension='" + getDimension() + "'" +
-            "}";
+               "id=" + getId() +
+               ", dimension='" + getDimension() + "'" +
+               "}";
     }
 }

@@ -32,6 +32,10 @@ public class SalonStats implements Serializable {
         return nbStandInTreatment;
     }
 
+    public void setNbStandInTreatment(long nbStandInTreatment) {
+        this.nbStandInTreatment = nbStandInTreatment;
+    }
+
     public void setNbStandInVerification(long nbStandInTreatment) {
         this.nbStandInTreatment = nbStandInTreatment;
     }
@@ -74,10 +78,6 @@ public class SalonStats implements Serializable {
 
     public void setDimensionStats(List<DimensionStats> dimensionStats) {
         this.dimensionStats = dimensionStats;
-    }
-
-    public void setNbStandInTreatment(long nbStandInTreatment) {
-        this.nbStandInTreatment = nbStandInTreatment;
     }
 
     public long getNbParticipationAcceptedPaid() {

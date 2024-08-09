@@ -1,8 +1,16 @@
 package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -68,13 +76,13 @@ public class Salon implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Salon id(UUID id) {
         this.setId(id);
         return this;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public Long getReferenceNumber() {
@@ -89,17 +97,21 @@ public class Salon implements Serializable {
         return this.place;
     }
 
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
     public Salon place(String place) {
         this.setPlace(place);
         return this;
     }
 
-    public void setPlace(String place) {
-        this.place = place;
-    }
-
     public Instant getStartingDate() {
         return this.startingDate;
+    }
+
+    public void setStartingDate(Instant startingDate) {
+        this.startingDate = startingDate;
     }
 
     public Salon startingDate(Instant startingDate) {
@@ -107,12 +119,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setStartingDate(Instant startingDate) {
-        this.startingDate = startingDate;
-    }
-
     public Instant getEndingDate() {
         return this.endingDate;
+    }
+
+    public void setEndingDate(Instant endingDate) {
+        this.endingDate = endingDate;
     }
 
     public Salon endingDate(Instant endingDate) {
@@ -120,12 +132,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setEndingDate(Instant endingDate) {
-        this.endingDate = endingDate;
-    }
-
     public Double getPriceMeal1() {
         return this.priceMeal1;
+    }
+
+    public void setPriceMeal1(Double priceMeal1) {
+        this.priceMeal1 = priceMeal1;
     }
 
     public Salon priceMeal1(Double priceMeal1) {
@@ -133,12 +145,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setPriceMeal1(Double priceMeal1) {
-        this.priceMeal1 = priceMeal1;
-    }
-
     public Double getPriceMeal2() {
         return this.priceMeal2;
+    }
+
+    public void setPriceMeal2(Double priceMeal2) {
+        this.priceMeal2 = priceMeal2;
     }
 
     public Salon priceMeal2(Double priceMeal2) {
@@ -146,12 +158,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setPriceMeal2(Double priceMeal2) {
-        this.priceMeal2 = priceMeal2;
-    }
-
     public Double getPriceMeal3() {
         return this.priceMeal3;
+    }
+
+    public void setPriceMeal3(Double priceMeal3) {
+        this.priceMeal3 = priceMeal3;
     }
 
     public Salon priceMeal3(Double priceMeal3) {
@@ -159,12 +171,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setPriceMeal3(Double priceMeal3) {
-        this.priceMeal3 = priceMeal3;
-    }
-
     public Double getPriceConference() {
         return this.priceConference;
+    }
+
+    public void setPriceConference(Double priceConference) {
+        this.priceConference = priceConference;
     }
 
     public Salon priceConference(Double priceConference) {
@@ -172,12 +184,12 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setPriceConference(Double priceConference) {
-        this.priceConference = priceConference;
-    }
-
     public Double getPriceSharingStand() {
         return this.priceSharingStand;
+    }
+
+    public void setPriceSharingStand(Double priceSharingStand) {
+        this.priceSharingStand = priceSharingStand;
     }
 
     public Salon priceSharingStand(Double priceSharingStand) {
@@ -185,21 +197,17 @@ public class Salon implements Serializable {
         return this;
     }
 
-    public void setPriceSharingStand(Double priceSharingStand) {
-        this.priceSharingStand = priceSharingStand;
-    }
-
     public String getExtraInformation() {
         return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
     public Salon extraInformation(String extraInformation) {
         this.setExtraInformation(extraInformation);
         return this;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
     }
 
     public Set<PriceStandSalon> getPriceStandSalons() {
@@ -248,17 +256,17 @@ public class Salon implements Serializable {
     @Override
     public String toString() {
         return "Salon{" +
-            "id=" + getId() +
-            ", referenceNumber='" + getReferenceNumber() + "'" +
-            ", place='" + getPlace() + "'" +
-            ", startingDate='" + getStartingDate() + "'" +
-            ", endingDate='" + getEndingDate() + "'" +
-            ", priceMeal1=" + getPriceMeal1() +
-            ", priceMeal2=" + getPriceMeal2() +
-            ", priceMeal3=" + getPriceMeal3() +
-            ", priceConference=" + getPriceConference() +
-            ", priceSharingStand=" + getPriceSharingStand() +
-            ", extraInformation='" + getExtraInformation() + "'" +
-            "}";
+               "id=" + getId() +
+               ", referenceNumber='" + getReferenceNumber() + "'" +
+               ", place='" + getPlace() + "'" +
+               ", startingDate='" + getStartingDate() + "'" +
+               ", endingDate='" + getEndingDate() + "'" +
+               ", priceMeal1=" + getPriceMeal1() +
+               ", priceMeal2=" + getPriceMeal2() +
+               ", priceMeal3=" + getPriceMeal3() +
+               ", priceConference=" + getPriceConference() +
+               ", priceSharingStand=" + getPriceSharingStand() +
+               ", extraInformation='" + getExtraInformation() + "'" +
+               "}";
     }
 }

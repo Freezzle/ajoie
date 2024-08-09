@@ -1,8 +1,13 @@
 package ch.salon.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -34,26 +39,26 @@ public class PriceStandSalon implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public PriceStandSalon id(UUID id) {
         this.setId(id);
         return this;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public Double getPrice() {
         return this.price;
     }
 
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
     public PriceStandSalon price(Double price) {
         this.setPrice(price);
         return this;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
     }
 
     public DimensionStand getDimension() {
@@ -92,8 +97,8 @@ public class PriceStandSalon implements Serializable {
     @Override
     public String toString() {
         return "PriceStandSalon{" +
-            "id=" + getId() +
-            ", price=" + getPrice() +
-            "}";
+               "id=" + getId() +
+               ", price=" + getPrice() +
+               "}";
     }
 }

@@ -1,8 +1,16 @@
 package ch.salon.domain;
 
-import ch.salon.domain.enumeration.Type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -47,26 +55,26 @@ public class InvoicingPlan implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public InvoicingPlan id(UUID id) {
         this.setId(id);
         return this;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public Instant getGenerationDate() {
         return this.generationDate;
     }
 
+    public void setGenerationDate(Instant generationDate) {
+        this.generationDate = generationDate;
+    }
+
     public InvoicingPlan generationDate(Instant generationDate) {
         this.setGenerationDate(generationDate);
         return this;
-    }
-
-    public void setGenerationDate(Instant generationDate) {
-        this.generationDate = generationDate;
     }
 
     public Participation getParticipation() {
@@ -144,10 +152,10 @@ public class InvoicingPlan implements Serializable {
     @Override
     public String toString() {
         return "Invoice{" +
-            "id=" + getId() +
-            ", generationDate='" + getGenerationDate() + "'" +
-            ", billingNumber=" + getBillingNumber() +
-            ", hasBeenSent='" + isHasBeenSent() + "'" +
-            "}";
+               "id=" + getId() +
+               ", generationDate='" + getGenerationDate() + "'" +
+               ", billingNumber=" + getBillingNumber() +
+               ", hasBeenSent='" + isHasBeenSent() + "'" +
+               "}";
     }
 }

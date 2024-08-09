@@ -3,16 +3,27 @@ package ch.salon.web.rest;
 import static ch.salon.service.ParticipationService.ENTITY_NAME;
 
 import ch.salon.domain.Participation;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ParticipationService;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -22,17 +33,17 @@ import tech.jhipster.web.util.ResponseUtil;
 public class ParticipationResource {
 
     private static final Logger log = LoggerFactory.getLogger(ParticipationResource.class);
+    private final ParticipationService participationService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final ParticipationService participationService;
 
     public ParticipationResource(ParticipationService participationService) {
         this.participationService = participationService;
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Participation> createParticipation(@RequestBody Participation participation) throws URISyntaxException {
         log.debug("REST request to save Participation : {}", participation);
 
@@ -43,6 +54,7 @@ public class ParticipationResource {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Participation> updateParticipation(
         @PathVariable(value = "id", required = false) final UUID id,
         @RequestBody Participation participation
@@ -57,6 +69,7 @@ public class ParticipationResource {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<Participation> getAllParticipations(@RequestParam(name = "idSalon", required = false) String idSalon) {
         log.debug("REST request to get all Participations");
 
@@ -64,6 +77,7 @@ public class ParticipationResource {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Participation> getParticipation(@PathVariable("id") UUID id) {
         log.debug("REST request to get Participation : {}", id);
 
@@ -71,6 +85,7 @@ public class ParticipationResource {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteParticipation(@PathVariable("id") UUID id) {
         log.debug("REST request to delete Participation : {}", id);
 

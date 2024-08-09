@@ -2,8 +2,16 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -67,17 +75,21 @@ public class Stand implements Serializable {
         return this.id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Stand id(UUID id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getDescription() {
         return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Stand description(String description) {
@@ -85,12 +97,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getWebsite() {
         return this.website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
     public Stand website(String website) {
@@ -98,12 +110,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
     public String getSocialMedia() {
         return this.socialMedia;
+    }
+
+    public void setSocialMedia(String socialMedia) {
+        this.socialMedia = socialMedia;
     }
 
     public Stand socialMedia(String socialMedia) {
@@ -111,12 +123,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setSocialMedia(String socialMedia) {
-        this.socialMedia = socialMedia;
-    }
-
     public String getUrlPicture() {
         return this.urlPicture;
+    }
+
+    public void setUrlPicture(String urlPicture) {
+        this.urlPicture = urlPicture;
     }
 
     public Stand urlPicture(String urlPicture) {
@@ -124,12 +136,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setUrlPicture(String urlPicture) {
-        this.urlPicture = urlPicture;
-    }
-
     public Boolean getShared() {
         return this.shared;
+    }
+
+    public void setShared(Boolean shared) {
+        this.shared = shared;
     }
 
     public Stand shared(Boolean shared) {
@@ -137,12 +149,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setShared(Boolean shared) {
-        this.shared = shared;
-    }
-
     public Long getNbTable() {
         return this.nbTable;
+    }
+
+    public void setNbTable(Long nbTable) {
+        this.nbTable = nbTable;
     }
 
     public Stand nbTable(Long nbTable) {
@@ -150,12 +162,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setNbTable(Long nbTable) {
-        this.nbTable = nbTable;
-    }
-
     public Long getNbChair() {
         return this.nbChair;
+    }
+
+    public void setNbChair(Long nbChair) {
+        this.nbChair = nbChair;
     }
 
     public Stand nbChair(Long nbChair) {
@@ -163,12 +175,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setNbChair(Long nbChair) {
-        this.nbChair = nbChair;
-    }
-
     public Boolean getNeedElectricity() {
         return this.needElectricity;
+    }
+
+    public void setNeedElectricity(Boolean needElectricity) {
+        this.needElectricity = needElectricity;
     }
 
     public Stand needElectricity(Boolean needElectricity) {
@@ -176,12 +188,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setNeedElectricity(Boolean needElectricity) {
-        this.needElectricity = needElectricity;
-    }
-
     public Status getStatus() {
         return this.status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public Stand status(Status status) {
@@ -189,21 +201,17 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public String getExtraInformation() {
         return this.extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 
     public Stand extraInformation(String extraInformation) {
         this.setExtraInformation(extraInformation);
         return this;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
     }
 
     public Participation getParticipation() {
@@ -255,17 +263,17 @@ public class Stand implements Serializable {
     @Override
     public String toString() {
         return "Stand{" +
-            "id=" + getId() +
-            ", description='" + getDescription() + "'" +
-            ", website='" + getWebsite() + "'" +
-            ", socialMedia='" + getSocialMedia() + "'" +
-            ", urlPicture='" + getUrlPicture() + "'" +
-            ", shared='" + getShared() + "'" +
-            ", nbTable=" + getNbTable() +
-            ", nbChair=" + getNbChair() +
-            ", needElectricity='" + getNeedElectricity() + "'" +
-            ", status='" + getStatus() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" +
-            "}";
+               "id=" + getId() +
+               ", description='" + getDescription() + "'" +
+               ", website='" + getWebsite() + "'" +
+               ", socialMedia='" + getSocialMedia() + "'" +
+               ", urlPicture='" + getUrlPicture() + "'" +
+               ", shared='" + getShared() + "'" +
+               ", nbTable=" + getNbTable() +
+               ", nbChair=" + getNbChair() +
+               ", needElectricity='" + getNeedElectricity() + "'" +
+               ", status='" + getStatus() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" +
+               "}";
     }
 }
