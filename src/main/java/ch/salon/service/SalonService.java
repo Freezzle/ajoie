@@ -51,8 +51,14 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!salonRepository.existsById(id)) {
+        Salon salonFound = salonRepository.getReferenceById(id);
+
+        if (salonFound == null) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
+            salon.setPriceStandSalons(salonFound.getPriceStandSalons());
         }
 
         return salonRepository.save(salon);

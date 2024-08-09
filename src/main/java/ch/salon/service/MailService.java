@@ -1,9 +1,9 @@
 package ch.salon.service;
 
-import static ch.salon.service.enumeration.EmailTemplateEnum.*;
+import static ch.salon.domain.enumeration.TemplateEmail.*;
 
 import ch.salon.domain.*;
-import ch.salon.service.enumeration.EmailTemplateEnum;
+import ch.salon.domain.enumeration.TemplateEmail;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.File;
@@ -78,7 +78,7 @@ public class MailService {
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
 
-        this.sendEmailFromTemplateSync(context, user.getEmail(), REST_PASSWORD_EMAIL, null);
+        this.sendEmailFromTemplateSync(context, user.getEmail(), RESET_PASSWORD_EMAIL, null);
     }
 
     public void sendInvoiceMail(Salon salon, Exponent exponent, InvoicingPlan invoicingPlan) {
@@ -96,7 +96,7 @@ public class MailService {
         this.sendEmailFromTemplateSync(context, exponent.getEmail(), INVOICE_EMAIL, args);
     }
 
-    private void sendEmailFromTemplateSync(Context context, String emailto, EmailTemplateEnum template, Object[] argsSubject) {
+    private void sendEmailFromTemplateSync(Context context, String emailto, TemplateEmail template, Object[] argsSubject) {
         String content = templateEngine.process(template.getTemplateName(), context);
         String subject = messageSource.getMessage(template.getSubjectKey(), argsSubject, context.getLocale());
 
