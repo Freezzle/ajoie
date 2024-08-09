@@ -200,14 +200,21 @@ public class ImportationResource {
                 String exponentNpaLocalite = csvRecord.get(EXPONENT_NPA_LOCALITE);
                 String exponentPhone = csvRecord.get(EXPONENT_PHONE_NUMBER);
 
-                Exponent currentExponent = new Exponent();
-                currentExponent.setEmail(sub(exponentEmail));
-                currentExponent.setFullName(sub(exponentFullname));
-                currentExponent.setAddress(sub(exponentAddress));
-                currentExponent.setNpaLocalite(sub(exponentNpaLocalite));
-                currentExponent.setPhoneNumber(exponentPhone);
-                currentExponent.setPhoneNumber(exponentPhone);
-                currentExponent = exponentRepository.save(currentExponent);
+                if (participationRepository.findByExponentEmailAndSalonId(exponentEmail, currentSalon.getId()) != null) {
+                    log.info("registration already passed through with email {} and salon {}", exponentEmail, currentSalon.getId());
+                    continue;
+                }
+
+                Exponent currentExponent = exponentRepository.findByEmail(exponentEmail);
+                if (currentExponent == null) {
+                    currentExponent = new Exponent();
+                    currentExponent.setEmail(sub(exponentEmail));
+                    currentExponent.setFullName(sub(exponentFullname));
+                    currentExponent.setAddress(sub(exponentAddress));
+                    currentExponent.setNpaLocalite(sub(exponentNpaLocalite));
+                    currentExponent.setPhoneNumber(exponentPhone);
+                    currentExponent = exponentRepository.save(currentExponent);
+                }
 
                 String participationMeal1 = csvRecord.get(STAND_MEAL_1);
                 String participationMeal2 = csvRecord.get(STAND_MEAL_2);

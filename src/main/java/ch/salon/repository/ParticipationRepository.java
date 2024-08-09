@@ -17,4 +17,6 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
 
     @Query("SELECT MAX(p.clientNumber) FROM Participation p")
     String findMaxClientNumber();
+
+    Participation findByExponentEmailAndSalonId(String email, UUID idSalon);
 }

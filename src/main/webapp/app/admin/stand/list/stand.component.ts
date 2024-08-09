@@ -52,7 +52,7 @@ export class StandComponent implements OnInit {
   protected state: any;
 
   ngOnInit(): void {
-    this.state = history.state;
+    this.state = window.history.state as { idSalon: string };
 
     if (!this.stands || this.stands.length === 0) {
       this.load();

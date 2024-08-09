@@ -27,6 +27,7 @@ export class ConferenceUpdateComponent implements OnInit {
 
   participationsSharedCollection: IParticipation[] = [];
 
+  protected state: any;
   protected conferenceService = inject(ConferenceService);
   protected conferenceFormService = inject(ConferenceFormService);
   protected participationService = inject(ParticipationService);
@@ -39,6 +40,7 @@ export class ConferenceUpdateComponent implements OnInit {
     this.participationService.compareParticipation(o1, o2);
 
   ngOnInit(): void {
+    this.state = window.history.state;
     this.activatedRoute.data.subscribe(({ conference }) => {
       this.conference = conference;
       if (conference) {
@@ -93,8 +95,11 @@ export class ConferenceUpdateComponent implements OnInit {
   }
 
   protected loadRelationshipsOptions(): void {
+    const queryObject: any = {
+      idSalon: this.state.idSalon,
+    };
     this.participationService
-      .query()
+      .query(queryObject)
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) =>

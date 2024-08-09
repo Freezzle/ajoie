@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import SharedModule from 'app/shared/shared.module';
 import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
-import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
+import { ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
 import { IConference } from '../conference.model';
 import { EntityArrayResponseType, ConferenceService } from '../service/conference.service';
 import { ConferenceDeleteDialogComponent } from '../delete/conference-delete-dialog.component';
@@ -43,7 +43,8 @@ export class ConferenceComponent implements OnInit {
   trackId = (_index: number, item: IConference): string => this.conferenceService.getConferenceIdentifier(item);
 
   ngOnInit(): void {
-    this.state = history.state;
+    this.state = window.history.state as { idSalon: string };
+
     if (!this.conferences || this.conferences.length === 0) {
       this.load();
     }

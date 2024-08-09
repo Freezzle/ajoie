@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface ExponentRepository extends JpaRepository<Exponent, UUID> {}
+public interface ExponentRepository extends JpaRepository<Exponent, UUID> {
+    Exponent findByEmail(String email);
+}

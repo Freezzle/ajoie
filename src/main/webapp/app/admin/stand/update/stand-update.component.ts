@@ -40,6 +40,7 @@ export class StandUpdateComponent implements OnInit {
   protected participationService = inject(ParticipationService);
   protected dimensionStandService = inject(DimensionStandService);
   protected activatedRoute = inject(ActivatedRoute);
+  protected state: any;
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: StandFormGroup = this.standFormService.createStandFormGroup();
@@ -51,6 +52,8 @@ export class StandUpdateComponent implements OnInit {
     this.dimensionStandService.compareDimensionStand(o1, o2);
 
   ngOnInit(): void {
+    this.state = window.history.state as { idSalon: string };
+
     this.activatedRoute.data.subscribe(({ stand }) => {
       this.stand = stand;
       if (stand) {
@@ -109,8 +112,12 @@ export class StandUpdateComponent implements OnInit {
   }
 
   protected loadRelationshipsOptions(): void {
+    const queryObject: any = {
+      idSalon: this.state.idSalon,
+    };
+
     this.participationService
-      .query()
+      .query(queryObject)
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) =>
@@ -120,7 +127,7 @@ export class StandUpdateComponent implements OnInit {
       .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
 
     this.dimensionStandService
-      .query()
+      .query(queryObject)
       .pipe(map((res: HttpResponse<IDimensionStand[]>) => res.body ?? []))
       .pipe(
         map((dimensionStands: IDimensionStand[]) =>

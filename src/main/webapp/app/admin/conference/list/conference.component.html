@@ -22,6 +22,7 @@
           data-cy="entityCreateButton"
           class="btn btn-outline-primary btn-sm"
           [routerLink]="['/admin/conferences/new']"
+          [state]="{ idSalon: state.idSalon }"
         >
           <fa-icon icon="plus"></fa-icon>
           <span jhiTranslate="common.create">Créer</span>
@@ -73,12 +74,22 @@
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['/admin/conferences', conference.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                  <a
+                    [routerLink]="['/admin/conferences', conference.id, 'view']"
+                    [state]="{ idSalon: state.idSalon }"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
                     <fa-icon icon="eye"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
                   </a>
 
-                  <a [routerLink]="['/admin/conferences', conference.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                  <a
+                    [routerLink]="['/admin/conferences', conference.id, 'edit']"
+                    [state]="{ idSalon: state.idSalon }"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
                     <fa-icon icon="pencil-alt"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
                   </a>
