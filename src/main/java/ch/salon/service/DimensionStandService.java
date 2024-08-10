@@ -44,7 +44,19 @@ public class DimensionStandService {
     }
 
     public List<DimensionStand> findAll() {
-        return dimensionStandRepository.findAll();
+        List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
+        if (dimensionStands.isEmpty()) {
+            dimensionStands.add(new DimensionStand("2 m x 2 m"));
+            dimensionStands.add(new DimensionStand("2.5 m x 2 m"));
+            dimensionStands.add(new DimensionStand("2.5 m x 2 m (possible de vendre des deux côtés)"));
+            dimensionStands.add(new DimensionStand("3 m x 2 m"));
+            dimensionStands.add(new DimensionStand("3 m x 2.5 m"));
+            dimensionStands.add(new DimensionStand("4 m x 2 m"));
+            dimensionStands.add(new DimensionStand("Autres"));
+
+            return dimensionStandRepository.saveAll(dimensionStands);
+        }
+        return dimensionStands;
     }
 
     public Optional<DimensionStand> get(UUID id) {

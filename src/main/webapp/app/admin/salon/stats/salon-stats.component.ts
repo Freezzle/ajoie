@@ -12,11 +12,11 @@ import { EMPTY, Observable, of } from 'rxjs';
 
 @Component({
   standalone: true,
-  selector: 'jhi-salon-detail',
-  templateUrl: './salon-detail.component.html',
+  selector: 'jhi-salon-stats',
+  templateUrl: './salon-stats.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe, SortByDirective, SortDirective],
 })
-export class SalonDetailComponent implements OnInit {
+export class SalonStatsComponent implements OnInit {
   salon = input<ISalon | null>(null);
   stats$: Observable<ISalonStats> | undefined;
 

@@ -1,6 +1,7 @@
 {
   "conference": {
     "create": "Création d'une nouvelle conférence",
+    "description": "Description",
     "edit": "Modification d'une conférence",
     "extraInformation": "Information complémentaire",
     "notFound": "Aucune conférence trouvé",

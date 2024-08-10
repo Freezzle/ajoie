@@ -1,176 +1,237 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-stand-create-heading" *ngIf="stand?.id" data-cy="StandCreateUpdateHeading" jhiTranslate="stand.edit">
-        Modification d'un stand
-      </h2>
-      <h2 id="jhi-stand-update-heading" *ngIf="!stand?.id" data-cy="StandCreateUpdateHeading" jhiTranslate="stand.create">
-        Création d'un nouveau stand
-      </h2>
+<div>
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+    <h2 id="page-heading" data-cy="StandHeading">
+      <span *ngIf="stand?.id" jhiTranslate="stand.edit">Modification d'un stand</span>
+      <span *ngIf="!stand?.id" jhiTranslate="stand.create">Création d'un nouveau stand</span>
 
-      <div>
-        <jhi-alert-error></jhi-alert-error>
+      <hr />
 
-        <div class="mb-3">
-          <label class="form-label" for="field_description" jhiTranslate="stand.description">Description</label>
-          <input
-            type="text"
-            class="form-control"
-            name="description"
-            id="field_description"
-            data-cy="description"
-            formControlName="description"
-          />
-          @if (editForm.get('description')!.invalid && (editForm.get('description')!.dirty || editForm.get('description')!.touched)) {
-            <div>
-              @if (editForm.get('description')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
-              }
+      <div class="d-flex justify-content-between mt-3">
+        <span>
+          <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+            <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+          </button>
+        </span>
+
+        <span>
+          <button
+            type="button"
+            id="edit-entity"
+            *ngIf="readonlyForm"
+            data-cy="entityCreateCancelButton"
+            class="btn btn-primary btn-sm"
+            (click)="writeBack()"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
+          </button>
+
+          <button
+            type="button"
+            id="cancel-save"
+            *ngIf="!readonlyForm"
+            data-cy="entityCreateCancelButton"
+            class="btn btn-secondary btn-sm"
+            (click)="readOnlyBack()"
+          >
+            <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
+          </button>
+          <button
+            type="submit"
+            id="save-entity"
+            data-cy="entityCreateSaveButton"
+            *ngIf="!readonlyForm"
+            [disabled]="editForm.invalid || isSaving"
+            class="btn btn-primary btn-sm"
+          >
+            <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
+          </button>
+        </span>
+      </div>
+      <hr />
+    </h2>
+
+    <div>
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <div class="card">
+        <h5 class="card-header">Information de base</h5>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_description" jhiTranslate="stand.description">Description</label>
             </div>
-          }
-        </div>
+            <div class="col-sm-10 align-content-center">
+              <textarea
+                class="form-control"
+                name="description"
+                id="field_description"
+                rows="6"
+                data-cy="description"
+                formControlName="description"
+              ></textarea>
+            </div>
+          </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_website" jhiTranslate="stand.website">Website</label>
-          <input type="text" class="form-control" name="website" id="field_website" data-cy="website" formControlName="website" />
-        </div>
+          <!-- PARTICIPATION / DIMENSION / STATUS -->
 
-        <div class="mb-3">
-          <label class="form-label" for="field_socialMedia" jhiTranslate="stand.socialMedia">Social Media</label>
-          <input
-            type="text"
-            class="form-control"
-            name="socialMedia"
-            id="field_socialMedia"
-            data-cy="socialMedia"
-            formControlName="socialMedia"
-          />
-        </div>
+          <div class="row mt-3">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_participation" jhiTranslate="stand.participation">Participation</label>
+            </div>
+            <div class="col-sm-2 align-content-center">
+              <select
+                class="form-control"
+                id="field_participation"
+                data-cy="participation"
+                name="participation"
+                formControlName="participation"
+                [compareWith]="compareParticipation"
+              >
+                <option [ngValue]="null"></option>
+                @for (participationOption of participationsSharedCollection; track $index) {
+                  <option [ngValue]="participationOption">{{ participationOption.exponent?.fullName }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_dimension" jhiTranslate="stand.dimension">Dimension</label>
+            </div>
+            <div class="col-sm-2 align-content-center">
+              <select
+                class="form-control"
+                id="field_dimension"
+                data-cy="dimension"
+                name="dimension"
+                formControlName="dimension"
+                [compareWith]="compareDimensionStand"
+              >
+                <option [ngValue]="null"></option>
+                @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
+                  <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_status" jhiTranslate="stand.status.label">Status</label>
+            </div>
+            <div class="col-sm-2 align-content-center">
+              <select class="form-control" name="status" formControlName="status" id="field_status" data-cy="status">
+                <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
+                @for (status of statusValues; track $index) {
+                  <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
+                }
+              </select>
+            </div>
+          </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_urlPicture" jhiTranslate="stand.urlPicture">Url Picture</label>
-          <input
-            type="text"
-            class="form-control"
-            name="urlPicture"
-            id="field_urlPicture"
-            data-cy="urlPicture"
-            formControlName="urlPicture"
-          />
-        </div>
+          <!-- WEBSITE / SOCIAL MEDIA -->
 
-        <div class="mb-3">
-          <label class="form-label" for="field_shared" jhiTranslate="stand.shared">Shared</label>
-          <div class="form-check form-switch">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-              name="shared"
-              data-cy="shared"
-              formControlName="shared"
-              id="field_shared"
-            />
+          <div class="row mt-3">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_website" jhiTranslate="stand.website">Website</label>
+            </div>
+            <div class="col-sm-4 align-content-center">
+              <input type="text" class="form-control" name="website" id="field_website" data-cy="website" formControlName="website" />
+            </div>
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_socialMedia" jhiTranslate="stand.socialMedia">Social Media</label>
+            </div>
+            <div class="col-sm-4 align-content-center">
+              <input
+                type="text"
+                class="form-control"
+                name="socialMedia"
+                id="field_socialMedia"
+                data-cy="socialMedia"
+                formControlName="socialMedia"
+              />
+            </div>
+          </div>
+
+          <!-- URL PICTURE -->
+
+          <div class="row mt-3">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_urlPicture" jhiTranslate="stand.urlPicture">Url Picture</label>
+            </div>
+            <div class="col-sm-10 align-content-center">
+              <input
+                type="text"
+                class="form-control"
+                name="urlPicture"
+                id="field_urlPicture"
+                data-cy="urlPicture"
+                formControlName="urlPicture"
+              />
+            </div>
+          </div>
+
+          <!-- SHARED / ELECTRICITY / TABLE / CHAIR -->
+
+          <div class="row mt-3">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_shared" jhiTranslate="stand.shared">Shared</label>
+            </div>
+            <div class="col-sm-1 align-content-center">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                name="shared"
+                data-cy="shared"
+                formControlName="shared"
+                id="field_shared"
+              />
+            </div>
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
+            </div>
+            <div class="col-sm-1 align-content-center">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                name="needElectricity"
+                data-cy="needElectricity"
+                formControlName="needElectricity"
+                id="field_needElectricity"
+              />
+            </div>
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_nbTable" jhiTranslate="stand.nbTable">Nb Table</label>
+            </div>
+            <div class="col-sm-1 align-content-center">
+              <input type="number" class="form-control" name="nbTable" id="field_nbTable" data-cy="nbTable" formControlName="nbTable" />
+            </div>
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
+            </div>
+            <div class="col-sm-1 align-content-center">
+              <input type="number" class="form-control" name="nbChair" id="field_nbChair" data-cy="nbChair" formControlName="nbChair" />
+            </div>
+          </div>
+
+          <!-- EXTRA INFO -->
+
+          <div class="row mt-3">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_extraInformation" jhiTranslate="stand.extraInformation">Extra Information</label>
+            </div>
+            <div class="col-sm-10 align-content-center">
+              <textarea
+                class="form-control"
+                name="extraInformation"
+                id="field_extraInformation"
+                rows="3"
+                data-cy="extraInformation"
+                formControlName="extraInformation"
+              ></textarea>
+            </div>
           </div>
         </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
-          <div class="form-check form-switch">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-              name="needElectricity"
-              data-cy="needElectricity"
-              formControlName="needElectricity"
-              id="field_needElectricity"
-            />
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_nbTable" jhiTranslate="stand.nbTable">Nb Table</label>
-          <input type="number" class="form-control" name="nbTable" id="field_nbTable" data-cy="nbTable" formControlName="nbTable" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
-          <input type="number" class="form-control" name="nbChair" id="field_nbChair" data-cy="nbChair" formControlName="nbChair" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_status" jhiTranslate="stand.status.label">Status</label>
-          <select class="form-control" name="status" formControlName="status" id="field_status" data-cy="status">
-            <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
-            @for (status of statusValues; track $index) {
-              <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_extraInformation" jhiTranslate="stand.extraInformation">Extra Information</label>
-          <input
-            type="text"
-            class="form-control"
-            name="extraInformation"
-            id="field_extraInformation"
-            data-cy="extraInformation"
-            formControlName="extraInformation"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_participation" jhiTranslate="stand.participation">Participation</label>
-          <select
-            class="form-control"
-            id="field_participation"
-            data-cy="participation"
-            name="participation"
-            formControlName="participation"
-            [compareWith]="compareParticipation"
-          >
-            <option [ngValue]="null"></option>
-            @for (participationOption of participationsSharedCollection; track $index) {
-              <option [ngValue]="participationOption">{{ participationOption.exponent?.fullName }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dimension" jhiTranslate="stand.dimension">Dimension</label>
-          <select
-            class="form-control"
-            id="field_dimension"
-            data-cy="dimension"
-            name="dimension"
-            formControlName="dimension"
-            [compareWith]="compareDimensionStand"
-          >
-            <option [ngValue]="null"></option>
-            @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
-              <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
-            }
-          </select>
-        </div>
       </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
-        </button>
-      </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>

@@ -7,7 +7,7 @@ import { IStand } from '../stand.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-stand-detail',
+  selector: 'jhi-stand-stats',
   templateUrl: './stand-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

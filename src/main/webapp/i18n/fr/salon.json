@@ -9,11 +9,11 @@
     "notFound": "Aucun salon trouvé",
     "participations": "Participations du salon",
     "place": "Salon",
-    "priceConference": "Prix d'une conférence",
-    "priceMeal1": "Prix samedi midi",
-    "priceMeal2": "Prix samedi soir",
-    "priceMeal3": "Prix dimanche midi",
-    "priceSharingStand": "Prix du partage d'un stand",
+    "priceConference": "Conférence",
+    "priceMeal1": "Repas samedi midi",
+    "priceMeal2": "Repas samedi soir",
+    "priceMeal3": "Repas dimanche midi",
+    "priceSharingStand": "Co-exposant du stand",
     "referenceNumber": "N° de référence",
     "stands": "Stands du salon",
     "startingDate": "Date de début",
@@ -30,7 +30,8 @@
       "standCanceled": "Annulé",
       "standInVerification": "En cours",
       "standRefused": "Refusé",
-      "stands": "Stands"
+      "stands": "Stands",
+      "title": "Statistiques"
     },
     "title": "Les salons"
   }

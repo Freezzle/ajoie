@@ -8,6 +8,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { createRequestOption } from 'app/core/request/request-util';
 import { ISalon, ISalonStats, NewSalon } from '../salon.model';
 import { isPresent } from '../../../core/util/operators';
+import { IDimensionStand } from '../../../entities/dimension-stand/dimension-stand.model';
 
 type RestOf<T extends ISalon | NewSalon> = Omit<T, 'startingDate' | 'endingDate'> & {
   startingDate?: string | null;
@@ -17,6 +18,7 @@ type RestOf<T extends ISalon | NewSalon> = Omit<T, 'startingDate' | 'endingDate'
 export type RestSalon = RestOf<ISalon>;
 export type EntityResponseType = HttpResponse<ISalon>;
 export type EntityArrayResponseType = HttpResponse<ISalon[]>;
+export type EntityDimensionsArrayResponseType = HttpResponse<IDimensionStand[]>;
 
 @Injectable({ providedIn: 'root' })
 export class SalonService {
@@ -24,6 +26,7 @@ export class SalonService {
   protected applicationConfigService = inject(ApplicationConfigService);
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/salons');
+  protected resourceDimensionsUrl = this.applicationConfigService.getEndpointFor('api/dimension-stands');
 
   create(salon: NewSalon): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(salon);
@@ -45,6 +48,10 @@ export class SalonService {
 
   stats(id: string): Observable<HttpResponse<ISalonStats>> {
     return this.http.get<ISalonStats>(`${this.resourceUrl}/${id}/stats`, { observe: 'response' });
+  }
+
+  queryDimensions(): Observable<EntityDimensionsArrayResponseType> {
+    return this.http.get<IDimensionStand[]>(this.resourceDimensionsUrl, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {

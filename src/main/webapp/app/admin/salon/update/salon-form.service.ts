@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Inject, Injectable } from '@angular/core';
+import { FormGroup, FormControl, Validators, Form, FormArray } from '@angular/forms';
 
 import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
-import { ISalon, NewSalon } from '../salon.model';
+import { IPriceStandSalon, ISalon, NewPriceStand, NewSalon } from '../salon.model';
 
 type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>> & { id: T['id'] };
 type SalonFormGroupInput = ISalon | PartialWithRequiredKeyOf<NewSalon>;
@@ -14,10 +14,17 @@ type FormValueOf<T extends ISalon | NewSalon> = Omit<T, 'startingDate' | 'ending
 };
 
 type SalonFormRawValue = FormValueOf<ISalon>;
+type PriceStandFormRawValue = FormValueOf<IPriceStandSalon>;
 
 type NewSalonFormRawValue = FormValueOf<NewSalon>;
 
 type SalonFormDefaults = Pick<NewSalon, 'id' | 'startingDate' | 'endingDate'>;
+
+type PriceStandGroupContent = {
+  id: FormControl<PriceStandFormRawValue['id'] | NewPriceStand['id']>;
+  price: FormControl<PriceStandFormRawValue['price']>;
+  dimension: FormControl<PriceStandFormRawValue['dimension']>;
+};
 
 type SalonFormGroupContent = {
   id: FormControl<SalonFormRawValue['id'] | NewSalon['id']>;
@@ -30,10 +37,12 @@ type SalonFormGroupContent = {
   priceMeal3: FormControl<SalonFormRawValue['priceMeal3']>;
   priceConference: FormControl<SalonFormRawValue['priceConference']>;
   priceSharingStand: FormControl<SalonFormRawValue['priceSharingStand']>;
+  priceStandSalons: FormArray<PriceStandFormGroup>;
   extraInformation: FormControl<SalonFormRawValue['extraInformation']>;
 };
 
 export type SalonFormGroup = FormGroup<SalonFormGroupContent>;
+export type PriceStandFormGroup = FormGroup<PriceStandGroupContent>;
 
 @Injectable({ providedIn: 'root' })
 export class SalonFormService {
@@ -42,14 +51,9 @@ export class SalonFormService {
       ...this.getFormDefaults(),
       ...salon,
     });
+
     return new FormGroup<SalonFormGroupContent>({
-      id: new FormControl(
-        { value: salonRawValue.id, disabled: true },
-        {
-          nonNullable: true,
-          validators: [Validators.required],
-        },
-      ),
+      id: new FormControl(salonRawValue.id),
       referenceNumber: new FormControl(salonRawValue.referenceNumber, {
         validators: [Validators.required],
       }),
@@ -67,6 +71,16 @@ export class SalonFormService {
       priceMeal3: new FormControl(salonRawValue.priceMeal3),
       priceConference: new FormControl(salonRawValue.priceConference),
       priceSharingStand: new FormControl(salonRawValue.priceSharingStand),
+      priceStandSalons: new FormArray(
+        salonRawValue.priceStandSalons?.map(
+          priceStand =>
+            new FormGroup<PriceStandGroupContent>({
+              id: new FormControl(priceStand.id),
+              price: new FormControl(priceStand.price),
+              dimension: new FormControl(priceStand.dimension),
+            }),
+        ) ?? [],
+      ),
       extraInformation: new FormControl(salonRawValue.extraInformation),
     });
   }

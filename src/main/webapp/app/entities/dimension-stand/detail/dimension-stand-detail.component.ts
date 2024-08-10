@@ -7,7 +7,7 @@ import { IDimensionStand } from '../dimension-stand.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-dimension-stand-detail',
+  selector: 'jhi-dimension-stand-stats',
   templateUrl: './dimension-stand-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

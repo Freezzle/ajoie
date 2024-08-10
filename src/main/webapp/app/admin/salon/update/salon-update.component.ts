@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ISalon } from '../salon.model';
+import { IPriceStandSalon, ISalon, NewPriceStandSalon } from '../salon.model';
 import { SalonService } from '../service/salon.service';
 import { SalonFormService, SalonFormGroup } from './salon-form.service';
 
@@ -15,11 +15,12 @@ import { SalonFormService, SalonFormGroup } from './salon-form.service';
   standalone: true,
   selector: 'jhi-salon-update',
   templateUrl: './salon-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterLink],
 })
 export class SalonUpdateComponent implements OnInit {
   isSaving = false;
   salon: ISalon | null = null;
+  readonlyForm = false;
 
   protected salonService = inject(SalonService);
   protected salonFormService = inject(SalonFormService);
@@ -29,12 +30,44 @@ export class SalonUpdateComponent implements OnInit {
   editForm: SalonFormGroup = this.salonFormService.createSalonFormGroup();
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(({ salon }) => {
-      this.salon = salon;
-      if (salon) {
-        this.updateForm(salon);
+    this.activatedRoute.data.subscribe(({ salon, readonly }) => {
+      if (!salon) {
+        salon = {};
       }
+
+      this.readonlyForm = readonly;
+
+      const salonData = salon as ISalon;
+
+      this.salonService.queryDimensions().subscribe(dimensions => {
+        if (dimensions.body) {
+          if (!salonData.priceStandSalons) {
+            salonData.priceStandSalons = [];
+          }
+          dimensions.body.forEach(dimensionParam => {
+            if (!salonData.priceStandSalons?.map(priceStand => priceStand.dimension?.id).includes(dimensionParam.id)) {
+              salonData.priceStandSalons?.push({ price: null, dimension: dimensionParam } as IPriceStandSalon);
+            }
+          });
+        }
+        this.updateForm(salonData);
+        if (this.readonlyForm) {
+          this.readOnlyBack();
+        } else {
+          this.writeBack();
+        }
+      });
     });
+  }
+
+  readOnlyBack(): void {
+    this.readonlyForm = true;
+    this.editForm.disable();
+  }
+
+  writeBack(): void {
+    this.readonlyForm = false;
+    this.editForm.enable();
   }
 
   previousState(): void {
@@ -72,6 +105,6 @@ export class SalonUpdateComponent implements OnInit {
 
   protected updateForm(salon: ISalon): void {
     this.salon = salon;
-    this.salonFormService.resetForm(this.editForm, salon);
+    this.editForm = this.salonFormService.createSalonFormGroup(salon);
   }
 }

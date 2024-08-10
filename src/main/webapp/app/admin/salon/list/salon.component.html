@@ -6,7 +6,7 @@
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+        <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
         </button>
       </span>
@@ -63,19 +63,22 @@
               <td class="text-center">{{ salon.endingDate | formatMediumDate }}</td>
               <td class="text-end">
                 <div class="btn-group">
+                  <a [routerLink]="['/admin/salons', salon.id, 'stats']" class="btn btn-warning btn-sm" data-cy="entityDetailsButton">
+                    <span class="d-none d-md-inline" jhiTranslate="salon.stats.title">Statistiques</span>
+                  </a>
+
                   <a [routerLink]="['/admin/salons', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon icon="eye"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
                   </a>
 
-                  <a [routerLink]="['/admin/salons', salon.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                  <a [routerLink]="['/admin/salons', salon.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
                     <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Voir</span>
                   </a>
 
                   <button type="submit" (click)="delete(salon)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
                   </button>
                 </div>
               </td>

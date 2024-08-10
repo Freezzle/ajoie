@@ -34,19 +34,11 @@ export class ConferenceFormService {
       ...conference,
     };
     return new FormGroup<ConferenceFormGroupContent>({
-      id: new FormControl(
-        { value: conferenceRawValue.id, disabled: true },
-        {
-          nonNullable: true,
-          validators: [Validators.required],
-        },
-      ),
-      title: new FormControl(conferenceRawValue.title, {
-        validators: [Validators.required],
-      }),
-      status: new FormControl(conferenceRawValue.status),
+      id: new FormControl(conferenceRawValue.id),
+      title: new FormControl(conferenceRawValue.title, Validators.required),
+      status: new FormControl(conferenceRawValue.status, Validators.required),
       extraInformation: new FormControl(conferenceRawValue.extraInformation),
-      participation: new FormControl(conferenceRawValue.participation),
+      participation: new FormControl(conferenceRawValue.participation, Validators.required),
     });
   }
 

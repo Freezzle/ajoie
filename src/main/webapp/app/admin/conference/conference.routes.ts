@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ConferenceComponent } from './list/conference.component';
-import { ConferenceDetailComponent } from './detail/conference-detail.component';
 import { ConferenceUpdateComponent } from './update/conference-update.component';
 import ConferenceResolve from './route/conference-routing-resolve.service';
 
@@ -15,9 +14,12 @@ const conferenceRoute: Routes = [
   },
   {
     path: ':id/view',
-    component: ConferenceDetailComponent,
+    component: ConferenceUpdateComponent,
     resolve: {
       conference: ConferenceResolve,
+    },
+    data: {
+      readonly: true,
     },
     canActivate: [UserRouteAccessService],
   },
@@ -27,6 +29,9 @@ const conferenceRoute: Routes = [
     resolve: {
       conference: ConferenceResolve,
     },
+    data: {
+      readonly: false,
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -34,6 +39,9 @@ const conferenceRoute: Routes = [
     component: ConferenceUpdateComponent,
     resolve: {
       conference: ConferenceResolve,
+    },
+    data: {
+      readonly: false,
     },
     canActivate: [UserRouteAccessService],
   },

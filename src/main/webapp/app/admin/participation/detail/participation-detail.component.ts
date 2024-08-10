@@ -20,7 +20,7 @@ import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
 
 @Component({
   standalone: true,
-  selector: 'jhi-participation-detail',
+  selector: 'jhi-participation-stats',
   templateUrl: './participation-detail.component.html',
   imports: [
     SharedModule,

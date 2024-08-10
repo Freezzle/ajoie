@@ -317,6 +317,8 @@ public class InvoicingPlanService {
     }
 
     private Invoice createInvoice(UUID referenceId, Type type, String label, Long quantity, Double defaultAmount) {
+        defaultAmount = defaultAmount != null ? defaultAmount : 0;
+
         Invoice invoice = new Invoice();
         invoice.setReferenceId(referenceId);
         invoice.setLock(false);

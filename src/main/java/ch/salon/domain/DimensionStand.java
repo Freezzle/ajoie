@@ -30,6 +30,12 @@ public class DimensionStand implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
+    public DimensionStand() {}
+
+    public DimensionStand(String dimension) {
+        this.dimension = dimension;
+    }
+
     public UUID getId() {
         return this.id;
     }

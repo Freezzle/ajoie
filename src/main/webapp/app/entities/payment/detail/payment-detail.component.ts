@@ -7,7 +7,7 @@ import { IPayment } from '../payment.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-payment-detail',
+  selector: 'jhi-payment-stats',
   templateUrl: './payment-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

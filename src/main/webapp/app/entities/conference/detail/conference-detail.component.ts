@@ -7,7 +7,7 @@ import { IConference } from '../conference.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-conference-detail',
+  selector: 'jhi-conference-stats',
   templateUrl: './conference-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

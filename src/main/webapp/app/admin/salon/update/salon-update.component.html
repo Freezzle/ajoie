@@ -1,188 +1,228 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-salon-create-heading" *ngIf="salon?.id" data-cy="SalonCreateUpdateHeading" jhiTranslate="salon.edit">
-        Modification d'un salon
-      </h2>
-      <h2 id="jhi-salon-update-heading" *ngIf="!salon?.id" data-cy="SalonCreateUpdateHeading" jhiTranslate="salon.create">
-        Création d'un nouveau salon
-      </h2>
+<div>
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+    <h2 id="page-heading" data-cy="SalonHeading">
+      <span *ngIf="salon?.id" jhiTranslate="salon.edit">Modification d'un salon</span>
+      <span *ngIf="!salon?.id" jhiTranslate="salon.create">Création d'un nouveau salon</span>
 
-      <div>
-        <jhi-alert-error></jhi-alert-error>
+      <hr />
 
-        <div class="card">
-          <h5 class="card-header">Information de base</h5>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_place" jhiTranslate="salon.place">Nom du salon</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
-                <input type="text" class="form-control" name="place" id="field_place" data-cy="place" formControlName="place" />
-              </div>
+      <div class="d-flex justify-content-between mt-3">
+        <span>
+          <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+            <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+          </button>
+        </span>
 
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_referenceNumber" jhiTranslate="salon.referenceNumber">N° de référence</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
-                <input
-                  type="text"
-                  class="form-control"
-                  name="referenceNumber"
-                  id="field_referenceNumber"
-                  data-cy="referenceNumber"
-                  formControlName="referenceNumber"
-                />
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_startingDate" jhiTranslate="salon.startingDate">Date de début</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
-                <input
-                  id="field_startingDate"
-                  data-cy="startingDate"
-                  type="date"
-                  class="form-control"
-                  name="startingDate"
-                  formControlName="startingDate"
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
+        <span>
+          <button
+            type="button"
+            id="edit-entity"
+            *ngIf="readonlyForm"
+            data-cy="entityCreateCancelButton"
+            class="btn btn-primary btn-sm"
+            (click)="writeBack()"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
+          </button>
 
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_endingDate" jhiTranslate="salon.endingDate">Date de fin</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
-                <input
-                  id="field_endingDate"
-                  data-cy="endingDate"
-                  type="date"
-                  class="form-control"
-                  name="endingDate"
-                  formControlName="endingDate"
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-            </div>
-            <div class="row mt-3">
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_extraInformation" jhiTranslate="salon.extraInformation">Extra Information</label>
-              </div>
-              <div class="col-sm-10 mb-3 align-content-center">
-                <input
-                  type="text"
-                  class="form-control"
-                  name="extraInformation"
-                  id="field_extraInformation"
-                  data-cy="extraInformation"
-                  formControlName="extraInformation"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+          <button
+            type="button"
+            id="cancel-save"
+            *ngIf="!readonlyForm"
+            data-cy="entityCreateCancelButton"
+            class="btn btn-secondary btn-sm"
+            (click)="readOnlyBack()"
+          >
+            <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
+          </button>
+          <button
+            type="submit"
+            id="save-entity"
+            data-cy="entityCreateSaveButton"
+            *ngIf="!readonlyForm"
+            [disabled]="editForm.invalid || isSaving"
+            class="btn btn-primary btn-sm"
+          >
+            <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
+          </button>
+        </span>
       </div>
+      <hr />
+    </h2>
 
-      <br />
+    <div>
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
 
       <div class="card">
-        <h5 class="card-header">Configuration des prix</h5>
+        <h5 class="card-header">Information de base</h5>
         <div class="card-body">
-          <div class="row mt-1">
+          <div class="row">
             <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_priceConference" jhiTranslate="salon.priceConference">Price Conference</label>
+              <label for="field_place" jhiTranslate="salon.place">Nom du salon</label>
             </div>
             <div class="col-sm-4 align-content-center">
-              <input
-                type="number"
-                class="form-control"
-                name="priceConference"
-                id="field_priceConference"
-                data-cy="priceConference"
-                formControlName="priceConference"
-              />
+              <input type="text" class="form-control" name="place" id="field_place" data-cy="place" formControlName="place" />
             </div>
 
             <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_priceSharingStand" jhiTranslate="salon.priceSharingStand">Price Sharing Stand</label>
+              <label for="field_referenceNumber" jhiTranslate="salon.referenceNumber">N° de référence</label>
             </div>
             <div class="col-sm-4 align-content-center">
               <input
-                type="number"
+                type="text"
                 class="form-control"
-                name="priceSharingStand"
-                id="field_priceSharingStand"
-                data-cy="priceSharingStand"
-                formControlName="priceSharingStand"
+                name="referenceNumber"
+                id="field_referenceNumber"
+                data-cy="referenceNumber"
+                formControlName="referenceNumber"
               />
             </div>
           </div>
-          <div class="row mt-2 align-content-center">
+          <div class="row mt-2">
             <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_priceMeal1" jhiTranslate="salon.priceMeal1">Price Meal 1</label>
+              <label for="field_startingDate" jhiTranslate="salon.startingDate">Date de début</label>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-4 align-content-center">
               <input
-                type="number"
+                id="field_startingDate"
+                data-cy="startingDate"
+                type="date"
                 class="form-control"
-                name="priceMeal1"
-                id="field_priceMeal1"
-                data-cy="priceMeal1"
-                formControlName="priceMeal1"
+                name="startingDate"
+                formControlName="startingDate"
+                placeholder="YYYY-MM-DD"
               />
             </div>
 
             <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_priceMeal2" jhiTranslate="salon.priceMeal2">Price Meal 2</label>
+              <label for="field_endingDate" jhiTranslate="salon.endingDate">Date de fin</label>
             </div>
-            <div class="col-sm-2 align-content-center">
+            <div class="col-sm-4 align-content-center">
               <input
-                type="number"
+                id="field_endingDate"
+                data-cy="endingDate"
+                type="date"
                 class="form-control"
-                name="priceMeal2"
-                id="field_priceMeal2"
-                data-cy="priceMeal2"
-                formControlName="priceMeal2"
+                name="endingDate"
+                formControlName="endingDate"
+                placeholder="YYYY-MM-DD"
               />
             </div>
-
+          </div>
+          <div class="row mt-3">
             <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_priceMeal3" jhiTranslate="salon.priceMeal3">Price Meal 3</label>
+              <label for="field_extraInformation" jhiTranslate="salon.extraInformation">Extra Information</label>
             </div>
-            <div class="col-sm-2 align-content-center">
+            <div class="col-sm-10 mb-3 align-content-center">
               <input
-                type="number"
+                type="text"
                 class="form-control"
-                name="priceMeal3"
-                id="field_priceMeal3"
-                data-cy="priceMeal3"
-                formControlName="priceMeal3"
+                name="extraInformation"
+                id="field_extraInformation"
+                data-cy="extraInformation"
+                formControlName="extraInformation"
               />
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <br />
+    <br />
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
-        </button>
+    <div class="card">
+      <h5 class="card-header">Configuration des prix</h5>
+      <div class="card-body">
+        <div class="row mt-1">
+          <div class="col-sm-2 fw-bold align-content-center">
+            <label for="field_priceConference" jhiTranslate="salon.priceConference">Price Conference</label>
+          </div>
+          <div class="col-sm-4 align-content-center">
+            <input
+              type="number"
+              class="form-control"
+              name="priceConference"
+              id="field_priceConference"
+              data-cy="priceConference"
+              formControlName="priceConference"
+            />
+          </div>
 
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
-        </button>
+          <div class="col-sm-2 fw-bold align-content-center">
+            <label for="field_priceSharingStand" jhiTranslate="salon.priceSharingStand">Price Sharing Stand</label>
+          </div>
+          <div class="col-sm-4 align-content-center">
+            <input
+              type="number"
+              class="form-control"
+              name="priceSharingStand"
+              id="field_priceSharingStand"
+              data-cy="priceSharingStand"
+              formControlName="priceSharingStand"
+            />
+          </div>
+        </div>
+        <div class="row mt-2 align-content-center">
+          <div class="col-sm-2 fw-bold align-content-center">
+            <label for="field_priceMeal1" jhiTranslate="salon.priceMeal1">Price Meal 1</label>
+          </div>
+          <div class="col-sm-2">
+            <input
+              type="number"
+              class="form-control"
+              name="priceMeal1"
+              id="field_priceMeal1"
+              data-cy="priceMeal1"
+              formControlName="priceMeal1"
+            />
+          </div>
+
+          <div class="col-sm-2 fw-bold align-content-center">
+            <label for="field_priceMeal2" jhiTranslate="salon.priceMeal2">Price Meal 2</label>
+          </div>
+          <div class="col-sm-2 align-content-center">
+            <input
+              type="number"
+              class="form-control"
+              name="priceMeal2"
+              id="field_priceMeal2"
+              data-cy="priceMeal2"
+              formControlName="priceMeal2"
+            />
+          </div>
+
+          <div class="col-sm-2 fw-bold align-content-center">
+            <label for="field_priceMeal3" jhiTranslate="salon.priceMeal3">Price Meal 3</label>
+          </div>
+          <div class="col-sm-2 align-content-center">
+            <input
+              type="number"
+              class="form-control"
+              name="priceMeal3"
+              id="field_priceMeal3"
+              data-cy="priceMeal3"
+              formControlName="priceMeal3"
+            />
+          </div>
+        </div>
+
+        <hr />
+
+        <div formArrayName="priceStandSalons">
+          <div
+            class="row mt-3 align-content-center"
+            *ngFor="let priceStand of editForm.controls['priceStandSalons'].controls; let i = index"
+            [formGroupName]="i"
+          >
+            <div class="col-sm-6 fw-bold align-content-center">Prix pour {{ priceStand.value.dimension?.dimension }}</div>
+            <div class="col-sm-6 align-content-center">
+              <input type="number" class="form-control" name="price" id="{{ 'field_price' + i }}" data-cy="price" formControlName="price" />
+            </div>
+          </div>
+        </div>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>

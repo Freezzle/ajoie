@@ -5,7 +5,6 @@ import ch.salon.domain.DimensionStand;
 import ch.salon.domain.Exponent;
 import ch.salon.domain.Invoice;
 import ch.salon.domain.Participation;
-import ch.salon.domain.PriceStandSalon;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.Status;
@@ -115,69 +114,6 @@ public class ImportationResource {
             Salon currentSalon = salonRepository.findById(UUID.fromString(idSalon)).orElseThrow();
 
             List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
-            if (dimensionStands.isEmpty()) {
-                // TODO : A supprimer plus tard
-                DimensionStand dimension2x2Stand = new DimensionStand();
-                dimension2x2Stand.setDimension("2 m x 2 m");
-                dimension2x2Stand = dimensionStandRepository.save(dimension2x2Stand);
-                DimensionStand dimension25x2Stand = new DimensionStand();
-                dimension25x2Stand.setDimension("2.5 m x 2 m");
-                dimension25x2Stand = dimensionStandRepository.save(dimension25x2Stand);
-                DimensionStand dimension25Cotex2Stand = new DimensionStand();
-                dimension25Cotex2Stand.setDimension("2.5 m x 2 m (possible de vendre des deux côtés)");
-                dimension25Cotex2Stand = dimensionStandRepository.save(dimension25Cotex2Stand);
-                DimensionStand dimension3x2Stand = new DimensionStand();
-                dimension3x2Stand.setDimension("3 m x 2 m");
-                dimension3x2Stand = dimensionStandRepository.save(dimension3x2Stand);
-                DimensionStand dimension3x25Stand = new DimensionStand();
-                dimension3x25Stand.setDimension("3 m x 2.5 m");
-                dimension3x25Stand = dimensionStandRepository.save(dimension3x25Stand);
-                DimensionStand dimension4x2Stand = new DimensionStand();
-                dimension4x2Stand.setDimension("4 m x 2 m");
-                dimension4x2Stand = dimensionStandRepository.save(dimension4x2Stand);
-                DimensionStand dimensionAutres = new DimensionStand();
-                dimensionAutres.setDimension("Autres");
-                dimensionAutres = dimensionStandRepository.save(dimensionAutres);
-
-                PriceStandSalon dimension2x2PriceStand = new PriceStandSalon();
-                dimension2x2PriceStand.setPrice(260.0);
-                dimension2x2PriceStand.setDimension(dimension2x2Stand);
-                currentSalon.addPriceStandSalon(dimension2x2PriceStand);
-
-                PriceStandSalon dimension25x2PriceStand = new PriceStandSalon();
-                dimension25x2PriceStand.setPrice(300.0);
-                dimension25x2PriceStand.setDimension(dimension25x2Stand);
-                currentSalon.addPriceStandSalon(dimension25x2PriceStand);
-
-                PriceStandSalon dimension25Cotex2PriceStand = new PriceStandSalon();
-                dimension25Cotex2PriceStand.setPrice(350.0);
-                dimension25Cotex2PriceStand.setDimension(dimension25Cotex2Stand);
-                currentSalon.addPriceStandSalon(dimension25Cotex2PriceStand);
-
-                PriceStandSalon dimension3x2PriceStand = new PriceStandSalon();
-                dimension3x2PriceStand.setPrice(350.0);
-                dimension3x2PriceStand.setDimension(dimension3x2Stand);
-                currentSalon.addPriceStandSalon(dimension3x2PriceStand);
-
-                PriceStandSalon dimension3x25PriceStand = new PriceStandSalon();
-                dimension3x25PriceStand.setPrice(400.0);
-                dimension3x25PriceStand.setDimension(dimension3x25Stand);
-                currentSalon.addPriceStandSalon(dimension3x25PriceStand);
-
-                PriceStandSalon dimension4x2PriceStand = new PriceStandSalon();
-                dimension4x2PriceStand.setPrice(480.0);
-                dimension4x2PriceStand.setDimension(dimension4x2Stand);
-                currentSalon.addPriceStandSalon(dimension4x2PriceStand);
-
-                PriceStandSalon dimensionPriceAutres = new PriceStandSalon();
-                dimensionPriceAutres.setPrice(500.0);
-                dimensionPriceAutres.setDimension(dimensionAutres);
-                currentSalon.addPriceStandSalon(dimensionPriceAutres);
-
-                currentSalon = salonRepository.save(currentSalon);
-
-                dimensionStands = dimensionStandRepository.findAll();
-            }
 
             int index = 0;
             for (CSVRecord csvRecord : csvParser) {

@@ -8,7 +8,7 @@ import { ParticipationService } from '../service/participation.service';
 
 @Component({
   standalone: true,
-  selector: 'jhi-participation-detail',
+  selector: 'jhi-participation-stats',
   templateUrl: './participation-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

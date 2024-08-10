@@ -7,7 +7,7 @@ import { IInvoice } from '../invoice.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-invoice-detail',
+  selector: 'jhi-invoice-stats',
   templateUrl: './invoice-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

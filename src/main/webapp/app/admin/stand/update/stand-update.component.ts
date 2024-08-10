@@ -31,6 +31,7 @@ export class StandUpdateComponent implements OnInit {
   isSaving = false;
   stand: IStand | null = null;
   statusValues = Object.keys(Status);
+  readonlyForm = false;
 
   participationsSharedCollection: IParticipation[] = [];
   dimensionStandsSharedCollection: IDimensionStand[] = [];
@@ -54,14 +55,31 @@ export class StandUpdateComponent implements OnInit {
   ngOnInit(): void {
     this.state = window.history.state as { idSalon: string };
 
-    this.activatedRoute.data.subscribe(({ stand }) => {
+    this.activatedRoute.data.subscribe(({ stand, readonly }) => {
       this.stand = stand;
+      this.readonlyForm = readonly;
+
       if (stand) {
         this.updateForm(stand);
+        if (this.readonlyForm) {
+          this.readOnlyBack();
+        } else {
+          this.writeBack();
+        }
       }
 
       this.loadRelationshipsOptions();
     });
+  }
+
+  readOnlyBack(): void {
+    this.readonlyForm = true;
+    this.editForm.disable();
+  }
+
+  writeBack(): void {
+    this.readonlyForm = false;
+    this.editForm.enable();
   }
 
   previousState(): void {

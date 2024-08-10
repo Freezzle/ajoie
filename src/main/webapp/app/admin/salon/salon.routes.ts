@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { SalonComponent } from './list/salon.component';
-import { SalonDetailComponent } from './detail/salon-detail.component';
+import { SalonStatsComponent } from './stats/salon-stats.component';
 import { SalonUpdateComponent } from './update/salon-update.component';
 import SalonResolve from './route/salon-routing-resolve.service';
 
@@ -14,10 +14,21 @@ const salonRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
-    component: SalonDetailComponent,
+    path: ':id/stats',
+    component: SalonStatsComponent,
     resolve: {
       salon: SalonResolve,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':id/view',
+    component: SalonUpdateComponent,
+    resolve: {
+      salon: SalonResolve,
+    },
+    data: {
+      readonly: true,
     },
     canActivate: [UserRouteAccessService],
   },
@@ -27,6 +38,9 @@ const salonRoute: Routes = [
     resolve: {
       salon: SalonResolve,
     },
+    data: {
+      readonly: false,
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -34,6 +48,9 @@ const salonRoute: Routes = [
     component: SalonUpdateComponent,
     resolve: {
       salon: SalonResolve,
+    },
+    data: {
+      readonly: false,
     },
     canActivate: [UserRouteAccessService],
   },

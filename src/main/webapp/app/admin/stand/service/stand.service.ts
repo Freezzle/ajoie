@@ -9,6 +9,7 @@ import { createRequestOption } from 'app/core/request/request-util';
 import { IStand, NewStand } from '../stand.model';
 import { RestSalon } from '../../salon/service/salon.service';
 import { isPresent } from '../../../core/util/operators';
+import { IDimensionStand } from '../../../entities/dimension-stand/dimension-stand.model';
 
 export type PartialUpdateStand = Partial<IStand> & Pick<IStand, 'id'>;
 

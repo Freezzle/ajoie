@@ -74,8 +74,13 @@ Generic styles
 }
 
 .form-control {
-  background-color: #fff;
+  background-color: #ffeccb;
   border: 1px dashed $primary;
+}
+
+.form-control:disabled {
+  background-color: #fff;
+  border: 1px dashed $secondary;
 }
 
 .readonly {
@@ -143,7 +148,7 @@ entity list page css
 }
 
 /* ==========================================================================
-entity detail page css
+entity stats page css
 ========================================================================== */
 .row-md.jh-entity-details {
   display: grid;

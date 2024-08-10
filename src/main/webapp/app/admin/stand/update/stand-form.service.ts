@@ -44,16 +44,8 @@ export class StandFormService {
       ...stand,
     };
     return new FormGroup<StandFormGroupContent>({
-      id: new FormControl(
-        { value: standRawValue.id, disabled: true },
-        {
-          nonNullable: true,
-          validators: [Validators.required],
-        },
-      ),
-      description: new FormControl(standRawValue.description, {
-        validators: [Validators.required],
-      }),
+      id: new FormControl(standRawValue.id),
+      description: new FormControl(standRawValue.description, Validators.required),
       website: new FormControl(standRawValue.website),
       socialMedia: new FormControl(standRawValue.socialMedia),
       urlPicture: new FormControl(standRawValue.urlPicture),
@@ -61,10 +53,10 @@ export class StandFormService {
       nbTable: new FormControl(standRawValue.nbTable),
       nbChair: new FormControl(standRawValue.nbChair),
       needElectricity: new FormControl(standRawValue.needElectricity),
-      status: new FormControl(standRawValue.status),
+      status: new FormControl(standRawValue.status, Validators.required),
       extraInformation: new FormControl(standRawValue.extraInformation),
-      participation: new FormControl(standRawValue.participation),
-      dimension: new FormControl(standRawValue.dimension),
+      participation: new FormControl(standRawValue.participation, Validators.required),
+      dimension: new FormControl(standRawValue.dimension, Validators.required),
     });
   }
 

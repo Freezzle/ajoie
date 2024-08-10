@@ -24,6 +24,7 @@ export class ConferenceUpdateComponent implements OnInit {
   isSaving = false;
   conference: IConference | null = null;
   statusValues = Object.keys(Status);
+  readonlyForm = false;
 
   participationsSharedCollection: IParticipation[] = [];
 
@@ -41,14 +42,31 @@ export class ConferenceUpdateComponent implements OnInit {
 
   ngOnInit(): void {
     this.state = window.history.state;
-    this.activatedRoute.data.subscribe(({ conference }) => {
+
+    this.activatedRoute.data.subscribe(({ conference, readonly }) => {
+      this.readonlyForm = readonly;
       this.conference = conference;
       if (conference) {
         this.updateForm(conference);
+        if (this.readonlyForm) {
+          this.readOnlyBack();
+        } else {
+          this.writeBack();
+        }
       }
 
       this.loadRelationshipsOptions();
     });
+  }
+
+  readOnlyBack(): void {
+    this.readonlyForm = true;
+    this.editForm.disable();
+  }
+
+  writeBack(): void {
+    this.readonlyForm = false;
+    this.editForm.enable();
   }
 
   previousState(): void {

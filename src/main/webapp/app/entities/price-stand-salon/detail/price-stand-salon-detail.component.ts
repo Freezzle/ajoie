@@ -7,7 +7,7 @@ import { IPriceStandSalon } from '../price-stand-salon.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-price-stand-salon-detail',
+  selector: 'jhi-price-stand-salon-stats',
   templateUrl: './price-stand-salon-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

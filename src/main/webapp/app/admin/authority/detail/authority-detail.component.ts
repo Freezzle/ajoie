@@ -7,7 +7,7 @@ import { IAuthority } from '../authority.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-authority-detail',
+  selector: 'jhi-authority-stats',
   templateUrl: './authority-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

@@ -7,7 +7,7 @@ import { ISalon } from '../salon.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-salon-detail',
+  selector: 'jhi-salon-stats',
   templateUrl: './salon-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })

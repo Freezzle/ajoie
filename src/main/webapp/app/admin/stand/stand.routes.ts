@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { StandComponent } from './list/stand.component';
-import { StandDetailComponent } from './detail/stand-detail.component';
 import { StandUpdateComponent } from './update/stand-update.component';
 import StandResolve from './route/stand-routing-resolve.service';
 
@@ -15,9 +14,12 @@ const standRoute: Routes = [
   },
   {
     path: ':id/view',
-    component: StandDetailComponent,
+    component: StandUpdateComponent,
     resolve: {
       stand: StandResolve,
+    },
+    data: {
+      readonly: true,
     },
     canActivate: [UserRouteAccessService],
   },
@@ -27,6 +29,9 @@ const standRoute: Routes = [
     resolve: {
       stand: StandResolve,
     },
+    data: {
+      readonly: false,
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -34,6 +39,9 @@ const standRoute: Routes = [
     component: StandUpdateComponent,
     resolve: {
       stand: StandResolve,
+    },
+    data: {
+      readonly: false,
     },
     canActivate: [UserRouteAccessService],
   },

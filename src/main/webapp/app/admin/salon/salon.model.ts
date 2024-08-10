@@ -17,6 +17,7 @@ export interface ISalon {
 }
 
 export type NewSalon = Omit<ISalon, 'id'> & { id: null };
+export type NewPriceStand = Omit<IPriceStandSalon, 'id'> & { id: null };
 
 export interface IPriceStandSalon {
   id: string;

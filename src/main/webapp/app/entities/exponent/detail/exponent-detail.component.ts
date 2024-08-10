@@ -7,7 +7,7 @@ import { IExponent } from '../exponent.model';
 
 @Component({
   standalone: true,
-  selector: 'jhi-exponent-detail',
+  selector: 'jhi-exponent-stats',
   templateUrl: './exponent-detail.component.html',
   imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe],
 })
