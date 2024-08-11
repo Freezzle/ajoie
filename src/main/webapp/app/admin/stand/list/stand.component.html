@@ -6,7 +6,7 @@
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button type="submit" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+        <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
         </button>
       </span>
@@ -108,7 +108,7 @@
                     <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
                   </a>
 
-                  <button type="submit" (click)="delete(stand)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon icon="times"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
                   </button>

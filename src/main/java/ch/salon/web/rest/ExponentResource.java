@@ -2,9 +2,9 @@ package ch.salon.web.rest;
 
 import static ch.salon.service.ExponentService.ENTITY_NAME;
 
-import ch.salon.domain.Exponent;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ExponentService;
+import ch.salon.service.dto.ExponentDTO;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,7 +47,7 @@ public class ExponentResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Exponent> createExponent(@Valid @RequestBody Exponent exponent) throws URISyntaxException {
+    public ResponseEntity<ExponentDTO> createExponent(@Valid @RequestBody ExponentDTO exponent) throws URISyntaxException {
         log.debug("REST request to save Exponent : {}", exponent);
 
         UUID id = exponentService.create(exponent);
@@ -59,9 +59,9 @@ public class ExponentResource {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Exponent> updateExponent(
+    public ResponseEntity<ExponentDTO> updateExponent(
         @PathVariable(value = "id", required = false) final UUID id,
-        @Valid @RequestBody Exponent exponent
+        @Valid @RequestBody ExponentDTO exponent
     ) throws URISyntaxException {
         log.debug("REST request to update Exponent : {}, {}", id, exponent);
 
@@ -74,7 +74,7 @@ public class ExponentResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<Exponent> getAllExponents() {
+    public List<ExponentDTO> getAllExponents() {
         log.debug("REST request to get all Exponents");
 
         return exponentService.findAll();
@@ -82,7 +82,7 @@ public class ExponentResource {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Exponent> getExponent(@PathVariable("id") UUID id) {
+    public ResponseEntity<ExponentDTO> getExponent(@PathVariable("id") UUID id) {
         log.debug("REST request to get Exponent : {}", id);
 
         return ResponseUtil.wrapOrNotFound(exponentService.get(id));

@@ -1,7 +1,8 @@
 package ch.salon.service;
 
-import ch.salon.domain.Exponent;
 import ch.salon.repository.ExponentRepository;
+import ch.salon.service.dto.ExponentDTO;
+import ch.salon.service.mapper.ExponentMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Objects;
@@ -20,15 +21,15 @@ public class ExponentService {
         this.exponentRepository = exponentRepository;
     }
 
-    public UUID create(Exponent exponent) {
+    public UUID create(ExponentDTO exponent) {
         if (exponent.getId() != null) {
             throw new BadRequestAlertException("A new exponent cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return exponentRepository.save(exponent).getId();
+        return exponentRepository.save(ExponentMapper.INSTANCE.toEntity(exponent)).getId();
     }
 
-    public Exponent update(final UUID id, Exponent exponent) {
+    public ExponentDTO update(final UUID id, ExponentDTO exponent) {
         if (exponent.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -40,15 +41,15 @@ public class ExponentService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return exponentRepository.save(exponent);
+        return ExponentMapper.INSTANCE.toDto(exponentRepository.save(ExponentMapper.INSTANCE.toEntity(exponent)));
     }
 
-    public List<Exponent> findAll() {
-        return exponentRepository.findAll();
+    public List<ExponentDTO> findAll() {
+        return exponentRepository.findAll().stream().map(ExponentMapper.INSTANCE::toDto).toList();
     }
 
-    public Optional<Exponent> get(UUID id) {
-        return exponentRepository.findById(id);
+    public Optional<ExponentDTO> get(UUID id) {
+        return exponentRepository.findById(id).map(ExponentMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {

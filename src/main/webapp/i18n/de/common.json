@@ -8,6 +8,7 @@
     "delete": "Supprimer",
     "edit": "Editer",
     "generate": "Générer",
+    "import": "Importer",
     "open": "Ouvrir",
     "refresh": "Actualiser",
     "save": "Sauvegarder",
@@ -25,6 +26,6 @@
       "patternLogin": "Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.",
       "required": "Ce champ est obligatoire."
     },
-    "view": "Voir"
+    "view": "Détail"
   }
 }

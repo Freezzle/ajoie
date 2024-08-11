@@ -1,0 +1,69 @@
+package ch.salon.service.dto;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+public class InvoicingPlanDTO implements Serializable {
+
+    private UUID id;
+    private Instant generationDate;
+    private String billingNumber;
+    private boolean hasBeenSent = false;
+    private Set<InvoiceDTO> invoices = new HashSet<>();
+    private ParticipationLightDTO participation;
+
+    public InvoicingPlanDTO() {
+        // Empty constructor needed for Jackson.
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Instant getGenerationDate() {
+        return generationDate;
+    }
+
+    public void setGenerationDate(Instant generationDate) {
+        this.generationDate = generationDate;
+    }
+
+    public String getBillingNumber() {
+        return billingNumber;
+    }
+
+    public void setBillingNumber(String billingNumber) {
+        this.billingNumber = billingNumber;
+    }
+
+    public boolean isHasBeenSent() {
+        return hasBeenSent;
+    }
+
+    public void setHasBeenSent(boolean hasBeenSent) {
+        this.hasBeenSent = hasBeenSent;
+    }
+
+    public Set<InvoiceDTO> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(Set<InvoiceDTO> invoices) {
+        this.invoices = invoices;
+    }
+
+    public ParticipationLightDTO getParticipation() {
+        return participation;
+    }
+
+    public void setParticipation(ParticipationLightDTO participation) {
+        this.participation = participation;
+    }
+}

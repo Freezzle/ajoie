@@ -1,13 +1,13 @@
 {
   "salon": {
-    "benevoles": "Bénévoles du salon",
-    "conferences": "Conférences du salon",
+    "benevoles": "Bénévoles",
+    "conferences": "Conférences",
     "create": "Création d'un nouveau salon",
     "edit": "Modification d'un salon",
     "endingDate": "Date de fin",
     "extraInformation": "Information complémentaire",
     "notFound": "Aucun salon trouvé",
-    "participations": "Participations du salon",
+    "participations": "Participations",
     "place": "Salon",
     "priceConference": "Conférence",
     "priceMeal1": "Repas samedi midi",
@@ -15,7 +15,7 @@
     "priceMeal3": "Repas dimanche midi",
     "priceSharingStand": "Co-exposant du stand",
     "referenceNumber": "N° de référence",
-    "stands": "Stands du salon",
+    "stands": "Stands",
     "startingDate": "Date de début",
     "stats": {
       "billingPaid": "Payé",

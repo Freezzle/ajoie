@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(uses = { ParticipationMapper.class, DimensionStandMapper.class })
 public interface StandMapper {
     StandMapper INSTANCE = Mappers.getMapper(StandMapper.class);
 

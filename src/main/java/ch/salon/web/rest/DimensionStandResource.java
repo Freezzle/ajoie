@@ -2,9 +2,9 @@ package ch.salon.web.rest;
 
 import static ch.salon.service.DimensionStandService.ENTITY_NAME;
 
-import ch.salon.domain.DimensionStand;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.DimensionStandService;
+import ch.salon.service.dto.DimensionStandDTO;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,7 +44,7 @@ public class DimensionStandResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<DimensionStand> createDimensionStand(@Valid @RequestBody DimensionStand dimensionStand)
+    public ResponseEntity<DimensionStandDTO> createDimensionStand(@Valid @RequestBody DimensionStandDTO dimensionStand)
         throws URISyntaxException {
         log.debug("REST request to save DimensionStand : {}", dimensionStand);
 
@@ -57,9 +57,9 @@ public class DimensionStandResource {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<DimensionStand> updateDimensionStand(
+    public ResponseEntity<DimensionStandDTO> updateDimensionStand(
         @PathVariable(value = "id", required = false) final UUID id,
-        @Valid @RequestBody DimensionStand dimensionStand
+        @Valid @RequestBody DimensionStandDTO dimensionStand
     ) throws URISyntaxException {
         log.debug("REST request to update DimensionStand : {}, {}", id, dimensionStand);
 
@@ -72,7 +72,7 @@ public class DimensionStandResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<DimensionStand> getAllDimensionStands() {
+    public List<DimensionStandDTO> getAllDimensionStands() {
         log.debug("REST request to get all DimensionStands");
 
         return dimensionStandService.findAll();
@@ -80,7 +80,7 @@ public class DimensionStandResource {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<DimensionStand> getDimensionStand(@PathVariable("id") UUID id) {
+    public ResponseEntity<DimensionStandDTO> getDimensionStand(@PathVariable("id") UUID id) {
         log.debug("REST request to get DimensionStand : {}", id);
 
         return ResponseUtil.wrapOrNotFound(dimensionStandService.get(id));

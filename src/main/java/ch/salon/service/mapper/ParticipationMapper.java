@@ -6,7 +6,7 @@ import ch.salon.service.dto.ParticipationLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(uses = { ExponentMapper.class, SalonMapper.class })
 public interface ParticipationMapper {
     ParticipationMapper INSTANCE = Mappers.getMapper(ParticipationMapper.class);
 

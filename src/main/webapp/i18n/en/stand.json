@@ -1,6 +1,9 @@
 {
   "stand": {
     "create": "Création d'un nouveau stand",
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer le stand \"{{description}}\" ?"
+    },
     "description": "Description",
     "dimension": "Dimension",
     "edit": "Modification d'un stand",

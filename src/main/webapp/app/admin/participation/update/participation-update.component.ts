@@ -1,8 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { EMPTY, filter, Observable, of, tap } from 'rxjs';
+import { finalize, map, mergeMap } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,28 +13,44 @@ import { ISalon } from 'app/entities/salon/salon.model';
 import { SalonService } from 'app/entities/salon/service/salon.service';
 import { Status } from 'app/entities/enumerations/status.model';
 import { ParticipationService } from '../service/participation.service';
-import { IParticipation } from '../participation.model';
+import { IInvoicingPlan, IParticipation } from '../participation.model';
 import { ParticipationFormService, ParticipationFormGroup } from './participation-form.service';
+import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
+import StatusPipe from '../../../shared/pipe/status.pipe';
+import { IConference } from '../../conference/conference.model';
+import { ConferenceDeleteDialogComponent } from '../../conference/delete/conference-delete-dialog.component';
+import { ITEM_DELETED_EVENT } from '../../../config/navigation.constants';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConferenceService } from '../../conference/service/conference.service';
+import { StandDeleteDialogComponent } from '../../stand/delete/stand-delete-dialog.component';
+import { IStand } from '../../stand/stand.model';
+import { StandService } from '../../stand/service/stand.service';
 
 @Component({
   standalone: true,
   selector: 'jhi-participation-update',
   templateUrl: './participation-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe],
 })
 export class ParticipationUpdateComponent implements OnInit {
   isSaving = false;
   participation: IParticipation | null = null;
   statusValues = Object.keys(Status);
+  readonlyForm = false;
+  conferences$: Observable<IConference[]> | undefined;
+  stands$: Observable<IStand[]> | undefined;
 
   exponentsSharedCollection: IExponent[] = [];
   salonsSharedCollection: ISalon[] = [];
 
   protected participationService = inject(ParticipationService);
   protected participationFormService = inject(ParticipationFormService);
+  protected conferenceService = inject(ConferenceService);
+  protected standService = inject(StandService);
   protected exponentService = inject(ExponentService);
   protected salonService = inject(SalonService);
   protected activatedRoute = inject(ActivatedRoute);
+  protected modalService = inject(NgbModal);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ParticipationFormGroup = this.participationFormService.createParticipationFormGroup();
@@ -44,14 +60,32 @@ export class ParticipationUpdateComponent implements OnInit {
   compareSalon = (o1: ISalon | null, o2: ISalon | null): boolean => this.salonService.compareSalon(o1, o2);
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(({ participation }) => {
+    this.activatedRoute.data.subscribe(({ participation, readonly }) => {
+      this.readonlyForm = readonly;
       this.participation = participation;
       if (participation) {
         this.updateForm(participation);
+        if (this.readonlyForm) {
+          this.readOnlyBack();
+          this.loadConferences();
+          this.loadStands();
+        } else {
+          this.writeBack();
+        }
       }
 
       this.loadRelationshipsOptions();
     });
+  }
+
+  readOnlyBack(): void {
+    this.readonlyForm = true;
+    this.editForm.disable();
+  }
+
+  writeBack(): void {
+    this.readonlyForm = false;
+    this.editForm.enable();
   }
 
   previousState(): void {
@@ -66,6 +100,60 @@ export class ParticipationUpdateComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.participationService.create(participation));
     }
+  }
+
+  deleteConference(conference: IConference): void {
+    const modalRef = this.modalService.open(ConferenceDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.conference = conference;
+    // unsubscribe not needed because closed completes on modal close
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT),
+        tap(() => this.loadConferences()),
+      )
+      .subscribe();
+  }
+
+  deleteStand(stand: IStand): void {
+    const modalRef = this.modalService.open(StandDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.stand = stand;
+    // unsubscribe not needed because closed completes on modal close
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT),
+        tap(() => this.loadStands()),
+      )
+      .subscribe();
+  }
+
+  protected loadConferences(): void {
+    const queryObject: any = {
+      idParticipation: this.participation?.id,
+    };
+    this.conferences$ = this.conferenceService.query(queryObject).pipe(
+      mergeMap((conferences: HttpResponse<IConference[]>) => {
+        if (conferences.body) {
+          return of(conferences.body);
+        } else {
+          return EMPTY;
+        }
+      }),
+    );
+  }
+
+  protected loadStands(): void {
+    const queryObject: any = {
+      idParticipation: this.participation?.id,
+    };
+    this.stands$ = this.standService.query(queryObject).pipe(
+      mergeMap((stands: HttpResponse<IStand[]>) => {
+        if (stands.body) {
+          return of(stands.body);
+        } else {
+          return EMPTY;
+        }
+      }),
+    );
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IParticipation>>): void {

@@ -14,10 +14,21 @@ const participationRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
+    path: ':id/billing',
     component: ParticipationDetailComponent,
     resolve: {
       participation: ParticipationResolve,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':id/view',
+    component: ParticipationUpdateComponent,
+    resolve: {
+      participation: ParticipationResolve,
+    },
+    data: {
+      readonly: true,
     },
     canActivate: [UserRouteAccessService],
   },
@@ -27,6 +38,9 @@ const participationRoute: Routes = [
     resolve: {
       participation: ParticipationResolve,
     },
+    data: {
+      readonly: false,
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -34,6 +48,9 @@ const participationRoute: Routes = [
     component: ParticipationUpdateComponent,
     resolve: {
       participation: ParticipationResolve,
+    },
+    data: {
+      readonly: false,
     },
     canActivate: [UserRouteAccessService],
   },

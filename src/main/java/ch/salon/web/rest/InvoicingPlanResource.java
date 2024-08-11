@@ -2,9 +2,9 @@ package ch.salon.web.rest;
 
 import static ch.salon.service.InvoicingPlanService.ENTITY_NAME;
 
-import ch.salon.domain.InvoicingPlan;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
+import ch.salon.service.dto.InvoicingPlanDTO;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -45,7 +45,7 @@ public class InvoicingPlanResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<InvoicingPlan> createInvoicingPlan(@RequestBody InvoicingPlan invoicingPlan) throws URISyntaxException {
+    public ResponseEntity<InvoicingPlanDTO> createInvoicingPlan(@RequestBody InvoicingPlanDTO invoicingPlan) throws URISyntaxException {
         log.debug("REST request to save InvoicingPlan : {}", invoicingPlan);
 
         UUID id = invoicingPlanService.create(invoicingPlan);
@@ -57,9 +57,9 @@ public class InvoicingPlanResource {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<InvoicingPlan> updateInvoicingPlan(
+    public ResponseEntity<InvoicingPlanDTO> updateInvoicingPlan(
         @PathVariable(value = "id", required = false) final UUID id,
-        @RequestBody InvoicingPlan invoicingPlan
+        @RequestBody InvoicingPlanDTO invoicingPlan
     ) {
         log.debug("REST request to update InvoicingPlan : {}, {}", id, invoicingPlan);
 
@@ -94,7 +94,7 @@ public class InvoicingPlanResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<InvoicingPlan> getAllInvoicingPlans(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
+    public List<InvoicingPlanDTO> getAllInvoicingPlans(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all InvoicingPlans");
 
         return invoicingPlanService.findAll(idParticipation);
@@ -102,7 +102,7 @@ public class InvoicingPlanResource {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<InvoicingPlan> getInvoicingPlan(@PathVariable("id") UUID id) {
+    public ResponseEntity<InvoicingPlanDTO> getInvoicingPlan(@PathVariable("id") UUID id) {
         log.debug("REST request to get InvoicingPlan : {}", id);
 
         return ResponseUtil.wrapOrNotFound(invoicingPlanService.get(id));

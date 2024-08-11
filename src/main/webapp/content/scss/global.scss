@@ -103,6 +103,7 @@ Custom alerts for notification
 .alerts {
   .alert {
     text-overflow: ellipsis;
+
     pre {
       background: none;
       border: none;
@@ -111,22 +112,28 @@ Custom alerts for notification
       padding: 0;
       margin: 0;
     }
+
     .popover pre {
       font-size: 10px;
     }
   }
+
   .jhi-toast {
     position: fixed;
     width: 100%;
+
     &.left {
       left: 5px;
     }
+
     &.right {
       right: 5px;
     }
+
     &.top {
       top: 55px;
     }
+
     &.bottom {
       bottom: 55px;
     }
@@ -168,6 +175,7 @@ entity stats page css
       white-space: nowrap;
       padding: 0.5em 0;
     }
+
     dd {
       border-bottom: 1px solid #eee;
       padding: 0.5em 0;
@@ -218,6 +226,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
     }
   }
 }
+
 /* jhipster-needle-scss-add-main JHipster will add new css style */
 
 .form-1-box {
@@ -348,4 +357,9 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 .card-body {
   border: 1px solid #2b4f74;
+}
+
+.alert-warning {
+  color: black;
+  background-color: #f8e6d8;
 }

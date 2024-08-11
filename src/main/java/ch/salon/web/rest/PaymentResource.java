@@ -2,9 +2,9 @@ package ch.salon.web.rest;
 
 import static ch.salon.service.PaymentService.ENTITY_NAME;
 
-import ch.salon.domain.Payment;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.PaymentService;
+import ch.salon.service.dto.PaymentDTO;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,7 +45,7 @@ public class PaymentResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Payment> createPayment(@Valid @RequestBody Payment payment) throws URISyntaxException {
+    public ResponseEntity<PaymentDTO> createPayment(@Valid @RequestBody PaymentDTO payment) throws URISyntaxException {
         log.debug("REST request to save Payment : {}", payment);
 
         UUID id = paymentService.create(payment);
@@ -57,9 +57,9 @@ public class PaymentResource {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Payment> updatePayment(
+    public ResponseEntity<PaymentDTO> updatePayment(
         @PathVariable(value = "id", required = false) final UUID id,
-        @Valid @RequestBody Payment payment
+        @Valid @RequestBody PaymentDTO payment
     ) throws URISyntaxException {
         log.debug("REST request to update Payment : {}, {}", id, payment);
 
@@ -72,7 +72,7 @@ public class PaymentResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<Payment> getAllPayments(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
+    public List<PaymentDTO> getAllPayments(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all Payments");
 
         return paymentService.findAll(idParticipation);
@@ -80,7 +80,7 @@ public class PaymentResource {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Payment> getPayment(@PathVariable("id") UUID id) {
+    public ResponseEntity<PaymentDTO> getPayment(@PathVariable("id") UUID id) {
         log.debug("REST request to get Payment : {}", id);
 
         return ResponseUtil.wrapOrNotFound(paymentService.get(id));

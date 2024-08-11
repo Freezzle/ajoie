@@ -14,6 +14,8 @@ import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
+import ch.salon.service.dto.InvoicingPlanDTO;
+import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
 import java.util.Comparator;
@@ -59,15 +61,15 @@ public class InvoicingPlanService {
         this.mailService = mailService;
     }
 
-    public UUID create(InvoicingPlan invoicingPlan) {
+    public UUID create(InvoicingPlanDTO invoicingPlan) {
         if (invoicingPlan.getId() != null) {
             throw new BadRequestAlertException("A new invoicingPlan cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return invoicingPlanRepository.save(invoicingPlan).getId();
+        return invoicingPlanRepository.save(InvoicingPlanMapper.INSTANCE.toEntity(invoicingPlan)).getId();
     }
 
-    public InvoicingPlan update(final UUID id, InvoicingPlan invoicingPlan) {
+    public InvoicingPlanDTO update(final UUID id, InvoicingPlanDTO invoicingPlan) {
         if (invoicingPlan.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -80,7 +82,7 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return invoicingPlanRepository.save(invoicingPlan);
+        return InvoicingPlanMapper.INSTANCE.toDto(invoicingPlanRepository.save(InvoicingPlanMapper.INSTANCE.toEntity(invoicingPlan)));
     }
 
     public void send(UUID idInvoicingPlan) {
@@ -120,18 +122,18 @@ public class InvoicingPlanService {
         invoicingPlanRepository.save(invoicingPlan);
     }
 
-    public List<InvoicingPlan> findAll(String idParticipation) {
+    public List<InvoicingPlanDTO> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
             List<InvoicingPlan> invoicingPlans = invoicingPlanRepository.findByParticipationId(UUID.fromString(idParticipation));
             invoicingPlans.sort(Comparator.comparing(InvoicingPlan::getBillingNumber).reversed());
-            return invoicingPlans;
+            return invoicingPlans.stream().map(InvoicingPlanMapper.INSTANCE::toDto).toList();
         }
 
         throw new IllegalStateException("No filter given");
     }
 
-    public Optional<InvoicingPlan> get(UUID id) {
-        return invoicingPlanRepository.findById(id);
+    public Optional<InvoicingPlanDTO> get(UUID id) {
+        return invoicingPlanRepository.findById(id).map(InvoicingPlanMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {

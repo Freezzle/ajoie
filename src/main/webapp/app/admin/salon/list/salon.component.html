@@ -63,10 +63,6 @@
               <td class="text-center">{{ salon.endingDate | formatMediumDate }}</td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['/admin/salons', salon.id, 'stats']" class="btn btn-warning btn-sm" data-cy="entityDetailsButton">
-                    <span class="d-none d-md-inline" jhiTranslate="salon.stats.title">Statistiques</span>
-                  </a>
-
                   <a [routerLink]="['/admin/salons', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon icon="eye"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>

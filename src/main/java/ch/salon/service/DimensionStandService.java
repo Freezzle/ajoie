@@ -2,6 +2,8 @@ package ch.salon.service;
 
 import ch.salon.domain.DimensionStand;
 import ch.salon.repository.DimensionStandRepository;
+import ch.salon.service.dto.DimensionStandDTO;
+import ch.salon.service.mapper.DimensionStandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Objects;
@@ -20,15 +22,15 @@ public class DimensionStandService {
         this.dimensionStandRepository = dimensionStandRepository;
     }
 
-    public UUID create(DimensionStand dimensionStand) {
+    public UUID create(DimensionStandDTO dimensionStand) {
         if (dimensionStand.getId() != null) {
             throw new BadRequestAlertException("A new dimensionStand cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return dimensionStandRepository.save(dimensionStand).getId();
+        return dimensionStandRepository.save(DimensionStandMapper.INSTANCE.toEntity(dimensionStand)).getId();
     }
 
-    public DimensionStand update(final UUID id, DimensionStand dimensionStand) {
+    public DimensionStandDTO update(final UUID id, DimensionStandDTO dimensionStand) {
         if (dimensionStand.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -40,10 +42,10 @@ public class DimensionStandService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return dimensionStandRepository.save(dimensionStand);
+        return DimensionStandMapper.INSTANCE.toDto(dimensionStandRepository.save(DimensionStandMapper.INSTANCE.toEntity(dimensionStand)));
     }
 
-    public List<DimensionStand> findAll() {
+    public List<DimensionStandDTO> findAll() {
         List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
         if (dimensionStands.isEmpty()) {
             dimensionStands.add(new DimensionStand("2 m x 2 m"));
@@ -54,13 +56,13 @@ public class DimensionStandService {
             dimensionStands.add(new DimensionStand("4 m x 2 m"));
             dimensionStands.add(new DimensionStand("Autres"));
 
-            return dimensionStandRepository.saveAll(dimensionStands);
+            dimensionStands = dimensionStandRepository.saveAll(dimensionStands);
         }
-        return dimensionStands;
+        return dimensionStands.stream().map(DimensionStandMapper.INSTANCE::toDto).toList();
     }
 
-    public Optional<DimensionStand> get(UUID id) {
-        return dimensionStandRepository.findById(id);
+    public Optional<DimensionStandDTO> get(UUID id) {
+        return dimensionStandRepository.findById(id).map(DimensionStandMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {

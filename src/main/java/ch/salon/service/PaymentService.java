@@ -1,7 +1,8 @@
 package ch.salon.service;
 
-import ch.salon.domain.Payment;
 import ch.salon.repository.PaymentRepository;
+import ch.salon.service.dto.PaymentDTO;
+import ch.salon.service.mapper.PaymentMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Objects;
@@ -21,15 +22,15 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public UUID create(Payment payment) {
+    public UUID create(PaymentDTO payment) {
         if (payment.getId() != null) {
             throw new BadRequestAlertException("A new payment cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return paymentRepository.save(payment).getId();
+        return paymentRepository.save(PaymentMapper.INSTANCE.toEntity(payment)).getId();
     }
 
-    public Payment update(final UUID id, Payment payment) {
+    public PaymentDTO update(final UUID id, PaymentDTO payment) {
         if (payment.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -41,19 +42,23 @@ public class PaymentService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return paymentRepository.save(payment);
+        return PaymentMapper.INSTANCE.toDto(paymentRepository.save(PaymentMapper.INSTANCE.toEntity(payment)));
     }
 
-    public List<Payment> findAll(String idParticipation) {
+    public List<PaymentDTO> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
-            return paymentRepository.findByParticipationId(UUID.fromString(idParticipation));
+            return paymentRepository
+                .findByParticipationId(UUID.fromString(idParticipation))
+                .stream()
+                .map(PaymentMapper.INSTANCE::toDto)
+                .toList();
         }
 
         throw new IllegalStateException("No filter given");
     }
 
-    public Optional<Payment> get(UUID id) {
-        return paymentRepository.findById(id);
+    public Optional<PaymentDTO> get(UUID id) {
+        return paymentRepository.findById(id).map(PaymentMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {

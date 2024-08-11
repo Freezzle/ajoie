@@ -41,11 +41,12 @@ export class ConferenceUpdateComponent implements OnInit {
     this.participationService.compareParticipation(o1, o2);
 
   ngOnInit(): void {
-    this.state = window.history.state;
+    this.state = window.history.state as { idSalon: string; idParticipation: string };
 
     this.activatedRoute.data.subscribe(({ conference, readonly }) => {
       this.readonlyForm = readonly;
       this.conference = conference;
+
       if (conference) {
         this.updateForm(conference);
         if (this.readonlyForm) {
@@ -120,9 +121,15 @@ export class ConferenceUpdateComponent implements OnInit {
       .query(queryObject)
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
-        map((participations: IParticipation[]) =>
-          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.conference?.participation),
-        ),
+        map((participations: IParticipation[]) => {
+          this.editForm
+            .get('participation')
+            ?.setValue(participations.find(participation => participation.id === this.state.idParticipation));
+          return this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
+            participations,
+            this.conference?.participation,
+          );
+        }),
       )
       .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
   }

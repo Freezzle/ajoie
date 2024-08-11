@@ -1,121 +1,119 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="page-heading" data-cy="ConferenceHeading">
-        <span *ngIf="conference?.id" jhiTranslate="conference.edit">Modification d'une conférence</span>
-        <span *ngIf="!conference?.id" jhiTranslate="conference.create">Création d'une nouvelle conférence</span>
+<div>
+  <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+    <h2 id="page-heading" data-cy="ConferenceHeading">
+      <span *ngIf="conference?.id" jhiTranslate="conference.edit">Modification d'une conférence</span>
+      <span *ngIf="!conference?.id" jhiTranslate="conference.create">Création d'une nouvelle conférence</span>
 
-        <hr />
+      <hr />
 
-        <div class="d-flex justify-content-between mt-3">
-          <span>
-            <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
-            </button>
-          </span>
+      <div class="d-flex justify-content-between mt-3">
+        <span>
+          <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+            <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+          </button>
+        </span>
 
-          <span>
-            <button
-              type="button"
-              id="edit-entity"
-              *ngIf="readonlyForm"
-              data-cy="entityCreateCancelButton"
-              class="btn btn-primary btn-sm"
-              (click)="writeBack()"
-            >
-              <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
-            </button>
+        <span>
+          <button
+            type="button"
+            id="edit-entity"
+            *ngIf="readonlyForm"
+            data-cy="entityCreateCancelButton"
+            class="btn btn-primary btn-sm"
+            (click)="writeBack()"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
+          </button>
 
-            <button
-              type="button"
-              id="cancel-save"
-              *ngIf="!readonlyForm"
-              data-cy="entityCreateCancelButton"
-              class="btn btn-secondary btn-sm"
-              (click)="readOnlyBack()"
-            >
-              <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
-            </button>
-            <button
-              type="submit"
-              id="save-entity"
-              data-cy="entityCreateSaveButton"
-              *ngIf="!readonlyForm"
-              [disabled]="editForm.invalid || isSaving"
-              class="btn btn-primary btn-sm"
-            >
-              <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
-            </button>
-          </span>
-        </div>
-        <hr />
-      </h2>
+          <button
+            type="button"
+            id="cancel-save"
+            *ngIf="!readonlyForm"
+            data-cy="entityCreateCancelButton"
+            class="btn btn-secondary btn-sm"
+            (click)="readOnlyBack()"
+          >
+            <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
+          </button>
+          <button
+            type="submit"
+            id="save-entity"
+            data-cy="entityCreateSaveButton"
+            *ngIf="!readonlyForm"
+            [disabled]="editForm.invalid || isSaving"
+            class="btn btn-primary btn-sm"
+          >
+            <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
+          </button>
+        </span>
+      </div>
+      <hr />
+    </h2>
 
-      <div>
-        <jhi-alert-error></jhi-alert-error>
+    <div>
+      <jhi-alert-error></jhi-alert-error>
 
-        <jhi-alert></jhi-alert>
+      <jhi-alert></jhi-alert>
 
-        <div class="card">
-          <h5 class="card-header">Information de base</h5>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_title" jhiTranslate="conference.description">Description</label>
-              </div>
-              <div class="col-sm-10 align-content-center">
-                <textarea class="form-control" name="title" id="field_title" rows="6" data-cy="title" formControlName="title"></textarea>
-              </div>
+      <div class="card">
+        <h5 class="card-header">Information de base</h5>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_title" jhiTranslate="conference.description">Description</label>
             </div>
-            <div class="row mt-3">
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_participation" jhiTranslate="conference.participation">Participation</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
-                <select
-                  class="form-control"
-                  id="field_participation"
-                  data-cy="participation"
-                  name="participation"
-                  formControlName="participation"
-                  [compareWith]="compareParticipation"
-                >
-                  <option [ngValue]="null"></option>
-                  @for (participationOption of participationsSharedCollection; track $index) {
-                    <option [ngValue]="participationOption">{{ participationOption.exponent?.fullName }}</option>
-                  }
-                </select>
-              </div>
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_status" jhiTranslate="conference.status.label">Status</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
-                <select class="form-control" name="status" formControlName="status" id="field_status" data-cy="status">
-                  <option [ngValue]="null">{{ 'conference.status.list.null' | translate }}</option>
-                  @for (status of statusValues; track $index) {
-                    <option [value]="status">{{ 'conference.status.list.' + status | translate }}</option>
-                  }
-                </select>
-              </div>
+            <div class="col-sm-10 align-content-center">
+              <textarea class="form-control" name="title" id="field_title" rows="6" data-cy="title" formControlName="title"></textarea>
             </div>
-            <div class="row mt-3">
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_extraInformation" jhiTranslate="conference.extraInformation">Extra Information</label>
-              </div>
-              <div class="col-sm-10 align-content-center">
-                <textarea
-                  class="form-control"
-                  name="extraInformation"
-                  id="field_extraInformation"
-                  rows="3"
-                  data-cy="extraInformation"
-                  formControlName="extraInformation"
-                ></textarea>
-              </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_participation" jhiTranslate="conference.participation">Participation</label>
+            </div>
+            <div class="col-sm-4 align-content-center">
+              <select
+                class="form-control"
+                id="field_participation"
+                data-cy="participation"
+                name="participation"
+                formControlName="participation"
+                [compareWith]="compareParticipation"
+              >
+                <option [ngValue]="null"></option>
+                @for (participationOption of participationsSharedCollection; track $index) {
+                  <option [ngValue]="participationOption">{{ participationOption.exponent?.fullName }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_status" jhiTranslate="conference.status.label">Status</label>
+            </div>
+            <div class="col-sm-4 align-content-center">
+              <select class="form-control" name="status" formControlName="status" id="field_status" data-cy="status">
+                <option [ngValue]="null">{{ 'conference.status.list.null' | translate }}</option>
+                @for (status of statusValues; track $index) {
+                  <option [value]="status">{{ 'conference.status.list.' + status | translate }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-sm-2 fw-bold align-content-center">
+              <label for="field_extraInformation" jhiTranslate="conference.extraInformation">Extra Information</label>
+            </div>
+            <div class="col-sm-10 align-content-center">
+              <textarea
+                class="form-control"
+                name="extraInformation"
+                id="field_extraInformation"
+                rows="3"
+                data-cy="extraInformation"
+                formControlName="extraInformation"
+              ></textarea>
             </div>
           </div>
         </div>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>

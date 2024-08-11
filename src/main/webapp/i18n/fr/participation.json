@@ -2,6 +2,9 @@
   "participation": {
     "acceptedChart": "Charte accepté ?",
     "acceptedContract": "Contrat accepté ?",
+    "billing": {
+      "title": "Facturation"
+    },
     "create": "Création d'une nouvelle participation",
     "edit": "Modification d'une participation",
     "exponent": "Exposant",
