@@ -57,11 +57,9 @@
             <tr data-cy="entityTable">
               <td>
                 @if (conference.participation) {
-                  <div>
-                    <a [routerLink]="['/admin/participations', conference.participation.id, 'view']">{{
-                      conference.participation.exponent?.fullName
-                    }}</a>
-                  </div>
+                  <a [routerLink]="['/admin/participations', conference.participation.id, 'view']">
+                    {{ conference.participation.exponent?.fullName }}
+                  </a>
                 }
               </td>
               <td>{{ conference.title }}</td>

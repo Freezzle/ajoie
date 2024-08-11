@@ -11,6 +11,20 @@
         </button>
       </span>
 
+      <span class="row">
+        <div class="col-auto">
+          <input type="text" class="form-control" placeholder="Nom de l'exposant" (blur)="filteringExponent($event)" />
+        </div>
+        <div class="col-auto">
+          <select class="form-control" name="status" (change)="filteringStatus($event)">
+            <option [ngValue]="null">{{ 'participation.status.list.null' | translate }}</option>
+            @for (status of statusValues; track $index) {
+              <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
+            }
+          </select>
+        </div>
+      </span>
+
       <span>
         <button class="btn btn-primary btn-sm" (click)="load()" [disabled]="isLoading">
           <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
@@ -58,9 +72,7 @@
             <tr data-cy="entityTable">
               <td>
                 @if (participation.exponent) {
-                  <div>
-                    <a [routerLink]="['/admin/participations', participation.id, 'view']">{{ participation.exponent.fullName }}</a>
-                  </div>
+                  <a [routerLink]="['/admin/participations', participation.id, 'view']">{{ participation.exponent.fullName }}</a>
                 }
               </td>
               <td class="text-center">{{ participation.registrationDate | formatMediumDate }}</td>

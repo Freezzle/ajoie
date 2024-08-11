@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import SharedModule from 'app/shared/shared.module';
 import { sortStateSignal, SortDirective, SortByDirective, type SortState, SortService } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigation.constants';
 import { IParticipation } from '../participation.model';
 import { EntityArrayResponseType, ParticipationService } from '../service/participation.service';
@@ -15,6 +15,8 @@ import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
+import FilterComponent from '../../../shared/filter/filter.component';
+import { Status } from '../../../entities/enumerations/status.model';
 
 @Component({
   standalone: true,
@@ -33,12 +35,15 @@ import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
     StatusPipe,
     CheckBoolPipe,
     ColorBoolPipe,
+    FilterComponent,
+    ReactiveFormsModule,
   ],
 })
 export class ParticipationComponent implements OnInit {
   subscription: Subscription | null = null;
   participations?: IParticipation[];
   isLoading = false;
+  statusValues = Object.keys(Status);
 
   public router = inject(Router);
   protected participationService = inject(ParticipationService);
@@ -78,6 +83,24 @@ export class ParticipationComponent implements OnInit {
 
   previousState(): void {
     window.history.back();
+  }
+
+  filteringExponent(event: any): void {
+    if (event.target.value) {
+      this.participations = this.participations?.filter(participation =>
+        participation.exponent?.fullName?.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase()),
+      );
+    } else {
+      this.load();
+    }
+  }
+
+  filteringStatus(event: any): void {
+    if (event.target.value) {
+      this.participations = this.participations?.filter(participation => participation.status?.includes(event.target.value));
+    } else {
+      this.load();
+    }
   }
 
   protected onResponseSuccess(response: EntityArrayResponseType): void {

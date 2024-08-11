@@ -53,7 +53,7 @@ export class StandUpdateComponent implements OnInit {
     this.dimensionStandService.compareDimensionStand(o1, o2);
 
   ngOnInit(): void {
-    this.state = window.history.state as { idSalon: string };
+    this.state = window.history.state as { idSalon: string; idParticipation: string };
 
     this.activatedRoute.data.subscribe(({ stand, readonly }) => {
       this.stand = stand;
@@ -138,9 +138,12 @@ export class StandUpdateComponent implements OnInit {
       .query(queryObject)
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
-        map((participations: IParticipation[]) =>
-          this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.stand?.participation),
-        ),
+        map((participations: IParticipation[]) => {
+          this.editForm
+            .get('participation')
+            ?.setValue(participations.find(participation => participation.id === this.state.idParticipation));
+          return this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.stand?.participation);
+        }),
       )
       .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
 

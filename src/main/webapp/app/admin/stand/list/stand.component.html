@@ -66,19 +66,13 @@
             <tr data-cy="entityTable">
               <td>
                 @if (stand.participation) {
-                  <div>
-                    <a [routerLink]="['/admin/participations', stand.participation.id, 'view']">{{
-                      stand.participation.exponent?.fullName
-                    }}</a>
-                  </div>
+                  <a [routerLink]="['/admin/participations', stand.participation.id, 'view']">
+                    {{ stand.participation.exponent?.fullName }}
+                  </a>
                 }
               </td>
               <td>{{ stand.description }}</td>
-              <td>
-                @if (stand.dimension) {
-                  <div>{{ stand.dimension.dimension }}</div>
-                }
-              </td>
+              <td>{{ stand.dimension?.dimension }}</td>
               <td class="text-center">
                 <fa-icon
                   icon="{{ stand.status | status }}"
