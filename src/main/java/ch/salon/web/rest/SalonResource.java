@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.SalonService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.SalonService;
@@ -50,8 +52,8 @@ public class SalonResource {
 
         UUID id = salonService.create(salon);
 
-        return ResponseEntity.created(new URI("/api/salons/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+        return created(new URI("/api/salons/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(salon);
     }
 
@@ -60,14 +62,12 @@ public class SalonResource {
     public ResponseEntity<SalonDTO> updateSalon(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody SalonDTO salon
-    ) throws URISyntaxException {
+    ) {
         log.debug("REST request to update Salon : {}, {}", id, salon);
 
         salon = salonService.update(id, salon);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, salon.getId().toString()))
-            .body(salon);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, salon.getId().toString())).body(salon);
     }
 
     @GetMapping("/{id}/stats")
@@ -77,9 +77,7 @@ public class SalonResource {
 
         SalonStats stats = salonService.getStats(id);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .body(stats);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stats);
     }
 
     @GetMapping("")
@@ -104,8 +102,6 @@ public class SalonResource {
 
         salonService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

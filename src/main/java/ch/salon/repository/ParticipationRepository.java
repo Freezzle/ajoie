@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository;
 public interface ParticipationRepository extends JpaRepository<Participation, UUID> {
     List<Participation> findBySalonId(UUID idSalon);
 
-    @Query("SELECT MAX(p.clientNumber) FROM Participation p")
-    String findMaxClientNumber();
+    @Query("SELECT MAX(p.clientNumber) FROM Participation p where p.salon.id = ?1")
+    String findMaxClientNumber(UUID idSalon);
 
     Participation findByExponentEmailAndSalonId(String email, UUID idSalon);
 }

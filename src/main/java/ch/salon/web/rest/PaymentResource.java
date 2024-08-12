@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.PaymentService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.PaymentService;
@@ -50,8 +52,8 @@ public class PaymentResource {
 
         UUID id = paymentService.create(payment);
 
-        return ResponseEntity.created(new URI("/api/payments/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+        return created(new URI("/api/payments/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(payment);
     }
 
@@ -60,14 +62,12 @@ public class PaymentResource {
     public ResponseEntity<PaymentDTO> updatePayment(
         @PathVariable(value = "id", required = false) final UUID id,
         @Valid @RequestBody PaymentDTO payment
-    ) throws URISyntaxException {
+    ) {
         log.debug("REST request to update Payment : {}, {}", id, payment);
 
         payment = paymentService.update(id, payment);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, payment.getId().toString()))
-            .body(payment);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, payment.getId().toString())).body(payment);
     }
 
     @GetMapping("")
@@ -93,8 +93,6 @@ public class PaymentResource {
 
         paymentService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

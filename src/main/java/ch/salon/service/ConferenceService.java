@@ -46,21 +46,21 @@ public class ConferenceService {
     }
 
     public List<ConferenceDTO> findAll(String idSalon, String idParticipation) {
-        if (StringUtils.isNotBlank(idSalon)) {
-            return conferenceRepository
-                .findByParticipationSalonId(UUID.fromString(idSalon))
-                .stream()
-                .map(ConferenceMapper.INSTANCE::toDto)
-                .toList();
-        } else if (StringUtils.isNotBlank(idParticipation)) {
+        if (StringUtils.isNotBlank(idParticipation)) {
             return conferenceRepository
                 .findByParticipationId(UUID.fromString(idParticipation))
                 .stream()
                 .map(ConferenceMapper.INSTANCE::toDto)
                 .toList();
+        } else if (StringUtils.isNotBlank(idSalon)) {
+            return conferenceRepository
+                .findByParticipationSalonId(UUID.fromString(idSalon))
+                .stream()
+                .map(ConferenceMapper.INSTANCE::toDto)
+                .toList();
+        } else {
+            throw new IllegalStateException("No filter given");
         }
-
-        throw new IllegalStateException("No filter given");
     }
 
     public Optional<ConferenceDTO> get(UUID id) {

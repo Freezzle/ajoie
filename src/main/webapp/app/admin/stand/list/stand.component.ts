@@ -1,19 +1,17 @@
-import { Component, NgZone, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
+import { Component, inject, NgZone, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { filter, Observable, Subscription, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import { sortStateSignal, SortDirective, SortByDirective, type SortState, SortService } from 'app/shared/sort';
-import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
+import { SortByDirective, SortDirective, SortService, sortStateSignal } from 'app/shared/sort';
+import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
-import { SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigation.constants';
+import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IStand } from '../stand.model';
 import { EntityArrayResponseType, StandService } from '../service/stand.service';
 import { StandDeleteDialogComponent } from '../delete/stand-delete-dialog.component';
 import { Location } from '@angular/common';
-import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
-import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 

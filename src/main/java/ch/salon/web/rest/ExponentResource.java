@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.ExponentService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ExponentService;
@@ -52,8 +54,8 @@ public class ExponentResource {
 
         UUID id = exponentService.create(exponent);
 
-        return ResponseEntity.created(new URI("/api/exponents/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+        return created(new URI("/api/exponents/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(exponent);
     }
 
@@ -67,9 +69,7 @@ public class ExponentResource {
 
         exponent = exponentService.update(id, exponent);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, exponent.getId().toString()))
-            .body(exponent);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, exponent.getId().toString())).body(exponent);
     }
 
     @GetMapping("")
@@ -95,8 +95,6 @@ public class ExponentResource {
 
         exponentService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

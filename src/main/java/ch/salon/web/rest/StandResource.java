@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.StandService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.StandService;
@@ -48,13 +50,11 @@ public class StandResource {
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<StandDTO> createStand(@Valid @RequestBody StandDTO stand) throws URISyntaxException {
         log.debug("REST request to save Stand : {}", stand);
-        if (stand.getId() != null) {
-            throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "idexists");
-        }
+
         UUID id = standService.create(stand);
 
-        return ResponseEntity.created(new URI("/api/stands/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+        return created(new URI("/api/stands/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(stand);
     }
 
@@ -68,9 +68,7 @@ public class StandResource {
 
         stand = standService.update(id, stand);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stand.getId().toString()))
-            .body(stand);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stand.getId().toString())).body(stand);
     }
 
     @GetMapping("")
@@ -99,8 +97,6 @@ public class StandResource {
 
         standService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

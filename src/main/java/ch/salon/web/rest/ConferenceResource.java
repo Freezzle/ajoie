@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.ConferenceService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ConferenceService;
@@ -50,8 +52,8 @@ public class ConferenceResource {
 
         UUID id = conferenceService.create(conference);
 
-        return ResponseEntity.created(new URI("/api/conferences/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+        return created(new URI("/api/conferences/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(conference);
     }
 
@@ -65,9 +67,7 @@ public class ConferenceResource {
 
         conference = conferenceService.update(id, conference);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, conference.getId().toString()))
-            .body(conference);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, conference.getId().toString())).body(conference);
     }
 
     @GetMapping("")
@@ -96,8 +96,6 @@ public class ConferenceResource {
 
         conferenceService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

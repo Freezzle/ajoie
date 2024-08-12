@@ -7,19 +7,15 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IExponent } from 'app/entities/exponent/exponent.model';
-import { ExponentService } from 'app/entities/exponent/service/exponent.service';
-import { ISalon } from 'app/admin/salon/salon.model';
-import { SalonService } from 'app/admin/salon/service/salon.service';
 import { IDimensionStand } from 'app/entities/dimension-stand/dimension-stand.model';
 import { DimensionStandService } from 'app/entities/dimension-stand/service/dimension-stand.service';
 import { StandService } from '../service/stand.service';
 import { IStand } from '../stand.model';
-import { StandFormService, StandFormGroup } from './stand-form.service';
+import { StandFormGroup, StandFormService } from './stand-form.service';
 import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 import { Status } from '../../../entities/enumerations/status.model';
-import { IParticipation } from '../../../entities/participation/participation.model';
-import { ParticipationService } from '../../../entities/participation/service/participation.service';
+import { IParticipation } from '../../participation/participation.model';
+import { ParticipationService } from '../../participation/service/participation.service';
 
 @Component({
   standalone: true,
@@ -139,9 +135,8 @@ export class StandUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) => {
-          this.editForm
-            .get('participation')
-            ?.setValue(participations.find(participation => participation.id === this.state.idParticipation));
+          const idParticipationToFilter = this.stand?.participation?.id ? this.stand.participation.id : this.state.idParticipation;
+          this.editForm.get('participation')?.setValue(participations.find(participation => participation.id === idParticipationToFilter));
           return this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.stand?.participation);
         }),
       )

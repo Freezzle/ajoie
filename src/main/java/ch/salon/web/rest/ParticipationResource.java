@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.ParticipationService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.domain.Participation;
 import ch.salon.security.AuthoritiesConstants;
@@ -48,8 +50,9 @@ public class ParticipationResource {
         log.debug("REST request to save Participation : {}", participation);
 
         UUID id = participationService.create(participation);
-        return ResponseEntity.created(new URI("/api/participations/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+
+        return created(new URI("/api/participations/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(participation);
     }
 
@@ -63,8 +66,8 @@ public class ParticipationResource {
 
         participation = participationService.update(id, participation);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, participation.getId().toString()))
+        return ok()
+            .headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, participation.getId().toString()))
             .body(participation);
     }
 
@@ -91,8 +94,6 @@ public class ParticipationResource {
 
         participationService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

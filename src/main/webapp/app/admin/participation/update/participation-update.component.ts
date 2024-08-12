@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { EMPTY, filter, Observable, of, tap } from 'rxjs';
 import { finalize, map, mergeMap } from 'rxjs/operators';
 
@@ -9,12 +9,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IExponent } from 'app/entities/exponent/exponent.model';
 import { ExponentService } from 'app/entities/exponent/service/exponent.service';
-import { ISalon } from 'app/entities/salon/salon.model';
-import { SalonService } from 'app/entities/salon/service/salon.service';
 import { Status } from 'app/entities/enumerations/status.model';
 import { ParticipationService } from '../service/participation.service';
-import { IInvoicingPlan, IParticipation } from '../participation.model';
-import { ParticipationFormService, ParticipationFormGroup } from './participation-form.service';
+import { IParticipation } from '../participation.model';
+import { ParticipationFormGroup, ParticipationFormService } from './participation-form.service';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import { IConference } from '../../conference/conference.model';
@@ -25,6 +23,8 @@ import { ConferenceService } from '../../conference/service/conference.service';
 import { StandDeleteDialogComponent } from '../../stand/delete/stand-delete-dialog.component';
 import { IStand } from '../../stand/stand.model';
 import { StandService } from '../../stand/service/stand.service';
+import { ISalon } from '../../salon/salon.model';
+import { SalonService } from '../../salon/service/salon.service';
 
 @Component({
   standalone: true,

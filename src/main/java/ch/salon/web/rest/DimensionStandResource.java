@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.DimensionStandService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.DimensionStandService;
@@ -50,8 +52,8 @@ public class DimensionStandResource {
 
         UUID id = dimensionStandService.create(dimensionStand);
 
-        return ResponseEntity.created(new URI("/api/dimension-stands/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+        return created(new URI("/api/dimension-stands/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(dimensionStand);
     }
 
@@ -65,8 +67,8 @@ public class DimensionStandResource {
 
         dimensionStand = dimensionStandService.update(id, dimensionStand);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, dimensionStand.getId().toString()))
+        return ok()
+            .headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, dimensionStand.getId().toString()))
             .body(dimensionStand);
     }
 
@@ -93,8 +95,6 @@ public class DimensionStandResource {
 
         dimensionStandService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

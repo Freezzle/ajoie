@@ -1,6 +1,8 @@
 package ch.salon.web.rest;
 
 import static ch.salon.service.InvoicingPlanService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
@@ -50,8 +52,8 @@ public class InvoicingPlanResource {
 
         UUID id = invoicingPlanService.create(invoicingPlan);
 
-        return ResponseEntity.created(new URI("/api/invoicing-plans/" + id))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+        return created(new URI("/api/invoicing-plans/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .body(invoicingPlan);
     }
 
@@ -65,31 +67,9 @@ public class InvoicingPlanResource {
 
         invoicingPlan = invoicingPlanService.update(id, invoicingPlan);
 
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, invoicingPlan.getId().toString()))
+        return ok()
+            .headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, invoicingPlan.getId().toString()))
             .body(invoicingPlan);
-    }
-
-    @PatchMapping("/generation")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public void generateInvoicingPlan(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
-        log.debug("REST request to get all Participations");
-        invoicingPlanService.generateInvoicingPlan(idParticipation);
-    }
-
-    @PatchMapping("{id}/send")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public void sendInvoiceEmail(@PathVariable(value = "id", required = false) final UUID id) {
-        invoicingPlanService.send(id);
-    }
-
-    @PatchMapping("{id}/invoices/{idInvoice}/lock")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public void switchLock(
-        @PathVariable(value = "id", required = false) final UUID id,
-        @PathVariable(name = "idInvoice", required = false) UUID idInvoice
-    ) {
-        invoicingPlanService.switchLock(id, idInvoice);
     }
 
     @GetMapping("")
@@ -115,8 +95,33 @@ public class InvoicingPlanResource {
 
         invoicingPlanService.delete(id);
 
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+    }
+
+    @PatchMapping("/generation")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public void generateInvoicingPlan(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
+        log.debug("REST request to get all Participations");
+
+        invoicingPlanService.generateInvoicingPlan(idParticipation);
+    }
+
+    @PatchMapping("{id}/send")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<Void> sendInvoiceEmail(@PathVariable(value = "id", required = false) final UUID id) {
+        invoicingPlanService.send(id);
+
+        return noContent().build();
+    }
+
+    @PatchMapping("{id}/invoices/{idInvoice}/lock")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<Void> switchLock(
+        @PathVariable(value = "id", required = false) final UUID id,
+        @PathVariable(name = "idInvoice", required = false) UUID idInvoice
+    ) {
+        invoicingPlanService.switchLock(id, idInvoice);
+
+        return noContent().build();
     }
 }

@@ -10,9 +10,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Status } from 'app/entities/enumerations/status.model';
 import { ConferenceService } from '../service/conference.service';
 import { IConference } from '../conference.model';
-import { ConferenceFormService, ConferenceFormGroup } from './conference-form.service';
-import { IParticipation } from '../../../entities/participation/participation.model';
-import { ParticipationService } from '../../../entities/participation/service/participation.service';
+import { ConferenceFormGroup, ConferenceFormService } from './conference-form.service';
+import { IParticipation } from '../../participation/participation.model';
+import { ParticipationService } from '../../participation/service/participation.service';
 
 @Component({
   standalone: true,
@@ -122,9 +122,11 @@ export class ConferenceUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) => {
-          this.editForm
-            .get('participation')
-            ?.setValue(participations.find(participation => participation.id === this.state.idParticipation));
+          const idParticipationToFilter = this.conference?.participation?.id
+            ? this.conference.participation.id
+            : this.state.idParticipation;
+
+          this.editForm.get('participation')?.setValue(participations.find(participation => participation.id === idParticipationToFilter));
           return this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
             participations,
             this.conference?.participation,

@@ -1,8 +1,9 @@
 import dayjs from 'dayjs/esm';
 import { IExponent } from 'app/entities/exponent/exponent.model';
-import { ISalon } from 'app/entities/salon/salon.model';
 import { Status } from 'app/entities/enumerations/status.model';
 import { Type } from '../../entities/enumerations/type.model';
+import { Mode } from '../../entities/enumerations/mode.model';
+import { ISalon } from '../salon/salon.model';
 
 export interface IParticipation {
   id: string;
@@ -45,6 +46,16 @@ export interface IInvoice {
   quantity?: number | null;
   total?: number | null;
   lock?: boolean | null;
+  extraInformation?: string | null;
+}
+
+export type NewPayment = Omit<IPayment, 'id'> & { id: null };
+
+export interface IPayment {
+  id: string;
+  billingDate?: dayjs.Dayjs | null;
+  paymentMode?: Mode | null;
+  amount?: number | null;
   extraInformation?: string | null;
 }
 

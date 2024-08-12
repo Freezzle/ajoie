@@ -2,18 +2,15 @@ import { Component, inject, input, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
-import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
-import { IInvoicingPlan, IParticipation } from '../participation.model';
+import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
+import { IInvoice, IInvoicingPlan, IParticipation, IPayment } from '../participation.model';
 import { ParticipationService } from '../service/participation.service';
-import { IInvoice } from '../../../entities/invoice/invoice.model';
-import { EMPTY, map, Observable, of } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
-import { InvoiceService } from '../../../entities/invoice/service/invoice.service';
 import { FormsModule } from '@angular/forms';
 import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
-import { IPayment } from '../../../entities/payment/payment.model';
 import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
 import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
 import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
@@ -45,8 +42,6 @@ export class ParticipationDetailComponent implements OnInit {
 
   protected participationService = inject(ParticipationService);
 
-  protected invoicingPlanService = inject(InvoiceService);
-
   ngOnInit(): void {
     this.loadInvoices();
     this.loadPayments();
@@ -74,11 +69,7 @@ export class ParticipationDetailComponent implements OnInit {
     });
   }
 
-  deleteInvoice(invoice: IInvoice): void {
-    this.invoicingPlanService.delete(invoice.id).subscribe(() => {
-      this.loadInvoices();
-    });
-  }
+  deleteInvoice(invoice: IInvoice): void {}
 
   deletePayment(payment: IPayment): void {}
 
@@ -86,13 +77,13 @@ export class ParticipationDetailComponent implements OnInit {
     return (
       invoices
         .map(invoice => invoice.defaultAmount)
-        .reduce((previousValue, defaultAmount) => 0 + (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
+        .reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
     );
   }
 
   totalInvoices(invoices: IInvoice[]): number {
     return (
-      invoices.map(invoice => invoice.total).reduce((previousValue, defaultAmount) => 0 + (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
+      invoices.map(invoice => invoice.total).reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
     );
   }
 

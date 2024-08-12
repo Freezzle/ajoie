@@ -46,14 +46,14 @@ public class StandService {
     }
 
     public List<StandDTO> findAll(String idSalon, String idParticipation) {
-        if (StringUtils.isNotBlank(idSalon)) {
-            return standRepository.findByParticipationSalonId(UUID.fromString(idSalon)).stream().map(StandMapper.INSTANCE::toDto).toList();
-        } else if (StringUtils.isNotBlank(idParticipation)) {
+        if (StringUtils.isNotBlank(idParticipation)) {
             return standRepository
                 .findByParticipationId(UUID.fromString(idParticipation))
                 .stream()
                 .map(StandMapper.INSTANCE::toDto)
                 .toList();
+        } else if (StringUtils.isNotBlank(idSalon)) {
+            return standRepository.findByParticipationSalonId(UUID.fromString(idSalon)).stream().map(StandMapper.INSTANCE::toDto).toList();
         }
 
         throw new IllegalStateException("No filter given");
