@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-
-import dayjs from 'dayjs/esm';
-import { DATE_FORMAT } from 'app/config/input.constants';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IStand, NewStand } from '../stand.model';
+import { Status } from '../../enumerations/status.model';
 
 /**
  * A partial Type with required key is used as form input.
@@ -16,7 +14,7 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type StandFormGroupInput = IStand | PartialWithRequiredKeyOf<NewStand>;
 
-type StandFormDefaults = Pick<NewStand, 'id' | 'shared' | 'needElectricity'>;
+type StandFormDefaults = Pick<NewStand, 'id' | 'shared' | 'needElectricity' | 'status'>;
 
 type StandFormGroupContent = {
   id: FormControl<IStand['id'] | NewStand['id']>;
@@ -79,6 +77,7 @@ export class StandFormService {
       id: null,
       shared: false,
       needElectricity: false,
+      status: Status.IN_VERIFICATION,
     };
   }
 }

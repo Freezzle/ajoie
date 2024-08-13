@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { IConference, NewConference } from '../conference.model';
+import { Status } from '../../enumerations/status.model';
 
 /**
  * A partial Type with required key is used as form input.
@@ -14,7 +15,7 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type ConferenceFormGroupInput = IConference | PartialWithRequiredKeyOf<NewConference>;
 
-type ConferenceFormDefaults = Pick<NewConference, 'id'>;
+type ConferenceFormDefaults = Pick<NewConference, 'id' | 'status'>;
 
 type ConferenceFormGroupContent = {
   id: FormControl<IConference['id'] | NewConference['id']>;
@@ -59,6 +60,7 @@ export class ConferenceFormService {
   private getFormDefaults(): ConferenceFormDefaults {
     return {
       id: null,
+      status: Status.IN_VERIFICATION,
     };
   }
 }

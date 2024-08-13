@@ -7,15 +7,15 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IDimensionStand } from 'app/entities/dimension-stand/dimension-stand.model';
-import { DimensionStandService } from 'app/entities/dimension-stand/service/dimension-stand.service';
 import { StandService } from '../service/stand.service';
 import { IStand } from '../stand.model';
 import { StandFormGroup, StandFormService } from './stand-form.service';
 import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
-import { Status } from '../../../entities/enumerations/status.model';
 import { IParticipation } from '../../participation/participation.model';
 import { ParticipationService } from '../../participation/service/participation.service';
+import { IDimensionStand } from '../../dimension-stand/dimension-stand.model';
+import { DimensionStandService } from '../../dimension-stand/service/dimension-stand.service';
+import { Status } from '../../enumerations/status.model';
 
 @Component({
   standalone: true,

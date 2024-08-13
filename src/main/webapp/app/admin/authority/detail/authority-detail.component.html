@@ -18,7 +18,7 @@
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+          <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
         </button>
       </div>
     }

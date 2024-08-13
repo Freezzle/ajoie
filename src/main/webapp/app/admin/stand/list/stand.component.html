@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between mt-3">
       <span>
         <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+          <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
         </button>
       </span>
 
@@ -88,8 +88,7 @@
                     class="btn btn-info btn-sm"
                     data-cy="entityDetailsButton"
                   >
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                   </a>
 
                   <a
@@ -98,13 +97,11 @@
                     class="btn btn-primary btn-sm"
                     data-cy="entityEditButton"
                   >
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                   </a>
 
                   <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.delete">Supprimer</span>
+                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                   </button>
                 </div>
               </td>

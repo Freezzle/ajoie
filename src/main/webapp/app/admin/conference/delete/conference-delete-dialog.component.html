@@ -13,11 +13,11 @@
 
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
-        <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
+        <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
       </button>
 
       <button id="jhi-confirm-delete-conference" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
-        <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="common.delete">Supprimer</span>
+        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
       </button>
     </div>
   </form>

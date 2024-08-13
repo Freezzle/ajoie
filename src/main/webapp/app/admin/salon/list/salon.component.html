@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between mt-3">
       <span>
         <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+          <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
         </button>
       </span>
 
@@ -64,17 +64,15 @@
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/admin/salons', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                   </a>
 
                   <a [routerLink]="['/admin/salons', salon.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Voir</span>
+                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                   </a>
 
                   <button type="submit" (click)="delete(salon)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
+                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                   </button>
                 </div>
               </td>

@@ -5,8 +5,8 @@
       "question": "Êtes-vous certain de vouloir supprimer la conférence \"{{title}}\" ?"
     },
     "description": "Description",
-    "edit": "Modification d'une conférence",
-    "extraInformation": "Information complémentaire",
+    "edit": "Détail d'une conférence",
+    "extraInformation": "Commentaire",
     "notFound": "Aucune conférence trouvé",
     "participation": "Participation",
     "status": {

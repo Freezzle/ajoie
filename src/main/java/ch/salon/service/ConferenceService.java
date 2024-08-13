@@ -1,8 +1,13 @@
 package ch.salon.service;
 
+import ch.salon.domain.Conference;
+import ch.salon.domain.Stand;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.service.dto.ConferenceDTO;
+import ch.salon.service.dto.ParticipationLightDTO;
+import ch.salon.service.dto.StandDTO;
 import ch.salon.service.mapper.ConferenceMapper;
+import ch.salon.service.mapper.StandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +22,11 @@ public class ConferenceService {
     public static final String ENTITY_NAME = "conference";
 
     private final ConferenceRepository conferenceRepository;
+    private final ParticipationService participationService;
 
-    public ConferenceService(ConferenceRepository conferenceRepository) {
+    public ConferenceService(ConferenceRepository conferenceRepository, ParticipationService participationService) {
         this.conferenceRepository = conferenceRepository;
+        this.participationService = participationService;
     }
 
     public UUID create(ConferenceDTO conference) {
@@ -27,7 +34,11 @@ public class ConferenceService {
             throw new BadRequestAlertException("A new conference cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference)).getId();
+        Conference conferenceCreated = conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference));
+
+        this.participationService.adaptStatusFromChildren(conferenceCreated.getParticipation().getId());
+
+        return conferenceCreated.getId();
     }
 
     public ConferenceDTO update(final UUID id, ConferenceDTO conference) {
@@ -42,7 +53,13 @@ public class ConferenceService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return ConferenceMapper.INSTANCE.toDto(conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference)));
+        ConferenceDTO conferenceDTO = ConferenceMapper.INSTANCE.toDto(
+            conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference))
+        );
+
+        this.participationService.adaptStatusFromChildren(conferenceDTO.getParticipation().getId());
+
+        return conferenceDTO;
     }
 
     public List<ConferenceDTO> findAll(String idSalon, String idParticipation) {
@@ -68,6 +85,8 @@ public class ConferenceService {
     }
 
     public void delete(UUID id) {
+        UUID idParticipation = get(id).map(ConferenceDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
         conferenceRepository.deleteById(id);
+        this.participationService.adaptStatusFromChildren(idParticipation);
     }
 }

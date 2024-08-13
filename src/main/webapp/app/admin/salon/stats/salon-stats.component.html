@@ -10,7 +10,7 @@
       <div class="d-flex justify-content-between mt-3">
         <span>
           <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-            <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+            <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
           </button>
         </span>
         <button type="button" class="btn btn-primary btn-sm" (click)="generate()">

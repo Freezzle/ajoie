@@ -36,7 +36,7 @@
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
+          <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
         </button>
 
         <button
@@ -46,7 +46,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
+          <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
         </button>
       </div>
     </form>

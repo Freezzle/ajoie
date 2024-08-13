@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between mt-3">
       <span>
         <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+          <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
         </button>
       </span>
 
@@ -36,6 +36,7 @@
           data-cy="entityCreateButton"
           class="btn btn-outline-primary btn-sm"
           [routerLink]="['/admin/participations/new']"
+          [state]="{ idSalon: state.idSalon }"
         >
           <fa-icon icon="plus"></fa-icon>
           <span jhiTranslate="common.create">Créer</span>
@@ -62,7 +63,7 @@
             <th class="col-auto text-center"><span jhiTranslate="participation.needArrangment">Avec arrangement ?</span></th>
             <th class="col-auto text-center"><span jhiTranslate="participation.acceptedChart">Charte accepté ?</span></th>
             <th class="col-auto text-center"><span jhiTranslate="participation.acceptedContract">Contrat accepté ?</span></th>
-            <th class="col-auto text-center"><span jhiTranslate="participation.isBillingClosed">Facturation clos ?</span></th>
+            <th class="col-auto text-center"><span jhiTranslate="participation.isBillingClosed">Factures payées ?</span></th>
             <th class="col-auto text-center"><span jhiTranslate="participation.status.label">Statut</span></th>
             <th class="col-auto">&nbsp;</th>
           </tr>
@@ -109,8 +110,7 @@
                     class="btn btn-info btn-sm"
                     data-cy="entityDetailsButton"
                   >
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.view">Voir</span>
+                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                   </a>
 
                   <a
@@ -118,12 +118,11 @@
                     class="btn btn-primary btn-sm"
                     data-cy="entityEditButton"
                   >
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="common.edit">Editer</span>
+                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                   </a>
 
                   <button type="button" (click)="delete(participation)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
+                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                   </button>
                 </div>
               </td>

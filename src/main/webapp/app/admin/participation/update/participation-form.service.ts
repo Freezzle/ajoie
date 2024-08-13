@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { IParticipation, NewParticipation } from '../participation.model';
+import { Status } from '../../enumerations/status.model';
 
 /**
  * A partial Type with required key is used as form input.
@@ -29,7 +30,7 @@ type NewParticipationFormRawValue = FormValueOf<NewParticipation>;
 
 type ParticipationFormDefaults = Pick<
   NewParticipation,
-  'id' | 'registrationDate' | 'acceptedChart' | 'acceptedContract' | 'needArrangment' | 'isBillingClosed'
+  'id' | 'registrationDate' | 'acceptedChart' | 'acceptedContract' | 'needArrangment' | 'isBillingClosed' | 'status'
 >;
 
 type ParticipationFormGroupContent = {
@@ -102,6 +103,7 @@ export class ParticipationFormService {
       acceptedContract: false,
       needArrangment: false,
       isBillingClosed: false,
+      status: Status.IN_VERIFICATION,
     };
   }
 

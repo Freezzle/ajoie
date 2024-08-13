@@ -9,7 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IExponent } from '../exponent.model';
 import { ExponentService } from '../service/exponent.service';
-import { ExponentFormService, ExponentFormGroup } from './exponent-form.service';
+import { ExponentFormGroup, ExponentFormService } from './exponent-form.service';
 
 @Component({
   standalone: true,

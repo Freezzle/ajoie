@@ -36,10 +36,6 @@ const routes: Routes = [
     component: LoginComponent,
     title: 'login.title',
   },
-  {
-    path: '',
-    loadChildren: () => import(`./entities/entity.routes`),
-  },
   ...errorRoute,
 ];
 

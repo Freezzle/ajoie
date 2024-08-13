@@ -1,4 +1,4 @@
-import { Status } from 'app/entities/enumerations/status.model';
+import { Status } from '../enumerations/status.model';
 import { IParticipation } from '../participation/participation.model';
 
 export interface IConference {

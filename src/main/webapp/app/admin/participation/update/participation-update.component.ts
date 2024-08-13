@@ -7,9 +7,6 @@ import { finalize, map, mergeMap } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IExponent } from 'app/entities/exponent/exponent.model';
-import { ExponentService } from 'app/entities/exponent/service/exponent.service';
-import { Status } from 'app/entities/enumerations/status.model';
 import { ParticipationService } from '../service/participation.service';
 import { IParticipation } from '../participation.model';
 import { ParticipationFormGroup, ParticipationFormService } from './participation-form.service';
@@ -25,6 +22,9 @@ import { IStand } from '../../stand/stand.model';
 import { StandService } from '../../stand/service/stand.service';
 import { ISalon } from '../../salon/salon.model';
 import { SalonService } from '../../salon/service/salon.service';
+import { IExponent } from '../../exponent/exponent.model';
+import { ExponentService } from '../../exponent/service/exponent.service';
+import { Status } from '../../enumerations/status.model';
 
 @Component({
   standalone: true,
@@ -39,6 +39,7 @@ export class ParticipationUpdateComponent implements OnInit {
   readonlyForm = false;
   conferences$: Observable<IConference[]> | undefined;
   stands$: Observable<IStand[]> | undefined;
+  state: any;
 
   exponentsSharedCollection: IExponent[] = [];
   salonsSharedCollection: ISalon[] = [];
@@ -60,15 +61,18 @@ export class ParticipationUpdateComponent implements OnInit {
   compareSalon = (o1: ISalon | null, o2: ISalon | null): boolean => this.salonService.compareSalon(o1, o2);
 
   ngOnInit(): void {
+    this.state = window.history.state as { idSalon: string };
+
     this.activatedRoute.data.subscribe(({ participation, readonly }) => {
       this.readonlyForm = readonly;
       this.participation = participation;
+
       if (participation) {
         this.updateForm(participation);
+        this.loadConferences();
+        this.loadStands();
         if (this.readonlyForm) {
           this.readOnlyBack();
-          this.loadConferences();
-          this.loadStands();
         } else {
           this.writeBack();
         }
@@ -200,7 +204,13 @@ export class ParticipationUpdateComponent implements OnInit {
     this.salonService
       .query()
       .pipe(map((res: HttpResponse<ISalon[]>) => res.body ?? []))
-      .pipe(map((salons: ISalon[]) => this.salonService.addSalonToCollectionIfMissing<ISalon>(salons, this.participation?.salon)))
+      .pipe(
+        map((salons: ISalon[]) => {
+          const idSalonToFilter = this.participation?.id ? this.participation.id : this.state.idSalon;
+          this.editForm.get('salon')?.setValue(salons.find(participation => participation.id === idSalonToFilter));
+          return this.salonService.addSalonToCollectionIfMissing<ISalon>(salons, this.participation?.salon);
+        }),
+      )
       .subscribe((salons: ISalon[]) => (this.salonsSharedCollection = salons));
   }
 }

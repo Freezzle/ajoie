@@ -1,5 +1,5 @@
 import dayjs from 'dayjs/esm';
-import { IDimensionStand } from '../../entities/dimension-stand/dimension-stand.model';
+import { IDimensionStand } from '../dimension-stand/dimension-stand.model';
 
 export interface ISalon {
   id: string;

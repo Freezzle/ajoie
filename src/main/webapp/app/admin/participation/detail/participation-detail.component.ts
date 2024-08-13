@@ -8,7 +8,7 @@ import { ParticipationService } from '../service/participation.service';
 import { EMPTY, Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
@@ -31,6 +31,7 @@ import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
     ColorLockBooleanPipe,
     LockBooleanPipe,
     SendBooleanPipe,
+    ReactiveFormsModule,
   ],
 })
 export class ParticipationDetailComponent implements OnInit {

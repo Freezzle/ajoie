@@ -1,7 +1,7 @@
 <div>
   <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
     <h2 id="page-heading" data-cy="ParticipationHeading">
-      <span *ngIf="participation?.id" jhiTranslate="participation.edit">Modification d'une participation</span>
+      <span *ngIf="participation?.id" jhiTranslate="participation.edit">Détail d'une participation</span>
       <span *ngIf="!participation?.id" jhiTranslate="participation.create">Création d'une nouvelle participation</span>
 
       <hr />
@@ -9,7 +9,7 @@
       <div class="d-flex justify-content-between mt-3">
         <span>
           <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-            <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+            <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
           </button>
         </span>
 
@@ -32,7 +32,7 @@
             class="btn btn-primary btn-sm"
             (click)="writeBack()"
           >
-            <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
+            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
           </button>
 
           <button
@@ -43,7 +43,7 @@
             class="btn btn-secondary btn-sm"
             (click)="readOnlyBack()"
           >
-            <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
+            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
           </button>
           <button
             type="submit"
@@ -53,7 +53,7 @@
             [disabled]="editForm.invalid || isSaving"
             class="btn btn-primary btn-sm"
           >
-            <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
+            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
           </button>
         </span>
       </div>
@@ -186,7 +186,7 @@
                   />
                 </div>
                 <div class="col-sm-2 fw-bold align-content-center">
-                  <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Facturation clos ?</label>
+                  <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Factures payées ?</label>
                 </div>
                 <div class="col-sm-1 align-content-center">
                   <input
@@ -238,8 +238,7 @@
 
                 <div *ngIf="stands$ | async; let stands">
                   <div>
-                    <div class="d-flex justify-content-between mt-3">
-                      <h4 jhiTranslate="stand.title">Les stands</h4>
+                    <div class="d-flex justify-content-end">
                       <button
                         id="jh-create-stand"
                         type="button"
@@ -295,7 +294,7 @@
                                       class="btn btn-info btn-sm"
                                       data-cy="entityDetailsButton"
                                     >
-                                      <fa-icon icon="eye"></fa-icon>
+                                      <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                                     </a>
 
                                     <a
@@ -304,7 +303,7 @@
                                       class="btn btn-primary btn-sm"
                                       data-cy="entityEditButton"
                                     >
-                                      <fa-icon icon="pencil-alt"></fa-icon>
+                                      <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                                     </a>
 
                                     <button
@@ -313,7 +312,7 @@
                                       class="btn btn-danger btn-sm"
                                       data-cy="entityDeleteButton"
                                     >
-                                      <fa-icon icon="times"></fa-icon>
+                                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                                     </button>
                                   </div>
                                 </td>
@@ -341,12 +340,11 @@
             </div>
             <div class="card-body" *ngIf="readonlyForm">
               <div class="row">
-                <!-- STANDS LIST -->
+                <!-- CONFERENCES LIST -->
 
                 <div class="col-sm-12" *ngIf="conferences$ | async; let conferences">
                   <div>
-                    <div class="d-flex justify-content-between mt-3">
-                      <h4 jhiTranslate="conference.title">Les Conférences</h4>
+                    <div class="d-flex justify-content-end">
                       <button
                         id="jh-create-entity"
                         type="button"
@@ -394,7 +392,7 @@
                                       class="btn btn-info btn-sm"
                                       data-cy="entityDetailsButton"
                                     >
-                                      <fa-icon icon="eye"></fa-icon>
+                                      <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                                     </a>
 
                                     <a
@@ -403,7 +401,7 @@
                                       class="btn btn-primary btn-sm"
                                       data-cy="entityEditButton"
                                     >
-                                      <fa-icon icon="pencil-alt"></fa-icon>
+                                      <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                                     </a>
 
                                     <button
@@ -412,7 +410,7 @@
                                       class="btn btn-danger btn-sm"
                                       data-cy="entityDeleteButton"
                                     >
-                                      <fa-icon icon="times"></fa-icon>
+                                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                                     </button>
                                   </div>
                                 </td>

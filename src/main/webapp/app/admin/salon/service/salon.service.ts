@@ -8,7 +8,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { createRequestOption } from 'app/core/request/request-util';
 import { ISalon, ISalonStats, NewSalon } from '../salon.model';
 import { isPresent } from '../../../core/util/operators';
-import { IDimensionStand } from '../../../entities/dimension-stand/dimension-stand.model';
+import { IDimensionStand } from '../../dimension-stand/dimension-stand.model';
 
 type RestOf<T extends ISalon | NewSalon> = Omit<T, 'startingDate' | 'endingDate'> & {
   startingDate?: string | null;

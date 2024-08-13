@@ -9,7 +9,7 @@
       <div class="d-flex justify-content-between mt-3">
         <span>
           <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
-            <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="common.back">Retour</span>
+            <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
           </button>
         </span>
 
@@ -30,7 +30,7 @@
             data-cy="entityDetailsButton"
             *ngIf="readonlyForm"
           >
-            <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.participations">Participations</span>
+            <span class="d-inline" jhiTranslate="salon.participations">Participations</span>
           </a>
 
           <a
@@ -40,7 +40,7 @@
             data-cy="entityDetailsButton"
             *ngIf="readonlyForm"
           >
-            <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.stands">Stands</span>
+            <span class="d-inline" jhiTranslate="salon.stands">Stands</span>
           </a>
 
           <a
@@ -50,17 +50,7 @@
             data-cy="entityDetailsButton"
             *ngIf="readonlyForm"
           >
-            <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.conferences">Conférences</span>
-          </a>
-
-          <a
-            [routerLink]="['/admin/conferences']"
-            [state]="{ idSalon: salon?.id }"
-            class="btn btn-warning btn-sm"
-            data-cy="entityDetailsButton"
-            *ngIf="readonlyForm"
-          >
-            <fa-icon icon="eye"></fa-icon>&nbsp;<span class="d-inline" jhiTranslate="salon.benevoles">Bénévoles</span>
+            <span class="d-inline" jhiTranslate="salon.conferences">Conférences</span>
           </a>
         </span>
         <span>
@@ -72,7 +62,7 @@
             class="btn btn-primary btn-sm"
             (click)="writeBack()"
           >
-            <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="common.edit">Editer</span>
+            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
           </button>
 
           <button
@@ -83,7 +73,7 @@
             class="btn btn-secondary btn-sm"
             (click)="readOnlyBack()"
           >
-            <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="common.cancel">Annuler</span>
+            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
           </button>
           <button
             type="submit"
@@ -93,7 +83,7 @@
             [disabled]="editForm.invalid || isSaving"
             class="btn btn-primary btn-sm"
           >
-            <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="common.save">Sauvegarder</span>
+            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
           </button>
         </span>
       </div>
@@ -165,15 +155,15 @@
             <div class="col-sm-2 fw-bold align-content-center">
               <label for="field_extraInformation" jhiTranslate="salon.extraInformation">Extra Information</label>
             </div>
-            <div class="col-sm-10 mb-3 align-content-center">
-              <input
-                type="text"
+            <div class="col-sm-10 align-content-center">
+              <textarea
                 class="form-control"
                 name="extraInformation"
                 id="field_extraInformation"
+                rows="3"
                 data-cy="extraInformation"
                 formControlName="extraInformation"
-              />
+              ></textarea>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
-import { IDimensionStand } from 'app/entities/dimension-stand/dimension-stand.model';
-import { Status } from '../../entities/enumerations/status.model';
 import { IParticipation } from '../participation/participation.model';
+import { IDimensionStand } from '../dimension-stand/dimension-stand.model';
+import { Status } from '../enumerations/status.model';
 
 export interface IStand {
   id: string;

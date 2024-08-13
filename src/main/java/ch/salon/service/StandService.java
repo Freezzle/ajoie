@@ -1,6 +1,8 @@
 package ch.salon.service;
 
+import ch.salon.domain.Stand;
 import ch.salon.repository.StandRepository;
+import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.dto.StandDTO;
 import ch.salon.service.mapper.StandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
@@ -17,9 +19,11 @@ public class StandService {
     public static final String ENTITY_NAME = "stand";
 
     private final StandRepository standRepository;
+    private final ParticipationService participationService;
 
-    public StandService(StandRepository standRepository) {
+    public StandService(StandRepository standRepository, ParticipationService participationService) {
         this.standRepository = standRepository;
+        this.participationService = participationService;
     }
 
     public UUID create(StandDTO stand) {
@@ -27,7 +31,11 @@ public class StandService {
             throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        return standRepository.save(StandMapper.INSTANCE.toEntity(stand)).getId();
+        Stand standCreated = standRepository.save(StandMapper.INSTANCE.toEntity(stand));
+
+        this.participationService.adaptStatusFromChildren(standCreated.getParticipation().getId());
+
+        return standCreated.getId();
     }
 
     public StandDTO update(final UUID id, StandDTO stand) {
@@ -42,7 +50,11 @@ public class StandService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return StandMapper.INSTANCE.toDto(standRepository.save(StandMapper.INSTANCE.toEntity(stand)));
+        StandDTO standDTO = StandMapper.INSTANCE.toDto(standRepository.save(StandMapper.INSTANCE.toEntity(stand)));
+
+        this.participationService.adaptStatusFromChildren(standDTO.getParticipation().getId());
+
+        return standDTO;
     }
 
     public List<StandDTO> findAll(String idSalon, String idParticipation) {
@@ -64,6 +76,8 @@ public class StandService {
     }
 
     public void delete(UUID id) {
+        UUID idParticipation = get(id).map(StandDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
         standRepository.deleteById(id);
+        this.participationService.adaptStatusFromChildren(idParticipation);
     }
 }

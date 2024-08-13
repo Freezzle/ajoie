@@ -7,12 +7,12 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { Status } from 'app/entities/enumerations/status.model';
 import { ConferenceService } from '../service/conference.service';
 import { IConference } from '../conference.model';
 import { ConferenceFormGroup, ConferenceFormService } from './conference-form.service';
 import { IParticipation } from '../../participation/participation.model';
 import { ParticipationService } from '../../participation/service/participation.service';
+import { Status } from '../../enumerations/status.model';
 
 @Component({
   standalone: true,

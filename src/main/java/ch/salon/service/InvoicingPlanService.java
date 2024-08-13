@@ -1,5 +1,7 @@
 package ch.salon.service;
 
+import static ch.salon.domain.enumeration.Type.*;
+
 import ch.salon.domain.Conference;
 import ch.salon.domain.Exponent;
 import ch.salon.domain.Invoice;
@@ -8,6 +10,7 @@ import ch.salon.domain.Participation;
 import ch.salon.domain.PriceStandSalon;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
+import ch.salon.domain.enumeration.Status;
 import ch.salon.domain.enumeration.Type;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.InvoicingPlanRepository;
@@ -179,11 +182,14 @@ public class InvoicingPlanService {
 
         List<Stand> stands = standRepository.findByParticipationId(participation.getId());
         removeObsoleteStandInvoices(lockedInvoices, stands);
-        stands.forEach(stand -> processStand(stand, salon, lockedInvoices));
+        stands.stream().filter(stand -> !stand.getStatus().isInvalidStatus()).forEach(stand -> processStand(stand, salon, lockedInvoices));
 
         List<Conference> conferences = conferenceRepository.findByParticipationId(participation.getId());
         removeObsoleteConferenceInvoices(lockedInvoices, conferences);
-        conferences.forEach(conference -> processConference(conference, salon, lockedInvoices));
+        conferences
+            .stream()
+            .filter(conference -> !conference.getStatus().isInvalidStatus())
+            .forEach(conference -> processConference(conference, salon, lockedInvoices));
 
         processMeals(participation, salon, lockedInvoices);
 
@@ -204,10 +210,15 @@ public class InvoicingPlanService {
     }
 
     private void removeObsoleteStandInvoices(Set<Invoice> lockedInvoices, List<Stand> stands) {
+        stands.forEach(stand -> {
+            if (stand.getStatus().isInvalidStatus()) {
+                lockedInvoices.removeIf(invoice -> (invoice.getType().isFromStand()) && stand.getId().equals(invoice.getReferenceId()));
+            }
+        });
+
         lockedInvoices.removeIf(
             invoice ->
-                (invoice.getType() == Type.STAND || invoice.getType() == Type.SHARED) &&
-                stands.stream().map(Stand::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
+                (invoice.getType().isFromStand()) && stands.stream().map(Stand::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
         );
     }
 
@@ -225,7 +236,7 @@ public class InvoicingPlanService {
         updateOrCreateInvoice(
             lockedInvoices,
             stand.getId(),
-            Type.STAND,
+            STAND,
             stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
             1L,
             defaultPrice
@@ -235,7 +246,7 @@ public class InvoicingPlanService {
             updateOrCreateInvoice(
                 lockedInvoices,
                 stand.getId(),
-                Type.SHARED,
+                SHARED,
                 stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
                 1L,
                 salon.getPriceSharingStand()
@@ -244,34 +255,42 @@ public class InvoicingPlanService {
     }
 
     private void removeObsoleteConferenceInvoices(Set<Invoice> lockedInvoices, List<Conference> conferences) {
+        conferences.forEach(conference -> {
+            if (conference.getStatus().isInvalidStatus()) {
+                lockedInvoices.removeIf(
+                    invoice -> (invoice.getType().isFromConference()) && conference.getId().equals(invoice.getReferenceId())
+                );
+            }
+        });
+
         lockedInvoices.removeIf(
             invoice ->
-                invoice.getType() == Type.CONFERENCE &&
+                invoice.getType().isFromConference() &&
                 conferences.stream().map(Conference::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
         );
     }
 
     private void processConference(Conference conference, Salon salon, Set<Invoice> lockedInvoices) {
-        updateOrCreateInvoice(lockedInvoices, conference.getId(), Type.CONFERENCE, conference.getTitle(), 1L, salon.getPriceConference());
+        updateOrCreateInvoice(lockedInvoices, conference.getId(), CONFERENCE, conference.getTitle(), 1L, salon.getPriceConference());
     }
 
     private void processMeals(Participation participation, Salon salon, Set<Invoice> lockedInvoices) {
         processMeal(
-            Type.MEAL1,
+            MEAL1,
             participation.getNbMeal1(),
             messageSource.getMessage("saturday.midday", null, Locale.FRENCH),
             salon.getPriceMeal1(),
             lockedInvoices
         );
         processMeal(
-            Type.MEAL2,
+            MEAL2,
             participation.getNbMeal2(),
             messageSource.getMessage("saturday.evening", null, Locale.FRENCH),
             salon.getPriceMeal2(),
             lockedInvoices
         );
         processMeal(
-            Type.MEAL3,
+            MEAL3,
             participation.getNbMeal3(),
             messageSource.getMessage("sunday.midday", null, Locale.FRENCH),
             salon.getPriceMeal3(),

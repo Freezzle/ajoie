@@ -1,9 +1,9 @@
 import dayjs from 'dayjs/esm';
-import { IExponent } from 'app/entities/exponent/exponent.model';
-import { Status } from 'app/entities/enumerations/status.model';
-import { Type } from '../../entities/enumerations/type.model';
-import { Mode } from '../../entities/enumerations/mode.model';
 import { ISalon } from '../salon/salon.model';
+import { IExponent } from '../exponent/exponent.model';
+import { Status } from '../enumerations/status.model';
+import { Type } from '../enumerations/type.model';
+import { Mode } from '../enumerations/mode.model';
 
 export interface IParticipation {
   id: string;
