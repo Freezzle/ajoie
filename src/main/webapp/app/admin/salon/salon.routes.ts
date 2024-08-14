@@ -5,6 +5,9 @@ import { SalonComponent } from './list/salon.component';
 import { SalonStatsComponent } from './stats/salon-stats.component';
 import { SalonUpdateComponent } from './update/salon-update.component';
 import SalonResolve from './route/salon-routing-resolve.service';
+import conferenceRoutes from '../conference/conference.routes';
+import standRoutes from '../stand/stand.routes';
+import participationRoutes from '../participation/participation.routes';
 
 const salonRoute: Routes = [
   {
@@ -56,15 +59,15 @@ const salonRoute: Routes = [
   },
   {
     path: ':idSalon/conferences',
-    loadChildren: () => import('../conference/conference.routes'),
+    children: conferenceRoutes,
   },
   {
     path: ':idSalon/stands',
-    loadChildren: () => import('../stand/stand.routes'),
+    children: standRoutes,
   },
   {
     path: ':idSalon/participations',
-    loadChildren: () => import('../participation/participation.routes'),
+    children: participationRoutes,
   },
 ];
 
