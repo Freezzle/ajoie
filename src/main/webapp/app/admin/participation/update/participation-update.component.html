@@ -33,7 +33,7 @@
           <button
             type="button"
             id="cancel-save"
-            *ngIf="!readonlyForm"
+            *ngIf="!readonlyForm && participation?.id"
             data-cy="entityCreateCancelButton"
             class="btn btn-secondary btn-sm"
             (click)="readOnlyBack()"
@@ -139,61 +139,37 @@
                   <label for="field_acceptedChart" jhiTranslate="participation.acceptedChart">Charte accepté ?</label>
                 </div>
                 <div class="col-sm-1 align-content-center">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    role="switch"
-                    name="acceptedChart"
-                    data-cy="acceptedChart"
-                    formControlName="acceptedChart"
-                    id="field_acceptedChart"
-                    checked
-                  />
+                  <label class="switch">
+                    <input type="checkbox" name="acceptedChart" formControlName="acceptedChart" id="field_acceptedChart" />
+                    <span class="slider"></span>
+                  </label>
                 </div>
                 <div class="col-sm-2 fw-bold align-content-center">
                   <label for="field_acceptedContract" jhiTranslate="participation.acceptedContract">Contrat accepté ?</label>
                 </div>
                 <div class="col-sm-1 align-content-center">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    role="switch"
-                    name="acceptedContract"
-                    data-cy="acceptedContract"
-                    formControlName="acceptedContract"
-                    id="field_acceptedContract"
-                    checked
-                  />
+                  <label class="switch">
+                    <input type="checkbox" name="acceptedContract" formControlName="acceptedContract" id="field_acceptedContract" />
+                    <span class="slider"></span>
+                  </label>
                 </div>
                 <div class="col-sm-2 fw-bold align-content-center">
                   <label for="field_needArrangment" jhiTranslate="participation.needArrangment">Avec arrangement ?</label>
                 </div>
                 <div class="col-sm-1 align-content-center">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    role="switch"
-                    name="needArrangment"
-                    data-cy="needArrangment"
-                    formControlName="needArrangment"
-                    id="field_needArrangment"
-                    checked
-                  />
+                  <label class="switch">
+                    <input type="checkbox" name="needArrangment" formControlName="needArrangment" id="field_needArrangment" />
+                    <span class="slider"></span>
+                  </label>
                 </div>
                 <div class="col-sm-2 fw-bold align-content-center">
                   <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Factures payées ?</label>
                 </div>
                 <div class="col-sm-1 align-content-center">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    role="switch"
-                    name="isBillingClosed"
-                    data-cy="isBillingClosed"
-                    formControlName="isBillingClosed"
-                    id="field_isBillingClosed"
-                    checked
-                  />
+                  <label class="switch">
+                    <input type="checkbox" name="isBillingClosed" formControlName="isBillingClosed" id="field_isBillingClosed" />
+                    <span class="slider"></span>
+                  </label>
                 </div>
               </div>
 

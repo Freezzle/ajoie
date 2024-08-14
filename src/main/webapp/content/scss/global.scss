@@ -363,3 +363,60 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   color: black;
   background-color: #f8e6d8;
 }
+
+/* Style du conteneur de la case à cocher */
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+}
+
+/* Masquer la case à cocher réelle */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider (la partie visible du switch) */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $secondary;
+  transition: 0.4s;
+  border-radius: 25px;
+}
+
+/* Rond à l'intérieur du slider */
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 23px;
+  width: 25px;
+  left: 2px;
+  bottom: 1px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 25px;
+}
+
+/* Quand le checkbox est sélectionné */
+input:checked + .slider {
+  background-color: $primary;
+}
+
+/* Déplacer le rond à droite quand le checkbox est sélectionné */
+input:checked + .slider:before {
+  transform: translateX(21px);
+}
+
+/* Ajout d'une ombre subtile autour du slider */
+.slider {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}

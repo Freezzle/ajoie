@@ -66,18 +66,18 @@ export class ParticipationFormService {
           validators: [Validators.required],
         },
       ),
-      registrationDate: new FormControl(participationRawValue.registrationDate),
+      registrationDate: new FormControl(participationRawValue.registrationDate, Validators.required),
       nbMeal1: new FormControl(participationRawValue.nbMeal1),
       nbMeal2: new FormControl(participationRawValue.nbMeal2),
       nbMeal3: new FormControl(participationRawValue.nbMeal3),
       acceptedChart: new FormControl(participationRawValue.acceptedChart),
       acceptedContract: new FormControl(participationRawValue.acceptedContract),
       needArrangment: new FormControl(participationRawValue.needArrangment),
-      isBillingClosed: new FormControl(participationRawValue.isBillingClosed),
-      status: new FormControl(participationRawValue.status),
+      isBillingClosed: new FormControl(participationRawValue.isBillingClosed, Validators.required),
+      status: new FormControl(participationRawValue.status, Validators.required),
       extraInformation: new FormControl(participationRawValue.extraInformation),
-      exponent: new FormControl(participationRawValue.exponent),
-      salon: new FormControl(participationRawValue.salon),
+      exponent: new FormControl(participationRawValue.exponent, Validators.required),
+      salon: new FormControl(participationRawValue.salon, Validators.required),
     });
   }
 

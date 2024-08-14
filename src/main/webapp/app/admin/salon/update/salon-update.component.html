@@ -45,7 +45,7 @@
           <button
             type="button"
             id="cancel-save"
-            *ngIf="!readonlyForm"
+            *ngIf="!readonlyForm && salon?.id"
             data-cy="entityCreateCancelButton"
             class="btn btn-secondary btn-sm"
             (click)="readOnlyBack()"

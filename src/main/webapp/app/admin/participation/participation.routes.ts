@@ -16,6 +16,17 @@ const participationRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
+    path: 'new',
+    component: ParticipationUpdateComponent,
+    resolve: {
+      salon: ParticipationResolve,
+    },
+    data: {
+      readonly: false,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
     path: ':idParticipation/billings',
     component: ParticipationDetailComponent,
     resolve: {
