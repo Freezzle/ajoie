@@ -13,7 +13,7 @@ const conferenceRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
+    path: ':idConference/view',
     component: ConferenceUpdateComponent,
     resolve: {
       conference: ConferenceResolve,
@@ -35,7 +35,18 @@ const conferenceRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/edit',
+    path: ':idConference/edit',
+    component: ConferenceUpdateComponent,
+    resolve: {
+      conference: ConferenceResolve,
+    },
+    data: {
+      readonly: false,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':idConference/edit',
     component: ConferenceUpdateComponent,
     resolve: {
       conference: ConferenceResolve,

@@ -17,13 +17,7 @@
           <span jhiTranslate="common.refresh">Actualiser</span>
         </button>
 
-        <button
-          id="jh-create-entity"
-          data-cy="entityCreateButton"
-          class="btn btn-outline-primary btn-sm"
-          [routerLink]="['/admin/stands/new']"
-          [state]="{ idSalon: state.idSalon }"
-        >
+        <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-outline-primary btn-sm" [routerLink]="['./new']">
           <fa-icon icon="plus"></fa-icon>
           <span jhiTranslate="common.create">Créer</span>
         </button>
@@ -82,21 +76,11 @@
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a
-                    [routerLink]="['/admin/stands', stand.id, 'view']"
-                    [state]="{ idSalon: state.idSalon }"
-                    class="btn btn-info btn-sm"
-                    data-cy="entityDetailsButton"
-                  >
+                  <a [routerLink]="['./', stand.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                   </a>
 
-                  <a
-                    [routerLink]="['/admin/stands', stand.id, 'edit']"
-                    [state]="{ idSalon: state.idSalon }"
-                    class="btn btn-primary btn-sm"
-                    data-cy="entityEditButton"
-                  >
+                  <a [routerLink]="['./', stand.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
                     <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                   </a>
 

@@ -1,6 +1,6 @@
 import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { filter, Observable, Subscription, tap } from 'rxjs';
+import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
@@ -44,6 +44,7 @@ export class ParticipationComponent implements OnInit {
   participations?: IParticipation[];
   isLoading = false;
   statusValues = Object.keys(Status);
+  params: any;
 
   public router = inject(Router);
   protected participationService = inject(ParticipationService);
@@ -51,14 +52,14 @@ export class ParticipationComponent implements OnInit {
   protected sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
-  protected state: any;
 
   ngOnInit(): void {
-    this.state = history.state;
-
-    if (!this.participations || this.participations.length === 0) {
-      this.load();
-    }
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
+      this.params = params;
+      if (!this.participations || this.participations.length === 0) {
+        this.load();
+      }
+    });
   }
 
   delete(participation: IParticipation): void {
@@ -115,7 +116,7 @@ export class ParticipationComponent implements OnInit {
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
     const queryObject: any = {
-      idSalon: this.state.idSalon,
+      idSalon: this.params.get('idSalon'),
     };
     return this.participationService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }

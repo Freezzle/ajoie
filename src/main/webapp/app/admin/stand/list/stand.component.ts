@@ -1,10 +1,10 @@
 import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { filter, Observable, Subscription, tap } from 'rxjs';
+import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import { SortByDirective, SortDirective, SortService, sortStateSignal } from 'app/shared/sort';
+import { SortByDirective, SortDirective, SortService } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
@@ -36,8 +36,7 @@ export class StandComponent implements OnInit {
   subscription: Subscription | null = null;
   stands?: IStand[];
   isLoading = false;
-
-  sortState = sortStateSignal({});
+  params: any;
 
   public router = inject(Router);
   protected location = inject(Location);
@@ -47,14 +46,13 @@ export class StandComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  protected state: any;
-
   ngOnInit(): void {
-    this.state = window.history.state as { idSalon: string };
-
-    if (!this.stands || this.stands.length === 0) {
-      this.load();
-    }
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
+      this.params = params;
+      if (!this.stands || this.stands.length === 0) {
+        this.load();
+      }
+    });
   }
 
   delete(stand: IStand): void {
@@ -92,7 +90,8 @@ export class StandComponent implements OnInit {
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
     const queryObject: any = {
-      idSalon: this.state.idSalon,
+      idSalon: this.params.get('idSalon'),
+      idParticipation: this.params.get('idParticipation'),
     };
     return this.standService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }

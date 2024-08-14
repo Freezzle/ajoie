@@ -14,12 +14,7 @@
         </span>
 
         <span>
-          <a
-            [routerLink]="['/admin/participations', participation?.id, 'billing']"
-            *ngIf="readonlyForm"
-            class="btn btn-warning btn-sm"
-            data-cy="entityBillingButton"
-          >
+          <a [routerLink]="['../billings']" *ngIf="readonlyForm" class="btn btn-warning btn-sm" data-cy="entityBillingButton">
             <span class="d-none d-md-inline" jhiTranslate="participation.billing.title">Facturations</span>
           </a>
         </span>
@@ -244,8 +239,7 @@
                         type="button"
                         data-cy="entityCreateButton"
                         class="btn btn-outline-primary btn-sm"
-                        [routerLink]="['/admin/stands/new']"
-                        [state]="{ idSalon: participation?.salon?.id, idParticipation: participation?.id }"
+                        [routerLink]="['../stands/new']"
                       >
                         <fa-icon icon="plus"></fa-icon>
                         <span jhiTranslate="common.create">Créer</span>
@@ -289,8 +283,7 @@
                                 <td class="text-end">
                                   <div class="btn-group">
                                     <a
-                                      [routerLink]="['/admin/stands', stand.id, 'view']"
-                                      [state]="{ idSalon: participation?.salon?.id, idParticipation: participation?.id }"
+                                      [routerLink]="['../stands', stand.id, 'view']"
                                       class="btn btn-info btn-sm"
                                       data-cy="entityDetailsButton"
                                     >
@@ -298,8 +291,7 @@
                                     </a>
 
                                     <a
-                                      [routerLink]="['/admin/stands', stand.id, 'edit']"
-                                      [state]="{ idSalon: participation?.salon?.id, idParticipation: participation?.id }"
+                                      [routerLink]="['../stands', stand.id, 'edit']"
                                       class="btn btn-primary btn-sm"
                                       data-cy="entityEditButton"
                                     >
@@ -350,8 +342,7 @@
                         type="button"
                         data-cy="entityCreateButton"
                         class="btn btn-outline-primary btn-sm"
-                        [routerLink]="['/admin/conferences/new']"
-                        [state]="{ idSalon: participation?.salon?.id, idParticipation: participation?.id }"
+                        [routerLink]="['../conferences/new']"
                       >
                         <fa-icon icon="plus"></fa-icon>
                         <span jhiTranslate="common.create">Créer</span>
@@ -387,8 +378,7 @@
                                 <td class="text-end">
                                   <div class="btn-group">
                                     <a
-                                      [routerLink]="['/admin/conferences', conference.id, 'view']"
-                                      [state]="{ idSalon: participation?.salon?.id, idParticipation: participation?.id }"
+                                      [routerLink]="['../conferences', conference.id, 'view']"
                                       class="btn btn-info btn-sm"
                                       data-cy="entityDetailsButton"
                                     >
@@ -396,8 +386,7 @@
                                     </a>
 
                                     <a
-                                      [routerLink]="['/admin/conferences', conference.id, 'edit']"
-                                      [state]="{ idSalon: participation?.salon?.id, idParticipation: participation?.id }"
+                                      [routerLink]="['../conferences', conference.id, 'edit']"
                                       class="btn btn-primary btn-sm"
                                       data-cy="entityEditButton"
                                     >

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -28,6 +28,7 @@ export class StandUpdateComponent implements OnInit {
   stand: IStand | null = null;
   statusValues = Object.keys(Status);
   readonlyForm = false;
+  params: any;
 
   participationsSharedCollection: IParticipation[] = [];
   dimensionStandsSharedCollection: IDimensionStand[] = [];
@@ -37,7 +38,6 @@ export class StandUpdateComponent implements OnInit {
   protected participationService = inject(ParticipationService);
   protected dimensionStandService = inject(DimensionStandService);
   protected activatedRoute = inject(ActivatedRoute);
-  protected state: any;
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: StandFormGroup = this.standFormService.createStandFormGroup();
@@ -49,14 +49,13 @@ export class StandUpdateComponent implements OnInit {
     this.dimensionStandService.compareDimensionStand(o1, o2);
 
   ngOnInit(): void {
-    this.state = window.history.state as { idSalon: string; idParticipation: string };
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
+      this.stand = data['stand'];
+      this.readonlyForm = data['readonly'];
+      this.params = params;
 
-    this.activatedRoute.data.subscribe(({ stand, readonly }) => {
-      this.stand = stand;
-      this.readonlyForm = readonly;
-
-      if (stand) {
-        this.updateForm(stand);
+      if (this.stand) {
+        this.updateForm(this.stand);
         if (this.readonlyForm) {
           this.readOnlyBack();
         } else {
@@ -119,6 +118,7 @@ export class StandUpdateComponent implements OnInit {
       this.participationsSharedCollection,
       stand.participation,
     );
+
     this.dimensionStandsSharedCollection = this.dimensionStandService.addDimensionStandToCollectionIfMissing<IDimensionStand>(
       this.dimensionStandsSharedCollection,
       stand.dimension,
@@ -127,7 +127,8 @@ export class StandUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     const queryObject: any = {
-      idSalon: this.state.idSalon,
+      idSalon: this.params.get('idSalon'),
+      idParticipation: this.params.get('idParticipation'),
     };
 
     this.participationService
@@ -135,8 +136,12 @@ export class StandUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) => {
-          const idParticipationToFilter = this.stand?.participation?.id ? this.stand.participation.id : this.state.idParticipation;
-          this.editForm.get('participation')?.setValue(participations.find(participation => participation.id === idParticipationToFilter));
+          if (this.params.get('idParticipation')) {
+            this.editForm
+              .get('participation')
+              ?.setValue(participations.find(participation => participation.id === this.params.get('idParticipation')));
+          }
+
           return this.participationService.addParticipationToCollectionIfMissing<IParticipation>(participations, this.stand?.participation);
         }),
       )

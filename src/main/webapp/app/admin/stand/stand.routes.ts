@@ -13,7 +13,7 @@ const standRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
+    path: ':idStand/view',
     component: StandUpdateComponent,
     resolve: {
       stand: StandResolve,
@@ -35,7 +35,7 @@ const standRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/edit',
+    path: ':idStand/edit',
     component: StandUpdateComponent,
     resolve: {
       stand: StandResolve,

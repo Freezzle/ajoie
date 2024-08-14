@@ -1,14 +1,14 @@
-import { Component, NgZone, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
+import { Component, inject, NgZone, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
+import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
-import { ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
+import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IConference } from '../conference.model';
-import { EntityArrayResponseType, ConferenceService } from '../service/conference.service';
+import { ConferenceService, EntityArrayResponseType } from '../service/conference.service';
 import { ConferenceDeleteDialogComponent } from '../delete/conference-delete-dialog.component';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
@@ -32,22 +32,21 @@ export class ConferenceComponent implements OnInit {
   subscription: Subscription | null = null;
   conferences?: IConference[];
   isLoading = false;
+  params: any;
 
   public router = inject(Router);
-  protected state: any;
   protected conferenceService = inject(ConferenceService);
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  trackId = (_index: number, item: IConference): string => this.conferenceService.getConferenceIdentifier(item);
-
   ngOnInit(): void {
-    this.state = window.history.state as { idSalon: string };
-
-    if (!this.conferences || this.conferences.length === 0) {
-      this.load();
-    }
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
+      this.params = params;
+      if (!this.conferences || this.conferences.length === 0) {
+        this.load();
+      }
+    });
   }
 
   delete(conference: IConference): void {
@@ -63,7 +62,7 @@ export class ConferenceComponent implements OnInit {
   }
 
   load(): void {
-    this.queryBackend().subscribe({
+    this.queryBackend({ idSalon: this.params.get('idSalon') }).subscribe({
       next: (res: EntityArrayResponseType) => {
         this.onResponseSuccess(res);
       },
@@ -83,11 +82,8 @@ export class ConferenceComponent implements OnInit {
     return data ?? [];
   }
 
-  protected queryBackend(): Observable<EntityArrayResponseType> {
+  protected queryBackend(query?: any): Observable<EntityArrayResponseType> {
     this.isLoading = true;
-    const queryObject: any = {
-      idSalon: this.state.idSalon,
-    };
-    return this.conferenceService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.conferenceService.query(query).pipe(tap(() => (this.isLoading = false)));
   }
 }

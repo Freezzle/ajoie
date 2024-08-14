@@ -23,33 +23,15 @@
             <span class="d-none d-md-inline" jhiTranslate="salon.stats.title">Statistiques</span>
           </a>
 
-          <a
-            [routerLink]="['/admin/participations']"
-            [state]="{ idSalon: salon?.id }"
-            class="btn btn-warning btn-sm"
-            data-cy="entityDetailsButton"
-            *ngIf="readonlyForm"
-          >
+          <a [routerLink]="['../participations']" class="btn btn-warning btn-sm" data-cy="entityDetailsButton" *ngIf="readonlyForm">
             <span class="d-inline" jhiTranslate="salon.participations">Participations</span>
           </a>
 
-          <a
-            [routerLink]="['/admin/stands']"
-            [state]="{ idSalon: salon?.id }"
-            class="btn btn-warning btn-sm"
-            data-cy="entityDetailsButton"
-            *ngIf="readonlyForm"
-          >
+          <a [routerLink]="['../stands']" class="btn btn-warning btn-sm" data-cy="entityDetailsButton" *ngIf="readonlyForm">
             <span class="d-inline" jhiTranslate="salon.stands">Stands</span>
           </a>
 
-          <a
-            [routerLink]="['/admin/conferences']"
-            [state]="{ idSalon: salon?.id }"
-            class="btn btn-warning btn-sm"
-            data-cy="entityDetailsButton"
-            *ngIf="readonlyForm"
-          >
+          <a [routerLink]="['../conferences']" class="btn btn-warning btn-sm" data-cy="entityDetailsButton" *ngIf="readonlyForm">
             <span class="d-inline" jhiTranslate="salon.conferences">Conférences</span>
           </a>
         </span>

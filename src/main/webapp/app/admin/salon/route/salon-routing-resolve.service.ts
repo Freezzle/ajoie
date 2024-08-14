@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { of, EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 import { ISalon } from '../salon.model';
 import { SalonService } from '../service/salon.service';
 
 const salonResolve = (route: ActivatedRouteSnapshot): Observable<null | ISalon> => {
-  const id = route.params['id'];
+  const id = route.params['idSalon'];
   if (id) {
     return inject(SalonService)
       .find(id)

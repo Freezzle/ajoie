@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { of, EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 import { IConference } from '../conference.model';
 import { ConferenceService } from '../service/conference.service';
 
 const conferenceResolve = (route: ActivatedRouteSnapshot): Observable<null | IConference> => {
-  const id = route.params['id'];
+  const id = route.params['idConference'];
   if (id) {
     return inject(ConferenceService)
       .find(id)

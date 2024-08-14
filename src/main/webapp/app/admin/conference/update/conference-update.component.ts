@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -25,10 +25,10 @@ export class ConferenceUpdateComponent implements OnInit {
   conference: IConference | null = null;
   statusValues = Object.keys(Status);
   readonlyForm = false;
+  params: any;
 
   participationsSharedCollection: IParticipation[] = [];
 
-  protected state: any;
   protected conferenceService = inject(ConferenceService);
   protected conferenceFormService = inject(ConferenceFormService);
   protected participationService = inject(ParticipationService);
@@ -41,21 +41,20 @@ export class ConferenceUpdateComponent implements OnInit {
     this.participationService.compareParticipation(o1, o2);
 
   ngOnInit(): void {
-    this.state = window.history.state as { idSalon: string; idParticipation: string };
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
+      this.params = params;
+      this.readonlyForm = data['readonly'];
+      this.conference = data['conference'];
 
-    this.activatedRoute.data.subscribe(({ conference, readonly }) => {
-      this.readonlyForm = readonly;
-      this.conference = conference;
+      if (this.conference) {
+        this.updateForm(this.conference);
 
-      if (conference) {
-        this.updateForm(conference);
         if (this.readonlyForm) {
           this.readOnlyBack();
         } else {
           this.writeBack();
         }
       }
-
       this.loadRelationshipsOptions();
     });
   }
@@ -114,19 +113,17 @@ export class ConferenceUpdateComponent implements OnInit {
   }
 
   protected loadRelationshipsOptions(): void {
-    const queryObject: any = {
-      idSalon: this.state.idSalon,
-    };
     this.participationService
-      .query(queryObject)
+      .query({ idSalon: this.params.get('idSalon') })
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) => {
-          const idParticipationToFilter = this.conference?.participation?.id
-            ? this.conference.participation.id
-            : this.state.idParticipation;
+          if (this.params.get('idParticipation')) {
+            this.editForm
+              .get('participation')
+              ?.setValue(participations.find(participation => participation.id === this.params.get('idParticipation')));
+          }
 
-          this.editForm.get('participation')?.setValue(participations.find(participation => participation.id === idParticipationToFilter));
           return this.participationService.addParticipationToCollectionIfMissing<IParticipation>(
             participations,
             this.conference?.participation,

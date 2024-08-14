@@ -14,7 +14,7 @@ const salonRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/stats',
+    path: ':idSalon/stats',
     component: SalonStatsComponent,
     resolve: {
       salon: SalonResolve,
@@ -22,7 +22,7 @@ const salonRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
+    path: ':idSalon/view',
     component: SalonUpdateComponent,
     resolve: {
       salon: SalonResolve,
@@ -44,7 +44,7 @@ const salonRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/edit',
+    path: ':idSalon/edit',
     component: SalonUpdateComponent,
     resolve: {
       salon: SalonResolve,
@@ -53,6 +53,18 @@ const salonRoute: Routes = [
       readonly: false,
     },
     canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':idSalon/conferences',
+    loadChildren: () => import('../conference/conference.routes'),
+  },
+  {
+    path: ':idSalon/stands',
+    loadChildren: () => import('../stand/stand.routes'),
+  },
+  {
+    path: ':idSalon/participations',
+    loadChildren: () => import('../participation/participation.routes'),
   },
 ];
 

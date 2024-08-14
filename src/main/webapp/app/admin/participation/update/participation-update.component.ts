@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { EMPTY, filter, Observable, of, tap } from 'rxjs';
+import { combineLatest, EMPTY, filter, Observable, of, tap } from 'rxjs';
 import { finalize, map, mergeMap } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -39,7 +39,7 @@ export class ParticipationUpdateComponent implements OnInit {
   readonlyForm = false;
   conferences$: Observable<IConference[]> | undefined;
   stands$: Observable<IStand[]> | undefined;
-  state: any;
+  params: any;
 
   exponentsSharedCollection: IExponent[] = [];
   salonsSharedCollection: ISalon[] = [];
@@ -61,16 +61,16 @@ export class ParticipationUpdateComponent implements OnInit {
   compareSalon = (o1: ISalon | null, o2: ISalon | null): boolean => this.salonService.compareSalon(o1, o2);
 
   ngOnInit(): void {
-    this.state = window.history.state as { idSalon: string };
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
+      this.readonlyForm = data['readonly'];
+      this.participation = data['participation'];
+      this.params = params;
 
-    this.activatedRoute.data.subscribe(({ participation, readonly }) => {
-      this.readonlyForm = readonly;
-      this.participation = participation;
-
-      if (participation) {
-        this.updateForm(participation);
+      if (this.participation) {
+        this.updateForm(this.participation);
         this.loadConferences();
         this.loadStands();
+
         if (this.readonlyForm) {
           this.readOnlyBack();
         } else {
@@ -206,8 +206,9 @@ export class ParticipationUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<ISalon[]>) => res.body ?? []))
       .pipe(
         map((salons: ISalon[]) => {
-          const idSalonToFilter = this.participation?.id ? this.participation.id : this.state.idSalon;
-          this.editForm.get('salon')?.setValue(salons.find(participation => participation.id === idSalonToFilter));
+          if (this.params.get('idSalon')) {
+            this.editForm.get('salon')?.setValue(salons.find(salon => salon.id === this.params.get('idSalon')));
+          }
           return this.salonService.addSalonToCollectionIfMissing<ISalon>(salons, this.participation?.salon);
         }),
       )

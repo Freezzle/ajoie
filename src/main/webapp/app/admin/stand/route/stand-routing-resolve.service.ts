@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { of, EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 import { IStand } from '../stand.model';
 import { StandService } from '../service/stand.service';
 
 const standResolve = (route: ActivatedRouteSnapshot): Observable<null | IStand> => {
-  const id = route.params['id'];
+  const id = route.params['idStand'];
   if (id) {
     return inject(StandService)
       .find(id)
