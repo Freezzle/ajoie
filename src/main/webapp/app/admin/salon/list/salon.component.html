@@ -17,12 +17,7 @@
           <span jhiTranslate="common.refresh">Actualiser</span>
         </button>
 
-        <button
-          id="jh-create-entity"
-          data-cy="entityCreateButton"
-          class="btn btn-outline-primary btn-sm"
-          [routerLink]="['/admin/salons/new']"
-        >
+        <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-outline-primary btn-sm" [routerLink]="['./new']">
           <fa-icon icon="plus"></fa-icon>
           <span jhiTranslate="common.create">Créer</span>
         </button>
@@ -63,11 +58,11 @@
               <td class="text-center">{{ salon.endingDate | formatMediumDate }}</td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['/admin/salons', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                  <a [routerLink]="['./', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                   </a>
 
-                  <a [routerLink]="['/admin/salons', salon.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
+                  <a [routerLink]="['./', salon.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
                     <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                   </a>
 

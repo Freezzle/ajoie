@@ -60,7 +60,7 @@
             <tr data-cy="entityTable">
               <td>
                 @if (stand.participation) {
-                  <a [routerLink]="['/admin/participations', stand.participation.id, 'view']">
+                  <a [routerLink]="['/admin/salons', params.get('idSalon'), 'participations', stand.participation.id, 'view']">
                     {{ stand.participation.exponent?.fullName }}
                   </a>
                 }

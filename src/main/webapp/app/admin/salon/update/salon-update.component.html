@@ -14,12 +14,7 @@
         </span>
 
         <span>
-          <a
-            [routerLink]="['/admin/salons', salon?.id, 'stats']"
-            class="btn btn-warning btn-sm"
-            data-cy="entityDetailsButton"
-            *ngIf="readonlyForm"
-          >
+          <a [routerLink]="['../stats']" class="btn btn-warning btn-sm" data-cy="entityDetailsButton" *ngIf="readonlyForm">
             <span class="d-none d-md-inline" jhiTranslate="salon.stats.title">Statistiques</span>
           </a>
 
