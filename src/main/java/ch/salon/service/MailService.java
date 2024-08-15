@@ -1,13 +1,13 @@
 package ch.salon.service;
 
-import static ch.salon.domain.enumeration.TemplateEmail.*;
+import static ch.salon.domain.enumeration.EmailTemplate.*;
 
 import ch.salon.domain.DateUtils;
 import ch.salon.domain.Exponent;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Salon;
 import ch.salon.domain.User;
-import ch.salon.domain.enumeration.TemplateEmail;
+import ch.salon.domain.enumeration.EmailTemplate;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.File;
@@ -100,7 +100,7 @@ public class MailService {
         this.sendEmailFromTemplateSync(context, exponent.getEmail(), INVOICE_EMAIL, args);
     }
 
-    private void sendEmailFromTemplateSync(Context context, String emailto, TemplateEmail template, Object[] argsSubject) {
+    private void sendEmailFromTemplateSync(Context context, String emailto, EmailTemplate template, Object[] argsSubject) {
         String content = templateEngine.process(template.getTemplateName(), context);
         String subject = messageSource.getMessage(template.getSubjectKey(), argsSubject, context.getLocale());
 

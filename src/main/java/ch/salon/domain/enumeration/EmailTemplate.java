@@ -1,6 +1,6 @@
 package ch.salon.domain.enumeration;
 
-public enum TemplateEmail {
+public enum EmailTemplate {
     CREATION_ACCOUNT_EMAIL("mail/creationEmail", "email.creation.title"),
     ACTIVATION_EMAIL("mail/activationEmail", "email.activation.title"),
     RESET_PASSWORD_EMAIL("mail/passwordResetEmail", "email.reset.title"),
@@ -14,7 +14,7 @@ public enum TemplateEmail {
     private final String templateName;
     private final String subjectKey;
 
-    TemplateEmail(String templateName, String subjectKey) {
+    EmailTemplate(String templateName, String subjectKey) {
         this.templateName = templateName;
         this.subjectKey = subjectKey;
     }

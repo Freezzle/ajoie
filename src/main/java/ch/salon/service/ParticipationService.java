@@ -80,32 +80,35 @@ public class ParticipationService {
         List<Conference> conferences = this.conferenceRepository.findByParticipationId(idParticipation);
         Set<Status> conferencesStatus = conferences.stream().map(Conference::getStatus).collect(Collectors.toSet());
 
-        if (
-            standsStatus.stream().anyMatch(status -> status == IN_VERIFICATION) ||
-            conferencesStatus.stream().anyMatch(status -> status == IN_VERIFICATION)
-        ) {
-            // If one in verification mode, so we set the status in verification mode for the participation
+        if (isAnyOf(standsStatus, conferencesStatus, IN_VERIFICATION)) {
+            // If one in verification mode, so participation is still in verification
             participation.setStatus(IN_VERIFICATION);
-        } else if (
-            standsStatus.stream().anyMatch(status -> status == ACCEPTED) ||
-            conferencesStatus.stream().anyMatch(status -> status == ACCEPTED)
-        ) {
-            // If one accepted mode (and no one in verification due to the previous condition), so we set the status accepted mode for the participation
+        } else if (isAnyOf(standsStatus, conferencesStatus, ACCEPTED)) {
+            // If one in accepted mode (and none in verification mode due to the previous condition), so participation is accepted
             participation.setStatus(ACCEPTED);
-        } else if (
-            standsStatus.stream().anyMatch(status -> status == REFUSED) || conferencesStatus.stream().anyMatch(status -> status == REFUSED)
-        ) {
-            // If one accepted mode (and no one in verification or accepted due to the previous condition), so we set the status refused mode for the participation
+        } else if (isAnyOf(standsStatus, conferencesStatus, REFUSED)) {
+            // If one in refused mode (and none in verification/accepted mode due to the previous conditions), so participation is refused
             participation.setStatus(REFUSED);
-        } else if (
-            standsStatus.stream().allMatch(status -> status == CANCELED) &&
-            conferencesStatus.stream().allMatch(status -> status == CANCELED)
-        ) {
-            // If one accepted mode (and no one in verification or accepted due to the previous condition), so we set the status refused mode for the participation
+        } else if (isAllOf(standsStatus, conferencesStatus, CANCELED)) {
+            // if none in verification/accepted/refused mode, so participation is canceled
             participation.setStatus(CANCELED);
         }
 
         participationRepository.save(participation);
+    }
+
+    private boolean isAllOf(Set<Status> stands, Set<Status> conferences, Status status) {
+        return (
+            stands.stream().allMatch(statusStand -> statusStand == status) &&
+            conferences.stream().allMatch(statusConf -> statusConf == status)
+        );
+    }
+
+    private boolean isAnyOf(Set<Status> stands, Set<Status> conferences, Status status) {
+        return (
+            stands.stream().anyMatch(statusStand -> statusStand == status) ||
+            conferences.stream().anyMatch(statusConf -> statusConf == status)
+        );
     }
 
     public Optional<Participation> get(UUID id) {
