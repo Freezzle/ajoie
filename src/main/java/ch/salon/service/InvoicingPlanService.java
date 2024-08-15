@@ -10,7 +10,6 @@ import ch.salon.domain.Participation;
 import ch.salon.domain.PriceStandSalon;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
-import ch.salon.domain.enumeration.Status;
 import ch.salon.domain.enumeration.Type;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.InvoicingPlanRepository;

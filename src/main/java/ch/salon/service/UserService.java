@@ -197,6 +197,7 @@ public class UserService {
      * Update all information for a specific user, and return the modified user.
      *
      * @param userDTO user to update.
+     *
      * @return updated user.
      */
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {

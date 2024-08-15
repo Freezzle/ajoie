@@ -134,11 +134,7 @@ public class Conference implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Conference{" +
-               "id=" + getId() +
-               ", title='" + getTitle() + "'" +
-               ", status='" + getStatus() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" +
-               "}";
+        return "Conference{" + "id=" + getId() + ", title='" + getTitle() + "'" + ", status='" + getStatus() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" + "}";
     }
 }

@@ -119,12 +119,7 @@ public class PersistentToken implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "PersistentToken{" +
-               "series='" + series + '\'' +
-               ", tokenValue='" + tokenValue + '\'' +
-               ", tokenDate=" + tokenDate +
-               ", ipAddress='" + ipAddress + '\'' +
-               ", userAgent='" + userAgent + '\'' +
-               "}";
+        return "PersistentToken{" + "series='" + series + '\'' + ", tokenValue='" + tokenValue + '\'' + ", tokenDate=" +
+               tokenDate + ", ipAddress='" + ipAddress + '\'' + ", userAgent='" + userAgent + '\'' + "}";
     }
 }

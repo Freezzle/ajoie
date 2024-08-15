@@ -1,6 +1,6 @@
 package ch.salon.web.rest;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.badRequest;
 
 import ch.salon.service.UserService;
 import ch.salon.service.dto.UserDTO;

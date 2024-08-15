@@ -231,18 +231,10 @@ public class Invoice implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Invoice{" +
-               "id=" + getId() +
-               ", referenceId=" + getReferenceId() +
-               ", generationDate='" + getGenerationDate() + "'" +
-               ", type='" + getType() + "'" +
-               ", label='" + getLabel() + "'" +
-               ", defaultAmount=" + getDefaultAmount() +
-               ", customAmount=" + getCustomAmount() +
-               ", quantity=" + getQuantity() +
-               ", total=" + getTotal() +
-               ", lock='" + getLock() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" +
-               "}";
+        return "Invoice{" + "id=" + getId() + ", referenceId=" + getReferenceId() + ", generationDate='" +
+               getGenerationDate() + "'" + ", type='" + getType() + "'" + ", label='" + getLabel() + "'" +
+               ", defaultAmount=" + getDefaultAmount() + ", customAmount=" + getCustomAmount() + ", quantity=" +
+               getQuantity() + ", total=" + getTotal() + ", lock='" + getLock() + "'" + ", extraInformation='" +
+               getExtraInformation() + "'" + "}";
     }
 }

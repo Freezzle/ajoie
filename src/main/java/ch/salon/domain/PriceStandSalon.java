@@ -96,9 +96,6 @@ public class PriceStandSalon implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "PriceStandSalon{" +
-               "id=" + getId() +
-               ", price=" + getPrice() +
-               "}";
+        return "PriceStandSalon{" + "id=" + getId() + ", price=" + getPrice() + "}";
     }
 }

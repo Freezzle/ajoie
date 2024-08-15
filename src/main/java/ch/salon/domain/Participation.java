@@ -272,19 +272,11 @@ public class Participation implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Participation{" +
-               "id=" + getId() +
-               ", registrationDate='" + getRegistrationDate() + "'" +
-               ", clientNumber='" + getClientNumber() + "'" +
-               ", nbMeal1=" + getNbMeal1() +
-               ", nbMeal2=" + getNbMeal2() +
-               ", nbMeal3=" + getNbMeal3() +
-               ", acceptedChart='" + getAcceptedChart() + "'" +
-               ", acceptedContract='" + getAcceptedContract() + "'" +
-               ", needArrangment='" + getNeedArrangment() + "'" +
-               ", isBillingClosed='" + getIsBillingClosed() + "'" +
-               ", status='" + getStatus() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" +
-               "}";
+        return "Participation{" + "id=" + getId() + ", registrationDate='" + getRegistrationDate() + "'" +
+               ", clientNumber='" + getClientNumber() + "'" + ", nbMeal1=" + getNbMeal1() + ", nbMeal2=" +
+               getNbMeal2() + ", nbMeal3=" + getNbMeal3() + ", acceptedChart='" + getAcceptedChart() + "'" +
+               ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangment='" + getNeedArrangment() + "'" +
+               ", isBillingClosed='" + getIsBillingClosed() + "'" + ", status='" + getStatus() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" + "}";
     }
 }

@@ -92,8 +92,6 @@ public class Authority implements Serializable, Persistable<String> {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Authority{" +
-               "name=" + getName() +
-               "}";
+        return "Authority{" + "name=" + getName() + "}";
     }
 }

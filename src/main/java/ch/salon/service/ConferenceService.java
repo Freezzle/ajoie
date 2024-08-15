@@ -1,13 +1,10 @@
 package ch.salon.service;
 
 import ch.salon.domain.Conference;
-import ch.salon.domain.Stand;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.service.dto.ConferenceDTO;
 import ch.salon.service.dto.ParticipationLightDTO;
-import ch.salon.service.dto.StandDTO;
 import ch.salon.service.mapper.ConferenceMapper;
-import ch.salon.service.mapper.StandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
 import java.util.Objects;

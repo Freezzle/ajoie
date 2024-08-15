@@ -262,18 +262,10 @@ public class Stand implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Stand{" +
-               "id=" + getId() +
-               ", description='" + getDescription() + "'" +
-               ", website='" + getWebsite() + "'" +
-               ", socialMedia='" + getSocialMedia() + "'" +
-               ", urlPicture='" + getUrlPicture() + "'" +
-               ", shared='" + getShared() + "'" +
-               ", nbTable=" + getNbTable() +
-               ", nbChair=" + getNbChair() +
-               ", needElectricity='" + getNeedElectricity() + "'" +
-               ", status='" + getStatus() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" +
-               "}";
+        return "Stand{" + "id=" + getId() + ", description='" + getDescription() + "'" + ", website='" + getWebsite() +
+               "'" + ", socialMedia='" + getSocialMedia() + "'" + ", urlPicture='" + getUrlPicture() + "'" +
+               ", shared='" + getShared() + "'" + ", nbTable=" + getNbTable() + ", nbChair=" + getNbChair() +
+               ", needElectricity='" + getNeedElectricity() + "'" + ", status='" + getStatus() + "'" +
+               ", extraInformation='" + getExtraInformation() + "'" + "}";
     }
 }

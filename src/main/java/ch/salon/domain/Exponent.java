@@ -159,14 +159,8 @@ public class Exponent implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Exponent{" +
-               "id=" + getId() +
-               ", fullName='" + getFullName() + "'" +
-               ", email='" + getEmail() + "'" +
-               ", phoneNumber='" + getPhoneNumber() + "'" +
-               ", address='" + getAddress() + "'" +
-               ", npaLocalite='" + getNpaLocalite() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" +
-               "}";
+        return "Exponent{" + "id=" + getId() + ", fullName='" + getFullName() + "'" + ", email='" + getEmail() + "'" +
+               ", phoneNumber='" + getPhoneNumber() + "'" + ", address='" + getAddress() + "'" + ", npaLocalite='" +
+               getNpaLocalite() + "'" + ", extraInformation='" + getExtraInformation() + "'" + "}";
     }
 }

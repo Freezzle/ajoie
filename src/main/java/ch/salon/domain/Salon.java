@@ -255,18 +255,10 @@ public class Salon implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Salon{" +
-               "id=" + getId() +
-               ", referenceNumber='" + getReferenceNumber() + "'" +
-               ", place='" + getPlace() + "'" +
-               ", startingDate='" + getStartingDate() + "'" +
-               ", endingDate='" + getEndingDate() + "'" +
-               ", priceMeal1=" + getPriceMeal1() +
-               ", priceMeal2=" + getPriceMeal2() +
-               ", priceMeal3=" + getPriceMeal3() +
-               ", priceConference=" + getPriceConference() +
-               ", priceSharingStand=" + getPriceSharingStand() +
-               ", extraInformation='" + getExtraInformation() + "'" +
-               "}";
+        return "Salon{" + "id=" + getId() + ", referenceNumber='" + getReferenceNumber() + "'" + ", place='" +
+               getPlace() + "'" + ", startingDate='" + getStartingDate() + "'" + ", endingDate='" + getEndingDate() +
+               "'" + ", priceMeal1=" + getPriceMeal1() + ", priceMeal2=" + getPriceMeal2() + ", priceMeal3=" +
+               getPriceMeal3() + ", priceConference=" + getPriceConference() + ", priceSharingStand=" +
+               getPriceSharingStand() + ", extraInformation='" + getExtraInformation() + "'" + "}";
     }
 }

@@ -84,9 +84,6 @@ public class DimensionStand implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "DimensionStand{" +
-               "id=" + getId() +
-               ", dimension='" + getDimension() + "'" +
-               "}";
+        return "DimensionStand{" + "id=" + getId() + ", dimension='" + getDimension() + "'" + "}";
     }
 }

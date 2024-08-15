@@ -1,7 +1,9 @@
 package ch.salon.web.rest;
 
-import static org.springframework.http.ResponseEntity.*;
-import static tech.jhipster.web.util.HeaderUtil.*;
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
+import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
 
 import ch.salon.domain.Authority;
 import ch.salon.repository.AuthorityRepository;
@@ -10,7 +12,6 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 @RestController

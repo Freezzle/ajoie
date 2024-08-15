@@ -151,11 +151,7 @@ public class InvoicingPlan implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Invoice{" +
-               "id=" + getId() +
-               ", generationDate='" + getGenerationDate() + "'" +
-               ", billingNumber=" + getBillingNumber() +
-               ", hasBeenSent='" + isHasBeenSent() + "'" +
-               "}";
+        return "Invoice{" + "id=" + getId() + ", generationDate='" + getGenerationDate() + "'" + ", billingNumber=" +
+               getBillingNumber() + ", hasBeenSent='" + isHasBeenSent() + "'" + "}";
     }
 }

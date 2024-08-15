@@ -7,7 +7,6 @@ import static tech.jhipster.web.util.HeaderUtil.*;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.StandService;
 import ch.salon.service.dto.StandDTO;
-import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 @RestController

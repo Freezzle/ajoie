@@ -152,12 +152,7 @@ public class Payment implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Payment{" +
-               "id=" + getId() +
-               ", amount=" + getAmount() +
-               ", billingDate='" + getBillingDate() + "'" +
-               ", paymentMode='" + getPaymentMode() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" +
-               "}";
+        return "Payment{" + "id=" + getId() + ", amount=" + getAmount() + ", billingDate='" + getBillingDate() + "'" +
+               ", paymentMode='" + getPaymentMode() + "'" + ", extraInformation='" + getExtraInformation() + "'" + "}";
     }
 }

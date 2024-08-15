@@ -51,6 +51,7 @@ public class LoggingAspect {
      * Retrieves the {@link Logger} associated to the given {@link JoinPoint}.
      *
      * @param joinPoint join point we want the logger for.
+     *
      * @return {@link Logger} associated to the given {@link JoinPoint}.
      */
     private Logger logger(JoinPoint joinPoint) {
@@ -86,7 +87,9 @@ public class LoggingAspect {
      * Advice that logs when a method is entered and exited.
      *
      * @param joinPoint join point for advice.
+     *
      * @return result.
+     *
      * @throws Throwable throws {@link IllegalArgumentException}.
      */
     @Around("applicationPackagePointcut() && springBeanPointcut()")

@@ -413,7 +413,7 @@ input:checked + .slider {
 
 /* Déplacer le rond à droite quand le checkbox est sélectionné */
 input:checked + .slider:before {
-  transform: translateX(21px);
+  transform: translateX(22px);
 }
 
 /* Ajout d'une ombre subtile autour du slider */
