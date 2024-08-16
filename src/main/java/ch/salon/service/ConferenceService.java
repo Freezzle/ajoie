@@ -8,13 +8,12 @@ import ch.salon.service.dto.ConferenceDTO;
 import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.mapper.ConferenceMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ConferenceService {
@@ -25,7 +24,11 @@ public class ConferenceService {
     private final ParticipationService participationService;
     private final EventLogService eventLogService;
 
-    public ConferenceService(ConferenceRepository conferenceRepository, ParticipationService participationService, EventLogService eventLogService) {
+    public ConferenceService(
+        ConferenceRepository conferenceRepository,
+        ParticipationService participationService,
+        EventLogService eventLogService
+    ) {
         this.conferenceRepository = conferenceRepository;
         this.participationService = participationService;
         this.eventLogService = eventLogService;
@@ -37,7 +40,12 @@ public class ConferenceService {
         }
 
         Conference conferenceCreated = conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference));
-        this.eventLogService.eventFromSystem("Une conférence a été ajoutée.", EventType.EVENT, EntityType.PARTICIPATION, conferenceCreated.getParticipation().getId());
+        this.eventLogService.eventFromSystem(
+                "Une conférence a été ajoutée.",
+                EventType.EVENT,
+                EntityType.PARTICIPATION,
+                conferenceCreated.getParticipation().getId()
+            );
         this.participationService.adaptStatusFromChildren(conferenceCreated.getParticipation().getId());
 
         return conferenceCreated.getId();
@@ -60,20 +68,33 @@ public class ConferenceService {
         Conference conferenceToUpdate = ConferenceMapper.INSTANCE.toEntity(conference);
 
         if (Conference.hasDifference(conferenceToUpdate, conferenceExisting)) {
-            this.eventLogService.eventFromSystem("Des éléments d'une conférence ont changé.", EventType.EVENT, EntityType.PARTICIPATION, conferenceExisting.getParticipation().getId());
+            this.eventLogService.eventFromSystem(
+                    "Des éléments d'une conférence ont changé.",
+                    EventType.EVENT,
+                    EntityType.PARTICIPATION,
+                    conferenceExisting.getParticipation().getId()
+                );
         }
+
+        conferenceToUpdate = conferenceRepository.save(conferenceToUpdate);
         this.participationService.adaptStatusFromChildren(conferenceToUpdate.getParticipation().getId());
 
-        return ConferenceMapper.INSTANCE.toDto(conferenceRepository.save(conferenceToUpdate));
+        return ConferenceMapper.INSTANCE.toDto(conferenceToUpdate);
     }
 
     public List<ConferenceDTO> findAll(String idSalon, String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
-            return conferenceRepository.findByParticipationId(UUID.fromString(idParticipation)).stream()
-                .map(ConferenceMapper.INSTANCE::toDto).toList();
+            return conferenceRepository
+                .findByParticipationId(UUID.fromString(idParticipation))
+                .stream()
+                .map(ConferenceMapper.INSTANCE::toDto)
+                .toList();
         } else if (StringUtils.isNotBlank(idSalon)) {
-            return conferenceRepository.findByParticipationSalonId(UUID.fromString(idSalon)).stream()
-                .map(ConferenceMapper.INSTANCE::toDto).toList();
+            return conferenceRepository
+                .findByParticipationSalonId(UUID.fromString(idSalon))
+                .stream()
+                .map(ConferenceMapper.INSTANCE::toDto)
+                .toList();
         } else {
             throw new IllegalStateException("No filter given");
         }

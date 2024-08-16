@@ -1,9 +1,9 @@
 import dayjs from 'dayjs/esm';
 import { ISalon } from '../salon/salon.model';
-import { IExhibitor}from '../exhibitor/exhibitor.model';
 import { Status } from '../enumerations/status.model';
 import { Type } from '../enumerations/type.model';
 import { Mode } from '../enumerations/mode.model';
+import { IExhibitor } from '../exhibitor/exhibitor.model';
 
 export interface IParticipation {
   id: string;
@@ -19,7 +19,7 @@ export interface IParticipation {
   isBillingClosed?: boolean | null;
   status?: keyof typeof Status | null;
   extraInformation?: string | null;
-exhibitor?: IExhibitor | null;
+  exhibitor?: IExhibitor | null;
   salon?: ISalon | null;
 }
 

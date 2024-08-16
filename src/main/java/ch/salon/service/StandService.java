@@ -8,13 +8,12 @@ import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.dto.StandDTO;
 import ch.salon.service.mapper.StandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StandService {
@@ -37,7 +36,12 @@ public class StandService {
         }
 
         Stand standCreated = standRepository.save(StandMapper.INSTANCE.toEntity(stand));
-        this.eventLogService.eventFromSystem("Un stand a été ajoutée.", EventType.EVENT, EntityType.PARTICIPATION, standCreated.getParticipation().getId());
+        this.eventLogService.eventFromSystem(
+                "Un stand a été ajoutée.",
+                EventType.EVENT,
+                EntityType.PARTICIPATION,
+                standCreated.getParticipation().getId()
+            );
         this.participationService.adaptStatusFromChildren(standCreated.getParticipation().getId());
 
         return standCreated.getId();
@@ -60,21 +64,29 @@ public class StandService {
         Stand standToUpdate = StandMapper.INSTANCE.toEntity(stand);
 
         if (Stand.hasDifference(standToUpdate, standExisting)) {
-            this.eventLogService.eventFromSystem("Des éléments d'un stand ont changé.", EventType.EVENT, EntityType.PARTICIPATION, standExisting.getParticipation().getId());
+            this.eventLogService.eventFromSystem(
+                    "Des éléments d'un stand ont changé.",
+                    EventType.EVENT,
+                    EntityType.PARTICIPATION,
+                    standExisting.getParticipation().getId()
+                );
         }
 
+        standToUpdate = standRepository.save(standToUpdate);
         this.participationService.adaptStatusFromChildren(standToUpdate.getParticipation().getId());
 
-        return StandMapper.INSTANCE.toDto(standRepository.save(standToUpdate));
+        return StandMapper.INSTANCE.toDto(standToUpdate);
     }
 
     public List<StandDTO> findAll(String idSalon, String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
-            return standRepository.findByParticipationId(UUID.fromString(idParticipation)).stream()
-                .map(StandMapper.INSTANCE::toDto).toList();
+            return standRepository
+                .findByParticipationId(UUID.fromString(idParticipation))
+                .stream()
+                .map(StandMapper.INSTANCE::toDto)
+                .toList();
         } else if (StringUtils.isNotBlank(idSalon)) {
-            return standRepository.findByParticipationSalonId(UUID.fromString(idSalon)).stream()
-                .map(StandMapper.INSTANCE::toDto).toList();
+            return standRepository.findByParticipationSalonId(UUID.fromString(idSalon)).stream().map(StandMapper.INSTANCE::toDto).toList();
         }
 
         throw new IllegalStateException("No filter given");

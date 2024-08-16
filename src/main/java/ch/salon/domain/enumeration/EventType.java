@@ -5,6 +5,6 @@ public enum EventType {
     EMAIL,
     EVENT,
     PAYMENT,
-    COMMENT,
-    MISC;
+    DISCUSSION,
+    MISC,
 }
