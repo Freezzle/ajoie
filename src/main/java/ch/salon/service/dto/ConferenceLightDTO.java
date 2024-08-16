@@ -8,7 +8,8 @@ public class ConferenceLightDTO implements Serializable {
     private UUID id;
     private String title;
 
-    public ConferenceLightDTO() {}
+    public ConferenceLightDTO() {
+    }
 
     public UUID getId() {
         return id;

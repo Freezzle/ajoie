@@ -86,10 +86,10 @@ export class ParticipationComponent implements OnInit {
     window.history.back();
   }
 
-  filteringExponent(event: any): void {
+  filteringExhibitor(event: any): void {
     if (event.target.value) {
       this.participations = this.participations?.filter(participation =>
-        participation.exponent?.fullName?.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase()),
+        participation.exhibitor?.fullName?.toLocaleLowerCase().includes(event.target.value.toLocaleLowerCase()),
       );
     } else {
       this.load();

@@ -17,16 +17,11 @@ public class OpenApiConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "apiFirstGroupedOpenAPI")
-    public GroupedOpenApi apiFirstGroupedOpenAPI(
-        JHipsterOpenApiCustomizer jhipsterOpenApiCustomizer,
-        JHipsterProperties jHipsterProperties
-    ) {
+    public GroupedOpenApi apiFirstGroupedOpenAPI(JHipsterOpenApiCustomizer jhipsterOpenApiCustomizer,
+                                                 JHipsterProperties jHipsterProperties) {
         JHipsterProperties.ApiDocs properties = jHipsterProperties.getApiDocs();
-        return GroupedOpenApi.builder()
-            .group("openapi")
-            .addOpenApiCustomizer(jhipsterOpenApiCustomizer)
-            .packagesToScan(API_FIRST_PACKAGE)
-            .pathsToMatch(properties.getDefaultIncludePattern())
+        return GroupedOpenApi.builder().group("openapi").addOpenApiCustomizer(jhipsterOpenApiCustomizer)
+            .packagesToScan(API_FIRST_PACKAGE).pathsToMatch(properties.getDefaultIncludePattern())
             .build();
     }
 }

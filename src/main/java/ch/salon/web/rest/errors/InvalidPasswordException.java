@@ -10,14 +10,9 @@ public class InvalidPasswordException extends ErrorResponseException {
     private static final long serialVersionUID = 1L;
 
     public InvalidPasswordException() {
-        super(
-            HttpStatus.BAD_REQUEST,
-            ProblemDetailWithCauseBuilder.instance()
-                .withStatus(HttpStatus.BAD_REQUEST.value())
+        super(HttpStatus.BAD_REQUEST,
+            ProblemDetailWithCauseBuilder.instance().withStatus(HttpStatus.BAD_REQUEST.value())
                 .withType(ErrorConstants.INVALID_PASSWORD_TYPE)
-                .withTitle("Incorrect password")
-                .build(),
-            null
-        );
+                .withTitle("Incorrect password").build(), null);
     }
 }

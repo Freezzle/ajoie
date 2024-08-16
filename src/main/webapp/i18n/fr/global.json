@@ -67,7 +67,7 @@
       "entities": {
         "conference": "Conférences",
         "dimensionStand": "Dimensions",
-        "exponent": "Exposants",
+        "exhibitor": "Exposants",
         "invoice": "Factures",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "main": "Entités",

@@ -1,33 +1,26 @@
 package ch.salon.web.rest;
 
-import static ch.salon.service.ConferenceService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.*;
-import static tech.jhipster.web.util.HeaderUtil.*;
-
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ConferenceService;
 import ch.salon.service.dto.ConferenceDTO;
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.UUID;
+
+import static ch.salon.service.ConferenceService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
 
 @RestController
 @RequestMapping("/api/conferences")
@@ -46,35 +39,34 @@ public class ConferenceResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<ConferenceDTO> createConference(@Valid @RequestBody ConferenceDTO conference) throws URISyntaxException {
+    public ResponseEntity<ConferenceDTO> createConference(
+        @Valid @RequestBody ConferenceDTO conference) throws URISyntaxException {
         log.debug("REST request to save Conference : {}", conference);
 
         UUID id = conferenceService.create(conference);
 
-        return created(new URI("/api/conferences/" + id))
-            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .body(conference);
+        return created(new URI("/api/conferences/" + id)).headers(
+            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(conference);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<ConferenceDTO> updateConference(
-        @PathVariable(value = "id", required = false) final UUID id,
-        @Valid @RequestBody ConferenceDTO conference
-    ) throws URISyntaxException {
+    public ResponseEntity<ConferenceDTO> updateConference(@PathVariable(value = "id", required = false) final UUID id,
+                                                          @Valid @RequestBody
+                                                          ConferenceDTO conference) throws URISyntaxException {
         log.debug("REST request to update Conference : {}, {}", id, conference);
 
         conference = conferenceService.update(id, conference);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, conference.getId().toString())).body(conference);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, conference.getId().toString()))
+            .body(conference);
     }
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<ConferenceDTO> getAllConferences(
-        @RequestParam(name = "idSalon", required = false) String idSalon,
-        @RequestParam(name = "idParticipation", required = false) String idParticipation
-    ) {
+    public List<ConferenceDTO> getAllConferences(@RequestParam(name = "idSalon", required = false) String idSalon,
+                                                 @RequestParam(name = "idParticipation", required = false)
+                                                 String idParticipation) {
         log.debug("REST request to get all Conferences");
 
         return conferenceService.findAll(idSalon, idParticipation);
@@ -95,6 +87,7 @@ public class ConferenceResource {
 
         conferenceService.delete(id);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

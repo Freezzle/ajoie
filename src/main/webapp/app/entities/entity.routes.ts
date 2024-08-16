@@ -2,9 +2,10 @@ import { Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'exponent',
-    data: { pageTitle: 'salonApp.exponent.home.title' },
-    loadChildren: () => import('./exponent/exponent.routes'),
+path: 'exhibitor',
+data: {pageTitle: 'salonApp.exhibitor.home.title'
+},
+loadChildren:() => import('./exhibitor/exhibitor.routes'),
   },
   {
     path: 'dimension-stand',

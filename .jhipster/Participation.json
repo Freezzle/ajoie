@@ -85,8 +85,8 @@
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "exponent",
-      "relationshipName": "exponent",
+      "otherEntityName": "exhibitor",
+      "relationshipName": "exhibitor",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },

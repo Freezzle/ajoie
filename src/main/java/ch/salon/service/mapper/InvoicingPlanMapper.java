@@ -5,9 +5,10 @@ import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.InvoicingPlanLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = { ParticipationMapper.class, InvoiceMapper.class })
+@Mapper(uses = {ParticipationMapper.class, InvoiceMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface InvoicingPlanMapper {
     InvoicingPlanMapper INSTANCE = Mappers.getMapper(InvoicingPlanMapper.class);
 

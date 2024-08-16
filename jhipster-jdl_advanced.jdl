@@ -1,5 +1,5 @@
 
-entity Exponent {
+entity Exhibitor {
 	id UUID
     fullName String required
 	email String required
@@ -102,7 +102,7 @@ entity PriceStandSalon {
 }
 
 relationship OneToMany {
-	Exponent to Participation{exponent}
+	Exhibitor to Participation{exhibitor}
     Participation to Conference{participation}
     Participation to Payment{participation}
     Participation to Invoice{participation}

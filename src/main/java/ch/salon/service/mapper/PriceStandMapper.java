@@ -5,9 +5,10 @@ import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.PriceStandLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = { DimensionStandMapper.class })
+@Mapper(uses = {DimensionStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PriceStandMapper {
     PriceStandMapper INSTANCE = Mappers.getMapper(PriceStandMapper.class);
 

@@ -32,7 +32,8 @@ public class SalonDTO implements Serializable {
 
     private Set<PriceStandDTO> priceStandSalons = new HashSet<>();
 
-    public SalonDTO() {}
+    public SalonDTO() {
+    }
 
     public UUID getId() {
         return id;

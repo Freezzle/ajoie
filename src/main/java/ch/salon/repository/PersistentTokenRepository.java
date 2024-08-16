@@ -2,9 +2,10 @@ package ch.salon.repository;
 
 import ch.salon.domain.PersistentToken;
 import ch.salon.domain.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Spring Data JPA repository for the {@link PersistentToken} entity.

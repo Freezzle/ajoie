@@ -130,6 +130,10 @@ export class ParticipationService {
     );
   }
 
+  getEventLogs(idParticipation: string): Observable<HttpResponse<any>> {
+    return this.http.get<any[]>(`${this.resourceUrl}/${idParticipation}/events`, { observe: 'response', });
+  }
+
   getParticipationIdentifier(participation: Pick<IParticipation, 'id'>): string {
     return participation.id;
   }

@@ -4,12 +4,13 @@ import ch.salon.repository.PaymentRepository;
 import ch.salon.service.dto.PaymentDTO;
 import ch.salon.service.mapper.PaymentMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentService {
@@ -47,11 +48,8 @@ public class PaymentService {
 
     public List<PaymentDTO> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
-            return paymentRepository
-                .findByParticipationId(UUID.fromString(idParticipation))
-                .stream()
-                .map(PaymentMapper.INSTANCE::toDto)
-                .toList();
+            return paymentRepository.findByParticipationId(UUID.fromString(idParticipation)).stream()
+                .map(PaymentMapper.INSTANCE::toDto).toList();
         }
 
         throw new IllegalStateException("No filter given");

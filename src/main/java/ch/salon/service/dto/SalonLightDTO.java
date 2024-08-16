@@ -9,7 +9,8 @@ public class SalonLightDTO implements Serializable {
 
     private String place;
 
-    public SalonLightDTO() {}
+    public SalonLightDTO() {
+    }
 
     public UUID getId() {
         return id;

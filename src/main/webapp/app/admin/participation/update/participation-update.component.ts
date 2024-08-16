@@ -22,8 +22,8 @@ import { IStand } from '../../stand/stand.model';
 import { StandService } from '../../stand/service/stand.service';
 import { ISalon } from '../../salon/salon.model';
 import { SalonService } from '../../salon/service/salon.service';
-import { IExponent } from '../../exponent/exponent.model';
-import { ExponentService } from '../../exponent/service/exponent.service';
+import {IExhibitor}from '../../exhibitor/exhibitor.model';
+import {ExhibitorService }from '../../exhibitor/service/exhibitor.service';
 import { Status } from '../../enumerations/status.model';
 
 @Component({
@@ -41,14 +41,14 @@ export class ParticipationUpdateComponent implements OnInit {
   stands$: Observable<IStand[]> | undefined;
   params: any;
 
-  exponentsSharedCollection: IExponent[] = [];
+exhibitorsSharedCollection: IExhibitor[] = [];
   salonsSharedCollection: ISalon[] = [];
 
   protected participationService = inject(ParticipationService);
   protected participationFormService = inject(ParticipationFormService);
   protected conferenceService = inject(ConferenceService);
   protected standService = inject(StandService);
-  protected exponentService = inject(ExponentService);
+protected exhibitorService = inject(ExhibitorService);
   protected salonService = inject(SalonService);
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
@@ -56,7 +56,7 @@ export class ParticipationUpdateComponent implements OnInit {
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ParticipationFormGroup = this.participationFormService.createParticipationFormGroup();
 
-  compareExponent = (o1: IExponent | null, o2: IExponent | null): boolean => this.exponentService.compareExponent(o1, o2);
+compareExhibitor = (o1: IExhibitor | null, o2: IExhibitor | null): boolean => this.exhibitorService.compareExhibitor(o1, o2);
 
   compareSalon = (o1: ISalon | null, o2: ISalon | null): boolean => this.salonService.compareSalon(o1, o2);
 
@@ -183,23 +183,23 @@ export class ParticipationUpdateComponent implements OnInit {
     this.participation = participation;
     this.participationFormService.resetForm(this.editForm, participation);
 
-    this.exponentsSharedCollection = this.exponentService.addExponentToCollectionIfMissing<IExponent>(
-      this.exponentsSharedCollection,
-      participation.exponent,
+    this.exhibitorsSharedCollection = this.exhibitorService.addExhibitorToCollectionIfMissing<IExhibitor>(
+      this.exhibitorsSharedCollection,
+      participation.exhibitor,
     );
     this.salonsSharedCollection = this.salonService.addSalonToCollectionIfMissing<ISalon>(this.salonsSharedCollection, participation.salon);
   }
 
   protected loadRelationshipsOptions(): void {
-    this.exponentService
+    this.exhibitorService
       .query()
-      .pipe(map((res: HttpResponse<IExponent[]>) => res.body ?? []))
+      .pipe(map((res: HttpResponse<IExhibitor[]>) => res.body ?? []))
       .pipe(
-        map((exponents: IExponent[]) =>
-          this.exponentService.addExponentToCollectionIfMissing<IExponent>(exponents, this.participation?.exponent),
+        map((exhibitors: IExhibitor[]) =>
+          this.exhibitorService.addExhibitorToCollectionIfMissing<IExhibitor>(exhibitors, this.participation?.exhibitor),
         ),
       )
-      .subscribe((exponents: IExponent[]) => (this.exponentsSharedCollection = exponents));
+.subscribe((exhibitors: IExhibitor[]) => (this.exhibitorsSharedCollection = exhibitors));
 
     this.salonService
       .query()

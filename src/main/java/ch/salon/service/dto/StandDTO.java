@@ -1,6 +1,7 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Status;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -32,7 +33,8 @@ public class StandDTO implements Serializable {
 
     private DimensionStandLightDTO dimension;
 
-    public StandDTO() {}
+    public StandDTO() {
+    }
 
     public UUID getId() {
         return id;

@@ -6,7 +6,7 @@ import java.util.UUID;
 public class ParticipationLightDTO implements Serializable {
 
     private UUID id;
-    private ExponentLightDTO exponent;
+    private ExhibitorLightDTO exhibitor;
 
     public ParticipationLightDTO() {
         // Empty constructor needed for Jackson.
@@ -20,11 +20,11 @@ public class ParticipationLightDTO implements Serializable {
         this.id = id;
     }
 
-    public ExponentLightDTO getExponent() {
-        return exponent;
+    public ExhibitorLightDTO getExhibitor() {
+        return exhibitor;
     }
 
-    public void setExponent(ExponentLightDTO exponent) {
-        this.exponent = exponent;
+    public void setExhibitor(ExhibitorLightDTO exhibitor) {
+        this.exhibitor = exhibitor;
     }
 }

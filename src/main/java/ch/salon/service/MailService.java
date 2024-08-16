@@ -1,19 +1,11 @@
 package ch.salon.service;
 
-import static ch.salon.domain.enumeration.EmailTemplate.*;
-
-import ch.salon.domain.DateUtils;
-import ch.salon.domain.Exponent;
-import ch.salon.domain.InvoicingPlan;
-import ch.salon.domain.Salon;
-import ch.salon.domain.User;
+import ch.salon.domain.*;
 import ch.salon.domain.enumeration.EmailTemplate;
+import ch.salon.domain.enumeration.EntityType;
+import ch.salon.domain.enumeration.EventType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -27,6 +19,13 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+
+import static ch.salon.domain.enumeration.EmailTemplate.*;
+
 @Service
 public class MailService {
 
@@ -39,17 +38,16 @@ public class MailService {
     private final JavaMailSender javaMailSender;
     private final MessageSource messageSource;
     private final SpringTemplateEngine templateEngine;
+    private final EventLogService eventLogService;
 
-    public MailService(
-        JHipsterProperties jHipsterProperties,
-        JavaMailSender javaMailSender,
-        MessageSource messageSource,
-        SpringTemplateEngine templateEngine
-    ) {
+    public MailService(JHipsterProperties jHipsterProperties, JavaMailSender javaMailSender,
+                       MessageSource messageSource, SpringTemplateEngine templateEngine,
+                       EventLogService eventLogService) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
+        this.eventLogService = eventLogService;
     }
 
     @Async
@@ -85,22 +83,26 @@ public class MailService {
         this.sendEmailFromTemplateSync(context, user.getEmail(), RESET_PASSWORD_EMAIL, null);
     }
 
-    public void sendInvoiceMail(Salon salon, Exponent exponent, InvoicingPlan invoicingPlan) {
-        log.debug("Sending invoice email to '{}'", exponent.getEmail());
+    public void sendInvoiceMail(Salon salon, Exhibitor exhibitor, InvoicingPlan invoicingPlan) {
+        log.debug("Sending invoice email to '{}'", exhibitor.getEmail());
 
         Context context = new Context(Locale.FRENCH);
         context.setVariable("salon", salon.getPlace());
         context.setVariable("billingNumber", invoicingPlan.getBillingNumber());
-        context.setVariable("fullName", exponent.getFullName());
+        context.setVariable("fullName", exhibitor.getFullName());
         context.setVariable("startDate", DateUtils.instantToIso(salon.getStartingDate()));
         context.setVariable("endDate", DateUtils.instantToIso(salon.getEndingDate()));
 
-        Object[] args = { invoicingPlan.getBillingNumber(), salon.getPlace() };
+        Object[] args = {invoicingPlan.getBillingNumber(), salon.getPlace()};
 
-        this.sendEmailFromTemplateSync(context, exponent.getEmail(), INVOICE_EMAIL, args);
+        this.sendEmailFromTemplateSync(context, exhibitor.getEmail(), INVOICE_EMAIL, args);
+
+        eventLogService.eventFromSystem("La facture #" + invoicingPlan.getBillingNumber() + " a été envoyée.", EventType.EMAIL, EntityType.PARTICIPATION,
+            invoicingPlan.getParticipation().getId());
     }
 
-    private void sendEmailFromTemplateSync(Context context, String emailto, EmailTemplate template, Object[] argsSubject) {
+    private void sendEmailFromTemplateSync(Context context, String emailto, EmailTemplate template,
+                                           Object[] argsSubject) {
         String content = templateEngine.process(template.getTemplateName(), context);
         String subject = messageSource.getMessage(template.getSubjectKey(), argsSubject, context.getLocale());
 
@@ -108,7 +110,8 @@ public class MailService {
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, false, StandardCharsets.UTF_8.name());
             message.setFrom("dylan.claude.work@gmail.com"); // FIXME CHANGE THAT LATER
-            message.setTo(emailto.contains("dylan") ? emailto : "dylan.claude.work@gmail.com"); // FIXME CHANGE THAT LATER, AVOID SENDING PROD
+            message.setTo(emailto.contains(
+                "dylan") ? emailto : "dylan.claude.work@gmail.com"); // FIXME CHANGE THAT LATER, AVOID SENDING PROD
             message.setSubject(subject);
             message.setText(content, true);
 
@@ -116,7 +119,8 @@ public class MailService {
             File file = new File("email.eml");
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 mimeMessage.writeTo(fos);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             javaMailSender.send(mimeMessage);
             log.debug("Sent email to User '{}'", emailto);

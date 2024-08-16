@@ -1,16 +1,9 @@
 package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -65,9 +58,10 @@ public class Salon implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL, targetEntity = PriceStandSalon.class)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL,
+               targetEntity = PriceStandSalon.class)
     @JoinColumn(name = "salon_id", referencedColumnName = "id")
-    @JsonIgnoreProperties(value = { "dimension" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"dimension"}, allowSetters = true)
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

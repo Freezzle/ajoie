@@ -1,11 +1,8 @@
 package ch.salon.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -30,7 +27,8 @@ public class DimensionStand implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public DimensionStand() {}
+    public DimensionStand() {
+    }
 
     public DimensionStand(String dimension) {
         this.dimension = dimension;

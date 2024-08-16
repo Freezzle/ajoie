@@ -1,9 +1,10 @@
 package ch.salon.repository;
 
 import ch.salon.domain.DimensionStand;
-import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
 
 /**
  * Spring Data JPA repository for the DimensionStand entity.

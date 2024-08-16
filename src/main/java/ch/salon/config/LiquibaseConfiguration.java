@@ -1,7 +1,5 @@
 package ch.salon.config;
 
-import java.util.concurrent.Executor;
-import javax.sql.DataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +16,9 @@ import org.springframework.core.env.Profiles;
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.liquibase.SpringLiquibaseUtil;
 
+import javax.sql.DataSource;
+import java.util.concurrent.Executor;
+
 @Configuration
 public class LiquibaseConfiguration {
 
@@ -33,30 +34,20 @@ public class LiquibaseConfiguration {
     }
 
     @Bean
-    public SpringLiquibase liquibase(
-        @Qualifier("taskExecutor") Executor executor,
-        LiquibaseProperties liquibaseProperties,
-        @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
-        ObjectProvider<DataSource> dataSource,
-        DataSourceProperties dataSourceProperties
-    ) {
+    public SpringLiquibase liquibase(@Qualifier("taskExecutor") Executor executor,
+                                     LiquibaseProperties liquibaseProperties,
+                                     @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
+                                     ObjectProvider<DataSource> dataSource, DataSourceProperties dataSourceProperties) {
         SpringLiquibase liquibase;
         if (Boolean.TRUE.equals(asyncStart)) {
-            liquibase = SpringLiquibaseUtil.createAsyncSpringLiquibase(
-                this.env,
-                executor,
+            liquibase = SpringLiquibaseUtil.createAsyncSpringLiquibase(this.env, executor,
                 liquibaseDataSource.getIfAvailable(),
-                liquibaseProperties,
-                dataSource.getIfUnique(),
-                dataSourceProperties
-            );
+                liquibaseProperties, dataSource.getIfUnique(),
+                dataSourceProperties);
         } else {
-            liquibase = SpringLiquibaseUtil.createSpringLiquibase(
-                liquibaseDataSource.getIfAvailable(),
-                liquibaseProperties,
-                dataSource.getIfUnique(),
-                dataSourceProperties
-            );
+            liquibase =
+                SpringLiquibaseUtil.createSpringLiquibase(liquibaseDataSource.getIfAvailable(), liquibaseProperties,
+                    dataSource.getIfUnique(), dataSourceProperties);
         }
         liquibase.setChangeLog("classpath:config/liquibase/master.xml");
         liquibase.setContexts(liquibaseProperties.getContexts());

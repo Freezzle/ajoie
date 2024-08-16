@@ -1,6 +1,7 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.User;
+
 import java.io.Serializable;
 import java.util.Objects;
 

@@ -61,7 +61,7 @@
               <td>
                 @if (stand.participation) {
                   <a [routerLink]="['/admin/salons', params.get('idSalon'), 'participations', stand.participation.id, 'view']">
-                    {{ stand.participation.exponent?.fullName }}
+                    {{ stand.participation.exhibitor?.fullName }}
                   </a>
                 }
               </td>

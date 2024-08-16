@@ -6,5 +6,5 @@ DELETE FROM payment;
 DELETE FROM invoice;
 DELETE FROM invoicing_plan;
 DELETE FROM participation;
-DELETE FROM exponent;
+DELETE FROM exhibitor;
 DELETE FROM salon;

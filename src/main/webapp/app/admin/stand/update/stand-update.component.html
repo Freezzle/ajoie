@@ -91,7 +91,7 @@
               >
                 <option [ngValue]="null"></option>
                 @for (participationOption of participationsSharedCollection; track $index) {
-                  <option [ngValue]="participationOption">{{ participationOption.exponent?.fullName }}</option>
+                <option [ngValue]="participationOption">{{ participationOption.exhibitor?.fullName }}</option>
                 }
               </select>
             </div>

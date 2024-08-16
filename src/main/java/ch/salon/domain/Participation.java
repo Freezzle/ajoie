@@ -2,17 +2,11 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -65,10 +59,10 @@ public class Participation implements Serializable {
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private Exponent exponent;
+    private Exhibitor exhibitor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "priceStandSalons" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -216,16 +210,16 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public Exponent getExponent() {
-        return this.exponent;
+    public Exhibitor getExhibitor() {
+        return this.exhibitor;
     }
 
-    public void setExponent(Exponent exponent) {
-        this.exponent = exponent;
+    public void setExhibitor(Exhibitor exhibitor) {
+        this.exhibitor = exhibitor;
     }
 
-    public Participation exponent(Exponent exponent) {
-        this.setExponent(exponent);
+    public Participation exhibitor(Exhibitor exhibitor) {
+        this.setExhibitor(exhibitor);
         return this;
     }
 
@@ -250,7 +244,13 @@ public class Participation implements Serializable {
         this.clientNumber = clientNumber;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    public static boolean hasDifference(Participation part1, Participation part2) {
+        return part1 == null && part2 != null || part1 != null && part2 == null ||
+            (part1 != null && part2 != null &&
+                (!Objects.equals(part1.getNbMeal1(), part2.getNbMeal1()) ||
+                    !Objects.equals(part1.getNbMeal2(), part2.getNbMeal2()) ||
+                    !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3())));
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -273,10 +273,10 @@ public class Participation implements Serializable {
     @Override
     public String toString() {
         return "Participation{" + "id=" + getId() + ", registrationDate='" + getRegistrationDate() + "'" +
-               ", clientNumber='" + getClientNumber() + "'" + ", nbMeal1=" + getNbMeal1() + ", nbMeal2=" +
-               getNbMeal2() + ", nbMeal3=" + getNbMeal3() + ", acceptedChart='" + getAcceptedChart() + "'" +
-               ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangment='" + getNeedArrangment() + "'" +
-               ", isBillingClosed='" + getIsBillingClosed() + "'" + ", status='" + getStatus() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" + "}";
+            ", clientNumber='" + getClientNumber() + "'" + ", nbMeal1=" + getNbMeal1() + ", nbMeal2=" +
+            getNbMeal2() + ", nbMeal3=" + getNbMeal3() + ", acceptedChart='" + getAcceptedChart() + "'" +
+            ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangment='" + getNeedArrangment() + "'" +
+            ", isBillingClosed='" + getIsBillingClosed() + "'" + ", status='" + getStatus() + "'" +
+            ", extraInformation='" + getExtraInformation() + "'" + "}";
     }
 }

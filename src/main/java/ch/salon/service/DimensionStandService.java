@@ -5,11 +5,12 @@ import ch.salon.repository.DimensionStandRepository;
 import ch.salon.service.dto.DimensionStandDTO;
 import ch.salon.service.mapper.DimensionStandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
 
 @Service
 public class DimensionStandService {
@@ -24,7 +25,8 @@ public class DimensionStandService {
 
     public UUID create(DimensionStandDTO dimensionStand) {
         if (dimensionStand.getId() != null) {
-            throw new BadRequestAlertException("A new dimensionStand cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new dimensionStand cannot already have an ID", ENTITY_NAME,
+                "idexists");
         }
 
         return dimensionStandRepository.save(DimensionStandMapper.INSTANCE.toEntity(dimensionStand)).getId();
@@ -42,7 +44,8 @@ public class DimensionStandService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return DimensionStandMapper.INSTANCE.toDto(dimensionStandRepository.save(DimensionStandMapper.INSTANCE.toEntity(dimensionStand)));
+        return DimensionStandMapper.INSTANCE.toDto(
+            dimensionStandRepository.save(DimensionStandMapper.INSTANCE.toEntity(dimensionStand)));
     }
 
     public List<DimensionStandDTO> findAll() {

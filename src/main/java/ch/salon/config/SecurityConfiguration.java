@@ -1,13 +1,9 @@
 package ch.salon.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.web.filter.SpaWebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -21,11 +17,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.*;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
@@ -33,6 +25,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.web.filter.CookieCsrfFilter;
+
+import java.util.function.Supplier;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
@@ -54,34 +51,19 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
-        http
-            .cors(withDefaults())
-            .csrf(
-                csrf ->
-                    csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-            )
+        http.cors(withDefaults()).csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()))
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
-            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
-            .headers(
-                headers ->
-                    headers
-                        .contentSecurityPolicy(csp -> csp.policyDirectives(jHipsterProperties.getSecurity().getContentSecurityPolicy()))
-                        .frameOptions(FrameOptionsConfig::sameOrigin)
-                        .referrerPolicy(
-                            referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-                        )
-                        .permissionsPolicy(
-                            permissions ->
-                                permissions.policy(
-                                    "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()"
-                                )
-                        )
-            )
-            .authorizeHttpRequests(
-                authz ->
-                    // prettier-ignore
+            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class).headers(
+                headers -> headers.contentSecurityPolicy(
+                        csp -> csp.policyDirectives(jHipsterProperties.getSecurity().getContentSecurityPolicy()))
+                    .frameOptions(FrameOptionsConfig::sameOrigin).referrerPolicy(
+                        referrer -> referrer.policy(
+                            ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                    .permissionsPolicy(permissions -> permissions.policy(
+                        "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
+            .authorizeHttpRequests(authz ->
+                // prettier-ignore
                                            authz.requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"),
                                                                  mvc.pattern("/*.txt"), mvc.pattern("/*.json"),
                                                                  mvc.pattern("/*.map"), mvc.pattern("/*.css"))
@@ -108,34 +90,16 @@ public class SecurityConfiguration {
                                                 .requestMatchers(mvc.pattern("/management/info")).permitAll()
                                                 .requestMatchers(mvc.pattern("/management/prometheus")).permitAll()
                                                 .requestMatchers(mvc.pattern("/management/**"))
-                                                .hasAuthority(AuthoritiesConstants.ADMIN)
-            )
-            .rememberMe(
-                rememberMe ->
-                    rememberMe
-                        .rememberMeServices(rememberMeServices)
-                        .rememberMeParameter("remember-me")
-                        .key(jHipsterProperties.getSecurity().getRememberMe().getKey())
-            )
-            .exceptionHandling(
-                exceptionHanding ->
-                    exceptionHanding.defaultAuthenticationEntryPointFor(
-                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                        new OrRequestMatcher(antMatcher("/api/**"))
-                    )
-            )
-            .formLogin(
-                formLogin ->
-                    formLogin
-                        .loginPage("/")
-                        .loginProcessingUrl("/api/authentication")
-                        .successHandler((request, response, authentication) -> response.setStatus(HttpStatus.OK.value()))
-                        .failureHandler((request, response, exception) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()))
-                        .permitAll()
-            )
-            .logout(
-                logout -> logout.logoutUrl("/api/logout").logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).permitAll()
-            );
+                                               .hasAuthority(AuthoritiesConstants.ADMIN)).rememberMe(
+                rememberMe -> rememberMe.rememberMeServices(rememberMeServices).rememberMeParameter("remember-me")
+                    .key(jHipsterProperties.getSecurity().getRememberMe().getKey()))
+            .exceptionHandling(exceptionHanding -> exceptionHanding.defaultAuthenticationEntryPointFor(
+                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new OrRequestMatcher(antMatcher("/api/**"))))
+            .formLogin(formLogin -> formLogin.loginPage("/").loginProcessingUrl("/api/authentication").successHandler(
+                (request, response, authentication) -> response.setStatus(HttpStatus.OK.value())).failureHandler(
+                (request, response, exception) -> response.setStatus(HttpStatus.UNAUTHORIZED.value())).permitAll())
+            .logout(logout -> logout.logoutUrl("/api/logout")
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).permitAll());
         return http.build();
     }
 

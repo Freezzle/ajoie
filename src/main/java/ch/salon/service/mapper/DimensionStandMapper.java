@@ -5,9 +5,10 @@ import ch.salon.service.dto.DimensionStandDTO;
 import ch.salon.service.dto.DimensionStandLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DimensionStandMapper {
     DimensionStandMapper INSTANCE = Mappers.getMapper(DimensionStandMapper.class);
 

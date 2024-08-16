@@ -5,9 +5,10 @@ import ch.salon.service.dto.StandDTO;
 import ch.salon.service.dto.StandLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = { ParticipationMapper.class, DimensionStandMapper.class })
+@Mapper(uses = {ParticipationMapper.class, DimensionStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface StandMapper {
     StandMapper INSTANCE = Mappers.getMapper(StandMapper.class);
 

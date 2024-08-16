@@ -1,36 +1,19 @@
 package ch.salon.service;
 
-import static ch.salon.domain.enumeration.Type.*;
-
-import ch.salon.domain.Conference;
-import ch.salon.domain.Exponent;
-import ch.salon.domain.Invoice;
-import ch.salon.domain.InvoicingPlan;
-import ch.salon.domain.Participation;
-import ch.salon.domain.PriceStandSalon;
-import ch.salon.domain.Salon;
-import ch.salon.domain.Stand;
+import ch.salon.domain.*;
 import ch.salon.domain.enumeration.Type;
-import ch.salon.repository.ConferenceRepository;
-import ch.salon.repository.InvoicingPlanRepository;
-import ch.salon.repository.ParticipationRepository;
-import ch.salon.repository.SalonRepository;
-import ch.salon.repository.StandRepository;
+import ch.salon.repository.*;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import java.time.Instant;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.*;
+
+import static ch.salon.domain.enumeration.Type.*;
 
 @Service
 public class InvoicingPlanService {
@@ -45,15 +28,10 @@ public class InvoicingPlanService {
     private final MessageSource messageSource;
     private final MailService mailService;
 
-    public InvoicingPlanService(
-        SalonRepository salonRepository,
-        ParticipationRepository participationRepository,
-        InvoicingPlanRepository invoicingPlanRepository,
-        StandRepository standRepository,
-        ConferenceRepository conferenceRepository,
-        MessageSource messageSource,
-        MailService mailService
-    ) {
+    public InvoicingPlanService(SalonRepository salonRepository, ParticipationRepository participationRepository,
+                                InvoicingPlanRepository invoicingPlanRepository, StandRepository standRepository,
+                                ConferenceRepository conferenceRepository, MessageSource messageSource,
+                                MailService mailService) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
         this.invoicingPlanRepository = invoicingPlanRepository;
@@ -65,7 +43,8 @@ public class InvoicingPlanService {
 
     public UUID create(InvoicingPlanDTO invoicingPlan) {
         if (invoicingPlan.getId() != null) {
-            throw new BadRequestAlertException("A new invoicingPlan cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new invoicingPlan cannot already have an ID", ENTITY_NAME,
+                "idexists");
         }
 
         return invoicingPlanRepository.save(InvoicingPlanMapper.INSTANCE.toEntity(invoicingPlan)).getId();
@@ -84,7 +63,8 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        return InvoicingPlanMapper.INSTANCE.toDto(invoicingPlanRepository.save(InvoicingPlanMapper.INSTANCE.toEntity(invoicingPlan)));
+        return InvoicingPlanMapper.INSTANCE.toDto(
+            invoicingPlanRepository.save(InvoicingPlanMapper.INSTANCE.toEntity(invoicingPlan)));
     }
 
     public void send(UUID idInvoicingPlan) {
@@ -92,14 +72,13 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan).orElseThrow(
+            () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         Salon salon = invoicingPlan.getParticipation().getSalon();
-        Exponent exponent = invoicingPlan.getParticipation().getExponent();
+        Exhibitor exhibitor = invoicingPlan.getParticipation().getExhibitor();
 
-        mailService.sendInvoiceMail(salon, exponent, invoicingPlan);
+        mailService.sendInvoiceMail(salon, exhibitor, invoicingPlan);
 
         invoicingPlan.setHasBeenSent(true);
         invoicingPlanRepository.save(invoicingPlan);
@@ -110,23 +89,20 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan).orElseThrow(
+            () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Invoice invoiceFound = invoicingPlan
-            .getInvoices()
-            .stream()
-            .filter(invoice -> invoice.getId().equals(idInvoice))
-            .findFirst()
-            .orElseThrow();
+        Invoice invoiceFound =
+            invoicingPlan.getInvoices().stream().filter(invoice -> invoice.getId().equals(idInvoice)).findFirst()
+                .orElseThrow();
         invoiceFound.setLock(!invoiceFound.getLock());
         invoicingPlanRepository.save(invoicingPlan);
     }
 
     public List<InvoicingPlanDTO> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
-            List<InvoicingPlan> invoicingPlans = invoicingPlanRepository.findByParticipationId(UUID.fromString(idParticipation));
+            List<InvoicingPlan> invoicingPlans =
+                invoicingPlanRepository.findByParticipationId(UUID.fromString(idParticipation));
             invoicingPlans.sort(Comparator.comparing(InvoicingPlan::getBillingNumber).reversed());
             return invoicingPlans.stream().map(InvoicingPlanMapper.INSTANCE::toDto).toList();
         }
@@ -152,11 +128,9 @@ public class InvoicingPlanService {
             return;
         }
 
-        final InvoicingPlan lastPlan = invoicingPlanRepository
-            .findByParticipationId(participation.getId())
-            .stream()
-            .max(Comparator.comparing(InvoicingPlan::getBillingNumber))
-            .orElse(null);
+        final InvoicingPlan lastPlan = invoicingPlanRepository.findByParticipationId(participation.getId()).stream()
+            .max(Comparator.comparing(
+                InvoicingPlan::getBillingNumber)).orElse(null);
 
         InvoicingPlan currentInvoicingPlan;
         Set<Invoice> lockedInvoices = new HashSet<>();
@@ -181,13 +155,12 @@ public class InvoicingPlanService {
 
         List<Stand> stands = standRepository.findByParticipationId(participation.getId());
         removeObsoleteStandInvoices(lockedInvoices, stands);
-        stands.stream().filter(stand -> !stand.getStatus().isInvalidStatus()).forEach(stand -> processStand(stand, salon, lockedInvoices));
+        stands.stream().filter(stand -> !stand.getStatus().isInvalidStatus())
+            .forEach(stand -> processStand(stand, salon, lockedInvoices));
 
         List<Conference> conferences = conferenceRepository.findByParticipationId(participation.getId());
         removeObsoleteConferenceInvoices(lockedInvoices, conferences);
-        conferences
-            .stream()
-            .filter(conference -> !conference.getStatus().isInvalidStatus())
+        conferences.stream().filter(conference -> !conference.getStatus().isInvalidStatus())
             .forEach(conference -> processConference(conference, salon, lockedInvoices));
 
         processMeals(participation, salon, lockedInvoices);
@@ -199,111 +172,80 @@ public class InvoicingPlanService {
     }
 
     private void copyLockedInvoices(InvoicingPlan plan, Set<Invoice> lockedInvoices) {
-        plan
-            .getInvoices()
-            .forEach(invoice -> {
-                if (invoice.getLock()) {
-                    lockedInvoices.add(new Invoice(invoice));
-                }
-            });
+        plan.getInvoices().forEach(invoice -> {
+            if (invoice.getLock()) {
+                lockedInvoices.add(new Invoice(invoice));
+            }
+        });
     }
 
     private void removeObsoleteStandInvoices(Set<Invoice> lockedInvoices, List<Stand> stands) {
         stands.forEach(stand -> {
             if (stand.getStatus().isInvalidStatus()) {
-                lockedInvoices.removeIf(invoice -> (invoice.getType().isFromStand()) && stand.getId().equals(invoice.getReferenceId()));
+                lockedInvoices.removeIf(
+                    invoice -> (invoice.getType().isFromStand()) && stand.getId().equals(invoice.getReferenceId()));
             }
         });
 
-        lockedInvoices.removeIf(
-            invoice ->
-                (invoice.getType().isFromStand()) && stands.stream().map(Stand::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
-        );
+        lockedInvoices.removeIf(invoice -> (invoice.getType().isFromStand()) && stands.stream().map(Stand::getId)
+            .noneMatch(id -> id.equals(
+                invoice.getReferenceId())));
     }
 
     private void processStand(Stand stand, Salon salon, Set<Invoice> lockedInvoices) {
-        Double defaultPrice = stand.getDimension() == null
-            ? 0
-            : salon
-                .getPriceStandSalons()
-                .stream()
-                .filter(priceStand -> priceStand.getDimension().getId().equals(stand.getDimension().getId()))
-                .findFirst()
-                .map(PriceStandSalon::getPrice)
-                .orElse(0.0);
+        Double defaultPrice = stand.getDimension() == null ? 0 : salon.getPriceStandSalons().stream()
+            .filter(priceStand -> priceStand.getDimension()
+                .getId()
+                .equals(stand.getDimension()
+                    .getId()))
+            .findFirst().map(PriceStandSalon::getPrice)
+            .orElse(0.0);
 
-        updateOrCreateInvoice(
-            lockedInvoices,
-            stand.getId(),
-            STAND,
+        updateOrCreateInvoice(lockedInvoices, stand.getId(), STAND,
             stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
-            1L,
-            defaultPrice
-        );
+            1L, defaultPrice);
 
         if (stand.getShared()) {
-            updateOrCreateInvoice(
-                lockedInvoices,
-                stand.getId(),
-                SHARED,
-                stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
-                1L,
-                salon.getPriceSharingStand()
-            );
+            updateOrCreateInvoice(lockedInvoices, stand.getId(), SHARED,
+                stand.getDimension() != null ? stand.getDimension()
+                    .getDimension() : "unknown dimension", 1L,
+                salon.getPriceSharingStand());
         }
     }
 
     private void removeObsoleteConferenceInvoices(Set<Invoice> lockedInvoices, List<Conference> conferences) {
         conferences.forEach(conference -> {
             if (conference.getStatus().isInvalidStatus()) {
-                lockedInvoices.removeIf(
-                    invoice -> (invoice.getType().isFromConference()) && conference.getId().equals(invoice.getReferenceId())
-                );
+                lockedInvoices.removeIf(invoice -> (invoice.getType().isFromConference()) &&
+                    conference.getId().equals(invoice.getReferenceId()));
             }
         });
 
-        lockedInvoices.removeIf(
-            invoice ->
-                invoice.getType().isFromConference() &&
-                conferences.stream().map(Conference::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
-        );
+        lockedInvoices.removeIf(invoice -> invoice.getType().isFromConference() &&
+            conferences.stream().map(Conference::getId)
+                .noneMatch(id -> id.equals(invoice.getReferenceId())));
     }
 
     private void processConference(Conference conference, Salon salon, Set<Invoice> lockedInvoices) {
-        updateOrCreateInvoice(lockedInvoices, conference.getId(), CONFERENCE, conference.getTitle(), 1L, salon.getPriceConference());
+        updateOrCreateInvoice(lockedInvoices, conference.getId(), CONFERENCE, conference.getTitle(), 1L,
+            salon.getPriceConference());
     }
 
     private void processMeals(Participation participation, Salon salon, Set<Invoice> lockedInvoices) {
-        processMeal(
-            MEAL1,
-            participation.getNbMeal1(),
-            messageSource.getMessage("saturday.midday", null, Locale.FRENCH),
-            salon.getPriceMeal1(),
-            lockedInvoices
-        );
-        processMeal(
-            MEAL2,
-            participation.getNbMeal2(),
-            messageSource.getMessage("saturday.evening", null, Locale.FRENCH),
-            salon.getPriceMeal2(),
-            lockedInvoices
-        );
-        processMeal(
-            MEAL3,
-            participation.getNbMeal3(),
-            messageSource.getMessage("sunday.midday", null, Locale.FRENCH),
-            salon.getPriceMeal3(),
-            lockedInvoices
-        );
+        processMeal(MEAL1, participation.getNbMeal1(), messageSource.getMessage("saturday.midday", null, Locale.FRENCH),
+            salon.getPriceMeal1(), lockedInvoices);
+        processMeal(MEAL2, participation.getNbMeal2(),
+            messageSource.getMessage("saturday.evening", null, Locale.FRENCH), salon.getPriceMeal2(),
+            lockedInvoices);
+        processMeal(MEAL3, participation.getNbMeal3(), messageSource.getMessage("sunday.midday", null, Locale.FRENCH),
+            salon.getPriceMeal3(), lockedInvoices);
     }
 
     private void processMeal(Type type, Long mealCount, String description, Double price, Set<Invoice> lockedInvoices) {
         if (mealCount != null && mealCount > 0) {
-            Invoice invoiceMealLocked = lockedInvoices
-                .stream()
-                .filter(invoice -> invoice.getType() == type && invoice.getLock())
-                .findFirst()
-                .orElse(null);
+            Invoice invoiceMealLocked =
+                lockedInvoices.stream().filter(invoice -> invoice.getType() == type && invoice.getLock())
+                    .findFirst().orElse(null);
             if (invoiceMealLocked != null) {
                 invoiceMealLocked.setDefaultAmount(price);
                 invoiceMealLocked.setQuantity(mealCount);
@@ -316,19 +258,11 @@ public class InvoicingPlanService {
         }
     }
 
-    private void updateOrCreateInvoice(
-        Set<Invoice> lockedInvoices,
-        UUID referenceId,
-        Type type,
-        String description,
-        Long quantity,
-        Double defaultAmount
-    ) {
-        Invoice lockedInvoice = lockedInvoices
-            .stream()
-            .filter(invoice -> invoice.getType() == type && invoice.getReferenceId().equals(referenceId))
-            .findFirst()
-            .orElse(null);
+    private void updateOrCreateInvoice(Set<Invoice> lockedInvoices, UUID referenceId, Type type, String description,
+                                       Long quantity, Double defaultAmount) {
+        Invoice lockedInvoice = lockedInvoices.stream().filter(invoice -> invoice.getType() == type &&
+                invoice.getReferenceId().equals(referenceId))
+            .findFirst().orElse(null);
         if (lockedInvoice != null) {
             lockedInvoice.setDefaultAmount(defaultAmount);
         } else {

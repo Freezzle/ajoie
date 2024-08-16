@@ -45,7 +45,7 @@ type ParticipationFormGroupContent = {
   isBillingClosed: FormControl<ParticipationFormRawValue['isBillingClosed']>;
   status: FormControl<ParticipationFormRawValue['status']>;
   extraInformation: FormControl<ParticipationFormRawValue['extraInformation']>;
-  exponent: FormControl<ParticipationFormRawValue['exponent']>;
+exhibitor: FormControl < ParticipationFormRawValue['exhibitor']>;
   salon: FormControl<ParticipationFormRawValue['salon']>;
 };
 
@@ -76,7 +76,7 @@ export class ParticipationFormService {
       isBillingClosed: new FormControl(participationRawValue.isBillingClosed, Validators.required),
       status: new FormControl(participationRawValue.status, Validators.required),
       extraInformation: new FormControl(participationRawValue.extraInformation),
-      exponent: new FormControl(participationRawValue.exponent, Validators.required),
+      exhibitor: new FormControl(participationRawValue.exhibitor, Validators.required),
       salon: new FormControl(participationRawValue.salon, Validators.required),
     });
   }

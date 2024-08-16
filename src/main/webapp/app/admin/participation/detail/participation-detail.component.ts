@@ -14,6 +14,7 @@ import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
 import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
 import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
+import EventTypePipe from '../../../shared/pipe/event-type.pipe';
 
 @Component({
   standalone: true,
@@ -32,13 +33,15 @@ import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
     LockBooleanPipe,
     SendBooleanPipe,
     ReactiveFormsModule,
-  ],
+EventTypePipe
+]
 })
 export class ParticipationDetailComponent implements OnInit {
   participation = input<IParticipation | null>(null);
 
   invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
   payments$: Observable<IPayment[]> | undefined;
+eventLogs$: Observable < any[]> | undefined;
   active = 'detail';
 
   protected participationService = inject(ParticipationService);
@@ -46,6 +49,7 @@ export class ParticipationDetailComponent implements OnInit {
   ngOnInit(): void {
     this.loadInvoices();
     this.loadPayments();
+    this.loadEventLogs();
   }
 
   previousState(): void {
@@ -67,6 +71,7 @@ export class ParticipationDetailComponent implements OnInit {
   sendInvoicingPlan(idInvoicingPlan: string): void {
     this.participationService.sendInvoicingPlan(idInvoicingPlan).subscribe(() => {
       this.loadInvoices();
+      this.loadEventLogs();
     });
   }
 
@@ -111,6 +116,17 @@ export class ParticipationDetailComponent implements OnInit {
       mergeMap((payments: HttpResponse<IPayment[]>) => {
         if (payments.body) {
           return of(payments.body);
+        }
+        return EMPTY;
+      }),
+    );
+  }
+
+  loadEventLogs(): void {
+    this.eventLogs$ = this.participationService.getEventLogs(this.participation()!.id).pipe(
+      mergeMap((events: HttpResponse<any[]>) => {
+        if (events.body) {
+          return of(events.body);
         }
         return EMPTY;
       }),

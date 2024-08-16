@@ -1,12 +1,7 @@
 package ch.salon.web.rest;
 
-import static org.springframework.http.ResponseEntity.badRequest;
-
 import ch.salon.service.UserService;
 import ch.salon.service.dto.UserDTO;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,13 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.springframework.http.ResponseEntity.badRequest;
+
 @RestController
 @RequestMapping("/api")
 public class PublicUserResource {
 
     private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
-        Arrays.asList("id", "login", "firstName", "lastName", "email", "activated", "langKey")
-    );
+        Arrays.asList("id", "login", "firstName", "lastName", "email", "activated", "langKey"));
     private static final Logger log = LoggerFactory.getLogger(PublicUserResource.class);
 
     private final UserService userService;
@@ -37,14 +37,16 @@ public class PublicUserResource {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserDTO>> getAllPublicUsers(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<UserDTO>> getAllPublicUsers(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get all public User names");
         if (!onlyContainsAllowedProperties(pageable)) {
             return badRequest().build();
         }
 
         final Page<UserDTO> page = userService.getAllPublicUsers(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers =
+            PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 

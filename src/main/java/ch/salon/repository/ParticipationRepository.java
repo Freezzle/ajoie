@@ -1,11 +1,12 @@
 package ch.salon.repository;
 
 import ch.salon.domain.Participation;
-import java.util.List;
-import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Spring Data JPA repository for the Participation entity.
@@ -18,5 +19,5 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
     @Query("SELECT MAX(p.clientNumber) FROM Participation p where p.salon.id = ?1")
     String findMaxClientNumber(UUID idSalon);
 
-    Participation findByExponentEmailAndSalonId(String email, UUID idSalon);
+    Participation findByExhibitorEmailAndSalonId(String email, UUID idSalon);
 }

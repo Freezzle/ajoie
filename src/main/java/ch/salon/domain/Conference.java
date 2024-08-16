@@ -2,17 +2,11 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -42,7 +36,7 @@ public class Conference implements Serializable {
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "exponent", "salon" }, allowSetters = true)
+    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
     private Participation participation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -110,6 +104,12 @@ public class Conference implements Serializable {
     public Conference participation(Participation participation) {
         this.setParticipation(participation);
         return this;
+    }
+
+    public static boolean hasDifference(Conference conf1, Conference conf2) {
+        return conf1 == null && conf2 != null || conf1 != null && conf2 == null ||
+            (conf1 != null && conf2 != null &&
+                (!Objects.equals(conf1.getStatus(), conf2.getStatus())));
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

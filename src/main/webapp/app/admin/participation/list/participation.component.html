@@ -13,7 +13,7 @@
 
       <span class="row">
         <div class="col-auto">
-          <input type="text" class="form-control" placeholder="Nom de l'exposant" (blur)="filteringExponent($event)" />
+          <input type="text" class="form-control" placeholder="Nom de l'exposant" (blur)="filteringExhibitor($event)" />
         </div>
         <div class="col-auto">
           <select class="form-control" name="status" (change)="filteringStatus($event)">
@@ -52,7 +52,7 @@
       <table class="table table-striped" aria-describedby="page-heading">
         <thead>
           <tr>
-            <th class="col-auto"><span jhiTranslate="participation.exponent">Exposant</span></th>
+            <th class="col-auto"><span jhiTranslate="participation.exhibitor">Exposant</span></th>
             <th class="col-1 text-center"><span jhiTranslate="participation.registrationDate">Date d'inscription</span></th>
             <th class="col-auto text-center"><span jhiTranslate="participation.needArrangment">Avec arrangement ?</span></th>
             <th class="col-auto text-center"><span jhiTranslate="participation.acceptedChart">Charte accepté ?</span></th>
@@ -66,8 +66,8 @@
           @for (participation of participations; track $index) {
             <tr data-cy="entityTable">
               <td>
-                @if (participation.exponent) {
-                  <a [routerLink]="['./', participation.id, 'view']">{{ participation.exponent.fullName }}</a>
+                @if (participation.exhibitor) {
+                <a [routerLink]="['./', participation.id, 'view']">{{ participation.exhibitor.fullName }}</a>
                 }
               </td>
               <td class="text-center">{{ participation.registrationDate | formatMediumDate }}</td>

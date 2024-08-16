@@ -2,6 +2,7 @@ package ch.salon.service.dto;
 
 import ch.salon.domain.Salon;
 import ch.salon.domain.enumeration.Status;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -32,11 +33,12 @@ public class ParticipationDTO implements Serializable {
 
     private String extraInformation;
 
-    private ExponentLightDTO exponent;
+    private ExhibitorLightDTO exhibitor;
 
     private Salon salon;
 
-    public ParticipationDTO() {}
+    public ParticipationDTO() {
+    }
 
     public UUID getId() {
         return id;
@@ -134,12 +136,12 @@ public class ParticipationDTO implements Serializable {
         this.extraInformation = extraInformation;
     }
 
-    public ExponentLightDTO getExponent() {
-        return exponent;
+    public ExhibitorLightDTO getExhibitor() {
+        return exhibitor;
     }
 
-    public void setExponent(ExponentLightDTO exponent) {
-        this.exponent = exponent;
+    public void setExhibitor(ExhibitorLightDTO exhibitor) {
+        this.exhibitor = exhibitor;
     }
 
     public Salon getSalon() {

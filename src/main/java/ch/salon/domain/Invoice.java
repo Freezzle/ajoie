@@ -1,13 +1,8 @@
 package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Type;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -60,7 +55,8 @@ public class Invoice implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public Invoice() {}
+    public Invoice() {
+    }
 
     public Invoice(Invoice invoice) {
         this.id = null;

@@ -420,3 +420,12 @@ input:checked + .slider:before {
 .slider {
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
 }
+
+.log-container {
+  max-height: calc(10 * 1.5rem);
+  overflow-y: auto;
+}
+
+.log-row {
+  height: 1.4rem;
+}
