@@ -63,7 +63,6 @@ entity Invoice {
     defaultAmount Double
     customAmount Double
     quantity Long
-    total Double
     lock Boolean
     extraInformation String
 }

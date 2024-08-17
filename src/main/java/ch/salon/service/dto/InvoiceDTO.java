@@ -1,7 +1,6 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Type;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,7 +15,6 @@ public class InvoiceDTO implements Serializable {
     private Double defaultAmount;
     private Double customAmount;
     private Long quantity;
-    private Double total;
     private Boolean lock;
     private String extraInformation;
 
@@ -86,14 +84,6 @@ public class InvoiceDTO implements Serializable {
 
     public void setQuantity(Long quantity) {
         this.quantity = quantity;
-    }
-
-    public Double getTotal() {
-        return total;
-    }
-
-    public void setTotal(Double total) {
-        this.total = total;
     }
 
     public Boolean getLock() {

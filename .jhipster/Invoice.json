@@ -38,10 +38,6 @@
       "fieldType": "Long"
     },
     {
-      "fieldName": "total",
-      "fieldType": "Double"
-    },
-    {
       "fieldName": "lock",
       "fieldType": "Boolean"
     },

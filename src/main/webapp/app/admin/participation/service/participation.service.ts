@@ -120,6 +120,16 @@ export class ParticipationService {
     );
   }
 
+  updateInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
+    return this.http.put<IInvoice>(
+      this.applicationConfigService.getEndpointFor(`api/invoicing-plans/${idInvoicingPlan}/invoices/${invoice.id}`),
+      invoice,
+      {
+        observe: 'response',
+      },
+    );
+  }
+
   sendInvoicingPlan(idInvoicingPlan: string): Observable<HttpResponse<{}>> {
     return this.http.patch(
       this.applicationConfigService.getEndpointFor(`api/invoicing-plans/${idInvoicingPlan}/send`),

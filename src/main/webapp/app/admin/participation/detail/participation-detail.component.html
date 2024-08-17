@@ -186,12 +186,11 @@
                           <th class="col-auto text-center"><span>Verrouillé ?</span></th>
                           <th class="col-auto"><span>Type</span></th>
                           <th class="col-2"><span>Libellé</span></th>
-                          <th class="col-auto text-center"><span>Montant configuration</span></th>
-                          <th class="col-auto text-center"><span>Montant</span></th>
+                          <th class="col-1 text-center"><span>Montant configuration</span></th>
+                          <th class="col-1 text-center"><span>Montant</span></th>
                           <th class="col-auto text-center"><span>Quantité</span></th>
-                          <th class="col-auto text-center"><span>Total</span></th>
-                          <th class="col-1 text-center"><span>Extra info</span></th>
-                          <th class="col-2">&nbsp;</th>
+                          <th class="col-1 text-center"><span>Total</span></th>
+                          <th class="col-3 text-center"><span>Extra info</span></th>
                         </tr>
                       </thead>
                       <tbody *ngIf="invoicingPlan.invoices; let invoices">
@@ -222,41 +221,21 @@
                               <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
                               <td>{{ invoice.label }}</td>
                               <td class="text-center">{{ invoice.defaultAmount | currency: 'CHF' }}</td>
-                              <td class="text-center">{{ invoice.customAmount | currency: 'CHF' }}</td>
-                              <td class="text-center">{{ invoice.quantity }}</td>
-                              <td class="text-center">{{ invoice.total | currency: 'CHF' }}</td>
-                              <td>{{ invoice.extraInformation }}</td>
-                              <td class="text-end">
-                                <div class="btn-group">
-                                  <a
-                                    [routerLink]="['/admin/invoices', invoice.id, 'view']"
-                                    class="btn btn-info btn-sm"
-                                    data-cy="entityDetailsButton"
-                                    *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed"
-                                  >
-                                    <fa-icon icon="eye" title="{{ 'common.view' | translate }}"></fa-icon>
-                                  </a>
-
-                                  <a
-                                    [routerLink]="['/admin/invoices', invoice.id, 'edit']"
-                                    class="btn btn-primary btn-sm"
-                                    data-cy="entityEditButton"
-                                    *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed"
-                                  >
-                                    <fa-icon icon="pencil-alt" title="{{ 'common.edit' | translate }}"></fa-icon>
-                                  </a>
-
-                                  <button
-                                    type="button"
-                                    (click)="deleteInvoice(invoice)"
-                                    class="btn btn-danger btn-sm"
-                                    data-cy="entityDeleteButton"
-                                    *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed"
-                                  >
-                                    <fa-icon icon="times" title="{{ 'common.delete' | translate }}"></fa-icon>
-                                  </button>
-                                </div>
+                              <td class="text-center">
+                                <input
+                                  type="number"
+                                  class="form-control text-center"
+                                  (blur)="onCustomAmountChange($event, invoicingPlan.id, invoice)"
+                                  *ngIf="!invoice.lock && !invoicingPlan.hasBeenSent && !participation()?.isBillingClosed"
+                                  value="{{ invoice.customAmount }}"
+                                />
+                                @if (!(!invoice.lock && !invoicingPlan.hasBeenSent && !participation()?.isBillingClosed)) {
+                                  {{ invoice.customAmount | currency: 'CHF' }}
+                                }
                               </td>
+                              <td class="text-center">{{ invoice.quantity }}</td>
+                              <td class="text-center">{{ (invoice.quantity ?? 0) * (invoice.customAmount ?? 0) | currency: 'CHF' }}</td>
+                              <td>{{ invoice.extraInformation }}</td>
                             </tr>
                           }
                           <tr data-cy="entityTable">
@@ -264,7 +243,7 @@
                             <td>&nbsp;</td>
                             <td>&nbsp;</td>
                             <td class="text-center fw-bold">{{ totalDefault(invoices) | currency: 'CHF' }}</td>
-                            <td>&nbsp;</td>
+                            <td class="text-center fw-bold">{{ totalCustom(invoices) | currency: 'CHF' }}</td>
                             <td>&nbsp;</td>
                             <td class="text-center fw-bold">{{ totalInvoices(invoices) | currency: 'CHF' }}</td>
                             <td>&nbsp;</td>

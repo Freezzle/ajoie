@@ -36,9 +36,6 @@
             <column name="quantity" type="bigint">
                 <constraints nullable="true" />
             </column>
-            <column name="total" type="double">
-                <constraints nullable="true" />
-            </column>
             <column name="lock" type="boolean">
                 <constraints nullable="true" />
             </column>

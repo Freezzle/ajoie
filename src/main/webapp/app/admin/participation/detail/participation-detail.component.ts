@@ -15,6 +15,7 @@ import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
 import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
 import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
 import EventTypePipe from '../../../shared/pipe/event-type.pipe';
+import { Type } from '../../enumerations/type.model';
 
 @Component({
   standalone: true,
@@ -80,27 +81,36 @@ export class ParticipationDetailComponent implements OnInit {
     });
   }
 
-  deleteInvoice(invoice: IInvoice): void {}
+  onCustomAmountChange(event: any, idInvoicingPlan: string, invoice: IInvoice): void {
+    invoice.customAmount = event.target.value;
+    this.participationService.updateInvoice(idInvoicingPlan, invoice).subscribe(invoiceBack => {
+      if (invoiceBack.body) {
+        invoice = invoiceBack.body;
+      }
+    });
+  }
 
   deletePayment(payment: IPayment): void {}
 
   totalDefault(invoices: IInvoice[]): number {
-    return (
-      invoices
-        .map(invoice => invoice.defaultAmount)
-        .reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
-    );
+    return invoices
+      .map(invoice => Number(invoice.defaultAmount))
+      .reduce((previousValue, defaultAmount) => previousValue + defaultAmount, 0);
+  }
+
+  totalCustom(invoices: IInvoice[]): number {
+    return invoices.map(invoice => Number(invoice.customAmount)).reduce((previousValue, customAmount) => previousValue + customAmount, 0);
   }
 
   totalInvoices(invoices: IInvoice[]): number {
-    return (
-      invoices.map(invoice => invoice.total).reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
-    );
+    return invoices
+      .map(invoice => (invoice.quantity ?? 1) * (invoice.customAmount ?? 0))
+      .reduce((previousValue, defaultAmount) => previousValue + defaultAmount);
   }
 
   totalPayments(payments: IPayment[]): number {
     return (
-      payments.map(payment => payment.amount).reduce((previousValue, defaultAmount) => 0 + (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
+      payments.map(payment => payment.amount).reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0)) ?? 0
     );
   }
 
@@ -137,4 +147,6 @@ export class ParticipationDetailComponent implements OnInit {
       }),
     );
   }
+
+  protected readonly Type = Type;
 }

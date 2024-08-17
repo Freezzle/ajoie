@@ -111,6 +111,33 @@ public class InvoicingPlanService {
         return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceFound));
     }
 
+    public Optional<InvoiceDTO> updateInvoice(UUID idInvoicingPlan, UUID idInvoice, InvoiceDTO invoiceDTO) {
+        if (idInvoicingPlan == null || invoiceDTO == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository
+            .findById(idInvoicingPlan)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        Invoice invoiceFound = invoicingPlan
+            .getInvoices()
+            .stream()
+            .filter(invoice -> invoice.getId().equals(idInvoice))
+            .findFirst()
+            .orElseThrow();
+
+        invoiceFound.setLabel(invoiceDTO.getLabel());
+        invoiceFound.setDefaultAmount(invoiceDTO.getDefaultAmount());
+        invoiceFound.setCustomAmount(invoiceDTO.getCustomAmount());
+        invoiceFound.setGenerationDate(Instant.now());
+        invoiceFound.setExtraInformation(invoiceDTO.getExtraInformation());
+
+        invoicingPlanRepository.save(invoicingPlan);
+
+        return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceFound));
+    }
+
     public List<InvoicingPlanDTO> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
             List<InvoicingPlan> invoicingPlans = invoicingPlanRepository.findByParticipationIdOrderByBillingNumberDesc(
@@ -325,7 +352,6 @@ public class InvoicingPlanService {
                 invoiceMealLocked.setPosition(position);
                 invoiceMealLocked.setDefaultAmount(price);
                 invoiceMealLocked.setQuantity(mealCount);
-                invoiceMealLocked.setTotal(invoiceMealLocked.getCustomAmount() * mealCount);
             } else {
                 lockedInvoices.add(createInvoice(null, type, description, mealCount, price, position));
             }
@@ -372,7 +398,6 @@ public class InvoicingPlanService {
         invoice.setQuantity(quantity);
         invoice.setDefaultAmount(defaultAmount);
         invoice.setCustomAmount(defaultAmount);
-        invoice.setTotal(defaultAmount * quantity);
 
         return invoice;
     }

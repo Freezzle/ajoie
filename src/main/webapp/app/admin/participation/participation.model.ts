@@ -44,7 +44,6 @@ export interface IInvoice {
   defaultAmount?: number | null;
   customAmount?: number | null;
   quantity?: number | null;
-  total?: number | null;
   lock?: boolean | null;
   extraInformation?: string | null;
 }

@@ -46,9 +46,6 @@ public class Invoice implements Serializable {
     @Column(name = "quantity")
     private Long quantity;
 
-    @Column(name = "total")
-    private Double total;
-
     @Column(name = "lock")
     private Boolean lock;
 
@@ -70,7 +67,6 @@ public class Invoice implements Serializable {
         this.defaultAmount = invoice.getDefaultAmount();
         this.customAmount = invoice.getCustomAmount();
         this.lock = invoice.getLock();
-        this.total = invoice.getTotal();
         this.extraInformation = invoice.getExtraInformation();
     }
 
@@ -152,19 +148,6 @@ public class Invoice implements Serializable {
         return this;
     }
 
-    public Double getTotal() {
-        return this.total;
-    }
-
-    public void setTotal(Double total) {
-        this.total = total;
-    }
-
-    public Invoice total(Double total) {
-        this.setTotal(total);
-        return this;
-    }
-
     public Boolean getLock() {
         return this.lock;
     }
@@ -238,7 +221,7 @@ public class Invoice implements Serializable {
         return "Invoice{" + "id=" + getId() + ", referenceId=" + getReferenceId() + ", generationDate='" +
                getGenerationDate() + "'" + ", type='" + getType() + "'" + ", label='" + getLabel() + "'" +
                ", defaultAmount=" + getDefaultAmount() + ", customAmount=" + getCustomAmount() + ", quantity=" +
-               getQuantity() + ", total=" + getTotal() + ", lock='" + getLock() + "'" + ", extraInformation='" +
+               getQuantity() + ", lock='" + getLock() + "'" + ", extraInformation='" +
                getExtraInformation() + "'" + "}";
     }
 }

@@ -113,4 +113,14 @@ public class InvoicingPlanResource {
     ) {
         return ResponseUtil.wrapOrNotFound(invoicingPlanService.switchLock(id, idInvoice));
     }
+
+    @PutMapping("{id}/invoices/{idInvoice}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<InvoiceDTO> updateInvoice(
+        @PathVariable(value = "id", required = false) final UUID id,
+        @PathVariable(name = "idInvoice", required = false) UUID idInvoice,
+        @RequestBody InvoiceDTO invoiceDTO
+    ) {
+        return ResponseUtil.wrapOrNotFound(invoicingPlanService.updateInvoice(id, idInvoice, invoiceDTO));
+    }
 }

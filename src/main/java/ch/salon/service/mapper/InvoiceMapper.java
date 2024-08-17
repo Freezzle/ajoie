@@ -18,6 +18,5 @@ public interface InvoiceMapper {
 
     InvoiceLightDTO toLightDto(Invoice invoice);
 
-    @Mapping(target = "total", ignore = true)
     Invoice toLightEntity(InvoiceLightDTO invoice);
 }
