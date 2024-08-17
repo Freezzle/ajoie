@@ -3,6 +3,7 @@
     "acceptedChart": "Charte accepté ?",
     "acceptedContract": "Contrat accepté ?",
     "billing": {
+      "plans": "Plans de facturation",
       "title": "Facturations"
     },
     "create": "Création d'une nouvelle participation",

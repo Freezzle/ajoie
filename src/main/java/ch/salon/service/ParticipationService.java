@@ -1,24 +1,21 @@
 package ch.salon.service;
 
-import ch.salon.domain.Conference;
-import ch.salon.domain.Participation;
-import ch.salon.domain.Stand;
+import static ch.salon.domain.enumeration.Status.*;
+
+import ch.salon.domain.*;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.repository.ConferenceRepository;
-import ch.salon.repository.ParticipationRepository;
-import ch.salon.repository.StandRepository;
+import ch.salon.repository.*;
+import ch.salon.service.dto.BillingLineDTO;
 import ch.salon.service.dto.EventLogDTO;
+import ch.salon.service.dto.RecapBillingDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static ch.salon.domain.enumeration.Status.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ParticipationService {
@@ -30,20 +27,28 @@ public class ParticipationService {
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
     private final EventLogService eventLogService;
+    private final PaymentRepository paymentRepository;
+    private final InvoicingPlanRepository invoicingPlanRepository;
 
-    public ParticipationService(ParticipationRepository participationRepository,
-                                ConferenceRepository conferenceRepository, StandRepository standRepository,
-                                EventLogService eventLogService) {
+    public ParticipationService(
+        ParticipationRepository participationRepository,
+        ConferenceRepository conferenceRepository,
+        StandRepository standRepository,
+        EventLogService eventLogService,
+        PaymentRepository paymentRepository,
+        InvoicingPlanRepository invoicingPlanRepository
+    ) {
         this.participationRepository = participationRepository;
         this.conferenceRepository = conferenceRepository;
         this.standRepository = standRepository;
         this.eventLogService = eventLogService;
+        this.paymentRepository = paymentRepository;
+        this.invoicingPlanRepository = invoicingPlanRepository;
     }
 
     public UUID create(Participation participation) {
         if (participation.getId() != null) {
-            throw new BadRequestAlertException("A new participation cannot already have an ID", ENTITY_NAME,
-                "idexists");
+            throw new BadRequestAlertException("A new participation cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
         return participationRepository.save(participation).getId();
@@ -62,7 +67,12 @@ public class ParticipationService {
         }
 
         if (Participation.hasDifference(participation, existingParticipation)) {
-            this.eventLogService.eventFromSystem("Des éléments de la participation ont changé.", EventType.EVENT, EntityType.PARTICIPATION, participation.getId());
+            this.eventLogService.eventFromSystem(
+                    "Des éléments de la participation ont changé.",
+                    EventType.EVENT,
+                    EntityType.PARTICIPATION,
+                    participation.getId()
+                );
         }
 
         return participationRepository.save(participation);
@@ -106,21 +116,29 @@ public class ParticipationService {
         }
 
         if (currentStatus != statusToChange) {
-            this.eventLogService.eventFromSystem("Le statut de la participation a changé de " + currentStatus + " à " + statusToChange + ".", EventType.EVENT, EntityType.PARTICIPATION, participation.getId());
+            this.eventLogService.eventFromSystem(
+                    "Le statut de la participation a changé de " + currentStatus + " à " + statusToChange + ".",
+                    EventType.EVENT,
+                    EntityType.PARTICIPATION,
+                    participation.getId()
+                );
             participation.setStatus(statusToChange);
             participationRepository.save(participation);
         }
-
     }
 
     private boolean isAllOf(Set<Status> stands, Set<Status> conferences, Status status) {
-        return (stands.stream().allMatch(statusStand -> statusStand == status) &&
-            conferences.stream().allMatch(statusConf -> statusConf == status));
+        return (
+            stands.stream().allMatch(statusStand -> statusStand == status) &&
+            conferences.stream().allMatch(statusConf -> statusConf == status)
+        );
     }
 
     private boolean isAnyOf(Set<Status> stands, Set<Status> conferences, Status status) {
-        return (stands.stream().anyMatch(statusStand -> statusStand == status) ||
-            conferences.stream().anyMatch(statusConf -> statusConf == status));
+        return (
+            stands.stream().anyMatch(statusStand -> statusStand == status) ||
+            conferences.stream().anyMatch(statusConf -> statusConf == status)
+        );
     }
 
     public Optional<Participation> get(UUID id) {
@@ -132,12 +150,47 @@ public class ParticipationService {
     }
 
     public void createEventLog(UUID idExhibitor, EventLogDTO eventLogDTO) {
-        this.eventLogService.eventFromUser(eventLogDTO.getLabel(), eventLogDTO.getType(), EntityType.PARTICIPATION,
-            idExhibitor, eventLogDTO.getReferenceDate());
+        this.eventLogService.eventFromUser(
+                eventLogDTO.getLabel(),
+                eventLogDTO.getType(),
+                EntityType.PARTICIPATION,
+                idExhibitor,
+                eventLogDTO.getReferenceDate()
+            );
     }
 
     public List<EventLogDTO> findAllEventLogs(UUID idParticipation) {
-        return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation).stream()
-            .map(EventLogMapper.INSTANCE::toDto).toList();
+        return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation)
+            .stream()
+            .map(EventLogMapper.INSTANCE::toDto)
+            .toList();
+    }
+
+    public RecapBillingDTO getRecapBilling(UUID idParticipation) {
+        Participation existingParticipation = participationRepository.getReferenceById(idParticipation);
+        if (existingParticipation == null) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        final InvoicingPlan lastPlan = invoicingPlanRepository
+            .findByParticipationIdOrderByBillingNumberDesc(idParticipation)
+            .stream()
+            .max(Comparator.comparing(InvoicingPlan::getBillingNumber))
+            .orElse(null);
+
+        RecapBillingDTO recap = new RecapBillingDTO();
+        lastPlan
+            .getInvoices()
+            .forEach(invoice -> {
+                recap.getLines().add(new BillingLineDTO(invoice.getLabel(), invoice.getTotalAmount()));
+            });
+
+        List<Payment> payments = this.paymentRepository.findByParticipationIdOrderByBillingDateDesc(idParticipation);
+
+        payments.forEach(payment -> {
+            recap.getLines().add(new BillingLineDTO(payment.getPaymentMode().name(), -payment.getAmount()));
+        });
+
+        return recap;
     }
 }

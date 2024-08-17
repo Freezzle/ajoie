@@ -198,6 +198,10 @@ public class Invoice implements Serializable {
         this.position = position;
     }
 
+    public Double getTotalAmount() {
+        return this.quantity * this.customAmount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

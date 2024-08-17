@@ -15,7 +15,7 @@
 
         <span>
           <a [routerLink]="['../billings']" *ngIf="readonlyForm" class="btn btn-warning btn-sm" data-cy="entityBillingButton">
-            <span class="d-none d-md-inline" jhiTranslate="participation.billing.title">Facturations</span>
+            <span class="d-none d-md-inline" jhiTranslate="participation.billing.title">Plans de facturation</span>
           </a>
         </span>
         <span>
@@ -80,7 +80,7 @@
                   >
                     <option [ngValue]="null"></option>
                     @for (exhibitorOption of exhibitorsSharedCollection; track $index) {
-                    <option [ngValue]="exhibitorOption">{{ exhibitorOption.fullName }}</option>
+                      <option [ngValue]="exhibitorOption">{{ exhibitorOption.fullName }}</option>
                     }
                   </select>
                 </div>

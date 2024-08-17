@@ -37,6 +37,7 @@ export type NewInvoicingPlan = Omit<IInvoicingPlan, 'id'> & { id: null };
 
 export interface IInvoice {
   id: string;
+  readMode: boolean | null; // only frontend field
   generationDate?: dayjs.Dayjs | null;
   referenceId?: string | null;
   type?: Type | null;
@@ -59,3 +60,12 @@ export interface IPayment {
 }
 
 export type NewInvoice = Omit<IInvoice, 'id'> & { id: null };
+
+export interface IRecapBilling {
+  lines?: IBillingLine[] | null;
+}
+
+export interface IBillingLine {
+  label?: string | null;
+  amount?: number | null;
+}

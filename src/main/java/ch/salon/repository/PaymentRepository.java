@@ -1,11 +1,10 @@
 package ch.salon.repository;
 
 import ch.salon.domain.Payment;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * Spring Data JPA repository for the Payment entity.
@@ -13,5 +12,5 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
-    List<Payment> findByParticipationId(UUID participationId);
+    List<Payment> findByParticipationIdOrderByBillingDateDesc(UUID participationId);
 }

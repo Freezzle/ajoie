@@ -105,15 +105,6 @@ public class InvoicingPlanResource {
         return noContent().build();
     }
 
-    @PatchMapping("{id}/invoices/{idInvoice}/lock")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<InvoiceDTO> switchLock(
-        @PathVariable(value = "id", required = false) final UUID id,
-        @PathVariable(name = "idInvoice", required = false) UUID idInvoice
-    ) {
-        return ResponseUtil.wrapOrNotFound(invoicingPlanService.switchLock(id, idInvoice));
-    }
-
     @PutMapping("{id}/invoices/{idInvoice}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<InvoiceDTO> updateInvoice(

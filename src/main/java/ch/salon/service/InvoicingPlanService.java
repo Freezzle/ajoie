@@ -3,6 +3,8 @@ package ch.salon.service;
 import static ch.salon.domain.enumeration.Type.*;
 
 import ch.salon.domain.*;
+import ch.salon.domain.enumeration.EntityType;
+import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Type;
 import ch.salon.repository.*;
 import ch.salon.service.dto.InvoiceDTO;
@@ -28,6 +30,7 @@ public class InvoicingPlanService {
     private final ConferenceRepository conferenceRepository;
     private final MessageSource messageSource;
     private final MailService mailService;
+    private final EventLogService eventLogService;
 
     public InvoicingPlanService(
         SalonRepository salonRepository,
@@ -36,7 +39,8 @@ public class InvoicingPlanService {
         StandRepository standRepository,
         ConferenceRepository conferenceRepository,
         MessageSource messageSource,
-        MailService mailService
+        MailService mailService,
+        EventLogService eventLogService
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
@@ -45,6 +49,7 @@ public class InvoicingPlanService {
         this.conferenceRepository = conferenceRepository;
         this.messageSource = messageSource;
         this.mailService = mailService;
+        this.eventLogService = eventLogService;
     }
 
     public UUID create(InvoicingPlanDTO invoicingPlan) {
@@ -89,28 +94,6 @@ public class InvoicingPlanService {
         invoicingPlanRepository.save(invoicingPlan);
     }
 
-    public Optional<InvoiceDTO> switchLock(UUID idInvoicingPlan, UUID idInvoice) {
-        if (idInvoicingPlan == null || idInvoice == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-
-        Invoice invoiceFound = invoicingPlan
-            .getInvoices()
-            .stream()
-            .filter(invoice -> invoice.getId().equals(idInvoice))
-            .findFirst()
-            .orElseThrow();
-
-        invoiceFound.setLock(!invoiceFound.getLock());
-        invoicingPlanRepository.save(invoicingPlan);
-
-        return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceFound));
-    }
-
     public Optional<InvoiceDTO> updateInvoice(UUID idInvoicingPlan, UUID idInvoice, InvoiceDTO invoiceDTO) {
         if (idInvoicingPlan == null || invoiceDTO == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -127,11 +110,21 @@ public class InvoicingPlanService {
             .findFirst()
             .orElseThrow();
 
+        if (!Objects.equals(invoiceFound.getCustomAmount(), invoiceDTO.getCustomAmount())) {
+            this.eventLogService.eventFromSystem(
+                    "Une facture a été changée.",
+                    EventType.EVENT,
+                    EntityType.PARTICIPATION,
+                    invoicingPlan.getParticipation().getId()
+                );
+        }
+
         invoiceFound.setLabel(invoiceDTO.getLabel());
         invoiceFound.setDefaultAmount(invoiceDTO.getDefaultAmount());
         invoiceFound.setCustomAmount(invoiceDTO.getCustomAmount());
         invoiceFound.setGenerationDate(Instant.now());
         invoiceFound.setExtraInformation(invoiceDTO.getExtraInformation());
+        invoiceFound.setLock(invoiceDTO.getLock());
 
         invoicingPlanRepository.save(invoicingPlan);
 
