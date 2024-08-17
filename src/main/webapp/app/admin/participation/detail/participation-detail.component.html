@@ -161,19 +161,19 @@
                   [attr.aria-labelledby]="'heading' + $index"
                   data-bs-parent="#facturations"
                 >
-                  <div class="col" *ngIf="!invoicingPlan.hasBeenSent && !participation()?.isBillingClosed">
+                  <div class="col" *ngIf="!invoicingPlan.hasBeenSent">
                     <div class="d-flex justify-content-end mt-3 me-3">
                       <div>
-                        <button class="btn btn-warning btn-sm" (click)="sendInvoicingPlan(invoicingPlan.id)">
+                        <button [disabled]="isSending" class="btn btn-warning btn-sm" (click)="sendInvoicingPlan(invoicingPlan)">
                           <span jhiTranslate="invoicingPlan.send">Envoyer facture</span>
                         </button>
                       </div>
                     </div>
                   </div>
-                  <div class="col" *ngIf="invoicingPlan.hasBeenSent || participation()?.isBillingClosed">
+                  <div class="col" *ngIf="invoicingPlan.hasBeenSent">
                     <div class="d-flex justify-content-end mt-3 me-3">
                       <div>
-                        <button class="btn btn-primary btn-sm" (click)="sendInvoicingPlan(invoicingPlan.id)">
+                        <button [disabled]="isSending" class="btn btn-primary btn-sm" (click)="sendInvoicingPlan(invoicingPlan)">
                           <span jhiTranslate="invoicingPlan.resend">Renvoyer facture</span>
                         </button>
                       </div>
@@ -208,7 +208,7 @@
                                   icon="{{ invoice.lock | lockBoolean }}"
                                   size="lg"
                                   class="{{ invoice.lock | colorLockBoolean }}"
-                                  (click)="switchLock(invoicingPlan.id, invoice.id)"
+                                  (click)="switchLock(invoicingPlan, invoice)"
                                 ></fa-icon>
                               </td>
                               <td class="text-center" *ngIf="invoicingPlan.hasBeenSent || participation()?.isBillingClosed">

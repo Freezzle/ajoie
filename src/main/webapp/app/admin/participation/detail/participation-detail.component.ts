@@ -33,16 +33,17 @@ import EventTypePipe from '../../../shared/pipe/event-type.pipe';
     LockBooleanPipe,
     SendBooleanPipe,
     ReactiveFormsModule,
-EventTypePipe
-]
+    EventTypePipe,
+  ],
 })
 export class ParticipationDetailComponent implements OnInit {
   participation = input<IParticipation | null>(null);
 
   invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
   payments$: Observable<IPayment[]> | undefined;
-eventLogs$: Observable < any[]> | undefined;
+  eventLogs$: Observable<any[]> | undefined;
   active = 'detail';
+  isSending = false;
 
   protected participationService = inject(ParticipationService);
 
@@ -62,16 +63,20 @@ eventLogs$: Observable < any[]> | undefined;
     });
   }
 
-  switchLock(idInvoicingPlan: string, idInvoice: string): void {
-    this.participationService.switchLock(idInvoicingPlan, idInvoice).subscribe(() => {
-      this.loadInvoices();
+  switchLock(invoicingPlan: IInvoicingPlan, invoice: IInvoice): void {
+    this.participationService.switchLock(invoicingPlan.id, invoice.id).subscribe(invoiceBack => {
+      if (invoiceBack.body) {
+        invoice.lock = invoiceBack.body.lock;
+      }
     });
   }
 
-  sendInvoicingPlan(idInvoicingPlan: string): void {
-    this.participationService.sendInvoicingPlan(idInvoicingPlan).subscribe(() => {
+  sendInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
+    this.isSending = true;
+    this.participationService.sendInvoicingPlan(invoicingPlan.id).subscribe(() => {
       this.loadInvoices();
       this.loadEventLogs();
+      this.isSending = false;
     });
   }
 

@@ -2,7 +2,6 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Type;
 import jakarta.persistence.*;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -21,6 +20,9 @@ public class Invoice implements Serializable {
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @Column(name = "position")
+    private Long position;
 
     @Column(name = "generation_date")
     private Instant generationDate = Instant.now();
@@ -55,11 +57,11 @@ public class Invoice implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public Invoice() {
-    }
+    public Invoice() {}
 
     public Invoice(Invoice invoice) {
         this.id = null;
+        this.position = invoice.position;
         this.generationDate = Instant.now();
         this.referenceId = invoice.getReferenceId();
         this.type = invoice.getType();
@@ -205,7 +207,13 @@ public class Invoice implements Serializable {
         this.referenceId = referenceId;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
+    }
 
     @Override
     public boolean equals(Object o) {

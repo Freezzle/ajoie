@@ -22,8 +22,8 @@ import { IStand } from '../../stand/stand.model';
 import { StandService } from '../../stand/service/stand.service';
 import { ISalon } from '../../salon/salon.model';
 import { SalonService } from '../../salon/service/salon.service';
-import {IExhibitor}from '../../exhibitor/exhibitor.model';
-import {ExhibitorService }from '../../exhibitor/service/exhibitor.service';
+import { IExhibitor } from '../../exhibitor/exhibitor.model';
+import { ExhibitorService } from '../../exhibitor/service/exhibitor.service';
 import { Status } from '../../enumerations/status.model';
 
 @Component({
@@ -41,14 +41,14 @@ export class ParticipationUpdateComponent implements OnInit {
   stands$: Observable<IStand[]> | undefined;
   params: any;
 
-exhibitorsSharedCollection: IExhibitor[] = [];
+  exhibitorsSharedCollection: IExhibitor[] = [];
   salonsSharedCollection: ISalon[] = [];
 
   protected participationService = inject(ParticipationService);
   protected participationFormService = inject(ParticipationFormService);
   protected conferenceService = inject(ConferenceService);
   protected standService = inject(StandService);
-protected exhibitorService = inject(ExhibitorService);
+  protected exhibitorService = inject(ExhibitorService);
   protected salonService = inject(SalonService);
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
@@ -56,7 +56,7 @@ protected exhibitorService = inject(ExhibitorService);
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ParticipationFormGroup = this.participationFormService.createParticipationFormGroup();
 
-compareExhibitor = (o1: IExhibitor | null, o2: IExhibitor | null): boolean => this.exhibitorService.compareExhibitor(o1, o2);
+  compareExhibitor = (o1: IExhibitor | null, o2: IExhibitor | null): boolean => this.exhibitorService.compareExhibitor(o1, o2);
 
   compareSalon = (o1: ISalon | null, o2: ISalon | null): boolean => this.salonService.compareSalon(o1, o2);
 
@@ -199,7 +199,7 @@ compareExhibitor = (o1: IExhibitor | null, o2: IExhibitor | null): boolean => th
           this.exhibitorService.addExhibitorToCollectionIfMissing<IExhibitor>(exhibitors, this.participation?.exhibitor),
         ),
       )
-.subscribe((exhibitors: IExhibitor[]) => (this.exhibitorsSharedCollection = exhibitors));
+      .subscribe((exhibitors: IExhibitor[]) => (this.exhibitorsSharedCollection = exhibitors));
 
     this.salonService
       .query()

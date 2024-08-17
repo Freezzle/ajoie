@@ -2,7 +2,6 @@ package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -35,10 +34,11 @@ public class InvoicingPlan implements Serializable {
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
+    @OrderBy("position ASC")
     private Set<Invoice> invoices = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
+    @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
     private Participation participation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

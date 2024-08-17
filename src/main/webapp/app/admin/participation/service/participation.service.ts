@@ -7,7 +7,7 @@ import dayjs from 'dayjs/esm';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IInvoicingPlan, IParticipation, IPayment, NewParticipation } from '../participation.model';
+import { IInvoice, IInvoicingPlan, IParticipation, IPayment, NewParticipation } from '../participation.model';
 
 export type PartialUpdateParticipation = Partial<IParticipation> & Pick<IParticipation, 'id'>;
 
@@ -110,8 +110,8 @@ export class ParticipationService {
     );
   }
 
-  switchLock(idInvoicingPlan: string, idInvoice: string): Observable<HttpResponse<{}>> {
-    return this.http.patch(
+  switchLock(idInvoicingPlan: string, idInvoice: string): Observable<HttpResponse<IInvoice>> {
+    return this.http.patch<IInvoice>(
       this.applicationConfigService.getEndpointFor(`api/invoicing-plans/${idInvoicingPlan}/invoices/${idInvoice}/lock`),
       {},
       {
@@ -131,7 +131,7 @@ export class ParticipationService {
   }
 
   getEventLogs(idParticipation: string): Observable<HttpResponse<any>> {
-    return this.http.get<any[]>(`${this.resourceUrl}/${idParticipation}/events`, { observe: 'response', });
+    return this.http.get<any[]>(`${this.resourceUrl}/${idParticipation}/events`, { observe: 'response' });
   }
 
   getParticipationIdentifier(participation: Pick<IParticipation, 'id'>): string {

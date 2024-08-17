@@ -1,4 +1,4 @@
-exportinterfaceIExhibitor {
+export interface IExhibitor {
   id: string;
   fullName?: string | null;
   email?: string | null;
