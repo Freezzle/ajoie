@@ -1,5 +1,6 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.State;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -24,13 +25,14 @@ public class InvoicingPlan implements Serializable {
     private UUID id;
 
     @Column(name = "generation_date")
-    private Instant generationDate;
+    private Instant generationDate = Instant.now();
 
     @Column(name = "billing_number", nullable = false)
     private String billingNumber;
 
-    @Column(name = "has_been_sent", nullable = false)
-    private boolean hasBeenSent = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    private State state = State.CURRENT;
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
@@ -82,14 +84,6 @@ public class InvoicingPlan implements Serializable {
         return this;
     }
 
-    public boolean isHasBeenSent() {
-        return hasBeenSent;
-    }
-
-    public void setHasBeenSent(boolean hasBeenSent) {
-        this.hasBeenSent = hasBeenSent;
-    }
-
     public String getBillingNumber() {
         return billingNumber;
     }
@@ -121,7 +115,13 @@ public class InvoicingPlan implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -140,10 +140,20 @@ public class InvoicingPlan implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Invoice{" + "id=" + getId() + ", generationDate='" + getGenerationDate() + "'" + ", billingNumber=" +
-               getBillingNumber() + ", hasBeenSent='" + isHasBeenSent() + "'" + "}";
+        return (
+            "InvoicingPlan{" +
+            "id=" +
+            id +
+            ", generationDate=" +
+            generationDate +
+            ", billingNumber='" +
+            billingNumber +
+            '\'' +
+            ", state=" +
+            state +
+            '}'
+        );
     }
 }

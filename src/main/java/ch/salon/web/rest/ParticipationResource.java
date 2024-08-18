@@ -10,12 +10,10 @@ import ch.salon.service.ParticipationService;
 import ch.salon.service.PaymentService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.PaymentDTO;
-import ch.salon.service.dto.RecapBillingDTO;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,13 +162,5 @@ public class ParticipationResource {
         return noContent()
             .headers(createEntityDeletionAlert(applicationName, true, PaymentService.ENTITY_NAME, idPayment.toString()))
             .build();
-    }
-
-    @GetMapping("/{id}/recap")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<RecapBillingDTO> getRecap(@PathVariable("id") UUID id) {
-        log.debug("REST request to delete Payment : {}", id);
-
-        return ResponseUtil.wrapOrNotFound(Optional.of(this.participationService.getRecapBilling(id)));
     }
 }

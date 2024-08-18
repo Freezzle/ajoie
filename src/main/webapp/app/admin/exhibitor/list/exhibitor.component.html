@@ -26,7 +26,7 @@
 
   @if (exhibitors?.length === 0) {
     <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="salonApp.exhibitor.home.notFound">Aucun Exhibitor trouvé</span>
+      <span jhiTranslate="salonApp.exhibitor.home.notFound">Aucun exposant</span>
     </div>
   }
 
@@ -88,7 +88,7 @@
           </tr>
         </thead>
         <tbody>
-        @for (exhibitor of exhibitors; track trackId) {
+          @for (exhibitor of exhibitors; track trackId) {
             <tr data-cy="entityTable">
               <td>
                 <a [routerLink]="['/exhibitor', exhibitor.id, 'view']">{{ exhibitor.id }}</a>
@@ -101,18 +101,15 @@
               <td>{{ exhibitor.extraInformation }}</td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['/exhibitor', exhibitor.id, 'view']" class="btn btn-info btn-sm"
-                     data-cy="entityDetailsButton">
+                  <a [routerLink]="['/exhibitor', exhibitor.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
                   </a>
 
-                  <a [routerLink]="['/exhibitor', exhibitor.id, 'edit']" class="btn btn-primary btn-sm"
-                     data-cy="entityEditButton">
+                  <a [routerLink]="['/exhibitor', exhibitor.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
                     <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
                   </a>
 
-                  <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm"
-                          data-cy="entityDeleteButton">
+                  <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                   </button>
                 </div>

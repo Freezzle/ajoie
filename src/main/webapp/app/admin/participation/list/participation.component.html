@@ -43,7 +43,7 @@
 
   @if (participations?.length === 0) {
     <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="participation.notFound">Aucun Participation trouvé</span>
+      <span jhiTranslate="participation.notFound">Aucune participation</span>
     </div>
   }
 
@@ -67,7 +67,7 @@
             <tr data-cy="entityTable">
               <td>
                 @if (participation.exhibitor) {
-                <a [routerLink]="['./', participation.id, 'view']">{{ participation.exhibitor.fullName }}</a>
+                  <a [routerLink]="['./', participation.id, 'view']">{{ participation.exhibitor.fullName }}</a>
                 }
               </td>
               <td class="text-center">{{ participation.registrationDate | formatMediumDate }}</td>

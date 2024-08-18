@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity InvoicingPlan.
@@ -20,8 +18,8 @@
             <column name="billing_number" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="has_been_sent" type="boolean">
-                <constraints nullable="true" />
+            <column name="state" type="varchar(255)">
+                <constraints nullable="false"/>
             </column>
             <column name="participation_id" type="${uuidType}">
                 <constraints nullable="true" />

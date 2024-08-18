@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { IBillingLine, IInvoice, IInvoicingPlan, IParticipation, IPayment, IRecapBilling } from '../participation.model';
+import { IInvoice, IInvoicingPlan, IParticipation, IPayment } from '../participation.model';
 import { ParticipationService } from '../service/participation.service';
 import { EMPTY, Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
@@ -16,6 +16,7 @@ import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
 import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
 import EventTypePipe from '../../../shared/pipe/event-type.pipe';
 import { Type } from '../../enumerations/type.model';
+import { State } from '../../enumerations/state.model';
 
 @Component({
   standalone: true,
@@ -43,17 +44,17 @@ export class ParticipationDetailComponent implements OnInit {
   invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
   payments$: Observable<IPayment[]> | undefined;
   eventLogs$: Observable<any[]> | undefined;
-  recapBilling$: Observable<IRecapBilling> | undefined;
   active = 'detail';
   isSending = false;
 
+  protected readonly Type = Type;
+  protected readonly State = State;
   protected participationService = inject(ParticipationService);
 
   ngOnInit(): void {
     this.loadInvoices();
     this.loadPayments();
     this.loadEventLogs();
-    this.loadRecapBilling();
   }
 
   previousState(): void {
@@ -63,7 +64,6 @@ export class ParticipationDetailComponent implements OnInit {
   generate(): void {
     this.participationService.generateInvoices(this.participation()!.id).subscribe(() => {
       this.loadInvoices();
-      this.loadRecapBilling();
     });
   }
 
@@ -88,16 +88,6 @@ export class ParticipationDetailComponent implements OnInit {
     invoice.extraInformation = event.target.value;
   }
 
-  totalDefault(invoices: IInvoice[]): number {
-    return invoices
-      .map(invoice => Number(invoice.defaultAmount))
-      .reduce((previousValue, defaultAmount) => previousValue + defaultAmount, 0);
-  }
-
-  totalCustom(invoices: IInvoice[]): number {
-    return invoices.map(invoice => Number(invoice.customAmount)).reduce((previousValue, customAmount) => previousValue + customAmount, 0);
-  }
-
   totalInvoices(invoices: IInvoice[]): number {
     return invoices
       .map(invoice => (invoice.quantity ?? 1) * (invoice.customAmount ?? 0))
@@ -110,30 +100,8 @@ export class ParticipationDetailComponent implements OnInit {
     );
   }
 
-  totalDebit(lines: IBillingLine[]): number {
-    return (
-      lines
-        .filter(line => line.amount && line.amount < 0)
-        .map(line => line.amount)
-        .reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0), 0) ?? 0
-    );
-  }
-
-  totalCredit(lines: IBillingLine[]): number {
-    return (
-      lines
-        .filter(line => line.amount && line.amount >= 0)
-        .map(line => line.amount)
-        .reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0), 0) ?? 0
-    );
-  }
-
-  totalRecap(lines: IBillingLine[]): number {
-    if (lines.length === 0) {
-      return 0;
-    }
-
-    return lines.map(line => line.amount ?? 0).reduce((previousValue, defaultAmount) => previousValue + defaultAmount);
+  remainingTotal(invoices: IInvoice[], payments: IPayment[]): number {
+    return this.totalInvoices(invoices) + this.totalPayments(payments);
   }
 
   loadInvoices(): void {
@@ -177,17 +145,6 @@ export class ParticipationDetailComponent implements OnInit {
     );
   }
 
-  loadRecapBilling(): void {
-    this.recapBilling$ = this.participationService.getRecap(this.participation()!.id).pipe(
-      mergeMap((recap: HttpResponse<IRecapBilling>) => {
-        if (recap.body) {
-          return of(recap.body);
-        }
-        return EMPTY;
-      }),
-    );
-  }
-
   readActionInvoice(invoicingPlan: IInvoicingPlan, invoice: IInvoice): void {
     invoice.readMode = true;
     this.participationService.updateInvoice(invoicingPlan.id, invoice).subscribe(invoiceBack => {
@@ -196,7 +153,6 @@ export class ParticipationDetailComponent implements OnInit {
         invoice.extraInformation = invoiceBack.body.extraInformation;
         invoice.lock = invoiceBack.body.lock;
         this.loadEventLogs();
-        this.loadRecapBilling();
       }
     });
   }
@@ -206,12 +162,10 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   mustBeReadMode(invoice: IInvoice, invoicingPlan: IInvoicingPlan): boolean {
-    return !!invoice.readMode || !!invoicingPlan.hasBeenSent || !!this.participation()?.isBillingClosed;
+    return !!invoice.readMode || invoicingPlan.state === State.CLOSED || !!this.participation()?.isBillingClosed;
   }
 
   mustDisableSendButton(invoicingPlan: IInvoicingPlan): boolean {
     return this.isSending || !invoicingPlan.invoices?.every((inv: IInvoice) => inv.readMode);
   }
-
-  protected readonly Type = Type;
 }

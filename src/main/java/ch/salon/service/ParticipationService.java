@@ -2,14 +2,14 @@ package ch.salon.service;
 
 import static ch.salon.domain.enumeration.Status.*;
 
-import ch.salon.domain.*;
+import ch.salon.domain.Conference;
+import ch.salon.domain.Participation;
+import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.*;
-import ch.salon.service.dto.BillingLineDTO;
 import ch.salon.service.dto.EventLogDTO;
-import ch.salon.service.dto.RecapBillingDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.*;
@@ -164,33 +164,5 @@ public class ParticipationService {
             .stream()
             .map(EventLogMapper.INSTANCE::toDto)
             .toList();
-    }
-
-    public RecapBillingDTO getRecapBilling(UUID idParticipation) {
-        Participation existingParticipation = participationRepository.getReferenceById(idParticipation);
-        if (existingParticipation == null) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        final InvoicingPlan lastPlan = invoicingPlanRepository
-            .findByParticipationIdOrderByBillingNumberDesc(idParticipation)
-            .stream()
-            .max(Comparator.comparing(InvoicingPlan::getBillingNumber))
-            .orElse(null);
-
-        RecapBillingDTO recap = new RecapBillingDTO();
-        lastPlan
-            .getInvoices()
-            .forEach(invoice -> {
-                recap.getLines().add(new BillingLineDTO(invoice.getLabel(), invoice.getTotalAmount()));
-            });
-
-        List<Payment> payments = this.paymentRepository.findByParticipationIdOrderByBillingDateDesc(idParticipation);
-
-        payments.forEach(payment -> {
-            recap.getLines().add(new BillingLineDTO(payment.getPaymentMode().name(), -payment.getAmount()));
-        });
-
-        return recap;
     }
 }

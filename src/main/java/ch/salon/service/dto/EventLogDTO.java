@@ -4,7 +4,6 @@ import ch.salon.domain.enumeration.EventType;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.Data;
 
 public class EventLogDTO implements Serializable {
 

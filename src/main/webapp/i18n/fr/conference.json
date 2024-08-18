@@ -7,7 +7,7 @@
     "description": "Description",
     "edit": "Détail d'une conférence",
     "extraInformation": "Commentaire",
-    "notFound": "Aucune conférence trouvé",
+    "notFound": "Aucune conférence",
     "participation": "Participation",
     "status": {
       "label": "Statut",

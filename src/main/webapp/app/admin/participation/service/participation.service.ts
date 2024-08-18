@@ -7,7 +7,7 @@ import dayjs from 'dayjs/esm';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IInvoice, IInvoicingPlan, IParticipation, IPayment, IRecapBilling, NewParticipation } from '../participation.model';
+import { IInvoice, IInvoicingPlan, IParticipation, IPayment, NewParticipation } from '../participation.model';
 
 export type PartialUpdateParticipation = Partial<IParticipation> & Pick<IParticipation, 'id'>;
 
@@ -81,12 +81,6 @@ export class ParticipationService {
 
     return this.http.get<RestInvoice[]>(this.applicationConfigService.getEndpointFor('api/invoicing-plans'), {
       params: queryObject,
-      observe: 'response',
-    });
-  }
-
-  getRecap(id: string): Observable<HttpResponse<IRecapBilling>> {
-    return this.http.get<IRecapBilling>(`${this.resourceUrl}/${id}/recap`, {
       observe: 'response',
     });
   }

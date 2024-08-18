@@ -113,8 +113,8 @@
     <br />
 
     <div class="row">
-      <div class="col-sm-6">
-        <div class="card h-100">
+      <div class="col-sm-12">
+        <div class="card">
           <h5 class="card-header">Plans de facturation</h5>
           <div class="card-body">
             <div class="col" *ngIf="!participation()?.isBillingClosed">
@@ -146,10 +146,12 @@
                             <div class="col-4 text-center">{{ invoicingPlan.generationDate | formatMediumDate }}</div>
                             <div class="col-4 pe-5 text-end">
                               <fa-icon
-                                icon="{{ invoicingPlan.hasBeenSent | sendBoolean }}"
+                                icon="{{ invoicingPlan.state === State.CLOSED | sendBoolean }}"
                                 size="lg"
-                                [title]="(invoicingPlan.hasBeenSent ? 'invoicingPlan.sent' : 'invoicingPlan.notSent') | translate"
-                                class="{{ invoicingPlan.hasBeenSent | colorBool }}"
+                                [title]="
+                                  (invoicingPlan.state === State.CLOSED ? 'invoicingPlan.sent' : 'invoicingPlan.notSent') | translate
+                                "
+                                class="{{ invoicingPlan.state === State.CLOSED | colorBool }}"
                               ></fa-icon>
                             </div>
                           </div>
@@ -163,7 +165,7 @@
                       [attr.aria-labelledby]="'heading' + $index"
                       data-bs-parent="#facturations"
                     >
-                      <div class="col" *ngIf="!invoicingPlan.hasBeenSent">
+                      <div class="col" *ngIf="invoicingPlan.state === State.CURRENT">
                         <div class="d-flex justify-content-end mt-3 me-3">
                           <div>
                             <button
@@ -176,7 +178,7 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col" *ngIf="invoicingPlan.hasBeenSent">
+                      <div class="col" *ngIf="invoicingPlan.state === State.CLOSED">
                         <div class="d-flex justify-content-end mt-3 me-3">
                           <div>
                             <button
@@ -190,109 +192,137 @@
                         </div>
                       </div>
                       <div class="accordion-body">
-                        <table class="table table-striped" aria-describedby="page-heading">
+                        <table class="table" aria-describedby="page-heading">
                           <thead>
                             <tr>
-                              <th class="col-auto text-center"><span>Verrouillé ?</span></th>
-                              <th class="col-auto"><span>Type</span></th>
-                              <th class="col-2"><span>Libellé</span></th>
-                              <th class="col-1 text-center"><span>Montant configuration</span></th>
-                              <th class="col-1 text-center"><span>Montant</span></th>
+                              <th class="col-1 text-center"><span>Date</span></th>
+                              <th class="col-auto text-center"><span>&nbsp;</span></th>
+                              <th class="col-1"><span>Type</span></th>
+                              <th class="col-4"><span>Libellé</span></th>
+                              <th class="col-auto text-center"><span>Montant</span></th>
                               <th class="col-auto text-center"><span>Quantité</span></th>
-                              <th class="col-1 text-center"><span>Total</span></th>
-                              <th class="col-3 text-center"><span>Extra info</span></th>
-                              <th class="col-auto"><span>&nbsp;</span></th>
+                              <th class="col-auto text-center"><span>Total</span></th>
+                              <th class="col-3"><span>Commentaire</span></th>
+                              <th class="col-1"><span>&nbsp;</span></th>
                             </tr>
                           </thead>
-                          <tbody *ngIf="invoicingPlan.invoices; let invoices">
-                            @if (!invoices.length) {
+                          @if (payments$ | async; as payments) {
+                            <tbody *ngIf="invoicingPlan.invoices; let invoices">
                               <tr>
-                                <td colspan="9"><span>Aucune facture trouvé</span></td>
+                                <td class="table-section" colspan="9">Section factures</td>
                               </tr>
-                            }
-                            @if (invoices.length) {
-                              @for (invoice of invoices; track $index) {
-                                <tr data-cy="entityTable">
-                                  <td class="text-center" *ngIf="!mustBeReadMode(invoice, invoicingPlan)">
-                                    <fa-icon
-                                      icon="{{ invoice.lock | lockBoolean }}"
-                                      size="lg"
-                                      class="{{ invoice.lock | colorLockBoolean }}"
-                                      (click)="onClickLock(invoice)"
-                                    ></fa-icon>
-                                  </td>
-                                  <td class="text-center" *ngIf="mustBeReadMode(invoice, invoicingPlan)">
-                                    <fa-icon
-                                      icon="{{ invoice.lock | lockBoolean }}"
-                                      size="lg"
-                                      class="{{ invoice.lock | colorLockBoolean }}"
-                                      disabled
-                                    ></fa-icon>
-                                  </td>
-                                  <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
-                                  <td>{{ invoice.label }}</td>
-                                  <td class="text-center">{{ invoice.defaultAmount | currency: 'CHF' }}</td>
-                                  <td class="text-center">
-                                    <input
-                                      type="number"
-                                      class="form-control text-center"
-                                      (blur)="onCustomAmountChange($event, invoice)"
-                                      *ngIf="!mustBeReadMode(invoice, invoicingPlan)"
-                                      value="{{ invoice.customAmount }}"
-                                    />
-                                    @if (mustBeReadMode(invoice, invoicingPlan)) {
-                                      {{ invoice.customAmount | currency: 'CHF' }}
-                                    }
-                                  </td>
-                                  <td class="text-center">{{ invoice.quantity }}</td>
-                                  <td class="text-center">{{ (invoice.quantity ?? 0) * (invoice.customAmount ?? 0) | currency: 'CHF' }}</td>
-                                  <td>
-                                    <input
-                                      type="text"
-                                      class="form-control"
-                                      (blur)="onExtraInformationChange($event, invoice)"
-                                      *ngIf="!mustBeReadMode(invoice, invoicingPlan)"
-                                      value="{{ invoice.extraInformation }}"
-                                    />
-                                    @if (mustBeReadMode(invoice, invoicingPlan)) {
-                                      {{ invoice.extraInformation }}
-                                    }
-                                  </td>
-                                  <td>
-                                    <span *ngIf="!invoicingPlan.hasBeenSent && !this.participation()?.isBillingClosed">
-                                      <button
-                                        *ngIf="invoice.readMode"
-                                        type="button"
-                                        class="btn btn-primary btn-sm"
-                                        (click)="editActionInvoice(invoice)"
-                                      >
-                                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                                      </button>
-                                      <button
-                                        *ngIf="!invoice.readMode"
-                                        type="button"
-                                        class="btn btn-primary btn-sm"
-                                        (click)="readActionInvoice(invoicingPlan, invoice)"
-                                      >
-                                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                                      </button>
-                                    </span>
-                                  </td>
+                              @if (!invoices.length) {
+                                <tr>
+                                  <td colspan="9"><span>Aucune facture</span></td>
                                 </tr>
                               }
-                              <tr data-cy="entityTable">
-                                <td class="fw-bold">&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td class="text-center fw-bold">{{ totalDefault(invoices) | currency: 'CHF' }}</td>
-                                <td class="text-center fw-bold">{{ totalCustom(invoices) | currency: 'CHF' }}</td>
-                                <td>&nbsp;</td>
-                                <td class="text-center fw-bold">{{ totalInvoices(invoices) | currency: 'CHF' }}</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
+                              @if (invoices.length) {
+                                @for (invoice of invoices; track $index) {
+                                  <tr data-cy="entityTable">
+                                    <td class="text-center">{{ invoice.generationDate | formatMediumDate }}</td>
+                                    <td class="text-center">
+                                      <fa-icon
+                                        *ngIf="!mustBeReadMode(invoice, invoicingPlan)"
+                                        icon="{{ invoice.lock | lockBoolean }}"
+                                        size="lg"
+                                        class="{{ invoice.lock | colorLockBoolean }}"
+                                        (click)="onClickLock(invoice)"
+                                      ></fa-icon>
+                                      <fa-icon
+                                        *ngIf="mustBeReadMode(invoice, invoicingPlan)"
+                                        icon="{{ invoice.lock | lockBoolean }}"
+                                        size="lg"
+                                        class="{{ invoice.lock | colorLockBoolean }}"
+                                        disabled
+                                      ></fa-icon>
+                                    </td>
+                                    <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
+                                    <td>{{ invoice.label }}</td>
+                                    <td class="text-center">
+                                      <input
+                                        type="number"
+                                        class="form-control text-center"
+                                        *ngIf="!mustBeReadMode(invoice, invoicingPlan)"
+                                        (blur)="onCustomAmountChange($event, invoice)"
+                                        value="{{ invoice.customAmount }}"
+                                      />
+                                      @if (mustBeReadMode(invoice, invoicingPlan)) {
+                                        {{ invoice.customAmount | currency: 'CHF' }}
+                                      }
+                                    </td>
+                                    <td class="text-center">{{ invoice.quantity }}</td>
+                                    <td class="text-center">
+                                      {{ (invoice.quantity ?? 0) * (invoice.customAmount ?? 0) | currency: 'CHF' }}
+                                    </td>
+                                    <td>
+                                      <input
+                                        type="text"
+                                        class="form-control"
+                                        (blur)="onExtraInformationChange($event, invoice)"
+                                        *ngIf="!mustBeReadMode(invoice, invoicingPlan)"
+                                        value="{{ invoice.extraInformation }}"
+                                      />
+                                      @if (mustBeReadMode(invoice, invoicingPlan)) {
+                                        {{ invoice.extraInformation }}
+                                      }
+                                    </td>
+                                    <td class="text-end">
+                                      <span *ngIf="invoicingPlan.state === State.CURRENT && !this.participation()?.isBillingClosed">
+                                        <button
+                                          *ngIf="invoice.readMode"
+                                          type="button"
+                                          class="btn btn-primary btn-sm"
+                                          (click)="editActionInvoice(invoice)"
+                                        >
+                                          <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                                        </button>
+                                        <button
+                                          *ngIf="!invoice.readMode"
+                                          type="button"
+                                          class="btn btn-primary btn-sm"
+                                          (click)="readActionInvoice(invoicingPlan, invoice)"
+                                        >
+                                          <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                                        </button>
+                                      </span>
+                                    </td>
+                                  </tr>
+                                }
+                              }
+                              <tr>
+                                <td class="table-section" colspan="9">Section paiements</td>
                               </tr>
-                            }
-                          </tbody>
+                              @if (!payments.length) {
+                                <tr>
+                                  <td colspan="9"><span>Aucun paiement</span></td>
+                                </tr>
+                              }
+                              @if (payments.length) {
+                                @for (payment of payments; track $index) {
+                                  <tr data-cy="entityTable">
+                                    <td class="text-center">{{ payment.billingDate | formatMediumDate }}</td>
+                                    <td>&nbsp;</td>
+                                    <td>{{ 'payment.type.list.' + (payment.paymentMode ?? 'null') | translate }}</td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td class="text-center">{{ payment.amount | currency: 'CHF' }}</td>
+                                    <td>{{ payment.extraInformation }}</td>
+                                    <td>&nbsp;</td>
+                                  </tr>
+                                }
+                              }
+                              <tr>
+                                <td class="fw-bold" class="table-section-ending">Résultat</td>
+                                <td colspan="5" class="table-section-ending">&nbsp;</td>
+                                <td class="table-section-ending text-center fw-bold">
+                                  {{ remainingTotal(invoices, payments) | currency: 'CHF' }}
+                                </td>
+                                <td class="table-section-ending">&nbsp;</td>
+                                <td class="table-section-ending">&nbsp;</td>
+                              </tr>
+                            </tbody>
+                          }
                         </table>
                       </div>
                     </div>
@@ -302,90 +332,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="col-sm-6">
-        <div class="card h-100">
-          <h5 class="card-header">Recapitulatif</h5>
-          <div class="card-body">
-            <div class="table-responsive table-entities" id="entities-recap">
-              <table class="table table-striped" aria-describedby="page-heading">
-                <thead>
-                  <tr>
-                    <th class="col-9"><span>Label</span></th>
-                    <th class="col-1 text-center"><span>Débit</span></th>
-                    <th class="col-1 text-center"><span>Crédit</span></th>
-                    <th class="col-1 text-center"><span>Résultat</span></th>
-                  </tr>
-                </thead>
-                <tbody *ngIf="recapBilling$ | async; let recap">
-                  @for (line of recap.lines; track $index) {
-                    <tr data-cy="entityTable">
-                      <td>{{ line.label }}</td>
-                      <td class="text-center">{{ (line.amount ?? 0) < 0 ? '' : (line.amount | currency: 'CHF') }}</td>
-                      <td class="text-center">{{ (line.amount ?? 0) >= 0 ? '' : (line.amount | currency: 'CHF') }}</td>
-                      <td>&nbsp;</td>
-                    </tr>
-                  }
-                  <tr data-cy="entityTable">
-                    <td>&nbsp;</td>
-                    <td class="text-center fw-bold">{{ totalCredit(recap.lines ?? []) | currency: 'CHF' }}</td>
-                    <td class="text-center fw-bold">{{ totalDebit(recap.lines ?? []) | currency: 'CHF' }}</td>
-                    <td class="text-center fw-bold">{{ totalRecap(recap.lines ?? []) | currency: 'CHF' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-6">
-        <div class="card h-100">
-          <h5 class="card-header">Paiements</h5>
-          <div class="card-body">
-            <div class="table-responsive table-entities" id="entities-payments">
-              <table class="table table-striped" aria-describedby="page-heading">
-                <thead>
-                  <tr>
-                    <th class="col-1 text-center"><span>Date</span></th>
-                    <th class="col-1 text-center"><span>Mode</span></th>
-                    <th class="col-1 text-center"><span>Montant</span></th>
-                    <th class="col-auto"><span>Commentaire</span></th>
-                  </tr>
-                </thead>
-                <tbody *ngIf="payments$ | async; let payments">
-                  @if (!payments.length) {
-                    <tr>
-                      <td colspan="5"><span>Aucun paiement trouvé</span></td>
-                    </tr>
-                  }
-                  @if (payments.length) {
-                    @for (payment of payments; track $index) {
-                      <tr data-cy="entityTable">
-                        <td class="text-center">{{ payment.billingDate | formatMediumDate }}</td>
-                        <td class="text-center">{{ payment.paymentMode }}</td>
-                        <td class="text-center">{{ payment.amount | currency: 'CHF' }}</td>
-                        <td>{{ payment.extraInformation }}</td>
-                      </tr>
-                    }
-                    <tr data-cy="entityTable">
-                      <td class="fw-bold">&nbsp;</td>
-                      <td>&nbsp;</td>
-                      <td class="text-center fw-bold">{{ totalPayments(payments) | currency: 'CHF' }}</td>
-                      <td>&nbsp;</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6">
-        <div class="h-100">&nbsp;</div>
       </div>
     </div>
   }

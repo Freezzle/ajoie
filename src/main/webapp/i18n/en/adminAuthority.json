@@ -12,7 +12,7 @@
       "home": {
         "createLabel": "Créer une nouvelle authorité",
         "createOrEditLabel": "Créer ou éditer une authorité",
-        "notFound": "Aucune authorité trouvé",
+        "notFound": "Aucune authorité",
         "title": "Authorities"
       },
       "name": "Name",

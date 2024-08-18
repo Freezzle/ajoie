@@ -1,5 +1,6 @@
 package ch.salon.service.dto;
 
+import ch.salon.domain.enumeration.State;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -10,8 +11,8 @@ public class InvoicingPlanDTO implements Serializable {
 
     private UUID id;
     private Instant generationDate;
+    private State state;
     private String billingNumber;
-    private boolean hasBeenSent = false;
     private Set<InvoiceDTO> invoices = new HashSet<>();
     private ParticipationLightDTO participation;
 
@@ -25,6 +26,14 @@ public class InvoicingPlanDTO implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public Instant getGenerationDate() {
@@ -41,14 +50,6 @@ public class InvoicingPlanDTO implements Serializable {
 
     public void setBillingNumber(String billingNumber) {
         this.billingNumber = billingNumber;
-    }
-
-    public boolean isHasBeenSent() {
-        return hasBeenSent;
-    }
-
-    public void setHasBeenSent(boolean hasBeenSent) {
-        this.hasBeenSent = hasBeenSent;
     }
 
     public Set<InvoiceDTO> getInvoices() {

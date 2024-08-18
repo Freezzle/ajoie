@@ -5,6 +5,7 @@ import static ch.salon.domain.enumeration.Type.*;
 import ch.salon.domain.*;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Type;
 import ch.salon.repository.*;
 import ch.salon.service.dto.InvoiceDTO;
@@ -90,7 +91,7 @@ public class InvoicingPlanService {
 
         mailService.sendInvoiceMail(salon, exhibitor, invoicingPlan);
 
-        invoicingPlan.setHasBeenSent(true);
+        invoicingPlan.setState(State.CLOSED);
         invoicingPlanRepository.save(invoicingPlan);
     }
 
@@ -173,7 +174,7 @@ public class InvoicingPlanService {
             currentInvoicingPlan = new InvoicingPlan();
             currentInvoicingPlan.setParticipation(participation);
             currentInvoicingPlan.setBillingNumber(participation.getClientNumber() + "-" + "001");
-        } else if (lastPlan.isHasBeenSent()) {
+        } else if (lastPlan.getState() == State.CLOSED) {
             currentInvoicingPlan = new InvoicingPlan();
             currentInvoicingPlan.setParticipation(participation);
             currentInvoicingPlan.setBillingNumber(incrementBillingNumber(lastPlan.getBillingNumber()));

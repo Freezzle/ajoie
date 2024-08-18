@@ -4,6 +4,7 @@ import { Status } from '../enumerations/status.model';
 import { Type } from '../enumerations/type.model';
 import { Mode } from '../enumerations/mode.model';
 import { IExhibitor } from '../exhibitor/exhibitor.model';
+import { State } from '../enumerations/state.model';
 
 export interface IParticipation {
   id: string;
@@ -29,7 +30,7 @@ export interface IInvoicingPlan {
   id: string;
   generationDate?: dayjs.Dayjs | null;
   billingNumber?: string | null;
-  hasBeenSent?: boolean | null;
+  state?: State | null;
   invoices?: IInvoice[];
 }
 
@@ -60,12 +61,3 @@ export interface IPayment {
 }
 
 export type NewInvoice = Omit<IInvoice, 'id'> & { id: null };
-
-export interface IRecapBilling {
-  lines?: IBillingLine[] | null;
-}
-
-export interface IBillingLine {
-  label?: string | null;
-  amount?: number | null;
-}
