@@ -39,6 +39,11 @@ public class InvoicingPlan implements Serializable {
     @OrderBy("position ASC")
     private Set<Invoice> invoices = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
+    @OrderBy("billingDate ASC")
+    private Set<Payment> payments = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
     private Participation participation;
@@ -112,6 +117,24 @@ public class InvoicingPlan implements Serializable {
 
     public InvoicingPlan removeInvoice(Invoice invoice) {
         this.invoices.remove(invoice);
+        return this;
+    }
+
+    public Set<Payment> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(Set<Payment> payments) {
+        this.payments = payments;
+    }
+
+    public InvoicingPlan addPayment(Payment payment) {
+        this.payments.add(payment);
+        return this;
+    }
+
+    public InvoicingPlan removePayment(Payment payment) {
+        this.payments.remove(payment);
         return this;
     }
 

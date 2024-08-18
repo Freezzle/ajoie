@@ -27,7 +27,6 @@ public class ParticipationService {
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
     private final EventLogService eventLogService;
-    private final PaymentRepository paymentRepository;
     private final InvoicingPlanRepository invoicingPlanRepository;
 
     public ParticipationService(
@@ -35,14 +34,12 @@ public class ParticipationService {
         ConferenceRepository conferenceRepository,
         StandRepository standRepository,
         EventLogService eventLogService,
-        PaymentRepository paymentRepository,
         InvoicingPlanRepository invoicingPlanRepository
     ) {
         this.participationRepository = participationRepository;
         this.conferenceRepository = conferenceRepository;
         this.standRepository = standRepository;
         this.eventLogService = eventLogService;
-        this.paymentRepository = paymentRepository;
         this.invoicingPlanRepository = invoicingPlanRepository;
     }
 

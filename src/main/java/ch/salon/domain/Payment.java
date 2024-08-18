@@ -4,7 +4,6 @@ import ch.salon.domain.enumeration.Mode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -39,11 +38,14 @@ public class Payment implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
-    private Participation participation;
+    public Payment() {}
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    public Payment(Payment payment) {
+        this.amount = payment.getAmount();
+        this.billingDate = payment.getBillingDate();
+        this.paymentMode = payment.getPaymentMode();
+        this.extraInformation = payment.getExtraInformation();
+    }
 
     public UUID getId() {
         return this.id;
@@ -109,21 +111,6 @@ public class Payment implements Serializable {
         this.setExtraInformation(extraInformation);
         return this;
     }
-
-    public Participation getParticipation() {
-        return this.participation;
-    }
-
-    public void setParticipation(Participation participation) {
-        this.participation = participation;
-    }
-
-    public Payment participation(Participation participation) {
-        this.setParticipation(participation);
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {

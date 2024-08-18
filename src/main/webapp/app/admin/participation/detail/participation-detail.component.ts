@@ -42,7 +42,6 @@ export class ParticipationDetailComponent implements OnInit {
   participation = input<IParticipation | null>(null);
 
   invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
-  payments$: Observable<IPayment[]> | undefined;
   eventLogs$: Observable<any[]> | undefined;
   active = 'detail';
   isSending = false;
@@ -53,7 +52,6 @@ export class ParticipationDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadInvoices();
-    this.loadPayments();
     this.loadEventLogs();
   }
 
@@ -65,6 +63,10 @@ export class ParticipationDetailComponent implements OnInit {
     this.participationService.generateInvoices(this.participation()!.id).subscribe(() => {
       this.loadInvoices();
     });
+  }
+
+  hasDiffCustomAndDefault(invoice: IInvoice): boolean {
+    return Number(invoice.customAmount ?? 0) !== Number(invoice.defaultAmount ?? 0);
   }
 
   sendInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
@@ -100,8 +102,8 @@ export class ParticipationDetailComponent implements OnInit {
     );
   }
 
-  remainingTotal(invoices: IInvoice[], payments: IPayment[]): number {
-    return this.totalInvoices(invoices) + this.totalPayments(payments);
+  remainingTotal(invoicingPlan: IInvoicingPlan): number {
+    return this.totalInvoices(invoicingPlan.invoices ?? []) + this.totalPayments(invoicingPlan.payments ?? []);
   }
 
   loadInvoices(): void {
@@ -115,21 +117,16 @@ export class ParticipationDetailComponent implements OnInit {
               invoice.readMode = true;
             });
           });
+
+          invoicingPlansList.forEach(ipl => {
+            ipl.payments?.forEach(payment => {
+              payment.readMode = true;
+            });
+          });
           return of(invoicingPlansList);
         } else {
           return EMPTY;
         }
-      }),
-    );
-  }
-
-  loadPayments(): void {
-    this.payments$ = this.participationService.getPayments(this.participation()!.id).pipe(
-      mergeMap((payments: HttpResponse<IPayment[]>) => {
-        if (payments.body) {
-          return of(payments.body);
-        }
-        return EMPTY;
       }),
     );
   }

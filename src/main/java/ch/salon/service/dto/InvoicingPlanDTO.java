@@ -14,6 +14,7 @@ public class InvoicingPlanDTO implements Serializable {
     private State state;
     private String billingNumber;
     private Set<InvoiceDTO> invoices = new HashSet<>();
+    private Set<PaymentDTO> payments = new HashSet<>();
     private ParticipationLightDTO participation;
 
     public InvoicingPlanDTO() {
@@ -66,5 +67,13 @@ public class InvoicingPlanDTO implements Serializable {
 
     public void setParticipation(ParticipationLightDTO participation) {
         this.participation = participation;
+    }
+
+    public Set<PaymentDTO> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(Set<PaymentDTO> payments) {
+        this.payments = payments;
     }
 }

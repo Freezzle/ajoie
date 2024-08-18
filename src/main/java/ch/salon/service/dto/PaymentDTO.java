@@ -1,7 +1,6 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Mode;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -13,8 +12,6 @@ public class PaymentDTO implements Serializable {
     private Instant billingDate;
     private Mode paymentMode;
     private String extraInformation;
-
-    private ParticipationLightDTO participation;
 
     public PaymentDTO() {
         // Empty constructor needed for Jackson.
@@ -58,13 +55,5 @@ public class PaymentDTO implements Serializable {
 
     public void setExtraInformation(String extraInformation) {
         this.extraInformation = extraInformation;
-    }
-
-    public ParticipationLightDTO getParticipation() {
-        return participation;
-    }
-
-    public void setParticipation(ParticipationLightDTO participation) {
-        this.participation = participation;
     }
 }

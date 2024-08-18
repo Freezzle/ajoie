@@ -32,6 +32,7 @@ export interface IInvoicingPlan {
   billingNumber?: string | null;
   state?: State | null;
   invoices?: IInvoice[];
+  payments?: IPayment[];
 }
 
 export type NewInvoicingPlan = Omit<IInvoicingPlan, 'id'> & { id: null };
@@ -54,6 +55,7 @@ export type NewPayment = Omit<IPayment, 'id'> & { id: null };
 
 export interface IPayment {
   id: string;
+  readMode: boolean | null; // only frontend field;
   billingDate?: dayjs.Dayjs | null;
   paymentMode?: Mode | null;
   amount?: number | null;

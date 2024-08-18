@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <!--
         Added the constraints for entity Payment.
     -->
     <changeSet id="20240731190749-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="participation_id"
+        <addForeignKeyConstraint baseColumnNames="invoicing_plan_id"
                                  baseTableName="payment"
-                                 constraintName="fk_payment__participation_id"
+                                 constraintName="fk_payment__invoicing_plan_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="participation"
+                                 referencedTableName="invoicing_plan"
                                  />
     </changeSet>
 </databaseChangeLog>

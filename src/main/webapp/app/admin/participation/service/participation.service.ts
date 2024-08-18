@@ -86,7 +86,7 @@ export class ParticipationService {
   }
 
   getPayments(id: string): Observable<PaymentArrayResponseType> {
-    return this.http.get<RestPayment[]>(`${this.resourceUrl}/${id}/payments`, {
+    return this.http.get<RestPayment[]>(`${this.applicationConfigService.getEndpointFor('api/invoicing-plans')}/${id}/payments`, {
       observe: 'response',
     });
   }

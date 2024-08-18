@@ -191,14 +191,18 @@
                           </div>
                         </div>
                       </div>
+
+                      <hr />
+
                       <div class="accordion-body">
                         <table class="table" aria-describedby="page-heading">
                           <thead>
                             <tr>
                               <th class="col-1 text-center"><span>Date</span></th>
                               <th class="col-auto text-center"><span>&nbsp;</span></th>
-                              <th class="col-1"><span>Type</span></th>
-                              <th class="col-4"><span>Libellé</span></th>
+                              <th class="col-auto"><span>Type</span></th>
+                              <th class="col-3"><span>Libellé</span></th>
+                              <th class="col-auto text-center"><span>&nbsp;</span></th>
                               <th class="col-auto text-center"><span>Montant</span></th>
                               <th class="col-auto text-center"><span>Quantité</span></th>
                               <th class="col-auto text-center"><span>Total</span></th>
@@ -206,14 +210,14 @@
                               <th class="col-1"><span>&nbsp;</span></th>
                             </tr>
                           </thead>
-                          @if (payments$ | async; as payments) {
-                            <tbody *ngIf="invoicingPlan.invoices; let invoices">
+                          <tbody style="border: 1px solid grey">
+                            @if (invoicingPlan.invoices; as invoices) {
                               <tr>
-                                <td class="table-section" colspan="9">Section factures</td>
+                                <td class="table-section" colspan="10">Prestations à payer</td>
                               </tr>
                               @if (!invoices.length) {
                                 <tr>
-                                  <td colspan="9"><span>Aucune facture</span></td>
+                                  <td colspan="10"><span>Aucune facture</span></td>
                                 </tr>
                               }
                               @if (invoices.length) {
@@ -238,6 +242,18 @@
                                     </td>
                                     <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
                                     <td>{{ invoice.label }}</td>
+                                    <td class="text-center">
+                                      @if (hasDiffCustomAndDefault(invoice)) {
+                                        <fa-icon
+                                          icon="circle-info"
+                                          class="text-warning"
+                                          title="{{
+                                            'invoicingPlan.amount.different' | translate: { defaultPrice: invoice.defaultAmount }
+                                          }}"
+                                        ></fa-icon>
+                                      }
+                                      &nbsp;
+                                    </td>
                                     <td class="text-center">
                                       <input
                                         type="number"
@@ -289,12 +305,14 @@
                                   </tr>
                                 }
                               }
+                            }
+                            @if (invoicingPlan.payments; as payments) {
                               <tr>
-                                <td class="table-section" colspan="9">Section paiements</td>
+                                <td class="table-section" colspan="10">Paiements reçus</td>
                               </tr>
                               @if (!payments.length) {
                                 <tr>
-                                  <td colspan="9"><span>Aucun paiement</span></td>
+                                  <td colspan="10"><span>Aucun paiement</span></td>
                                 </tr>
                               }
                               @if (payments.length) {
@@ -306,23 +324,24 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
                                     <td class="text-center">{{ payment.amount | currency: 'CHF' }}</td>
                                     <td>{{ payment.extraInformation }}</td>
                                     <td>&nbsp;</td>
                                   </tr>
                                 }
                               }
-                              <tr>
-                                <td class="fw-bold" class="table-section-ending">Résultat</td>
-                                <td colspan="5" class="table-section-ending">&nbsp;</td>
-                                <td class="table-section-ending text-center fw-bold">
-                                  {{ remainingTotal(invoices, payments) | currency: 'CHF' }}
-                                </td>
-                                <td class="table-section-ending">&nbsp;</td>
-                                <td class="table-section-ending">&nbsp;</td>
-                              </tr>
-                            </tbody>
-                          }
+                            }
+                            <tr>
+                              <td class="fw-bold" class="table-section-ending">Résultat</td>
+                              <td colspan="6" class="table-section-ending">&nbsp;</td>
+                              <td class="table-section-ending text-center fw-bold">
+                                {{ remainingTotal(invoicingPlan) | currency: 'CHF' }}
+                              </td>
+                              <td class="table-section-ending">&nbsp;</td>
+                              <td class="table-section-ending">&nbsp;</td>
+                            </tr>
+                          </tbody>
                         </table>
                       </div>
                     </div>

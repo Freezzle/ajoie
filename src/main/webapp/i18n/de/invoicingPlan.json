@@ -1,5 +1,8 @@
 {
   "invoicingPlan": {
+    "amount": {
+      "different": "Le montant diffère du prix par défaut : {{defaultPrice}}"
+    },
     "hasBeenSent": "Facture envoyé ?",
     "notSent": "Facture non envoyé",
     "resend": "Renvoyer facture",
