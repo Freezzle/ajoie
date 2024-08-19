@@ -48,6 +48,7 @@ export class ParticipationDetailComponent implements OnInit {
   eventLogs$: Observable<any[]> | undefined;
   active = 'detail';
   isSending = false;
+  modeValues = Object.keys(Mode);
 
   protected readonly Type = Type;
   protected readonly State = State;
@@ -96,6 +97,14 @@ export class ParticipationDetailComponent implements OnInit {
 
   onExtraInformationChange(event: any, invoice: IInvoice): void {
     invoice.extraInformation = event.target.value;
+  }
+
+  onPaymentModeChange(event: any, payment: IPayment): void {
+    payment.paymentMode = event.target.value;
+  }
+
+  onAmountPaymentChange(event: any, payment: IPayment): void {
+    payment.amount = event.target.value;
   }
 
   totalInvoices(invoices: IInvoice[]): number {
@@ -238,11 +247,19 @@ export class ParticipationDetailComponent implements OnInit {
     } as IPayment);
   }
 
+  mustPaymentBeReadMode(payment: IPayment, invoicingPlan: IInvoicingPlan): boolean {
+    return !!payment.readMode || invoicingPlan.state === State.CLOSED || !!this.participation()?.isBillingClosed;
+  }
+
   mustBeReadMode(invoice: IInvoice, invoicingPlan: IInvoicingPlan): boolean {
     return !!invoice.readMode || invoicingPlan.state === State.CLOSED || !!this.participation()?.isBillingClosed;
   }
 
   mustDisableSendButton(invoicingPlan: IInvoicingPlan): boolean {
-    return this.isSending || !invoicingPlan.invoices?.every((inv: IInvoice) => inv.readMode);
+    return (
+      this.isSending ||
+      !invoicingPlan.invoices?.every((inv: IInvoice) => inv.readMode) ||
+      !invoicingPlan.payments?.every((pay: IPayment) => pay.readMode)
+    );
   }
 }

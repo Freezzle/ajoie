@@ -215,7 +215,12 @@
                               <tr>
                                 <td class="table-section align-middle" colspan="9">Prestations à payer</td>
                                 <td class="table-section align-middle text-end">
-                                  <button id="jh-create-invoice" class="btn btn-warning btn-sm" (click)="addInvoice(invoicingPlan)">
+                                  <button
+                                    id="jh-create-invoice"
+                                    class="btn btn-warning btn-sm"
+                                    *ngIf="invoicingPlan.state !== State.CLOSED"
+                                    (click)="addInvoice(invoicingPlan)"
+                                  >
                                     <fa-icon icon="plus"></fa-icon>
                                   </button>
                                 </td>
@@ -328,7 +333,12 @@
                               <tr>
                                 <td class="table-section align-middle" colspan="9">Paiements reçus</td>
                                 <td class="table-section align-middle text-end">
-                                  <button id="jh-create-payment" class="btn btn-warning btn-sm" (click)="addPayment(invoicingPlan)">
+                                  <button
+                                    id="jh-create-payment"
+                                    class="btn btn-warning btn-sm"
+                                    *ngIf="invoicingPlan.state !== State.CLOSED"
+                                    (click)="addPayment(invoicingPlan)"
+                                  >
                                     <fa-icon icon="plus"></fa-icon>
                                   </button>
                                 </td>
@@ -343,14 +353,60 @@
                                   <tr data-cy="entityTable">
                                     <td class="text-center">{{ payment.billingDate | formatMediumDate }}</td>
                                     <td>&nbsp;</td>
-                                    <td>{{ 'payment.type.list.' + (payment.paymentMode ?? 'null') | translate }}</td>
+                                    <td>
+                                      <select
+                                        class="form-control"
+                                        name="mode"
+                                        id="field_mode"
+                                        [value]="payment.paymentMode"
+                                        (blur)="onPaymentModeChange($event, payment)"
+                                        *ngIf="!mustPaymentBeReadMode(payment, invoicingPlan)"
+                                      >
+                                        @for (mode of modeValues; track $index) {
+                                          <option [value]="mode">{{ 'payment.type.list.' + mode | translate }}</option>
+                                        }
+                                      </select>
+                                      @if (mustPaymentBeReadMode(payment, invoicingPlan)) {
+                                        {{ 'payment.type.list.' + (payment.paymentMode ?? 'null') | translate }}
+                                      }
+                                    </td>
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
-                                    <td class="text-center">{{ payment.amount | currency: 'CHF' }}</td>
+                                    <td class="text-center">
+                                      <input
+                                        type="number"
+                                        class="form-control text-center"
+                                        *ngIf="!mustPaymentBeReadMode(payment, invoicingPlan)"
+                                        (blur)="onAmountPaymentChange($event, payment)"
+                                        value="{{ payment.amount }}"
+                                      />
+                                      @if (mustPaymentBeReadMode(payment, invoicingPlan)) {
+                                        {{ payment.amount | currency: 'CHF' }}
+                                      }
+                                    </td>
                                     <td>{{ payment.extraInformation }}</td>
-                                    <td>&nbsp;</td>
+                                    <td class="text-end">
+                                      <span *ngIf="invoicingPlan.state === State.CURRENT && !this.participation()?.isBillingClosed">
+                                        <button
+                                          *ngIf="payment.readMode"
+                                          type="button"
+                                          class="btn btn-primary btn-sm"
+                                          (click)="editActionPayment(payment)"
+                                        >
+                                          <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                                        </button>
+                                        <button
+                                          *ngIf="!payment.readMode"
+                                          type="button"
+                                          class="btn btn-primary btn-sm"
+                                          (click)="readActionPayment(invoicingPlan, payment)"
+                                        >
+                                          <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                                        </button>
+                                      </span>
+                                    </td>
                                   </tr>
                                 }
                               }
