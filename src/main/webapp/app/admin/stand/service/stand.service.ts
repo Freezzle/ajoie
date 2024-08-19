@@ -31,8 +31,8 @@ export class StandService {
     return this.http.patch<IStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand, { observe: 'response' });
   }
 
-  find(id: string): Observable<EntityResponseType> {
-    return this.http.get<IStand>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  find(idStand: string): Observable<EntityResponseType> {
+    return this.http.get<IStand>(`${this.resourceUrl}/${idStand}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -40,8 +40,8 @@ export class StandService {
     return this.http.get<IStand[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(idStand: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${idStand}`, { observe: 'response' });
   }
 
   getStandIdentifier(stand: Pick<IStand, 'id'>): string {

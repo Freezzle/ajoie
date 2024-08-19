@@ -17,6 +17,7 @@ import SendBooleanPipe from '../../../shared/pipe/send-boolean.pipe';
 import EventTypePipe from '../../../shared/pipe/event-type.pipe';
 import { Type } from '../../enumerations/type.model';
 import { State } from '../../enumerations/state.model';
+import { InvoicingPlanService } from '../service/invoicing-plan.service';
 
 @Component({
   standalone: true,
@@ -49,6 +50,7 @@ export class ParticipationDetailComponent implements OnInit {
   protected readonly Type = Type;
   protected readonly State = State;
   protected participationService = inject(ParticipationService);
+  protected invoicingPlanService = inject(InvoicingPlanService);
 
   ngOnInit(): void {
     this.loadInvoices();
@@ -71,7 +73,7 @@ export class ParticipationDetailComponent implements OnInit {
 
   sendInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
     this.isSending = true;
-    this.participationService.sendInvoicingPlan(invoicingPlan.id).subscribe(() => {
+    this.invoicingPlanService.sendInvoicingPlan(invoicingPlan.id).subscribe(() => {
       this.loadInvoices();
       this.loadEventLogs();
       this.isSending = false;
@@ -144,7 +146,7 @@ export class ParticipationDetailComponent implements OnInit {
 
   readActionInvoice(invoicingPlan: IInvoicingPlan, invoice: IInvoice): void {
     invoice.readMode = true;
-    this.participationService.updateInvoice(invoicingPlan.id, invoice).subscribe(invoiceBack => {
+    this.invoicingPlanService.updateInvoice(invoicingPlan.id, invoice).subscribe(invoiceBack => {
       if (invoiceBack.body) {
         invoice.customAmount = invoiceBack.body.customAmount;
         invoice.extraInformation = invoiceBack.body.extraInformation;

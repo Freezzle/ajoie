@@ -5,12 +5,11 @@ import ch.salon.repository.DimensionStandRepository;
 import ch.salon.service.dto.DimensionStandDTO;
 import ch.salon.service.mapper.DimensionStandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 @Service
 public class DimensionStandService {
@@ -21,31 +20,6 @@ public class DimensionStandService {
 
     public DimensionStandService(DimensionStandRepository dimensionStandRepository) {
         this.dimensionStandRepository = dimensionStandRepository;
-    }
-
-    public UUID create(DimensionStandDTO dimensionStand) {
-        if (dimensionStand.getId() != null) {
-            throw new BadRequestAlertException("A new dimensionStand cannot already have an ID", ENTITY_NAME,
-                "idexists");
-        }
-
-        return dimensionStandRepository.save(DimensionStandMapper.INSTANCE.toEntity(dimensionStand)).getId();
-    }
-
-    public DimensionStandDTO update(final UUID id, DimensionStandDTO dimensionStand) {
-        if (dimensionStand.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, dimensionStand.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!dimensionStandRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        return DimensionStandMapper.INSTANCE.toDto(
-            dimensionStandRepository.save(DimensionStandMapper.INSTANCE.toEntity(dimensionStand)));
     }
 
     public List<DimensionStandDTO> findAll() {
@@ -62,13 +36,5 @@ public class DimensionStandService {
             dimensionStands = dimensionStandRepository.saveAll(dimensionStands);
         }
         return dimensionStands.stream().map(DimensionStandMapper.INSTANCE::toDto).toList();
-    }
-
-    public Optional<DimensionStandDTO> get(UUID id) {
-        return dimensionStandRepository.findById(id).map(DimensionStandMapper.INSTANCE::toDto);
-    }
-
-    public void delete(UUID id) {
-        dimensionStandRepository.deleteById(id);
     }
 }

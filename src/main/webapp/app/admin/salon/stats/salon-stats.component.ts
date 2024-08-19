@@ -1,8 +1,8 @@
 import { Component, inject, input, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
-import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
+import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { ISalon, ISalonStats } from '../salon.model';
 import { SortByDirective, SortDirective } from '../../../shared/sort';
 import { SalonService } from '../service/salon.service';
@@ -38,10 +38,7 @@ export class SalonStatsComponent implements OnInit {
   }
 
   generate(): void {
-    const queryObject: any = {
-      idSalon: this.salon()!.id,
-    };
-    this.salonService.generate(queryObject).subscribe(() => {
+    this.salonService.generate(this.salon()!.id).subscribe(() => {
       this.loadStats();
     });
   }

@@ -1,11 +1,11 @@
-import{inject, Injectable}from '@angular/core';
-import {HttpClient, HttpResponse}from '@angular/common/http';
-import {Observable}from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import {isPresent}from 'app/core/util/operators';
-import {ApplicationConfigService}from 'app/core/config/application-config.service';
-import {createRequestOption}from 'app/core/request/request-util';
-import {IExhibitor, NewExhibitor }from '../exhibitor.model';
+import { isPresent } from 'app/core/util/operators';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { createRequestOption } from 'app/core/request/request-util';
+import { IExhibitor, NewExhibitor } from '../exhibitor.model';
 
 export type PartialUpdateExhibitor = Partial<IExhibitor> & Pick<IExhibitor, 'id'>;
 
@@ -14,12 +14,12 @@ export type EntityArrayResponseType = HttpResponse<IExhibitor[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ExhibitorService {
-protected http = inject(HttpClient);
-protected applicationConfigService = inject(ApplicationConfigService);
+  protected http = inject(HttpClient);
+  protected applicationConfigService = inject(ApplicationConfigService);
 
-protected resourceUrl = this.applicationConfigService.getEndpointFor('api/exhibitors');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/exhibitors');
 
-create(exhibitor: NewExhibitor): Observable<EntityResponseType> {
+  create(exhibitor: NewExhibitor): Observable<EntityResponseType> {
     return this.http.post<IExhibitor>(this.resourceUrl, exhibitor, { observe: 'response' });
   }
 
@@ -31,8 +31,8 @@ create(exhibitor: NewExhibitor): Observable<EntityResponseType> {
     return this.http.patch<IExhibitor>(`${this.resourceUrl}/${this.getExhibitorIdentifier(exhibitor)}`, exhibitor, { observe: 'response' });
   }
 
-  find(id: string): Observable<EntityResponseType> {
-    return this.http.get<IExhibitor>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  find(idExhibitor: string): Observable<EntityResponseType> {
+    return this.http.get<IExhibitor>(`${this.resourceUrl}/${idExhibitor}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -40,8 +40,8 @@ create(exhibitor: NewExhibitor): Observable<EntityResponseType> {
     return this.http.get<IExhibitor[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(idExhibitor: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${idExhibitor}`, { observe: 'response' });
   }
 
   getExhibitorIdentifier(exhibitor: Pick<IExhibitor, 'id'>): string {

@@ -1,9 +1,17 @@
 package ch.salon.web.rest;
 
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
+import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
+
 import ch.salon.domain.Authority;
 import ch.salon.repository.AuthorityRepository;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,15 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import static org.springframework.http.ResponseEntity.created;
-import static org.springframework.http.ResponseEntity.noContent;
-import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
 
 @RestController
 @RequestMapping("/api/authorities")
@@ -41,8 +40,7 @@ public class AuthorityResource {
 
     @PostMapping("")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Authority> createAuthority(
-        @Valid @RequestBody Authority authority) throws URISyntaxException {
+    public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority) throws URISyntaxException {
         log.debug("REST request to save Authority : {}", authority);
 
         if (authorityRepository.existsById(authority.getName())) {
@@ -50,8 +48,9 @@ public class AuthorityResource {
         }
 
         authority = authorityRepository.save(authority);
-        return created(new URI("/api/authorities/" + authority.getName())).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, authority.getName())).body(authority);
+        return created(new URI("/api/authorities/" + authority.getName()))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, authority.getName()))
+            .body(authority);
     }
 
     @GetMapping("")
@@ -62,21 +61,21 @@ public class AuthorityResource {
         return authorityRepository.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idAuthority}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Authority> getAuthority(@PathVariable("id") String id) {
-        log.debug("REST request to get Authority : {}", id);
+    public ResponseEntity<Authority> getAuthority(@PathVariable("idAuthority") String idAuthority) {
+        log.debug("REST request to get Authority : {}", idAuthority);
 
-        return ResponseUtil.wrapOrNotFound(authorityRepository.findById(id));
+        return ResponseUtil.wrapOrNotFound(authorityRepository.findById(idAuthority));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idAuthority}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteAuthority(@PathVariable("id") String id) {
-        log.debug("REST request to delete Authority : {}", id);
+    public ResponseEntity<Void> deleteAuthority(@PathVariable("idAuthority") String idAuthority) {
+        log.debug("REST request to delete Authority : {}", idAuthority);
 
-        authorityRepository.deleteById(id);
+        authorityRepository.deleteById(idAuthority);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idAuthority)).build();
     }
 }

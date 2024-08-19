@@ -203,7 +203,7 @@ public class InvoicingPlanService {
         throw new IllegalStateException("No filter given");
     }
 
-    public void generateInvoicingPlan(String idParticipation) {
+    public void refreshInvoicingPlans(String idParticipation) {
         if (StringUtils.isBlank(idParticipation)) {
             throw new IllegalStateException("No idParticipation given");
         }

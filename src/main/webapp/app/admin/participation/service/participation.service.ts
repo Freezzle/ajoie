@@ -6,8 +6,7 @@ import dayjs from 'dayjs/esm';
 
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { createRequestOption } from 'app/core/request/request-util';
-import { IInvoice, IInvoicingPlan, IParticipation, IPayment, NewParticipation } from '../participation.model';
+import { IInvoicingPlan, IParticipation, NewParticipation } from '../participation.model';
 
 export type PartialUpdateParticipation = Partial<IParticipation> & Pick<IParticipation, 'id'>;
 
@@ -17,17 +16,11 @@ type RestOf<T extends IParticipation | NewParticipation> = Omit<T, 'registration
 
 export type RestParticipation = RestOf<IParticipation>;
 
-export type NewRestParticipation = RestOf<NewParticipation>;
-
-export type PartialUpdateRestParticipation = RestOf<PartialUpdateParticipation>;
-
 export type EntityResponseType = HttpResponse<IParticipation>;
 export type EntityArrayResponseType = HttpResponse<IParticipation[]>;
 
 export type InvoiceArrayResponseType = HttpResponse<IInvoicingPlan[]>;
-export type PaymentArrayResponseType = HttpResponse<IPayment[]>;
 export type RestInvoice = RestOf<IInvoicingPlan>;
-export type RestPayment = RestOf<IPayment>;
 
 @Injectable({ providedIn: 'root' })
 export class ParticipationService {
@@ -35,6 +28,7 @@ export class ParticipationService {
   protected applicationConfigService = inject(ApplicationConfigService);
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/participations');
+  protected salonResourceUrl = this.applicationConfigService.getEndpointFor('api/salons');
 
   create(participation: NewParticipation): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(participation);
@@ -50,79 +44,30 @@ export class ParticipationService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
-  partialUpdate(participation: PartialUpdateParticipation): Observable<EntityResponseType> {
-    const copy = this.convertDateFromClient(participation);
+  find(idParticipation: string): Observable<EntityResponseType> {
     return this.http
-      .patch<RestParticipation>(`${this.resourceUrl}/${this.getParticipationIdentifier(participation)}`, copy, { observe: 'response' })
+      .get<RestParticipation>(`${this.resourceUrl}/${idParticipation}`, { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
-  find(id: string): Observable<EntityResponseType> {
+  query(idSalon: string): Observable<EntityArrayResponseType> {
     return this.http
-      .get<RestParticipation>(`${this.resourceUrl}/${id}`, { observe: 'response' })
-      .pipe(map(res => this.convertResponseFromServer(res)));
-  }
-
-  query(req?: any): Observable<EntityArrayResponseType> {
-    const options = createRequestOption(req);
-    return this.http
-      .get<RestParticipation[]>(this.resourceUrl, { params: options, observe: 'response' })
+      .get<RestParticipation[]>(`${this.salonResourceUrl}/${idSalon}/participations`, { observe: 'response' })
       .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(idParticipation: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${idParticipation}`, { observe: 'response' });
   }
 
-  getInvoicingPlans(id: string): Observable<InvoiceArrayResponseType> {
-    const queryObject: any = {
-      idParticipation: id,
-    };
-
-    return this.http.get<RestInvoice[]>(this.applicationConfigService.getEndpointFor('api/invoicing-plans'), {
-      params: queryObject,
+  getInvoicingPlans(idParticipation: string): Observable<InvoiceArrayResponseType> {
+    return this.http.get<RestInvoice[]>(`${this.resourceUrl}/${idParticipation}/invoicing-plans`, {
       observe: 'response',
     });
   }
 
-  getPayments(id: string): Observable<PaymentArrayResponseType> {
-    return this.http.get<RestPayment[]>(`${this.applicationConfigService.getEndpointFor('api/invoicing-plans')}/${id}/payments`, {
-      observe: 'response',
-    });
-  }
-
-  generateInvoices(id: string): Observable<HttpResponse<{}>> {
-    const queryObject: any = {
-      idParticipation: id,
-    };
-    return this.http.patch(
-      this.applicationConfigService.getEndpointFor('api/invoicing-plans/generation'),
-      {},
-      {
-        params: queryObject,
-        observe: 'response',
-      },
-    );
-  }
-
-  updateInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
-    return this.http.put<IInvoice>(
-      this.applicationConfigService.getEndpointFor(`api/invoicing-plans/${idInvoicingPlan}/invoices/${invoice.id}`),
-      invoice,
-      {
-        observe: 'response',
-      },
-    );
-  }
-
-  sendInvoicingPlan(idInvoicingPlan: string): Observable<HttpResponse<{}>> {
-    return this.http.patch(
-      this.applicationConfigService.getEndpointFor(`api/invoicing-plans/${idInvoicingPlan}/send`),
-      {},
-      {
-        observe: 'response',
-      },
-    );
+  generateInvoices(idParticipation: string): Observable<HttpResponse<{}>> {
+    return this.http.patch(`${this.resourceUrl}/${idParticipation}/refresh-invoicing-plans`, {}, { observe: 'response' });
   }
 
   getEventLogs(idParticipation: string): Observable<HttpResponse<any>> {

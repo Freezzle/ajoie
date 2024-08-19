@@ -5,11 +5,12 @@ import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import { FormArray, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IPriceStandSalon, ISalon, NewPriceStandSalon } from '../salon.model';
+import { IPriceStandSalon, ISalon } from '../salon.model';
 import { SalonService } from '../service/salon.service';
-import { SalonFormService, SalonFormGroup } from './salon-form.service';
+import { SalonFormGroup, SalonFormService } from './salon-form.service';
+import { DimensionStandService } from '../../dimension-stand/service/dimension-stand.service';
 
 @Component({
   standalone: true,
@@ -24,6 +25,7 @@ export class SalonUpdateComponent implements OnInit {
 
   protected salonService = inject(SalonService);
   protected salonFormService = inject(SalonFormService);
+  protected dimensionStandService = inject(DimensionStandService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -39,7 +41,7 @@ export class SalonUpdateComponent implements OnInit {
 
       const salonData = salon as ISalon;
 
-      this.salonService.queryDimensions().subscribe(dimensions => {
+      this.dimensionStandService.query().subscribe(dimensions => {
         if (dimensions.body) {
           if (!salonData.priceStandSalons) {
             salonData.priceStandSalons = [];

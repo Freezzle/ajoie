@@ -40,18 +40,14 @@ export class SalonService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
-  find(id: string): Observable<EntityResponseType> {
+  find(idSalon: string): Observable<EntityResponseType> {
     return this.http
-      .get<RestSalon>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+      .get<RestSalon>(`${this.resourceUrl}/${idSalon}`, { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
-  stats(id: string): Observable<HttpResponse<ISalonStats>> {
-    return this.http.get<ISalonStats>(`${this.resourceUrl}/${id}/stats`, { observe: 'response' });
-  }
-
-  queryDimensions(): Observable<EntityDimensionsArrayResponseType> {
-    return this.http.get<IDimensionStand[]>(this.resourceDimensionsUrl, { observe: 'response' });
+  stats(idSalon: string): Observable<HttpResponse<ISalonStats>> {
+    return this.http.get<ISalonStats>(`${this.resourceUrl}/${idSalon}/stats`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -61,17 +57,12 @@ export class SalonService {
       .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
-  generate(req: any): Observable<any> {
-    const options = createRequestOption(req);
-    return this.http.post<any>(
-      this.applicationConfigService.getEndpointFor('api/importation'),
-      {},
-      { params: options, observe: 'response' },
-    );
+  generate(idSalon: string): Observable<any> {
+    return this.http.post<any>(`${this.resourceUrl}/${idSalon}/import`, {}, { observe: 'response' });
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(idSalon: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${idSalon}`, { observe: 'response' });
   }
 
   getSalonIdentifier(salon: Pick<ISalon, 'id'>): string {

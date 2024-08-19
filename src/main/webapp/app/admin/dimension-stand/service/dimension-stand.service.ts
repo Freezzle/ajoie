@@ -35,8 +35,8 @@ export class DimensionStandService {
     });
   }
 
-  find(id: string): Observable<EntityResponseType> {
-    return this.http.get<IDimensionStand>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  find(idDimension: string): Observable<EntityResponseType> {
+    return this.http.get<IDimensionStand>(`${this.resourceUrl}/${idDimension}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -44,8 +44,8 @@ export class DimensionStandService {
     return this.http.get<IDimensionStand[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(idDimension: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${idDimension}`, { observe: 'response' });
   }
 
   getDimensionStandIdentifier(dimensionStand: Pick<IDimensionStand, 'id'>): string {

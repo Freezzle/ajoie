@@ -37,22 +37,6 @@ public class InvoicingPlanResource {
         this.invoicingPlanService = invoicingPlanService;
     }
 
-    @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<InvoicingPlanDTO> getAllInvoicingPlans(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
-        log.debug("REST request to get all InvoicingPlans");
-
-        return invoicingPlanService.findAll(idParticipation);
-    }
-
-    @PatchMapping("/generation")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public void generateInvoicingPlan(@RequestParam(name = "idParticipation", required = false) String idParticipation) {
-        log.debug("REST request to get all Participations");
-
-        invoicingPlanService.generateInvoicingPlan(idParticipation);
-    }
-
     @PatchMapping("{idInvoicingPlan}/send")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> sendInvoiceEmail(@PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan) {

@@ -1,9 +1,17 @@
 package ch.salon.web.rest;
 
+import static ch.salon.service.StandService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.*;
+import static tech.jhipster.web.util.HeaderUtil.*;
+
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.StandService;
 import ch.salon.service.dto.StandDTO;
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,15 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.ResponseUtil;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.UUID;
-
-import static ch.salon.service.StandService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.*;
-import static tech.jhipster.web.util.HeaderUtil.*;
 
 @RestController
 @RequestMapping("/api/stands")
@@ -44,48 +43,50 @@ public class StandResource {
 
         UUID id = standService.create(stand);
 
-        return created(new URI("/api/stands/" + id)).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stand);
+        return created(new URI("/api/stands/" + id))
+            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(stand);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{idStand}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<StandDTO> updateStand(@PathVariable(value = "id", required = false) final UUID id,
-                                                @Valid @RequestBody StandDTO stand) {
-        log.debug("REST request to update Stand : {}, {}", id, stand);
+    public ResponseEntity<StandDTO> updateStand(
+        @PathVariable(value = "idStand", required = false) final UUID idStand,
+        @Valid @RequestBody StandDTO stand
+    ) {
+        log.debug("REST request to update Stand : {}, {}", idStand, stand);
 
-        stand = standService.update(id, stand);
+        stand = standService.update(idStand, stand);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stand.getId().toString()))
-            .body(stand);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stand.getId().toString())).body(stand);
     }
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<StandDTO> getAllStands(@RequestParam(name = "idSalon", required = false) String idSalon,
-                                       @RequestParam(name = "idParticipation", required = false)
-                                       String idParticipation) {
+    public List<StandDTO> getAllStands(
+        @RequestParam(name = "idSalon", required = false) String idSalon,
+        @RequestParam(name = "idParticipation", required = false) String idParticipation
+    ) {
         log.debug("REST request to get all Stands");
 
         return standService.findAll(idSalon, idParticipation);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idStand}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<StandDTO> getStand(@PathVariable("id") UUID id) {
-        log.debug("REST request to get Stand : {}", id);
+    public ResponseEntity<StandDTO> getStand(@PathVariable("idStand") UUID idStand) {
+        log.debug("REST request to get Stand : {}", idStand);
 
-        return ResponseUtil.wrapOrNotFound(standService.get(id));
+        return ResponseUtil.wrapOrNotFound(standService.get(idStand));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idStand}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Void> deleteStand(@PathVariable("id") UUID id) {
-        log.debug("REST request to delete Stand : {}", id);
+    public ResponseEntity<Void> deleteStand(@PathVariable("idStand") UUID idStand) {
+        log.debug("REST request to delete Stand : {}", idStand);
 
-        standService.delete(id);
+        standService.delete(idStand);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idStand.toString())).build();
     }
 }

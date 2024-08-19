@@ -21,8 +21,8 @@ export class AuthorityService {
     return this.http.post<IAuthority>(this.resourceUrl, authority, { observe: 'response' });
   }
 
-  find(id: string): Observable<EntityResponseType> {
-    return this.http.get<IAuthority>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  find(idAuthority: string): Observable<EntityResponseType> {
+    return this.http.get<IAuthority>(`${this.resourceUrl}/${idAuthority}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -30,8 +30,8 @@ export class AuthorityService {
     return this.http.get<IAuthority[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(idAuthority: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${idAuthority}`, { observe: 'response' });
   }
 
   getAuthorityIdentifier(authority: Pick<IAuthority, 'name'>): string {

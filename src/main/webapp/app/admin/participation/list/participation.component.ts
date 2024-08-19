@@ -115,9 +115,6 @@ export class ParticipationComponent implements OnInit {
 
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
-    const queryObject: any = {
-      idSalon: this.params.get('idSalon'),
-    };
-    return this.participationService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.participationService.query(this.params.get('idSalon')).pipe(tap(() => (this.isLoading = false)));
   }
 }

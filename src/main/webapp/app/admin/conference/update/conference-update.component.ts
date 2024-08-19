@@ -114,7 +114,7 @@ export class ConferenceUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     this.participationService
-      .query({ idSalon: this.params.get('idSalon') })
+      .query(this.params.get('idSalon'))
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) => {

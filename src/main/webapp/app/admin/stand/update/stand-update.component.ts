@@ -126,13 +126,8 @@ export class StandUpdateComponent implements OnInit {
   }
 
   protected loadRelationshipsOptions(): void {
-    const queryObject: any = {
-      idSalon: this.params.get('idSalon'),
-      idParticipation: this.params.get('idParticipation'),
-    };
-
     this.participationService
-      .query(queryObject)
+      .query(this.params.get('idSalon'))
       .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
       .pipe(
         map((participations: IParticipation[]) => {
@@ -148,7 +143,7 @@ export class StandUpdateComponent implements OnInit {
       .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
 
     this.dimensionStandService
-      .query(queryObject)
+      .query()
       .pipe(map((res: HttpResponse<IDimensionStand[]>) => res.body ?? []))
       .pipe(
         map((dimensionStands: IDimensionStand[]) =>

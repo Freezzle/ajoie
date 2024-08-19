@@ -35,8 +35,8 @@ export class ConferenceService {
     });
   }
 
-  find(id: string): Observable<EntityResponseType> {
-    return this.http.get<IConference>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  find(idConference: string): Observable<EntityResponseType> {
+    return this.http.get<IConference>(`${this.resourceUrl}/${idConference}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -44,8 +44,8 @@ export class ConferenceService {
     return this.http.get<IConference[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(idConference: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${idConference}`, { observe: 'response' });
   }
 
   getConferenceIdentifier(conference: Pick<IConference, 'id'>): string {

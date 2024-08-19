@@ -6,8 +6,10 @@ import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.domain.Participation;
 import ch.salon.security.AuthoritiesConstants;
+import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.ParticipationService;
 import ch.salon.service.dto.EventLogDTO;
+import ch.salon.service.dto.InvoicingPlanDTO;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,12 +31,14 @@ public class ParticipationResource {
 
     private static final Logger log = LoggerFactory.getLogger(ParticipationResource.class);
     private final ParticipationService participationService;
+    private final InvoicingPlanService invoicingPlanService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    public ParticipationResource(ParticipationService participationService) {
+    public ParticipationResource(ParticipationService participationService, InvoicingPlanService invoicingPlanService) {
         this.participationService = participationService;
+        this.invoicingPlanService = invoicingPlanService;
     }
 
     @PostMapping("")
@@ -49,65 +53,71 @@ public class ParticipationResource {
             .body(participation);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{idParticipation}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Participation> updateParticipation(
-        @PathVariable(value = "id", required = false) final UUID id,
+        @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
         @RequestBody Participation participation
     ) throws URISyntaxException {
-        log.debug("REST request to update Participation : {}, {}", id, participation);
+        log.debug("REST request to update Participation : {}, {}", idParticipation, participation);
 
-        participation = participationService.update(id, participation);
+        participation = participationService.update(idParticipation, participation);
 
-        return ok()
-            .headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, participation.getId().toString()))
-            .body(participation);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, idParticipation.toString())).body(participation);
     }
 
-    @GetMapping("")
+    @GetMapping("/{idParticipation}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<Participation> getAllParticipations(@RequestParam(name = "idSalon", required = false) String idSalon) {
+    public ResponseEntity<Participation> getParticipation(@PathVariable("idParticipation") UUID idParticipation) {
+        log.debug("REST request to get Participation : {}", idParticipation);
+
+        return ResponseUtil.wrapOrNotFound(participationService.get(idParticipation));
+    }
+
+    @DeleteMapping("/{idParticipation}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<Void> deleteParticipation(@PathVariable("idParticipation") UUID idParticipation) {
+        log.debug("REST request to delete Participation : {}", idParticipation);
+
+        participationService.delete(idParticipation);
+
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idParticipation.toString())).build();
+    }
+
+    @GetMapping("/{idParticipation}/invoicing-plans")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public List<InvoicingPlanDTO> getAllInvoicingPlans(@PathVariable(name = "idParticipation", required = false) String idParticipation) {
+        log.debug("REST request to get all InvoicingPlans");
+
+        return invoicingPlanService.findAll(idParticipation);
+    }
+
+    @PatchMapping("/{idParticipation}/refresh-invoicing-plans")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public void generateInvoicingPlan(@PathVariable(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all Participations");
 
-        return participationService.findAll(idSalon);
+        invoicingPlanService.refreshInvoicingPlans(idParticipation);
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Participation> getParticipation(@PathVariable("id") UUID id) {
-        log.debug("REST request to get Participation : {}", id);
-
-        return ResponseUtil.wrapOrNotFound(participationService.get(id));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Void> deleteParticipation(@PathVariable("id") UUID id) {
-        log.debug("REST request to delete Participation : {}", id);
-
-        participationService.delete(id);
-
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
-    }
-
-    @PostMapping("/{id}/events")
+    @PostMapping("/{idParticipation}/events")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> createEventLog(
-        @PathVariable(value = "id", required = false) final UUID id,
+        @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
         @Valid @RequestBody EventLogDTO eventLogDTO
     ) throws URISyntaxException {
         log.debug("REST request to save eventLog : {}", eventLogDTO);
 
-        participationService.createEventLog(id, eventLogDTO);
+        participationService.createEventLog(idParticipation, eventLogDTO);
 
         return noContent().build();
     }
 
-    @GetMapping("/{id}/events")
+    @GetMapping("/{idParticipation}/events")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public List<EventLogDTO> getAllLogs(@PathVariable(value = "id", required = false) final UUID id) {
+    public List<EventLogDTO> getAllLogs(@PathVariable(value = "idParticipation", required = false) final UUID idParticipation) {
         log.debug("REST request to get all EventLogs");
 
-        return participationService.findAllEventLogs(id);
+        return participationService.findAllEventLogs(idParticipation);
     }
 }
