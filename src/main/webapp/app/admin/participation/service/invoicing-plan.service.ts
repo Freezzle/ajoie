@@ -41,6 +41,13 @@ export class InvoicingPlanService {
     );
   }
 
+  deletePayment(idInvoicingPlan: string, idPayment: string): Observable<HttpResponse<void>> {
+    return this.http.delete<void>(
+      this.applicationConfigService.getEndpointFor(`${this.resourceUrl}/${idInvoicingPlan}/payments/${idPayment}`),
+      { observe: 'response', },
+    );
+  }
+
   updatePayment(idInvoicingPlan: string, payment: IPayment): Observable<HttpResponse<IPayment>> {
     return this.http.put<IInvoice>(
       this.applicationConfigService.getEndpointFor(`${this.resourceUrl}/${idInvoicingPlan}/payments/${payment.id}`),

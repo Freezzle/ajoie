@@ -43,7 +43,7 @@ Generic styles
 .jh-global {
   margin-left: 20%;
   margin-right: 20%;
-  background-color: #99aabb;
+  background-color: #d9def4;
 }
 
 .jh-card {
@@ -409,7 +409,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 /* Quand le checkbox est sélectionné */
 input:checked + .slider {
-  background-color: $success;
+  background-color: #a5c86a;
 }
 
 /* Déplacer le rond à droite quand le checkbox est sélectionné */

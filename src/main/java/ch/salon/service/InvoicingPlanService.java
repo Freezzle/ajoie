@@ -1,7 +1,5 @@
 package ch.salon.service;
 
-import static ch.salon.domain.enumeration.Type.*;
-
 import ch.salon.domain.*;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
@@ -15,11 +13,14 @@ import ch.salon.service.mapper.InvoiceMapper;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.service.mapper.PaymentMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import java.time.Instant;
-import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.*;
+
+import static ch.salon.domain.enumeration.Type.*;
 
 @Service
 public class InvoicingPlanService {
@@ -147,11 +148,7 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("A new payment cannot already have an ID", ENTITY_NAME, "idexists");
         }
         if (paymentDTO.getAmount() >= 0.00) {
-            throw new BadRequestAlertException(
-                "A payment cannot have an amount equals or greater than 0.00",
-                ENTITY_NAME,
-                "positiveAmount"
-            );
+            paymentDTO.setAmount(paymentDTO.getAmount() * -1);
         }
 
         InvoicingPlan invoicingPlan = invoicingPlanRepository.getReferenceById(idInvoicingPlan);
@@ -199,7 +196,10 @@ public class InvoicingPlanService {
         paymentFound.setPaymentMode(paymentDTO.getPaymentMode());
         paymentFound.setBillingDate(paymentDTO.getBillingDate());
         paymentFound.setExtraInformation(paymentDTO.getExtraInformation());
-        paymentFound.setAmount(paymentDTO.getAmount());
+
+        if (paymentDTO.getAmount() >= 0.00) {
+            paymentFound.setAmount(paymentDTO.getAmount() * -1);
+        }
 
         invoicingPlan = invoicingPlanRepository.save(invoicingPlan);
 

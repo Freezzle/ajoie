@@ -230,10 +230,8 @@
         <div formArrayName="priceStandSalons">
           <div
             class="row mt-3 align-content-center"
-            *ngFor="let priceStand of editForm.controls['priceStandSalons'].controls; let i = index"
-            [formGroupName]="i"
-          >
-            <div class="col-sm-6 fw-bold align-content-center">Prix pour {{ priceStand.value.dimension?.dimension }}</div>
+            *ngFor="let priceStand of editForm.controls['priceStandSalons'].controls; let i = index" [formGroupName]="i">
+            <div class="col-sm-6 fw-bold align-content-center">{{ priceStand.value.dimension?.dimension }}</div>
             <div class="col-sm-6 align-content-center">
               <input type="number" class="form-control" name="price" id="{{ 'field_price' + i }}" data-cy="price" formControlName="price" />
             </div>

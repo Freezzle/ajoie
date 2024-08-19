@@ -38,8 +38,8 @@ import { Mode } from '../../enumerations/mode.model';
     LockBooleanPipe,
     SendBooleanPipe,
     ReactiveFormsModule,
-    EventTypePipe,
-  ],
+    EventTypePipe
+  ]
 })
 export class ParticipationDetailComponent implements OnInit {
   participation = input<IParticipation | null>(null);
@@ -88,7 +88,7 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   onCustomAmountChange(event: any, invoice: IInvoice): void {
-    invoice.customAmount = event.target.value;
+    invoice.customAmount = Number(event.target.value);
   }
 
   onLabelChange(event: any, invoice: IInvoice): void {
@@ -104,7 +104,12 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   onAmountPaymentChange(event: any, payment: IPayment): void {
-    payment.amount = event.target.value;
+    const inputValue = Number(event.target.value);
+    payment.amount = payment.amount = inputValue > 0 ? -inputValue : inputValue;
+  }
+
+  onExtraInformationPaymentChange(event: any, payment: IPayment): void {
+    payment.extraInformation = event.target.value;
   }
 
   totalInvoices(invoices: IInvoice[]): number {
@@ -114,9 +119,9 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   totalPayments(payments: IPayment[]): number {
-    return (
-      payments.map(payment => payment.amount).reduce((previousValue, defaultAmount) => (previousValue ?? 0) + (defaultAmount ?? 0), 0) ?? 0
-    );
+    return payments
+      .map(payment => Number(payment.amount ?? 0))
+      .reduce((previousValue, defaultAmount) => previousValue + defaultAmount, 0);
   }
 
   remainingTotal(invoicingPlan: IInvoicingPlan): number {
@@ -144,7 +149,7 @@ export class ParticipationDetailComponent implements OnInit {
         } else {
           return EMPTY;
         }
-      }),
+      })
     );
   }
 
@@ -155,7 +160,7 @@ export class ParticipationDetailComponent implements OnInit {
           return of(events.body);
         }
         return EMPTY;
-      }),
+      })
     );
   }
 
@@ -233,7 +238,7 @@ export class ParticipationDetailComponent implements OnInit {
       lock: true,
       quantity: 1,
       readMode: false,
-      type: Type.OTHERS,
+      type: Type.OTHERS
     } as IInvoice);
   }
 
@@ -243,8 +248,24 @@ export class ParticipationDetailComponent implements OnInit {
       paymentMode: Mode.BANK,
       billingDate: dayjs(),
       extraInformation: null,
-      readMode: false,
+      readMode: false
     } as IPayment);
+  }
+
+  deleteActionPayment(invoicingPlan: IInvoicingPlan, paymentToRemove: IPayment): void {
+    const indexToRemove = invoicingPlan.payments?.findIndex(payment => payment === paymentToRemove);
+
+    if (paymentToRemove.id) {
+      this.invoicingPlanService.deletePayment(invoicingPlan.id, paymentToRemove.id).subscribe(() => {
+        if (indexToRemove !== undefined && indexToRemove >= 0) {
+          invoicingPlan.payments?.splice(indexToRemove, 1);
+        }
+      });
+    } else {
+      if (indexToRemove !== undefined && indexToRemove >= 0) {
+        invoicingPlan.payments?.splice(indexToRemove, 1);
+      }
+    }
   }
 
   mustPaymentBeReadMode(payment: IPayment, invoicingPlan: IInvoicingPlan): boolean {
