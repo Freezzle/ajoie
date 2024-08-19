@@ -18,6 +18,8 @@ import EventTypePipe from '../../../shared/pipe/event-type.pipe';
 import { Type } from '../../enumerations/type.model';
 import { State } from '../../enumerations/state.model';
 import { InvoicingPlanService } from '../service/invoicing-plan.service';
+import dayjs from 'dayjs/esm';
+import { Mode } from '../../enumerations/mode.model';
 
 @Component({
   standalone: true,
@@ -88,6 +90,10 @@ export class ParticipationDetailComponent implements OnInit {
     invoice.customAmount = event.target.value;
   }
 
+  onLabelChange(event: any, invoice: IInvoice): void {
+    invoice.label = event.target.value;
+  }
+
   onExtraInformationChange(event: any, invoice: IInvoice): void {
     invoice.extraInformation = event.target.value;
   }
@@ -146,18 +152,90 @@ export class ParticipationDetailComponent implements OnInit {
 
   readActionInvoice(invoicingPlan: IInvoicingPlan, invoice: IInvoice): void {
     invoice.readMode = true;
-    this.invoicingPlanService.updateInvoice(invoicingPlan.id, invoice).subscribe(invoiceBack => {
-      if (invoiceBack.body) {
-        invoice.customAmount = invoiceBack.body.customAmount;
-        invoice.extraInformation = invoiceBack.body.extraInformation;
-        invoice.lock = invoiceBack.body.lock;
-        this.loadEventLogs();
-      }
-    });
+
+    if (invoice.id) {
+      this.invoicingPlanService.updateInvoice(invoicingPlan.id, invoice).subscribe(invoiceBack => {
+        if (invoiceBack.body) {
+          invoice.defaultAmount = invoiceBack.body.defaultAmount;
+          invoice.customAmount = invoiceBack.body.customAmount;
+          invoice.extraInformation = invoiceBack.body.extraInformation;
+          invoice.generationDate = invoiceBack.body.generationDate;
+          invoice.lock = invoiceBack.body.lock;
+          this.loadEventLogs();
+        }
+      });
+    } else {
+      this.invoicingPlanService.createInvoice(invoicingPlan.id, invoice).subscribe(invoiceBack => {
+        if (invoiceBack.body) {
+          invoice.id = invoiceBack.body.id;
+          invoice.defaultAmount = invoiceBack.body.defaultAmount;
+          invoice.customAmount = invoiceBack.body.customAmount;
+          invoice.extraInformation = invoiceBack.body.extraInformation;
+          invoice.generationDate = invoiceBack.body.generationDate;
+          invoice.lock = invoiceBack.body.lock;
+          this.loadEventLogs();
+        }
+      });
+    }
   }
 
   editActionInvoice(invoice: IInvoice): void {
     invoice.readMode = false;
+  }
+
+  readActionPayment(invoicingPlan: IInvoicingPlan, payment: IPayment): void {
+    payment.readMode = true;
+
+    if (payment.id) {
+      this.invoicingPlanService.updatePayment(invoicingPlan.id, payment).subscribe(paymentBack => {
+        if (paymentBack.body) {
+          payment.paymentMode = paymentBack.body.paymentMode;
+          payment.extraInformation = paymentBack.body.extraInformation;
+          payment.billingDate = paymentBack.body.billingDate;
+          payment.amount = paymentBack.body.amount;
+          this.loadEventLogs();
+        }
+      });
+    } else {
+      this.invoicingPlanService.createPayment(invoicingPlan.id, payment).subscribe(paymentBack => {
+        if (paymentBack.body) {
+          payment.id = paymentBack.body.id;
+          payment.paymentMode = paymentBack.body.paymentMode;
+          payment.extraInformation = paymentBack.body.extraInformation;
+          payment.billingDate = paymentBack.body.billingDate;
+          payment.amount = paymentBack.body.amount;
+          this.loadEventLogs();
+        }
+      });
+    }
+  }
+
+  editActionPayment(payment: IPayment): void {
+    payment.readMode = false;
+  }
+
+  addInvoice(invoicingPlan: IInvoicingPlan): void {
+    invoicingPlan.invoices?.push({
+      customAmount: 0,
+      defaultAmount: null,
+      extraInformation: null,
+      generationDate: dayjs(),
+      label: null,
+      lock: true,
+      quantity: 1,
+      readMode: false,
+      type: Type.OTHERS,
+    } as IInvoice);
+  }
+
+  addPayment(invoicingPlan: IInvoicingPlan): void {
+    invoicingPlan.payments?.push({
+      amount: 0,
+      paymentMode: Mode.BANK,
+      billingDate: dayjs(),
+      extraInformation: null,
+      readMode: false,
+    } as IPayment);
   }
 
   mustBeReadMode(invoice: IInvoice, invoicingPlan: IInvoicingPlan): boolean {

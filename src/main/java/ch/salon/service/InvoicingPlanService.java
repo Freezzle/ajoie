@@ -31,6 +31,8 @@ public class InvoicingPlanService {
     private final InvoicingPlanRepository invoicingPlanRepository;
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
+    private final PaymentRepository paymentRepository;
+    private final InvoiceRepository invoiceRepository;
     private final MessageSource messageSource;
     private final MailService mailService;
     private final EventLogService eventLogService;
@@ -43,7 +45,9 @@ public class InvoicingPlanService {
         ConferenceRepository conferenceRepository,
         MessageSource messageSource,
         MailService mailService,
-        EventLogService eventLogService
+        EventLogService eventLogService,
+        PaymentRepository paymentRepository,
+        InvoiceRepository invoiceRepository
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
@@ -53,6 +57,8 @@ public class InvoicingPlanService {
         this.messageSource = messageSource;
         this.mailService = mailService;
         this.eventLogService = eventLogService;
+        this.paymentRepository = paymentRepository;
+        this.invoiceRepository = invoiceRepository;
     }
 
     public void send(UUID idInvoicingPlan) {
@@ -71,6 +77,32 @@ public class InvoicingPlanService {
 
         invoicingPlan.setState(State.CLOSED);
         invoicingPlanRepository.save(invoicingPlan);
+    }
+
+    public Optional<InvoiceDTO> createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {
+        if (idInvoicingPlan == null || invoiceDTO == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository
+            .findById(idInvoicingPlan)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        Invoice invoiceToCreate = InvoiceMapper.INSTANCE.toEntity(invoiceDTO);
+        invoiceToCreate.setDefaultAmount(invoiceDTO.getCustomAmount());
+        invoiceToCreate = this.invoiceRepository.save(invoiceToCreate);
+
+        invoicingPlan.addInvoice(invoiceToCreate);
+        invoicingPlan = invoicingPlanRepository.save(invoicingPlan);
+
+        this.eventLogService.eventFromSystem(
+                "Une facture a été ajoutée.",
+                EventType.EVENT,
+                EntityType.PARTICIPATION,
+                invoicingPlan.getParticipation().getId()
+            );
+
+        return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceToCreate));
     }
 
     public Optional<InvoiceDTO> updateInvoice(UUID idInvoicingPlan, UUID idInvoice, InvoiceDTO invoiceDTO) {
@@ -110,7 +142,7 @@ public class InvoicingPlanService {
         return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceFound));
     }
 
-    public void createPayment(UUID idInvoicingPlan, PaymentDTO paymentDTO) {
+    public Optional<PaymentDTO> createPayment(UUID idInvoicingPlan, PaymentDTO paymentDTO) {
         if (paymentDTO.getId() != null) {
             throw new BadRequestAlertException("A new payment cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -124,8 +156,9 @@ public class InvoicingPlanService {
 
         InvoicingPlan invoicingPlan = invoicingPlanRepository.getReferenceById(idInvoicingPlan);
         Payment payment = PaymentMapper.INSTANCE.toEntity(paymentDTO);
-        invoicingPlan.addPayment(payment);
+        payment = this.paymentRepository.save(payment);
 
+        invoicingPlan.addPayment(payment);
         invoicingPlan = this.invoicingPlanRepository.save(invoicingPlan);
 
         this.eventLogService.eventFromSystem(
@@ -134,6 +167,8 @@ public class InvoicingPlanService {
                 EntityType.PARTICIPATION,
                 invoicingPlan.getParticipation().getId()
             );
+
+        return Optional.of(PaymentMapper.INSTANCE.toDto(payment));
     }
 
     public Optional<PaymentDTO> updatePayment(final UUID idInvoicingPlan, final UUID idPayment, PaymentDTO paymentDTO) {
@@ -166,7 +201,7 @@ public class InvoicingPlanService {
         paymentFound.setExtraInformation(paymentDTO.getExtraInformation());
         paymentFound.setAmount(paymentDTO.getAmount());
 
-        invoicingPlanRepository.save(invoicingPlan);
+        invoicingPlan = invoicingPlanRepository.save(invoicingPlan);
 
         return Optional.of(PaymentMapper.INSTANCE.toDto(paymentFound));
     }

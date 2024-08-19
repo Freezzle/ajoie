@@ -45,6 +45,15 @@ public class InvoicingPlanResource {
         return noContent().build();
     }
 
+    @PostMapping("{idInvoicingPlan}/invoices")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<InvoiceDTO> updateInvoice(
+        @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan,
+        @RequestBody InvoiceDTO invoiceDTO
+    ) {
+        return ResponseUtil.wrapOrNotFound(invoicingPlanService.createInvoice(idInvoicingPlan, invoiceDTO));
+    }
+
     @PutMapping("{idInvoicingPlan}/invoices/{idInvoice}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<InvoiceDTO> updateInvoice(
@@ -57,15 +66,13 @@ public class InvoicingPlanResource {
 
     @PostMapping("/{idInvoicingPlan}/payments")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Void> createPayment(
+    public ResponseEntity<PaymentDTO> createPayment(
         @PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
         @Valid @RequestBody PaymentDTO payment
     ) throws URISyntaxException {
         log.debug("REST request to save Payment : {}", payment);
 
-        this.invoicingPlanService.createPayment(idInvoicingPlan, payment);
-
-        return noContent().build();
+        return ResponseUtil.wrapOrNotFound(this.invoicingPlanService.createPayment(idInvoicingPlan, payment));
     }
 
     @PutMapping("/{idInvoicingPlan}/payments/{idPayment}")

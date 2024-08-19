@@ -213,7 +213,12 @@
                           <tbody style="border: 1px solid grey">
                             @if (invoicingPlan.invoices; as invoices) {
                               <tr>
-                                <td class="table-section" colspan="10">Prestations à payer</td>
+                                <td class="table-section align-middle" colspan="9">Prestations à payer</td>
+                                <td class="table-section align-middle text-end">
+                                  <button id="jh-create-invoice" class="btn btn-warning btn-sm" (click)="addInvoice(invoicingPlan)">
+                                    <fa-icon icon="plus"></fa-icon>
+                                  </button>
+                                </td>
                               </tr>
                               @if (!invoices.length) {
                                 <tr>
@@ -241,9 +246,22 @@
                                       ></fa-icon>
                                     </td>
                                     <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
-                                    <td>{{ invoice.label }}</td>
+
+                                    <td>
+                                      <input
+                                        type="text"
+                                        class="form-control"
+                                        (blur)="onLabelChange($event, invoice)"
+                                        *ngIf="!mustBeReadMode(invoice, invoicingPlan) && invoice.type === Type.OTHERS"
+                                        value="{{ invoice.label }}"
+                                      />
+                                      @if (!(!mustBeReadMode(invoice, invoicingPlan) && invoice.type === Type.OTHERS)) {
+                                        {{ invoice.label }}
+                                      }
+                                    </td>
+
                                     <td class="text-center">
-                                      @if (hasDiffCustomAndDefault(invoice)) {
+                                      @if (hasDiffCustomAndDefault(invoice) && invoice.id) {
                                         <fa-icon
                                           icon="circle-info"
                                           class="text-warning"
@@ -308,7 +326,12 @@
                             }
                             @if (invoicingPlan.payments; as payments) {
                               <tr>
-                                <td class="table-section" colspan="10">Paiements reçus</td>
+                                <td class="table-section align-middle" colspan="9">Paiements reçus</td>
+                                <td class="table-section align-middle text-end">
+                                  <button id="jh-create-payment" class="btn btn-warning btn-sm" (click)="addPayment(invoicingPlan)">
+                                    <fa-icon icon="plus"></fa-icon>
+                                  </button>
+                                </td>
                               </tr>
                               @if (!payments.length) {
                                 <tr>
@@ -333,9 +356,9 @@
                               }
                             }
                             <tr>
-                              <td class="fw-bold" class="table-section-ending">Résultat</td>
+                              <td class="fw-bold table-section-ending align-middle">Résultat</td>
                               <td colspan="6" class="table-section-ending">&nbsp;</td>
-                              <td class="table-section-ending text-center fw-bold">
+                              <td class="table-section-ending text-center align-middle fw-bold">
                                 {{ remainingTotal(invoicingPlan) | currency: 'CHF' }}
                               </td>
                               <td class="table-section-ending">&nbsp;</td>
