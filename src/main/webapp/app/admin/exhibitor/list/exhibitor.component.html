@@ -1,123 +1,119 @@
 <div>
-  <h2 id="page-heading" data-cy="ExhibitorHeading">
-    <span jhiTranslate="salonApp.exhibitor.home.title">Exhibitors</span>
+    <h2 data-cy="ExhibitorHeading" id="page-heading">
+        <span jhiTranslate="salonApp.exhibitor.home.title">Exhibitors</span>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="common.refresh">Actualiser la liste</span>
-      </button>
+        <div class="d-flex justify-content-end">
+            <button (click)="load()" [disabled]="isLoading" class="btn btn-info me-2">
+                <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
+                <span jhiTranslate="common.refresh">Actualiser la liste</span>
+            </button>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-exhibitor"
-        [routerLink]="['/exhibitor/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="salonApp.exhibitor.home.createLabel">Créer un nouveau Exhibitor</span>
-      </button>
-    </div>
-  </h2>
+            <button [routerLink]="['/exhibitor/new']" class="btn btn-primary jh-create-entity create-exhibitor" data-cy="entityCreateButton"
+                    id="jh-create-entity">
+                <fa-icon icon="plus"></fa-icon>
+                <span jhiTranslate="salonApp.exhibitor.home.createLabel">Créer un nouveau Exhibitor</span>
+            </button>
+        </div>
+    </h2>
 
-  <jhi-alert-error></jhi-alert-error>
+    <jhi-alert-error></jhi-alert-error>
 
-  <jhi-alert></jhi-alert>
+    <jhi-alert></jhi-alert>
 
-  @if (exhibitors?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="salonApp.exhibitor.home.notFound">Aucun exposant</span>
-    </div>
-  }
+    @if (exhibitors?.length === 0) {
+        <div class="alert alert-warning" id="no-result">
+            <span jhiTranslate="salonApp.exhibitor.home.notFound">Aucun exposant</span>
+        </div>
+    }
 
-  @if (exhibitors && exhibitors.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exhibitor.id">Id</span>
+    @if (exhibitors && exhibitors.length > 0) {
+        <div class="table-responsive table-entities" id="entities">
+            <table class="table table-striped" aria-describedby="page-heading">
+                <thead>
+                    <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+                        <th scope="col" jhiSortBy="id">
+                            <div class="d-flex">
+                                <span jhiTranslate="salonApp.exhibitor.id">Id</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="fullName">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exhibitor.fullName">Full Name</span>
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="fullName">
+                            <div class="d-flex">
+                                <span jhiTranslate="salonApp.exhibitor.fullName">Full Name</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="email">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exhibitor.email">Email</span>
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="email">
+                            <div class="d-flex">
+                                <span jhiTranslate="salonApp.exhibitor.email">Email</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="phoneNumber">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exhibitor.phoneNumber">Phone Number</span>
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="phoneNumber">
+                            <div class="d-flex">
+                                <span jhiTranslate="salonApp.exhibitor.phoneNumber">Phone Number</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="address">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exhibitor.address">Address</span>
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="address">
+                            <div class="d-flex">
+                                <span jhiTranslate="salonApp.exhibitor.address">Address</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="npaLocalite">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exhibitor.npaLocalite">Npa Localite</span>
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="npaLocalite">
+                            <div class="d-flex">
+                                <span jhiTranslate="salonApp.exhibitor.npaLocalite">Npa Localite</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="extraInformation">
-              <div class="d-flex">
-                <span jhiTranslate="salonApp.exhibitor.extraInformation">Extra Information</span>
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="extraInformation">
+                            <div class="d-flex">
+                                <span jhiTranslate="salonApp.exhibitor.extraInformation">Extra Information</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (exhibitor of exhibitors; track trackId) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/exhibitor', exhibitor.id, 'view']">{{ exhibitor.id }}</a>
-              </td>
-              <td>{{ exhibitor.fullName }}</td>
-              <td>{{ exhibitor.email }}</td>
-              <td>{{ exhibitor.phoneNumber }}</td>
-              <td>{{ exhibitor.address }}</td>
-              <td>{{ exhibitor.npaLocalite }}</td>
-              <td>{{ exhibitor.extraInformation }}</td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/exhibitor', exhibitor.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
-                  </a>
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (exhibitor of exhibitors; track trackId) {
+                        <tr data-cy="entityTable">
+                            <td>
+                                <a [routerLink]="['/exhibitor', exhibitor.id, 'view']">{{ exhibitor.id }}</a>
+                            </td>
+                            <td>{{ exhibitor.fullName }}</td>
+                            <td>{{ exhibitor.email }}</td>
+                            <td>{{ exhibitor.phoneNumber }}</td>
+                            <td>{{ exhibitor.address }}</td>
+                            <td>{{ exhibitor.npaLocalite }}</td>
+                            <td>{{ exhibitor.extraInformation }}</td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a [routerLink]="['/exhibitor', exhibitor.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                                        <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
+                                    </a>
 
-                  <a [routerLink]="['/exhibitor', exhibitor.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                  </a>
+                                    <a [routerLink]="['/exhibitor', exhibitor.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                                    </a>
 
-                  <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+                                    <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                                        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>

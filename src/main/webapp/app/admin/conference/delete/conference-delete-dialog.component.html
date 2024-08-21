@@ -1,24 +1,24 @@
 @if (conference) {
-  <form name="deleteForm" (ngSubmit)="confirmDelete(conference.id!)">
-    <div class="modal-header">
-      <h4 class="modal-title" data-cy="conferenceDeleteDialogHeading" jhiTranslate="common.delete">Confirmation de suppression</h4>
-    </div>
+    <form name="deleteForm" (ngSubmit)="confirmDelete(conference.id!)">
+        <div class="modal-header">
+            <h4 class="modal-title" data-cy="conferenceDeleteDialogHeading" jhiTranslate="common.delete">Confirmation de suppression</h4>
+        </div>
 
-    <div class="modal-body">
-      <jhi-alert-error></jhi-alert-error>
-      <p id="jhi-delete-conference-heading" jhiTranslate="conference.delete.question" [translateValues]="{ title: conference.title }">
-        Êtes-vous certain de vouloir supprimer le Conference {{ conference.title }} ?
-      </p>
-    </div>
+        <div class="modal-body">
+            <jhi-alert-error></jhi-alert-error>
+            <p id="jhi-delete-conference-heading" jhiTranslate="conference.delete.question" [translateValues]="{ title: conference.title }">
+                Êtes-vous certain de vouloir supprimer le Conference {{ conference.title }} ?
+            </p>
+        </div>
 
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
-        <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-      </button>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+                <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+            </button>
 
-      <button id="jhi-confirm-delete-conference" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
-        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-      </button>
-    </div>
-  </form>
+            <button id="jhi-confirm-delete-conference" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+                <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+            </button>
+        </div>
+    </form>
 }

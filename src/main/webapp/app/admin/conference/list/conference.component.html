@@ -1,88 +1,89 @@
 <div>
-  <h2 id="page-heading" data-cy="ConferenceHeading">
-    <span jhiTranslate="conference.title">Les conférences</span>
+    <h2 data-cy="ConferenceHeading" id="page-heading">
+        <span jhiTranslate="conference.title">Les conférences</span>
 
-    <hr />
+        <hr/>
 
-    <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-between mt-3">
       <span>
-        <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+        <button (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton" type="button">
           <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
         </button>
       </span>
 
-      <span>
-        <button class="btn btn-primary btn-sm" (click)="load()" [disabled]="isLoading">
-          <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+            <span>
+        <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
           <span jhiTranslate="common.refresh">Actualiser</span>
         </button>
 
-        <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-success btn-sm" [routerLink]="['./new']">
+        <button [routerLink]="['./new']" class="btn btn-success btn-sm" data-cy="entityCreateButton" id="jh-create-entity">
           <fa-icon icon="plus"></fa-icon>
           <span jhiTranslate="common.create">Créer</span>
         </button>
       </span>
-    </div>
+        </div>
 
-    <hr />
-  </h2>
+        <hr/>
+    </h2>
 
-  <jhi-alert-error></jhi-alert-error>
+    <jhi-alert-error></jhi-alert-error>
 
-  @if (conferences?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="conference.notFound">Aucune Conference</span>
-    </div>
-  }
+    @if (conferences?.length === 0) {
+        <div class="alert alert-warning" id="no-result">
+            <span jhiTranslate="conference.notFound">Aucune Conference</span>
+        </div>
+    }
 
-  @if (conferences && conferences.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr>
-            <th class="col-auto"><span jhiTranslate="conference.participation">Participation</span></th>
-            <th class="col-8"><span jhiTranslate="conference.title">Title</span></th>
-            <th class="col-auto text-center"><span jhiTranslate="conference.status.label">Status</span></th>
-            <th class="col-auto">&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (conference of conferences; track $index) {
-            <tr data-cy="entityTable">
-              <td>
-                @if (conference.participation) {
-                  <a [routerLink]="['/admin/salons', params.get('idSalon'), 'participations', conference.participation.id, 'view']">
-                    {{ conference.participation.exhibitor?.fullName }}
-                  </a>
-                }
-              </td>
-              <td>{{ conference.title }}</td>
-              <td class="text-center">
-                <fa-icon
-                  icon="{{ conference.status | status }}"
-                  class="{{ conference.status | colorStatus }}"
-                  title="{{ 'conference.status.list.' + conference.status | translate }}"
-                ></fa-icon>
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['./', conference.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
-                  </a>
+    @if (conferences && conferences.length > 0) {
+        <div class="table-responsive table-entities" id="entities">
+            <table class="table table-striped" aria-describedby="page-heading">
+                <thead>
+                    <tr>
+                        <th class="col-auto">
+                            <span jhiTranslate="conference.participation">Participation</span>
+                        </th>
+                        <th class="col-8">
+                            <span jhiTranslate="conference.title">Title</span>
+                        </th>
+                        <th class="col-auto text-center">
+                            <span jhiTranslate="conference.status.label">Status</span>
+                        </th>
+                        <th class="col-auto">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (conference of conferences; track $index) {
+                        <tr data-cy="entityTable">
+                            <td>
+                                @if (conference.participation) {
+                                    <a [routerLink]="['/admin/salons', params.get('idSalon'), 'participations', conference.participation.id, 'view']"> {{ conference.participation.exhibitor?.fullName }} </a>
+                                }
+                            </td>
+                            <td>{{ conference.title }}</td>
+                            <td class="text-center">
+                                <fa-icon icon="{{ conference.status | status }}" class="{{ conference.status | colorStatus }}"
+                                         title="{{ 'conference.status.list.' + conference.status | translate }}"></fa-icon>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a [routerLink]="['./', conference.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                                        <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
+                                    </a>
 
-                  <a [routerLink]="['./', conference.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                  </a>
+                                    <a [routerLink]="['./', conference.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                                    </a>
 
-                  <button type="button" (click)="delete(conference)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+                                    <button type="button" (click)="delete(conference)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                                        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>

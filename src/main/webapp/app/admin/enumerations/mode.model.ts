@@ -1,9 +1,9 @@
 export enum Mode {
-  BANK = 'BANK',
+    BANK = 'BANK',
 
-  CASH = 'CASH',
+    CASH = 'CASH',
 
-  SERVICE = 'SERVICE',
+    SERVICE = 'SERVICE',
 
-  OTHER = 'OTHER',
+    OTHER = 'OTHER',
 }

@@ -1,13 +1,13 @@
 export enum Type {
-  STAND = 'STAND',
+    STAND = 'STAND',
 
-  CONFERENCE = 'CONFERENCE',
+    CONFERENCE = 'CONFERENCE',
 
-  SHARED = 'SHARED',
+    SHARED = 'SHARED',
 
-  ELECTRICITY = 'ELECTRICITY',
+    ELECTRICITY = 'ELECTRICITY',
 
-  MEAL = 'MEAL',
+    MEAL = 'MEAL',
 
-  OTHERS = 'OTHERS',
+    OTHERS = 'OTHERS',
 }

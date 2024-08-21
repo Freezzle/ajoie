@@ -1,4 +1,4 @@
 export enum State {
-  CURRENT = 'CURRENT',
-  CLOSED = 'CLOSED',
+    CURRENT = 'CURRENT',
+    CLOSED = 'CLOSED',
 }

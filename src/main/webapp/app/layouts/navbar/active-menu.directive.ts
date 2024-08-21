@@ -1,30 +1,30 @@
-import { Directive, OnInit, ElementRef, Renderer2, inject, input } from '@angular/core';
-import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
+import {Directive, ElementRef, inject, input, OnInit, Renderer2} from '@angular/core';
+import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 
 @Directive({
-  standalone: true,
-  selector: '[jhiActiveMenu]',
-})
+               standalone: true,
+               selector: '[jhiActiveMenu]',
+           })
 export default class ActiveMenuDirective implements OnInit {
-  jhiActiveMenu = input();
+    jhiActiveMenu = input();
 
-  private readonly el = inject(ElementRef);
-  private readonly renderer = inject(Renderer2);
-  private readonly translateService = inject(TranslateService);
+    private readonly el = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly translateService = inject(TranslateService);
 
-  ngOnInit(): void {
-    this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
-      this.updateActiveFlag(event.lang);
-    });
+    ngOnInit(): void {
+        this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
+            this.updateActiveFlag(event.lang);
+        });
 
-    this.updateActiveFlag(this.translateService.currentLang);
-  }
-
-  updateActiveFlag(selectedLanguage: string): void {
-    if (this.jhiActiveMenu() === selectedLanguage) {
-      this.renderer.addClass(this.el.nativeElement, 'active');
-    } else {
-      this.renderer.removeClass(this.el.nativeElement, 'active');
+        this.updateActiveFlag(this.translateService.currentLang);
     }
-  }
+
+    updateActiveFlag(selectedLanguage: string): void {
+        if (this.jhiActiveMenu() === selectedLanguage) {
+            this.renderer.addClass(this.el.nativeElement, 'active');
+        } else {
+            this.renderer.removeClass(this.el.nativeElement, 'active');
+        }
+    }
 }

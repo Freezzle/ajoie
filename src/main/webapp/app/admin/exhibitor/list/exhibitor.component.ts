@@ -1,121 +1,121 @@
-import { Component, inject, NgZone, OnInit } from '@angular/core';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, inject, NgZone, OnInit} from '@angular/core';
+import {ActivatedRoute, Data, ParamMap, Router, RouterModule} from '@angular/router';
+import {combineLatest, filter, Observable, Subscription, tap} from 'rxjs';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { FormsModule } from '@angular/forms';
-import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
-import {IExhibitor}from '../exhibitor.model';
-import {EntityArrayResponseType, ExhibitorService}from '../service/exhibitor.service';
-import {ExhibitorDeleteDialogComponent}from '../delete/exhibitor-delete-dialog.component';
+import {SortByDirective, SortDirective, SortService, type SortState, sortStateSignal} from 'app/shared/sort';
+import {DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe} from 'app/shared/date';
+import {FormsModule} from '@angular/forms';
+import {DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT} from 'app/config/navigation.constants';
+import {IExhibitor} from '../exhibitor.model';
+import {EntityArrayResponseType, ExhibitorService} from '../service/exhibitor.service';
+import {ExhibitorDeleteDialogComponent} from '../delete/exhibitor-delete-dialog.component';
 
 @Component({
-  standalone: true,
-selector: 'jhi-exhibitor',
-templateUrl: './exhibitor.component.html',
-  imports: [
-    RouterModule,
-    FormsModule,
-    SharedModule,
-    SortDirective,
-    SortByDirective,
-    DurationPipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatePipe,
-  ],
-})
+               standalone: true,
+               selector: 'jhi-exhibitor',
+               templateUrl: './exhibitor.component.html',
+               imports: [
+                   RouterModule,
+                   FormsModule,
+                   SharedModule,
+                   SortDirective,
+                   SortByDirective,
+                   DurationPipe,
+                   FormatMediumDatetimePipe,
+                   FormatMediumDatePipe,
+               ],
+           })
 export class ExhibitorComponent implements OnInit {
-  subscription: Subscription | null = null;
-exhibitors?: IExhibitor[];
-  isLoading = false;
+    subscription: Subscription | null = null;
+    exhibitors?: IExhibitor[];
+    isLoading = false;
 
-  sortState = sortStateSignal({});
+    sortState = sortStateSignal({});
 
-  public router = inject(Router);
-protected exhibitorService = inject(ExhibitorService);
-  protected activatedRoute = inject(ActivatedRoute);
-  protected sortService = inject(SortService);
-  protected modalService = inject(NgbModal);
-  protected ngZone = inject(NgZone);
+    public router = inject(Router);
+    protected exhibitorService = inject(ExhibitorService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected sortService = inject(SortService);
+    protected modalService = inject(NgbModal);
+    protected ngZone = inject(NgZone);
 
-trackId = (_index: number, item: IExhibitor): string => this.exhibitorService.getExhibitorIdentifier(item);
+    trackId = (_index: number, item: IExhibitor): string => this.exhibitorService.getExhibitorIdentifier(item);
 
-  ngOnInit(): void {
-    this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
-      .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
-          if (!this.exhibitors || this.exhibitors.length === 0) {
-            this.load();
-          }
-        }),
-      )
-      .subscribe();
-  }
+    ngOnInit(): void {
+        this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
+            .pipe(
+                tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
+                tap(() => {
+                    if (!this.exhibitors || this.exhibitors.length === 0) {
+                        this.load();
+                    }
+                }),
+            )
+            .subscribe();
+    }
 
-  delete(exhibitor: IExhibitor): void {
-    const modalRef = this.modalService.open(ExhibitorDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.exhibitor = exhibitor;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
-      )
-      .subscribe();
-  }
+    delete(exhibitor: IExhibitor): void {
+        const modalRef = this.modalService.open(ExhibitorDeleteDialogComponent, {size: 'lg', backdrop: 'static'});
+        modalRef.componentInstance.exhibitor = exhibitor;
+        // unsubscribe not needed because closed completes on modal close
+        modalRef.closed
+                .pipe(
+                    filter(reason => reason === ITEM_DELETED_EVENT),
+                    tap(() => this.load()),
+                )
+                .subscribe();
+    }
 
-  load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
-    });
-  }
+    load(): void {
+        this.queryBackend().subscribe({
+                                          next: (res: EntityArrayResponseType) => {
+                                              this.onResponseSuccess(res);
+                                          },
+                                      });
+    }
 
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
-  }
+    navigateToWithComponentValues(event: SortState): void {
+        this.handleNavigation(event);
+    }
 
-  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
-    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
-  }
+    protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
+        this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
+    }
 
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.exhibitors = this.refineData(dataFromBody);
-  }
+    protected onResponseSuccess(response: EntityArrayResponseType): void {
+        const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+        this.exhibitors = this.refineData(dataFromBody);
+    }
 
-  protected refineData(data: IExhibitor[]): IExhibitor[] {
-    const { predicate, order } = this.sortState();
-    return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
-  }
+    protected refineData(data: IExhibitor[]): IExhibitor[] {
+        const {predicate, order} = this.sortState();
+        return predicate && order ? data.sort(this.sortService.startSort({predicate, order})) : data;
+    }
 
-  protected fillComponentAttributesFromResponseBody(data: IExhibitor[] | null): IExhibitor[] {
-    return data ?? [];
-  }
+    protected fillComponentAttributesFromResponseBody(data: IExhibitor[] | null): IExhibitor[] {
+        return data ?? [];
+    }
 
-  protected queryBackend(): Observable<EntityArrayResponseType> {
-    this.isLoading = true;
-    const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
-    };
-    return this.exhibitorService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
-  }
+    protected queryBackend(): Observable<EntityArrayResponseType> {
+        this.isLoading = true;
+        const queryObject: any = {
+            sort: this.sortService.buildSortParam(this.sortState()),
+        };
+        return this.exhibitorService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    }
 
-  protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
+    protected handleNavigation(sortState: SortState): void {
+        const queryParamsObj = {
+            sort: this.sortService.buildSortParam(sortState),
+        };
 
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
-    });
-  }
+        this.ngZone.run(() => {
+            this.router.navigate(['./'], {
+                relativeTo: this.activatedRoute,
+                queryParams: queryParamsObj,
+            });
+        });
+    }
 }
