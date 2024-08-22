@@ -1,0 +1,17 @@
+<div th:fragment="letterhead">
+  <table>
+    <tr>
+      <td class="width-70">&nbsp;</td>
+      <td class="width-30">
+        [[${recipient.getEnterpriseName()}]]<br />
+        [[${recipient.getFullName()}]]<br />
+        [[${recipient.getStreet()}]]<br />
+        [[${recipient.getCity()}]]<br />
+        [[${recipient.getCountry()}]]
+      </td>
+    </tr>
+  </table>
+  <br />
+  <hr class="border-grey-thick" />
+  <br />
+</div>

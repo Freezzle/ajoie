@@ -1,42 +1,68 @@
 package ch.salon.service;
 
-import ch.salon.domain.*;
+import static ch.salon.domain.enumeration.Type.*;
+
+import ch.salon.domain.Conference;
+import ch.salon.domain.Exhibitor;
+import ch.salon.domain.Invoice;
+import ch.salon.domain.InvoicingPlan;
+import ch.salon.domain.Participation;
+import ch.salon.domain.Payment;
+import ch.salon.domain.PriceStandSalon;
+import ch.salon.domain.Salon;
+import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Type;
-import ch.salon.repository.*;
+import ch.salon.repository.ConferenceRepository;
+import ch.salon.repository.InvoiceRepository;
+import ch.salon.repository.InvoicingPlanRepository;
+import ch.salon.repository.ParticipationRepository;
+import ch.salon.repository.PaymentRepository;
+import ch.salon.repository.SalonRepository;
+import ch.salon.repository.StandRepository;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.PaymentDTO;
+import ch.salon.service.mail.InvoiceDataProvider;
 import ch.salon.service.mapper.InvoiceMapper;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.service.mapper.PaymentMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.*;
-
-import static ch.salon.domain.enumeration.Type.*;
 
 @Service
 public class InvoicingPlanService {
 
     public static final String ENTITY_NAME = "invoicingPlan";
+    private final EventLogService eventLogService;
 
     private final SalonRepository salonRepository;
     private final ParticipationRepository participationRepository;
     private final InvoicingPlanRepository invoicingPlanRepository;
+
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
+
     private final PaymentRepository paymentRepository;
     private final InvoiceRepository invoiceRepository;
+
     private final MessageSource messageSource;
     private final MailService mailService;
-    private final EventLogService eventLogService;
+    private final DocumentService documentService;
 
     public InvoicingPlanService(
         SalonRepository salonRepository,
@@ -48,7 +74,8 @@ public class InvoicingPlanService {
         MailService mailService,
         EventLogService eventLogService,
         PaymentRepository paymentRepository,
-        InvoiceRepository invoiceRepository
+        InvoiceRepository invoiceRepository,
+        DocumentService documentService
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
@@ -60,9 +87,10 @@ public class InvoicingPlanService {
         this.eventLogService = eventLogService;
         this.paymentRepository = paymentRepository;
         this.invoiceRepository = invoiceRepository;
+        this.documentService = documentService;
     }
 
-    public void send(UUID idInvoicingPlan) {
+    public void send(UUID idInvoicingPlan) throws Exception {
         if (idInvoicingPlan == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -74,7 +102,11 @@ public class InvoicingPlanService {
         Salon salon = invoicingPlan.getParticipation().getSalon();
         Exhibitor exhibitor = invoicingPlan.getParticipation().getExhibitor();
 
-        mailService.sendInvoiceMail(salon, exhibitor, invoicingPlan);
+        InputStreamSource inputStreamSource = documentService.generate(
+            new InvoiceDataProvider(invoicingPlanRepository, invoicingPlan.getId())
+        );
+
+        mailService.sendInvoiceMail(salon, exhibitor, invoicingPlan, inputStreamSource);
 
         invoicingPlan.setState(State.CLOSED);
         invoicingPlanRepository.save(invoicingPlan);

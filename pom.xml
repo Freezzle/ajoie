@@ -79,6 +79,46 @@
     </properties>
 
     <dependencies>
+
+        <!-- TO GENERATE HTML TO PDF -->
+        <!-- https://mvnrepository.com/artifact/net.sf.jtidy/jtidy -->
+        <dependency>
+            <groupId>net.sf.jtidy</groupId>
+            <artifactId>jtidy</artifactId>
+            <version>r938</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/ognl/ognl -->
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>3.2.21</version> <!-- Vous pouvez essayer cette version -->
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-core -->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-core</artifactId>
+            <version>9.9.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf -->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>9.9.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf -->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>9.9.0</version>
+        </dependency>
+
+
+        <!-- END TO GENERATE HTML TO PDF -->
+
         <dependency>
             <groupId>tech.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
