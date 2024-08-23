@@ -1,6 +1,6 @@
 package ch.salon.service;
 
-import ch.salon.service.mail.DataProvider;
+import ch.salon.service.document.DocumentDataProvider;
 import com.lowagie.text.pdf.BaseFont;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,8 +37,11 @@ public class DocumentService {
         return outputStream.toString(StandardCharsets.UTF_8);
     }
 
-    public InputStreamSource generate(DataProvider dataProvider) throws Exception {
-        String renderedHtmlContent = documentTemplateEngine.process(dataProvider.getTemplateName(), dataProvider.getContext());
+    public InputStreamSource generate(DocumentDataProvider documentDataProvider) throws Exception {
+        String renderedHtmlContent = documentTemplateEngine.process(
+            documentDataProvider.getTemplateName(),
+            documentDataProvider.getContext()
+        );
         String xHtml = convertToXhtml(renderedHtmlContent); // Conversion en XHTML
 
         ITextRenderer renderer = new ITextRenderer();

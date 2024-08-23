@@ -3,7 +3,6 @@ package ch.salon.service;
 import static ch.salon.domain.enumeration.Type.*;
 
 import ch.salon.domain.Conference;
-import ch.salon.domain.Exhibitor;
 import ch.salon.domain.Invoice;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
@@ -25,7 +24,7 @@ import ch.salon.repository.StandRepository;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.PaymentDTO;
-import ch.salon.service.mail.InvoiceDataProvider;
+import ch.salon.service.mail.InvoiceEmailService;
 import ch.salon.service.mapper.InvoiceMapper;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.service.mapper.PaymentMapper;
@@ -41,7 +40,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -61,8 +59,7 @@ public class InvoicingPlanService {
     private final InvoiceRepository invoiceRepository;
 
     private final MessageSource messageSource;
-    private final MailService mailService;
-    private final DocumentService documentService;
+    private final InvoiceEmailService invoiceEmailService;
 
     public InvoicingPlanService(
         SalonRepository salonRepository,
@@ -71,11 +68,10 @@ public class InvoicingPlanService {
         StandRepository standRepository,
         ConferenceRepository conferenceRepository,
         MessageSource messageSource,
-        MailService mailService,
         EventLogService eventLogService,
         PaymentRepository paymentRepository,
         InvoiceRepository invoiceRepository,
-        DocumentService documentService
+        InvoiceEmailService invoiceEmailService
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
@@ -83,11 +79,10 @@ public class InvoicingPlanService {
         this.standRepository = standRepository;
         this.conferenceRepository = conferenceRepository;
         this.messageSource = messageSource;
-        this.mailService = mailService;
         this.eventLogService = eventLogService;
         this.paymentRepository = paymentRepository;
         this.invoiceRepository = invoiceRepository;
-        this.documentService = documentService;
+        this.invoiceEmailService = invoiceEmailService;
     }
 
     public void send(UUID idInvoicingPlan) throws Exception {
@@ -99,14 +94,13 @@ public class InvoicingPlanService {
             .findById(idInvoicingPlan)
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Salon salon = invoicingPlan.getParticipation().getSalon();
-        Exhibitor exhibitor = invoicingPlan.getParticipation().getExhibitor();
-
-        InputStreamSource inputStreamSource = documentService.generate(
-            new InvoiceDataProvider(invoicingPlanRepository, invoicingPlan.getId())
+        invoiceEmailService.send(invoicingPlan);
+        eventLogService.eventFromSystem(
+            "La facture #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
+            EventType.EMAIL,
+            EntityType.PARTICIPATION,
+            invoicingPlan.getParticipation().getId()
         );
-
-        mailService.sendInvoiceMail(salon, exhibitor, invoicingPlan, inputStreamSource);
 
         invoicingPlan.setState(State.CLOSED);
         invoicingPlanRepository.save(invoicingPlan);

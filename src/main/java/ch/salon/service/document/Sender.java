@@ -1,4 +1,4 @@
-package ch.salon.service.mail;
+package ch.salon.service.document;
 
 import ch.salon.domain.Salon;
 import java.io.Serializable;

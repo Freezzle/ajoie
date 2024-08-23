@@ -2,18 +2,13 @@ package ch.salon.service;
 
 import static ch.salon.domain.enumeration.EmailTemplate.*;
 
-import ch.salon.domain.DateUtils;
-import ch.salon.domain.Exhibitor;
-import ch.salon.domain.InvoicingPlan;
-import ch.salon.domain.Salon;
+import ch.salon.EmailData;
 import ch.salon.domain.User;
-import ch.salon.domain.enumeration.EmailTemplate;
-import ch.salon.domain.enumeration.EntityType;
-import ch.salon.domain.enumeration.EventType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,7 +60,11 @@ public class MailService {
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
 
-        this.sendEmailFromTemplateSync(context, null, user.getEmail(), CREATION_ACCOUNT_EMAIL, null);
+        EmailData emailData = new EmailData();
+        emailData.setTemplate(CREATION_ACCOUNT_EMAIL);
+        emailData.setContext(context);
+
+        this.sendEmailSync(emailData, user.getEmail(), null);
     }
 
     @Async
@@ -76,7 +75,11 @@ public class MailService {
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
 
-        this.sendEmailFromTemplateSync(context, null, user.getEmail(), ACTIVATION_EMAIL, null);
+        EmailData emailData = new EmailData();
+        emailData.setTemplate(ACTIVATION_EMAIL);
+        emailData.setContext(context);
+
+        this.sendEmailSync(emailData, user.getEmail(), null);
     }
 
     @Async
@@ -87,50 +90,39 @@ public class MailService {
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
 
-        this.sendEmailFromTemplateSync(context, null, user.getEmail(), RESET_PASSWORD_EMAIL, null);
+        EmailData emailData = new EmailData();
+        emailData.setTemplate(RESET_PASSWORD_EMAIL);
+        emailData.setContext(context);
+
+        this.sendEmailSync(emailData, user.getEmail(), null);
     }
 
-    public void sendInvoiceMail(Salon salon, Exhibitor exhibitor, InvoicingPlan invoicingPlan, InputStreamSource inputStreamSource)
-        throws Exception {
-        log.debug("Sending invoice email to '{}'", exhibitor.getEmail());
-
-        Context context = new Context(Locale.FRENCH);
-        context.setVariable("salon", salon.getPlace());
-        context.setVariable("billingNumber", invoicingPlan.getBillingNumber());
-        context.setVariable("fullName", exhibitor.getFullName());
-        context.setVariable("startDate", DateUtils.instantToIso(salon.getStartingDate()));
-        context.setVariable("endDate", DateUtils.instantToIso(salon.getEndingDate()));
-
-        Object[] args = { invoicingPlan.getBillingNumber(), salon.getPlace() };
-        this.sendEmailFromTemplateSync(context, inputStreamSource, exhibitor.getEmail(), INVOICE_EMAIL, args);
-
-        eventLogService.eventFromSystem(
-            "La facture #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
-            EventType.EMAIL,
-            EntityType.PARTICIPATION,
-            invoicingPlan.getParticipation().getId()
-        );
+    @Async
+    public void sendEmailAsync(EmailData emailData, String emailto, Object[] argsSubject) {
+        this.sendEmailSync(emailData, emailto, argsSubject);
     }
 
-    private void sendEmailFromTemplateSync(
-        Context context,
-        InputStreamSource inputStreamSource,
-        String emailto,
-        EmailTemplate template,
-        Object[] argsSubject
-    ) {
-        String content = mailTemplateEngine.process(template.getTemplateName(), context);
-        String subject = messageSource.getMessage(template.getSubjectKey(), argsSubject, context.getLocale());
+    public void sendEmailSync(EmailData emailData, String emailto, Object[] argsSubject) {
+        String content = mailTemplateEngine.process(emailData.getTemplate().getTemplateName(), emailData.getContext());
+        String subject = messageSource.getMessage(emailData.getTemplate().getSubjectKey(), argsSubject, emailData.getContext().getLocale());
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
-            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, inputStreamSource != null, StandardCharsets.UTF_8.name());
-            message.setFrom("dylan.claude.work@gmail.com"); // FIXME CHANGE THAT LATER
-            message.setTo(emailto.contains("dylan") ? emailto : "dylan.claude.work@gmail.com"); // FIXME CHANGE THAT LATER, AVOID SENDING PROD
+            MimeMessageHelper message = new MimeMessageHelper(
+                mimeMessage,
+                !emailData.getAttachments().isEmpty(),
+                StandardCharsets.UTF_8.name()
+            );
+            // FIXME CHANGE THAT LATER
+            message.setFrom("dylan.claude.work@gmail.com");
+
+            // FIXME CHANGE THAT LATER, AVOID SENDING PROD
+            message.setTo(emailto.contains("dylan") ? emailto : "dylan.claude.work@gmail.com");
             message.setSubject(subject);
             message.setText(content, true);
-            if (inputStreamSource != null) {
-                message.addAttachment("invoice.pdf", inputStreamSource);
+
+            for (Map.Entry<String, InputStreamSource> entry : emailData.getAttachments().entrySet()) {
+                message.addAttachment(entry.getKey(), entry.getValue());
             }
 
             javaMailSender.send(mimeMessage);

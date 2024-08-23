@@ -1,19 +1,15 @@
-package ch.salon.service.mail;
+package ch.salon.service.document;
 
 import ch.salon.domain.InvoicingPlan;
-import ch.salon.repository.InvoicingPlanRepository;
 import java.time.LocalDate;
-import java.util.UUID;
 import org.thymeleaf.context.Context;
 
-public class InvoiceDataProvider implements DataProvider {
+public class InvoiceDocumentDataProvider implements DocumentDataProvider {
 
-    private final InvoicingPlanRepository invoicingPlanRepository;
-    private UUID idInvoicingPlan;
+    private final InvoicingPlan invoicingPlan;
 
-    public InvoiceDataProvider(InvoicingPlanRepository invoicingPlanRepository, UUID idInvoicingPlan) {
-        this.invoicingPlanRepository = invoicingPlanRepository;
-        this.idInvoicingPlan = idInvoicingPlan;
+    public InvoiceDocumentDataProvider(InvoicingPlan invoicingPlan) {
+        this.invoicingPlan = invoicingPlan;
     }
 
     @Override
@@ -24,7 +20,6 @@ public class InvoiceDataProvider implements DataProvider {
     @Override
     public Context getContext() {
         Context context = new Context();
-        InvoicingPlan invoicingPlan = invoicingPlanRepository.getReferenceById(idInvoicingPlan);
 
         Recipient recipient = new Recipient(invoicingPlan.getParticipation().getExhibitor());
 
