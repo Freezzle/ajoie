@@ -227,6 +227,8 @@ public class InvoicingPlanService {
 
         if (paymentDTO.getAmount() >= 0.00) {
             paymentFound.setAmount(paymentDTO.getAmount() * -1);
+        } else {
+            paymentFound.setAmount(paymentDTO.getAmount());
         }
 
         invoicingPlan = invoicingPlanRepository.save(invoicingPlan);

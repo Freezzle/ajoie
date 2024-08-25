@@ -37,7 +37,7 @@ public class InvoiceEmailCreator extends AbstractEmailCreator {
 
     @Override
     protected String getTranslatedSubject() {
-        Object[] args = { invoicingPlan.getBillingNumber(), invoicingPlan.getParticipation().getSalon().getPlace() };
+        Object[] args = { invoicingPlan.getParticipation().getSalon().getPlace() };
         return this.messageSource.getMessage("email.invoice.title", args, getContext().getLocale());
     }
 
@@ -70,6 +70,6 @@ public class InvoiceEmailCreator extends AbstractEmailCreator {
     @Override
     public Map<String, InputStreamSource> getAttachments() throws Exception {
         this.invoiceDocumentCreator.fillInvoicingPlan(invoicingPlan);
-        return Map.of("invoice.pdf", invoiceDocumentCreator.generate());
+        return Map.of("Facture_" + invoicingPlan.getBillingNumber() + ".pdf", invoiceDocumentCreator.generate());
     }
 }

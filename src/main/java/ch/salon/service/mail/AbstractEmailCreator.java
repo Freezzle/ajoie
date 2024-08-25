@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.MailException;
@@ -44,7 +45,7 @@ public abstract class AbstractEmailCreator {
     public void sendEmailSync() throws Exception {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
-            Map<String, InputStreamSource> attachments = getAttachments();
+            Map<String, InputStreamSource> attachments = getAttachments() != null ? getAttachments() : new HashMap<>();
 
             MimeMessageHelper message = getMimeMessageHelper(mimeMessage, !attachments.isEmpty(), getHtmlContent());
 

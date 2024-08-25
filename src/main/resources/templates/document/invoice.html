@@ -14,12 +14,16 @@
       <table class="padding-all-5">
         <tr>
           <td class="top-left">
-            <b>N° de référence : [[${reference}]]</b><br />
-            Date d'émission : [[${#temporals.format(sentDate, 'dd.MM.yyyy')}]]<br />
-            Date d'échéance : [[${#temporals.format(expirationDate, 'dd.MM.yyyy')}]]
+            <span th:utext="#{document.invoice.reference}"></span>
+            <b>[[${reference}]]</b><br />
+            <span th:text="#{document.invoice.send-date}"></span>
+            [[${#temporals.format(sentDate, 'dd.MM.yyyy')}]]<br />
+            <span th:text="#{document.invoice.expiration-date}"></span>
+            [[${#temporals.format(expirationDate, 'dd.MM.yyyy')}]]<br />
           </td>
           <td class="top-right">
-            <b>Personnes de contact</b><br />
+            <span th:utext="#{document.invoice.contacts}"></span>
+            <br />
             [[${contact}]]<br />
             [[${phone}]]
           </td>
@@ -28,10 +32,18 @@
       <br />
       <table class="padding-all-5">
         <thead class="bg">
-          <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40"><b>Description</b></td>
-          <td class="bottom-right width-20 padding-top-5 padding-bottom-5"><b>Prix</b></td>
-          <td class="bottom-center width-10 padding-top-5 padding-bottom-5"><b>Quantité</b></td>
-          <td class="bottom-right padding-right-5 width-30 padding-top-5 padding-bottom-5"><b>Montant</b></td>
+          <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40">
+            <span th:utext="#{document.invoice.table.header.description}"></span>
+          </td>
+          <td class="bottom-right width-20 padding-top-5 padding-bottom-5">
+            <span th:utext="#{document.invoice.table.header.price}"></span>
+          </td>
+          <td class="bottom-center width-10 padding-top-5 padding-bottom-5">
+            <span th:utext="#{document.invoice.table.header.quantity}"></span>
+          </td>
+          <td class="bottom-right padding-right-5 width-30 padding-top-5 padding-bottom-5">
+            <span th:utext="#{document.invoice.table.header.amount}"></span>
+          </td>
         </thead>
 
         <tr>
@@ -47,7 +59,7 @@
           <td colspan="4">&nbsp;</td>
         </tr>
         <tr th:if="${hasPaidSomething}">
-          <td class="center-left padding-left-5">Paiements reçus</td>
+          <td class="center-left padding-left-5" th:text="#{document.invoice.table.line.received-payments}" />
           <td class="center-right">&nbsp;</td>
           <td class="center-center">&nbsp;</td>
           <td class="center-right padding-right-5" th:text="${#numbers.formatDecimal(paymentsTotal, 1, 2, 'POINT')}" />
@@ -56,7 +68,11 @@
           <td colspan="4">&nbsp;</td>
         </tr>
         <tr class="bg">
-          <td class="top-left padding-left-5 padding-bottom-5 padding-top-5" colspan="3"><b>Montant à payer</b></td>
+          <td
+            class="top-left padding-left-5 padding-bottom-5 padding-top-5"
+            colspan="3"
+            th:utext="${total < 0} ? #{document.invoice.table.line.negative-remaining-amount} : #{document.invoice.table.line.positive-remaining-amount}"
+          ></td>
           <td class="top-right padding-right-5 padding-bottom-5 padding-top-5">
             <b>[[${#numbers.formatDecimal(total, 1, 2, 'POINT')}]]</b>
           </td>
@@ -65,15 +81,15 @@
       <br />
       <br />
       <div>
-        <b>Important</b>
+        <span th:utext="#{document.invoice.important.title}"></span>
         <hr class="border-thin" />
         <div class="padding-left-5">
-          - Veuillez effectuer votre paiement via E-banking <b>en indiquant votre nom et prénom</b>.<br />
-          - Le délai de paiement est de <b>30 jours</b>. Sans réception du paiement dans les délais, votre place sera considérée comme
-          vacante.
+          <span th:utext="#{document.invoice.important.text1}"></span>
+          <br />
+          <span th:utext="#{document.invoice.important.text2}"></span>
         </div>
         <br />
-        <b>Coordonnées bancaires</b>
+        <span th:utext="#{document.invoice.bank-detail.title}"></span>
         <hr class="border-thin" />
         <div class="padding-left-5">
           [[${iban}]]<br />
@@ -85,7 +101,7 @@
 
       <br />
       <div>
-        <p>Le Salon de [[${sender.getEnterpriseName()}]] vous remercie pour votre confiance. Au plaisir de vous voir.</p>
+        <p th:utext="#{document.invoice.text.final(${sender.getEnterpriseName()})}"></p>
       </div>
     </div>
     <div class="footer" th:include="common/footer::footer"></div>

@@ -5,10 +5,11 @@ import ch.salon.domain.User;
 import ch.salon.repository.PersistentTokenRepository;
 import ch.salon.repository.UserRepository;
 import ch.salon.security.SecurityUtils;
-import ch.salon.service.MailService;
 import ch.salon.service.UserService;
 import ch.salon.service.dto.AdminUserDTO;
 import ch.salon.service.dto.PasswordChangeDTO;
+import ch.salon.service.mail.ActivationEmailCreator;
+import ch.salon.service.mail.PasswordResetEmailCreator;
 import ch.salon.web.rest.errors.EmailAlreadyUsedException;
 import ch.salon.web.rest.errors.InvalidPasswordException;
 import ch.salon.web.rest.vm.KeyAndPasswordVM;
@@ -23,7 +24,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -32,19 +41,22 @@ public class AccountResource {
     private static final Logger log = LoggerFactory.getLogger(AccountResource.class);
     private final UserRepository userRepository;
     private final UserService userService;
-    private final MailService mailService;
     private final PersistentTokenRepository persistentTokenRepository;
+    private final ActivationEmailCreator activationEmailCreator;
+    private final PasswordResetEmailCreator passwordResetEmailCreator;
 
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
-        MailService mailService,
-        PersistentTokenRepository persistentTokenRepository
+        PersistentTokenRepository persistentTokenRepository,
+        ActivationEmailCreator activationEmailCreator,
+        PasswordResetEmailCreator passwordResetEmailCreator
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
-        this.mailService = mailService;
         this.persistentTokenRepository = persistentTokenRepository;
+        this.activationEmailCreator = activationEmailCreator;
+        this.passwordResetEmailCreator = passwordResetEmailCreator;
     }
 
     private static boolean isPasswordLengthInvalid(String password) {
@@ -57,14 +69,14 @@ public class AccountResource {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) throws Exception {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
 
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-
-        mailService.sendActivationEmail(user);
+        activationEmailCreator.fillUser(user);
+        activationEmailCreator.sendEmailAsync();
     }
 
     @GetMapping("/activate")
@@ -152,10 +164,11 @@ public class AccountResource {
     }
 
     @PostMapping(path = "/account/reset-password/init")
-    public void requestPasswordReset(@RequestBody String mail) {
+    public void requestPasswordReset(@RequestBody String mail) throws Exception {
         Optional<User> user = userService.requestPasswordReset(mail);
         if (user.isPresent()) {
-            mailService.sendPasswordResetMail(user.orElseThrow());
+            passwordResetEmailCreator.fillUser(user.orElseThrow());
+            passwordResetEmailCreator.sendEmailAsync();
         } else {
             // Pretend the request has been successful to prevent checking which emails really exist
             // but log that an invalid attempt has been made
