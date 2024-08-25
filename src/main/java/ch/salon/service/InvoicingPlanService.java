@@ -24,7 +24,7 @@ import ch.salon.repository.StandRepository;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.PaymentDTO;
-import ch.salon.service.mail.InvoiceEmailService;
+import ch.salon.service.mail.InvoiceEmailCreator;
 import ch.salon.service.mapper.InvoiceMapper;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.service.mapper.PaymentMapper;
@@ -59,7 +59,7 @@ public class InvoicingPlanService {
     private final InvoiceRepository invoiceRepository;
 
     private final MessageSource messageSource;
-    private final InvoiceEmailService invoiceEmailService;
+    private final InvoiceEmailCreator invoiceEmailCreator;
 
     public InvoicingPlanService(
         SalonRepository salonRepository,
@@ -71,7 +71,7 @@ public class InvoicingPlanService {
         EventLogService eventLogService,
         PaymentRepository paymentRepository,
         InvoiceRepository invoiceRepository,
-        InvoiceEmailService invoiceEmailService
+        InvoiceEmailCreator invoiceEmailCreator
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
@@ -82,7 +82,7 @@ public class InvoicingPlanService {
         this.eventLogService = eventLogService;
         this.paymentRepository = paymentRepository;
         this.invoiceRepository = invoiceRepository;
-        this.invoiceEmailService = invoiceEmailService;
+        this.invoiceEmailCreator = invoiceEmailCreator;
     }
 
     public void send(UUID idInvoicingPlan) throws Exception {
@@ -94,7 +94,9 @@ public class InvoicingPlanService {
             .findById(idInvoicingPlan)
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        invoiceEmailService.send(invoicingPlan);
+        invoiceEmailCreator.fillInvoicingPlan(invoicingPlan);
+        invoiceEmailCreator.sendEmailSync();
+
         eventLogService.eventFromSystem(
             "La facture #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
             EventType.EMAIL,

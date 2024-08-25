@@ -36,20 +36,17 @@ public class MailService {
     private final JavaMailSender javaMailSender;
     private final MessageSource messageSource;
     private final SpringTemplateEngine mailTemplateEngine;
-    private final EventLogService eventLogService;
 
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
-        @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine,
-        EventLogService eventLogService
+        @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.mailTemplateEngine = mailTemplateEngine;
-        this.eventLogService = eventLogService;
     }
 
     @Async
