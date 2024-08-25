@@ -1,0 +1,85 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <link href="styles.css" media="all" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <div class="header" th:include="common/header::header"></div>
+
+    <div class="letterhead" th:include="common/letterhead::letterhead"></div>
+
+    <div class="body">
+      <table class="padding-all-5">
+        <tr>
+          <td class="top-left">
+            <span th:utext="#{document.invoice-receipt.reference}"></span>
+            <b>[[${reference}]]</b><br />
+          </td>
+          <td class="top-right">
+            <span th:utext="#{document.invoice-receipt.contacts}"></span>
+            <br />
+            [[${contact}]]<br />
+            [[${phone}]]
+          </td>
+        </tr>
+      </table>
+      <br />
+      <table class="padding-all-5">
+        <thead class="bg">
+          <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40">
+            <span th:utext="#{document.invoice-receipt.table.header.description}"></span>
+          </td>
+          <td class="bottom-right width-20 padding-top-5 padding-bottom-5">
+            <span th:utext="#{document.invoice-receipt.table.header.price}"></span>
+          </td>
+          <td class="bottom-center width-10 padding-top-5 padding-bottom-5">
+            <span th:utext="#{document.invoice-receipt.table.header.quantity}"></span>
+          </td>
+          <td class="bottom-right padding-right-5 width-30 padding-top-5 padding-bottom-5">
+            <span th:utext="#{document.invoice-receipt.table.header.amount}"></span>
+          </td>
+        </thead>
+
+        <tr>
+          <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr th:each="invoice: ${invoices}">
+          <td class="center-left padding-left-5" th:text="${invoice.getLabel()}" />
+          <td class="center-right" th:text="${#numbers.formatDecimal(invoice.getCustomAmount(), 1, 2, 'POINT')}" />
+          <td class="center-center" th:text="${invoice.getQuantity()}" />
+          <td class="center-right padding-right-5" th:text="${#numbers.formatDecimal(invoice.getTotalAmount(), 1, 2, 'POINT')}" />
+        </tr>
+        <tr>
+          <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr th:if="${hasPaidSomething}">
+          <td class="center-left padding-left-5" th:text="#{document.invoice-receipt.table.line.received-payments}" />
+          <td class="center-right">&nbsp;</td>
+          <td class="center-center">&nbsp;</td>
+          <td class="center-right padding-right-5" th:text="${#numbers.formatDecimal(paymentsTotal, 1, 2, 'POINT')}" />
+        </tr>
+        <tr th:if="${hasPaidSomething}">
+          <td colspan="4">&nbsp;</td>
+        </tr>
+        <tr class="bg">
+          <td
+            class="top-left padding-left-5 padding-bottom-5 padding-top-5"
+            colspan="3"
+            th:utext="${total < 0} ? #{document.invoice-receipt.table.line.negative-remaining-amount} : #{document.invoice-receipt.table.line.positive-remaining-amount}"
+          ></td>
+          <td class="top-right padding-right-5 padding-bottom-5 padding-top-5">
+            <b>[[${#numbers.formatDecimal(total, 1, 2, 'POINT')}]]</b>
+          </td>
+        </tr>
+      </table>
+      <br />
+      <br />
+      <div>
+        <p th:utext="#{document.invoice-receipt.text.final(${sender.getEnterpriseName()})}"></p>
+      </div>
+    </div>
+    <div class="footer" th:include="common/footer::footer"></div>
+  </body>
+</html>

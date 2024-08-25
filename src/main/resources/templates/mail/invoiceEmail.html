@@ -1,21 +1,14 @@
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
   <head>
-    <title th:text="#{email.invoice.title(${billingNumber}, ${salon})}">{1} - #{0}</title>
+    <title th:text="#{email.invoice.title(${salon})}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
   <body>
-    <p th:text="#{email.invoice.greeting(${fullName})}">Cher {0}</p>
+    <p th:text="#{email.invoice.greeting(${fullName})}"></p>
     <p>&nbsp;</p>
-    <p th:utext="#{email.invoice.text1(${salon}, ${startDate}, ${endDate})}">
-      Nous nous réjouissons de te compter parmi nous au salon <strong>{0}</strong> qui se déroulera du <strong>{1}</strong> au
-      <strong>{2}</strong> !
-    </p>
-    <p th:utext="#{email.invoice.text2(${billingNumber})}">
-      En pièce jointe, tu trouveras ta facture <strong>#{0}</strong> selon les données que tu nous as transmises lors de ton inscription.
-    </p>
+    <p th:utext="#{email.invoice.text1(${salon}, ${startDate}, ${endDate})}"></p>
+    <p th:utext="#{email.invoice.text2}"></p>
     <p>&nbsp;</p>
-    <p th:utext="#{email.invoice.text3}">
-      N’hésite pas à nous contacter si tu as la moindre question et en attendant, nous te souhaitons une belle semaine !
-    </p>
+    <p th:utext="#{email.invoice.text3}"></p>
   </body>
 </html>

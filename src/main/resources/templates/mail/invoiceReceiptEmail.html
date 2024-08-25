@@ -1,15 +1,14 @@
-<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
   <head>
-    <title th:text="#{email.invoice.title(${billingNumber}, ${salon})}">xxxxx</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title th:text="#{email.invoice-receipt.title(${salon})}"></title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
   </head>
   <body>
-    <p th:text="#{email.invoice.greeting(${fullName})}">xxxxx</p>
-    <p th:utext="#{email.invoice.text1(${salon}, ${startDate}, ${endDate})}">xxxxx</p>
-    <br />
-    <p th:utext="#{email.invoice.text2(${billingNumber})}">xxxxx</p>
-    <br />
-    <p th:text="#{email.invoice.text3}">xxxxx</p>
+    <p th:text="#{email.invoice-receipt.greeting(${fullName})}"></p>
+    <p>&nbsp;</p>
+    <p th:utext="#{email.invoice-receipt.text1}"></p>
+    <p th:utext="#{email.invoice-receipt.text2}"></p>
+    <p>&nbsp;</p>
+    <p th:utext="#{email.invoice-receipt.text3}"></p>
   </body>
 </html>
