@@ -1,61 +1,50 @@
-import {Routes} from '@angular/router';
+import { Routes } from '@angular/router';
 
-import {UserRouteAccessService} from 'app/core/auth/user-route-access.service';
-import {ConferenceComponent} from './list/conference.component';
-import {ConferenceUpdateComponent} from './update/conference-update.component';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { ConferenceComponent } from './list/conference.component';
+import { ConferenceUpdateComponent } from './update/conference-update.component';
 import ConferenceResolve from './route/conference-routing-resolve.service';
 
 const conferenceRoute: Routes = [
-    {
-        path: '',
-        component: ConferenceComponent,
-        data: {},
-        canActivate: [UserRouteAccessService],
+  {
+    path: '',
+    component: ConferenceComponent,
+    data: {},
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':idConference/view',
+    component: ConferenceUpdateComponent,
+    resolve: {
+      conference: ConferenceResolve,
     },
-    {
-        path: ':idConference/view',
-        component: ConferenceUpdateComponent,
-        resolve: {
-            conference: ConferenceResolve,
-        },
-        data: {
-            readonly: true,
-        },
-        canActivate: [UserRouteAccessService],
+    data: {
+      readonly: true,
     },
-    {
-        path: 'new',
-        component: ConferenceUpdateComponent,
-        resolve: {
-            conference: ConferenceResolve,
-        },
-        data: {
-            readonly: false,
-        },
-        canActivate: [UserRouteAccessService],
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'new',
+    component: ConferenceUpdateComponent,
+    resolve: {
+      conference: ConferenceResolve,
     },
-    {
-        path: ':idConference/edit',
-        component: ConferenceUpdateComponent,
-        resolve: {
-            conference: ConferenceResolve,
-        },
-        data: {
-            readonly: false,
-        },
-        canActivate: [UserRouteAccessService],
+    data: {
+      readonly: false,
     },
-    {
-        path: ':idConference/edit',
-        component: ConferenceUpdateComponent,
-        resolve: {
-            conference: ConferenceResolve,
-        },
-        data: {
-            readonly: false,
-        },
-        canActivate: [UserRouteAccessService],
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':idConference/edit',
+    component: ConferenceUpdateComponent,
+    resolve: {
+      conference: ConferenceResolve,
     },
+    data: {
+      readonly: false,
+    },
+    canActivate: [UserRouteAccessService],
+  },
 ];
 
 export default conferenceRoute;

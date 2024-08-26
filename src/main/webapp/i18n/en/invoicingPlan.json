@@ -3,11 +3,11 @@
     "amount": {
       "different": "Le montant diffère du prix par défaut : {{defaultPrice}}"
     },
-    "resend": "Renvoyer facture",
-    "send": "Envoyer facture",
-    "sent": "Facture envoyé",
     "receipt": {
       "send": "Envoyer quittance"
-    }
+    },
+    "resend": "Renvoyer facture",
+    "send": "Envoyer facture",
+    "sent": "Facture envoyé"
   }
 }

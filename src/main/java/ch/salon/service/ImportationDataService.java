@@ -1,8 +1,18 @@
 package ch.salon.service;
 
-import ch.salon.domain.*;
+import ch.salon.domain.Conference;
+import ch.salon.domain.DimensionStand;
+import ch.salon.domain.Exhibitor;
+import ch.salon.domain.Participation;
+import ch.salon.domain.Salon;
+import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.repository.*;
+import ch.salon.repository.ConferenceRepository;
+import ch.salon.repository.DimensionStandRepository;
+import ch.salon.repository.ExhibitorRepository;
+import ch.salon.repository.ParticipationRepository;
+import ch.salon.repository.SalonRepository;
+import ch.salon.repository.StandRepository;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
