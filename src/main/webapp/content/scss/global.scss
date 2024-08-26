@@ -322,42 +322,38 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 .orange-icon {
-  color: orange;
+  color: $warning;
 }
 
 .grey-icon {
-  color: grey;
-}
-
-.gold-icon {
-  color: gold;
+  color: $secondary;
 }
 
 .blue-icon {
-  color: cornflowerblue;
+  color: $primary;
 }
 
 .green-icon {
-  color: darkseagreen;
+  color: $success;
 }
 
 .card-header {
-  background-color: #2b4f74;
+  background-color: $primary;
   color: white;
 }
 
 .accordion-button:not(.collapsed) {
-  background-color: #2b4f74;
+  background-color: $primary;
   color: white;
 }
 
 .accordion-button.collapsed {
-  background-color: #2c6e89;
+  background-color: $info;
   color: white;
 }
 
 .card-body {
-  border: 1px solid #2b4f74;
+  border: 1px solid $primary;
 }
 
 .alert-warning {
@@ -389,7 +385,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: $danger;
+  background-color: $secondary;
   transition: 0.4s;
   border-radius: 25px;
 }
@@ -409,7 +405,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 /* Quand le checkbox est sélectionné */
 input:checked + .slider {
-  background-color: #a5c86a;
+  background-color: $warning;
 }
 
 /* Déplacer le rond à droite quand le checkbox est sélectionné */

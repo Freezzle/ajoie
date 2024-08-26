@@ -80,7 +80,7 @@ public class ParticipationService {
 
     public List<Participation> findAll(String idSalon) {
         if (StringUtils.isNotBlank(idSalon)) {
-            return participationRepository.findBySalonId(UUID.fromString(idSalon));
+            return participationRepository.findBySalonIdOrderByRegistrationDateDesc(UUID.fromString(idSalon));
         }
 
         throw new IllegalStateException("No filter given");

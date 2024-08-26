@@ -149,7 +149,7 @@ public class InvoicingPlanService {
         invoicingPlan = invoicingPlanRepository.save(invoicingPlan);
 
         this.eventLogService.eventFromSystem(
-                "Une facture a été ajoutée.",
+                "Une ligne de facture a été ajoutée dans la facture #" + invoicingPlan.getBillingNumber(),
                 EventType.EVENT,
                 EntityType.PARTICIPATION,
                 invoicingPlan.getParticipation().getId()
@@ -176,7 +176,7 @@ public class InvoicingPlanService {
 
         if (!Objects.equals(invoiceFound.getCustomAmount(), invoiceDTO.getCustomAmount())) {
             this.eventLogService.eventFromSystem(
-                    "Une facture a été changée.",
+                    "Une ligne de facture a été changée dans la facture #" + invoicingPlan.getBillingNumber(),
                     EventType.EVENT,
                     EntityType.PARTICIPATION,
                     invoicingPlan.getParticipation().getId()
@@ -211,7 +211,7 @@ public class InvoicingPlanService {
         invoicingPlan = this.invoicingPlanRepository.save(invoicingPlan);
 
         this.eventLogService.eventFromSystem(
-                "Un paiement a été ajouté.",
+                "Un paiement a été ajouté dans la facture #" + invoicingPlan.getBillingNumber(),
                 EventType.PAYMENT,
                 EntityType.PARTICIPATION,
                 invoicingPlan.getParticipation().getId()
@@ -238,7 +238,7 @@ public class InvoicingPlanService {
 
         if (!Objects.equals(paymentDTO.getAmount(), paymentFound.getAmount())) {
             this.eventLogService.eventFromSystem(
-                    "Un paiement a été changée.",
+                    "Un paiement a été changée dans la facture #" + invoicingPlan.getBillingNumber(),
                     EventType.EVENT,
                     EntityType.PARTICIPATION,
                     invoicingPlan.getParticipation().getId()
@@ -274,7 +274,7 @@ public class InvoicingPlanService {
 
         this.invoicingPlanRepository.save(invoicingPlan);
         this.eventLogService.eventFromSystem(
-                "Un paiement a été supprimé.",
+                "Un paiement a été supprimé dans la facture #" + invoicingPlan.getBillingNumber(),
                 EventType.PAYMENT,
                 EntityType.PARTICIPATION,
                 invoicingPlan.getParticipation().getId()

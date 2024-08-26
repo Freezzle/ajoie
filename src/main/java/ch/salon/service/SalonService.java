@@ -3,6 +3,8 @@ package ch.salon.service;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
+import ch.salon.domain.enumeration.EntityType;
+import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.SalonRepository;
@@ -31,11 +33,18 @@ public class SalonService {
     private final SalonRepository salonRepository;
     private final ParticipationRepository participationRepository;
     private final StandRepository standRepository;
+    private final EventLogService eventLogService;
 
-    public SalonService(SalonRepository salonRepository, ParticipationRepository participationRepository, StandRepository standRepository) {
+    public SalonService(
+        SalonRepository salonRepository,
+        ParticipationRepository participationRepository,
+        StandRepository standRepository,
+        EventLogService eventLogService
+    ) {
         this.salonRepository = salonRepository;
         this.participationRepository = participationRepository;
         this.standRepository = standRepository;
+        this.eventLogService = eventLogService;
     }
 
     public UUID create(SalonDTO salon) {
@@ -66,7 +75,21 @@ public class SalonService {
             );
         }
 
-        return SalonMapper.INSTANCE.toDto(salonRepository.save(SalonMapper.INSTANCE.toEntity(salon)));
+        Salon salonToUpdate = SalonMapper.INSTANCE.toEntity(salon);
+        if (Salon.hasDifference(salonFound, salonToUpdate)) {
+            participationRepository
+                .findBySalonIdOrderByRegistrationDateDesc(salonFound.getId())
+                .forEach(participation -> {
+                    eventLogService.eventFromSystem(
+                        "Attention : Le salon a changé des prix.",
+                        EventType.EVENT,
+                        EntityType.PARTICIPATION,
+                        participation.getId()
+                    );
+                });
+        }
+
+        return SalonMapper.INSTANCE.toDto(salonRepository.save(salonToUpdate));
     }
 
     public List<SalonDTO> findAll() {
@@ -82,7 +105,7 @@ public class SalonService {
     }
 
     public SalonStats getStats(UUID id) {
-        List<Participation> participationsSalon = this.participationRepository.findBySalonId(id);
+        List<Participation> participationsSalon = this.participationRepository.findBySalonIdOrderByRegistrationDateDesc(id);
 
         SalonStats stats = new SalonStats();
 

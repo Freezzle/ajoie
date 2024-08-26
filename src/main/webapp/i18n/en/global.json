@@ -56,11 +56,13 @@
         "apidocs": "API",
         "configuration": "Configuration",
         "database": "Base de données",
+        "exhibitors": "Gestion des exposants",
         "health": "Diagnostics",
         "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)",
         "logs": "Logs",
         "main": "Administration",
         "metrics": "Métriques",
+        "salons": "Gestion des salons",
         "tracker": "Suivi des utilisateurs",
         "userManagement": "Gestion des utilisateurs"
       },

@@ -46,6 +46,7 @@ public class ConferenceService {
                 EntityType.PARTICIPATION,
                 conferenceCreated.getParticipation().getId()
             );
+
         this.participationService.adaptStatusFromChildren(conferenceCreated.getParticipation().getId());
 
         return conferenceCreated.getId();

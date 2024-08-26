@@ -109,14 +109,6 @@
             <version>9.9.0</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf -->
-        <dependency>
-            <groupId>org.xhtmlrenderer</groupId>
-            <artifactId>flying-saucer-pdf</artifactId>
-            <version>9.9.0</version>
-        </dependency>
-
-
         <!-- END TO GENERATE HTML TO PDF -->
 
         <dependency>

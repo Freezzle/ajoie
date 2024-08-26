@@ -14,8 +14,12 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "salon")
@@ -78,6 +82,41 @@ public class Salon implements Serializable {
     public Salon id(UUID id) {
         this.setId(id);
         return this;
+    }
+
+    public static boolean hasDifference(Salon salon1, Salon salon2) {
+        return (
+            (salon1 == null && salon2 != null) ||
+            (salon1 != null && salon2 == null) ||
+            (salon1 != null &&
+                salon2 != null &&
+                (!Objects.equals(salon1.getPriceConference(), salon2.getPriceConference()) ||
+                    !Objects.equals(salon1.getPriceSharingStand(), salon2.getPriceSharingStand()) ||
+                    !Objects.equals(salon1.getPriceMeal1(), salon2.getPriceMeal1()) ||
+                    !Objects.equals(salon1.getPriceMeal2(), salon2.getPriceMeal2()) ||
+                    !Objects.equals(salon1.getPriceMeal3(), salon2.getPriceMeal3()) ||
+                    hasPriceStandChanged(salon1.getPriceStandSalons(), salon2.getPriceStandSalons())))
+        );
+    }
+
+    public static boolean hasPriceStandChanged(Set<PriceStandSalon> oldPrices, Set<PriceStandSalon> newPrices) {
+        Map<UUID, PriceStandSalon> oldPriceMap = oldPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+
+        Map<UUID, PriceStandSalon> newPriceMap = newPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+
+        // Vérification des éléments manquants et des changements de prix
+        for (UUID id : oldPriceMap.keySet()) {
+            PriceStandSalon oldPrice = oldPriceMap.get(id);
+            PriceStandSalon newPrice = newPriceMap.get(id);
+
+            if (newPrice == null) {
+                return true;
+            } else if (oldPrice.getPrice().doubleValue() != newPrice.getPrice().doubleValue()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public Long getReferenceNumber() {
