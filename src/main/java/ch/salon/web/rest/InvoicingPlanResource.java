@@ -41,11 +41,21 @@ public class InvoicingPlanResource {
         this.invoicingPlanService = invoicingPlanService;
     }
 
-    @PatchMapping("{idInvoicingPlan}/send")
+    @PatchMapping("{idInvoicingPlan}/send-invoice-receipt")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<Void> sendInvoiceReceiptEmail(
+        @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan
+    ) throws Exception {
+        invoicingPlanService.sendInvoiceReceipt(idInvoicingPlan);
+
+        return noContent().build();
+    }
+
+    @PatchMapping("{idInvoicingPlan}/send-invoice")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> sendInvoiceEmail(@PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan)
         throws Exception {
-        invoicingPlanService.send(idInvoicingPlan);
+        invoicingPlanService.sendInvoice(idInvoicingPlan);
 
         return noContent().build();
     }

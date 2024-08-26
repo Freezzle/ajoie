@@ -25,6 +25,7 @@ import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.PaymentDTO;
 import ch.salon.service.mail.InvoiceEmailCreator;
+import ch.salon.service.mail.InvoiceReceiptEmailCreator;
 import ch.salon.service.mapper.InvoiceMapper;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.service.mapper.PaymentMapper;
@@ -60,6 +61,7 @@ public class InvoicingPlanService {
 
     private final MessageSource messageSource;
     private final InvoiceEmailCreator invoiceEmailCreator;
+    private final InvoiceReceiptEmailCreator invoiceReceiptEmailCreator;
 
     public InvoicingPlanService(
         SalonRepository salonRepository,
@@ -71,7 +73,8 @@ public class InvoicingPlanService {
         EventLogService eventLogService,
         PaymentRepository paymentRepository,
         InvoiceRepository invoiceRepository,
-        InvoiceEmailCreator invoiceEmailCreator
+        InvoiceEmailCreator invoiceEmailCreator,
+        InvoiceReceiptEmailCreator invoiceReceiptEmailCreator
     ) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
@@ -83,9 +86,30 @@ public class InvoicingPlanService {
         this.paymentRepository = paymentRepository;
         this.invoiceRepository = invoiceRepository;
         this.invoiceEmailCreator = invoiceEmailCreator;
+        this.invoiceReceiptEmailCreator = invoiceReceiptEmailCreator;
     }
 
-    public void send(UUID idInvoicingPlan) throws Exception {
+    public void sendInvoiceReceipt(UUID idInvoicingPlan) throws Exception {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository
+            .findById(idInvoicingPlan)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        invoiceReceiptEmailCreator.fillInvoicingPlan(invoicingPlan);
+        invoiceReceiptEmailCreator.sendEmailSync();
+
+        eventLogService.eventFromSystem(
+            "La quittance #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
+            EventType.EMAIL,
+            EntityType.PARTICIPATION,
+            invoicingPlan.getParticipation().getId()
+        );
+    }
+
+    public void sendInvoice(UUID idInvoicingPlan) throws Exception {
         if (idInvoicingPlan == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
