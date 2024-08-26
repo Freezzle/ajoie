@@ -2,16 +2,20 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * A Participation.
- */
 @Entity
 @Table(name = "participation")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -62,10 +66,8 @@ public class Participation implements Serializable {
     private Exhibitor exhibitor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
+    @JsonIgnoreProperties(value = { "priceStandSalons" }, allowSetters = true)
     private Salon salon;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
         return this.id;
@@ -245,11 +247,15 @@ public class Participation implements Serializable {
     }
 
     public static boolean hasDifference(Participation part1, Participation part2) {
-        return part1 == null && part2 != null || part1 != null && part2 == null ||
-            (part1 != null && part2 != null &&
+        return (
+            (part1 == null && part2 != null) ||
+            (part1 != null && part2 == null) ||
+            (part1 != null &&
+                part2 != null &&
                 (!Objects.equals(part1.getNbMeal1(), part2.getNbMeal1()) ||
                     !Objects.equals(part1.getNbMeal2(), part2.getNbMeal2()) ||
-                    !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3())));
+                    !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3())))
+        );
     }
 
     @Override
@@ -269,14 +275,43 @@ public class Participation implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Participation{" + "id=" + getId() + ", registrationDate='" + getRegistrationDate() + "'" +
-            ", clientNumber='" + getClientNumber() + "'" + ", nbMeal1=" + getNbMeal1() + ", nbMeal2=" +
-            getNbMeal2() + ", nbMeal3=" + getNbMeal3() + ", acceptedChart='" + getAcceptedChart() + "'" +
-            ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangment='" + getNeedArrangment() + "'" +
-            ", isBillingClosed='" + getIsBillingClosed() + "'" + ", status='" + getStatus() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" + "}";
+        return (
+            "Participation{" +
+            "id=" +
+            getId() +
+            ", registrationDate='" +
+            getRegistrationDate() +
+            "'" +
+            ", clientNumber='" +
+            getClientNumber() +
+            "'" +
+            ", nbMeal1=" +
+            getNbMeal1() +
+            ", nbMeal2=" +
+            getNbMeal2() +
+            ", nbMeal3=" +
+            getNbMeal3() +
+            ", acceptedChart='" +
+            getAcceptedChart() +
+            "'" +
+            ", acceptedContract='" +
+            getAcceptedContract() +
+            "'" +
+            ", needArrangment='" +
+            getNeedArrangment() +
+            "'" +
+            ", isBillingClosed='" +
+            getIsBillingClosed() +
+            "'" +
+            ", status='" +
+            getStatus() +
+            "'" +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }

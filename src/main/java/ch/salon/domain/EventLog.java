@@ -2,15 +2,17 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * A Invoice.
- */
 @Entity
 @Table(name = "event_log")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -118,7 +120,20 @@ public class EventLog implements Serializable {
 
     @Override
     public String toString() {
-        return "EventLog{" + "fromSystem=" + fromSystem + ", label='" + label + '\'' + ", type=" + type +
-            ", referenceDate=" + referenceDate + ", id=" + id + '}';
+        return (
+            "EventLog{" +
+            "fromSystem=" +
+            fromSystem +
+            ", label='" +
+            label +
+            '\'' +
+            ", type=" +
+            type +
+            ", referenceDate=" +
+            referenceDate +
+            ", id=" +
+            id +
+            '}'
+        );
     }
 }

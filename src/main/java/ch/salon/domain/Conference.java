@@ -2,16 +2,20 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * A Conference.
- */
 @Entity
 @Table(name = "conference")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -36,10 +40,8 @@ public class Conference implements Serializable {
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
+    @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
     private Participation participation;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
         return this.id;
@@ -107,12 +109,12 @@ public class Conference implements Serializable {
     }
 
     public static boolean hasDifference(Conference conf1, Conference conf2) {
-        return conf1 == null && conf2 != null || conf1 != null && conf2 == null ||
-            (conf1 != null && conf2 != null &&
-                (!Objects.equals(conf1.getStatus(), conf2.getStatus())));
+        return (
+            (conf1 == null && conf2 != null) ||
+            (conf1 != null && conf2 == null) ||
+            (conf1 != null && conf2 != null && (!Objects.equals(conf1.getStatus(), conf2.getStatus())))
+        );
     }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
@@ -131,10 +133,22 @@ public class Conference implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Conference{" + "id=" + getId() + ", title='" + getTitle() + "'" + ", status='" + getStatus() + "'" +
-               ", extraInformation='" + getExtraInformation() + "'" + "}";
+        return (
+            "Conference{" +
+            "id=" +
+            getId() +
+            ", title='" +
+            getTitle() +
+            "'" +
+            ", status='" +
+            getStatus() +
+            "'" +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }

@@ -1,18 +1,22 @@
 package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * A Salon.
- */
 @Entity
 @Table(name = "salon")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -58,13 +62,10 @@ public class Salon implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL,
-               targetEntity = PriceStandSalon.class)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL, targetEntity = PriceStandSalon.class)
     @JoinColumn(name = "salon_id", referencedColumnName = "id")
-    @JsonIgnoreProperties(value = {"dimension"}, allowSetters = true)
+    @JsonIgnoreProperties(value = { "dimension" }, allowSetters = true)
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
         return this.id;
@@ -246,13 +247,38 @@ public class Salon implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Salon{" + "id=" + getId() + ", referenceNumber='" + getReferenceNumber() + "'" + ", place='" +
-               getPlace() + "'" + ", startingDate='" + getStartingDate() + "'" + ", endingDate='" + getEndingDate() +
-               "'" + ", priceMeal1=" + getPriceMeal1() + ", priceMeal2=" + getPriceMeal2() + ", priceMeal3=" +
-               getPriceMeal3() + ", priceConference=" + getPriceConference() + ", priceSharingStand=" +
-               getPriceSharingStand() + ", extraInformation='" + getExtraInformation() + "'" + "}";
+        return (
+            "Salon{" +
+            "id=" +
+            getId() +
+            ", referenceNumber='" +
+            getReferenceNumber() +
+            "'" +
+            ", place='" +
+            getPlace() +
+            "'" +
+            ", startingDate='" +
+            getStartingDate() +
+            "'" +
+            ", endingDate='" +
+            getEndingDate() +
+            "'" +
+            ", priceMeal1=" +
+            getPriceMeal1() +
+            ", priceMeal2=" +
+            getPriceMeal2() +
+            ", priceMeal3=" +
+            getPriceMeal3() +
+            ", priceConference=" +
+            getPriceConference() +
+            ", priceSharingStand=" +
+            getPriceSharingStand() +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }

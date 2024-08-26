@@ -1,14 +1,14 @@
 package ch.salon.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * A Exhibitor.
- */
 @Entity
 @Table(name = "exhibitor")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -40,8 +40,6 @@ public class Exhibitor implements Serializable {
 
     @Column(name = "extra_information")
     private String extraInformation;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
         return this.id;
@@ -134,8 +132,6 @@ public class Exhibitor implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -153,11 +149,31 @@ public class Exhibitor implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Exhibitor{" + "id=" + getId() + ", fullName='" + getFullName() + "'" + ", email='" + getEmail() + "'" +
-               ", phoneNumber='" + getPhoneNumber() + "'" + ", address='" + getAddress() + "'" + ", npaLocalite='" +
-               getNpaLocalite() + "'" + ", extraInformation='" + getExtraInformation() + "'" + "}";
+        return (
+            "Exhibitor{" +
+            "id=" +
+            getId() +
+            ", fullName='" +
+            getFullName() +
+            "'" +
+            ", email='" +
+            getEmail() +
+            "'" +
+            ", phoneNumber='" +
+            getPhoneNumber() +
+            "'" +
+            ", address='" +
+            getAddress() +
+            "'" +
+            ", npaLocalite='" +
+            getNpaLocalite() +
+            "'" +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }

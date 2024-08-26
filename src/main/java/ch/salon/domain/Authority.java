@@ -1,20 +1,25 @@
 package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.springframework.data.domain.Persistable;
-
 import java.io.Serializable;
 import java.util.Objects;
+import org.springframework.data.domain.Persistable;
 
 /**
  * A Authority.
  */
 @Entity
 @Table(name = "jhi_authority")
-@JsonIgnoreProperties(value = {"new", "id"})
+@JsonIgnoreProperties(value = { "new", "id" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Authority implements Serializable, Persistable<String> {
 
@@ -28,8 +33,6 @@ public class Authority implements Serializable, Persistable<String> {
 
     @Transient
     private boolean isPersisted;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public String getName() {
         return this.name;
@@ -66,8 +69,6 @@ public class Authority implements Serializable, Persistable<String> {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -84,7 +85,6 @@ public class Authority implements Serializable, Persistable<String> {
         return Objects.hashCode(getName());
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "Authority{" + "name=" + getName() + "}";

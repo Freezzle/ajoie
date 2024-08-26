@@ -1,4 +1,4 @@
-package ch.salon.domain;
+package ch.salon.utils;
 
 import java.time.Instant;
 import java.time.ZoneId;

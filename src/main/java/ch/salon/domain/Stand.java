@@ -2,16 +2,20 @@ package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * A Stand.
- */
 @Entity
 @Table(name = "stand")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -57,13 +61,11 @@ public class Stand implements Serializable {
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
+    @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
     private Participation participation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private DimensionStand dimension;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
         return this.id;
@@ -235,14 +237,16 @@ public class Stand implements Serializable {
     }
 
     public static boolean hasDifference(Stand stand1, Stand stand2) {
-        return stand1 == null && stand2 != null || stand1 != null && stand2 == null ||
-            (stand1 != null && stand2 != null &&
+        return (
+            (stand1 == null && stand2 != null) ||
+            (stand1 != null && stand2 == null) ||
+            (stand1 != null &&
+                stand2 != null &&
                 (!Objects.equals(stand1.getDimension().getId(), stand2.getDimension().getId()) ||
                     !Objects.equals(stand1.getShared(), stand2.getShared()) ||
-                    !Objects.equals(stand1.getStatus(), stand2.getStatus())));
+                    !Objects.equals(stand1.getStatus(), stand2.getStatus())))
+        );
     }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
@@ -261,13 +265,41 @@ public class Stand implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Stand{" + "id=" + getId() + ", description='" + getDescription() + "'" + ", website='" + getWebsite() +
-            "'" + ", socialMedia='" + getSocialMedia() + "'" + ", urlPicture='" + getUrlPicture() + "'" +
-            ", shared='" + getShared() + "'" + ", nbTable=" + getNbTable() + ", nbChair=" + getNbChair() +
-            ", needElectricity='" + getNeedElectricity() + "'" + ", status='" + getStatus() + "'" +
-            ", extraInformation='" + getExtraInformation() + "'" + "}";
+        return (
+            "Stand{" +
+            "id=" +
+            getId() +
+            ", description='" +
+            getDescription() +
+            "'" +
+            ", website='" +
+            getWebsite() +
+            "'" +
+            ", socialMedia='" +
+            getSocialMedia() +
+            "'" +
+            ", urlPicture='" +
+            getUrlPicture() +
+            "'" +
+            ", shared='" +
+            getShared() +
+            "'" +
+            ", nbTable=" +
+            getNbTable() +
+            ", nbChair=" +
+            getNbChair() +
+            ", needElectricity='" +
+            getNeedElectricity() +
+            "'" +
+            ", status='" +
+            getStatus() +
+            "'" +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }

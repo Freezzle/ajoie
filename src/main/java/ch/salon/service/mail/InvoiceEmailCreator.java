@@ -1,8 +1,8 @@
 package ch.salon.service.mail;
 
-import ch.salon.domain.DateUtils;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.service.document.InvoiceDocumentCreator;
+import ch.salon.utils.DateUtils;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;

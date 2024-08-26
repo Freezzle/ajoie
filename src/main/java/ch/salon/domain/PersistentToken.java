@@ -1,19 +1,17 @@
 package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-/**
- * Persistent tokens are used by Spring Security to automatically log in users.
- *
- * @see ch.salon.security.PersistentTokenRememberMeServices
- */
 @Entity
 @Table(name = "jhi_persistent_token")
 public class PersistentToken implements Serializable {
@@ -33,7 +31,6 @@ public class PersistentToken implements Serializable {
     @Column(name = "token_date")
     private LocalDate tokenDate;
 
-    //an IPV6 address max length is 39 characters
     @Size(min = 0, max = 39)
     @Column(name = "ip_address", length = 39)
     private String ipAddress;
@@ -113,10 +110,25 @@ public class PersistentToken implements Serializable {
         return Objects.hashCode(series);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "PersistentToken{" + "series='" + series + '\'' + ", tokenValue='" + tokenValue + '\'' + ", tokenDate=" +
-               tokenDate + ", ipAddress='" + ipAddress + '\'' + ", userAgent='" + userAgent + '\'' + "}";
+        return (
+            "PersistentToken{" +
+            "series='" +
+            series +
+            '\'' +
+            ", tokenValue='" +
+            tokenValue +
+            '\'' +
+            ", tokenDate=" +
+            tokenDate +
+            ", ipAddress='" +
+            ipAddress +
+            '\'' +
+            ", userAgent='" +
+            userAgent +
+            '\'' +
+            "}"
+        );
     }
 }

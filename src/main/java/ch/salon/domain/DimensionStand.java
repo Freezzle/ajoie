@@ -1,14 +1,14 @@
 package ch.salon.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * A DimensionStand.
- */
 @Entity
 @Table(name = "dimension_stand")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -25,10 +25,7 @@ public class DimensionStand implements Serializable {
     @Column(name = "dimension", nullable = false)
     private String dimension;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
-
-    public DimensionStand() {
-    }
+    public DimensionStand() {}
 
     public DimensionStand(String dimension) {
         this.dimension = dimension;
@@ -60,8 +57,6 @@ public class DimensionStand implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -79,7 +74,6 @@ public class DimensionStand implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "DimensionStand{" + "id=" + getId() + ", dimension='" + getDimension() + "'" + "}";

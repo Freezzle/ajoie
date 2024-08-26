@@ -8,11 +8,17 @@ import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.repository.*;
+import ch.salon.repository.ConferenceRepository;
+import ch.salon.repository.ParticipationRepository;
+import ch.salon.repository.StandRepository;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -27,20 +33,17 @@ public class ParticipationService {
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
     private final EventLogService eventLogService;
-    private final InvoicingPlanRepository invoicingPlanRepository;
 
     public ParticipationService(
         ParticipationRepository participationRepository,
         ConferenceRepository conferenceRepository,
         StandRepository standRepository,
-        EventLogService eventLogService,
-        InvoicingPlanRepository invoicingPlanRepository
+        EventLogService eventLogService
     ) {
         this.participationRepository = participationRepository;
         this.conferenceRepository = conferenceRepository;
         this.standRepository = standRepository;
         this.eventLogService = eventLogService;
-        this.invoicingPlanRepository = invoicingPlanRepository;
     }
 
     public UUID create(Participation participation) {

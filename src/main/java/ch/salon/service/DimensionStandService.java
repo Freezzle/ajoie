@@ -4,11 +4,7 @@ import ch.salon.domain.DimensionStand;
 import ch.salon.repository.DimensionStandRepository;
 import ch.salon.service.dto.DimensionStandDTO;
 import ch.salon.service.mapper.DimensionStandMapper;
-import ch.salon.web.rest.errors.BadRequestAlertException;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -4,7 +4,6 @@ import ch.salon.domain.Participation;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
@@ -14,11 +13,15 @@ import ch.salon.service.mapper.SalonMapper;
 import ch.salon.web.rest.dto.DimensionStats;
 import ch.salon.web.rest.dto.SalonStats;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class SalonService {
@@ -28,14 +31,11 @@ public class SalonService {
     private final SalonRepository salonRepository;
     private final ParticipationRepository participationRepository;
     private final StandRepository standRepository;
-    private final ConferenceRepository conferenceRepository;
 
-    public SalonService(SalonRepository salonRepository, ParticipationRepository participationRepository,
-                        StandRepository standRepository, ConferenceRepository conferenceRepository) {
+    public SalonService(SalonRepository salonRepository, ParticipationRepository participationRepository, StandRepository standRepository) {
         this.salonRepository = salonRepository;
         this.participationRepository = participationRepository;
         this.standRepository = standRepository;
-        this.conferenceRepository = conferenceRepository;
     }
 
     public UUID create(SalonDTO salon) {
@@ -61,8 +61,9 @@ public class SalonService {
         }
 
         if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
-            salon.setPriceStandSalons(salonFound.getPriceStandSalons().stream().map(PriceStandMapper.INSTANCE::toDto)
-                .collect(Collectors.toSet()));
+            salon.setPriceStandSalons(
+                salonFound.getPriceStandSalons().stream().map(PriceStandMapper.INSTANCE::toDto).collect(Collectors.toSet())
+            );
         }
 
         return SalonMapper.INSTANCE.toDto(salonRepository.save(SalonMapper.INSTANCE.toEntity(salon)));
@@ -85,33 +86,30 @@ public class SalonService {
 
         SalonStats stats = new SalonStats();
 
-        List<Stand> standsAccepted =
-            standRepository.findByParticipationId(id).stream().filter(stand -> stand.getStatus() == Status.ACCEPTED)
-                .toList();
+        List<Stand> standsAccepted = standRepository
+            .findByParticipationId(id)
+            .stream()
+            .filter(stand -> stand.getStatus() == Status.ACCEPTED)
+            .toList();
 
         stats.setNbStandAccepted(standsAccepted.stream().filter(stand -> stand.getStatus() == Status.ACCEPTED).count());
-        stats.setNbStandInVerification(
-            participationsSalon.stream().filter(stand -> stand.getStatus() == Status.IN_VERIFICATION).count());
-        stats.setNbStandRefused(
-            participationsSalon.stream().filter(stand -> stand.getStatus() == Status.REFUSED).count());
-        stats.setNbStandCanceled(
-            participationsSalon.stream().filter(stand -> stand.getStatus() == Status.CANCELED).count());
+        stats.setNbStandInVerification(participationsSalon.stream().filter(stand -> stand.getStatus() == Status.IN_VERIFICATION).count());
+        stats.setNbStandRefused(participationsSalon.stream().filter(stand -> stand.getStatus() == Status.REFUSED).count());
+        stats.setNbStandCanceled(participationsSalon.stream().filter(stand -> stand.getStatus() == Status.CANCELED).count());
 
-        List<Participation> participationsAccepted =
-            participationsSalon.stream().filter(participation -> participation.getStatus() == Status.ACCEPTED)
-                .toList();
+        List<Participation> participationsAccepted = participationsSalon
+            .stream()
+            .filter(participation -> participation.getStatus() == Status.ACCEPTED)
+            .toList();
 
-        stats.setNbMealSaturdayMidday(
-            participationsAccepted.stream().map(Participation::getNbMeal1).reduce(0L, Long::sum));
-        stats.setNbMealSaturdayEvening(
-            participationsAccepted.stream().map(Participation::getNbMeal2).reduce(0L, Long::sum));
-        stats.setNbMealSundayMidday(
-            participationsAccepted.stream().map(Participation::getNbMeal3).reduce(0L, Long::sum));
+        stats.setNbMealSaturdayMidday(participationsAccepted.stream().map(Participation::getNbMeal1).reduce(0L, Long::sum));
+        stats.setNbMealSaturdayEvening(participationsAccepted.stream().map(Participation::getNbMeal2).reduce(0L, Long::sum));
+        stats.setNbMealSundayMidday(participationsAccepted.stream().map(Participation::getNbMeal3).reduce(0L, Long::sum));
 
-        stats.setNbParticipationAcceptedPaid(
-            participationsSalon.stream().filter(Participation::getIsBillingClosed).count());
+        stats.setNbParticipationAcceptedPaid(participationsSalon.stream().filter(Participation::getIsBillingClosed).count());
         stats.setNbParticipationAcceptedUnpaid(
-            participationsSalon.stream().filter(participation -> !participation.getIsBillingClosed()).count());
+            participationsSalon.stream().filter(participation -> !participation.getIsBillingClosed()).count()
+        );
 
         Map<String, Long> dimensions = new HashMap<>();
         for (Stand stand : standsAccepted) {

@@ -21,9 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * A Invoice.
- */
 @Entity
 @Table(name = "invoicing_plan")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -59,8 +56,6 @@ public class InvoicingPlan implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
     private Participation participation;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
         return this.id;

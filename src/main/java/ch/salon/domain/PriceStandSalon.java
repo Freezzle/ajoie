@@ -1,14 +1,16 @@
 package ch.salon.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * A PriceStandSalon.
- */
 @Entity
 @Table(name = "price_stand_salon")
 @SuppressWarnings("common-java:DuplicatedBlocks")
@@ -69,8 +71,6 @@ public class PriceStandSalon implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -88,7 +88,6 @@ public class PriceStandSalon implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "PriceStandSalon{" + "id=" + getId() + ", price=" + getPrice() + "}";

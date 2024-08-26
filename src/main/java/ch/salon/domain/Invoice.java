@@ -1,7 +1,13 @@
 package ch.salon.domain;
 
 import ch.salon.domain.enumeration.Type;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -51,8 +57,6 @@ public class Invoice implements Serializable {
 
     @Column(name = "extra_information")
     private String extraInformation;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Invoice() {}
 
@@ -219,13 +223,36 @@ public class Invoice implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Invoice{" + "id=" + getId() + ", referenceId=" + getReferenceId() + ", generationDate='" +
-               getGenerationDate() + "'" + ", type='" + getType() + "'" + ", label='" + getLabel() + "'" +
-               ", defaultAmount=" + getDefaultAmount() + ", customAmount=" + getCustomAmount() + ", quantity=" +
-               getQuantity() + ", lock='" + getLock() + "'" + ", extraInformation='" +
-               getExtraInformation() + "'" + "}";
+        return (
+            "Invoice{" +
+            "id=" +
+            getId() +
+            ", referenceId=" +
+            getReferenceId() +
+            ", generationDate='" +
+            getGenerationDate() +
+            "'" +
+            ", type='" +
+            getType() +
+            "'" +
+            ", label='" +
+            getLabel() +
+            "'" +
+            ", defaultAmount=" +
+            getDefaultAmount() +
+            ", customAmount=" +
+            getCustomAmount() +
+            ", quantity=" +
+            getQuantity() +
+            ", lock='" +
+            getLock() +
+            "'" +
+            ", extraInformation='" +
+            getExtraInformation() +
+            "'" +
+            "}"
+        );
     }
 }
