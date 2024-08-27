@@ -1,0 +1,115 @@
+@import 'content/scss/global';
+
+/* Conteneur principal */
+.planner {
+  display: table;
+  width: 70%;
+  border-collapse: collapse; /* Supprimer l'espace entre les cellules */
+  table-layout: fixed; /* Assure que toutes les colonnes aient une largeur égale */
+}
+
+/* En-tête de la grille */
+.header {
+  display: table-row;
+  font-weight: bold;
+  background-color: $primary; /* Couleur de fond pour l'en-tête */
+  color: white;
+}
+
+.header .header-cell {
+  display: table-cell;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid $primary;
+}
+
+/* Contenu de chaque ligne (pour chaque bénévole) */
+.row {
+  display: table-row;
+}
+
+.row .cell {
+  display: table-cell;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid $primary;
+  vertical-align: middle; /* Centrage vertical des cellules */
+}
+
+/* Stylisation des cellules vides */
+.empty-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 5px;
+}
+
+/* Pour l'affichage des événements (à l'intérieur des cellules) */
+.event {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $primary;
+  color: white;
+  border-radius: 4px;
+  padding: 5px;
+  position: relative;
+}
+
+/* Bouton de addition dans les événements */
+.add-button {
+  position: relative;
+  background: white;
+  color: $success;
+}
+
+.add-button:hover {
+  color: white;
+  background: $success;
+  border-radius: 3px;
+}
+
+/* Bouton de suppression dans les événements */
+.delete-button {
+  position: relative;
+  width: 50%;
+  top: 0;
+  right: 0;
+}
+
+.delete-button:hover {
+  color: $danger;
+  background: white;
+  border-radius: 3px;
+}
+
+/* Bouton de modification dans les événements */
+.edit-button {
+  position: relative;
+  width: 50%;
+  top: 0;
+  left: 0;
+}
+
+.edit-button:hover {
+  color: $primary;
+  background: white;
+  border-radius: 3px;
+}
+
+.event-blue {
+  background-color: $primary;
+}
+
+.event-green {
+  background-color: $success;
+}
+
+.event-orange {
+  background-color: $warning;
+}
+
+.event-grey {
+  background-color: $secondary;
+}

@@ -72,6 +72,12 @@
                 <span jhiTranslate="global.menu.admin.salons">Gestion des salons</span>
               </a>
             </li>
+            <li>
+              <a (click)="collapseNavbar()" class="dropdown-item" routerLink="/admin/volunteers" routerLinkActive="active">
+                <fa-icon [fixedWidth]="true" icon="users"></fa-icon>
+                <span>Gestion des bénévoles</span>
+              </a>
+            </li>
             @if (openAPIEnabled) {
               <li>
                 <a class="dropdown-item" routerLink="/admin/docs" routerLinkActive="active" (click)="collapseNavbar()">

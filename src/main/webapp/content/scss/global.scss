@@ -61,27 +61,9 @@ Generic styles
   padding: 10px;
 }
 
-.w-40 {
-  width: 40% !important;
-}
-
-.w-60 {
-  width: 60% !important;
-}
-
 .break {
   white-space: normal;
   word-break: break-all;
-}
-
-.form-control {
-  background-color: #ffeccb;
-  border: 1px dashed $primary;
-}
-
-.form-control:disabled {
-  background-color: #fff;
-  border: 1px dashed $secondary;
 }
 
 .readonly {
@@ -228,119 +210,38 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   }
 }
 
-/* jhipster-needle-scss-add-main JHipster will add new css style */
+/******************** SALON STYLES *************************/
 
-.form-1-box {
-  padding-top: 30px;
-  text-align: left;
+/* ALERT */
+
+.alert-warning {
+  color: black;
+  background-color: #f8e6d8;
 }
 
-.form-1-box legend {
-  float: none;
-  font-size: inherit;
-  line-height: 30px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #555;
-}
+/* ICONS */
 
-.form-1-box .form-check-label {
-  line-height: 1.5;
-  vertical-align: top;
-}
-
-.form-1-box input[type='text'],
-.form-1-box input[type='email'],
-.form-1-box input[type='password'] {
-  background: none;
-  border: 1px solid #ddd;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  color: #888;
-  box-shadow: none;
-}
-
-.form-1-box input[type='text']:focus,
-.form-1-box input[type='email']:focus,
-.form-1-box input[type='password']:focus {
-  outline: 0;
-  background: none;
-  border: 1px solid #db5d50;
-  box-shadow: none;
-}
-
-.form-1-box input[type='text']::-moz-placeholder,
-.form-1-box input[type='email']::-moz-placeholder,
-.form-1-box input[type='password']::-moz-placeholder {
-  color: #bbb;
-  font-style: italic;
-}
-
-.form-1-box input[type='text']:-ms-input-placeholder,
-.form-1-box input[type='email']:-ms-input-placeholder,
-.form-1-box input[type='password']:-ms-input-placeholder {
-  color: #bbb;
-  font-style: italic;
-}
-
-.form-1-box input[type='text']::-webkit-input-placeholder,
-.form-1-box input[type='email']::-webkit-input-placeholder,
-.form-1-box input[type='password']::-webkit-input-placeholder {
-  color: #bbb;
-  font-style: italic;
-}
-
-.form-1-box button.btn-customized {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #db5d50;
-  border: 0;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  color: #fff;
-  box-shadow: none;
-}
-
-.form-1-box button.btn-customized:hover,
-.form-1-box button.btn-customized:active,
-.form-1-box button.btn-customized:focus,
-.form-1-box button.btn-customized:active:focus,
-.form-1-box button.btn-customized.active:focus,
-.form-1-box button.btn.btn-primary:not(:disabled):not(.disabled):active,
-.form-1-box button.btn.btn-primary:not(:disabled):not(.disabled):active:focus {
-  outline: 0;
-  background: #ca594d;
-  border: 0;
-  color: #fff;
-  box-shadow: none;
-}
-
-.red-icon {
-  color: lightcoral;
-}
-
-.orange-icon {
-  color: $warning;
+.blue-icon {
+  color: $primary;
 }
 
 .grey-icon {
   color: $secondary;
 }
 
-.blue-icon {
-  color: $primary;
-}
-
 .green-icon {
   color: $success;
 }
 
-.card-header {
-  background-color: $primary;
-  color: white;
+.orange-icon {
+  color: $warning;
 }
+
+.red-icon {
+  color: $danger;
+}
+
+/* ACCORDION */
 
 .accordion-button:not(.collapsed) {
   background-color: $primary;
@@ -352,16 +253,30 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   color: white;
 }
 
+/* CARD */
+
+.card-header {
+  background-color: $primary;
+  color: white;
+}
+
 .card-body {
   border: 1px solid $primary;
 }
 
-.alert-warning {
-  color: black;
-  background-color: #f8e6d8;
+/* FORM CONTROL */
+
+.form-control {
+  background-color: #ffeccb;
+  border: 1px dashed $primary;
 }
 
-/* Style du conteneur de la case à cocher */
+.form-control:disabled {
+  background-color: #fff;
+  border: 1px dashed $secondary;
+}
+
+/* SWITCH CHECKBOX */
 
 .switch {
   position: relative;
@@ -370,14 +285,12 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   height: 25px;
 }
 
-/* Masquer la case à cocher réelle */
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-/* Slider (la partie visible du switch) */
 .slider {
   position: absolute;
   cursor: pointer;
@@ -390,7 +303,6 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   border-radius: 25px;
 }
 
-/* Rond à l'intérieur du slider */
 .slider:before {
   position: absolute;
   content: '';
@@ -403,20 +315,15 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   border-radius: 25px;
 }
 
-/* Quand le checkbox est sélectionné */
 input:checked + .slider {
   background-color: $warning;
 }
 
-/* Déplacer le rond à droite quand le checkbox est sélectionné */
 input:checked + .slider:before {
   transform: translateX(22px);
 }
 
-/* Ajout d'une ombre subtile autour du slider */
-.slider {
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-}
+/* LOG EVENT */
 
 .log-container {
   max-height: calc(10 * 1.5rem);
@@ -426,6 +333,8 @@ input:checked + .slider:before {
 .log-row {
   height: 1.4rem;
 }
+
+/* TABLE SECTION FOR INVOICES */
 
 .table-section {
   background-color: #888888 !important;

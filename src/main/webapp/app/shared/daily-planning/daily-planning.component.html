@@ -1,0 +1,36 @@
+<div class="planner">
+  <!-- En-tête des heures -->
+  <div class="header">
+    <div class="cell header-cell">Bénévoles</div>
+    @for (hour of hours; track $index) {
+      <div class="cell header-cell">
+        {{ hour | date: 'HH:mm' }}
+      </div>
+    }
+  </div>
+
+  <!-- Contenu de la grille -->
+  @for (line of editingLines; track $index) {
+    <div class="row">
+      <div class="cell fw-bold">
+        <b>{{ line.label }}</b>
+      </div>
+      @for (hour of hours; track $index) {
+        <div class="cell">
+          <!-- Affichage des événements existants -->
+          @if (isEventAtHour(line, hour)) {
+            <div class="event {{ getColorClass(isEventAtHour(line, hour)!) }}">
+              <span class="edit-button" (click)="editEvent(isEventAtHour(line, hour)!)"><fa-icon icon="repeat"></fa-icon></span>
+              <span class="delete-button" (click)="removeEvent(line, isEventAtHour(line, hour)!)"><fa-icon icon="times"></fa-icon></span>
+            </div>
+          } @else {
+            <!-- Affichage du bouton "+" dans les cellules vides -->
+            <div class="empty-cell add-button" (click)="addEvent(line, hour)">
+              <fa-icon icon="plus"></fa-icon>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

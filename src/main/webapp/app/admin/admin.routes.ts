@@ -42,6 +42,11 @@ const routes: Routes = [
     data: { pageTitle: 'participation.title' },
     loadChildren: () => import('./participation/participation.routes'),
   },
+  {
+    path: 'volunteers',
+    data: { pageTitle: 'volunteer.title' },
+    loadChildren: () => import('./volunteer/volunteer.routes'),
+  },
   /* jhipster-needle-add-admin-route - JHipster will add admin routes here */
 ];
 
