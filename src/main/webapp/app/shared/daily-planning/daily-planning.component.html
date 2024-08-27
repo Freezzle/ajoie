@@ -19,7 +19,7 @@
         <div class="cell">
           <!-- Affichage des événements existants -->
           @if (isEventAtHour(line, hour)) {
-            <div class="event {{ getColorClass(isEventAtHour(line, hour)!) }}">
+            <div class="event {{ getColorClass(isEventAtHour(line, hour)!.type) }}">
               <span class="edit-button" (click)="editEvent(isEventAtHour(line, hour)!)"><fa-icon icon="repeat"></fa-icon></span>
               <span class="delete-button" (click)="removeEvent(line, isEventAtHour(line, hour)!)"><fa-icon icon="times"></fa-icon></span>
             </div>
@@ -33,4 +33,12 @@
       }
     </div>
   }
+  <div>
+    <span class="fw-bold">
+      <b>Meaning of colors</b>
+    </span>
+    @for (type of types; track $index) {
+      <span class="event {{ getColorClass(type) }}">{{ type }}</span>
+    }
+  </div>
 </div>

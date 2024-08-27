@@ -54,8 +54,8 @@ export class DailyPlanningComponent implements OnInit {
     line.plannings = line.plannings.filter(planning => planning !== planningToRemove);
   }
 
-  getColorClass(planning: Planning): string {
-    return this.colors[this.types.indexOf(planning.type)];
+  getColorClass(type: string): string {
+    return this.colors[this.types.indexOf(type)];
   }
 
   addEvent(line: Line, hour: Date): void {
