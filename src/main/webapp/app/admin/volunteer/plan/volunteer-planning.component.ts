@@ -13,9 +13,21 @@ import { Line } from '../../../shared/daily-planning/line.model';
 export class VolunteerPlanningComponent implements OnInit {
   constructor() {}
 
-  ngOnInit() {}
+  dbLines: Line[] = [];
 
-  getLines(): Line[] {
+  ngOnInit() {
+    this.dbLines = this.initLines();
+  }
+
+  saveLines(lines: Line[]): void {
+    this.dbLines = lines;
+  }
+
+  giveLines(): Line[] {
+    return this.dbLines;
+  }
+
+  initLines(): Line[] {
     return [
       {
         label: 'Béatrice',

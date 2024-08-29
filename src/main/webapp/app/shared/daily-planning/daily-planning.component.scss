@@ -61,6 +61,17 @@
   padding: 5px;
 }
 
+.empty-event {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  height: 100%;
+  padding: 5px;
+}
+
 /* Bouton de addition dans les événements */
 .add-button {
   display: flex;

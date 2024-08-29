@@ -12,7 +12,7 @@
       </button>
     </div>
     @for (hour of hours; track $index) {
-      <div class="cell header-cell">{{ hour.getHours() }} - {{ hour.getHours() + intervalHour }}</div>
+      <div class="cell header-cell">{{ hour.getHours() }}h - {{ hour.getHours() + intervalHour }}h</div>
     }
   </div>
 
@@ -38,7 +38,7 @@
             <div *ngIf="square.usable && !readMode" class="add-button" (click)="addEvent(square)">
               <fa-icon icon="plus"></fa-icon>
             </div>
-            <div class="empty-cell" *ngIf="!square.usable || readMode"></div>
+            <div class="empty-event" *ngIf="!square.usable || readMode">&nbsp;</div>
           }
         </div>
       }

@@ -1,3 +1,7 @@
 <div>
-  <daily-planning [lines]="getLines()" [types]="['Buvette', 'Cuisine', 'Vaisselle', 'Libre']"></daily-planning>
+  <daily-planning
+    [lines]="giveLines()"
+    (finalLines)="saveLines($event)"
+    [types]="['Buvette', 'Cuisine', 'Vaisselle', 'Libre']"
+  ></daily-planning>
 </div>
