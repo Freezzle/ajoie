@@ -48,6 +48,19 @@
   position: relative;
 }
 
+.read-event {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: white;
+  color: $white;
+  border: 1px solid $white;
+  border-radius: 3px;
+  height: 100%;
+  padding: 5px;
+}
+
 /* Bouton de addition dans les événements */
 .add-button {
   display: flex;
@@ -113,6 +126,14 @@
   background-color: $danger;
 }
 
+.event-purple {
+  background-color: palevioletred;
+}
+
 .event-grey {
   background-color: $secondary;
+}
+
+.event-lightgray {
+  background-color: lightgray;
 }

@@ -1,14 +1,16 @@
 <div class="planner">
   <div class="header">
-    @for (type of types; track $index) {
-      <div class="cell header-cell {{ getColorClass(type) }}">{{ type }}</div>
-    }
-  </div>
-
-  <br />
-
-  <div class="header">
-    <div class="cell header-cell">Bénévoles</div>
+    <div class="cell header-cell">
+      <button class="btn btn-primary btn-sm" *ngIf="readMode" (click)="actionOpenEditing()">
+        <fa-icon icon="pencil-alt"></fa-icon>
+      </button>
+      <button class="btn btn-primary btn-sm" *ngIf="!readMode" (click)="actionCancelEditing()">
+        <fa-icon icon="ban"></fa-icon>
+      </button>
+      <button class="btn btn-primary btn-sm" *ngIf="!readMode" (click)="actionEmitAndCloseEditing()">
+        <fa-icon icon="floppy-disk"></fa-icon>
+      </button>
+    </div>
     @for (hour of hours; track $index) {
       <div class="cell header-cell">{{ hour.getHours() }} - {{ hour.getHours() + intervalHour }}</div>
     }
@@ -23,19 +25,30 @@
         <div class="cell {{ !square.usable ? 'unusable' : '' }}">
           <!-- Affichage des événements existants -->
           @if (square.used) {
-            <div class="event {{ getColorClass(square.type) }}">
-              <span class="edit-button" (click)="editEvent(square)"><fa-icon icon="repeat"></fa-icon></span>
-              <span class="delete-button" (click)="removeEvent(square)"><fa-icon icon="times"></fa-icon></span>
-            </div>
+            @if (!readMode) {
+              <div class="event {{ getColorClass(square.type) }}">
+                <span class="edit-button" (click)="editEvent(square)"><fa-icon icon="repeat"></fa-icon></span>
+                <span class="delete-button" (click)="removeEvent(square)"><fa-icon icon="times"></fa-icon></span>
+              </div>
+            } @else {
+              <div class="read-event {{ getColorClass(square.type) }}">{{ square.type }}</div>
+            }
           } @else {
             <!-- Affichage du bouton "+" dans les cellules vides -->
-            <div *ngIf="square.usable" class="add-button" (click)="addEvent(square)">
+            <div *ngIf="square.usable && !readMode" class="add-button" (click)="addEvent(square)">
               <fa-icon icon="plus"></fa-icon>
             </div>
-            <div class="empty-cell" *ngIf="!square.usable"></div>
+            <div class="empty-cell" *ngIf="!square.usable || readMode"></div>
           }
         </div>
       }
     </div>
   }
+  <br />
+  <div *ngFor="let type of types" class="row">
+    <div class="header cell {{ getColorClass(type) }}">{{ type }}</div>
+    @for (hour of hours; track $index) {
+      <div class="cell header-cell">{{ countPerHour(hour, type) }}</div>
+    }
+  </div>
 </div>

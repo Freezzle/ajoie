@@ -18,8 +18,20 @@ export class VolunteerPlanningComponent implements OnInit {
   getLines(): Line[] {
     return [
       {
-        label: 'Dylan',
+        label: 'Béatrice',
         squares: [],
+        unusableHours: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 18, 19, 20, 21],
+      },
+      {
+        label: 'Mélanie',
+        squares: [
+          {
+            startHour: 9,
+            type: 'Vaisselle',
+            used: true,
+            usable: true,
+          },
+        ],
         unusableHours: [],
       },
       {
@@ -28,24 +40,69 @@ export class VolunteerPlanningComponent implements OnInit {
         unusableHours: [],
       },
       {
-        label: 'Davy',
+        label: 'Raphael',
         squares: [],
-        unusableHours: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+        unusableHours: [],
       },
       {
-        label: 'Mélanie',
+        label: 'Maeva',
         squares: [],
-        unusableHours: [11, 12, 13, 14, 15],
+        unusableHours: [],
       },
       {
-        label: 'Mathias',
+        label: 'Dylan',
         squares: [],
-        unusableHours: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+        unusableHours: [],
       },
       {
-        label: 'Anaïs',
+        label: 'Jeanine',
         squares: [],
-        unusableHours: [8, 9, 10],
+        unusableHours: [],
+      },
+      {
+        label: 'Mickael',
+        squares: [],
+        unusableHours: [],
+      },
+      {
+        label: 'Anais',
+        squares: [],
+        unusableHours: [],
+      },
+      {
+        label: 'Pascal',
+        squares: [],
+        unusableHours: [],
+      },
+      {
+        label: 'Esma',
+        squares: [],
+        unusableHours: [],
+      },
+      {
+        label: 'François',
+        squares: [],
+        unusableHours: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      },
+      {
+        label: 'Leila',
+        squares: [],
+        unusableHours: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+      },
+      {
+        label: 'Yagmur',
+        squares: [],
+        unusableHours: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+      },
+      {
+        label: 'Dina',
+        squares: [],
+        unusableHours: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20, 21],
+      },
+      {
+        label: 'Laurine',
+        squares: [],
+        unusableHours: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
       },
     ];
   }

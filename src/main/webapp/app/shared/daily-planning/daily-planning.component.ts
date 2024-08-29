@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { Square } from './planning.model';
@@ -16,22 +16,29 @@ export class DailyPlanningComponent implements OnInit {
   @Input() hours: Date[] = [];
   @Input() lines: Line[] = [];
   @Input() types: string[] = [];
-  colors: string[] = ['event-green', 'event-orange', 'event-red', 'event-grey'];
+  colors: string[] = ['event-green', 'event-orange', 'event-red', 'event-purple', 'event-grey', 'event-lightgray'];
   editingLines: Line[] = [];
   intervalHour: number = 1;
+  @Output() finalLines = new EventEmitter<Line[]>();
+  readMode: boolean = true;
 
   constructor() {}
 
   ngOnInit() {
+    this.init();
+  }
+
+  protected init() {
     if (!this.hours.length) {
       const now = dayjs();
-      this.hours = Array.from({ length: 12 }, (_, i) => new Date(now.year(), now.month() + 1, now.day() + 1, 8 + i, 0));
+      this.hours = Array.from({ length: 10 }, (_, i) => new Date(now.year(), now.month() + 1, now.day() + 1, 9 + i, 0));
     }
 
     if (!this.types.length) {
       this.types = ['normal'];
     }
 
+    this.editingLines = [];
     this.lines.forEach(line => {
       const newLine = {
         label: line.label,
@@ -78,6 +85,18 @@ export class DailyPlanningComponent implements OnInit {
     }
   }
 
+  countPerHour(hour: Date, type: string): string {
+    let count = 0;
+    this.editingLines.forEach(line => {
+      let squareFound = this.isEventAtHour(line, hour);
+      if (squareFound && squareFound.used && squareFound.type === type) {
+        count = count + 1;
+      }
+    });
+
+    return count > 0 ? '' + count : '-';
+  }
+
   removeEvent(square: Square): void {
     square.used = false;
     square.type = this.types[0];
@@ -85,5 +104,19 @@ export class DailyPlanningComponent implements OnInit {
 
   getColorClass(type: string): string {
     return this.colors[this.types.indexOf(type)];
+  }
+
+  actionOpenEditing(): void {
+    this.readMode = false;
+  }
+
+  actionCancelEditing(): void {
+    this.readMode = true;
+    this.init();
+  }
+
+  actionEmitAndCloseEditing(): void {
+    this.readMode = true;
+    this.finalLines.emit(this.editingLines);
   }
 }
