@@ -62,7 +62,13 @@ export class DailyPlanningComponent implements OnInit {
 
           newLine.squares.push(emptySquare);
         } else {
-          newLine.squares.push(squareFound);
+          const newSquare: Square = {
+            startHour: squareFound.startHour,
+            type: squareFound.type,
+            usable: squareFound.usable,
+            used: squareFound.used,
+          };
+          newLine.squares.push(newSquare);
         }
       });
     });

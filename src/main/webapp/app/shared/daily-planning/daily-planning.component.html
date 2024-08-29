@@ -46,9 +46,11 @@
   }
   <br />
   <div *ngFor="let type of types" class="row">
-    <div class="header cell {{ getColorClass(type) }}">{{ type }}</div>
+    <div class="cell read-event {{ getColorClass(type) }}">{{ type }}</div>
     @for (hour of hours; track $index) {
-      <div class="cell header-cell">{{ countPerHour(hour, type) }}</div>
+      <div class="cell">
+        <div class="result-event">{{ countPerHour(hour, type) }}</div>
+      </div>
     }
   </div>
 </div>

@@ -30,9 +30,9 @@
 
 .row .cell {
   display: table-cell;
-  padding: 5px;
+  padding: 0px;
   text-align: center;
-  border: 1px solid $primary;
+  border: 1px solid lightgray;
   vertical-align: middle; /* Centrage vertical des cellules */
 }
 
@@ -40,69 +40,53 @@
 .event {
   display: flex;
   justify-content: space-between;
+  border: 1px solid transparent;
   align-items: center;
-  background-color: $primary;
-  color: white;
-  border-radius: 4px;
   padding: 5px;
-  position: relative;
 }
 
 .read-event {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  background: white;
   color: $white;
-  border: 1px solid $white;
-  border-radius: 3px;
+  border: 1px solid transparent;
+  height: 100%;
+  padding: 5px;
+}
+
+.result-event {
+  color: $black;
+  border: 1px solid transparent;
   height: 100%;
   padding: 5px;
 }
 
 .empty-event {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
   border: 1px solid transparent;
-  border-radius: 3px;
   height: 100%;
   padding: 5px;
 }
 
 /* Bouton de addition dans les événements */
 .add-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
   background: white;
   color: $primary;
-  border: 1px solid $white;
-  border-radius: 3px;
   height: 100%;
   padding: 5px;
 }
 
 .add-button:hover {
   position: relative;
+  background: lightgray;
   color: $primary;
-  border: 1px solid $primary;
-  border-radius: 3px;
 }
 
 /* Bouton de suppression dans les événements */
 .delete-button {
   position: relative;
+  color: white;
   width: 50%;
   top: 0;
   right: 0;
-}
-
-.unusable {
-  background-color: lightgray;
 }
 
 .delete-button:hover {
@@ -114,6 +98,7 @@
 /* Bouton de modification dans les événements */
 .edit-button {
   position: relative;
+  color: white;
   width: 50%;
   top: 0;
   left: 0;
@@ -123,6 +108,10 @@
   color: $primary;
   background: white;
   border-radius: 3px;
+}
+
+.unusable {
+  background-color: lightgray;
 }
 
 .event-green {
