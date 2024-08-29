@@ -18,7 +18,7 @@
 
 .header .header-cell {
   display: table-cell;
-  padding: 10px;
+  padding: 5px;
   text-align: center;
   border: 1px solid $primary;
 }
@@ -36,15 +36,6 @@
   vertical-align: middle; /* Centrage vertical des cellules */
 }
 
-/* Stylisation des cellules vides */
-.empty-cell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  padding: 5px;
-}
-
 /* Pour l'affichage des événements (à l'intérieur des cellules) */
 .event {
   display: flex;
@@ -59,14 +50,22 @@
 
 /* Bouton de addition dans les événements */
 .add-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
   background: white;
-  color: $success;
+  color: $primary;
+  border: 1px solid $white;
+  border-radius: 3px;
+  height: 100%;
+  padding: 5px;
 }
 
 .add-button:hover {
-  color: white;
-  background: $success;
+  position: relative;
+  color: $primary;
+  border: 1px solid $primary;
   border-radius: 3px;
 }
 
@@ -76,6 +75,10 @@
   width: 50%;
   top: 0;
   right: 0;
+}
+
+.unusable {
+  background-color: lightgray;
 }
 
 .delete-button:hover {
@@ -96,10 +99,6 @@
   color: $primary;
   background: white;
   border-radius: 3px;
-}
-
-.event-blue {
-  background-color: $primary;
 }
 
 .event-green {

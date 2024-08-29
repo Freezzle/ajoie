@@ -19,11 +19,33 @@ export class VolunteerPlanningComponent implements OnInit {
     return [
       {
         label: 'Dylan',
-        plannings: [],
+        squares: [],
+        unusableHours: [],
       },
       {
-        label: 'Melanie',
-        plannings: [],
+        label: 'Charlène',
+        squares: [],
+        unusableHours: [],
+      },
+      {
+        label: 'Davy',
+        squares: [],
+        unusableHours: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+      },
+      {
+        label: 'Mélanie',
+        squares: [],
+        unusableHours: [11, 12, 13, 14, 15],
+      },
+      {
+        label: 'Mathias',
+        squares: [],
+        unusableHours: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+      },
+      {
+        label: 'Anaïs',
+        squares: [],
+        unusableHours: [8, 9, 10],
       },
     ];
   }

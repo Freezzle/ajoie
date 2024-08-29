@@ -1,44 +1,41 @@
 <div class="planner">
-  <!-- En-tête des heures -->
   <div class="header">
-    <div class="cell header-cell">Bénévoles</div>
-    @for (hour of hours; track $index) {
-      <div class="cell header-cell">
-        {{ hour | date: 'HH:mm' }}
-      </div>
+    @for (type of types; track $index) {
+      <div class="cell header-cell {{ getColorClass(type) }}">{{ type }}</div>
     }
   </div>
 
-  <!-- Contenu de la grille -->
+  <br />
+
+  <div class="header">
+    <div class="cell header-cell">Bénévoles</div>
+    @for (hour of hours; track $index) {
+      <div class="cell header-cell">{{ hour.getHours() }} - {{ hour.getHours() + intervalHour }}</div>
+    }
+  </div>
+
   @for (line of editingLines; track $index) {
     <div class="row">
       <div class="cell fw-bold">
         <b>{{ line.label }}</b>
       </div>
-      @for (hour of hours; track $index) {
-        <div class="cell">
+      @for (square of line.squares; track $index) {
+        <div class="cell {{ !square.usable ? 'unusable' : '' }}">
           <!-- Affichage des événements existants -->
-          @if (isEventAtHour(line, hour)) {
-            <div class="event {{ getColorClass(isEventAtHour(line, hour)!.type) }}">
-              <span class="edit-button" (click)="editEvent(isEventAtHour(line, hour)!)"><fa-icon icon="repeat"></fa-icon></span>
-              <span class="delete-button" (click)="removeEvent(line, isEventAtHour(line, hour)!)"><fa-icon icon="times"></fa-icon></span>
+          @if (square.used) {
+            <div class="event {{ getColorClass(square.type) }}">
+              <span class="edit-button" (click)="editEvent(square)"><fa-icon icon="repeat"></fa-icon></span>
+              <span class="delete-button" (click)="removeEvent(square)"><fa-icon icon="times"></fa-icon></span>
             </div>
           } @else {
             <!-- Affichage du bouton "+" dans les cellules vides -->
-            <div class="empty-cell add-button" (click)="addEvent(line, hour)">
+            <div *ngIf="square.usable" class="add-button" (click)="addEvent(square)">
               <fa-icon icon="plus"></fa-icon>
             </div>
+            <div class="empty-cell" *ngIf="!square.usable"></div>
           }
         </div>
       }
     </div>
   }
-  <div>
-    <span class="fw-bold">
-      <b>Meaning of colors</b>
-    </span>
-    @for (type of types; track $index) {
-      <span class="event {{ getColorClass(type) }}">{{ type }}</span>
-    }
-  </div>
 </div>

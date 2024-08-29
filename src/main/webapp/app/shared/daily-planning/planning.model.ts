@@ -1,5 +1,6 @@
-export interface Planning {
+export interface Square {
   startHour: number;
-  endHour: number;
   type: string;
+  usable: boolean;
+  used: boolean;
 }

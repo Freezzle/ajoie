@@ -1,12 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { Planning } from './planning.model';
+import { Square } from './planning.model';
 import { Line } from './line.model';
 import dayjs from 'dayjs/esm';
 
 @Component({
-  imports: [DatePipe, FaIconComponent],
+  imports: [DatePipe, FaIconComponent, CommonModule],
   selector: 'daily-planning',
   standalone: true,
   styleUrl: './daily-planning.component.scss',
@@ -16,15 +16,16 @@ export class DailyPlanningComponent implements OnInit {
   @Input() hours: Date[] = [];
   @Input() lines: Line[] = [];
   @Input() types: string[] = [];
-  colors: string[] = ['event-blue', 'event-green', 'event-orange', 'event-red', 'event-grey'];
+  colors: string[] = ['event-green', 'event-orange', 'event-red', 'event-grey'];
   editingLines: Line[] = [];
+  intervalHour: number = 1;
 
   constructor() {}
 
   ngOnInit() {
     if (!this.hours.length) {
       const now = dayjs();
-      this.hours = Array.from({ length: 8 }, (_, i) => new Date(now.year(), now.month() + 1, now.day() + 1, 8 + i, 0));
+      this.hours = Array.from({ length: 12 }, (_, i) => new Date(now.year(), now.month() + 1, now.day() + 1, 8 + i, 0));
     }
 
     if (!this.types.length) {
@@ -32,39 +33,57 @@ export class DailyPlanningComponent implements OnInit {
     }
 
     this.lines.forEach(line => {
-      this.editingLines.push(line);
+      const newLine = {
+        label: line.label,
+        squares: [],
+        unusableHours: line.unusableHours,
+      } as Line;
+
+      this.editingLines.push(newLine);
+
+      this.hours.forEach(hour => {
+        const squareFound = this.isEventAtHour(line, hour);
+        if (!squareFound) {
+          const emptySquare: Square = {
+            startHour: hour.getHours(),
+            type: this.types[0],
+            usable: !line.unusableHours.includes(hour.getHours()),
+            used: false,
+          };
+
+          newLine.squares.push(emptySquare);
+        } else {
+          newLine.squares.push(squareFound);
+        }
+      });
     });
   }
 
-  isEventAtHour(line: Line, hour: Date): Planning | undefined {
-    return line.plannings.find(planning => planning.startHour === hour.getHours());
+  isEventAtHour(line: Line, hour: Date): Square | undefined {
+    return line.squares.find(square => square.startHour === hour.getHours());
   }
 
-  editEvent(planningToEdit: Planning): void {
-    const index = this.types.indexOf(planningToEdit.type);
+  addEvent(square: Square): void {
+    square.used = true;
+    square.type = this.types[0];
+  }
+
+  editEvent(squareToEdit: Square): void {
+    const index = this.types.indexOf(squareToEdit.type || this.types[0]);
 
     if (index + 1 === this.types.length) {
-      planningToEdit.type = this.types[0];
+      squareToEdit.type = this.types[0];
     } else {
-      planningToEdit.type = this.types[index + 1];
+      squareToEdit.type = this.types[index + 1];
     }
   }
 
-  removeEvent(line: Line, planningToRemove: Planning): void {
-    line.plannings = line.plannings.filter(planning => planning !== planningToRemove);
+  removeEvent(square: Square): void {
+    square.used = false;
+    square.type = this.types[0];
   }
 
   getColorClass(type: string): string {
     return this.colors[this.types.indexOf(type)];
-  }
-
-  addEvent(line: Line, hour: Date): void {
-    const newPlanning: Planning = {
-      startHour: hour.getHours(),
-      endHour: hour.getHours() + 1,
-      type: this.types[0],
-    };
-
-    line.plannings.push(newPlanning);
   }
 }

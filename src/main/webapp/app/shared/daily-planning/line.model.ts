@@ -1,6 +1,7 @@
-import { Planning } from './planning.model';
+import { Square } from './planning.model';
 
 export interface Line {
   label: string;
-  plannings: Planning[];
+  squares: Square[];
+  unusableHours: number[];
 }
