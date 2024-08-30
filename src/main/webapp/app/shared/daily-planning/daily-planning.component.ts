@@ -4,6 +4,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { Square } from './planning.model';
 import { Line } from './line.model';
 import dayjs from 'dayjs/esm';
+import { Dayjs } from 'dayjs';
 
 @Component({
   imports: [DatePipe, FaIconComponent, CommonModule],
@@ -13,12 +14,13 @@ import dayjs from 'dayjs/esm';
   templateUrl: './daily-planning.component.html',
 })
 export class DailyPlanningComponent implements OnInit {
-  @Input() hours: Date[] = [];
+  @Input() day: Dayjs = dayjs();
+  @Input() hours: number[] = [];
   @Input() lines: Line[] = [];
   @Input() types: string[] = [];
-  colors: string[] = ['event-green', 'event-orange', 'event-red', 'event-grey', 'event-lightgray', 'event-purple'];
+  @Input() intervalHour: number = 1;
+  colors: string[] = ['event-first', 'event-second', 'event-third', 'event-fourth', 'event-fifth', 'event-sixth'];
   editingLines: Line[] = [];
-  intervalHour: number = 1;
   @Output() finalLines = new EventEmitter<Line[]>();
   readMode: boolean = true;
 
@@ -30,8 +32,7 @@ export class DailyPlanningComponent implements OnInit {
 
   protected init() {
     if (!this.hours.length) {
-      const now = dayjs();
-      this.hours = Array.from({ length: 10 / this.intervalHour }, (_, i) => new Date(now.year(), now.month() + 1, now.day() + 1, 9 + i, 0));
+      this.hours = Array.from({ length: 10 / this.intervalHour }, (_, i) => 9 + i);
     }
 
     if (!this.types.length) {
@@ -54,9 +55,9 @@ export class DailyPlanningComponent implements OnInit {
         const squareFound = this.isEventAtHour(line, hour);
         if (!squareFound) {
           const emptySquare: Square = {
-            startHour: hour.getHours(),
+            startHour: hour,
             type: this.types[0],
-            usable: !line.unusableHours.includes(hour.getHours()),
+            usable: !line.unusableHours.includes(hour),
             used: false,
           };
 
@@ -74,8 +75,8 @@ export class DailyPlanningComponent implements OnInit {
     });
   }
 
-  isEventAtHour(line: Line, hour: Date): Square | undefined {
-    return line.squares.find(square => square.startHour === hour.getHours());
+  isEventAtHour(line: Line, hour: number): Square | undefined {
+    return line.squares.find(square => square.startHour === hour);
   }
 
   addEvent(square: Square): void {
@@ -93,7 +94,7 @@ export class DailyPlanningComponent implements OnInit {
     }
   }
 
-  countPerHour(hour: Date, type: string): string {
+  countPerHour(hour: number, type: string): string {
     let count = 0;
     this.editingLines.forEach(line => {
       let squareFound = this.isEventAtHour(line, hour);

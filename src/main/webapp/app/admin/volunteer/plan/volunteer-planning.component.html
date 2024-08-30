@@ -1,7 +1,14 @@
 <div>
   <daily-planning
-    [lines]="giveLines()"
-    (finalLines)="saveLines($event)"
-    [types]="['Buvette', 'Cuisine', 'Vaisselle', 'Libre']"
+    [lines]="giveLinesFirstDay()"
+    (finalLines)="saveLinesFirstDay($event)"
+    [types]="['Buvette', 'Cuisine', 'Vaisselle', '-']"
+  ></daily-planning>
+
+  <br />
+  <daily-planning
+    [lines]="giveLinesSecondDay()"
+    (finalLines)="saveLinesSecondDay($event)"
+    [types]="['Buvette', 'Cuisine', 'Vaisselle', '-']"
   ></daily-planning>
 </div>

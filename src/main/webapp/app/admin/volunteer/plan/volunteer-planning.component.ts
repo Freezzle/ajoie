@@ -13,19 +13,30 @@ import { Line } from '../../../shared/daily-planning/line.model';
 export class VolunteerPlanningComponent implements OnInit {
   constructor() {}
 
-  dbLines: Line[] = [];
+  dbLinesFirstDay: Line[] = [];
+  dbLinesSecondDay: Line[] = [];
 
   ngOnInit() {
-    this.dbLines = this.initLines();
+    this.dbLinesFirstDay = this.initLines();
+    this.dbLinesSecondDay = this.initLines();
   }
 
-  saveLines(lines: Line[]): void {
+  saveLinesFirstDay(lines: Line[]): void {
     console.log(lines);
-    this.dbLines = lines;
+    this.dbLinesFirstDay = lines;
   }
 
-  giveLines(): Line[] {
-    return this.dbLines;
+  saveLinesSecondDay(lines: Line[]): void {
+    console.log(lines);
+    this.dbLinesSecondDay = lines;
+  }
+
+  giveLinesFirstDay(): Line[] {
+    return this.dbLinesFirstDay;
+  }
+
+  giveLinesSecondDay(): Line[] {
+    return this.dbLinesSecondDay;
   }
 
   initLines(): Line[] {
@@ -131,13 +142,13 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 14,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 15,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -167,13 +178,13 @@ export class VolunteerPlanningComponent implements OnInit {
         squares: [
           {
             startHour: 9,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 10,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -197,13 +208,13 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 14,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 15,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -233,13 +244,13 @@ export class VolunteerPlanningComponent implements OnInit {
         squares: [
           {
             startHour: 9,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 10,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -275,19 +286,19 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 16,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 17,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 18,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -311,19 +322,19 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 11,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 12,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 13,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -341,19 +352,19 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 16,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 17,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 18,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -395,13 +406,13 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 14,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 15,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -473,19 +484,19 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 16,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 17,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 18,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -527,13 +538,13 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 14,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 15,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -593,13 +604,13 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 14,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 15,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -629,13 +640,13 @@ export class VolunteerPlanningComponent implements OnInit {
         squares: [
           {
             startHour: 9,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 10,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
@@ -659,31 +670,31 @@ export class VolunteerPlanningComponent implements OnInit {
           },
           {
             startHour: 14,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 15,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 16,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 17,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },
           {
             startHour: 18,
-            type: 'Libre',
+            type: '-',
             usable: true,
             used: true,
           },

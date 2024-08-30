@@ -30,9 +30,9 @@
 
 .row .cell {
   display: table-cell;
-  padding: 0px;
+  padding: 0;
   text-align: center;
-  border: 1px solid lightgray;
+  border: 1px solid #666666;
   vertical-align: middle; /* Centrage vertical des cellules */
 }
 
@@ -42,36 +42,31 @@
   justify-content: space-between;
   border: 1px solid transparent;
   align-items: center;
-  padding: 5px;
 }
 
 .read-event {
-  color: $white;
+  color: $black;
   border: 1px solid transparent;
   height: 100%;
-  padding: 5px;
 }
 
 .result-event {
   color: $black;
   border: 1px solid transparent;
   height: 100%;
-  padding: 5px;
 }
 
 .empty-event {
   border: 1px solid transparent;
   height: 100%;
-  padding: 5px;
 }
 
 /* Bouton de addition dans les événements */
 .add-button {
   position: relative;
-  background: white;
-  color: $primary;
+  background: $white;
+  color: $black;
   height: 100%;
-  padding: 5px;
 }
 
 .add-button:hover {
@@ -83,7 +78,7 @@
 /* Bouton de suppression dans les événements */
 .delete-button {
   position: relative;
-  color: white;
+  color: $black;
   width: 50%;
   top: 0;
   right: 0;
@@ -92,13 +87,12 @@
 .delete-button:hover {
   color: $danger;
   background: white;
-  border-radius: 3px;
 }
 
 /* Bouton de modification dans les événements */
 .edit-button {
   position: relative;
-  color: white;
+  color: $black;
   width: 50%;
   top: 0;
   left: 0;
@@ -107,33 +101,34 @@
 .edit-button:hover {
   color: $primary;
   background: white;
-  border-radius: 3px;
 }
 
 .unusable {
-  background-color: lightgray;
+  background-color: #666666; /* Couleur de fond */
+  background-image: radial-gradient(black 10%, transparent 20%); /* Création des points */
+  background-size: 0.4rem 0.4rem; /* Taille des points */
 }
 
-.event-green {
-  background-color: $success;
+.event-first {
+  background-color: #a7b7de;
 }
 
-.event-orange {
-  background-color: $warning;
+.event-second {
+  background-color: #b3cbe3;
 }
 
-.event-red {
-  background-color: $danger;
+.event-third {
+  background-color: #fff0bd;
 }
 
-.event-purple {
-  background-color: palevioletred;
+.event-fourth {
+  background-color: #fffcd6;
 }
 
-.event-grey {
-  background-color: $secondary;
+.event-fifth {
+  background-color: #ffcfd6;
 }
 
-.event-lightgray {
-  background-color: lightgray;
+.event-sixth {
+  background-color: #f5bcc5;
 }
