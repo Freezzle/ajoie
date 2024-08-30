@@ -200,9 +200,6 @@
                           <th class="col-auto text-center">
                             <span>&nbsp;</span>
                           </th>
-                          <th class="col-auto">
-                            <span>Type</span>
-                          </th>
                           <th class="col-3">
                             <span>Libellé</span>
                           </th>
@@ -229,7 +226,7 @@
                       <tbody style="border: 1px solid grey">
                         @if (invoicingPlan.invoices; as invoices) {
                           <tr>
-                            <td class="table-section align-middle" colspan="9">Factures</td>
+                            <td class="table-section align-middle" colspan="8">Factures</td>
                             <td class="table-section align-middle text-end">
                               <button
                                 id="jh-create-invoice"
@@ -243,7 +240,7 @@
                           </tr>
                           @if (!invoices.length) {
                             <tr>
-                              <td colspan="10">
+                              <td colspan="9">
                                 <span>Aucune facture</span>
                               </td>
                             </tr>
@@ -267,17 +264,15 @@
                                     disabled
                                   ></fa-icon>
                                 </td>
-                                <td>{{ 'participation.type.list.' + (invoice.type ?? null) | translate }}</td>
-
                                 <td>
                                   <input
                                     type="text"
                                     class="form-control"
                                     (blur)="onLabelChange($event, invoice)"
-                                    *ngIf="!mustBeReadMode(invoice, invoicingPlan) && invoice.type === Type.OTHERS"
+                                    *ngIf="!mustBeReadMode(invoice, invoicingPlan)"
                                     value="{{ invoice.label }}"
                                   />
-                                  @if (!(!mustBeReadMode(invoice, invoicingPlan) && invoice.type === Type.OTHERS)) {
+                                  @if (!!mustBeReadMode(invoice, invoicingPlan)) {
                                     {{ invoice.label }}
                                   }
                                 </td>
@@ -346,7 +341,7 @@
                         }
                         @if (invoicingPlan.payments; as payments) {
                           <tr>
-                            <td class="table-section align-middle" colspan="9">Paiements</td>
+                            <td class="table-section align-middle" colspan="8">Paiements</td>
                             <td class="table-section align-middle text-end">
                               <button
                                 id="jh-create-payment"
@@ -360,7 +355,7 @@
                           </tr>
                           @if (!payments.length) {
                             <tr>
-                              <td colspan="10">
+                              <td colspan="9">
                                 <span>Aucun paiement</span>
                               </td>
                             </tr>
@@ -387,7 +382,6 @@
                                     {{ 'payment.type.list.' + (payment.paymentMode ?? 'null') | translate }}
                                   }
                                 </td>
-                                <td>&nbsp;</td>
                                 <td>&nbsp;</td>
                                 <td>&nbsp;</td>
                                 <td>&nbsp;</td>
@@ -449,7 +443,7 @@
                         }
                         <tr>
                           <td class="table-section-ending align-middle">Résultat</td>
-                          <td colspan="6" class="table-section-ending">&nbsp;</td>
+                          <td colspan="5" class="table-section-ending">&nbsp;</td>
                           <td class="table-section-ending text-center align-middle">
                             {{ remainingTotal(invoicingPlan) | currency: 'CHF' }}
                           </td>

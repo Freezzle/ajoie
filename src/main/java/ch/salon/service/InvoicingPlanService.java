@@ -349,7 +349,7 @@ public class InvoicingPlanService {
         position = processMeal(
             MEAL1,
             participation.getNbMeal1(),
-            messageSource.getMessage("saturday.midday", null, Locale.FRENCH),
+            messageSource.getMessage("invoice.saturday-midday.label", null, Locale.FRENCH),
             salon.getPriceMeal1(),
             lockedInvoices,
             position
@@ -357,7 +357,7 @@ public class InvoicingPlanService {
         position = processMeal(
             MEAL2,
             participation.getNbMeal2(),
-            messageSource.getMessage("saturday.evening", null, Locale.FRENCH),
+            messageSource.getMessage("invoice.saturday-evening.label", null, Locale.FRENCH),
             salon.getPriceMeal2(),
             lockedInvoices,
             position
@@ -365,7 +365,7 @@ public class InvoicingPlanService {
         processMeal(
             MEAL3,
             participation.getNbMeal3(),
-            messageSource.getMessage("sunday.midday", null, Locale.FRENCH),
+            messageSource.getMessage("invoice.sunday-midday.label", null, Locale.FRENCH),
             salon.getPriceMeal3(),
             lockedInvoices,
             position
@@ -421,11 +421,13 @@ public class InvoicingPlanService {
 
         position += 1;
 
+        Object[] args = { (stand.getDimension() != null ? stand.getDimension().getDimension() : "") };
+
         updateOrCreateInvoice(
             lockedInvoices,
             stand.getId(),
             STAND,
-            stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
+            messageSource.getMessage("invoice.stand.label", args, Locale.FRENCH),
             1L,
             defaultPrice,
             position
@@ -438,7 +440,7 @@ public class InvoicingPlanService {
                 lockedInvoices,
                 stand.getId(),
                 SHARED,
-                stand.getDimension() != null ? stand.getDimension().getDimension() : "unknown dimension",
+                messageSource.getMessage("invoice.shared.label", args, Locale.FRENCH),
                 1L,
                 salon.getPriceSharingStand(),
                 position
@@ -478,7 +480,14 @@ public class InvoicingPlanService {
             lockedInvoice.setDefaultAmount(salon.getPriceConference());
         } else {
             lockedInvoices.add(
-                createInvoice(conference.getId(), CONFERENCE, conference.getTitle(), 1L, salon.getPriceConference(), position)
+                createInvoice(
+                    conference.getId(),
+                    CONFERENCE,
+                    messageSource.getMessage("invoice.conference.label", null, Locale.FRENCH),
+                    1L,
+                    salon.getPriceConference(),
+                    position
+                )
             );
         }
 
@@ -569,6 +578,6 @@ public class InvoicingPlanService {
     }
 
     private String sub(String chaine) {
-        return chaine != null ? chaine.substring(0, Math.min(30, chaine.length())) : null;
+        return chaine != null ? chaine.substring(0, Math.min(40, chaine.length())) : null;
     }
 }

@@ -4,12 +4,14 @@ import static ch.salon.domain.enumeration.Status.*;
 
 import ch.salon.domain.Conference;
 import ch.salon.domain.Participation;
+import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.ParticipationRepository;
+import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.mapper.EventLogMapper;
@@ -33,17 +35,20 @@ public class ParticipationService {
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
     private final EventLogService eventLogService;
+    private final SalonRepository salonRepository;
 
     public ParticipationService(
         ParticipationRepository participationRepository,
         ConferenceRepository conferenceRepository,
         StandRepository standRepository,
-        EventLogService eventLogService
+        EventLogService eventLogService,
+        SalonRepository salonRepository
     ) {
         this.participationRepository = participationRepository;
         this.conferenceRepository = conferenceRepository;
         this.standRepository = standRepository;
         this.eventLogService = eventLogService;
+        this.salonRepository = salonRepository;
     }
 
     public UUID create(Participation participation) {
@@ -51,6 +56,14 @@ public class ParticipationService {
             throw new BadRequestAlertException("A new participation cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
+        Salon salonFound = salonRepository.getReferenceById(participation.getSalon().getId());
+        if (salonFound == null) {
+            throw new BadRequestAlertException("No salon for the given Id", ENTITY_NAME, "idnotfound");
+        }
+
+        participation.setClientNumber(
+            getClientNumber(participationRepository.findMaxClientNumber(salonFound.getId()), salonFound.getReferenceNumber())
+        );
         return participationRepository.save(participation).getId();
     }
 
@@ -164,5 +177,19 @@ public class ParticipationService {
             .stream()
             .map(EventLogMapper.INSTANCE::toDto)
             .toList();
+    }
+
+    public static String getClientNumber(String clientNumberMax, Long referenceSalon) {
+        int number = 100;
+        if (clientNumberMax != null) {
+            String[] split = clientNumberMax.split("-");
+            number = Integer.parseInt(split[split.length - 1]);
+        }
+
+        // Incrémenter le nombre
+        number = number + 1;
+
+        // Reformater le numéro incrémenté avec le même nombre de chiffres
+        return referenceSalon + "-" + String.format("%03d", number);
     }
 }

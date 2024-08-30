@@ -137,9 +137,9 @@ public class ImportationDataService {
 
                 Participation currentParticipation = new Participation();
                 currentParticipation.setClientNumber(
-                    incrementClientNumber(
-                        currentSalon.getReferenceNumber(),
-                        participationRepository.findMaxClientNumber(currentSalon.getId())
+                    ParticipationService.getClientNumber(
+                        participationRepository.findMaxClientNumber(currentSalon.getId()),
+                        currentSalon.getReferenceNumber()
                     )
                 );
                 currentParticipation.setSalon(currentSalon);
