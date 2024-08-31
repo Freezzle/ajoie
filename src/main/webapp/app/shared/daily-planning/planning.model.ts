@@ -1,5 +1,5 @@
 export interface Square {
-  startHour: number;
+  column: number;
   type: string;
   usable: boolean;
   used: boolean;

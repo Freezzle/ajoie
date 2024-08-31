@@ -1,18 +1,22 @@
 <div class="planner">
+  <div class="header full-width-line">
+    <div class="cell header-cell">{{ title }}</div>
+  </div>
+
   <div class="header">
     <div class="cell header-cell">
-      <button class="btn btn-primary btn-sm" *ngIf="readMode" (click)="actionOpenEditing()">
+      <button (click)="actionOpenEditing()" *ngIf="readMode" class="btn btn-primary btn-sm">
         <fa-icon icon="pencil-alt"></fa-icon>
       </button>
-      <button class="btn btn-primary btn-sm" *ngIf="!readMode" (click)="actionCancelEditing()">
+      <button (click)="actionCancelEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
         <fa-icon icon="ban"></fa-icon>
       </button>
-      <button class="btn btn-primary btn-sm" *ngIf="!readMode" (click)="actionEmitAndCloseEditing()">
+      <button (click)="actionEmitAndCloseEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
         <fa-icon icon="floppy-disk"></fa-icon>
       </button>
     </div>
-    @for (hour of hours; track $index) {
-      <div class="cell header-cell">{{ hour }}h - {{ hour + intervalHour }}h</div>
+    @for (column of columnNames; track $index) {
+      <div class="cell header-cell">{{ column }}</div>
     }
   </div>
 
@@ -23,7 +27,6 @@
       </div>
       @for (square of line.squares; track $index) {
         <div class="cell {{ !square.usable ? 'unusable' : '' }}">
-          <!-- Affichage des événements existants -->
           @if (square.used) {
             @if (!readMode) {
               <div class="event {{ getColorClass(square.type) }}">

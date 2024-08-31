@@ -15,7 +15,8 @@ import { Dayjs } from 'dayjs';
 })
 export class DailyPlanningComponent implements OnInit {
   @Input() day: Dayjs = dayjs();
-  @Input() hours: number[] = [];
+  @Input() title: string = 'Planning';
+  @Input() columnNames: string[] = [];
   @Input() lines: Line[] = [];
   @Input() types: string[] = [];
   @Input() intervalHour: number = 1;
@@ -31,12 +32,12 @@ export class DailyPlanningComponent implements OnInit {
   }
 
   protected init() {
-    if (!this.hours.length) {
-      this.hours = Array.from({ length: 10 / this.intervalHour }, (_, i) => 9 + i);
+    if (!this.columnNames.length) {
+      this.columnNames = Array.from({ length: 10 / this.intervalHour }, (_, i) => 9 + i + 'h');
     }
 
     if (!this.types.length) {
-      this.types = ['normal'];
+      this.types = ['-'];
     } else if (this.types.length > this.colors.length) {
       throw new Error('Reach out the size of' + this.colors.length + ' maximum types.');
     }
@@ -46,37 +47,33 @@ export class DailyPlanningComponent implements OnInit {
       const newLine = {
         label: line.label,
         squares: [],
-        unusableHours: line.unusableHours,
+        unusableColumns: line.unusableColumns,
       } as Line;
 
       this.editingLines.push(newLine);
 
-      this.hours.forEach(hour => {
-        const squareFound = this.isEventAtHour(line, hour);
+      for (let i = 0; i < this.columnNames.length; i++) {
+        const squareFound = line.squares.find(square => square.column === i);
         if (!squareFound) {
           const emptySquare: Square = {
-            startHour: hour,
+            column: i,
             type: this.types[0],
-            usable: !line.unusableHours.includes(hour),
+            usable: !line.unusableColumns.includes(i),
             used: false,
           };
 
           newLine.squares.push(emptySquare);
         } else {
           const newSquare: Square = {
-            startHour: squareFound.startHour,
+            column: squareFound.column,
             type: squareFound.type,
             usable: squareFound.usable,
             used: squareFound.used,
           };
           newLine.squares.push(newSquare);
         }
-      });
+      }
     });
-  }
-
-  isEventAtHour(line: Line, hour: number): Square | undefined {
-    return line.squares.find(square => square.startHour === hour);
   }
 
   addEvent(square: Square): void {
@@ -92,18 +89,6 @@ export class DailyPlanningComponent implements OnInit {
     } else {
       squareToEdit.type = this.types[index + 1];
     }
-  }
-
-  countPerHour(hour: number, type: string): string {
-    let count = 0;
-    this.editingLines.forEach(line => {
-      let squareFound = this.isEventAtHour(line, hour);
-      if (squareFound && squareFound.used && squareFound.type === type) {
-        count = count + 1;
-      }
-    });
-
-    return count > 0 ? '' + count : '-';
   }
 
   removeEvent(square: Square): void {

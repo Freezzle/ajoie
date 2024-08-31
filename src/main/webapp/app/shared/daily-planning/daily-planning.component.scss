@@ -8,6 +8,12 @@
   table-layout: fixed; /* Assure que toutes les colonnes aient une largeur égale */
 }
 
+.full-width-line {
+  display: table-row;
+  width: 100%;
+  text-align: center;
+}
+
 /* En-tête de la grille */
 .header {
   display: table-row;
@@ -110,23 +116,23 @@
 }
 
 .event-first {
-  background-color: #a7b7de;
+  background-color: #a1d6b2;
 }
 
 .event-second {
-  background-color: #b3cbe3;
+  background-color: #cedf9f;
 }
 
 .event-third {
-  background-color: #fff0bd;
+  background-color: #f1f3c2;
 }
 
 .event-fourth {
-  background-color: #fffcd6;
+  background-color: #e8b86d;
 }
 
 .event-fifth {
-  background-color: #ffcfd6;
+  background-color: #ef9c66;
 }
 
 .event-sixth {
