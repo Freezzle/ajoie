@@ -1,16 +1,17 @@
 import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
+import { combineLatest, filter, Observable, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
 import { IExhibitor } from '../exhibitor.model';
 import { EntityArrayResponseType, ExhibitorService } from '../service/exhibitor.service';
 import { ExhibitorDeleteDialogComponent } from '../delete/exhibitor-delete-dialog.component';
+import { ExhibitorFilterFormGroup, ExhibitorFormService } from '../update/exhibitor-form.service';
 
 @Component({
   standalone: true,
@@ -25,26 +26,28 @@ import { ExhibitorDeleteDialogComponent } from '../delete/exhibitor-delete-dialo
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    ReactiveFormsModule,
   ],
 })
 export class ExhibitorComponent implements OnInit {
-  subscription: Subscription | null = null;
-  exhibitors?: IExhibitor[];
-  isLoading = false;
-
   sortState = sortStateSignal({});
 
   public router = inject(Router);
   protected exhibitorService = inject(ExhibitorService);
+  protected exhibitorFormService = inject(ExhibitorFormService);
   protected activatedRoute = inject(ActivatedRoute);
   protected sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
+  exhibitors?: IExhibitor[];
+  isLoading = false;
+  filters: ExhibitorFilterFormGroup = this.exhibitorFormService.createFilterFormGroup();
+
   trackId = (_index: number, item: IExhibitor): string => this.exhibitorService.getExhibitorIdentifier(item);
 
   ngOnInit(): void {
-    this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
+    combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
         tap(() => {
@@ -68,12 +71,21 @@ export class ExhibitorComponent implements OnInit {
       .subscribe();
   }
 
+  actionFilter(): void {
+    this.load();
+  }
+
   load(): void {
     this.queryBackend().subscribe({
       next: (res: EntityArrayResponseType) => {
         this.onResponseSuccess(res);
       },
     });
+  }
+
+  refresh(): void {
+    this.filters.reset();
+    this.load();
   }
 
   navigateToWithComponentValues(event: SortState): void {
@@ -91,6 +103,17 @@ export class ExhibitorComponent implements OnInit {
   protected onResponseSuccess(response: EntityArrayResponseType): void {
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
     this.exhibitors = this.refineData(dataFromBody);
+
+    const fullNameFilter = this.filters.get('fullName')?.value;
+    if (fullNameFilter && fullNameFilter.length > 0) {
+      this.exhibitors = this.exhibitors?.filter(exhibitor =>
+        exhibitor.fullName?.toLocaleLowerCase().includes(fullNameFilter.toLocaleLowerCase()),
+      );
+    }
+    const emailFilter = this.filters.get('email')?.value;
+    if (emailFilter && emailFilter.length > 0) {
+      this.exhibitors = this.exhibitors?.filter(exhibitor => exhibitor.email?.includes(emailFilter));
+    }
   }
 
   protected refineData(data: IExhibitor[]): IExhibitor[] {

@@ -30,8 +30,22 @@ type ExhibitorFormGroupContent = {
 
 export type ExhibitorFormGroup = FormGroup<ExhibitorFormGroupContent>;
 
+type ExhibitorFilterFormGroupContent = {
+  fullName: FormControl<IExhibitor['fullName']>;
+  email: FormControl<IExhibitor['email']>;
+};
+
+export type ExhibitorFilterFormGroup = FormGroup<ExhibitorFilterFormGroupContent>;
+
 @Injectable({ providedIn: 'root' })
 export class ExhibitorFormService {
+  createFilterFormGroup(): ExhibitorFilterFormGroup {
+    return new FormGroup<ExhibitorFilterFormGroupContent>({
+      fullName: new FormControl(),
+      email: new FormControl(),
+    });
+  }
+
   createExhibitorFormGroup(exhibitor: ExhibitorFormGroupInput = { id: null }): ExhibitorFormGroup {
     const exhibitorRawValue = {
       ...this.getFormDefaults(),
