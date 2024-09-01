@@ -11,8 +11,22 @@
         </button>
       </span>
 
+      <span [formGroup]="filters" class="row">
+        <div class="col-auto">
+          <input (blur)="actionFilter()" class="form-control" formControlName="fullName" placeholder="Nom de l'exposant" type="text" />
+        </div>
+        <div class="col-auto">
+          <select (change)="actionFilter()" class="form-control" formControlName="status">
+            <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
+            @for (status of statusValues; track $index) {
+              <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
+            }
+          </select>
+        </div>
+      </span>
+
       <span>
-        <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
           <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
           <span jhiTranslate="common.refresh">Actualiser</span>
         </button>

@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IParticipation } from '../participation.model';
 import { EntityArrayResponseType, ParticipationService } from '../service/participation.service';
@@ -17,6 +17,8 @@ import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import FilterComponent from '../../../shared/filter/filter.component';
 import { Status } from '../../enumerations/status.model';
+import { finalize } from 'rxjs/operators';
+import { ParticipationFilterFormGroup, ParticipationFormService } from '../update/participation-form.service';
 
 @Component({
   standalone: true,
@@ -40,19 +42,17 @@ import { Status } from '../../enumerations/status.model';
   ],
 })
 export class ParticipationComponent implements OnInit {
+  public router = inject(Router);
+  protected participationFormService = inject(ParticipationFormService);
+  protected participationService = inject(ParticipationService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected modalService = inject(NgbModal);
+
   participations?: IParticipation[];
   isLoading = false;
   statusValues = Object.keys(Status);
   params: any;
-  filters: FormGroup<any> = new FormGroup<any>({
-    fullName: new FormControl(),
-    status: new FormControl(),
-  });
-
-  public router = inject(Router);
-  protected participationService = inject(ParticipationService);
-  protected activatedRoute = inject(ActivatedRoute);
-  protected modalService = inject(NgbModal);
+  filters: ParticipationFilterFormGroup = this.participationFormService.createFilterFormGroup();
 
   ngOnInit(): void {
     combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
@@ -77,17 +77,6 @@ export class ParticipationComponent implements OnInit {
 
   actionFilter(): void {
     this.load();
-
-    const fullNameFilter = this.filters.get('fullName')?.value;
-    if (fullNameFilter && fullNameFilter.length > 0) {
-      this.participations = this.participations?.filter(participation =>
-        participation.exhibitor?.fullName?.toLocaleLowerCase().includes(this.filters.get('fullName')?.value),
-      );
-    }
-    const statusFilter = this.filters.get('status')?.value;
-    if (statusFilter && statusFilter.length > 0) {
-      this.participations = this.participations?.filter(participation => participation.status?.includes(this.filters.get('status')?.value));
-    }
   }
 
   load(): void {
@@ -108,8 +97,19 @@ export class ParticipationComponent implements OnInit {
   }
 
   protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.participations = dataFromBody;
+    this.participations = this.fillComponentAttributesFromResponseBody(response.body);
+
+    const fullNameFilter = this.filters.get('fullName')?.value;
+    if (fullNameFilter && fullNameFilter.length > 0) {
+      this.participations = this.participations?.filter(participation =>
+        participation.exhibitor?.fullName?.toLocaleLowerCase().includes(fullNameFilter.toLocaleLowerCase()),
+      );
+    }
+
+    const statusFilter = this.filters.get('status')?.value;
+    if (statusFilter && statusFilter.length > 0) {
+      this.participations = this.participations?.filter(participation => participation.status?.includes(statusFilter));
+    }
   }
 
   protected fillComponentAttributesFromResponseBody(data: IParticipation[] | null): IParticipation[] {
@@ -118,6 +118,6 @@ export class ParticipationComponent implements OnInit {
 
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
-    return this.participationService.query(this.params.get('idSalon')).pipe(tap(() => (this.isLoading = false)));
+    return this.participationService.query(this.params.get('idSalon')).pipe(finalize(() => (this.isLoading = false)));
   }
 }
