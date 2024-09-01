@@ -1,7 +1,7 @@
 <div>
   <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
     <h2 data-cy="exhibitorHeading" id="page-heading">
-      <span *ngIf="exhibitor?.id" jhiTranslate="exhibitor.edit">Modification d'un nouvel exposant</span>
+      <span *ngIf="exhibitor?.id" jhiTranslate="exhibitor.edit">Modification d'un exposant</span>
       <span *ngIf="!exhibitor?.id" jhiTranslate="exhibitor.create">Création d'un nouvel exposant</span>
 
       <hr />

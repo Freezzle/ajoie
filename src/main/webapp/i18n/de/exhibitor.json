@@ -1,0 +1,17 @@
+{
+  "exhibitor": {
+    "address": "Rue et n°",
+    "create": "Création d'un nouvel exposant",
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer \"{{ id }}\" ?"
+    },
+    "edit": "Modification d'un exposant",
+    "email": "Email",
+    "extraInformation": "Commentaire",
+    "fullName": "Nom complet",
+    "notfound": "Aucun exposant",
+    "npaLocalite": "Npa et localité",
+    "phoneNumber": "N° de tél",
+    "title": "Les exposants"
+  }
+}

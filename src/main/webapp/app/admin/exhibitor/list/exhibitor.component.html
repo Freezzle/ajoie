@@ -35,8 +35,8 @@
 
   @if (exhibitors && exhibitors.length > 0) {
     <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
+      <table class="table table-hover" aria-describedby="page-heading">
+        <thead class="thead-primary">
           <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="fullName">
               <div class="d-flex">

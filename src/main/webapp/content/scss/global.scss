@@ -177,6 +177,10 @@ ui bootstrap tweaks
   cursor: pointer;
 }
 
+a {
+  color: $primary;
+}
+
 .thread-dump-modal-lock {
   max-width: 450px;
   overflow: hidden;
@@ -251,6 +255,20 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .accordion-button.collapsed {
   background-color: $info;
   color: white;
+}
+
+/* TABLE */
+.table .thead-primary th {
+  background-color: $primary;
+  color: white;
+}
+
+.table {
+  border: 1px solid rgba($primary, 0.4);
+}
+
+.table td {
+  vertical-align: middle;
 }
 
 /* CARD */
@@ -337,8 +355,6 @@ input:checked + .slider:before {
 /* TABLE SECTION FOR INVOICES */
 
 .table-section {
-  background-color: #888888 !important;
-  color: white !important;
 }
 
 .table-section-ending {

@@ -11,12 +11,12 @@
         </button>
       </span>
 
-      <span class="row">
+      <span class="row" [formGroup]="filters">
         <div class="col-auto">
-          <input (blur)="filteringExhibitor($event)" class="form-control" placeholder="Nom de l'exposant" type="text" />
+          <input (blur)="actionFilter()" formControlName="fullName" class="form-control" placeholder="Nom de l'exposant" type="text" />
         </div>
         <div class="col-auto">
-          <select (change)="filteringStatus($event)" class="form-control" name="status">
+          <select (change)="actionFilter()" class="form-control" formControlName="status">
             <option [ngValue]="null">{{ 'participation.status.list.null' | translate }}</option>
             @for (status of statusValues; track $index) {
               <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
@@ -26,7 +26,7 @@
       </span>
 
       <span>
-        <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
           <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
           <span jhiTranslate="common.refresh">Actualiser</span>
         </button>
@@ -49,8 +49,8 @@
 
   @if (participations && participations.length > 0) {
     <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
+      <table class="table table-hover" aria-describedby="page-heading">
+        <thead class="thead-primary">
           <tr>
             <th class="col-auto">
               <span jhiTranslate="participation.exhibitor">Exposant</span>
