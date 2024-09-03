@@ -87,7 +87,13 @@
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 {{ participation.registrationDate | formatMediumDate }}
               </td>
-              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">{{ participation.needArrangment }}</td>
+              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                @if (participation.needArrangment) {
+                  <fa-icon icon="triangle-exclamation" class="{{ !participation.acceptedChart | colorBool }}"></fa-icon>
+                } @else {
+                  &nbsp;
+                }
+              </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 <fa-icon
                   icon="{{ participation.acceptedChart | checkBool }}"

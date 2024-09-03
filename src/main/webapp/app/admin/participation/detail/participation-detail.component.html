@@ -48,7 +48,7 @@
               <div class="col-sm-2 fw-bold align-content-center">
                 <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Factures payées ?</label>
               </div>
-              <div class="col-sm-4 align-content-center">
+              <div class="col-sm-2 align-content-center">
                 <label class="switch">
                   <input
                     type="checkbox"
@@ -61,9 +61,24 @@
                 </label>
               </div>
               <div class="col-sm-2 fw-bold align-content-center">
+                <label for="field_needArrangment" jhiTranslate="participation.needArrangment">Arrangement ?</label>
+              </div>
+              <div class="col-sm-2 align-content-center">
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    name="needArrangment"
+                    id="field_needArrangment"
+                    [checked]="participation()!.needArrangment"
+                    disabled
+                  />
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="col-sm-2 fw-bold align-content-center">
                 <label for="field_date" jhiTranslate="participation.status.label">Status</label>
               </div>
-              <div class="col-sm-4 align-content-center">
+              <div class="col-sm-2 align-content-center">
                 <input
                   type="text"
                   class="form-control"
