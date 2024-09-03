@@ -1,5 +1,5 @@
 <div>
-  <h2 data-cy="AuthorityHeading" id="page-heading">
+  <h2 id="page-heading">
     <span jhiTranslate="salonApp.adminAuthority.home.title">Authorities</span>
 
     <div class="d-flex justify-content-end">
@@ -8,12 +8,7 @@
         <span jhiTranslate="common.refresh">Actualiser la liste</span>
       </button>
 
-      <button
-        [routerLink]="['/authority/new']"
-        class="btn btn-primary jh-create-entity create-authority"
-        data-cy="entityCreateButton"
-        id="jh-create-entity"
-      >
+      <button [routerLink]="['/authority/new']" class="btn btn-primary jh-create-entity create-authority" id="jh-create-entity">
         <fa-icon icon="plus"></fa-icon>
         <span jhiTranslate="salonApp.adminAuthority.home.createLabel">Créer un nouveau Authority</span>
       </button>
@@ -46,7 +41,7 @@
         </thead>
         <tbody>
           @for (authority of authorities; track trackName) {
-            <tr data-cy="entityTable">
+            <tr>
               <td>
                 <a [routerLink]="['/authority', authority.name, 'view']">{{ authority.name }}</a>
               </td>

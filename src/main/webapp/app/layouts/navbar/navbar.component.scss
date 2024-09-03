@@ -19,10 +19,25 @@ Navbar
 .navbar {
   padding: 0.2rem 1rem;
 
-  .dropdown-item.active,
-  .dropdown-item.active:focus,
-  .dropdown-item.active:hover {
+  ul.navbar-nav {
+    .nav-item {
+      margin-left: 0.5em;
+    }
+  }
+
+  .dropdown-item.active {
     background-color: $dark;
+    color: $white;
+  }
+
+  .dropdown-item {
+    color: $black;
+  }
+
+  .dropdown-item:focus,
+  .dropdown-item:hover {
+    background-color: $primary;
+    color: $white;
   }
 
   a.nav-link {

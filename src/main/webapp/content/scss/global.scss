@@ -20,10 +20,6 @@ a:hover {
   cursor: pointer;
 }
 
-.dropdown-item:hover {
-  color: $dropdown-link-hover-color;
-}
-
 /* ==========================================================================
 Browser Upgrade Prompt
 ========================================================================== */
@@ -207,15 +203,6 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   -o-transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
   transform: rotate(-45deg);
-}
-
-/* navbar.component.scss */
-.navbar {
-  ul.navbar-nav {
-    .nav-item {
-      margin-left: 0.5em;
-    }
-  }
 }
 
 /******************** SALON STYLES *************************/

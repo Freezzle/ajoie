@@ -1,6 +1,6 @@
 <div>
   <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <h2 data-cy="exhibitorHeading" id="page-heading">
+    <h2 id="page-heading">
       <span *ngIf="exhibitor?.id" jhiTranslate="exhibitor.edit">Modification d'un exposant</span>
       <span *ngIf="!exhibitor?.id" jhiTranslate="exhibitor.create">Création d'un nouvel exposant</span>
 
@@ -14,14 +14,7 @@
         </span>
 
         <span>
-          <button
-            (click)="writeBack()"
-            *ngIf="readonlyForm"
-            class="btn btn-primary btn-sm"
-            data-cy="entityCreateCancelButton"
-            id="edit-entity"
-            type="button"
-          >
+          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
             <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
           </button>
 
@@ -29,7 +22,6 @@
             (click)="readOnlyBack()"
             *ngIf="!readonlyForm && exhibitor?.id"
             class="btn btn-secondary btn-sm"
-            data-cy="entityCreateCancelButton"
             id="cancel-save"
             type="button"
           >
@@ -39,7 +31,6 @@
             *ngIf="!readonlyForm"
             [disabled]="editForm.invalid || isSaving"
             class="btn btn-primary btn-sm"
-            data-cy="entityCreateSaveButton"
             id="save-entity"
             type="submit"
           >
@@ -97,20 +88,13 @@
               <label for="field_address" jhiTranslate="exhibitor.address">Addresse</label>
             </div>
             <div class="col-sm-4 align-content-center">
-              <input class="form-control" data-cy="address" formControlName="address" id="field_address" name="address" type="text" />
+              <input class="form-control" formControlName="address" id="field_address" name="address" type="text" />
             </div>
             <div class="col-sm-2 fw-bold align-content-center">
               <label class="form-label" for="field_npaLocalite" jhiTranslate="exhibitor.npaLocalite">Npa Localite</label>
             </div>
             <div class="col-sm-4 align-content-center">
-              <input
-                class="form-control"
-                data-cy="npaLocalite"
-                formControlName="npaLocalite"
-                id="field_npaLocalite"
-                name="npaLocalite"
-                type="text"
-              />
+              <input class="form-control" formControlName="npaLocalite" id="field_npaLocalite" name="npaLocalite" type="text" />
             </div>
           </div>
 
@@ -121,7 +105,6 @@
             <div class="col-sm-10 align-content-center">
               <textarea
                 class="form-control"
-                data-cy="extraInformation"
                 formControlName="extraInformation"
                 id="field_extraInformation"
                 name="extraInformation"

@@ -1,24 +1,24 @@
 @if (salon) {
-    <form name="deleteForm" (ngSubmit)="confirmDelete(salon.id!)">
-        <div class="modal-header">
-            <h4 class="modal-title" data-cy="salonDeleteDialogHeading" jhiTranslate="common.delete">Confirmation de suppression</h4>
-        </div>
+  <form name="deleteForm" (ngSubmit)="confirmDelete(salon.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" jhiTranslate="common.delete">Confirmation de suppression</h4>
+    </div>
 
-        <div class="modal-body">
-            <jhi-alert-error></jhi-alert-error>
-            <p id="jhi-delete-salon-heading" jhiTranslate="salonApp.salon.delete.question" [translateValues]="{ id: salon.place }">
-                Êtes-vous certain de vouloir supprimer le Salon {{ salon.place }} ?
-            </p>
-        </div>
+    <div class="modal-body">
+      <jhi-alert-error></jhi-alert-error>
+      <p id="jhi-delete-salon-heading" jhiTranslate="salonApp.salon.delete.question" [translateValues]="{ id: salon.place }">
+        Êtes-vous certain de vouloir supprimer le Salon {{ salon.place }} ?
+      </p>
+    </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
-                <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-            </button>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+      </button>
 
-            <button id="jhi-confirm-delete-salon" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
-                <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-            </button>
-        </div>
-    </form>
+      <button id="jhi-confirm-delete-salon" type="submit" class="btn btn-danger">
+        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+      </button>
+    </div>
+  </form>
 }

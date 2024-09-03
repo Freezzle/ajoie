@@ -1,7 +1,7 @@
 @if (exhibitor) {
   <form name="deleteForm" (ngSubmit)="confirmDelete(exhibitor.id!)">
     <div class="modal-header">
-      <h4 class="modal-title" data-cy="exhibitorDeleteDialogHeading" jhiTranslate="common.delete">Confirmation de suppression</h4>
+      <h4 class="modal-title" jhiTranslate="common.delete">Confirmation de suppression</h4>
     </div>
 
     <div class="modal-body">
@@ -16,7 +16,7 @@
         <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
       </button>
 
-      <button id="jhi-confirm-delete-exhibitor" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+      <button id="jhi-confirm-delete-exhibitor" type="submit" class="btn btn-danger">
         <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
       </button>
     </div>

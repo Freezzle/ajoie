@@ -1,17 +1,17 @@
 <div>
   <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <h2 data-cy="ParticipationHeading" id="page-heading">
+    <h2 id="page-heading">
       <span *ngIf="participation?.id" jhiTranslate="participation.edit">Détail d'une participation</span>
       <span *ngIf="!participation?.id" jhiTranslate="participation.create">Création d'une nouvelle participation</span>
       <hr />
       <div class="d-flex justify-content-between mt-3">
         <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton" type="button">
+          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
             <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
           </button>
         </span>
         <span>
-          <a *ngIf="readonlyForm" [routerLink]="['../billings']" class="btn btn-warning btn-sm" data-cy="entityBillingButton">
+          <a *ngIf="readonlyForm" [routerLink]="['../billings']" class="btn btn-warning btn-sm">
             <span class="d-none d-md-inline" jhiTranslate="participation.billing.title">Plans de facturation</span>
           </a>
         </span>
@@ -24,7 +24,6 @@
             (click)="readOnlyBack()"
             *ngIf="!readonlyForm && participation?.id"
             class="btn btn-secondary btn-sm"
-            data-cy="entityCreateCancelButton"
             id="cancel-save"
             type="button"
           >
@@ -34,7 +33,6 @@
             *ngIf="!readonlyForm"
             [disabled]="editForm.invalid || isSaving"
             class="btn btn-primary btn-sm"
-            data-cy="entityCreateSaveButton"
             id="save-entity"
             type="submit"
           >
@@ -62,7 +60,6 @@
                   <select
                     [compareWith]="compareExhibitor"
                     class="form-control"
-                    data-cy="exhibitor"
                     formControlName="exhibitor"
                     id="field_exhibitor"
                     name="exhibitor"
@@ -78,7 +75,6 @@
                 <div class="col-sm-2 align-content-center">
                   <input
                     class="form-control"
-                    data-cy="registrationDate"
                     formControlName="registrationDate"
                     id="field_registrationDate"
                     name="registrationDate"
@@ -90,7 +86,7 @@
                   <label for="field_status" jhiTranslate="participation.status.label">Statut</label>
                 </div>
                 <div class="col-sm-2 align-content-center">
-                  <select class="form-control" data-cy="status" formControlName="status" id="field_status" name="status">
+                  <select class="form-control" formControlName="status" id="field_status" name="status">
                     @for (status of statusValues; track $index) {
                       <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
                     }
@@ -110,13 +106,13 @@
                   <label for="field_nbMeal2" jhiTranslate="participation.nbMeal2">Repas samedi soir</label>
                 </div>
                 <div class="col-sm-2 align-content-center">
-                  <input class="form-control" data-cy="nbMeal2" formControlName="nbMeal2" id="field_nbMeal2" name="nbMeal2" type="number" />
+                  <input class="form-control" formControlName="nbMeal2" id="field_nbMeal2" name="nbMeal2" type="number" />
                 </div>
                 <div class="col-sm-2 fw-bold align-content-center">
                   <label for="field_nbMeal3" jhiTranslate="participation.nbMeal3">Repas dimanche midi</label>
                 </div>
                 <div class="col-sm-2 align-content-center">
-                  <input class="form-control" data-cy="nbMeal3" formControlName="nbMeal3" id="field_nbMeal3" name="nbMeal3" type="number" />
+                  <input class="form-control" formControlName="nbMeal3" id="field_nbMeal3" name="nbMeal3" type="number" />
                 </div>
               </div>
 
@@ -168,7 +164,6 @@
                 <div class="col-sm-10 align-content-center">
                   <textarea
                     class="form-control"
-                    data-cy="extraInformation"
                     formControlName="extraInformation"
                     id="field_extraInformation"
                     name="extraInformation"
@@ -197,13 +192,7 @@
                 <div *ngIf="stands$ | async; let stands">
                   <div>
                     <div class="d-flex justify-content-end">
-                      <button
-                        [routerLink]="['../stands/new']"
-                        class="btn btn-success btn-sm"
-                        data-cy="entityCreateButton"
-                        id="jh-create-stand"
-                        type="button"
-                      >
+                      <button [routerLink]="['../stands/new']" class="btn btn-success btn-sm" id="jh-create-stand" type="button">
                         <fa-icon icon="plus"></fa-icon>
                         <span jhiTranslate="common.create">Créer</span>
                       </button>
@@ -233,7 +222,7 @@
                             </tr>
                           } @else {
                             @for (stand of stands; track $index) {
-                              <tr data-cy="entityTable">
+                              <tr>
                                 <td class="go-detail" [routerLink]="['../stands', stand.id, 'view']">{{ stand.description }}</td>
                                 <td class="go-detail" [routerLink]="['../stands', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
                                 <td class="go-detail text-center" [routerLink]="['../stands', stand.id, 'view']">
@@ -245,12 +234,7 @@
                                 </td>
                                 <td class="text-end">
                                   <div class="btn-group">
-                                    <button
-                                      type="button"
-                                      (click)="deleteStand(stand)"
-                                      class="btn btn-danger btn-sm"
-                                      data-cy="entityDeleteButton"
-                                    >
+                                    <button type="button" (click)="deleteStand(stand)" class="btn btn-danger btn-sm">
                                       <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                                       <span jhiTranslate="common.delete"></span>
                                     </button>
@@ -285,13 +269,7 @@
                 <div *ngIf="conferences$ | async; let conferences" class="col-sm-12">
                   <div>
                     <div class="d-flex justify-content-end">
-                      <button
-                        [routerLink]="['../conferences/new']"
-                        class="btn btn-success btn-sm"
-                        data-cy="entityCreateButton"
-                        id="jh-create-entity"
-                        type="button"
-                      >
+                      <button [routerLink]="['../conferences/new']" class="btn btn-success btn-sm" id="jh-create-entity" type="button">
                         <fa-icon icon="plus"></fa-icon>
                         <span jhiTranslate="common.create">Créer</span>
                       </button>
@@ -319,7 +297,7 @@
                             </tr>
                           } @else {
                             @for (conference of conferences; track $index) {
-                              <tr data-cy="entityTable">
+                              <tr>
                                 <td class="go-detail" [routerLink]="['../conferences', conference.id, 'view']">{{ conference.title }}</td>
                                 <td class="go-detail text-center" [routerLink]="['../conferences', conference.id, 'view']">
                                   <fa-icon
@@ -330,12 +308,7 @@
                                 </td>
                                 <td class="text-end">
                                   <div class="btn-group">
-                                    <button
-                                      type="button"
-                                      (click)="deleteConference(conference)"
-                                      class="btn btn-danger btn-sm"
-                                      data-cy="entityDeleteButton"
-                                    >
+                                    <button type="button" (click)="deleteConference(conference)" class="btn btn-danger btn-sm">
                                       <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                                       <span jhiTranslate="common.delete"></span>
                                     </button>

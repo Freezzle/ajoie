@@ -1,4 +1,4 @@
-<nav class="navbar navbar-dark navbar-expand-md bg-primary" data-cy="navbar">
+<nav class="navbar navbar-dark navbar-expand-md bg-primary">
   <div class="container-fluid">
     <a (click)="collapseNavbar()" class="navbar-brand logo" routerLink="/">
       <span class="navbar-title" jhiTranslate="global.title">Salon</span>
@@ -34,7 +34,7 @@
           ngbDropdown
           routerLinkActive="active"
         >
-          <a class="nav-link dropdown-toggle" data-cy="adminMenu" href="javascript:void(0);" id="admin-menu" ngbDropdownToggle>
+          <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="admin-menu" ngbDropdownToggle>
             <span>
               <fa-icon icon="users-cog"></fa-icon>
               <span jhiTranslate="global.menu.admin.main">Administration</span>
@@ -118,7 +118,7 @@
           ngbDropdown
           routerLinkActive="active"
         >
-          <a class="nav-link dropdown-toggle" data-cy="accountMenu" href="javascript:void(0);" id="account-menu" ngbDropdownToggle>
+          <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="account-menu" ngbDropdownToggle>
             @if (!account()?.imageUrl) {
               <span>
                 <fa-icon icon="user"></fa-icon>
@@ -133,25 +133,13 @@
           <ul aria-labelledby="account-menu" class="dropdown-menu" ngbDropdownMenu>
             @if (account() !== null) {
               <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/account/settings"
-                  routerLinkActive="active"
-                  (click)="collapseNavbar()"
-                  data-cy="settings"
-                >
+                <a class="dropdown-item" routerLink="/account/settings" routerLinkActive="active" (click)="collapseNavbar()">
                   <fa-icon icon="wrench" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.account.settings">Profil</span>
                 </a>
               </li>
               <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/account/password"
-                  routerLinkActive="active"
-                  (click)="collapseNavbar()"
-                  data-cy="passwordItem"
-                >
+                <a class="dropdown-item" routerLink="/account/password" routerLinkActive="active" (click)="collapseNavbar()">
                   <fa-icon icon="lock" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.account.password">Mot de passe</span>
                 </a>
@@ -163,26 +151,20 @@
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" (click)="logout()" id="logout" data-cy="logout">
+                <a class="dropdown-item" (click)="logout()" id="logout">
                   <fa-icon icon="sign-out-alt" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.account.logout">Déconnexion</span>
                 </a>
               </li>
             } @else {
               <li>
-                <a class="dropdown-item" (click)="login()" id="login" data-cy="login">
+                <a class="dropdown-item" (click)="login()" id="login">
                   <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.account.login">S&apos;authentifier</span>
                 </a>
               </li>
               <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/account/register"
-                  routerLinkActive="active"
-                  (click)="collapseNavbar()"
-                  data-cy="register"
-                >
+                <a class="dropdown-item" routerLink="/account/register" routerLinkActive="active" (click)="collapseNavbar()">
                   <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon>
                   <span jhiTranslate="global.menu.account.register">Créer un compte</span>
                 </a>

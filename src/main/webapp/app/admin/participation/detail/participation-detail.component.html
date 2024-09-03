@@ -4,13 +4,13 @@
   </script>
   @if (participation()) {
     <div>
-      <h2 data-cy="participationDetailsHeading">
+      <h2>
         <span jhiTranslate="participation.billing.title">Facturation de la participation</span>
       </h2>
       <hr />
       <div class="d-flex justify-content-between mt-2">
         <span>
-          <button type="button" (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton">
+          <button type="button" (click)="previousState()" class="btn btn-primary btn-sm">
             <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
           </button>
         </span>
@@ -250,7 +250,7 @@
                             </tr>
                           } @else if (invoices.length) {
                             @for (invoice of invoices; track $index) {
-                              <tr data-cy="entityTable">
+                              <tr>
                                 <td>&nbsp;</td>
                                 <td>{{ invoice.generationDate | formatMediumDate }}</td>
                                 <td class="text-center">
@@ -368,7 +368,7 @@
                           }
                           @if (payments.length) {
                             @for (payment of payments; track $index) {
-                              <tr data-cy="entityTable">
+                              <tr>
                                 <td>&nbsp;</td>
                                 <td>{{ payment.billingDate | formatMediumDate }}</td>
                                 <td>&nbsp;</td>

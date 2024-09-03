@@ -1,12 +1,12 @@
 <div>
-  <h2 data-cy="ExhibitorHeading" id="page-heading">
+  <h2 id="page-heading">
     <span jhiTranslate="exhibitor.title">Les exposants</span>
 
     <hr />
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" data-cy="entityDetailsBackButton" type="button">
+        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
           <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
         </button>
       </span>
@@ -28,7 +28,7 @@
           <span jhiTranslate="common.refresh">Actualiser</span>
         </button>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" data-cy="entityCreateButton" id="jh-create-entity">
+        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
           <fa-icon icon="plus"></fa-icon>
           <span jhiTranslate="common.create">Créer</span>
         </button>
@@ -76,13 +76,13 @@
         </thead>
         <tbody>
           @for (exhibitor of exhibitors; track trackId) {
-            <tr data-cy="entityTable">
+            <tr>
               <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.fullName }}</td>
               <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.email }}</td>
               <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.phoneNumber }}</td>
               <td class="text-end">
                 <div class="btn-group">
-                  <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm">
                     <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                     <span jhiTranslate="common.delete"></span>
                   </button>
