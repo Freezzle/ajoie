@@ -33,16 +33,15 @@ import { ConferenceFilterFormGroup, ConferenceFormService } from '../update/conf
 })
 export class ConferenceComponent implements OnInit {
   public router = inject(Router);
-  protected conferenceService = inject(ConferenceService);
-  protected conferenceFormService = inject(ConferenceFormService);
-  protected activatedRoute = inject(ActivatedRoute);
-  protected modalService = inject(NgbModal);
-
   conferences?: IConference[];
   isLoading = false;
   params: any;
   statusValues = Object.keys(Status);
+  protected conferenceService = inject(ConferenceService);
+  protected conferenceFormService = inject(ConferenceFormService);
   filters: ConferenceFilterFormGroup = this.conferenceFormService.createFilterFormGroup();
+  protected activatedRoute = inject(ActivatedRoute);
+  protected modalService = inject(NgbModal);
 
   ngOnInit(): void {
     combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {

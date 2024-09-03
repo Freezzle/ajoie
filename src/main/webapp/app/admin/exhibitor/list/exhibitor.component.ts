@@ -33,16 +33,15 @@ export class ExhibitorComponent implements OnInit {
   sortState = sortStateSignal({});
 
   public router = inject(Router);
+  exhibitors?: IExhibitor[];
+  isLoading = false;
   protected exhibitorService = inject(ExhibitorService);
   protected exhibitorFormService = inject(ExhibitorFormService);
+  filters: ExhibitorFilterFormGroup = this.exhibitorFormService.createFilterFormGroup();
   protected activatedRoute = inject(ActivatedRoute);
   protected sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
-
-  exhibitors?: IExhibitor[];
-  isLoading = false;
-  filters: ExhibitorFilterFormGroup = this.exhibitorFormService.createFilterFormGroup();
 
   trackId = (_index: number, item: IExhibitor): string => this.exhibitorService.getExhibitorIdentifier(item);
 

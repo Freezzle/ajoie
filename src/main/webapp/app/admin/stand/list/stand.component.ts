@@ -36,15 +36,14 @@ import { Status } from '../../enumerations/status.model';
 })
 export class StandComponent implements OnInit {
   public router = inject(Router);
-  protected standService = inject(StandService);
-  protected activatedRoute = inject(ActivatedRoute);
-  protected modalService = inject(NgbModal);
-  protected standFormService = inject(StandFormService);
-
   statusValues = Object.keys(Status);
   stands?: IStand[];
   isLoading = false;
   params: any;
+  protected standService = inject(StandService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected modalService = inject(NgbModal);
+  protected standFormService = inject(StandFormService);
   filters: StandFilterFormGroup = this.standFormService.createFilterFormGroup();
 
   ngOnInit(): void {

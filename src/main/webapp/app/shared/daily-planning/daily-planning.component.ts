@@ -31,6 +31,44 @@ export class DailyPlanningComponent implements OnInit {
     this.init();
   }
 
+  addEvent(square: Square): void {
+    square.used = true;
+    square.type = this.types[0];
+  }
+
+  editEvent(squareToEdit: Square): void {
+    const index = this.types.indexOf(squareToEdit.type || this.types[0]);
+
+    if (index + 1 === this.types.length) {
+      squareToEdit.type = this.types[0];
+    } else {
+      squareToEdit.type = this.types[index + 1];
+    }
+  }
+
+  removeEvent(square: Square): void {
+    square.used = false;
+    square.type = this.types[0];
+  }
+
+  getColorClass(type: string): string {
+    return this.colors[this.types.indexOf(type)];
+  }
+
+  actionOpenEditing(): void {
+    this.readMode = false;
+  }
+
+  actionCancelEditing(): void {
+    this.readMode = true;
+    this.init();
+  }
+
+  actionEmitAndCloseEditing(): void {
+    this.readMode = true;
+    this.finalLines.emit(this.editingLines);
+  }
+
   protected init() {
     if (!this.columnNames.length) {
       this.columnNames = Array.from({ length: 10 / this.intervalHour }, (_, i) => 9 + i + 'h');
@@ -74,43 +112,5 @@ export class DailyPlanningComponent implements OnInit {
         }
       }
     });
-  }
-
-  addEvent(square: Square): void {
-    square.used = true;
-    square.type = this.types[0];
-  }
-
-  editEvent(squareToEdit: Square): void {
-    const index = this.types.indexOf(squareToEdit.type || this.types[0]);
-
-    if (index + 1 === this.types.length) {
-      squareToEdit.type = this.types[0];
-    } else {
-      squareToEdit.type = this.types[index + 1];
-    }
-  }
-
-  removeEvent(square: Square): void {
-    square.used = false;
-    square.type = this.types[0];
-  }
-
-  getColorClass(type: string): string {
-    return this.colors[this.types.indexOf(type)];
-  }
-
-  actionOpenEditing(): void {
-    this.readMode = false;
-  }
-
-  actionCancelEditing(): void {
-    this.readMode = true;
-    this.init();
-  }
-
-  actionEmitAndCloseEditing(): void {
-    this.readMode = true;
-    this.finalLines.emit(this.editingLines);
   }
 }

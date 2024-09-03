@@ -1,20 +1,7 @@
 <nav class="navbar navbar-dark navbar-expand-md bg-primary">
   <div class="container-fluid">
     <a (click)="collapseNavbar()" class="navbar-brand logo" routerLink="/">
-      <span class="navbar-title" jhiTranslate="global.title">Salon</span>
-      <span class="navbar-version">{{ version }}</span>
-    </a>
-    <a
-      (click)="toggleNavbar()"
-      aria-controls="navbarResponsive"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-      class="navbar-toggler d-lg-none"
-      data-target="#navbarResponsive"
-      data-toggle="collapse"
-      href="javascript:void(0);"
-    >
-      <fa-icon icon="bars"></fa-icon>
+      <span>{{ version }}</span>
     </a>
     <div [ngbCollapse]="isNavbarCollapsed()" class="navbar-collapse collapse" id="navbarResponsive">
       <ul class="navbar-nav ms-auto">

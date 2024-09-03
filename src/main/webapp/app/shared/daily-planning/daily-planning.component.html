@@ -30,8 +30,12 @@
           @if (square.used) {
             @if (!readMode) {
               <div class="event {{ getColorClass(square.type) }}">
-                <span class="edit-button" (click)="editEvent(square)"><fa-icon icon="repeat"></fa-icon></span>
-                <span class="delete-button" (click)="removeEvent(square)"><fa-icon icon="times"></fa-icon></span>
+                <span class="edit-button" (click)="editEvent(square)">
+                  <fa-icon icon="repeat"></fa-icon>
+                </span>
+                <span class="delete-button" (click)="removeEvent(square)">
+                  <fa-icon icon="times"></fa-icon>
+                </span>
               </div>
             } @else {
               <div class="read-event {{ getColorClass(square.type) }}">{{ square.type }}</div>

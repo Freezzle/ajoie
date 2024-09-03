@@ -11,10 +11,10 @@ import { Line } from '../../../shared/daily-planning/line.model';
   imports: [DatePipe, FaIconComponent, DailyPlanningComponent],
 })
 export class VolunteerPlanningComponent implements OnInit {
-  constructor() {}
-
   dbLinesFirstDay: Line[] = [];
   dbLinesSecondDay: Line[] = [];
+
+  constructor() {}
 
   ngOnInit() {
     this.dbLinesFirstDay = this.initLines();

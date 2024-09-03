@@ -43,16 +43,15 @@ import { ParticipationFilterFormGroup, ParticipationFormService } from '../updat
 })
 export class ParticipationComponent implements OnInit {
   public router = inject(Router);
-  protected participationFormService = inject(ParticipationFormService);
-  protected participationService = inject(ParticipationService);
-  protected activatedRoute = inject(ActivatedRoute);
-  protected modalService = inject(NgbModal);
-
   participations?: IParticipation[];
   isLoading = false;
   statusValues = Object.keys(Status);
   params: any;
+  protected participationFormService = inject(ParticipationFormService);
   filters: ParticipationFilterFormGroup = this.participationFormService.createFilterFormGroup();
+  protected participationService = inject(ParticipationService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected modalService = inject(NgbModal);
 
   ngOnInit(): void {
     combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {

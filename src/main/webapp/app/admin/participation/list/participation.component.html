@@ -11,9 +11,9 @@
         </button>
       </span>
 
-      <span class="row" [formGroup]="filters">
+      <span [formGroup]="filters" class="row">
         <div class="col-auto">
-          <input (blur)="actionFilter()" formControlName="fullName" class="form-control" placeholder="Nom de l'exposant" type="text" />
+          <input (blur)="actionFilter()" class="form-control" formControlName="fullName" placeholder="Nom de l'exposant" type="text" />
         </div>
         <div class="col-auto">
           <select (change)="actionFilter()" class="form-control" formControlName="status">
