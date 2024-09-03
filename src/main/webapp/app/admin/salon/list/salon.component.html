@@ -60,22 +60,15 @@
         <tbody>
           @for (salon of salons; track $index) {
             <tr data-cy="entityTable">
-              <td>{{ salon.referenceNumber }}</td>
-              <td>{{ salon.place }}</td>
-              <td class="text-center">{{ salon.startingDate | formatMediumDate }}</td>
-              <td class="text-center">{{ salon.endingDate | formatMediumDate }}</td>
+              <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.referenceNumber }}</td>
+              <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.place }}</td>
+              <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{ salon.startingDate | formatMediumDate }}</td>
+              <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{ salon.endingDate | formatMediumDate }}</td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['./', salon.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
-                  </a>
-
-                  <a [routerLink]="['./', salon.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                  </a>
-
                   <button type="submit" (click)="delete(salon)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                    <span jhiTranslate="common.delete"></span>
                   </button>
                 </div>
               </td>

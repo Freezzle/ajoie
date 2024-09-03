@@ -234,9 +234,9 @@
                           } @else {
                             @for (stand of stands; track $index) {
                               <tr data-cy="entityTable">
-                                <td>{{ stand.description }}</td>
-                                <td>{{ stand.dimension?.dimension }}</td>
-                                <td class="text-center">
+                                <td class="go-detail" [routerLink]="['../stands', stand.id, 'view']">{{ stand.description }}</td>
+                                <td class="go-detail" [routerLink]="['../stands', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
+                                <td class="go-detail text-center" [routerLink]="['../stands', stand.id, 'view']">
                                   <fa-icon
                                     icon="{{ stand.status | status }}"
                                     class="{{ stand.status | colorStatus }}"
@@ -245,22 +245,6 @@
                                 </td>
                                 <td class="text-end">
                                   <div class="btn-group">
-                                    <a
-                                      [routerLink]="['../stands', stand.id, 'view']"
-                                      class="btn btn-info btn-sm"
-                                      data-cy="entityDetailsButton"
-                                    >
-                                      <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
-                                    </a>
-
-                                    <a
-                                      [routerLink]="['../stands', stand.id, 'edit']"
-                                      class="btn btn-primary btn-sm"
-                                      data-cy="entityEditButton"
-                                    >
-                                      <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                                    </a>
-
                                     <button
                                       type="button"
                                       (click)="deleteStand(stand)"
@@ -268,6 +252,7 @@
                                       data-cy="entityDeleteButton"
                                     >
                                       <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                      <span jhiTranslate="common.delete"></span>
                                     </button>
                                   </div>
                                 </td>
@@ -335,8 +320,8 @@
                           } @else {
                             @for (conference of conferences; track $index) {
                               <tr data-cy="entityTable">
-                                <td>{{ conference.title }}</td>
-                                <td class="text-center">
+                                <td class="go-detail" [routerLink]="['../conferences', conference.id, 'view']">{{ conference.title }}</td>
+                                <td class="go-detail text-center" [routerLink]="['../conferences', conference.id, 'view']">
                                   <fa-icon
                                     icon="{{ conference.status | status }}"
                                     class="{{ conference.status | colorStatus }}"
@@ -345,22 +330,6 @@
                                 </td>
                                 <td class="text-end">
                                   <div class="btn-group">
-                                    <a
-                                      [routerLink]="['../conferences', conference.id, 'view']"
-                                      class="btn btn-info btn-sm"
-                                      data-cy="entityDetailsButton"
-                                    >
-                                      <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
-                                    </a>
-
-                                    <a
-                                      [routerLink]="['../conferences', conference.id, 'edit']"
-                                      class="btn btn-primary btn-sm"
-                                      data-cy="entityEditButton"
-                                    >
-                                      <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                                    </a>
-
                                     <button
                                       type="button"
                                       (click)="deleteConference(conference)"
@@ -368,6 +337,7 @@
                                       data-cy="entityDeleteButton"
                                     >
                                       <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                      <span jhiTranslate="common.delete"></span>
                                     </button>
                                   </div>
                                 </td>

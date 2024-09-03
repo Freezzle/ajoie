@@ -84,27 +84,29 @@
                   <a [routerLink]="['/admin/exhibitors', participation.exhibitor.id, 'view']">{{ participation.exhibitor.fullName }}</a>
                 }
               </td>
-              <td class="text-center">{{ participation.registrationDate | formatMediumDate }}</td>
-              <td class="text-center">{{ participation.needArrangment }}</td>
-              <td class="text-center">
+              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                {{ participation.registrationDate | formatMediumDate }}
+              </td>
+              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">{{ participation.needArrangment }}</td>
+              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 <fa-icon
                   icon="{{ participation.acceptedChart | checkBool }}"
                   class="{{ participation.acceptedChart | colorBool }}"
                 ></fa-icon>
               </td>
-              <td class="text-center">
+              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 <fa-icon
                   icon="{{ participation.acceptedContract | checkBool }}"
                   class="{{ participation.acceptedContract | colorBool }}"
                 ></fa-icon>
               </td>
-              <td class="text-center">
+              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 <fa-icon
                   icon="{{ participation.isBillingClosed | checkBool }}"
                   class="{{ participation.isBillingClosed | colorBool }}"
                 ></fa-icon>
               </td>
-              <td class="text-center">
+              <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 <fa-icon
                   icon="{{ participation.status | status }}"
                   class="{{ participation.status | colorStatus }}"
@@ -113,16 +115,9 @@
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['./', participation.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
-                  </a>
-
-                  <a [routerLink]="['./', participation.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                  </a>
-
                   <button type="button" (click)="delete(participation)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                    <span jhiTranslate="common.delete"></span>
                   </button>
                 </div>
               </td>

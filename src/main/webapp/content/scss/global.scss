@@ -181,6 +181,10 @@ a {
   color: $primary;
 }
 
+a:hover {
+  color: $secondary;
+}
+
 .thread-dump-modal-lock {
   max-width: 450px;
   overflow: hidden;
@@ -269,6 +273,10 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 .table td {
   vertical-align: middle;
+}
+
+.table td.go-detail {
+  cursor: pointer;
 }
 
 /* CARD */

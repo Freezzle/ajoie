@@ -79,9 +79,9 @@
                   </a>
                 }
               </td>
-              <td>{{ stand.description }}</td>
-              <td>{{ stand.dimension?.dimension }}</td>
-              <td class="text-center">
+              <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.description }}</td>
+              <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
+              <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
                 <fa-icon
                   icon="{{ stand.status | status }}"
                   class="{{ stand.status | colorStatus }}"
@@ -90,16 +90,9 @@
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['./', stand.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon [title]="'common.view' | translate" icon="eye"></fa-icon>
-                  </a>
-
-                  <a [routerLink]="['./', stand.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                  </a>
-
                   <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                    <span jhiTranslate="common.delete"></span>
                   </button>
                 </div>
               </td>
