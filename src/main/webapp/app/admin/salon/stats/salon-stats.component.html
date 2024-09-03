@@ -1,137 +1,137 @@
 <div>
-  @if (salon()) {
-    <div>
-      <h2>
-        <span>Détail du salon</span>
-      </h2>
+    @if (salon()) {
+        <div>
+            <h2>
+                <span>Détail du salon</span>
+            </h2>
 
-      <hr />
+            <hr/>
 
-      <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button type="button" (click)="previousState()" class="btn btn-primary btn-sm">
-            <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
-          </button>
-        </span>
-        <button type="button" class="btn btn-primary btn-sm" (click)="generate()">
-          <span jhiTranslate="common.import">Importer</span>
-        </button>
-      </div>
-
-      <hr />
-    </div>
-
-    <div class="row" *ngIf="stats$ | async; let stats">
-      <div class="col form-2-box">
-        <div class="row">
-          <div class="col-4">
-            <!-- MENU DES STANDS FIELDSET -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.stands">Les stands</legend>
-              <div class="row">
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standAccepted">Accepté</div>
-                <div class="col-2">
-                  <button class="btn btn-success" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandValidated }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standInVerification">En cours</div>
-                <div class="col-2">
-                  <button class="btn btn-warning" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandInTreatment }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standRefused">Refusé</div>
-                <div class="col-2">
-                  <button class="btn btn-danger" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandRefused }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standCanceled">Annulé</div>
-                <div class="col-2">
-                  <button class="btn btn-danger" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandRefused }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-              </div>
-            </fieldset>
-          </div>
-          <div class="col-4">
-            <!-- FACTURATION DES STANDS VALIDES -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.billings">Facturation des participations acceptés</legend>
-              <div class="row">
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingPaid">Payé</div>
-                <div class="col-2">
-                  <button class="btn btn-success" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbParticipationAcceptedPaid }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingUnpaid">Impayé</div>
-                <div class="col-2">
-                  <button class="btn btn-warning" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbParticipationAcceptedUnpaid }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-              </div>
-            </fieldset>
-          </div>
-          <div class="col-4">
-            <!-- REPAS COMMANDES PAR STANDS VALIDES -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.meals">Repas des participations acceptés</legend>
-              <div class="row">
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal1">Samedi midi</div>
-                <div class="col-2">
-                  <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbMealSaturdayMidday }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal2">Samedi soir</div>
-                <div class="col-2">
-                  <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbMealSaturdayEvening }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal3">Dimanche midi</div>
-                <div class="col-2">
-                  <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbMealSundayMidday }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-              </div>
-            </fieldset>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-4">
-            <!-- DIMENSIONS DES STANDS VALIDES -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.dimensions">Dimensions des stands acceptés</legend>
-              <div class="row">
-                @for (dimension of stats.dimensionStats; track $index) {
-                  <div class="col-4 align-content-center">{{ dimension['dimension'] }}</div>
-                  <div class="col-2">
-                    <button class="btn btn-secondary">
-                      <span>{{ dimension['nb'] }}</span>
+            <div class="d-flex justify-content-between mt-3">
+                <span>
+                    <button type="button" (click)="previousState()" class="btn btn-primary btn-sm">
+                        <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
                     </button>
-                  </div>
-                  <div class="col-6">&nbsp;</div>
-                }
-              </div>
-            </fieldset>
-          </div>
+                </span>
+                <button type="button" class="btn btn-primary btn-sm" (click)="generate()">
+                    <span jhiTranslate="common.import">Importer</span>
+                </button>
+            </div>
+
+            <hr/>
         </div>
-      </div>
-    </div>
-  }
+
+        <div class="row" *ngIf="stats$ | async; let stats">
+            <div class="col form-2-box">
+                <div class="row">
+                    <div class="col-4">
+                        <!-- MENU DES STANDS FIELDSET -->
+                        <fieldset class="form-group border p-3 form-1-box">
+                            <legend class="w-auto px-2" jhiTranslate="salon.stats.stands">Les stands</legend>
+                            <div class="row">
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standAccepted">Accepté</div>
+                                <div class="col-2">
+                                    <button class="btn btn-success" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbStandValidated }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standInVerification">En cours</div>
+                                <div class="col-2">
+                                    <button class="btn btn-warning" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbStandInTreatment }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standRefused">Refusé</div>
+                                <div class="col-2">
+                                    <button class="btn btn-danger" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbStandRefused }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standCanceled">Annulé</div>
+                                <div class="col-2">
+                                    <button class="btn btn-danger" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbStandRefused }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-4">
+                        <!-- FACTURATION DES STANDS VALIDES -->
+                        <fieldset class="form-group border p-3 form-1-box">
+                            <legend class="w-auto px-2" jhiTranslate="salon.stats.billings">Facturation des participations acceptés</legend>
+                            <div class="row">
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingPaid">Payé</div>
+                                <div class="col-2">
+                                    <button class="btn btn-success" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbParticipationAcceptedPaid }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingUnpaid">Impayé</div>
+                                <div class="col-2">
+                                    <button class="btn btn-warning" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbParticipationAcceptedUnpaid }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-4">
+                        <!-- REPAS COMMANDES PAR STANDS VALIDES -->
+                        <fieldset class="form-group border p-3 form-1-box">
+                            <legend class="w-auto px-2" jhiTranslate="salon.stats.meals">Repas des participations acceptés</legend>
+                            <div class="row">
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal1">Samedi midi</div>
+                                <div class="col-2">
+                                    <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbMealSaturdayMidday }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal2">Samedi soir</div>
+                                <div class="col-2">
+                                    <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbMealSaturdayEvening }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal3">Dimanche midi</div>
+                                <div class="col-2">
+                                    <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
+                                        <span>{{ stats.nbMealSundayMidday }}</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">&nbsp;</div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <!-- DIMENSIONS DES STANDS VALIDES -->
+                        <fieldset class="form-group border p-3 form-1-box">
+                            <legend class="w-auto px-2" jhiTranslate="salon.stats.dimensions">Dimensions des stands acceptés</legend>
+                            <div class="row">
+                                @for (dimension of stats.dimensionStats; track $index) {
+                                    <div class="col-4 align-content-center">{{ dimension['dimension'] }}</div>
+                                    <div class="col-2">
+                                        <button class="btn btn-secondary">
+                                            <span>{{ dimension['nb'] }}</span>
+                                        </button>
+                                    </div>
+                                    <div class="col-6">&nbsp;</div>
+                                }
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>

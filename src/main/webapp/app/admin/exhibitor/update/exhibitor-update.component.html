@@ -1,119 +1,106 @@
 <div>
-  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <h2 id="page-heading">
-      <span *ngIf="exhibitor?.id" jhiTranslate="exhibitor.edit">Modification d'un exposant</span>
-      <span *ngIf="!exhibitor?.id" jhiTranslate="exhibitor.create">Création d'un nouvel exposant</span>
+    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+        <h2 id="page-heading">
+            <span *ngIf="exhibitor?.id" jhiTranslate="exhibitor.edit">Modification d'un exposant</span>
+            <span *ngIf="!exhibitor?.id" jhiTranslate="exhibitor.create">Création d'un nouvel exposant</span>
 
-      <hr />
+            <hr/>
 
-      <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
-          </button>
-        </span>
+            <div class="d-flex justify-content-between mt-3">
+                <span>
+                    <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+                        <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
+                    </button>
+                </span>
 
-        <span>
-          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-          </button>
+                <span>
+                    <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
+                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                    </button>
 
-          <button
-            (click)="readOnlyBack()"
-            *ngIf="!readonlyForm && exhibitor?.id"
-            class="btn btn-secondary btn-sm"
-            id="cancel-save"
-            type="button"
-          >
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-          </button>
-          <button
-            *ngIf="!readonlyForm"
-            [disabled]="editForm.invalid || isSaving"
-            class="btn btn-primary btn-sm"
-            id="save-entity"
-            type="submit"
-          >
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-          </button>
-        </span>
-      </div>
-      <hr />
-    </h2>
-
-    <div>
-      <jhi-alert-error></jhi-alert-error>
-      <jhi-alert></jhi-alert>
-
-      <div class="card">
-        <h5 class="card-header">Information de base</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_fullName" jhiTranslate="exhibitor.fullName">Nom complet</label>
+                    <button (click)="readOnlyBack()" *ngIf="!readonlyForm && exhibitor?.id" class="btn btn-secondary btn-sm" id="cancel-save"
+                            type="button">
+                        <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+                    </button>
+                    <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity"
+                            type="submit">
+                        <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
+                    </button>
+                </span>
             </div>
-            <div class="col-sm-2 align-content-center">
-              <input class="form-control" formControlName="fullName" id="field_fullName" name="fullName" />
-              @if (editForm.get('fullName')!.invalid && (editForm.get('fullName')!.dirty || editForm.get('fullName')!.touched)) {
-                <div>
-                  @if (editForm.get('fullName')?.errors?.required) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
-                  }
+            <hr/>
+        </h2>
+
+        <div>
+            <jhi-alert-error></jhi-alert-error>
+            <jhi-alert></jhi-alert>
+
+            <div class="card">
+                <h5 class="card-header">Information de base</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_fullName" jhiTranslate="exhibitor.fullName">Nom complet</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <input class="form-control" formControlName="fullName" id="field_fullName" name="fullName"/>
+                            @if (editForm.get('fullName')!.invalid && (editForm.get('fullName')!.dirty || editForm.get('fullName')!.touched)) {
+                                <div>
+                                    @if (editForm.get('fullName')?.errors?.required) {
+                                        <small class="form-text text-danger"
+                                               jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_email" jhiTranslate="exhibitor.email">Nom complet</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <input class="form-control" formControlName="email" id="field_email" name="email"/>
+                            @if (editForm.get('email')!.invalid && (editForm.get('email')!.dirty || editForm.get('email')!.touched)) {
+                                <div>
+                                    @if (editForm.get('email')?.errors?.required) {
+                                        <small class="form-text text-danger"
+                                               jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_phoneNumber" jhiTranslate="exhibitor.phoneNumber">Téléphone</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <input class="form-control" formControlName="phoneNumber" id="field_phoneNumber" name="phoneNumber"/>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_address" jhiTranslate="exhibitor.address">Addresse</label>
+                        </div>
+                        <div class="col-sm-4 align-content-center">
+                            <input class="form-control" formControlName="address" id="field_address" name="address" type="text"/>
+                        </div>
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label class="form-label" for="field_npaLocalite" jhiTranslate="exhibitor.npaLocalite">Npa Localite</label>
+                        </div>
+                        <div class="col-sm-4 align-content-center">
+                            <input class="form-control" formControlName="npaLocalite" id="field_npaLocalite" name="npaLocalite" type="text"/>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_extraInformation" jhiTranslate="exhibitor.extraInformation">Extra Information</label>
+                        </div>
+                        <div class="col-sm-10 align-content-center">
+                            <textarea class="form-control" formControlName="extraInformation" id="field_extraInformation" name="extraInformation"
+                                      rows="3"></textarea>
+                        </div>
+                    </div>
                 </div>
-              }
             </div>
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_email" jhiTranslate="exhibitor.email">Nom complet</label>
-            </div>
-            <div class="col-sm-2 align-content-center">
-              <input class="form-control" formControlName="email" id="field_email" name="email" />
-              @if (editForm.get('email')!.invalid && (editForm.get('email')!.dirty || editForm.get('email')!.touched)) {
-                <div>
-                  @if (editForm.get('email')?.errors?.required) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
-                  }
-                </div>
-              }
-            </div>
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_phoneNumber" jhiTranslate="exhibitor.phoneNumber">Téléphone</label>
-            </div>
-            <div class="col-sm-2 align-content-center">
-              <input class="form-control" formControlName="phoneNumber" id="field_phoneNumber" name="phoneNumber" />
-            </div>
-          </div>
-
-          <div class="row mt-3">
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_address" jhiTranslate="exhibitor.address">Addresse</label>
-            </div>
-            <div class="col-sm-4 align-content-center">
-              <input class="form-control" formControlName="address" id="field_address" name="address" type="text" />
-            </div>
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label class="form-label" for="field_npaLocalite" jhiTranslate="exhibitor.npaLocalite">Npa Localite</label>
-            </div>
-            <div class="col-sm-4 align-content-center">
-              <input class="form-control" formControlName="npaLocalite" id="field_npaLocalite" name="npaLocalite" type="text" />
-            </div>
-          </div>
-
-          <div class="row mt-3">
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_extraInformation" jhiTranslate="exhibitor.extraInformation">Extra Information</label>
-            </div>
-            <div class="col-sm-10 align-content-center">
-              <textarea
-                class="form-control"
-                formControlName="extraInformation"
-                id="field_extraInformation"
-                name="extraInformation"
-                rows="3"
-              ></textarea>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </form>
+    </form>
 </div>

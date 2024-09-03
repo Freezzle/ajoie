@@ -1,6 +1,6 @@
-import { computed, Directive, effect, inject, input, TemplateRef, ViewContainerRef } from '@angular/core';
+import {computed, Directive, effect, inject, input, TemplateRef, ViewContainerRef} from '@angular/core';
 
-import { AccountService } from 'app/core/auth/account.service';
+import {AccountService} from 'app/core/auth/account.service';
 
 /**
  * @whatItDoes Conditionally includes an HTML element if current user has any
@@ -14,29 +14,30 @@ import { AccountService } from 'app/core/auth/account.service';
  * ```
  */
 @Directive({
-  standalone: true,
-  selector: '[jhiHasAnyAuthority]',
+    standalone: true,
+    selector: '[jhiHasAnyAuthority]',
 })
 export default class HasAnyAuthorityDirective {
-  public authorities = input<string | string[]>([], { alias: 'jhiHasAnyAuthority' });
+    public authorities = input<string | string[]>([], {alias: 'jhiHasAnyAuthority'});
 
-  private templateRef = inject(TemplateRef<any>);
-  private viewContainerRef = inject(ViewContainerRef);
+    private templateRef = inject(TemplateRef<any>);
+    private viewContainerRef = inject(ViewContainerRef);
 
-  constructor() {
-    const accountService = inject(AccountService);
-    const currentAccount = accountService.trackCurrentAccount();
-    const hasPermission = computed(() => currentAccount()?.authorities && accountService.hasAnyAuthority(this.authorities()));
+    constructor() {
+        const accountService = inject(AccountService);
+        const currentAccount = accountService.trackCurrentAccount();
+        const hasPermission = computed(
+            () => currentAccount()?.authorities && accountService.hasAnyAuthority(this.authorities()));
 
-    effect(
-      () => {
-        if (hasPermission()) {
-          this.viewContainerRef.createEmbeddedView(this.templateRef);
-        } else {
-          this.viewContainerRef.clear();
-        }
-      },
-      { allowSignalWrites: true },
-    );
-  }
+        effect(
+            () => {
+                if (hasPermission()) {
+                    this.viewContainerRef.createEmbeddedView(this.templateRef);
+                } else {
+                    this.viewContainerRef.clear();
+                }
+            },
+            {allowSignalWrites: true},
+        );
+    }
 }
