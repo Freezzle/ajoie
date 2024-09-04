@@ -1,81 +1,83 @@
 <div>
-    <h2 id="page-heading">
-        <span jhiTranslate="salon.title">Les salons</span>
+  <h2 id="page-heading">
+    <span jhiTranslate="salon.title">Les salons</span>
 
-        <hr/>
+    <hr />
 
-        <div class="d-flex justify-content-between mt-3">
-            <span>
-                <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-                    <fa-icon [title]="'common.view' | translate" icon="arrow-left"></fa-icon>
-                </button>
-            </span>
+    <div class="d-flex justify-content-between mt-3">
+      <span>
+        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon> <span jhiTranslate="common.back">Back</span>
+        </button>
+      </span>
 
-            <span>
-                <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-                    <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-                    <span jhiTranslate="common.refresh">Actualiser</span>
-                </button>
+      <span>
+        <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
+          <span jhiTranslate="common.refresh">Actualiser</span>
+        </button>
 
-                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-                    <fa-icon icon="plus"></fa-icon>
-                    <span jhiTranslate="common.create">Créer</span>
-                </button>
-            </span>
-        </div>
+        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
+          <fa-icon icon="plus"></fa-icon>
+          <span jhiTranslate="common.create">Créer</span>
+        </button>
+      </span>
+    </div>
 
-        <hr/>
-    </h2>
+    <hr />
+  </h2>
 
-    <jhi-alert-error></jhi-alert-error>
+  <jhi-alert-error></jhi-alert-error>
 
-    <jhi-alert></jhi-alert>
+  <jhi-alert></jhi-alert>
 
-    @if (salons?.length === 0) {
-        <div class="alert alert-warning" id="no-result">
-            <span jhiTranslate="salon.notFound">Aucun salon</span>
-        </div>
-    }
-
-    @if (salons && salons.length > 0) {
-        <div class="table-responsive table-entities" id="entities">
-            <table class="table table-hover" aria-describedby="page-heading">
-                <thead class="thead-primary">
-                    <tr>
-                        <th class="text-white">
-                            <span jhiTranslate="salon.referenceNumber">N° de référence</span>
-                        </th>
-                        <th class="text-white">
-                            <span jhiTranslate="salon.place">Place</span>
-                        </th>
-                        <th class="text-center text-white">
-                            <span jhiTranslate="salon.startingDate">Starting Date</span>
-                        </th>
-                        <th class="text-center text-white">
-                            <span jhiTranslate="salon.endingDate">Ending Date</span>
-                        </th>
-                        <th>&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (salon of salons; track $index) {
-                        <tr>
-                            <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.referenceNumber }}</td>
-                            <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.place }}</td>
-                            <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{ salon.startingDate | formatMediumDate }}</td>
-                            <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{ salon.endingDate | formatMediumDate }}</td>
-                            <td class="text-end">
-                                <div class="btn-group">
-                                    <button type="submit" (click)="delete(salon)" class="btn btn-danger btn-sm">
-                                        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                        <span jhiTranslate="common.delete"></span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
+  @if (salons) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-hover" aria-describedby="page-heading">
+        <thead class="thead-primary">
+          <tr>
+            <th class="text-white">
+              <span jhiTranslate="salon.referenceNumber">N° de référence</span>
+            </th>
+            <th class="text-white">
+              <span jhiTranslate="salon.place">Place</span>
+            </th>
+            <th class="text-center text-white">
+              <span jhiTranslate="salon.startingDate">Starting Date</span>
+            </th>
+            <th class="text-center text-white">
+              <span jhiTranslate="salon.endingDate">Ending Date</span>
+            </th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (salons.length === 0) {
+            <tr>
+              <td colspan="5">
+                <span jhiTranslate="salon.notFound">Aucun salon</span>
+              </td>
+            </tr>
+          } @else {
+            @for (salon of salons; track $index) {
+              <tr>
+                <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.referenceNumber }}</td>
+                <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.place }}</td>
+                <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{ salon.startingDate | formatMediumDate }}</td>
+                <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{ salon.endingDate | formatMediumDate }}</td>
+                <td class="text-end">
+                  <div class="btn-group">
+                    <button type="submit" (click)="delete(salon)" class="btn btn-danger btn-sm">
+                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                      <span jhiTranslate="common.delete"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

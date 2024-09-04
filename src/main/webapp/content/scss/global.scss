@@ -328,6 +328,10 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   border-radius: 25px;
 }
 
+.switch input:disabled + .slider {
+  cursor: default;
+}
+
 input:checked + .slider {
   background-color: $warning;
 }
