@@ -9,13 +9,15 @@
       <div class="d-flex justify-content-between mt-3">
         <span>
           <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon> <span jhiTranslate="common.back">Back</span>
+            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+            <span jhiTranslate="common.back">Back</span>
           </button>
         </span>
 
         <span>
           <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon> <span jhiTranslate="common.edit">Edit</span>
+            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+            <span jhiTranslate="common.edit">Edit</span>
           </button>
 
           <button
@@ -25,7 +27,8 @@
             id="cancel-save"
             type="button"
           >
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon> <span jhiTranslate="common.cancel">Cancel</span>
+            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+            <span jhiTranslate="common.cancel">Cancel</span>
           </button>
           <button
             *ngIf="!readonlyForm"
@@ -34,7 +37,8 @@
             id="save-entity"
             type="submit"
           >
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon> <span jhiTranslate="common.save">Save</span>
+            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
+            <span jhiTranslate="common.save">Save</span>
           </button>
         </span>
       </div>

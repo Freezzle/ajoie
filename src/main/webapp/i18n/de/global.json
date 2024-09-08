@@ -54,6 +54,7 @@
       },
       "admin": {
         "apidocs": "API",
+        "authority": "Gestion des authorités",
         "configuration": "Configuration",
         "database": "Base de données",
         "exhibitors": "Gestion des exposants",

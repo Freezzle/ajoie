@@ -28,7 +28,7 @@ public class AuthorityResource {
 
     private static final Logger log = LoggerFactory.getLogger(AuthorityResource.class);
 
-    private static final String ENTITY_NAME = "adminAuthority";
+    private static final String ENTITY_NAME = "authority";
     private final AuthorityRepository authorityRepository;
 
     @Value("${jhipster.clientApp.name}")

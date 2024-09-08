@@ -3,6 +3,9 @@
     "benevoles": "Bénévoles",
     "conferences": "Conférences",
     "create": "Création d'un nouveau salon",
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer le salon \"{{id}}\" ?"
+    },
     "edit": "Détail d'un salon",
     "endingDate": "Date de fin",
     "extraInformation": "Commentaire",

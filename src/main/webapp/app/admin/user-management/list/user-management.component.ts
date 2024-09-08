@@ -1,24 +1,25 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { combineLatest } from 'rxjs';
+import { combineLatest, switchMap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, SortState, sortStateSignal } from 'app/shared/sort';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
-import { SORT } from 'app/config/navigation.constants';
+import { ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
 import { ItemCountComponent } from 'app/shared/pagination';
 import { AccountService } from 'app/core/auth/account.service';
 import { UserManagementService } from '../service/user-management.service';
 import { User } from '../user-management.model';
-import UserManagementDeleteDialogComponent from '../delete/user-management-delete-dialog.component';
+import { DeleteDialogComponent } from '../../../shared/deletion/delete-dialog.component';
+import { filter, tap } from 'rxjs/operators';
 
 @Component({
   standalone: true,
   selector: 'jhi-user-mgmt',
   templateUrl: './user-management.component.html',
-  imports: [RouterModule, SharedModule, UserManagementDeleteDialogComponent, SortDirective, SortByDirective, ItemCountComponent],
+  imports: [RouterModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent],
 })
 export default class UserManagementComponent implements OnInit {
   currentAccount = inject(AccountService).trackCurrentAccount();
@@ -52,14 +53,17 @@ export default class UserManagementComponent implements OnInit {
   }
 
   deleteUser(user: User): void {
-    const modalRef = this.modalService.open(UserManagementDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.user = user;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed.subscribe(reason => {
-      if (reason === 'deleted') {
-        this.load();
-      }
-    });
+    const modalRef = this.modalService.open(DeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.translateKey = 'userManagement.delete.question';
+    modalRef.componentInstance.translateValues = { login: user.login };
+
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT),
+        switchMap(() => this.userService.delete(user.login)),
+        tap(() => this.load()), // Recharge les données
+      )
+      .subscribe();
   }
 
   load(): void {

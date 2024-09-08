@@ -16,7 +16,6 @@
     "firstName": "Prénom",
     "home": {
       "createLabel": "Créer un nouvel utilisateur",
-      "createOrEditLabel": "Créer ou éditer un utilisateur",
       "title": "Utilisateurs"
     },
     "langKey": "Langue",
