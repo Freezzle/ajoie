@@ -1,99 +1,100 @@
 <div>
-  <h2 id="page-heading">
-    <span jhiTranslate="exhibitor.title">Les exposants</span>
+    <h2 id="page-heading">
+        <span jhiTranslate="exhibitor.title">Les exposants</span>
 
-    <hr />
+        <hr/>
 
-    <div class="d-flex justify-content-between mt-3">
-      <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon> <span jhiTranslate="common.back">Back</span>
-        </button>
-      </span>
+        <div class="d-flex justify-content-between mt-3">
+            <span>
+                <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+                    <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+                    <span jhiTranslate="common.back">Back</span>
+                </button>
+            </span>
 
-      <span [formGroup]="filters" class="row">
-        <div class="col-auto">
-          <input (blur)="actionFilter()" class="form-control" formControlName="fullName" placeholder="Nom de l'exposant" type="text" />
+            <span [formGroup]="filters" class="row">
+                <div class="col-auto">
+                    <input (blur)="actionFilter()" class="form-control" formControlName="fullName" placeholder="Nom de l'exposant" type="text"/>
+                </div>
+                <div class="col-auto">
+                    <div class="col-auto">
+                        <input (blur)="actionFilter()" class="form-control" formControlName="email" placeholder="Email de l'exposant" type="text"/>
+                    </div>
+                </div>
+            </span>
+
+            <span>
+                <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+                    <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
+                    <span jhiTranslate="common.refresh">Actualiser</span>
+                </button>
+
+                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
+                    <fa-icon icon="plus"></fa-icon>
+                    <span jhiTranslate="common.create">Créer</span>
+                </button>
+            </span>
         </div>
-        <div class="col-auto">
-          <div class="col-auto">
-            <input (blur)="actionFilter()" class="form-control" formControlName="email" placeholder="Email de l'exposant" type="text" />
-          </div>
+        <hr/>
+    </h2>
+
+    <jhi-alert-error></jhi-alert-error>
+
+    @if (exhibitors) {
+        <div class="table-responsive table-entities" id="entities">
+            <table class="table table-hover" aria-describedby="page-heading">
+                <thead class="thead-primary">
+                    <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+                        <th scope="col" jhiSortBy="fullName">
+                            <div class="d-flex">
+                                <span jhiTranslate="exhibitor.fullName">Nom complet</span>
+
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="email">
+                            <div class="d-flex">
+                                <span jhiTranslate="exhibitor.email">Email</span>
+
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col" jhiSortBy="phoneNumber">
+                            <div class="d-flex">
+                                <span jhiTranslate="exhibitor.phoneNumber">Téléphone</span>
+
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (exhibitors.length === 0) {
+                        <tr>
+                            <td colspan="4">
+                                <span jhiTranslate="exhibitor.notFound">Aucun exposant</span>
+                            </td>
+                        </tr>
+                    } @else {
+                        @for (exhibitor of exhibitors; track trackId) {
+                            <tr>
+                                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.fullName }}</td>
+                                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.email }}</td>
+                                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.phoneNumber }}</td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm">
+                                            <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                            <span jhiTranslate="common.delete"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
         </div>
-      </span>
-
-      <span>
-        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh">Actualiser</span>
-        </button>
-
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
-      </span>
-    </div>
-    <hr />
-  </h2>
-
-  <jhi-alert-error></jhi-alert-error>
-
-  @if (exhibitors) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-hover" aria-describedby="page-heading">
-        <thead class="thead-primary">
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="fullName">
-              <div class="d-flex">
-                <span jhiTranslate="exhibitor.fullName">Nom complet</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="email">
-              <div class="d-flex">
-                <span jhiTranslate="exhibitor.email">Email</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="phoneNumber">
-              <div class="d-flex">
-                <span jhiTranslate="exhibitor.phoneNumber">Téléphone</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (exhibitors.length === 0) {
-            <tr>
-              <td colspan="4">
-                <span jhiTranslate="exhibitor.notFound">Aucun exposant</span>
-              </td>
-            </tr>
-          } @else {
-            @for (exhibitor of exhibitors; track trackId) {
-              <tr>
-                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.fullName }}</td>
-                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.email }}</td>
-                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.phoneNumber }}</td>
-                <td class="text-end">
-                  <div class="btn-group">
-                    <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm">
-                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                      <span jhiTranslate="common.delete"></span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+    }
 </div>

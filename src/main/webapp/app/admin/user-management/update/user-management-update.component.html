@@ -1,191 +1,171 @@
 <div>
-  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <h2 id="page-heading">
-      <span *ngIf="user?.id" jhiTranslate="userManagement.edit">Modification d'un utilisateur</span>
-      <span *ngIf="!user?.id" jhiTranslate="userManagement.create">Création d'un nouvel utilisateur</span>
+    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+        <h2 id="page-heading">
+            <span *ngIf="user?.id" jhiTranslate="userManagement.edit">Modification d'un utilisateur</span>
+            <span *ngIf="!user?.id" jhiTranslate="userManagement.create">Création d'un nouvel utilisateur</span>
 
-      <hr />
+            <hr/>
 
-      <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-            <span jhiTranslate="common.back">Back</span>
-          </button>
-        </span>
+            <div class="d-flex justify-content-between mt-3">
+                <span>
+                    <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+                        <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+                        <span jhiTranslate="common.back">Back</span>
+                    </button>
+                </span>
 
-        <span>
-          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-            <span jhiTranslate="common.edit">Edit</span>
-          </button>
+                <span>
+                    <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
+                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                        <span jhiTranslate="common.edit">Edit</span>
+                    </button>
 
-          <button
-            (click)="readOnlyBack()"
-            *ngIf="!readonlyForm && user?.id"
-            class="btn btn-secondary btn-sm"
-            id="cancel-save"
-            type="button"
-          >
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-            <span jhiTranslate="common.cancel">Cancel</span>
-          </button>
-          <button
-            *ngIf="!readonlyForm"
-            [disabled]="editForm.invalid || isSaving()"
-            class="btn btn-primary btn-sm"
-            id="save-entity"
-            type="submit"
-          >
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-            <span jhiTranslate="common.save">Save</span>
-          </button>
-        </span>
-      </div>
-      <hr />
-    </h2>
-
-    <div>
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <div class="card">
-        <h5 class="card-header">Information de base</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_login" jhiTranslate="userManagement.login">Login</label>
+                    <button (click)="readOnlyBack()" *ngIf="!readonlyForm && user?.id" class="btn btn-secondary btn-sm" id="cancel-save"
+                            type="button">
+                        <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+                        <span jhiTranslate="common.cancel">Cancel</span>
+                    </button>
+                    <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving()" class="btn btn-primary btn-sm" id="save-entity"
+                            type="submit">
+                        <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
+                        <span jhiTranslate="common.save">Save</span>
+                    </button>
+                </span>
             </div>
-            <div class="col-sm-2 align-content-center">
-              <input class="form-control" formControlName="login" id="field_login" name="login" type="text" />
-              @if (editForm.get('login')!.invalid && (editForm.get('login')!.dirty || editForm.get('login')!.touched)) {
-                <div>
-                  @if (editForm.get('login')?.errors?.required) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
-                  }
+            <hr/>
+        </h2>
 
-                  @if (editForm.get('login')?.errors?.maxlength) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '50' }"
-                      >Ce champ doit faire moins de 50 caractères.</small
-                    >
-                  }
+        <div>
+            <jhi-alert-error></jhi-alert-error>
 
-                  @if (editForm.get('login')?.errors?.pattern) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.patternLogin"
-                      >Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.</small
-                    >
-                  }
+            <jhi-alert></jhi-alert>
+
+            <div class="card">
+                <h5 class="card-header">Information de base</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_login" jhiTranslate="userManagement.login">Login</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <input class="form-control" formControlName="login" id="field_login" name="login" type="text"/>
+                            @if (editForm.get('login')!.invalid && (editForm.get('login')!.dirty || editForm.get('login')!.touched)) {
+                                <div>
+                                    @if (editForm.get('login')?.errors?.required) {
+                                        <small class="form-text text-danger"
+                                               jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
+                                    }
+
+                                    @if (editForm.get('login')?.errors?.maxlength) {
+                                        <small class="form-text text-danger" jhiTranslate="common.validation.maxlength"
+                                               [translateValues]="{ max: '50' }">Ce champ doit faire moins de 50 caractères.</small>
+                                    }
+
+                                    @if (editForm.get('login')?.errors?.pattern) {
+                                        <small class="form-text text-danger"
+                                               jhiTranslate="common.validation.patternLogin">Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.</small>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_firstName" jhiTranslate="userManagement.firstName">Prénom</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <input class="form-control" formControlName="firstName" id="field_firstName" name="firstName" type="text"/>
+                            @if (editForm.get('firstName')!.invalid && (editForm.get('firstName')!.dirty || editForm.get('firstName')!.touched)) {
+                                <div>
+                                    @if (editForm.get('firstName')?.errors?.maxlength) {
+                                        <small class="form-text text-danger" jhiTranslate="common.validation.maxlength"
+                                               [translateValues]="{ max: '50' }">Ce champ doit faire moins de 50 caractères.</small>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_lastName" jhiTranslate="userManagement.lastName">Nom</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <input class="form-control" formControlName="lastName" id="field_lastName" name="lastName" type="text"/>
+                            @if (editForm.get('lastName')!.invalid && (editForm.get('lastName')!.dirty || editForm.get('lastName')!.touched)) {
+                                <div>
+                                    @if (editForm.get('lastName')?.errors?.maxlength) {
+                                        <small class="form-text text-danger" jhiTranslate="common.validation.maxlength"
+                                               [translateValues]="{ max: '50' }">Ce champ doit faire moins de 50 caractères.</small>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_email" jhiTranslate="userManagement.email">Nom</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <input class="form-control" formControlName="email" id="field_email" name="email" type="text"/>
+                            @if (editForm.get('email')!.invalid && (editForm.get('email')!.dirty || editForm.get('email')!.touched)) {
+                                <div>
+                                    @if (editForm.get('email')?.errors?.required) {
+                                        <small class="form-text text-danger"
+                                               jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
+                                    }
+
+                                    @if (editForm.get('email')?.errors?.maxlength) {
+                                        <small class="form-text text-danger" jhiTranslate="common.validation.maxlength"
+                                               [translateValues]="{ max: '100' }">Ce champ doit faire moins de 100 caractères.</small>
+                                    }
+
+                                    @if (editForm.get('email')?.errors?.minlength) {
+                                        <small class="form-text text-danger" jhiTranslate="common.validation.minlength"
+                                               [translateValues]="{ min: '5' }">Ce champ doit faire au minimum 5 caractères.</small>
+                                    }
+
+                                    @if (editForm.get('email')?.errors?.email) {
+                                        <small class="form-text text-danger"
+                                               jhiTranslate="global.messages.validate.email.invalid">Votre email n&apos;est pas valide.</small>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_activated" jhiTranslate="userManagement.activated">Activé</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <label class="switch">
+                                <input [attr.disabled]="editForm.value.id === undefined ? 'disabled' : null" formControlName="activated"
+                                       id="field_activated" name="activated" type="checkbox"/>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="langKey" jhiTranslate="userManagement.langKey">Langue</label>
+                        </div>
+                        <div class="col-sm-2 align-content-center">
+                            <select class="form-control" formControlName="langKey" id="langKey" name="langKey">
+                                @for (language of languages; track $index) {
+                                    <option [value]="language">{{ language | findLanguageFromKey }}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-2 fw-bold align-content-center">
+                            <label for="field_authority" jhiTranslate="userManagement.profiles">Droits</label>
+                        </div>
+                        <div class="col-sm-10 align-content-center">
+                            <select class="form-control" formControlName="authorities" id="field_authority" multiple name="authority">
+                                @for (authority of authorities(); track $index) {
+                                    <option [value]="authority">{{ authority }}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
                 </div>
-              }
             </div>
-
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_firstName" jhiTranslate="userManagement.firstName">Prénom</label>
-            </div>
-            <div class="col-sm-2 align-content-center">
-              <input class="form-control" formControlName="firstName" id="field_firstName" name="firstName" type="text" />
-              @if (editForm.get('firstName')!.invalid && (editForm.get('firstName')!.dirty || editForm.get('firstName')!.touched)) {
-                <div>
-                  @if (editForm.get('firstName')?.errors?.maxlength) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '50' }"
-                      >Ce champ doit faire moins de 50 caractères.</small
-                    >
-                  }
-                </div>
-              }
-            </div>
-
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_lastName" jhiTranslate="userManagement.lastName">Nom</label>
-            </div>
-            <div class="col-sm-2 align-content-center">
-              <input class="form-control" formControlName="lastName" id="field_lastName" name="lastName" type="text" />
-              @if (editForm.get('lastName')!.invalid && (editForm.get('lastName')!.dirty || editForm.get('lastName')!.touched)) {
-                <div>
-                  @if (editForm.get('lastName')?.errors?.maxlength) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '50' }"
-                      >Ce champ doit faire moins de 50 caractères.</small
-                    >
-                  }
-                </div>
-              }
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_email" jhiTranslate="userManagement.email">Nom</label>
-            </div>
-            <div class="col-sm-2 align-content-center">
-              <input class="form-control" formControlName="email" id="field_email" name="email" type="text" />
-              @if (editForm.get('email')!.invalid && (editForm.get('email')!.dirty || editForm.get('email')!.touched)) {
-                <div>
-                  @if (editForm.get('email')?.errors?.required) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
-                  }
-
-                  @if (editForm.get('email')?.errors?.maxlength) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.maxlength" [translateValues]="{ max: '100' }"
-                      >Ce champ doit faire moins de 100 caractères.</small
-                    >
-                  }
-
-                  @if (editForm.get('email')?.errors?.minlength) {
-                    <small class="form-text text-danger" jhiTranslate="common.validation.minlength" [translateValues]="{ min: '5' }"
-                      >Ce champ doit faire au minimum 5 caractères.</small
-                    >
-                  }
-
-                  @if (editForm.get('email')?.errors?.email) {
-                    <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid"
-                      >Votre email n&apos;est pas valide.</small
-                    >
-                  }
-                </div>
-              }
-            </div>
-
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_activated" jhiTranslate="userManagement.activated">Activé</label>
-            </div>
-            <div class="col-sm-2 align-content-center">
-              <label class="switch">
-                <input
-                  [attr.disabled]="editForm.value.id === undefined ? 'disabled' : null"
-                  formControlName="activated"
-                  id="field_activated"
-                  name="activated"
-                  type="checkbox"
-                />
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="langKey" jhiTranslate="userManagement.langKey">Langue</label>
-            </div>
-            <div class="col-sm-2 align-content-center">
-              <select class="form-control" formControlName="langKey" id="langKey" name="langKey">
-                @for (language of languages; track $index) {
-                  <option [value]="language">{{ language | findLanguageFromKey }}</option>
-                }
-              </select>
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-2 fw-bold align-content-center">
-              <label for="field_authority" jhiTranslate="userManagement.profiles">Droits</label>
-            </div>
-            <div class="col-sm-10 align-content-center">
-              <select class="form-control" formControlName="authorities" id="field_authority" multiple name="authority">
-                @for (authority of authorities(); track $index) {
-                  <option [value]="authority">{{ authority }}</option>
-                }
-              </select>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </form>
+    </form>
 </div>

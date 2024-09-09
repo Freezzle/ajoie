@@ -1,10 +1,10 @@
 import {
-  faArrowLeft, faAsterisk, faBan, faBars, faBell, faBolt, faBook, faCalendarAlt, faCheck, faCircle, faCircleHalfStroke,
-  faCircleInfo, faCloud, faCogs, faComments, faCreditCard, faDatabase, faEnvelope, faEnvelopeCircleCheck, faEye,
-  faFileImport, faFlag, faFloppyDisk, faHeart, faHome, faList, faLock, faLockOpen, faPencilAlt, faPhone, faPlus,
-  faRepeat, faRoad, faSave, faSearch, faSignInAlt, faSignOutAlt, faSlash, faSort, faSortDown, faSortUp, faSpinner,
-  faSync, faTachometerAlt, faTag, faTasks, faThList, faTimes, faTrashAlt, faTriangleExclamation, faUser, faUserPlus,
-  faUsers, faUsersCog, faWrench,
+    faArrowLeft, faAsterisk, faBan, faBars, faBell, faBolt, faBook, faCalendarAlt, faCheck, faCircle,
+    faCircleHalfStroke, faCircleInfo, faCloud, faCogs, faComments, faCreditCard, faDatabase, faEnvelope,
+    faEnvelopeCircleCheck, faEye, faFileImport, faFlag, faFloppyDisk, faHeart, faHome, faList, faLock, faLockOpen,
+    faPencilAlt, faPhone, faPlus, faRepeat, faRoad, faSave, faSearch, faSignInAlt, faSignOutAlt, faSlash, faSort,
+    faSortDown, faSortUp, faSpinner, faSync, faTachometerAlt, faTag, faTasks, faThList, faTimes, faTrashAlt,
+    faTriangleExclamation, faUser, faUserPlus, faUsers, faUsersCog, faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const fontAwesomeIcons = [
