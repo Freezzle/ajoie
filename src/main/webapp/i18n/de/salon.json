@@ -1,6 +1,5 @@
 {
   "salon": {
-    "benevoles": "Bénévoles",
     "conferences": "Conférences",
     "create": "Création d'un nouveau salon",
     "delete": {
@@ -36,6 +35,7 @@
       "stands": "Stands",
       "title": "Statistiques"
     },
-    "title": "Les salons"
+    "title": "Les salons",
+    "volunteers": "Bénévoles"
   }
 }

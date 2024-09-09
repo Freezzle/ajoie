@@ -54,18 +54,18 @@
       },
       "admin": {
         "apidocs": "API",
-        "authority": "Gestion des authorités",
+        "authority": "Authorités",
         "configuration": "Configuration",
         "database": "Base de données",
-        "exhibitors": "Gestion des exposants",
+        "exhibitors": "Exposants",
         "health": "Diagnostics",
         "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)",
         "logs": "Logs",
         "main": "Administration",
         "metrics": "Métriques",
-        "salons": "Gestion des salons",
+        "salons": "Salons",
         "tracker": "Suivi des utilisateurs",
-        "userManagement": "Gestion des utilisateurs"
+        "userManagement": "Utilisateurs"
       },
       "entities": {
         "conference": "Conférences",
