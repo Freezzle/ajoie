@@ -1,54 +1,51 @@
 <div class="planner">
-    <div class="header full-width-line">
-        <div class="cell header-cell">{{ title }}</div>
-    </div>
+  <div class="header full-width-line">
+    <div class="cell header-cell">{{ title }}</div>
+  </div>
 
-    <div class="header">
-        <div class="cell header-cell">
-            <button (click)="actionOpenEditing()" *ngIf="readMode" class="btn btn-primary btn-sm">
-                <fa-icon icon="pencil-alt"></fa-icon>
-            </button>
-            <button (click)="actionCancelEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
-                <fa-icon icon="ban"></fa-icon>
-            </button>
-            <button (click)="actionEmitAndCloseEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
-                <fa-icon icon="floppy-disk"></fa-icon>
-            </button>
-        </div>
-        @for (column of columnNames; track $index) {
-            <div class="cell header-cell">{{ column }}</div>
-        }
+  <div class="header">
+    <div class="cell header-cell">
+      <button (click)="actionOpenEditing()" *ngIf="readMode" class="btn btn-primary btn-sm">
+        <fa-icon icon="pencil-alt"></fa-icon>
+      </button>
+      <button (click)="actionCancelEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
+        <fa-icon icon="ban"></fa-icon>
+      </button>
+      <button (click)="actionEmitAndCloseEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
+        <fa-icon icon="floppy-disk"></fa-icon>
+      </button>
     </div>
-
-    @for (line of editingLines; track $index) {
-        <div class="row">
-            <div class="cell fw-bold">
-                <b>{{ line.label }}</b>
-            </div>
-            @for (square of line.squares; track $index) {
-                <div class="cell {{ !square.usable ? 'unusable' : '' }}">
-                    @if (square.used) {
-                        @if (!readMode) {
-                            <div class="event {{ getColorClass(square.type) }}">
-                                <span class="edit-button" (click)="editEvent(square)">
-                                    <fa-icon icon="repeat"></fa-icon>
-                                </span>
-                                <span class="delete-button" (click)="removeEvent(square)">
-                                    <fa-icon icon="times"></fa-icon>
-                                </span>
-                            </div>
-                        } @else {
-                            <div class="read-event {{ getColorClass(square.type) }}">{{ square.type }}</div>
-                        }
-                    } @else {
-                        <!-- Affichage du bouton "+" dans les cellules vides -->
-                        <div *ngIf="square.usable && !readMode" class="add-button" (click)="addEvent(square)">
-                            <fa-icon icon="plus"></fa-icon>
-                        </div>
-                        <div class="empty-event" *ngIf="!square.usable || readMode">&nbsp;</div>
-                    }
-                </div>
-            }
-        </div>
+    @for (column of columnNames; track $index) {
+      <div class="cell header-cell">{{ column }}</div>
     }
+  </div>
+
+  @for (line of editingLines; track $index) {
+    <div class="row">
+      <div class="cell fw-bold">
+        <b>{{ line.label }}</b>
+      </div>
+      @for (square of line.squares; track $index) {
+        <div class="cell {{ !square.usable ? 'unusable' : '' }}">
+          @if (square.used) {
+            @if (!readMode) {
+              <div class="event {{ getColorClass(square.type) }}">
+                <span class="edit-button" (click)="editEvent(square)">
+                  <fa-icon icon="repeat"></fa-icon>
+                </span>
+                <span class="delete-button" (click)="removeEvent(square)">
+                  <fa-icon icon="times"></fa-icon>
+                </span>
+              </div>
+            } @else {
+              <div class="read-event {{ getColorClass(square.type) }}">{{ square.type }}</div>
+            }
+          } @else {
+            <div *ngIf="square.usable && !readMode" class="add-button" (click)="addEvent(square)">&nbsp;</div>
+            <div class="empty-event" *ngIf="!square.usable || readMode">&nbsp;</div>
+          }
+        </div>
+      }
+    </div>
+  }
 </div>
