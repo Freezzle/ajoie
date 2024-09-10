@@ -8,6 +8,10 @@
     "edit": "Modification d'un exposant",
     "email": "Email",
     "extraInformation": "Commentaire",
+    "filter": {
+      "email": "Email de l'exposant",
+      "fullName": "Nom de l'exposant"
+    },
     "fullName": "Nom complet",
     "notfound": "Aucun exposant",
     "npaLocalite": "Npa et localité",

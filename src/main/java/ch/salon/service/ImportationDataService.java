@@ -84,7 +84,7 @@ public class ImportationDataService {
     public void importData(String idSalon) {
         try (
             Reader reader = new FileReader(
-                "E:\\ajoiedumieuxvivre\\src\\main\\java\\ch\\salon\\importation\\formulaire_2024.csv",
+                "C:\\Projects\\ajoie\\src\\main\\java\\ch\\salon\\importation\\formulaire_2024.csv",
                 Charset.defaultCharset()
             );
             CSVParser csvParser = new CSVParser(reader, CSVFormat.EXCEL.withDelimiter(';'))
@@ -95,6 +95,7 @@ public class ImportationDataService {
 
             int index = 0;
             for (CSVRecord csvRecord : csvParser) {
+                System.out.println(index);
                 if (index == 0) {
                     index++;
                     continue;
@@ -106,11 +107,11 @@ public class ImportationDataService {
                     break;
                 }
 
-                String exhibitorEmail = csvRecord.get(EXHIBITOR_EMAIL);
-                String exhibitorFullname = csvRecord.get(EXHIBITOR_FULL_NAME);
-                String exhibitorAddress = csvRecord.get(EXHIBITOR_ADDRESS);
-                String exhibitorNpaLocalite = csvRecord.get(EXHIBITOR_NPA_LOCALITE);
-                String exhibitorPhone = csvRecord.get(EXHIBITOR_PHONE_NUMBER);
+                String exhibitorEmail = csvRecord.get(EXHIBITOR_EMAIL).replaceAll("\"", "");
+                String exhibitorFullname = csvRecord.get(EXHIBITOR_FULL_NAME).replaceAll("\"", "");
+                String exhibitorAddress = csvRecord.get(EXHIBITOR_ADDRESS).replaceAll("\"", "");
+                String exhibitorNpaLocalite = csvRecord.get(EXHIBITOR_NPA_LOCALITE).replaceAll("\"", "");
+                String exhibitorPhone = csvRecord.get(EXHIBITOR_PHONE_NUMBER).replaceAll("\"", "");
 
                 if (participationRepository.findByExhibitorEmailAndSalonId(exhibitorEmail, currentSalon.getId()) != null) {
                     log.info("registration already passed through with email {} and salon {}", exhibitorEmail, currentSalon.getId());
@@ -128,12 +129,12 @@ public class ImportationDataService {
                     currentExhibitor = exhibitorRepository.save(currentExhibitor);
                 }
 
-                String participationMeal1 = csvRecord.get(STAND_MEAL_1);
-                String participationMeal2 = csvRecord.get(STAND_MEAL_2);
-                String participationMeal3 = csvRecord.get(STAND_MEAL_3);
-                String participationAcceptedContract = csvRecord.get(STAND_ACCEPTED_CONTRACT);
-                String participationArrangment = csvRecord.get(STAND_ARRANGMENT);
-                String participationAcceptedChart = csvRecord.get(STAND_ACCEPTED_CHART);
+                String participationMeal1 = csvRecord.get(STAND_MEAL_1).replaceAll("\"", "");
+                String participationMeal2 = csvRecord.get(STAND_MEAL_2).replaceAll("\"", "");
+                String participationMeal3 = csvRecord.get(STAND_MEAL_3).replaceAll("\"", "");
+                String participationAcceptedContract = csvRecord.get(STAND_ACCEPTED_CONTRACT).replaceAll("\"", "");
+                String participationArrangment = csvRecord.get(STAND_ARRANGMENT).replaceAll("\"", "");
+                String participationAcceptedChart = csvRecord.get(STAND_ACCEPTED_CHART).replaceAll("\"", "");
 
                 Participation currentParticipation = new Participation();
                 currentParticipation.setClientNumber(
@@ -144,9 +145,9 @@ public class ImportationDataService {
                 );
                 currentParticipation.setSalon(currentSalon);
                 currentParticipation.setExhibitor(currentExhibitor);
-                currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim()));
-                currentParticipation.setNbMeal2(Long.parseLong(participationMeal2.trim()));
-                currentParticipation.setNbMeal3(Long.parseLong(participationMeal3.trim()));
+                currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim().replaceAll("\"", "")));
+                currentParticipation.setNbMeal2(Long.parseLong(participationMeal2.trim().replaceAll("\"", "")));
+                currentParticipation.setNbMeal3(Long.parseLong(participationMeal3.trim().replaceAll("\"", "")));
                 currentParticipation.setAcceptedContract(participationAcceptedContract.contains("accepte"));
                 currentParticipation.setNeedArrangment(participationArrangment.contains("arrangement"));
                 currentParticipation.setAcceptedChart(participationAcceptedChart.contains("accepte"));
@@ -154,15 +155,15 @@ public class ImportationDataService {
                 currentParticipation.setStatus(Status.IN_VERIFICATION);
                 currentParticipation.setIsBillingClosed(false);
 
-                String standDescription = csvRecord.get(STAND_DESCRIPTION);
-                String standDimension = csvRecord.get(STAND_DIMENSION);
-                String standSharing = csvRecord.get(STAND_SHARING);
-                String standNbTable = csvRecord.get(STAND_NB_TABLE);
-                String standNbChair = csvRecord.get(STAND_NB_CHAIR);
-                String standElectricity = csvRecord.get(STAND_ELECTRICITY);
-                String standWebsite = csvRecord.get(EXHIBITOR_WEBSITE);
-                String standSocialMedia = csvRecord.get(EXHIBITOR_SOCIAL_MEDIA);
-                String standUrlPicture = csvRecord.get(EXHIBITOR_URL_PICTURE);
+                String standDescription = csvRecord.get(STAND_DESCRIPTION).replaceAll("\"", "");
+                String standDimension = csvRecord.get(STAND_DIMENSION).replaceAll("\"", "");
+                String standSharing = csvRecord.get(STAND_SHARING).replaceAll("\"", "");
+                String standNbTable = csvRecord.get(STAND_NB_TABLE).replaceAll("\"", "");
+                String standNbChair = csvRecord.get(STAND_NB_CHAIR).replaceAll("\"", "");
+                String standElectricity = csvRecord.get(STAND_ELECTRICITY).replaceAll("\"", "");
+                String standWebsite = csvRecord.get(EXHIBITOR_WEBSITE).replaceAll("\"", "");
+                String standSocialMedia = csvRecord.get(EXHIBITOR_SOCIAL_MEDIA).replaceAll("\"", "");
+                String standUrlPicture = csvRecord.get(EXHIBITOR_URL_PICTURE).replaceAll("\"", "");
 
                 Stand currentStand = new Stand();
                 currentStand.setParticipation(currentParticipation);
@@ -172,14 +173,18 @@ public class ImportationDataService {
                 currentStand.setUrlPicture(sub(standUrlPicture));
                 currentStand.setDimension(findDimension(dimensionStands, standDimension));
                 currentStand.setShared(standSharing.equalsIgnoreCase("oui"));
-                currentStand.setNbTable(standNbTable.contains("Aucune") ? 0 : Long.parseLong(standNbTable.substring(0, 1)));
-                currentStand.setNbChair(standNbChair.contains("Aucune") ? 0 : Long.parseLong(standNbChair.substring(0, 1)));
+                currentStand.setNbTable(
+                    standNbTable.contains("Aucune") ? 0 : Long.parseLong(standNbTable.replaceAll("\"", "").substring(0, 1))
+                );
+                currentStand.setNbChair(
+                    standNbChair.contains("Aucune") ? 0 : Long.parseLong(standNbChair.replaceAll("\"", "").substring(0, 1))
+                );
                 currentStand.setNeedElectricity(standElectricity.equalsIgnoreCase("oui"));
                 currentStand.setStatus(Status.IN_VERIFICATION);
                 standRepository.save(currentStand);
 
-                String conferenceDescription = csvRecord.get(CONFERENCE_DESCRIPTION);
-                String standConference = csvRecord.get(STAND_CONFERENCE);
+                String conferenceDescription = csvRecord.get(CONFERENCE_DESCRIPTION).replaceAll("\"", "");
+                String standConference = csvRecord.get(STAND_CONFERENCE).replaceAll("\"", "");
 
                 if (standConference.equalsIgnoreCase("oui")) {
                     Conference currentConference = new Conference();

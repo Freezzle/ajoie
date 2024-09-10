@@ -14,7 +14,13 @@
 
       <span [formGroup]="filters" class="row">
         <div class="col-auto">
-          <input (blur)="actionFilter()" class="form-control" formControlName="fullName" placeholder="Nom de l'exposant" type="text" />
+          <input
+            (blur)="actionFilter()"
+            class="form-control"
+            formControlName="fullName"
+            placeholder="{{ 'exhibitor.filter.fullName' | translate }}"
+            type="text"
+          />
         </div>
         <div class="col-auto">
           <select (change)="actionFilter()" class="form-control" formControlName="status">

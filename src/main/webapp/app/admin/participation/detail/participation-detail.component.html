@@ -23,19 +23,15 @@
     <div class="row">
       <div class="col-sm-6">
         <div class="card h-100">
-          <h5 class="card-header">Détail</h5>
+          <h5 class="card-header" jhiTranslate="participation.billing.details">Détails</h5>
           <div class="card-body">
             <div class="row">
-              <div class="col-sm-2 fw-bold align-content-center">
+              <div class="col-sm-6 fw-bold">
                 <label for="field_exhibitor" jhiTranslate="participation.exhibitor">Exposant</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
                 <input type="text" class="form-control" id="field_exhibitor" value="{{ participation()!.exhibitor?.fullName }}" disabled />
               </div>
-              <div class="col-sm-2 fw-bold align-content-center">
+              <div class="col-sm-6 fw-bold align-content-center">
                 <label for="field_date" jhiTranslate="participation.registrationDate">Date d'inscription</label>
-              </div>
-              <div class="col-sm-4 align-content-center">
                 <input
                   type="text"
                   class="form-control"
@@ -46,10 +42,11 @@
               </div>
             </div>
             <div class="row mt-3">
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Factures payées ?</label>
-              </div>
-              <div class="col-sm-2 align-content-center">
+              <div class="col-sm-4 fw-bold align-content-center">
+                <div>
+                  <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Factures payées ?</label>
+                </div>
+
                 <div class="switch">
                   <input
                     type="checkbox"
@@ -65,10 +62,10 @@
                   </label>
                 </div>
               </div>
-              <div class="col-sm-2 fw-bold align-content-center">
-                <label for="field_needArrangment" jhiTranslate="participation.needArrangment"></label>
-              </div>
-              <div class="col-sm-2 align-content-center">
+              <div class="col-sm-4 fw-bold align-content-center">
+                <div>
+                  <label for="field_needArrangment" jhiTranslate="participation.needArrangment"></label>
+                </div>
                 <div class="switch">
                   <input
                     type="checkbox"
@@ -84,10 +81,8 @@
                   </label>
                 </div>
               </div>
-              <div class="col-sm-2 fw-bold align-content-center">
+              <div class="col-sm-4 fw-bold align-content-center">
                 <label for="field_date" jhiTranslate="participation.status.label">Status</label>
-              </div>
-              <div class="col-sm-2 align-content-center">
                 <input
                   type="text"
                   class="form-control"
@@ -98,10 +93,9 @@
               </div>
             </div>
             <div class="row mt-3">
-              <div class="col-sm-2 fw-bold align-content-center">
+              <div class="col-sm-12 fw-bold align-content-center">
                 <label for="field_extraInformation" jhiTranslate="participation.extraInformation">Information complémentaire</label>
-              </div>
-              <div class="col-sm-10">
+
                 <textarea
                   class="form-control"
                   name="extraInformation"
@@ -118,7 +112,7 @@
 
       <div class="col-sm-6">
         <div class="card h-100">
-          <h5 class="card-header">Evénements</h5>
+          <h5 class="card-header" jhiTranslate="participation.billing.events">Evénements</h5>
           <div class="card-body log-container">
             <div class="row log-row" *ngFor="let eventLog of eventLogs$ | async; let i = index">
               <div class="col-sm-auto align-content-center">{{ eventLog.referenceDate | formatMediumDatetime }}</div>
@@ -161,14 +155,14 @@
                   >
                     <div class="col">
                       <div class="row">
-                        <div class="col-4 text-left">Facturation N°{{ invoicingPlan.billingNumber }}</div>
+                        <div
+                          class="col-4 text-left"
+                          jhiTranslate="invoicingPlan.title"
+                          [translateValues]="{ billingNumber: invoicingPlan.billingNumber }"
+                        ></div>
                         <div class="col-4 text-center">{{ invoicingPlan.generationDate | formatMediumDate }}</div>
                         <div class="col-4 pe-5 text-end">
-                          @if (invoicingPlan.state === State.CLOSED) {
-                            <span>Fermé</span>
-                          } @else if (invoicingPlan.state === State.CURRENT) {
-                            <span>Ouvert</span>
-                          }
+                          <span jhiTranslate="invoicingPlan.state.{{ invoicingPlan.state }}"></span>
                         </div>
                       </div>
                     </div>
@@ -222,28 +216,28 @@
                             <span>&nbsp;</span>
                           </th>
                           <th class="col-auto">
-                            <span>Date</span>
+                            <span jhiTranslate="invoicingPlan.header.date">Date</span>
                           </th>
                           <th class="col-auto text-center">
                             <span>&nbsp;</span>
                           </th>
                           <th class="col-3">
-                            <span>Libellé</span>
+                            <span jhiTranslate="invoicingPlan.header.label">Libellé</span>
                           </th>
                           <th class="col-auto text-center">
                             <span>&nbsp;</span>
                           </th>
                           <th class="col-auto text-center">
-                            <span>Montant</span>
+                            <span jhiTranslate="invoicingPlan.header.amount">Montant</span>
                           </th>
                           <th class="col-auto text-center">
-                            <span>Quantité</span>
+                            <span jhiTranslate="invoicingPlan.header.qty">Quantité</span>
                           </th>
                           <th class="col-auto text-center">
-                            <span>Total</span>
+                            <span jhiTranslate="invoicingPlan.header.sum">Total</span>
                           </th>
                           <th class="col-3">
-                            <span>Commentaire</span>
+                            <span jhiTranslate="invoicingPlan.header.comment">Commentaire</span>
                           </th>
                           <th class="col-1">
                             <span>&nbsp;</span>
@@ -253,7 +247,9 @@
                       <tbody style="border: 1px solid grey">
                         @if (invoicingPlan.invoices; as invoices) {
                           <tr>
-                            <td class="table-section align-middle fw-bold" colspan="9">Factures</td>
+                            <td class="table-section align-middle fw-bold" colspan="9" jhiTranslate="invoicingPlan.invoices.label">
+                              Factures
+                            </td>
                             <td class="table-section align-middle text-end">
                               <button
                                 id="jh-create-invoice"
@@ -270,7 +266,7 @@
                             <tr>
                               <td>&nbsp;</td>
                               <td colspan="9">
-                                <span>Aucune facture</span>
+                                <span jhiTranslate="invoicingPlan.invoices.notFound">Aucune facture</span>
                               </td>
                             </tr>
                           } @else if (invoices.length) {
@@ -373,7 +369,9 @@
                         }
                         @if (invoicingPlan.payments; as payments) {
                           <tr>
-                            <td class="table-section align-middle fw-bold" colspan="9">Paiements</td>
+                            <td class="table-section align-middle fw-bold" colspan="9" jhiTranslate="invoicingPlan.payments.label">
+                              Paiements
+                            </td>
                             <td class="table-section align-middle text-end">
                               <button
                                 id="jh-create-payment"
@@ -390,7 +388,7 @@
                             <tr>
                               <td>&nbsp;</td>
                               <td colspan="9">
-                                <span>Aucun paiement</span>
+                                <span jhiTranslate="invoicingPlan.payments.notFound">Aucun paiement</span>
                               </td>
                             </tr>
                           }
@@ -479,7 +477,7 @@
                           }
                         }
                         <tr>
-                          <td class="table-section-ending align-middle">Résultat</td>
+                          <td class="table-section-ending align-middle" jhiTranslate="invoicingPlan.result">Résultat</td>
                           <td colspan="6" class="table-section-ending">&nbsp;</td>
                           <td class="table-section-ending text-center align-middle">
                             {{ remainingTotal(invoicingPlan) | currency: 'CHF' }}

@@ -3,11 +3,33 @@
     "amount": {
       "different": "Le montant diffère du prix par défaut : {{defaultPrice}}"
     },
+    "header": {
+      "amount": "Prix",
+      "comment": "Commentaire",
+      "date": "Date",
+      "label": "Libellé",
+      "qty": "Quantité",
+      "sum": "Total"
+    },
+    "invoices": {
+      "label": "Factures",
+      "notFound": "Aucune facture"
+    },
+    "payments": {
+      "label": "Paiements",
+      "notFound": "Aucun paiement"
+    },
     "receipt": {
       "send": "Envoyer quittance"
     },
     "resend": "Renvoyer facture",
+    "result": "Résultat",
     "send": "Envoyer facture",
-    "sent": "Facture envoyé"
+    "sent": "Facture envoyé",
+    "state": {
+      "CLOSED": "Clôturé",
+      "CURRENT": "Ouvert"
+    },
+    "title": "Plan de facturation n° {{billingNumber}}"
   }
 }

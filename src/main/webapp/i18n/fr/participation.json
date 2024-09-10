@@ -3,9 +3,11 @@
     "acceptedChart": "Charte accepté ?",
     "acceptedContract": "Contrat accepté ?",
     "billing": {
-      "plans": "Plans de facturation",
+      "details": "Détails",
+      "events": "Evénements",
       "title": "Facturations"
     },
+    "cannot-show": "No data can be shown during editing a participation",
     "create": "Création d'une nouvelle participation",
     "edit": "Détail d'une participation",
     "exhibitor": "Exposant",

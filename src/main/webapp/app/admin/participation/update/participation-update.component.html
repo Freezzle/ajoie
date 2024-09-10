@@ -54,13 +54,11 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="card">
-            <h5 class="card-header">Information de base</h5>
+            <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
             <div class="card-body">
               <div class="row">
-                <div class="col-sm-2 fw-bold align-content-center">
+                <div class="col-sm-4 fw-bold">
                   <label for="field_exhibitor" jhiTranslate="participation.exhibitor">Exhibitor</label>
-                </div>
-                <div class="col-sm-2 align-content-center">
                   <select
                     [compareWith]="compareExhibitor"
                     class="form-control"
@@ -73,10 +71,8 @@
                     }
                   </select>
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
+                <div class="col-sm-4 fw-bold">
                   <label for="field_registrationDate" jhiTranslate="participation.registrationDate">Date d'inscription</label>
-                </div>
-                <div class="col-sm-2 align-content-center">
                   <input
                     class="form-control"
                     formControlName="registrationDate"
@@ -86,10 +82,8 @@
                     type="date"
                   />
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
+                <div class="col-sm-4 fw-bold">
                   <label for="field_status" jhiTranslate="participation.status.label">Statut</label>
-                </div>
-                <div class="col-sm-2 align-content-center">
                   <select class="form-control" formControlName="status" id="field_status" name="status">
                     @for (status of statusValues; track $index) {
                       <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
@@ -100,32 +94,29 @@
 
               <!-- MEALS -->
               <div class="row mt-3">
-                <div class="col-sm-2 fw-bold align-content-center">
+                <div class="col-sm-4 fw-bold">
                   <label for="field_nbMeal1" jhiTranslate="participation.nbMeal1">Repas samedi midi</label>
-                </div>
-                <div class="col-sm-2 align-content-center">
                   <input class="form-control" formControlName="nbMeal1" id="field_nbMeal1" name="nbMeal1" type="number" />
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
+
+                <div class="col-sm-4 fw-bold">
                   <label for="field_nbMeal2" jhiTranslate="participation.nbMeal2">Repas samedi soir</label>
-                </div>
-                <div class="col-sm-2 align-content-center">
                   <input class="form-control" formControlName="nbMeal2" id="field_nbMeal2" name="nbMeal2" type="number" />
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
+
+                <div class="col-sm-4 fw-bold">
                   <label for="field_nbMeal3" jhiTranslate="participation.nbMeal3">Repas dimanche midi</label>
-                </div>
-                <div class="col-sm-2 align-content-center">
                   <input class="form-control" formControlName="nbMeal3" id="field_nbMeal3" name="nbMeal3" type="number" />
                 </div>
               </div>
 
               <!-- BOOLEAN STUFFS -->
               <div class="row mt-3">
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <label for="field_acceptedChart" jhiTranslate="participation.acceptedChart">Charte accepté ?</label>
-                </div>
-                <div class="col-sm-1 align-content-center">
+                <div class="col-sm-3 fw-bold align-content-center">
+                  <div>
+                    <label for="field_acceptedChart" jhiTranslate="participation.acceptedChart">Charte accepté ?</label>
+                  </div>
+
                   <div class="switch">
                     <input
                       class="switch-checkbox"
@@ -140,10 +131,11 @@
                     </label>
                   </div>
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <label for="field_acceptedContract" jhiTranslate="participation.acceptedContract">Contrat accepté ?</label>
-                </div>
-                <div class="col-sm-1 align-content-center">
+                <div class="col-sm-3 fw-bold align-content-center">
+                  <div>
+                    <label for="field_acceptedContract" jhiTranslate="participation.acceptedContract">Contrat accepté ?</label>
+                  </div>
+
                   <div class="switch">
                     <input
                       class="switch-checkbox"
@@ -158,10 +150,11 @@
                     </label>
                   </div>
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <label for="field_needArrangment" jhiTranslate="participation.needArrangment">Avec arrangement ?</label>
-                </div>
-                <div class="col-sm-1 align-content-center">
+                <div class="col-sm-3 fw-bold align-content-center">
+                  <div>
+                    <label for="field_needArrangment" jhiTranslate="participation.needArrangment">Avec arrangement ?</label>
+                  </div>
+
                   <div class="switch">
                     <input
                       class="switch-checkbox"
@@ -176,10 +169,11 @@
                     </label>
                   </div>
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Cloturée ?</label>
-                </div>
-                <div class="col-sm-1 align-content-center">
+                <div class="col-sm-3 fw-bold align-content-center">
+                  <div>
+                    <label for="field_isBillingClosed" jhiTranslate="participation.isBillingClosed">Cloturée ?</label>
+                  </div>
+
                   <div class="switch">
                     <input
                       class="switch-checkbox"
@@ -221,7 +215,7 @@
             <div *ngIf="!readonlyForm" class="card-body">
               <div class="row">
                 <div class="col-sm-12 align-content-center">
-                  <label>No data can be shown during editing a participation</label>
+                  <label jhiTranslate="participation.cannot-show">No data can be shown during editing a participation</label>
                 </div>
               </div>
             </div>
@@ -298,7 +292,7 @@
             <div *ngIf="!readonlyForm" class="card-body">
               <div class="row">
                 <div class="col-sm-12 align-content-center">
-                  <label>No data can be shown during editing a participation</label>
+                  <label jhiTranslate="participation.cannot-show">No data can be shown during editing a participation</label>
                 </div>
               </div>
             </div>
