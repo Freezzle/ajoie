@@ -1,127 +1,127 @@
-import { Component, inject, NgZone, OnInit } from '@angular/core';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { combineLatest, filter, Observable, Subscription, switchMap, tap } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, inject, NgZone, OnInit} from '@angular/core';
+import {ActivatedRoute, Data, ParamMap, Router, RouterModule} from '@angular/router';
+import {combineLatest, filter, Observable, Subscription, switchMap, tap} from 'rxjs';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { FormsModule } from '@angular/forms';
-import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
-import { IAuthority } from '../authority.model';
-import { AuthorityService, EntityArrayResponseType } from '../service/authority.service';
-import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
+import {SortByDirective, SortDirective, SortService, type SortState, sortStateSignal} from 'app/shared/sort';
+import {DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe} from 'app/shared/date';
+import {FormsModule} from '@angular/forms';
+import {DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT} from 'app/config/navigation.constants';
+import {IAuthority} from '../authority.model';
+import {AuthorityService, EntityArrayResponseType} from '../service/authority.service';
+import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
 
 @Component({
-  standalone: true,
-  selector: 'jhi-authority',
-  templateUrl: './authority.component.html',
-  imports: [
-    RouterModule,
-    FormsModule,
-    SharedModule,
-    SortDirective,
-    SortByDirective,
-    DurationPipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatePipe,
-  ],
+    standalone: true,
+    selector: 'jhi-authority',
+    templateUrl: './authority.component.html',
+    imports: [
+        RouterModule,
+        FormsModule,
+        SharedModule,
+        SortDirective,
+        SortByDirective,
+        DurationPipe,
+        FormatMediumDatetimePipe,
+        FormatMediumDatePipe,
+    ],
 })
 export class AuthorityComponent implements OnInit {
-  subscription: Subscription | null = null;
-  authorities?: IAuthority[];
-  isLoading = false;
+    subscription: Subscription | null = null;
+    authorities?: IAuthority[];
+    isLoading = false;
 
-  sortState = sortStateSignal({});
+    sortState = sortStateSignal({});
 
-  public router = inject(Router);
-  protected authorityService = inject(AuthorityService);
-  protected activatedRoute = inject(ActivatedRoute);
-  protected sortService = inject(SortService);
-  protected modalService = inject(NgbModal);
-  protected ngZone = inject(NgZone);
+    public router = inject(Router);
+    protected authorityService = inject(AuthorityService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected sortService = inject(SortService);
+    protected modalService = inject(NgbModal);
+    protected ngZone = inject(NgZone);
 
-  trackName = (_index: number, item: IAuthority): string => this.authorityService.getAuthorityIdentifier(item);
+    trackName = (_index: number, item: IAuthority): string => this.authorityService.getAuthorityIdentifier(item);
 
-  ngOnInit(): void {
-    this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
-      .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
-          if (!this.authorities || this.authorities.length === 0) {
-            this.load();
-          }
-        }),
-      )
-      .subscribe();
-  }
+    ngOnInit(): void {
+        this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
+            .pipe(
+                tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
+                tap(() => {
+                    if (!this.authorities || this.authorities.length === 0) {
+                        this.load();
+                    }
+                }),
+            )
+            .subscribe();
+    }
 
-  previousState(): void {
-    window.history.back();
-  }
+    previousState(): void {
+        window.history.back();
+    }
 
-  delete(authority: IAuthority): void {
-    const modalRef = this.modalService.open(DeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.translateKey = 'authority.delete.question';
-    modalRef.componentInstance.translateValues = { id: authority.name };
+    delete(authority: IAuthority): void {
+        const modalRef = this.modalService.open(DeleteDialogComponent, {size: 'lg', backdrop: 'static'});
+        modalRef.componentInstance.translateKey = 'authority.delete.question';
+        modalRef.componentInstance.translateValues = {id: authority.name};
 
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        switchMap(() => this.authorityService.delete(authority.name)),
-        tap(() => this.load()), // Recharge les données
-      )
-      .subscribe();
-  }
+        modalRef.closed
+            .pipe(
+                filter(reason => reason === ITEM_DELETED_EVENT),
+                switchMap(() => this.authorityService.delete(authority.name)),
+                tap(() => this.load()), // Recharge les données
+            )
+            .subscribe();
+    }
 
-  load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
-    });
-  }
+    load(): void {
+        this.queryBackend().subscribe({
+            next: (res: EntityArrayResponseType) => {
+                this.onResponseSuccess(res);
+            },
+        });
+    }
 
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
-  }
+    navigateToWithComponentValues(event: SortState): void {
+        this.handleNavigation(event);
+    }
 
-  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
-    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
-  }
+    protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
+        this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
+    }
 
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.authorities = this.refineData(dataFromBody);
-  }
+    protected onResponseSuccess(response: EntityArrayResponseType): void {
+        const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
+        this.authorities = this.refineData(dataFromBody);
+    }
 
-  protected refineData(data: IAuthority[]): IAuthority[] {
-    const { predicate, order } = this.sortState();
-    return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
-  }
+    protected refineData(data: IAuthority[]): IAuthority[] {
+        const {predicate, order} = this.sortState();
+        return predicate && order ? data.sort(this.sortService.startSort({predicate, order})) : data;
+    }
 
-  protected fillComponentAttributesFromResponseBody(data: IAuthority[] | null): IAuthority[] {
-    return data ?? [];
-  }
+    protected fillComponentAttributesFromResponseBody(data: IAuthority[] | null): IAuthority[] {
+        return data ?? [];
+    }
 
-  protected queryBackend(): Observable<EntityArrayResponseType> {
-    this.isLoading = true;
-    const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
-    };
-    return this.authorityService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
-  }
+    protected queryBackend(): Observable<EntityArrayResponseType> {
+        this.isLoading = true;
+        const queryObject: any = {
+            sort: this.sortService.buildSortParam(this.sortState()),
+        };
+        return this.authorityService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    }
 
-  protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
+    protected handleNavigation(sortState: SortState): void {
+        const queryParamsObj = {
+            sort: this.sortService.buildSortParam(sortState),
+        };
 
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
-    });
-  }
+        this.ngZone.run(() => {
+            this.router.navigate(['./'], {
+                relativeTo: this.activatedRoute,
+                queryParams: queryParamsObj,
+            });
+        });
+    }
 }
