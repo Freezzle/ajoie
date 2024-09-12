@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="#{email.invoice.title(${billingNumber}, ${salon})}">{1} - #{0}</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <p>Cher exposant,</p>
+    <p>
+      Nous avons bien reçu ton paiement et sommes ravis de t’annoncer que ton inscription est désormais validée de manière définitive. Tu es
+      officiellement prêt à rejoindre le salon L’Ajoie de Mieux Vivre, qui se tiendra du 01.07.2025 au 02.07.2025.
+    </p>
+    <p>
+      Quelques semaines avant l’événement, tu recevras un email contenant toutes les informations nécessaires pour l’installation de ton
+      stand et les derniers détails pratiques.
+    </p>
+
+    <p>Si tu as la moindre question, n’hésite pas à nous contacter, nous serons ravis de t’aider.</p>
+    <p>En attendant cet événement unique, nous te souhaitons une semaine lumineuse et empreinte de belles énergies.</p>
+
+    <div th:include="common/footer::footer"></div>
+  </body>
+</html>

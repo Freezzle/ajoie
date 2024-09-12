@@ -2,7 +2,6 @@ package ch.salon.service.dto;
 
 import ch.salon.domain.Salon;
 import ch.salon.domain.enumeration.Status;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -27,6 +26,10 @@ public class ParticipationDTO implements Serializable {
 
     private Boolean needArrangment;
 
+    private String offer;
+
+    private String additionnalInformation;
+
     private Boolean isBillingClosed;
 
     private Status status;
@@ -37,8 +40,7 @@ public class ParticipationDTO implements Serializable {
 
     private Salon salon;
 
-    public ParticipationDTO() {
-    }
+    public ParticipationDTO() {}
 
     public UUID getId() {
         return id;

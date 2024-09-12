@@ -1,7 +1,6 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Status;
-
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -9,12 +8,12 @@ public class ConferenceDTO implements Serializable {
 
     private UUID id;
     private String title;
+    private String description;
     private Status status;
     private String extraInformation;
     private ParticipationLightDTO participation;
 
-    public ConferenceDTO() {
-    }
+    public ConferenceDTO() {}
 
     public UUID getId() {
         return id;
@@ -30,6 +29,14 @@ public class ConferenceDTO implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Status getStatus() {

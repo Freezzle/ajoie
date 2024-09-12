@@ -18,7 +18,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.ResponseUtil;
 
 @RestController
@@ -37,7 +45,7 @@ public class ConferenceResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ConferenceDTO> createConference(@Valid @RequestBody ConferenceDTO conference) throws URISyntaxException {
         log.debug("REST request to save Conference : {}", conference);
 
@@ -49,7 +57,7 @@ public class ConferenceResource {
     }
 
     @PutMapping("/{idConference}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ConferenceDTO> updateConference(
         @PathVariable(value = "idConference", required = false) final UUID idConference,
         @Valid @RequestBody ConferenceDTO conference
@@ -62,7 +70,7 @@ public class ConferenceResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<ConferenceDTO> getAllConferences(
         @RequestParam(name = "idSalon", required = false) String idSalon,
         @RequestParam(name = "idParticipation", required = false) String idParticipation
@@ -73,7 +81,7 @@ public class ConferenceResource {
     }
 
     @GetMapping("/{idConference}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ConferenceDTO> getConference(@PathVariable("idConference") UUID idConference) {
         log.debug("REST request to get Conference : {}", idConference);
 
@@ -81,7 +89,7 @@ public class ConferenceResource {
     }
 
     @DeleteMapping("/{idConference}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deleteConference(@PathVariable("idConference") UUID idConference) {
         log.debug("REST request to delete Conference : {}", idConference);
 

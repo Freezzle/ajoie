@@ -5,10 +5,10 @@
   </head>
   <body>
     <p th:text="#{email.invoice.greeting(${fullName})}"></p>
-    <br />
     <p th:utext="#{email.invoice.text1(${salon}, ${startDate}, ${endDate})}"></p>
     <p th:utext="#{email.invoice.text2}"></p>
-    <br />
     <p th:utext="#{email.invoice.text3}"></p>
+
+    <div th:include="common/footer::footer"></div>
   </body>
 </html>

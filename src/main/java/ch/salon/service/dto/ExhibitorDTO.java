@@ -9,6 +9,8 @@ public class ExhibitorDTO implements Serializable {
 
     private String fullName;
 
+    private String therapistName;
+
     private String email;
 
     private String phoneNumber;
@@ -37,6 +39,14 @@ public class ExhibitorDTO implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getTherapistName() {
+        return therapistName;
+    }
+
+    public void setTherapistName(String therapistName) {
+        this.therapistName = therapistName;
     }
 
     public String getEmail() {

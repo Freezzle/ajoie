@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="20240721083405-42" author="jhipster">
         <createTable tableName="event_log">
@@ -12,16 +12,16 @@
             <column name="reference_date" type="${datetimeType}">
                 <constraints nullable="false"/>
             </column>
-            <column name="type" type="varchar(255)">
+            <column name="type" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="label" type="varchar(255)">
+            <column name="label" type="varchar(500)">
                 <constraints nullable="false"/>
             </column>
             <column name="from_system" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_type" type="varchar(255)">
+            <column name="entity_type" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="reference_id" type="${uuidType}">

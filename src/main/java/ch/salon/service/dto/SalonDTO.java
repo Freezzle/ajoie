@@ -10,7 +10,7 @@ public class SalonDTO implements Serializable {
 
     private UUID id;
 
-    private Long referenceNumber;
+    private String referenceNumber;
 
     private String place;
 
@@ -43,11 +43,11 @@ public class SalonDTO implements Serializable {
         this.id = id;
     }
 
-    public Long getReferenceNumber() {
+    public String getReferenceNumber() {
         return referenceNumber;
     }
 
-    public void setReferenceNumber(Long referenceNumber) {
+    public void setReferenceNumber(String referenceNumber) {
         this.referenceNumber = referenceNumber;
     }
 

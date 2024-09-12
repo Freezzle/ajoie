@@ -10,12 +10,14 @@
     "extraInformation": "Commentaire",
     "filter": {
       "email": "Email de l'exposant",
-      "fullName": "Nom de l'exposant"
+      "fullName": "Nom de l'exposant",
+      "therapistName": "Nom de thérapeute"
     },
     "fullName": "Nom complet",
-    "notfound": "Aucun exposant",
+    "notFound": "Aucun exposant",
     "npaLocalite": "Npa et localité",
     "phoneNumber": "N° de tél",
+    "therapistName": "Nom de thérapeute",
     "title": "Les exposants"
   }
 }

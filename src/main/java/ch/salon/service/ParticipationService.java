@@ -179,7 +179,7 @@ public class ParticipationService {
             .toList();
     }
 
-    public static String getClientNumber(String clientNumberMax, Long referenceSalon) {
+    public static String getClientNumber(String clientNumberMax, String referenceSalon) {
         int number = 100;
         if (clientNumberMax != null) {
             String[] split = clientNumberMax.split("-");

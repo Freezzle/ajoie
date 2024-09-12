@@ -1,7 +1,6 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Status;
-
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -13,7 +12,9 @@ public class StandDTO implements Serializable {
 
     private String website;
 
-    private String socialMedia;
+    private String instagram;
+
+    private String facebook;
 
     private String urlPicture;
 
@@ -33,8 +34,7 @@ public class StandDTO implements Serializable {
 
     private DimensionStandLightDTO dimension;
 
-    public StandDTO() {
-    }
+    public StandDTO() {}
 
     public UUID getId() {
         return id;
@@ -60,12 +60,20 @@ public class StandDTO implements Serializable {
         this.website = website;
     }
 
-    public String getSocialMedia() {
-        return socialMedia;
+    public String getInstagram() {
+        return instagram;
     }
 
-    public void setSocialMedia(String socialMedia) {
-        this.socialMedia = socialMedia;
+    public void setInstagram(String instagram) {
+        this.instagram = instagram;
+    }
+
+    public String getFacebook() {
+        return facebook;
+    }
+
+    public void setFacebook(String facebook) {
+        this.facebook = facebook;
     }
 
     public String getUrlPicture() {

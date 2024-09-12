@@ -5,11 +5,18 @@
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
   </head>
   <body>
-    <p th:text="#{email.invoice.greeting(${fullName})}">Cher {0}</p>
-    <p th:utext="#{email.invoice.text1(${salon}, ${startDate}, ${endDate})}"></p>
-    <br />
-    <p th:utext="#{email.invoice.text2(${billingNumber})}"></p>
-    <br />
-    <p th:text="#{email.invoice.text3}"></p>
+    <p>Cher exposant,</p>
+    <p>C’est avec grand plaisir que nous t’annonçons que ton inscription a été acceptée par le comité du salon L’Ajoie de Mieux Vivre !</p>
+    <p>Nous sommes enchantés de te compter parmi nous pour cette belle aventure.</p>
+    <p>
+      Dans les semaines à venir, tu recevras par email ta facture détaillant les prestations que tu as sélectionnées. Nous te rappelons que
+      cette facture devra être réglée dans un délai de 30 jours après sa réception. Passé ce délai, nous serions malheureusement contraints
+      d’attribuer ta place à un autre exposant.
+    </p>
+
+    <p>Si tu as la moindre question, n’hésite pas à nous contacter, nous serons ravis de t’aider.</p>
+    <p>En attendant, nous te souhaitons une semaine remplie de belles énergies et nous nous réjouissons de te retrouver très bientôt !</p>
+
+    <div th:include="common/footer::footer"></div>
   </body>
 </html>

@@ -8,13 +8,14 @@
     "dimension": "Dimension",
     "edit": "Détail d'un stand",
     "extraInformation": "Commentaire",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
     "nbChair": "Nombre de chaises",
     "nbTable": "Nombre de tables",
     "needElectricity": "Avec électricité ?",
     "notFound": "Aucun stand",
     "participation": "Participation",
     "shared": "Partagé ?",
-    "socialMedia": "Social / Média",
     "status": {
       "label": "Statut",
       "list": {

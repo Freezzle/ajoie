@@ -4,7 +4,6 @@ import ch.salon.domain.Invoice;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoiceLightDTO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 

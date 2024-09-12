@@ -7,6 +7,7 @@ import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
 
 import ch.salon.domain.Authority;
 import ch.salon.repository.AuthorityRepository;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -18,7 +19,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.ResponseUtil;
 
 @RestController
@@ -39,7 +46,7 @@ public class AuthorityResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority) throws URISyntaxException {
         log.debug("REST request to save Authority : {}", authority);
 
@@ -54,7 +61,7 @@ public class AuthorityResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<Authority> getAllAuthorities() {
         log.debug("REST request to get all Authorities");
 
@@ -62,7 +69,7 @@ public class AuthorityResource {
     }
 
     @GetMapping("/{idAuthority}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Authority> getAuthority(@PathVariable("idAuthority") String idAuthority) {
         log.debug("REST request to get Authority : {}", idAuthority);
 
@@ -70,7 +77,7 @@ public class AuthorityResource {
     }
 
     @DeleteMapping("/{idAuthority}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteAuthority(@PathVariable("idAuthority") String idAuthority) {
         log.debug("REST request to delete Authority : {}", idAuthority);
 

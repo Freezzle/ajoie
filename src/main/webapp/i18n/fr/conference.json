@@ -19,6 +19,7 @@
         "null": " "
       }
     },
-    "title": "Les conférences"
+    "title": "Les conférences",
+    "titleField": "Titre"
   }
 }

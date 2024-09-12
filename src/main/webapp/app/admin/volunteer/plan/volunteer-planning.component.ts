@@ -23,12 +23,10 @@ export class VolunteerPlanningComponent implements OnInit {
     }
 
     saveLinesFirstDay(lines: Line[]): void {
-        console.log(lines);
         this.dbLinesFirstDay = lines;
     }
 
     saveLinesSecondDay(lines: Line[]): void {
-        console.log(lines);
         this.dbLinesSecondDay = lines;
     }
 

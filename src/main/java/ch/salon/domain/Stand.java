@@ -35,8 +35,11 @@ public class Stand implements Serializable {
     @Column(name = "website")
     private String website;
 
-    @Column(name = "social_media")
-    private String socialMedia;
+    @Column(name = "instagram")
+    private String instagram;
+
+    @Column(name = "facebook")
+    private String facebook;
 
     @Column(name = "url_picture")
     private String urlPicture;
@@ -106,17 +109,20 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public String getSocialMedia() {
-        return this.socialMedia;
+    public String getInstagram() {
+        return instagram;
     }
 
-    public void setSocialMedia(String socialMedia) {
-        this.socialMedia = socialMedia;
+    public void setInstagram(String instagram) {
+        this.instagram = instagram;
     }
 
-    public Stand socialMedia(String socialMedia) {
-        this.setSocialMedia(socialMedia);
-        return this;
+    public String getFacebook() {
+        return facebook;
+    }
+
+    public void setFacebook(String facebook) {
+        this.facebook = facebook;
     }
 
     public String getUrlPicture() {
@@ -270,36 +276,40 @@ public class Stand implements Serializable {
         return (
             "Stand{" +
             "id=" +
-            getId() +
+            id +
             ", description='" +
-            getDescription() +
-            "'" +
+            description +
+            '\'' +
             ", website='" +
-            getWebsite() +
-            "'" +
-            ", socialMedia='" +
-            getSocialMedia() +
-            "'" +
+            website +
+            '\'' +
+            ", instagram='" +
+            instagram +
+            '\'' +
+            ", facebook='" +
+            facebook +
+            '\'' +
             ", urlPicture='" +
-            getUrlPicture() +
-            "'" +
-            ", shared='" +
-            getShared() +
-            "'" +
+            urlPicture +
+            '\'' +
+            ", shared=" +
+            shared +
             ", nbTable=" +
-            getNbTable() +
+            nbTable +
             ", nbChair=" +
-            getNbChair() +
-            ", needElectricity='" +
-            getNeedElectricity() +
-            "'" +
-            ", status='" +
-            getStatus() +
-            "'" +
+            nbChair +
+            ", needElectricity=" +
+            needElectricity +
+            ", status=" +
+            status +
             ", extraInformation='" +
-            getExtraInformation() +
-            "'" +
-            "}"
+            extraInformation +
+            '\'' +
+            ", participation=" +
+            participation +
+            ", dimension=" +
+            dimension +
+            '}'
         );
     }
 }

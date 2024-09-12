@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity Salon.
@@ -14,41 +12,41 @@
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="reference_number" type="bigint">
+            <column name="reference_number" type="varchar(10)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="place" type="varchar(255)">
-                <constraints nullable="false" />
+            <column name="place" type="varchar(100)">
+                <constraints nullable="false"/>
             </column>
             <column name="starting_date" type="${datetimeType}">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="ending_date" type="${datetimeType}">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="price_meal_1" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="price_meal_2" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="price_meal_3" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="price_conference" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="price_sharing_stand" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
-            <column name="extra_information" type="varchar(255)">
-                <constraints nullable="true" />
+            <column name="extra_information" type="varchar(500)">
+                <constraints nullable="true"/>
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
         <dropDefaultValue tableName="salon" columnName="starting_date" columnDataType="${datetimeType}"/>
         <dropDefaultValue tableName="salon" columnName="ending_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

@@ -33,8 +33,8 @@ public class Salon implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @Column
-    private Long referenceNumber;
+    @Column(length = 10)
+    private String referenceNumber;
 
     @NotNull
     @Column(name = "place", nullable = false)
@@ -119,11 +119,11 @@ public class Salon implements Serializable {
         return false;
     }
 
-    public Long getReferenceNumber() {
+    public String getReferenceNumber() {
         return referenceNumber;
     }
 
-    public void setReferenceNumber(Long referenceNumber) {
+    public void setReferenceNumber(String referenceNumber) {
         this.referenceNumber = referenceNumber;
     }
 

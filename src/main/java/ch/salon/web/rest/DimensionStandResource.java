@@ -1,25 +1,17 @@
 package ch.salon.web.rest;
 
-import static ch.salon.service.DimensionStandService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.*;
-import static tech.jhipster.web.util.HeaderUtil.*;
-
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.DimensionStandService;
 import ch.salon.service.dto.DimensionStandDTO;
-import jakarta.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import tech.jhipster.web.util.ResponseUtil;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/dimension-stands")
@@ -37,7 +29,7 @@ public class DimensionStandResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<DimensionStandDTO> getAllDimensionStands() {
         log.debug("REST request to get all DimensionStands");
 

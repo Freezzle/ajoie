@@ -2,6 +2,7 @@
   "participation": {
     "acceptedChart": "Charte accepté ?",
     "acceptedContract": "Contrat accepté ?",
+    "additionnalInformation": "Complément d'information",
     "billing": {
       "details": "Détails",
       "events": "Evénements",
@@ -21,6 +22,7 @@
     "nbMeal3": "Repas dimanche midi",
     "needArrangment": "Arrangement ?",
     "notFound": "Aucune participation",
+    "offer": "Offre de soin",
     "registrationDate": "Date d'inscription",
     "status": {
       "label": "Statut",

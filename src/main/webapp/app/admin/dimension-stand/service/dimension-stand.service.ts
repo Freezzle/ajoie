@@ -7,11 +7,6 @@ import {ApplicationConfigService} from 'app/core/config/application-config.servi
 import {createRequestOption} from 'app/core/request/request-util';
 import {IDimensionStand, NewDimensionStand} from '../dimension-stand.model';
 
-export type PartialUpdateDimensionStand = Partial<IDimensionStand> & Pick<IDimensionStand, 'id'>;
-
-export type EntityResponseType = HttpResponse<IDimensionStand>;
-export type EntityArrayResponseType = HttpResponse<IDimensionStand[]>;
-
 @Injectable({providedIn: 'root'})
 export class DimensionStandService {
     protected http = inject(HttpClient);
@@ -19,29 +14,22 @@ export class DimensionStandService {
 
     protected resourceUrl = this.applicationConfigService.getEndpointFor('api/dimension-stands');
 
-    create(dimensionStand: NewDimensionStand): Observable<EntityResponseType> {
+    create(dimensionStand: NewDimensionStand): Observable<HttpResponse<IDimensionStand>> {
         return this.http.post<IDimensionStand>(this.resourceUrl, dimensionStand, {observe: 'response'});
     }
 
-    update(dimensionStand: IDimensionStand): Observable<EntityResponseType> {
+    update(dimensionStand: IDimensionStand): Observable<HttpResponse<IDimensionStand>> {
         return this.http.put<IDimensionStand>(`${this.resourceUrl}/${this.getDimensionStandIdentifier(dimensionStand)}`,
             dimensionStand, {
                 observe: 'response',
             });
     }
 
-    partialUpdate(dimensionStand: PartialUpdateDimensionStand): Observable<EntityResponseType> {
-        return this.http.patch<IDimensionStand>(
-            `${this.resourceUrl}/${this.getDimensionStandIdentifier(dimensionStand)}`, dimensionStand, {
-                observe: 'response',
-            });
-    }
-
-    find(idDimension: string): Observable<EntityResponseType> {
+    find(idDimension: string): Observable<HttpResponse<IDimensionStand>> {
         return this.http.get<IDimensionStand>(`${this.resourceUrl}/${idDimension}`, {observe: 'response'});
     }
 
-    query(req?: any): Observable<EntityArrayResponseType> {
+    query(req?: any): Observable<HttpResponse<IDimensionStand[]>> {
         const options = createRequestOption(req);
         return this.http.get<IDimensionStand[]>(this.resourceUrl, {params: options, observe: 'response'});
     }
@@ -58,7 +46,7 @@ export class DimensionStandService {
         return o1 && o2 ? this.getDimensionStandIdentifier(o1) === this.getDimensionStandIdentifier(o2) : o1 === o2;
     }
 
-    addDimensionStandToCollectionIfMissing<Type extends Pick<IDimensionStand, 'id'>>(
+    addDimensionsOptionsIfMissing<Type extends Pick<IDimensionStand, 'id'>>(
         dimensionStandCollection: Type[],
         ...dimensionStandsToCheck: (Type | null | undefined)[]
     ): Type[] {

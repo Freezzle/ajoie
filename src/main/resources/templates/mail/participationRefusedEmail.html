@@ -5,11 +5,22 @@
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
   </head>
   <body>
-    <p th:text="#{email.invoice.greeting(${fullName})}">Cher {0}</p>
-    <p th:utext="#{email.invoice.text1(${salon}, ${startDate}, ${endDate})}"></p>
-    <br />
-    <p th:utext="#{email.invoice.text2(${billingNumber})}"></p>
-    <br />
-    <p th:text="#{email.invoice.text3}"></p>
+    <p>Cher exposant,</p>
+    <p>
+      Après avoir examiné attentivement ton inscription, nous sommes au regret de t’informer qu’elle n’a malheureusement pas été retenue par
+      le comité du salon L’Ajoie de Mieux Vivre cette année.
+    </p>
+    <p>
+      Cette décision n’a pas été facile à prendre, car nous avons reçu un grand nombre de demandes et les places disponibles sont limitées.
+    </p>
+    <p>
+      Nous te remercions sincèrement pour l’intérêt que tu portes à notre événement et espérons avoir l’occasion de collaborer avec toi lors
+      d’une prochaine édition.
+    </p>
+
+    <p>Si tu souhaites obtenir des précisions, n’hésite pas à nous contacter, nous serons ravis d’échanger avec toi.</p>
+    <p>En attendant, nous te souhaitons une belle continuation dans tes projets et une semaine pleine de belles énergies.</p>
+
+    <div th:include="common/footer::footer"></div>
   </body>
 </html>

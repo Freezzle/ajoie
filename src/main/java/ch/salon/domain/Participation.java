@@ -55,6 +55,12 @@ public class Participation implements Serializable {
     @Column(name = "is_billing_closed")
     private Boolean isBillingClosed;
 
+    @Column(name = "offer")
+    private String offer;
+
+    @Column(name = "additional_information")
+    private String additionnalInformation;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private Status status;
@@ -106,6 +112,30 @@ public class Participation implements Serializable {
     public Participation nbMeal1(Long nbMeal1) {
         this.setNbMeal1(nbMeal1);
         return this;
+    }
+
+    public Boolean getBillingClosed() {
+        return isBillingClosed;
+    }
+
+    public void setBillingClosed(Boolean billingClosed) {
+        isBillingClosed = billingClosed;
+    }
+
+    public String getOffer() {
+        return offer;
+    }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
+    public String getAdditionnalInformation() {
+        return additionnalInformation;
+    }
+
+    public void setAdditionnalInformation(String additionnalInformation) {
+        this.additionnalInformation = additionnalInformation;
     }
 
     public Long getNbMeal2() {

@@ -19,7 +19,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
@@ -41,7 +48,7 @@ public class ExhibitorResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ExhibitorDTO> createExhibitor(@Valid @RequestBody ExhibitorDTO exhibitor) throws URISyntaxException {
         log.debug("REST request to save Exhibitor : {}", exhibitor);
 
@@ -53,7 +60,7 @@ public class ExhibitorResource {
     }
 
     @PutMapping("/{idExhibitor}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ExhibitorDTO> updateExhibitor(
         @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor,
         @Valid @RequestBody ExhibitorDTO exhibitor
@@ -66,7 +73,7 @@ public class ExhibitorResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<ExhibitorDTO> getAllExhibitors() {
         log.debug("REST request to get all Exhibitors");
 
@@ -74,7 +81,7 @@ public class ExhibitorResource {
     }
 
     @GetMapping("/{idExhibitor}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ExhibitorDTO> getExhibitor(@PathVariable("idExhibitor") UUID idExhibitor) {
         log.debug("REST request to get Exhibitor : {}", idExhibitor);
 
@@ -82,7 +89,7 @@ public class ExhibitorResource {
     }
 
     @DeleteMapping("/{idExhibitor}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deleteExhibitor(@PathVariable("idExhibitor") UUID idExhibitor) {
         log.debug("REST request to delete Exhibitor : {}", idExhibitor);
 
@@ -92,7 +99,7 @@ public class ExhibitorResource {
     }
 
     @PostMapping("/{idExhibitor}/events")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> createEventLog(
         @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor,
         @Valid @RequestBody EventLogDTO eventLogDTO
@@ -105,7 +112,7 @@ public class ExhibitorResource {
     }
 
     @GetMapping("/{idExhibitor}/events")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<EventLogDTO> getAllLogs(@PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor) {
         log.debug("REST request to get all EventLogs");
 

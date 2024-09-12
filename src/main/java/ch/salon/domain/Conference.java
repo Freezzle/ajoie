@@ -32,6 +32,10 @@ public class Conference implements Serializable {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @NotNull
+    @Column(name = "description", nullable = false)
+    private String description;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private Status status;
@@ -54,6 +58,14 @@ public class Conference implements Serializable {
     public Conference id(UUID id) {
         this.setId(id);
         return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getTitle() {
@@ -138,17 +150,21 @@ public class Conference implements Serializable {
         return (
             "Conference{" +
             "id=" +
-            getId() +
+            id +
             ", title='" +
-            getTitle() +
-            "'" +
-            ", status='" +
-            getStatus() +
-            "'" +
+            title +
+            '\'' +
+            ", description='" +
+            description +
+            '\'' +
+            ", status=" +
+            status +
             ", extraInformation='" +
-            getExtraInformation() +
-            "'" +
-            "}"
+            extraInformation +
+            '\'' +
+            ", participation=" +
+            participation +
+            '}'
         );
     }
 }

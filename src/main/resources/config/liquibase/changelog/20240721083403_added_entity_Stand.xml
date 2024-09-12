@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity Stand.
@@ -14,45 +12,48 @@
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="description" type="varchar(255)">
-                <constraints nullable="false" />
+            <column name="description" type="varchar(500)">
+                <constraints nullable="false"/>
             </column>
-            <column name="website" type="varchar(255)">
-                <constraints nullable="true" />
+            <column name="website" type="varchar(100)">
+                <constraints nullable="true"/>
             </column>
-            <column name="social_media" type="varchar(255)">
-                <constraints nullable="true" />
+            <column name="facebook" type="varchar(500)">
+                <constraints nullable="true"/>
             </column>
-            <column name="url_picture" type="varchar(255)">
-                <constraints nullable="true" />
+            <column name="instagram" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="url_picture" type="varchar(500)">
+                <constraints nullable="true"/>
             </column>
             <column name="shared" type="boolean">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="nb_table" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="nb_chair" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="need_electricity" type="boolean">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
-            <column name="status" type="varchar(255)">
-                <constraints nullable="true" />
+            <column name="status" type="varchar(100)">
+                <constraints nullable="true"/>
             </column>
-            <column name="extra_information" type="varchar(255)">
-                <constraints nullable="true" />
+            <column name="extra_information" type="varchar(500)">
+                <constraints nullable="true"/>
             </column>
             <column name="participation_id" type="${uuidType}">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="dimension_id" type="${uuidType}">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
     </changeSet>
 
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

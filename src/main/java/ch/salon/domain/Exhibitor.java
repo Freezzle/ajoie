@@ -25,6 +25,9 @@ public class Exhibitor implements Serializable {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
+    @Column(name = "therapist_name", nullable = false)
+    private String therapistName;
+
     @NotNull
     @Column(name = "email", nullable = false)
     private String email;
@@ -52,6 +55,14 @@ public class Exhibitor implements Serializable {
     public Exhibitor id(UUID id) {
         this.setId(id);
         return this;
+    }
+
+    public String getTherapistName() {
+        return therapistName;
+    }
+
+    public void setTherapistName(String therapistName) {
+        this.therapistName = therapistName;
     }
 
     public String getFullName() {
@@ -154,26 +165,29 @@ public class Exhibitor implements Serializable {
         return (
             "Exhibitor{" +
             "id=" +
-            getId() +
+            id +
             ", fullName='" +
-            getFullName() +
-            "'" +
+            fullName +
+            '\'' +
+            ", therapistName='" +
+            therapistName +
+            '\'' +
             ", email='" +
-            getEmail() +
-            "'" +
+            email +
+            '\'' +
             ", phoneNumber='" +
-            getPhoneNumber() +
-            "'" +
+            phoneNumber +
+            '\'' +
             ", address='" +
-            getAddress() +
-            "'" +
+            address +
+            '\'' +
             ", npaLocalite='" +
-            getNpaLocalite() +
-            "'" +
+            npaLocalite +
+            '\'' +
             ", extraInformation='" +
-            getExtraInformation() +
-            "'" +
-            "}"
+            extraInformation +
+            '\'' +
+            '}'
         );
     }
 }
