@@ -37,7 +37,7 @@ public class DimensionStandResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<DimensionStandDTO> getAllDimensionStands() {
         log.debug("REST request to get all DimensionStands");
 

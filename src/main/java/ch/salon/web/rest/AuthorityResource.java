@@ -7,6 +7,7 @@ import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
 
 import ch.salon.domain.Authority;
 import ch.salon.repository.AuthorityRepository;
+import ch.salon.security.AuthoritiesConstants;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -39,7 +40,7 @@ public class AuthorityResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority) throws URISyntaxException {
         log.debug("REST request to save Authority : {}", authority);
 
@@ -54,7 +55,7 @@ public class AuthorityResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<Authority> getAllAuthorities() {
         log.debug("REST request to get all Authorities");
 
@@ -62,7 +63,7 @@ public class AuthorityResource {
     }
 
     @GetMapping("/{idAuthority}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Authority> getAuthority(@PathVariable("idAuthority") String idAuthority) {
         log.debug("REST request to get Authority : {}", idAuthority);
 
@@ -70,7 +71,7 @@ public class AuthorityResource {
     }
 
     @DeleteMapping("/{idAuthority}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteAuthority(@PathVariable("idAuthority") String idAuthority) {
         log.debug("REST request to delete Authority : {}", idAuthority);
 

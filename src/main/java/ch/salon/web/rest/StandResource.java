@@ -37,7 +37,7 @@ public class StandResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<StandDTO> createStand(@Valid @RequestBody StandDTO stand) throws URISyntaxException {
         log.debug("REST request to save Stand : {}", stand);
 
@@ -49,7 +49,7 @@ public class StandResource {
     }
 
     @PutMapping("/{idStand}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<StandDTO> updateStand(
         @PathVariable(value = "idStand", required = false) final UUID idStand,
         @Valid @RequestBody StandDTO stand
@@ -62,7 +62,7 @@ public class StandResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<StandDTO> getAllStands(
         @RequestParam(name = "idSalon", required = false) String idSalon,
         @RequestParam(name = "idParticipation", required = false) String idParticipation
@@ -73,7 +73,7 @@ public class StandResource {
     }
 
     @GetMapping("/{idStand}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<StandDTO> getStand(@PathVariable("idStand") UUID idStand) {
         log.debug("REST request to get Stand : {}", idStand);
 
@@ -81,7 +81,7 @@ public class StandResource {
     }
 
     @DeleteMapping("/{idStand}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deleteStand(@PathVariable("idStand") UUID idStand) {
         log.debug("REST request to delete Stand : {}", idStand);
 

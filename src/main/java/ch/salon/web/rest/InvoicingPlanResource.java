@@ -42,7 +42,7 @@ public class InvoicingPlanResource {
     }
 
     @PatchMapping("{idInvoicingPlan}/send-invoice-receipt")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> sendInvoiceReceiptEmail(
         @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan
     ) throws Exception {
@@ -52,7 +52,7 @@ public class InvoicingPlanResource {
     }
 
     @PatchMapping("{idInvoicingPlan}/send-invoice")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> sendInvoiceEmail(@PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan)
         throws Exception {
         invoicingPlanService.sendInvoice(idInvoicingPlan);
@@ -61,7 +61,7 @@ public class InvoicingPlanResource {
     }
 
     @PostMapping("{idInvoicingPlan}/invoices")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<InvoiceDTO> updateInvoice(
         @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan,
         @RequestBody InvoiceDTO invoiceDTO
@@ -70,7 +70,7 @@ public class InvoicingPlanResource {
     }
 
     @PutMapping("{idInvoicingPlan}/invoices/{idInvoice}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<InvoiceDTO> updateInvoice(
         @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan,
         @PathVariable(name = "idInvoice", required = false) UUID idInvoice,
@@ -80,7 +80,7 @@ public class InvoicingPlanResource {
     }
 
     @PostMapping("/{idInvoicingPlan}/payments")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<PaymentDTO> createPayment(
         @PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
         @Valid @RequestBody PaymentDTO payment
@@ -91,7 +91,7 @@ public class InvoicingPlanResource {
     }
 
     @PutMapping("/{idInvoicingPlan}/payments/{idPayment}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<PaymentDTO> updatePayment(
         @PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
         @PathVariable("idPayment") UUID idPayment,
@@ -103,7 +103,7 @@ public class InvoicingPlanResource {
     }
 
     @DeleteMapping("/{idInvoicingPlan}/payments/{idPayment}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deletePayment(
         @PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
         @PathVariable("idPayment") UUID idPayment

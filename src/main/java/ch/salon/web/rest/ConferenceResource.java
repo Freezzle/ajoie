@@ -37,7 +37,7 @@ public class ConferenceResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ConferenceDTO> createConference(@Valid @RequestBody ConferenceDTO conference) throws URISyntaxException {
         log.debug("REST request to save Conference : {}", conference);
 
@@ -49,7 +49,7 @@ public class ConferenceResource {
     }
 
     @PutMapping("/{idConference}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ConferenceDTO> updateConference(
         @PathVariable(value = "idConference", required = false) final UUID idConference,
         @Valid @RequestBody ConferenceDTO conference
@@ -62,7 +62,7 @@ public class ConferenceResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<ConferenceDTO> getAllConferences(
         @RequestParam(name = "idSalon", required = false) String idSalon,
         @RequestParam(name = "idParticipation", required = false) String idParticipation
@@ -73,7 +73,7 @@ public class ConferenceResource {
     }
 
     @GetMapping("/{idConference}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ConferenceDTO> getConference(@PathVariable("idConference") UUID idConference) {
         log.debug("REST request to get Conference : {}", idConference);
 
@@ -81,7 +81,7 @@ public class ConferenceResource {
     }
 
     @DeleteMapping("/{idConference}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deleteConference(@PathVariable("idConference") UUID idConference) {
         log.debug("REST request to delete Conference : {}", idConference);
 

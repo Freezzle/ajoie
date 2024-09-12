@@ -45,7 +45,7 @@ public class SalonResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<SalonDTO> createSalon(@Valid @RequestBody SalonDTO salon) throws URISyntaxException {
         log.debug("REST request to save Salon : {}", salon);
 
@@ -57,7 +57,7 @@ public class SalonResource {
     }
 
     @PutMapping("/{idSalon}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<SalonDTO> updateSalon(
         @PathVariable(value = "idSalon", required = false) final UUID idSalon,
         @Valid @RequestBody SalonDTO salon
@@ -70,7 +70,7 @@ public class SalonResource {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<SalonDTO> getAllSalons() {
         log.debug("REST request to get all Salons");
 
@@ -78,14 +78,14 @@ public class SalonResource {
     }
 
     @GetMapping("/{idSalon}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<SalonDTO> getSalon(@PathVariable("idSalon") UUID idSalon) {
         log.debug("REST request to get Salon : {}", idSalon);
         return ResponseUtil.wrapOrNotFound(salonService.get(idSalon));
     }
 
     @DeleteMapping("/{idSalon}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deleteSalon(@PathVariable("idSalon") UUID idSalon) {
         log.debug("REST request to delete Salon : {}", idSalon);
 
@@ -95,7 +95,7 @@ public class SalonResource {
     }
 
     @GetMapping("{idSalon}/participations")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<Participation> getAllParticipations(@PathVariable(name = "idSalon", required = false) String idSalon) {
         log.debug("REST request to get all Participations");
 
@@ -103,7 +103,7 @@ public class SalonResource {
     }
 
     @PostMapping("/{idSalon}/import")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> importation(@PathVariable(name = "idSalon", required = false) String idSalon) throws URISyntaxException {
         importationService.importData(idSalon);
 
@@ -111,7 +111,7 @@ public class SalonResource {
     }
 
     @GetMapping("/{idSalon}/stats")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<SalonStats> getStats(@PathVariable(value = "idSalon", required = false) final UUID idSalon) {
         log.debug("REST request to get stats from Salon : {}", idSalon);
 

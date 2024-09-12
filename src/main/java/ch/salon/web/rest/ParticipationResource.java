@@ -42,7 +42,7 @@ public class ParticipationResource {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Participation> createParticipation(@RequestBody Participation participation) throws URISyntaxException {
         log.debug("REST request to save Participation : {}", participation);
 
@@ -54,7 +54,7 @@ public class ParticipationResource {
     }
 
     @PutMapping("/{idParticipation}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Participation> updateParticipation(
         @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
         @RequestBody Participation participation
@@ -67,7 +67,7 @@ public class ParticipationResource {
     }
 
     @GetMapping("/{idParticipation}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Participation> getParticipation(@PathVariable("idParticipation") UUID idParticipation) {
         log.debug("REST request to get Participation : {}", idParticipation);
 
@@ -75,7 +75,7 @@ public class ParticipationResource {
     }
 
     @DeleteMapping("/{idParticipation}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deleteParticipation(@PathVariable("idParticipation") UUID idParticipation) {
         log.debug("REST request to delete Participation : {}", idParticipation);
 
@@ -85,7 +85,7 @@ public class ParticipationResource {
     }
 
     @GetMapping("/{idParticipation}/invoicing-plans")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<InvoicingPlanDTO> getAllInvoicingPlans(@PathVariable(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all InvoicingPlans");
 
@@ -93,7 +93,7 @@ public class ParticipationResource {
     }
 
     @PatchMapping("/{idParticipation}/refresh-invoicing-plans")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public void generateInvoicingPlan(@PathVariable(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all Participations");
 
@@ -101,7 +101,7 @@ public class ParticipationResource {
     }
 
     @PostMapping("/{idParticipation}/events")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> createEventLog(
         @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
         @Valid @RequestBody EventLogDTO eventLogDTO
@@ -114,7 +114,7 @@ public class ParticipationResource {
     }
 
     @GetMapping("/{idParticipation}/events")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<EventLogDTO> getAllLogs(@PathVariable(value = "idParticipation", required = false) final UUID idParticipation) {
         log.debug("REST request to get all EventLogs");
 
