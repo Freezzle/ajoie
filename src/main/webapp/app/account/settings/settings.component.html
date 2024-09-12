@@ -1,95 +1,68 @@
 <div>
-  <div class="d-flex justify-content-center">
-    <div class="col-md-8">
-      @if (settingsForm.value.login) {
-        <h2 jhiTranslate="settings.title" [translateValues]="{ username: settingsForm.value.login }">
-          Profil de l&apos;utilisateur [<strong>{{ settingsForm.value.login }}</strong
-          >]
-        </h2>
-      }
+    <div class="d-flex justify-content-center">
+        <div class="col-md-8">
+            @if (settingsForm.value.login) {
+                <h2 jhiTranslate="settings.title" [translateValues]="{ username: settingsForm.value.login }">
+                    Profil de l&apos;utilisateur [<strong>{{ settingsForm.value.login }}</strong>] </h2>
+            }
 
-      @if (success()) {
-        <div class="alert alert-success" jhiTranslate="settings.messages.success">
-          <strong>Votre profil a été sauvegardé !</strong>
-        </div>
-      }
+            @if (success()) {
+                <div class="alert alert-success" jhiTranslate="settings.messages.success">
+                    <strong>Votre profil a été sauvegardé !</strong>
+                </div>
+            }
 
-      <jhi-alert-error></jhi-alert-error>
+            <jhi-alert-error></jhi-alert-error>
 
-      @if (settingsForm.value.login) {
-        <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
-          <div class="mb-3">
-            <label class="form-label" for="firstName" jhiTranslate="settings.form.firstname">Prénom</label>
-            <input
-              type="text"
-              class="form-control"
-              id="firstName"
-              name="firstName"
-              placeholder="{{ 'settings.form.firstname.placeholder' | translate }}"
-              formControlName="firstName"
-            />
+            @if (settingsForm.value.login) {
+                <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="firstName" jhiTranslate="settings.form.firstname">Prénom</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName"
+                               placeholder="{{ 'settings.form.firstname.placeholder' | translate }}" formControlName="firstName"/>
 
-            <field-error
-              [formControlElement]="getFirstName"
-              [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"
-            ></field-error>
-          </div>
+                        <field-error [formControlElement]="getFirstName"
+                                     [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"></field-error>
+                    </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="lastName" jhiTranslate="settings.form.lastname">Nom</label>
-            <input
-              type="text"
-              class="form-control"
-              id="lastName"
-              name="lastName"
-              placeholder="{{ 'settings.form.lastname.placeholder' | translate }}"
-              formControlName="lastName"
-            />
+                    <div class="mb-3">
+                        <label class="form-label" for="lastName" jhiTranslate="settings.form.lastname">Nom</label>
+                        <input type="text" class="form-control" id="lastName" name="lastName"
+                               placeholder="{{ 'settings.form.lastname.placeholder' | translate }}" formControlName="lastName"/>
 
-            <field-error
-              [formControlElement]="getLastName"
-              [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"
-            ></field-error>
-          </div>
+                        <field-error [formControlElement]="getLastName"
+                                     [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"></field-error>
+                    </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="email" jhiTranslate="global.form.email.label">Email</label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              placeholder="{{ 'global.form.email.placeholder' | translate }}"
-              formControlName="email"
-            />
+                    <div class="mb-3">
+                        <label class="form-label" for="email" jhiTranslate="global.form.email.label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               placeholder="{{ 'global.form.email.placeholder' | translate }}" formControlName="email"/>
 
-            <field-error
-              [formControlElement]="getEmail"
-              [errors]="[
+                        <field-error [formControlElement]="getEmail" [errors]="[
                 ErrorModel.required(),
                 ErrorModel.minlength(5),
                 ErrorModel.maxlength(50),
                 ErrorModel.custom('email', 'global.messages.validate.email.invalid'),
-              ]"
-            ></field-error>
-          </div>
+              ]"></field-error>
+                    </div>
 
-          @if (languages && languages.length > 0) {
-            <div class="mb-3">
-              <label for="langKey" jhiTranslate="settings.form.language">Langue</label>
-              <select class="form-control" id="langKey" name="langKey" formControlName="langKey">
-                @for (language of languages; track $index) {
-                  <option [value]="language">{{ language | findLanguageFromKey }}</option>
-                }
-              </select>
-            </div>
-          }
+                    @if (languages && languages.length > 0) {
+                        <div class="mb-3">
+                            <label for="langKey" jhiTranslate="settings.form.language">Langue</label>
+                            <select class="form-control" id="langKey" name="langKey" formControlName="langKey">
+                                @for (language of languages; track $index) {
+                                    <option [value]="language">{{ language | findLanguageFromKey }}</option>
+                                }
+                            </select>
+                        </div>
+                    }
 
-          <button type="submit" [disabled]="settingsForm.invalid" class="btn btn-primary" jhiTranslate="settings.form.button">
-            Sauvegarder
-          </button>
-        </form>
-      }
+                    <button type="submit" [disabled]="settingsForm.invalid" class="btn btn-primary" jhiTranslate="settings.form.button">
+                        Sauvegarder
+                    </button>
+                </form>
+            }
+        </div>
     </div>
-  </div>
 </div>

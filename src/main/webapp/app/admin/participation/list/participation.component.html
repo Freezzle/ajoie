@@ -1,145 +1,131 @@
 <div>
-  <h2 id="page-heading">
-    <span jhiTranslate="participation.title">Les participations</span>
+    <h2 id="page-heading">
+        <span jhiTranslate="participation.title">Les participations</span>
 
-    <hr />
+        <hr/>
 
-    <div class="d-flex justify-content-between mt-3">
-      <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-          <span jhiTranslate="common.back">Back</span>
-        </button>
-      </span>
+        <div class="d-flex justify-content-between mt-3">
+            <span>
+                <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+                    <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+                    <span jhiTranslate="common.back">Back</span>
+                </button>
+            </span>
 
-      <span [formGroup]="filters" class="row">
-        <div class="col-auto">
-          <input
-            (blur)="actionFilter()"
-            class="form-control"
-            formControlName="fullName"
-            placeholder="{{ 'exhibitor.filter.fullName' | translate }}"
-            type="text"
-          />
+            <span [formGroup]="filters" class="row">
+                <div class="col-auto">
+                    <input (blur)="actionFilter()" class="form-control" formControlName="fullName"
+                           placeholder="{{ 'exhibitor.filter.fullName' | translate }}" type="text"/>
+                </div>
+                <div class="col-auto">
+                    <select (change)="actionFilter()" class="form-control" formControlName="status">
+                        <option [ngValue]="null">{{ 'participation.status.list.null' | translate }}</option>
+                        @for (status of statusValues; track $index) {
+                            <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
+                        }
+                    </select>
+                </div>
+            </span>
+
+            <span>
+                <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+                    <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
+                    <span jhiTranslate="common.refresh"></span>
+                </button>
+
+                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
+                    <fa-icon icon="plus"></fa-icon>
+                    <span jhiTranslate="common.create">Créer</span>
+                </button>
+            </span>
         </div>
-        <div class="col-auto">
-          <select (change)="actionFilter()" class="form-control" formControlName="status">
-            <option [ngValue]="null">{{ 'participation.status.list.null' | translate }}</option>
-            @for (status of statusValues; track $index) {
-              <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
-            }
-          </select>
+
+        <hr/>
+    </h2>
+
+    @if (participations) {
+        <div class="table-responsive table-entities" id="entities">
+            <table class="table table-hover" aria-describedby="page-heading">
+                <thead class="thead-primary">
+                    <tr>
+                        <th class="col-auto">
+                            <span jhiTranslate="participation.exhibitor">Exposant</span>
+                        </th>
+                        <th class="col-1 text-center">
+                            <span jhiTranslate="participation.registrationDate">Date d'inscription</span>
+                        </th>
+                        <th class="col-auto text-center">
+                            <span jhiTranslate="participation.needArrangment">Avec arrangement ?</span>
+                        </th>
+                        <th class="col-auto text-center">
+                            <span jhiTranslate="participation.acceptedChart">Charte accepté ?</span>
+                        </th>
+                        <th class="col-auto text-center">
+                            <span jhiTranslate="participation.acceptedContract">Contrat accepté ?</span>
+                        </th>
+                        <th class="col-auto text-center">
+                            <span jhiTranslate="participation.isBillingClosed">Cloturée ?</span>
+                        </th>
+                        <th class="col-auto text-center">
+                            <span jhiTranslate="participation.status.label">Statut</span>
+                        </th>
+                        <th class="col-auto">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (participations.length === 0) {
+                        <tr>
+                            <td colspan="8">
+                                <span jhiTranslate="participation.notFound">Aucune participation</span>
+                            </td>
+                        </tr>
+                    } @else {
+                        @for (participation of participations; track $index) {
+                            <tr>
+                                <td>
+                                    @if (participation.exhibitor) {
+                                        <a [routerLink]="['/admin/exhibitors', participation.exhibitor.id, 'view']">{{ participation.exhibitor.fullName }}</a>
+                                    }
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                                    {{ participation.registrationDate | formatMediumDate }}
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                                    @if (participation.needArrangment) {
+                                        <fa-icon icon="triangle-exclamation" class="orange-icon"></fa-icon>
+                                    } @else {
+                                        &nbsp;
+                                    }
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                                    <fa-icon icon="{{ participation.acceptedChart | checkBool }}"
+                                             class="{{ participation.acceptedChart | colorBool }}"></fa-icon>
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                                    <fa-icon icon="{{ participation.acceptedContract | checkBool }}"
+                                             class="{{ participation.acceptedContract | colorBool }}"></fa-icon>
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                                    <fa-icon icon="{{ participation.isBillingClosed | checkBool }}"
+                                             class="{{ participation.isBillingClosed | colorBool }}"></fa-icon>
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
+                                    <fa-icon icon="{{ participation.status | status }}" class="{{ participation.status | colorStatus }}"
+                                             title="{{ 'participation.status.list.' + participation.status | translate }}"></fa-icon>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button type="button" (click)="delete(participation)" class="btn btn-danger btn-sm">
+                                            <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                            <span jhiTranslate="common.delete"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
         </div>
-      </span>
-
-      <span>
-        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
-
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
-      </span>
-    </div>
-
-    <hr />
-  </h2>
-
-  @if (participations) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-hover" aria-describedby="page-heading">
-        <thead class="thead-primary">
-          <tr>
-            <th class="col-auto">
-              <span jhiTranslate="participation.exhibitor">Exposant</span>
-            </th>
-            <th class="col-1 text-center">
-              <span jhiTranslate="participation.registrationDate">Date d'inscription</span>
-            </th>
-            <th class="col-auto text-center">
-              <span jhiTranslate="participation.needArrangment">Avec arrangement ?</span>
-            </th>
-            <th class="col-auto text-center">
-              <span jhiTranslate="participation.acceptedChart">Charte accepté ?</span>
-            </th>
-            <th class="col-auto text-center">
-              <span jhiTranslate="participation.acceptedContract">Contrat accepté ?</span>
-            </th>
-            <th class="col-auto text-center">
-              <span jhiTranslate="participation.isBillingClosed">Cloturée ?</span>
-            </th>
-            <th class="col-auto text-center">
-              <span jhiTranslate="participation.status.label">Statut</span>
-            </th>
-            <th class="col-auto">&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (participations.length === 0) {
-            <tr>
-              <td colspan="8">
-                <span jhiTranslate="participation.notFound">Aucune participation</span>
-              </td>
-            </tr>
-          } @else {
-            @for (participation of participations; track $index) {
-              <tr>
-                <td>
-                  @if (participation.exhibitor) {
-                    <a [routerLink]="['/admin/exhibitors', participation.exhibitor.id, 'view']">{{ participation.exhibitor.fullName }}</a>
-                  }
-                </td>
-                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                  {{ participation.registrationDate | formatMediumDate }}
-                </td>
-                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                  @if (participation.needArrangment) {
-                    <fa-icon icon="triangle-exclamation" class="orange-icon"></fa-icon>
-                  } @else {
-                    &nbsp;
-                  }
-                </td>
-                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                  <fa-icon
-                    icon="{{ participation.acceptedChart | checkBool }}"
-                    class="{{ participation.acceptedChart | colorBool }}"
-                  ></fa-icon>
-                </td>
-                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                  <fa-icon
-                    icon="{{ participation.acceptedContract | checkBool }}"
-                    class="{{ participation.acceptedContract | colorBool }}"
-                  ></fa-icon>
-                </td>
-                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                  <fa-icon
-                    icon="{{ participation.isBillingClosed | checkBool }}"
-                    class="{{ participation.isBillingClosed | colorBool }}"
-                  ></fa-icon>
-                </td>
-                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                  <fa-icon
-                    icon="{{ participation.status | status }}"
-                    class="{{ participation.status | colorStatus }}"
-                    title="{{ 'participation.status.list.' + participation.status | translate }}"
-                  ></fa-icon>
-                </td>
-                <td class="text-end">
-                  <div class="btn-group">
-                    <button type="button" (click)="delete(participation)" class="btn btn-danger btn-sm">
-                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                      <span jhiTranslate="common.delete"></span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+    }
 </div>

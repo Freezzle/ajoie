@@ -1,138 +1,118 @@
 <div>
-  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <h2 id="page-heading">
-      <span *ngIf="user?.id" jhiTranslate="userManagement.edit">Modification d'un utilisateur</span>
-      <span *ngIf="!user?.id" jhiTranslate="userManagement.create">Création d'un nouvel utilisateur</span>
+    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+        <h2 id="page-heading">
+            <span *ngIf="user?.id" jhiTranslate="userManagement.edit">Modification d'un utilisateur</span>
+            <span *ngIf="!user?.id" jhiTranslate="userManagement.create">Création d'un nouvel utilisateur</span>
 
-      <hr />
+            <hr/>
 
-      <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-            <span jhiTranslate="common.back">Back</span>
-          </button>
-        </span>
+            <div class="d-flex justify-content-between mt-3">
+                <span>
+                    <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+                        <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+                        <span jhiTranslate="common.back">Back</span>
+                    </button>
+                </span>
 
-        <span>
-          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-            <span jhiTranslate="common.edit">Edit</span>
-          </button>
+                <span>
+                    <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
+                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                        <span jhiTranslate="common.edit">Edit</span>
+                    </button>
 
-          <button
-            (click)="readOnlyBack()"
-            *ngIf="!readonlyForm && user?.id"
-            class="btn btn-secondary btn-sm"
-            id="cancel-save"
-            type="button"
-          >
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-            <span jhiTranslate="common.cancel">Cancel</span>
-          </button>
-          <button
-            *ngIf="!readonlyForm"
-            [disabled]="editForm.invalid || isSaving()"
-            class="btn btn-primary btn-sm"
-            id="save-entity"
-            type="submit"
-          >
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-            <span jhiTranslate="common.save">Save</span>
-          </button>
-        </span>
-      </div>
-      <hr />
-    </h2>
-
-    <div>
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <div class="card">
-        <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-sm-6 fw-bold align-content-center">
-              <label for="field_login" jhiTranslate="userManagement.login">Login</label>
-
-              <input class="form-control" formControlName="login" id="field_login" name="login" type="text" />
-              <field-error
-                [errors]="[ErrorModel.required(), ErrorModel.maxlength(50), ErrorModel.custom('login', 'common.validation.patternLogin')]"
-                [formControlElement]="getLogin"
-              ></field-error>
+                    <button (click)="readOnlyBack()" *ngIf="!readonlyForm && user?.id" class="btn btn-secondary btn-sm" id="cancel-save"
+                            type="button">
+                        <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+                        <span jhiTranslate="common.cancel">Cancel</span>
+                    </button>
+                    <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving()" class="btn btn-primary btn-sm" id="save-entity"
+                            type="submit">
+                        <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
+                        <span jhiTranslate="common.save">Save</span>
+                    </button>
+                </span>
             </div>
+            <hr/>
+        </h2>
 
-            <div class="col-sm-6 fw-bold align-content-center">
-              <label for="field_email" jhiTranslate="userManagement.email">Email</label>
-              <input class="form-control" formControlName="email" id="field_email" name="email" type="text" />
-              <field-error
-                [errors]="[
+        <div>
+            <jhi-alert-error></jhi-alert-error>
+
+            <jhi-alert></jhi-alert>
+
+            <div class="card">
+                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6 fw-bold align-content-center">
+                            <label for="field_login" jhiTranslate="userManagement.login">Login</label>
+
+                            <input class="form-control" formControlName="login" id="field_login" name="login" type="text"/>
+                            <field-error
+                                    [errors]="[ErrorModel.required(), ErrorModel.maxlength(50), ErrorModel.custom('login', 'common.validation.patternLogin')]"
+                                    [formControlElement]="getLogin"></field-error>
+                        </div>
+
+                        <div class="col-sm-6 fw-bold align-content-center">
+                            <label for="field_email" jhiTranslate="userManagement.email">Email</label>
+                            <input class="form-control" formControlName="email" id="field_email" name="email" type="text"/>
+                            <field-error [errors]="[
                   ErrorModel.required(),
                   ErrorModel.minlength(5),
                   ErrorModel.maxlength(100),
                   ErrorModel.custom('email', 'global.messages.validate.email.invalid'),
-                ]"
-                [formControlElement]="getEmail"
-              ></field-error>
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-6 fw-bold align-content-center">
-              <label for="field_lastName" jhiTranslate="userManagement.lastName">Nom</label>
-              <input class="form-control" formControlName="lastName" id="field_lastName" name="lastName" type="text" />
-              <field-error [errors]="[ErrorModel.maxlength(50)]" [formControlElement]="getLastName"></field-error>
-            </div>
+                ]" [formControlElement]="getEmail"></field-error>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-6 fw-bold align-content-center">
+                            <label for="field_lastName" jhiTranslate="userManagement.lastName">Nom</label>
+                            <input class="form-control" formControlName="lastName" id="field_lastName" name="lastName" type="text"/>
+                            <field-error [errors]="[ErrorModel.maxlength(50)]" [formControlElement]="getLastName"></field-error>
+                        </div>
 
-            <div class="col-sm-6 fw-bold align-content-center">
-              <label for="field_firstName" jhiTranslate="userManagement.firstName">Prénom</label>
-              <input class="form-control" formControlName="firstName" id="field_firstName" name="firstName" type="text" />
-              <field-error [errors]="[ErrorModel.maxlength(50)]" [formControlElement]="getFirstName"></field-error>
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-6 fw-bold align-content-center">
-              <label for="langKey" jhiTranslate="userManagement.langKey">Langue</label>
-              <select class="form-control" formControlName="langKey" id="langKey" name="langKey">
-                @for (language of languages; track $index) {
-                  <option [value]="language">{{ language | findLanguageFromKey }}</option>
-                }
-              </select>
-            </div>
+                        <div class="col-sm-6 fw-bold align-content-center">
+                            <label for="field_firstName" jhiTranslate="userManagement.firstName">Prénom</label>
+                            <input class="form-control" formControlName="firstName" id="field_firstName" name="firstName" type="text"/>
+                            <field-error [errors]="[ErrorModel.maxlength(50)]" [formControlElement]="getFirstName"></field-error>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-6 fw-bold align-content-center">
+                            <label for="langKey" jhiTranslate="userManagement.langKey">Langue</label>
+                            <select class="form-control" formControlName="langKey" id="langKey" name="langKey">
+                                @for (language of languages; track $index) {
+                                    <option [value]="language">{{ language | findLanguageFromKey }}</option>
+                                }
+                            </select>
+                        </div>
 
-            <div class="col-sm-6 fw-bold align-content-center">
-              <div>
-                <label for="field_activated" jhiTranslate="userManagement.activated">Activé</label>
-              </div>
-              <div class="switch">
-                <input
-                  [attr.disabled]="editForm.value.id === undefined ? 'disabled' : null"
-                  class="switch-checkbox"
-                  formControlName="activated"
-                  id="field_activated"
-                  name="activated"
-                  type="checkbox"
-                />
-                <label class="switch-label" for="field_activated">
-                  <span class="switch-inner"></span>
-                  <span class="switch-btn"></span>
-                </label>
-              </div>
+                        <div class="col-sm-6 fw-bold align-content-center">
+                            <div>
+                                <label for="field_activated" jhiTranslate="userManagement.activated">Activé</label>
+                            </div>
+                            <div class="switch">
+                                <input [attr.disabled]="editForm.value.id === undefined ? 'disabled' : null" class="switch-checkbox"
+                                       formControlName="activated" id="field_activated" name="activated" type="checkbox"/>
+                                <label class="switch-label" for="field_activated">
+                                    <span class="switch-inner"></span>
+                                    <span class="switch-btn"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-sm-12 fw-bold align-content-center">
+                            <label for="field_authority" jhiTranslate="userManagement.profiles">Droits</label>
+                            <select class="form-control" formControlName="authorities" id="field_authority" multiple name="authority">
+                                @for (authority of authorities(); track $index) {
+                                    <option [value]="authority">{{ authority }}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-12 fw-bold align-content-center">
-              <label for="field_authority" jhiTranslate="userManagement.profiles">Droits</label>
-              <select class="form-control" formControlName="authorities" id="field_authority" multiple name="authority">
-                @for (authority of authorities(); track $index) {
-                  <option [value]="authority">{{ authority }}</option>
-                }
-              </select>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </form>
+    </form>
 </div>

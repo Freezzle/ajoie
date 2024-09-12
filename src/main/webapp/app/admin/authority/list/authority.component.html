@@ -1,78 +1,78 @@
 <div>
-  <h2 id="page-heading">
-    <span jhiTranslate="authority.title">Les authorités</span>
+    <h2 id="page-heading">
+        <span jhiTranslate="authority.title">Les authorités</span>
 
-    <hr />
+        <hr/>
 
-    <div class="d-flex justify-content-between mt-3">
-      <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-          <span jhiTranslate="common.back">Back</span>
-        </button>
-      </span>
+        <div class="d-flex justify-content-between mt-3">
+            <span>
+                <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+                    <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+                    <span jhiTranslate="common.back">Back</span>
+                </button>
+            </span>
 
-      <span>
-        <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
+            <span>
+                <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+                    <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
+                    <span jhiTranslate="common.refresh"></span>
+                </button>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
-      </span>
-    </div>
+                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
+                    <fa-icon icon="plus"></fa-icon>
+                    <span jhiTranslate="common.create">Créer</span>
+                </button>
+            </span>
+        </div>
 
-    <hr />
-  </h2>
+        <hr/>
+    </h2>
 
-  <jhi-alert-error></jhi-alert-error>
+    <jhi-alert-error></jhi-alert-error>
 
-  <jhi-alert></jhi-alert>
+    <jhi-alert></jhi-alert>
 
-  @if (authorities) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-hover" aria-describedby="page-heading">
-        <thead class="thead-primary">
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th class="text-white" jhiSortBy="name">
-              <div class="d-flex">
-                <span jhiTranslate="authority.name">Name</span>
+    @if (authorities) {
+        <div class="table-responsive table-entities" id="entities">
+            <table class="table table-hover" aria-describedby="page-heading">
+                <thead class="thead-primary">
+                    <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+                        <th class="text-white" jhiSortBy="name">
+                            <div class="d-flex">
+                                <span jhiTranslate="authority.name">Name</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (authorities.length === 0) {
-            <tr>
-              <td colspan="2">
-                <span jhiTranslate="authority.home.notFound">Aucun Authority</span>
-              </td>
-            </tr>
-          } @else {
-            @for (authority of authorities; track trackName) {
-              <tr>
-                <td class="go-detail" [routerLink]="['./', authority.name, 'view']">
-                  {{ authority.name }}
-                </td>
-                <td class="text-end">
-                  <div class="btn-group">
-                    <button type="submit" (click)="delete(authority)" class="btn btn-danger btn-sm">
-                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                      <span jhiTranslate="common.delete"></span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+                                <fa-icon class="p-1" icon="sort"></fa-icon>
+                            </div>
+                        </th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (authorities.length === 0) {
+                        <tr>
+                            <td colspan="2">
+                                <span jhiTranslate="authority.home.notFound">Aucun Authority</span>
+                            </td>
+                        </tr>
+                    } @else {
+                        @for (authority of authorities; track trackName) {
+                            <tr>
+                                <td class="go-detail" [routerLink]="['./', authority.name, 'view']">
+                                    {{ authority.name }}
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button type="submit" (click)="delete(authority)" class="btn btn-danger btn-sm">
+                                            <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                            <span jhiTranslate="common.delete"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>

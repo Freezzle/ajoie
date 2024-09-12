@@ -1,127 +1,116 @@
 <div>
-  <h2 id="page-heading">
-    <span jhiTranslate="userManagement.home.title">Users</span>
+    <h2 id="page-heading">
+        <span jhiTranslate="userManagement.home.title">Users</span>
 
-    <hr />
+        <hr/>
 
-    <div class="d-flex justify-content-between mt-3">
-      <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-          <span jhiTranslate="common.back">Back</span>
-        </button>
-      </span>
+        <div class="d-flex justify-content-between mt-3">
+            <span>
+                <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+                    <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+                    <span jhiTranslate="common.back">Back</span>
+                </button>
+            </span>
 
-      <span>
-        <button (click)="load()" [disabled]="isLoading()" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading() ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
+            <span>
+                <button (click)="load()" [disabled]="isLoading()" class="btn btn-primary btn-sm">
+                    <fa-icon [animation]="isLoading() ? 'spin' : undefined" icon="sync"></fa-icon>
+                    <span jhiTranslate="common.refresh"></span>
+                </button>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
-      </span>
-    </div>
+                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
+                    <fa-icon icon="plus"></fa-icon>
+                    <span jhiTranslate="common.create">Créer</span>
+                </button>
+            </span>
+        </div>
 
-    <hr />
-  </h2>
+        <hr/>
+    </h2>
 
-  <jhi-alert-error></jhi-alert-error>
+    <jhi-alert-error></jhi-alert-error>
 
-  <jhi-alert></jhi-alert>
+    <jhi-alert></jhi-alert>
 
-  @if (users()) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-hover" aria-describedby="page-heading">
-        <thead class="thead-primary">
-          <tr jhiSort [sortState]="sortState" (sortChange)="transition($event)">
-            <th jhiSortBy="login">
-              <span jhiTranslate="userManagement.login">Login</span>
-              <fa-icon icon="sort"></fa-icon>
-            </th>
-            <th jhiSortBy="email">
-              <span jhiTranslate="userManagement.email">Email</span>
-              <fa-icon icon="sort"></fa-icon>
-            </th>
-            <th class="text-center" jhiTranslate="userManagement.activated">Activé</th>
-            <th class="text-center">
-              <span jhiTranslate="userManagement.langKey">Langue</span>
-            </th>
-            <th class="text-center">
-              <span jhiTranslate="userManagement.profiles">Droits</span>
-            </th>
-            <th class="text-center">
-              <span jhiTranslate="userManagement.createdDate">Créé le</span>
-            </th>
-            <th class="text-center">
-              <span jhiTranslate="userManagement.lastModifiedBy">Modifié par</span>
-            </th>
-            <th class="text-center">
-              <span jhiTranslate="userManagement.lastModifiedDate">Modifié le</span>
-            </th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (user of users(); track trackIdentity) {
-            <tr>
-              <td class="go-detail" [routerLink]="['./', user.login, 'view']">{{ user.login }}</td>
-              <td class="go-detail" [routerLink]="['./', user.login, 'view']">{{ user.email }}</td>
-              <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
-                <fa-icon icon="{{ user.activated | checkBool }}" class="{{ user.activated | colorBool }}"></fa-icon>
-              </td>
-              <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">{{ user.langKey }}</td>
-              <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
-                @for (authority of user.authorities; track $index) {
-                  <div>
-                    <span class="badge bg-primary">{{ authority }}</span>
-                  </div>
-                }
-              </td>
-              <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
-                {{ user.createdDate | date: 'dd/MM/yy HH:mm' }}
-              </td>
-              <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">{{ user.lastModifiedBy }}</td>
-              <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
-                {{ user.lastModifiedDate | date: 'dd/MM/yy HH:mm' }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <button
-                    type="button"
-                    (click)="deleteUser(user)"
-                    class="btn btn-danger btn-sm"
-                    [disabled]="!currentAccount() || currentAccount()?.login === user.login"
-                  >
-                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                    <span jhiTranslate="common.delete">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+    @if (users()) {
+        <div class="table-responsive table-entities" id="entities">
+            <table class="table table-hover" aria-describedby="page-heading">
+                <thead class="thead-primary">
+                    <tr jhiSort [sortState]="sortState" (sortChange)="transition($event)">
+                        <th jhiSortBy="login">
+                            <span jhiTranslate="userManagement.login">Login</span>
+                            <fa-icon icon="sort"></fa-icon>
+                        </th>
+                        <th jhiSortBy="email">
+                            <span jhiTranslate="userManagement.email">Email</span>
+                            <fa-icon icon="sort"></fa-icon>
+                        </th>
+                        <th class="text-center" jhiTranslate="userManagement.activated">Activé</th>
+                        <th class="text-center">
+                            <span jhiTranslate="userManagement.langKey">Langue</span>
+                        </th>
+                        <th class="text-center">
+                            <span jhiTranslate="userManagement.profiles">Droits</span>
+                        </th>
+                        <th class="text-center">
+                            <span jhiTranslate="userManagement.createdDate">Créé le</span>
+                        </th>
+                        <th class="text-center">
+                            <span jhiTranslate="userManagement.lastModifiedBy">Modifié par</span>
+                        </th>
+                        <th class="text-center">
+                            <span jhiTranslate="userManagement.lastModifiedDate">Modifié le</span>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (user of users(); track trackIdentity) {
+                        <tr>
+                            <td class="go-detail" [routerLink]="['./', user.login, 'view']">{{ user.login }}</td>
+                            <td class="go-detail" [routerLink]="['./', user.login, 'view']">{{ user.email }}</td>
+                            <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
+                                <fa-icon icon="{{ user.activated | checkBool }}" class="{{ user.activated | colorBool }}"></fa-icon>
+                            </td>
+                            <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">{{ user.langKey }}</td>
+                            <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
+                                @for (authority of user.authorities; track $index) {
+                                    <div>
+                                        <span class="badge bg-primary">{{ authority }}</span>
+                                    </div>
+                                }
+                            </td>
+                            <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
+                                {{ user.createdDate | date: 'dd/MM/yy HH:mm' }}
+                            </td>
+                            <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">{{ user.lastModifiedBy }}</td>
+                            <td class="go-detail text-center" [routerLink]="['./', user.login, 'view']">
+                                {{ user.lastModifiedDate | date: 'dd/MM/yy HH:mm' }}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button type="button" (click)="deleteUser(user)" class="btn btn-danger btn-sm"
+                                            [disabled]="!currentAccount() || currentAccount()?.login === user.login">
+                                        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                        <span jhiTranslate="common.delete">Delete</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page, totalItems: totalItems(), itemsPerPage: itemsPerPage }"></jhi-item-count>
-      </div>
+        <div>
+            <div class="d-flex justify-content-center">
+                <jhi-item-count [params]="{ page: page, totalItems: totalItems(), itemsPerPage: itemsPerPage }"></jhi-item-count>
+            </div>
 
-      <div class="d-flex justify-content-center">
-        <ngb-pagination
-          [collectionSize]="totalItems()"
-          [(page)]="page"
-          [pageSize]="itemsPerPage"
-          [maxSize]="5"
-          [rotate]="true"
-          [boundaryLinks]="true"
-          (pageChange)="transition()"
-        ></ngb-pagination>
-      </div>
-    </div>
-  }
+            <div class="d-flex justify-content-center">
+                <ngb-pagination [collectionSize]="totalItems()" [(page)]="page" [pageSize]="itemsPerPage" [maxSize]="5" [rotate]="true"
+                                [boundaryLinks]="true" (pageChange)="transition()"></ngb-pagination>
+            </div>
+        </div>
+    }
 </div>
