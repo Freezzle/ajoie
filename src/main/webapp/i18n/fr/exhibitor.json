@@ -13,7 +13,7 @@
       "fullName": "Nom de l'exposant"
     },
     "fullName": "Nom complet",
-    "notfound": "Aucun exposant",
+    "notFound": "Aucun exposant",
     "npaLocalite": "Npa et localité",
     "phoneNumber": "N° de tél",
     "title": "Les exposants"
