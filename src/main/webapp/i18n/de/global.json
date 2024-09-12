@@ -86,7 +86,10 @@
     },
     "messages": {
       "error": {
-        "dontmatch": "Le nouveau mot de passe et sa confirmation ne sont pas égaux !"
+        "dontmatch": "Le nouveau mot de passe et sa confirmation ne sont pas égaux !",
+        "maxlength": "Ce champ dépasse le nombre de caractères autorisés",
+        "minlength": "Ce champ est en dessous du nombre de caractères minimum",
+        "required": "Ce champs est obligatoire"
       },
       "info": {
         "authenticated": {

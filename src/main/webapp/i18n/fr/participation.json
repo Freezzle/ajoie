@@ -9,6 +9,9 @@
     },
     "cannot-show": "No data can be shown during editing a participation",
     "create": "Création d'une nouvelle participation",
+    "delete": {
+      "question": "Voulez-vous supprimer la participation \"{{fullName}}\""
+    },
     "edit": "Détail d'une participation",
     "exhibitor": "Exposant",
     "extraInformation": "Commentaire",

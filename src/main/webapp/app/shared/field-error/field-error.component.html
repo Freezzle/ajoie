@@ -1,0 +1,11 @@
+@if (formControlElement() && formControlElement().invalid && (formControlElement().dirty || formControlElement().touched)) {
+  <div>
+    @for (error of errors(); track $index) {
+      @if (error.errorKey && formControlElement().errors?.[error.errorKey]) {
+        <small class="form-text text-danger" jhiTranslate="{{ error.translateKey }}" [translateValues]="error.translateValues"
+          >Generic error</small
+        >
+      }
+    }
+  </div>
+}

@@ -6,7 +6,7 @@ import static tech.jhipster.web.util.HeaderUtil.*;
 
 import ch.salon.domain.Participation;
 import ch.salon.security.AuthoritiesConstants;
-import ch.salon.service.ImportationDataService;
+import ch.salon.service.ImportationService;
 import ch.salon.service.ParticipationService;
 import ch.salon.service.SalonService;
 import ch.salon.service.dto.SalonDTO;
@@ -32,19 +32,15 @@ public class SalonResource {
 
     private static final Logger log = LoggerFactory.getLogger(SalonResource.class);
     private final SalonService salonService;
-    private final ImportationDataService importationDataService;
+    private final ImportationService importationService;
     private final ParticipationService participationService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    public SalonResource(
-        SalonService salonService,
-        ImportationDataService importationDataService,
-        ParticipationService participationService
-    ) {
+    public SalonResource(SalonService salonService, ImportationService importationService, ParticipationService participationService) {
         this.salonService = salonService;
-        this.importationDataService = importationDataService;
+        this.importationService = importationService;
         this.participationService = participationService;
     }
 
@@ -109,7 +105,7 @@ public class SalonResource {
     @PostMapping("/{idSalon}/import")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> importation(@PathVariable(name = "idSalon", required = false) String idSalon) throws URISyntaxException {
-        importationDataService.importData(idSalon);
+        importationService.importData(idSalon);
 
         return ResponseEntity.created(new URI("/idSalon/import")).build();
     }

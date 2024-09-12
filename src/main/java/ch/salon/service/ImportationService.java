@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ImportationDataService {
+public class ImportationService {
 
-    private static final Logger log = LoggerFactory.getLogger(ImportationDataService.class);
+    private static final Logger log = LoggerFactory.getLogger(ImportationService.class);
     private static final int STAND_REGISTRATION_DATE = 0;
     private static final int EXHIBITOR_EMAIL = 1;
     private static final int EXHIBITOR_FULL_NAME = 2;
@@ -63,7 +63,7 @@ public class ImportationDataService {
     private final ParticipationRepository participationRepository;
     private final InvoicingPlanService invoiceService;
 
-    public ImportationDataService(
+    public ImportationService(
         SalonRepository salonRepository,
         StandRepository standRepository,
         ExhibitorRepository exhibitorRepository,

@@ -1,60 +1,58 @@
 <div>
-    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-        <h2 id="page-heading">
-            <span *ngIf="!authority?.name" jhiTranslate="authority.create">Création d'une nouvelle authorité</span>
+  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+    <h2 id="page-heading">
+      <span *ngIf="!authority?.name" jhiTranslate="authority.create">Création d'une nouvelle authorité</span>
 
-            <hr/>
+      <hr />
 
-            <div class="d-flex justify-content-between mt-3">
-                <span>
-                    <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-                        <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-                        <span jhiTranslate="common.back">Back</span>
-                    </button>
-                </span>
+      <div class="d-flex justify-content-between mt-3">
+        <span>
+          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+            <span jhiTranslate="common.back">Back</span>
+          </button>
+        </span>
 
-                <span>
-                    <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity"
-                            type="submit">
-                        <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-                        <span jhiTranslate="common.save">Save</span>
-                    </button>
-                </span>
+        <span>
+          <button
+            *ngIf="!readonlyForm"
+            [disabled]="editForm.invalid || isSaving"
+            class="btn btn-primary btn-sm"
+            id="save-entity"
+            type="submit"
+          >
+            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
+            <span jhiTranslate="common.save">Save</span>
+          </button>
+        </span>
+      </div>
+      <hr />
+    </h2>
+
+    <div>
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <div class="card">
+        <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12 fw-bold align-content-center">
+              <label for="field_name" jhiTranslate="authority.name">Nom</label>
+              <input
+                [readonly]="editForm.get('name')!.disabled"
+                class="form-control"
+                formControlName="name"
+                id="field_name"
+                name="name"
+                type="text"
+              />
+              <field-error [formControlElement]="getName" [errors]="[ErrorModel.required(), ErrorModel.maxlength(50)]"></field-error>
             </div>
-            <hr/>
-        </h2>
-
-        <div>
-            <jhi-alert-error></jhi-alert-error>
-
-            <jhi-alert></jhi-alert>
-
-            <div class="card">
-                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-2 fw-bold align-content-center">
-                            <label for="field_name" jhiTranslate="authority.name">Nom</label>
-                        </div>
-                        <div class="col-sm-10 align-content-center">
-                            <input [readonly]="editForm.get('name')!.disabled" class="form-control" formControlName="name" id="field_name" name="name"
-                                   type="text"/>
-                            @if (editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)) {
-                                <div>
-                                    @if (editForm.get('name')?.errors?.required) {
-                                        <small class="form-text text-danger"
-                                               jhiTranslate="common.validation.required">Ce champ est obligatoire.</small>
-                                    }
-                                    @if (editForm.get('name')?.errors?.maxlength) {
-                                        <small class="form-text text-danger" jhiTranslate="common.validation.maxlength"
-                                               [translateValues]="{ max: '50' }">Ce champ doit faire moins de 50 caractères.</small>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </form>
+      </div>
+    </div>
+  </form>
 </div>

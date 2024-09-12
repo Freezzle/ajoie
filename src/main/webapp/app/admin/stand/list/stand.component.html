@@ -1,104 +1,114 @@
 <div>
-    <h2 id="page-heading">
-        <span jhiTranslate="stand.title">Les stands</span>
+  <h2 id="page-heading">
+    <span jhiTranslate="stand.title">Les stands</span>
 
-        <hr/>
+    <hr />
 
-        <div class="d-flex justify-content-between mt-3">
-            <span>
-                <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-                    <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-                    <span jhiTranslate="common.back">Back</span>
-                </button>
-            </span>
+    <div class="d-flex justify-content-between mt-3">
+      <span>
+        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+          <span jhiTranslate="common.back">Back</span>
+        </button>
+      </span>
 
-            <span [formGroup]="filters" class="row">
-                <div class="col-auto">
-                    <input (blur)="actionFilter()" class="form-control" formControlName="fullName"
-                           placeholder="{{ 'exhibitor.filter.fullName' | translate }}" type="text"/>
-                </div>
-                <div class="col-auto">
-                    <select (change)="actionFilter()" class="form-control" formControlName="status">
-                        <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
-                        @for (status of statusValues; track $index) {
-                            <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
-                        }
-                    </select>
-                </div>
-            </span>
-
-            <span>
-                <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-                    <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-                    <span jhiTranslate="common.refresh">Actualiser</span>
-                </button>
-
-                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-                    <fa-icon icon="plus"></fa-icon>
-                    <span jhiTranslate="common.create">Créer</span>
-                </button>
-            </span>
+      <span [formGroup]="filters" class="row">
+        <div class="col-auto">
+          <input
+            (blur)="actionFilter()"
+            class="form-control"
+            formControlName="fullName"
+            placeholder="{{ 'exhibitor.filter.fullName' | translate }}"
+            type="text"
+          />
         </div>
-
-        <hr/>
-    </h2>
-
-    <jhi-alert-error></jhi-alert-error>
-
-    @if (stands) {
-        <div class="table-responsive table-entities" id="entities">
-            <table class="table table-hover" aria-describedby="page-heading">
-                <thead class="thead-primary">
-                    <tr>
-                        <th class="col-auto">
-                            <span jhiTranslate="stand.participation">Participation</span>
-                        </th>
-                        <th class="col-7">
-                            <span jhiTranslate="stand.description">Description</span>
-                        </th>
-                        <th class="col-auto">
-                            <span jhiTranslate="stand.dimension">Dimension</span>
-                        </th>
-                        <th class="col-auto text-center">
-                            <span jhiTranslate="stand.status.label">Statut</span>
-                        </th>
-                        <th class="col-auto">&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (stands.length === 0) {
-                        <tr>
-                            <td colspan="5">
-                                <span jhiTranslate="stand.notFound">Aucun Stand</span>
-                            </td>
-                        </tr>
-                    } @else {
-                        @for (stand of stands; track $index) {
-                            <tr>
-                                <td>
-                                    @if (stand.participation) {
-                                        <a [routerLink]="['/admin/salons', params.get('idSalon'), 'participations', stand.participation.id, 'view']"> {{ stand.participation.exhibitor?.fullName }} </a>
-                                    }
-                                </td>
-                                <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.description }}</td>
-                                <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
-                                <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
-                                    <fa-icon icon="{{ stand.status | status }}" class="{{ stand.status | colorStatus }}"
-                                             title="{{ 'stand.status.list.' + stand.status | translate }}"></fa-icon>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm">
-                                            <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                            <span jhiTranslate="common.delete"></span>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+        <div class="col-auto">
+          <select (change)="actionFilter()" class="form-control" formControlName="status">
+            <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
+            @for (status of statusValues; track $index) {
+              <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
+            }
+          </select>
         </div>
-    }
+      </span>
+
+      <span>
+        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
+          <span jhiTranslate="common.refresh"></span>
+        </button>
+
+        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
+          <fa-icon icon="plus"></fa-icon>
+          <span jhiTranslate="common.create">Créer</span>
+        </button>
+      </span>
+    </div>
+
+    <hr />
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  @if (stands) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-hover" aria-describedby="page-heading">
+        <thead class="thead-primary">
+          <tr>
+            <th class="col-auto">
+              <span jhiTranslate="stand.participation">Participation</span>
+            </th>
+            <th class="col-7">
+              <span jhiTranslate="stand.description">Description</span>
+            </th>
+            <th class="col-auto">
+              <span jhiTranslate="stand.dimension">Dimension</span>
+            </th>
+            <th class="col-auto text-center">
+              <span jhiTranslate="stand.status.label">Statut</span>
+            </th>
+            <th class="col-auto">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (stands.length === 0) {
+            <tr>
+              <td colspan="5">
+                <span jhiTranslate="stand.notFound">Aucun Stand</span>
+              </td>
+            </tr>
+          } @else {
+            @for (stand of stands; track $index) {
+              <tr>
+                <td>
+                  @if (stand.participation) {
+                    <a [routerLink]="['/admin/salons', params.get('idSalon'), 'participations', stand.participation.id, 'view']">
+                      {{ stand.participation.exhibitor?.fullName }}
+                    </a>
+                  }
+                </td>
+                <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.description }}</td>
+                <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
+                <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
+                  <fa-icon
+                    icon="{{ stand.status | status }}"
+                    class="{{ stand.status | colorStatus }}"
+                    title="{{ 'stand.status.list.' + stand.status | translate }}"
+                  ></fa-icon>
+                </td>
+                <td class="text-end">
+                  <div class="btn-group">
+                    <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm">
+                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                      <span jhiTranslate="common.delete"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

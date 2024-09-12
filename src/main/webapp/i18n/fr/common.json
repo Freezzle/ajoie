@@ -11,7 +11,7 @@
     "import": "Importer",
     "info-basic": "Information de base",
     "open": "Ouvrir",
-    "refresh": "Actualiser",
+    "refresh": "Reset",
     "save": "Sauvegarder",
     "show": "Show {{otherEntity}}",
     "validation": {
