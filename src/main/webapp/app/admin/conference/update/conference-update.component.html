@@ -46,6 +46,8 @@
                         <div class="col-sm-12 fw-bold align-content-center">
                             <label for="field_title" jhiTranslate="conference.description">Description</label>
                             <textarea class="form-control" formControlName="title" id="field_title" name="title" rows="6"></textarea>
+
+                            <field-error [formControlElement]="getTitle" [errors]="[ErrorModel.required(), ErrorModel.maxlength(500)]"></field-error>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -58,6 +60,8 @@
                                     <option [ngValue]="participationOption">{{ participationOption.exhibitor?.fullName }}</option>
                                 }
                             </select>
+
+                            <field-error [formControlElement]="getParticipation" [errors]="[ErrorModel.required()]"></field-error>
                         </div>
                         <div class="col-sm-6 fw-bold align-content-center">
                             <label for="field_status" jhiTranslate="conference.status.label">Status</label>
@@ -66,6 +70,7 @@
                                     <option [value]="status">{{ 'conference.status.list.' + status | translate }}</option>
                                 }
                             </select>
+                            <field-error [formControlElement]="getStatus" [errors]="[ErrorModel.required()]"></field-error>
                         </div>
                     </div>
                     <div class="row mt-3">

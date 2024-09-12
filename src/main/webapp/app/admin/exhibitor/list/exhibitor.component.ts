@@ -43,8 +43,6 @@ export class ExhibitorComponent implements OnInit {
     protected modalService = inject(NgbModal);
     protected ngZone = inject(NgZone);
 
-    trackId = (_index: number, item: IExhibitor): string => this.exhibitorService.getExhibitorIdentifier(item);
-
     ngOnInit(): void {
         combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
             .pipe(

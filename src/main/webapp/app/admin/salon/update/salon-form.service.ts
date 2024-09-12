@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
-import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 
 import dayjs from 'dayjs/esm';
 import {DATE_FORMAT} from 'app/config/input.constants';
 import {IPriceStandSalon, ISalon, NewPriceStand, NewSalon} from '../salon.model';
+import {CustomValidatorModel} from "../../../shared/field-error/custom-validator.model";
 
 type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>> & { id: T['id'] };
 type SalonFormGroupInput = ISalon | PartialWithRequiredKeyOf<NewSalon>;
@@ -54,11 +55,11 @@ export class SalonFormService {
 
         return new FormGroup<SalonFormGroupContent>({
             id: new FormControl(salonRawValue.id),
-            referenceNumber: new FormControl(salonRawValue.referenceNumber, {
-                validators: [Validators.required],
-            }),
             place: new FormControl(salonRawValue.place, {
-                validators: [Validators.required],
+                validators: [Validators.required, Validators.minLength(5), Validators.maxLength(50)],
+            }),
+            referenceNumber: new FormControl(salonRawValue.referenceNumber, {
+                validators: [Validators.required, CustomValidatorModel.onlyNumbers],
             }),
             startingDate: new FormControl(salonRawValue.startingDate, {
                 validators: [Validators.required],
@@ -83,6 +84,16 @@ export class SalonFormService {
             ),
             extraInformation: new FormControl(salonRawValue.extraInformation),
         });
+    }
+
+    onlyNumbers(control: AbstractControl): ValidationErrors | null  {
+        const value = control.value;
+        const regex = /^[0-9]*$/;
+
+        if (!regex.test(value)) {
+            return { onlyNumbers: true }; // Retourne une erreur si la valeur contient autre chose que des chiffres
+        }
+        return null; // Retourne null si tout va bien
     }
 
     getSalon(form: SalonFormGroup): ISalon | NewSalon {

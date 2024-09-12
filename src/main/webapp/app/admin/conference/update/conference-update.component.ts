@@ -5,7 +5,7 @@ import {combineLatest, Observable} from 'rxjs';
 import {finalize, map} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {ConferenceService} from '../service/conference.service';
 import {IConference} from '../conference.model';
@@ -13,12 +13,14 @@ import {ConferenceFormGroup, ConferenceFormService} from './conference-form.serv
 import {IParticipation} from '../../participation/participation.model';
 import {ParticipationService} from '../../participation/service/participation.service';
 import {Status} from '../../enumerations/status.model';
+import {FieldErrorComponent} from "../../../shared/field-error/field-error.component";
+import {ErrorModel} from "../../../shared/field-error/error.model";
 
 @Component({
     standalone: true,
     selector: 'jhi-conference-update',
     templateUrl: './conference-update.component.html',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule],
+    imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent],
 })
 export class ConferenceUpdateComponent implements OnInit {
     isSaving = false;
@@ -111,6 +113,19 @@ export class ConferenceUpdateComponent implements OnInit {
         );
     }
 
+
+    get getTitle(): FormControl {
+        return this.editForm.get('title') as FormControl;
+    }
+
+    get getParticipation(): FormControl {
+        return this.editForm.get('participation') as FormControl;
+    }
+
+    get getStatus(): FormControl {
+        return this.editForm.get('status') as FormControl;
+    }
+
     protected loadRelationshipsOptions(): void {
         this.participationService
             .query(this.params.get('idSalon'))
@@ -132,4 +147,6 @@ export class ConferenceUpdateComponent implements OnInit {
             )
             .subscribe((participations: IParticipation[]) => (this.participationsSharedCollection = participations));
     }
+
+    protected readonly ErrorModel = ErrorModel;
 }

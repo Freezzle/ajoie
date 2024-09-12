@@ -50,7 +50,7 @@ export class ErrorModel {
 
     public static number(): ErrorModel {
         const errorModel = new ErrorModel();
-        errorModel.errorKey = 'number';
+        errorModel.errorKey = 'onlyNumbers';
         errorModel.translateKey = 'common.validation.number';
         errorModel.translateValues = {};
 

@@ -68,25 +68,32 @@
                         <div class="col-sm-12 fw-bold align-content-center">
                             <label for="field_place" jhiTranslate="salon.place">Nom du salon</label>
                             <input class="form-control" formControlName="place" id="field_place" name="place" type="text"/>
+
+                            <field-error [formControlElement]="getPlace" [errors]="[ErrorModel.required(), ErrorModel.minlength(5), ErrorModel.maxlength(50)]"></field-error>
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-sm-4 fw-bold align-content-center">
                             <label for="field_referenceNumber" jhiTranslate="salon.referenceNumber">N° de référence</label>
                             <input class="form-control" formControlName="referenceNumber" id="field_referenceNumber" name="referenceNumber"
-                                   type="text"/>
+                                   type="number"/>
+                            <field-error [formControlElement]="getReferenceNumber" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
                         </div>
 
                         <div class="col-sm-4 fw-bold align-content-center">
                             <label for="field_startingDate" jhiTranslate="salon.startingDate">Date de début</label>
                             <input class="form-control" formControlName="startingDate" id="field_startingDate" name="startingDate"
                                    placeholder="DD.MM.YYYY" type="date"/>
+
+                            <field-error [formControlElement]="getStartingDate" [errors]="[ErrorModel.required()]"></field-error>
                         </div>
 
                         <div class="col-sm-4 fw-bold align-content-center">
                             <label for="field_endingDate" jhiTranslate="salon.endingDate">Date de fin</label>
                             <input class="form-control" formControlName="endingDate" id="field_endingDate" name="endingDate" placeholder="DD.MM.YYYY"
                                    type="date"/>
+
+                            <field-error [formControlElement]="getEndingDate" [errors]="[ErrorModel.required()]"></field-error>
                         </div>
                     </div>
                     <div class="row mt-3">

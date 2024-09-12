@@ -3,6 +3,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {IStand, NewStand} from '../stand.model';
 import {Status} from '../../enumerations/status.model';
 import {IExhibitor} from '../../exhibitor/exhibitor.model';
+import {CustomValidatorModel} from "../../../shared/field-error/custom-validator.model";
 
 type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>> & { id: T['id'] };
 
@@ -51,13 +52,13 @@ export class StandFormService {
         };
         return new FormGroup<StandFormGroupContent>({
             id: new FormControl(standRawValue.id),
-            description: new FormControl(standRawValue.description, Validators.required),
+            description: new FormControl(standRawValue.description, [Validators.required, Validators.maxLength(500)]),
             website: new FormControl(standRawValue.website),
             socialMedia: new FormControl(standRawValue.socialMedia),
             urlPicture: new FormControl(standRawValue.urlPicture),
             shared: new FormControl(standRawValue.shared),
-            nbTable: new FormControl(standRawValue.nbTable),
-            nbChair: new FormControl(standRawValue.nbChair),
+            nbTable: new FormControl(standRawValue.nbTable, [Validators.required, CustomValidatorModel.onlyNumbers]),
+            nbChair: new FormControl(standRawValue.nbChair, [Validators.required, CustomValidatorModel.onlyNumbers]),
             needElectricity: new FormControl(standRawValue.needElectricity),
             status: new FormControl(standRawValue.status, Validators.required),
             extraInformation: new FormControl(standRawValue.extraInformation),

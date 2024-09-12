@@ -5,7 +5,7 @@ import {combineLatest, Observable} from 'rxjs';
 import {finalize, map} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {StandService} from '../service/stand.service';
 import {IStand} from '../stand.model';
@@ -16,12 +16,14 @@ import {ParticipationService} from '../../participation/service/participation.se
 import {IDimensionStand} from '../../dimension-stand/dimension-stand.model';
 import {DimensionStandService} from '../../dimension-stand/service/dimension-stand.service';
 import {Status} from '../../enumerations/status.model';
+import {ErrorModel} from "../../../shared/field-error/error.model";
+import {FieldErrorComponent} from "../../../shared/field-error/field-error.component";
 
 @Component({
     standalone: true,
     selector: 'jhi-stand-update',
     templateUrl: './stand-update.component.html',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, FormatMediumDatePipe],
+    imports: [SharedModule, FormsModule, ReactiveFormsModule, FormatMediumDatePipe, FieldErrorComponent],
 })
 export class StandUpdateComponent implements OnInit {
     isSaving = false;
@@ -155,4 +157,30 @@ export class StandUpdateComponent implements OnInit {
             .subscribe(
                 (dimensionStands: IDimensionStand[]) => (this.dimensionStandsSharedCollection = dimensionStands));
     }
+
+    get getDescription(): FormControl {
+        return this.editForm.get('description') as FormControl;
+    }
+
+    get getParticipation(): FormControl {
+        return this.editForm.get('participation') as FormControl;
+    }
+
+    get getStatus(): FormControl {
+        return this.editForm.get('status') as FormControl;
+    }
+
+    get getDimension(): FormControl {
+        return this.editForm.get('dimension') as FormControl;
+    }
+
+    get getTable(): FormControl {
+        return this.editForm.get('nbTable') as FormControl;
+    }
+
+    get getChair(): FormControl {
+        return this.editForm.get('nbChair') as FormControl;
+    }
+
+    protected readonly ErrorModel = ErrorModel;
 }

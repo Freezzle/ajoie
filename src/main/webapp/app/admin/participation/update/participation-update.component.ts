@@ -5,7 +5,7 @@ import {combineLatest, EMPTY, filter, Observable, of, switchMap, tap} from 'rxjs
 import {finalize, map, mergeMap} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {ParticipationService} from '../service/participation.service';
 import {IParticipation} from '../participation.model';
@@ -24,12 +24,15 @@ import {IExhibitor} from '../../exhibitor/exhibitor.model';
 import {ExhibitorService} from '../../exhibitor/service/exhibitor.service';
 import {Status} from '../../enumerations/status.model';
 import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
+import {FieldErrorComponent} from "../../../shared/field-error/field-error.component";
+import {ErrorModel} from "../../../shared/field-error/error.model";
 
 @Component({
     standalone: true,
     selector: 'jhi-participation-update',
     templateUrl: './participation-update.component.html',
-    imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe],
+    imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
+              FieldErrorComponent],
 })
 export class ParticipationUpdateComponent implements OnInit {
     isSaving = false;
@@ -220,4 +223,30 @@ export class ParticipationUpdateComponent implements OnInit {
             )
             .subscribe((salons: ISalon[]) => (this.salonsSharedCollection = salons));
     }
+
+    get getExhibitor(): FormControl {
+        return this.editForm.get('exhibitor') as FormControl;
+    }
+
+    get getRegistrationDate(): FormControl {
+        return this.editForm.get('registrationDate') as FormControl;
+    }
+
+    get getMeal1(): FormControl {
+        return this.editForm.get('nbMeal1') as FormControl;
+    }
+
+    get getMeal2(): FormControl {
+        return this.editForm.get('nbMeal2') as FormControl;
+    }
+
+    get getMeal3(): FormControl {
+        return this.editForm.get('nbMeal3') as FormControl;
+    }
+
+    get getStatus(): FormControl {
+        return this.editForm.get('status') as FormControl;
+    }
+
+    protected readonly ErrorModel = ErrorModel;
 }

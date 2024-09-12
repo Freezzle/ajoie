@@ -244,7 +244,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 .accordion-button.collapsed {
-  background-color: $info;
+  background-color: $secondary;
   color: white;
 }
 
@@ -330,7 +330,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 /* Quand le switch est activé */
 .switch-checkbox:checked + .switch-label {
-  background-color: $success;
+  background-color: $primary;
 }
 
 /* Déplacement du bouton lorsque activé */
@@ -356,4 +356,19 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .table-section-ending {
   background-color: #555555 !important;
   color: white !important;
+}
+
+/* ASTERIX REQUIRED */
+
+/* Ajouter un astérisque rouge au label */
+label::after {
+  content: "*";
+  color: $danger;
+  margin-left: 5px;
+  display: none; /* L'astérisque est caché par défaut */
+}
+
+/* Afficher l'astérisque si le field-error contient une erreur */
+div:has(field-error) > label::after {
+  display: inline; /* Afficher l'astérisque rouge */
 }

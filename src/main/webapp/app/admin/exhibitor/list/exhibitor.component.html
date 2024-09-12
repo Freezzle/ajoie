@@ -79,7 +79,7 @@
                             </td>
                         </tr>
                     } @else {
-                        @for (exhibitor of exhibitors; track trackId) {
+                        @for (exhibitor of exhibitors; track $index) {
                             <tr>
                                 <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.fullName }}</td>
                                 <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.email }}</td>

@@ -55,11 +55,15 @@
                                             <option [ngValue]="exhibitorOption">{{ exhibitorOption.fullName }}</option>
                                         }
                                     </select>
+
+                                    <field-error [formControlElement]="getExhibitor" [errors]="[ErrorModel.required()]"></field-error>
                                 </div>
                                 <div class="col-sm-4 fw-bold">
                                     <label for="field_registrationDate" jhiTranslate="participation.registrationDate">Date d'inscription</label>
                                     <input class="form-control" formControlName="registrationDate" id="field_registrationDate" name="registrationDate"
                                            placeholder="DD.MM.YYYY" type="date"/>
+
+                                    <field-error [formControlElement]="getRegistrationDate" [errors]="[ErrorModel.required()]"></field-error>
                                 </div>
                                 <div class="col-sm-4 fw-bold">
                                     <label for="field_status" jhiTranslate="participation.status.label">Statut</label>
@@ -68,6 +72,8 @@
                                             <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
                                         }
                                     </select>
+
+                                    <field-error [formControlElement]="getStatus" [errors]="[ErrorModel.required()]"></field-error>
                                 </div>
                             </div>
 
@@ -76,16 +82,22 @@
                                 <div class="col-sm-4 fw-bold">
                                     <label for="field_nbMeal1" jhiTranslate="participation.nbMeal1">Repas samedi midi</label>
                                     <input class="form-control" formControlName="nbMeal1" id="field_nbMeal1" name="nbMeal1" type="number"/>
+
+                                    <field-error [formControlElement]="getMeal1" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
                                 </div>
 
                                 <div class="col-sm-4 fw-bold">
                                     <label for="field_nbMeal2" jhiTranslate="participation.nbMeal2">Repas samedi soir</label>
                                     <input class="form-control" formControlName="nbMeal2" id="field_nbMeal2" name="nbMeal2" type="number"/>
+
+                                    <field-error [formControlElement]="getMeal2" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
                                 </div>
 
                                 <div class="col-sm-4 fw-bold">
                                     <label for="field_nbMeal3" jhiTranslate="participation.nbMeal3">Repas dimanche midi</label>
                                     <input class="form-control" formControlName="nbMeal3" id="field_nbMeal3" name="nbMeal3" type="number"/>
+
+                                    <field-error [formControlElement]="getMeal3" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
                                 </div>
                             </div>
 

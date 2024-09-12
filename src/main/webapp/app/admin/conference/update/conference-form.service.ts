@@ -52,7 +52,7 @@ export class ConferenceFormService {
         };
         return new FormGroup<ConferenceFormGroupContent>({
             id: new FormControl(conferenceRawValue.id),
-            title: new FormControl(conferenceRawValue.title, Validators.required),
+            title: new FormControl(conferenceRawValue.title, [Validators.required, Validators.maxLength(500)]),
             status: new FormControl(conferenceRawValue.status, Validators.required),
             extraInformation: new FormControl(conferenceRawValue.extraInformation),
             participation: new FormControl(conferenceRawValue.participation, Validators.required),

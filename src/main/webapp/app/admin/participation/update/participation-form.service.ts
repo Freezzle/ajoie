@@ -6,6 +6,7 @@ import {DATE_FORMAT} from 'app/config/input.constants';
 import {IParticipation, NewParticipation} from '../participation.model';
 import {Status} from '../../enumerations/status.model';
 import {IExhibitor} from '../../exhibitor/exhibitor.model';
+import {CustomValidatorModel} from "../../../shared/field-error/custom-validator.model";
 
 type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>> & { id: T['id'] };
 
@@ -72,12 +73,12 @@ export class ParticipationFormService {
                 },
             ),
             registrationDate: new FormControl(participationRawValue.registrationDate, Validators.required),
-            nbMeal1: new FormControl(participationRawValue.nbMeal1),
-            nbMeal2: new FormControl(participationRawValue.nbMeal2),
-            nbMeal3: new FormControl(participationRawValue.nbMeal3),
-            acceptedChart: new FormControl(participationRawValue.acceptedChart),
-            acceptedContract: new FormControl(participationRawValue.acceptedContract),
-            needArrangment: new FormControl(participationRawValue.needArrangment),
+            nbMeal1: new FormControl(participationRawValue.nbMeal1, [Validators.required, CustomValidatorModel.onlyNumbers]),
+            nbMeal2: new FormControl(participationRawValue.nbMeal2, [Validators.required, CustomValidatorModel.onlyNumbers]),
+            nbMeal3: new FormControl(participationRawValue.nbMeal3, [Validators.required, CustomValidatorModel.onlyNumbers]),
+            acceptedChart: new FormControl(participationRawValue.acceptedChart, Validators.required),
+            acceptedContract: new FormControl(participationRawValue.acceptedContract, Validators.required),
+            needArrangment: new FormControl(participationRawValue.needArrangment, Validators.required),
             isBillingClosed: new FormControl(participationRawValue.isBillingClosed, Validators.required),
             status: new FormControl(participationRawValue.status, Validators.required),
             extraInformation: new FormControl(participationRawValue.extraInformation),

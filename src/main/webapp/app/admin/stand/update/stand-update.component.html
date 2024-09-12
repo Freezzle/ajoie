@@ -48,6 +48,8 @@
                             <label for="field_description" jhiTranslate="stand.description">Description</label>
                             <textarea class="form-control" formControlName="description" id="field_description" name="description"
                                       rows="6"></textarea>
+
+                            <field-error [formControlElement]="getDescription" [errors]="[ErrorModel.required(), ErrorModel.maxlength(500)]"></field-error>
                         </div>
                     </div>
 
@@ -63,6 +65,7 @@
                                     <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
                                 }
                             </select>
+                            <field-error [formControlElement]="getDimension" [errors]="[ErrorModel.required()]"></field-error>
                         </div>
                         <div class="col-sm-4 fw-bold align-content-center">
                             <label for="field_participation" jhiTranslate="stand.participation">Participation</label>
@@ -73,6 +76,7 @@
                                     <option [ngValue]="participationOption">{{ participationOption.exhibitor?.fullName }}</option>
                                 }
                             </select>
+                            <field-error [formControlElement]="getParticipation" [errors]="[ErrorModel.required()]"></field-error>
                         </div>
                         <div class="col-sm-4 fw-bold align-content-center">
                             <label for="field_status" jhiTranslate="stand.status.label">Status</label>
@@ -82,6 +86,7 @@
                                     <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
                                 }
                             </select>
+                            <field-error [formControlElement]="getStatus" [errors]="[ErrorModel.required()]"></field-error>
                         </div>
                     </div>
 
@@ -113,10 +118,12 @@
                         <div class="col-sm-4 fw-bold">
                             <label for="field_nbTable" jhiTranslate="stand.nbTable">Nb Table</label>
                             <input class="form-control" formControlName="nbTable" id="field_nbTable" name="nbTable" type="number"/>
+                            <field-error [formControlElement]="getTable" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
                         </div>
                         <div class="col-sm-4 fw-bold align-content-center">
                             <label for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
                             <input class="form-control" formControlName="nbChair" id="field_nbChair" name="nbChair" type="number"/>
+                            <field-error [formControlElement]="getChair" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
                         </div>
                         <div class="col-sm-2 fw-bold">
                             <div>
