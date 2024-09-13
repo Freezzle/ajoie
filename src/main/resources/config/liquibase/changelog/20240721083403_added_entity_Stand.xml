@@ -14,16 +14,16 @@
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="description" type="varchar(255)">
+            <column name="description" type="varchar(500)">
                 <constraints nullable="false" />
             </column>
-            <column name="website" type="varchar(255)">
+            <column name="website" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="social_media" type="varchar(255)">
+            <column name="social_media" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
-            <column name="url_picture" type="varchar(255)">
+            <column name="url_picture" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
             <column name="shared" type="boolean">
@@ -38,10 +38,10 @@
             <column name="need_electricity" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="status" type="varchar(255)">
+            <column name="status" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="extra_information" type="varchar(255)">
+            <column name="extra_information" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
             <column name="participation_id" type="${uuidType}">
@@ -50,9 +50,9 @@
             <column name="dimension_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
     </changeSet>
 
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

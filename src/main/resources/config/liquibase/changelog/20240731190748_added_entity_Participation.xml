@@ -15,7 +15,7 @@
             <column name="registration_date" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
-            <column name="client_number" type="varchar(255)">
+            <column name="client_number" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
             <column name="nb_meal_1" type="bigint">
@@ -39,10 +39,10 @@
             <column name="is_billing_closed" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="status" type="varchar(255)">
+            <column name="status" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="extra_information" type="varchar(255)">
+            <column name="extra_information" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
             <column name="exhibitor_id" type="${uuidType}">
@@ -51,10 +51,10 @@
             <column name="salon_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
         <dropDefaultValue tableName="participation" columnName="registration_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

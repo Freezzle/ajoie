@@ -15,16 +15,16 @@
             <column name="generation_date" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
-            <column name="billing_number" type="varchar(255)">
+            <column name="billing_number" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="state" type="varchar(255)">
+            <column name="state" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="participation_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
         <dropDefaultValue tableName="invoicing_plan" columnName="generation_date" columnDataType="${datetimeType}"/>
     </changeSet>

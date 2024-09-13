@@ -17,7 +17,7 @@
             <column name="reference_number" type="bigint">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="place" type="varchar(255)">
+            <column name="place" type="varchar(100)">
                 <constraints nullable="false" />
             </column>
             <column name="starting_date" type="${datetimeType}">
@@ -41,14 +41,14 @@
             <column name="price_sharing_stand" type="bigint">
                 <constraints nullable="true" />
             </column>
-            <column name="extra_information" type="varchar(255)">
+            <column name="extra_information" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
         <dropDefaultValue tableName="salon" columnName="starting_date" columnDataType="${datetimeType}"/>
         <dropDefaultValue tableName="salon" columnName="ending_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

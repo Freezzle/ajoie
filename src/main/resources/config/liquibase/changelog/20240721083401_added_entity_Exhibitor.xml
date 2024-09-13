@@ -12,27 +12,27 @@
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="full_name" type="varchar(255)">
+            <column name="full_name" type="varchar(100)">
                 <constraints nullable="false" />
             </column>
-            <column name="email" type="varchar(255)">
+            <column name="email" type="varchar(100)">
                 <constraints nullable="false" />
             </column>
-            <column name="phone_number" type="varchar(255)">
+            <column name="phone_number" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="address" type="varchar(255)">
+            <column name="address" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="npa_localite" type="varchar(255)">
+            <column name="npa_localite" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="extra_information" type="varchar(255)">
+            <column name="extra_information" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
     </changeSet>
 
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

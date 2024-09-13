@@ -12,16 +12,16 @@
             <column name="reference_date" type="${datetimeType}">
                 <constraints nullable="false"/>
             </column>
-            <column name="type" type="varchar(255)">
+            <column name="type" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="label" type="varchar(255)">
+            <column name="label" type="varchar(500)">
                 <constraints nullable="false"/>
             </column>
             <column name="from_system" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_type" type="varchar(255)">
+            <column name="entity_type" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="reference_id" type="${uuidType}">

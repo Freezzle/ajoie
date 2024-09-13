@@ -21,10 +21,10 @@
             <column name="reference_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
-            <column name="type" type="varchar(255)">
+            <column name="type" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="label" type="varchar(255)">
+            <column name="label" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
             <column name="default_amount" type="double">
@@ -39,16 +39,16 @@
             <column name="lock" type="boolean">
                 <constraints nullable="true" />
             </column>
-            <column name="extra_information" type="varchar(255)">
+            <column name="extra_information" type="varchar(500)">
                 <constraints nullable="true" />
             </column>
             <column name="invoicing_plan_id" type="${uuidType}">
                 <constraints nullable="true" />
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
         </createTable>
         <dropDefaultValue tableName="invoice" columnName="generation_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
-    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

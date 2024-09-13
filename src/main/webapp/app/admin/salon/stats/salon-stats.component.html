@@ -8,15 +8,28 @@
             <hr/>
 
             <div class="d-flex justify-content-between mt-3">
-                <span>
+                <span class="d-flex col-7 align-items-center">
                     <button type="button" (click)="previousState()" class="btn btn-primary btn-sm">
                         <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
                         <span jhiTranslate="common.back">Back</span>
                     </button>
                 </span>
-                <button type="button" class="btn btn-primary btn-sm" (click)="generate()">
-                    <span jhiTranslate="common.import">Importer</span>
-                </button>
+                <span class="d-flex col-5 justify-content-end justify-content-end">
+                    <span class="d-flex col-8 justify-content-end">
+                        <input type="file" id="file" class="form-control form-control-sm me-2" (change)="onFileSelected($event)"/>
+                    </span>
+                    <span class="d-flex col-auto justify-content-end">
+                        <select class="form-control form-control-sm me-2" formControlName="version" id="field_version" name="version">
+                            <option value="version_2024.1">V2024.1</option>
+                            <option value="version_2025.1" [selected]="true">V2025.1</option>
+                        </select>
+                    </span>
+                    <span class="d-flex col-auto justify-content-end">
+                        <button type="submit" class="btn btn-primary btn-sm" (click)="generate()">
+                            <span jhiTranslate="common.import">Importer</span>
+                        </button>
+                    </span>
+                </span>
             </div>
 
             <hr/>

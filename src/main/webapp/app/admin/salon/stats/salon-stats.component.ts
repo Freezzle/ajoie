@@ -9,17 +9,20 @@ import {SalonService} from '../service/salon.service';
 import {mergeMap} from 'rxjs/operators';
 import {HttpResponse} from '@angular/common/http';
 import {EMPTY, Observable, of} from 'rxjs';
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @Component({
     standalone: true,
     selector: 'jhi-salon-stats',
     templateUrl: './salon-stats.component.html',
     imports: [SharedModule, RouterModule, DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe, SortByDirective,
-              SortDirective],
+              SortDirective, FormsModule, ReactiveFormsModule],
 })
 export class SalonStatsComponent implements OnInit {
     salon = input<ISalon | null>(null);
     stats$: Observable<ISalonStats> | undefined;
+    selectedFile: File | null = null;
+    uploadResponse: any;
 
     protected salonService = inject(SalonService);
 
@@ -36,6 +39,13 @@ export class SalonStatsComponent implements OnInit {
                 return EMPTY;
             }),
         );
+    }
+
+    onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) {
+            this.selectedFile = input.files[0];
+        }
     }
 
     generate(): void {
