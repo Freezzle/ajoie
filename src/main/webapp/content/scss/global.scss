@@ -266,6 +266,13 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   cursor: pointer;
 }
 
+.truncate {
+  white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
+  overflow: hidden; /* Cache le texte qui déborde du conteneur */
+  text-overflow: ellipsis; /* Remplace le texte tronqué par "..." */
+  max-width: 500px; /* Fixe une largeur maximale pour la cellule */
+}
+
 /* CARD */
 
 .card-header {
@@ -362,7 +369,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 /* Ajouter un astérisque rouge au label */
 label::after {
-  content: "*";
+  content: '*';
   color: $danger;
   margin-left: 5px;
   display: none; /* L'astérisque est caché par défaut */

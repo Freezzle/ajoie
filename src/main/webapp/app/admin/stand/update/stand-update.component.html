@@ -1,168 +1,201 @@
 <div>
-    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-        <h2 id="page-heading">
-            <span *ngIf="stand?.id" jhiTranslate="stand.edit">Modification d'un stand</span>
-            <span *ngIf="!stand?.id" jhiTranslate="stand.create">Création d'un nouveau stand</span>
+  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+    <h2 id="page-heading">
+      <span *ngIf="stand?.id" jhiTranslate="stand.edit">Modification d'un stand</span>
+      <span *ngIf="!stand?.id" jhiTranslate="stand.create">Création d'un nouveau stand</span>
 
-            <hr/>
+      <hr />
 
-            <div class="d-flex justify-content-between mt-3">
-                <span>
-                    <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-                        <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-                        <span jhiTranslate="common.back">Back</span>
-                    </button>
-                </span>
+      <div class="d-flex justify-content-between mt-3">
+        <span>
+          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
+            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
+            <span jhiTranslate="common.back">Back</span>
+          </button>
+        </span>
 
-                <span>
-                    <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-                        <span jhiTranslate="common.edit">Edit</span>
-                    </button>
+        <span>
+          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
+            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+            <span jhiTranslate="common.edit">Edit</span>
+          </button>
 
-                    <button (click)="readOnlyBack()" *ngIf="!readonlyForm && stand?.id" class="btn btn-secondary btn-sm" id="cancel-save"
-                            type="button">
-                        <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-                        <span jhiTranslate="common.cancel">Cancel</span>
-                    </button>
-                    <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity"
-                            type="submit">
-                        <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-                        <span jhiTranslate="common.save">Save</span>
-                    </button>
-                </span>
+          <button
+            (click)="readOnlyBack()"
+            *ngIf="!readonlyForm && stand?.id"
+            class="btn btn-secondary btn-sm"
+            id="cancel-save"
+            type="button"
+          >
+            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+            <span jhiTranslate="common.cancel">Cancel</span>
+          </button>
+          <button
+            *ngIf="!readonlyForm"
+            [disabled]="editForm.invalid || isSaving"
+            class="btn btn-primary btn-sm"
+            id="save-entity"
+            type="submit"
+          >
+            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
+            <span jhiTranslate="common.save">Save</span>
+          </button>
+        </span>
+      </div>
+      <hr />
+    </h2>
+
+    <div>
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <div class="card">
+        <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12 fw-bold align-content-center">
+              <label for="field_description" jhiTranslate="stand.description">Description</label>
+              <textarea class="form-control" formControlName="description" id="field_description" name="description" rows="6"></textarea>
+              <small class="fw-light">({{ this.editForm.get('description')?.value?.length }} / 500)</small>
+              <field-error
+                [formControlElement]="getDescription"
+                [errors]="[ErrorModel.required(), ErrorModel.maxlength(500)]"
+              ></field-error>
             </div>
-            <hr/>
-        </h2>
+          </div>
 
-        <div>
-            <jhi-alert-error></jhi-alert-error>
+          <!-- PARTICIPATION / DIMENSION / STATUS -->
 
-            <jhi-alert></jhi-alert>
-
-            <div class="card">
-                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-12 fw-bold align-content-center">
-                            <label for="field_description" jhiTranslate="stand.description">Description</label>
-                            <textarea class="form-control" formControlName="description" id="field_description" name="description"
-                                      rows="6"></textarea>
-
-                            <field-error [formControlElement]="getDescription" [errors]="[ErrorModel.required(), ErrorModel.maxlength(500)]"></field-error>
-                        </div>
-                    </div>
-
-                    <!-- PARTICIPATION / DIMENSION / STATUS -->
-
-                    <div class="row mt-3">
-                        <div class="col-sm-4 fw-bold align-content-center">
-                            <label for="field_dimension" jhiTranslate="stand.dimension">Dimension</label>
-                            <select [compareWith]="compareDimensionStand" class="form-control" formControlName="dimension" id="field_dimension"
-                                    name="dimension">
-                                <option [ngValue]="null"></option>
-                                @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
-                                    <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
-                                }
-                            </select>
-                            <field-error [formControlElement]="getDimension" [errors]="[ErrorModel.required()]"></field-error>
-                        </div>
-                        <div class="col-sm-4 fw-bold align-content-center">
-                            <label for="field_participation" jhiTranslate="stand.participation">Participation</label>
-                            <select [compareWith]="compareParticipation" class="form-control" formControlName="participation" id="field_participation"
-                                    name="participation">
-                                <option [ngValue]="null"></option>
-                                @for (participationOption of participationsSharedCollection; track $index) {
-                                    <option [ngValue]="participationOption">{{ participationOption.exhibitor?.fullName }}</option>
-                                }
-                            </select>
-                            <field-error [formControlElement]="getParticipation" [errors]="[ErrorModel.required()]"></field-error>
-                        </div>
-                        <div class="col-sm-4 fw-bold align-content-center">
-                            <label for="field_status" jhiTranslate="stand.status.label">Status</label>
-                            <select class="form-control" formControlName="status" id="field_status" name="status">
-                                <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
-                                @for (status of statusValues; track $index) {
-                                    <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
-                                }
-                            </select>
-                            <field-error [formControlElement]="getStatus" [errors]="[ErrorModel.required()]"></field-error>
-                        </div>
-                    </div>
-
-                    <!-- WEBSITE / SOCIAL MEDIA -->
-
-                    <div class="row mt-3">
-                        <div class="col-sm-6 fw-bold align-content-center">
-                            <label for="field_website" jhiTranslate="stand.website">Website</label>
-                            <input class="form-control" formControlName="website" id="field_website" name="website" type="text"/>
-                        </div>
-                        <div class="col-sm-6 fw-bold align-content-center">
-                            <label for="field_socialMedia" jhiTranslate="stand.socialMedia">Social Media</label>
-                            <input class="form-control" formControlName="socialMedia" id="field_socialMedia" name="socialMedia" type="text"/>
-                        </div>
-                    </div>
-
-                    <!-- URL PICTURE -->
-
-                    <div class="row mt-3">
-                        <div class="col-sm-12 fw-bold align-content-center">
-                            <label for="field_urlPicture" jhiTranslate="stand.urlPicture">Url Picture</label>
-                            <input class="form-control" formControlName="urlPicture" id="field_urlPicture" name="urlPicture" type="text"/>
-                        </div>
-                    </div>
-
-                    <!-- SHARED / ELECTRICITY / TABLE / CHAIR -->
-
-                    <div class="row mt-3">
-                        <div class="col-sm-4 fw-bold">
-                            <label for="field_nbTable" jhiTranslate="stand.nbTable">Nb Table</label>
-                            <input class="form-control" formControlName="nbTable" id="field_nbTable" name="nbTable" type="number"/>
-                            <field-error [formControlElement]="getTable" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
-                        </div>
-                        <div class="col-sm-4 fw-bold align-content-center">
-                            <label for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
-                            <input class="form-control" formControlName="nbChair" id="field_nbChair" name="nbChair" type="number"/>
-                            <field-error [formControlElement]="getChair" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
-                        </div>
-                        <div class="col-sm-2 fw-bold">
-                            <div>
-                                <label for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
-                            </div>
-                            <div class="switch">
-                                <input class="switch-checkbox" formControlName="needElectricity" id="field_needElectricity" name="needElectricity"
-                                       type="checkbox"/>
-                                <label class="switch-label" for="field_needElectricity">
-                                    <span class="switch-inner"></span>
-                                    <span class="switch-btn"></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 fw-bold">
-                            <div>
-                                <label for="field_shared" jhiTranslate="stand.shared">Shared</label>
-                            </div>
-                            <div class="switch">
-                                <input class="switch-checkbox" formControlName="shared" id="field_shared" name="shared" type="checkbox"/>
-                                <label class="switch-label" for="field_shared">
-                                    <span class="switch-inner"></span>
-                                    <span class="switch-btn"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- EXTRA INFO -->
-
-                    <div class="row mt-3">
-                        <div class="col-sm-12 fw-bold">
-                            <label for="field_extraInformation" jhiTranslate="stand.extraInformation">Extra Information</label>
-                            <textarea class="form-control" formControlName="extraInformation" id="field_extraInformation" name="extraInformation"
-                                      rows="3"></textarea>
-                        </div>
-                    </div>
-                </div>
+          <div class="row mt-3">
+            <div class="col-sm-4 fw-bold align-content-center">
+              <label for="field_dimension" jhiTranslate="stand.dimension">Dimension</label>
+              <select
+                [compareWith]="compareDimensionStand"
+                class="form-control"
+                formControlName="dimension"
+                id="field_dimension"
+                name="dimension"
+              >
+                <option [ngValue]="null"></option>
+                @for (dimensionStandOption of dimensionStandsSharedCollection; track $index) {
+                  <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
+                }
+              </select>
+              <field-error [formControlElement]="getDimension" [errors]="[ErrorModel.required()]"></field-error>
             </div>
+            <div class="col-sm-4 fw-bold align-content-center">
+              <label for="field_participation" jhiTranslate="stand.participation">Participation</label>
+              <select
+                [compareWith]="compareParticipation"
+                class="form-control"
+                formControlName="participation"
+                id="field_participation"
+                name="participation"
+              >
+                <option [ngValue]="null"></option>
+                @for (participationOption of participationsSharedCollection; track $index) {
+                  <option [ngValue]="participationOption">{{ participationOption.exhibitor?.fullName }}</option>
+                }
+              </select>
+              <field-error [formControlElement]="getParticipation" [errors]="[ErrorModel.required()]"></field-error>
+            </div>
+            <div class="col-sm-4 fw-bold align-content-center">
+              <label for="field_status" jhiTranslate="stand.status.label">Status</label>
+              <select class="form-control" formControlName="status" id="field_status" name="status">
+                <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
+                @for (status of statusValues; track $index) {
+                  <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
+                }
+              </select>
+              <field-error [formControlElement]="getStatus" [errors]="[ErrorModel.required()]"></field-error>
+            </div>
+          </div>
+
+          <!-- WEBSITE / SOCIAL MEDIA -->
+
+          <div class="row mt-3">
+            <div class="col-sm-6 fw-bold align-content-center">
+              <label for="field_website" jhiTranslate="stand.website">Website</label>
+              <input class="form-control" formControlName="website" id="field_website" name="website" type="text" />
+            </div>
+            <div class="col-sm-6 fw-bold align-content-center">
+              <label for="field_socialMedia" jhiTranslate="stand.socialMedia">Social Media</label>
+              <input class="form-control" formControlName="socialMedia" id="field_socialMedia" name="socialMedia" type="text" />
+            </div>
+          </div>
+
+          <!-- URL PICTURE -->
+
+          <div class="row mt-3">
+            <div class="col-sm-12 fw-bold align-content-center">
+              <label for="field_urlPicture" jhiTranslate="stand.urlPicture">Url Picture</label>
+              <input class="form-control" formControlName="urlPicture" id="field_urlPicture" name="urlPicture" type="text" />
+            </div>
+          </div>
+
+          <!-- SHARED / ELECTRICITY / TABLE / CHAIR -->
+
+          <div class="row mt-3">
+            <div class="col-sm-4 fw-bold">
+              <label for="field_nbTable" jhiTranslate="stand.nbTable">Nb Table</label>
+              <input class="form-control" formControlName="nbTable" id="field_nbTable" name="nbTable" type="number" />
+              <field-error [formControlElement]="getTable" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
+            </div>
+            <div class="col-sm-4 fw-bold align-content-center">
+              <label for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
+              <input class="form-control" formControlName="nbChair" id="field_nbChair" name="nbChair" type="number" />
+              <field-error [formControlElement]="getChair" [errors]="[ErrorModel.required(), ErrorModel.number()]"></field-error>
+            </div>
+            <div class="col-sm-2 fw-bold">
+              <div>
+                <label for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
+              </div>
+              <div class="switch">
+                <input
+                  class="switch-checkbox"
+                  formControlName="needElectricity"
+                  id="field_needElectricity"
+                  name="needElectricity"
+                  type="checkbox"
+                />
+                <label class="switch-label" for="field_needElectricity">
+                  <span class="switch-inner"></span>
+                  <span class="switch-btn"></span>
+                </label>
+              </div>
+            </div>
+            <div class="col-sm-2 fw-bold">
+              <div>
+                <label for="field_shared" jhiTranslate="stand.shared">Shared</label>
+              </div>
+              <div class="switch">
+                <input class="switch-checkbox" formControlName="shared" id="field_shared" name="shared" type="checkbox" />
+                <label class="switch-label" for="field_shared">
+                  <span class="switch-inner"></span>
+                  <span class="switch-btn"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXTRA INFO -->
+
+          <div class="row mt-3">
+            <div class="col-sm-12 fw-bold">
+              <label for="field_extraInformation" jhiTranslate="stand.extraInformation">Extra Information</label>
+              <textarea
+                class="form-control"
+                formControlName="extraInformation"
+                id="field_extraInformation"
+                name="extraInformation"
+                rows="3"
+              ></textarea>
+              <small class="fw-light">({{ this.editForm.get('extraInformation')?.value?.length }} / 500)</small>
+            </div>
+          </div>
         </div>
-    </form>
+      </div>
+    </div>
+  </form>
 </div>

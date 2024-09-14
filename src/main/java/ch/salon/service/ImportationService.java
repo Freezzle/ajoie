@@ -13,6 +13,16 @@ import ch.salon.repository.ExhibitorRepository;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -20,14 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ImportationService {
@@ -64,11 +66,15 @@ public class ImportationService {
     private final ParticipationRepository participationRepository;
     private final InvoicingPlanService invoiceService;
 
-    public ImportationService(SalonRepository salonRepository, StandRepository standRepository,
-                              ExhibitorRepository exhibitorRepository, ConferenceRepository conferenceRepository,
-                              DimensionStandRepository dimensionStandRepository,
-                              ParticipationRepository participationRepository,
-                              InvoicingPlanService invoicingPlanService) {
+    public ImportationService(
+        SalonRepository salonRepository,
+        StandRepository standRepository,
+        ExhibitorRepository exhibitorRepository,
+        ConferenceRepository conferenceRepository,
+        DimensionStandRepository dimensionStandRepository,
+        ParticipationRepository participationRepository,
+        InvoicingPlanService invoicingPlanService
+    ) {
         this.salonRepository = salonRepository;
         this.standRepository = standRepository;
         this.exhibitorRepository = exhibitorRepository;
@@ -78,23 +84,17 @@ public class ImportationService {
         this.invoiceService = invoicingPlanService;
     }
 
-    public void importData(String idSalon) {
-        try (Reader reader = new FileReader(
-                "C:\\Projects\\ajoie\\src\\main\\java\\ch\\salon\\importation\\formulaire_2024.csv",
-                Charset.defaultCharset());
-             CSVParser csvParser = new CSVParser(reader, CSVFormat.EXCEL.withDelimiter(';'))) {
+    public void importData(String idSalon, InputStream file) {
+        try (
+            Reader reader = new InputStreamReader(file, Charset.defaultCharset());
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.EXCEL.withDelimiter(';'))
+        ) {
             Salon currentSalon = salonRepository.findById(UUID.fromString(idSalon)).orElseThrow();
 
             List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
 
             int index = 0;
             for (CSVRecord csvRecord : csvParser) {
-                System.out.println(index);
-                if (index == 0) {
-                    index++;
-                    continue;
-                }
-
                 String standRegistrationDate = csvRecord.get(STAND_REGISTRATION_DATE);
                 // To stop the process
                 if (StringUtils.isBlank(standRegistrationDate)) {
@@ -107,10 +107,8 @@ public class ImportationService {
                 String exhibitorNpaLocalite = csvRecord.get(EXHIBITOR_NPA_LOCALITE).replaceAll("\"", "");
                 String exhibitorPhone = csvRecord.get(EXHIBITOR_PHONE_NUMBER).replaceAll("\"", "");
 
-                if (participationRepository.findByExhibitorEmailAndSalonId(exhibitorEmail, currentSalon.getId()) !=
-                    null) {
-                    log.info("registration already passed through with email {} and salon {}", exhibitorEmail,
-                             currentSalon.getId());
+                if (participationRepository.findByExhibitorEmailAndSalonId(exhibitorEmail, currentSalon.getId()) != null) {
+                    log.info("registration already passed through with email {} and salon {}", exhibitorEmail, currentSalon.getId());
                     continue;
                 }
 
@@ -133,9 +131,12 @@ public class ImportationService {
                 String participationAcceptedChart = csvRecord.get(STAND_ACCEPTED_CHART).replaceAll("\"", "");
 
                 Participation currentParticipation = new Participation();
-                currentParticipation.setClientNumber(ParticipationService.getClientNumber(
+                currentParticipation.setClientNumber(
+                    ParticipationService.getClientNumber(
                         participationRepository.findMaxClientNumber(currentSalon.getId()),
-                        currentSalon.getReferenceNumber()));
+                        currentSalon.getReferenceNumber()
+                    )
+                );
                 currentParticipation.setSalon(currentSalon);
                 currentParticipation.setExhibitor(currentExhibitor);
                 currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim().replaceAll("\"", "")));
@@ -144,6 +145,7 @@ public class ImportationService {
                 currentParticipation.setAcceptedContract(participationAcceptedContract.contains("accepte"));
                 currentParticipation.setNeedArrangment(participationArrangment.contains("arrangement"));
                 currentParticipation.setAcceptedChart(participationAcceptedChart.contains("accepte"));
+
                 currentParticipation.setRegistrationDate(Instant.now()); // FIXME : Take registration date
                 currentParticipation.setStatus(Status.IN_VERIFICATION);
                 currentParticipation.setIsBillingClosed(false);
@@ -166,10 +168,12 @@ public class ImportationService {
                 currentStand.setUrlPicture(sub500(standUrlPicture));
                 currentStand.setDimension(findDimension(dimensionStands, standDimension));
                 currentStand.setShared(standSharing.equalsIgnoreCase("oui"));
-                currentStand.setNbTable(standNbTable.contains("Aucune") ? 0 : Long.parseLong(
-                        standNbTable.replaceAll("\"", "").substring(0, 1)));
-                currentStand.setNbChair(standNbChair.contains("Aucune") ? 0 : Long.parseLong(
-                        standNbChair.replaceAll("\"", "").substring(0, 1)));
+                currentStand.setNbTable(
+                    standNbTable.contains("Aucune") ? 0 : Long.parseLong(standNbTable.replaceAll("\"", "").substring(0, 1))
+                );
+                currentStand.setNbChair(
+                    standNbChair.contains("Aucune") ? 0 : Long.parseLong(standNbChair.replaceAll("\"", "").substring(0, 1))
+                );
                 currentStand.setNeedElectricity(standElectricity.equalsIgnoreCase("oui"));
                 currentStand.setStatus(Status.IN_VERIFICATION);
                 standRepository.save(currentStand);
@@ -190,18 +194,21 @@ public class ImportationService {
                 invoiceService.refreshInvoicingPlans(currentParticipation.getId().toString());
                 index++;
             }
-        } catch (IOException e) {
-        }
+        } catch (IOException e) {}
     }
 
     private DimensionStand findDimension(List<DimensionStand> dimensions, String dimension) {
-        return dimensions.stream().filter(dim -> dimension.contains(dim.getDimension())).findFirst().orElseGet(() -> {
-            DimensionStand newDimensionStand = new DimensionStand();
-            newDimensionStand.setDimension(sub100(dimension));
-            DimensionStand saved = dimensionStandRepository.save(newDimensionStand);
-            dimensions.add(saved);
-            return saved;
-        });
+        return dimensions
+            .stream()
+            .filter(dim -> dimension.contains(dim.getDimension()))
+            .findFirst()
+            .orElseGet(() -> {
+                DimensionStand newDimensionStand = new DimensionStand();
+                newDimensionStand.setDimension(sub100(dimension));
+                DimensionStand saved = dimensionStandRepository.save(newDimensionStand);
+                dimensions.add(saved);
+                return saved;
+            });
     }
 
     private String incrementClientNumber(Long referenceSalon, String clientNumber) {
@@ -223,6 +230,6 @@ public class ImportationService {
     }
 
     private String sub500(String chaine) {
-        return chaine != null ? chaine.substring(0, Math.min(100, chaine.length())) : null;
+        return chaine != null ? chaine.substring(0, Math.min(500, chaine.length())) : null;
     }
 }

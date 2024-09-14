@@ -22,7 +22,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import tech.jhipster.web.util.ResponseUtil;
 
 @RestController
@@ -102,12 +111,23 @@ public class SalonResource {
         return participationService.findAll(idSalon);
     }
 
-    @PostMapping("/{idSalon}/import")
+    @PostMapping("/{idSalon}/import-inscriptions")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Void> importation(@PathVariable(name = "idSalon", required = false) String idSalon) throws URISyntaxException {
-        importationService.importData(idSalon);
+    public ResponseEntity<String> importation(
+        @PathVariable(name = "idSalon", required = false) String idSalon,
+        @RequestParam("file") MultipartFile file
+    ) throws URISyntaxException {
+        try {
+            if (file == null || file.isEmpty()) {
+                throw new IllegalArgumentException("No file");
+            }
 
-        return ResponseEntity.created(new URI("/idSalon/import")).build();
+            importationService.importData(idSalon, file.getInputStream());
+
+            return ResponseEntity.created(new URI("/idSalon/import")).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to upload the file");
+        }
     }
 
     @GetMapping("/{idSalon}/stats")
