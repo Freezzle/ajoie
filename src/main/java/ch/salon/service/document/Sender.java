@@ -1,6 +1,7 @@
 package ch.salon.service.document;
 
 import ch.salon.domain.Salon;
+
 import java.io.Serializable;
 
 public class Sender implements Serializable {

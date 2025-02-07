@@ -1,7 +1,7 @@
 package ch.salon.service.dto;
 
-import ch.salon.domain.Salon;
 import ch.salon.domain.enumeration.Status;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -30,7 +30,9 @@ public class ParticipationDTO implements Serializable {
 
     private String additionnalInformation;
 
-    private Boolean isBillingClosed;
+    private Boolean guestOfHonor;
+
+    private Boolean crushOfHeart;
 
     private Status status;
 
@@ -38,9 +40,10 @@ public class ParticipationDTO implements Serializable {
 
     private ExhibitorLightDTO exhibitor;
 
-    private Salon salon;
+    private SalonLightDTO salon;
 
-    public ParticipationDTO() {}
+    public ParticipationDTO() {
+    }
 
     public UUID getId() {
         return id;
@@ -114,20 +117,44 @@ public class ParticipationDTO implements Serializable {
         this.needArrangment = needArrangment;
     }
 
-    public Boolean getBillingClosed() {
-        return isBillingClosed;
-    }
-
-    public void setBillingClosed(Boolean billingClosed) {
-        isBillingClosed = billingClosed;
-    }
-
     public Status getStatus() {
         return status;
     }
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getOffer() {
+        return offer;
+    }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
+    public String getAdditionnalInformation() {
+        return additionnalInformation;
+    }
+
+    public void setAdditionnalInformation(String additionnalInformation) {
+        this.additionnalInformation = additionnalInformation;
+    }
+
+    public Boolean getGuestOfHonor() {
+        return guestOfHonor;
+    }
+
+    public void setGuestOfHonor(Boolean guestOfHonor) {
+        this.guestOfHonor = guestOfHonor;
+    }
+
+    public Boolean getCrushOfHeart() {
+        return crushOfHeart;
+    }
+
+    public void setCrushOfHeart(Boolean crushOfHeart) {
+        this.crushOfHeart = crushOfHeart;
     }
 
     public String getExtraInformation() {
@@ -146,11 +173,11 @@ public class ParticipationDTO implements Serializable {
         this.exhibitor = exhibitor;
     }
 
-    public Salon getSalon() {
+    public SalonLightDTO getSalon() {
         return salon;
     }
 
-    public void setSalon(Salon salon) {
+    public void setSalon(SalonLightDTO salon) {
         this.salon = salon;
     }
 }

@@ -5,7 +5,7 @@ import { combineLatest } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { StandService } from '../service/stand.service';
 import { IStand } from '../stand.model';
@@ -13,17 +13,25 @@ import { StandFormGroup, StandFormService } from './stand-form.service';
 import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 import { IParticipation } from '../../participation/participation.model';
 import { ParticipationService } from '../../participation/service/participation.service';
-import { IDimensionStand } from '../../dimension-stand/dimension-stand.model';
+import { IDimensionStand, sortDimensionStand } from '../../dimension-stand/dimension-stand.model';
 import { DimensionStandService } from '../../dimension-stand/service/dimension-stand.service';
 import { Status } from '../../enumerations/status.model';
 import { ErrorModel } from '../../../shared/field-error/error.model';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
+import { Category } from '../../enumerations/category.model';
+import { getExhibitorName, getFormattedExhibitorName } from '../../exhibitor/exhibitor.model';
 
 @Component({
   standalone: true,
   selector: 'jhi-stand-update',
   templateUrl: './stand-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, FormatMediumDatePipe, FieldErrorComponent],
+  imports: [
+    SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FormatMediumDatePipe,
+    FieldErrorComponent,
+  ],
 })
 export class StandUpdateComponent implements OnInit {
   protected standService = inject(StandService);
@@ -35,11 +43,12 @@ export class StandUpdateComponent implements OnInit {
   isSaving = false;
   stand: IStand | null = null;
   statusValues = Object.keys(Status);
+  categoryValues = Object.keys(Category);
   readonlyForm = false;
   params: any;
   participationsOptions: IParticipation[] = [];
   dimensionsOptions: IDimensionStand[] = [];
-  editForm: StandFormGroup = this.standFormService.createStandFormGroup({ id: null });
+  editForm: FormGroup<StandFormGroup> = this.standFormService.createStandFormGroup({ id: null });
 
   compareParticipation = (o1: IParticipation | null, o2: IParticipation | null): boolean =>
     this.participationService.compareParticipation(o1, o2);
@@ -48,23 +57,25 @@ export class StandUpdateComponent implements OnInit {
     this.dimensionStandService.compareDimensionStand(o1, o2);
 
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
-      this.stand = data['stand'];
-      this.readonlyForm = data['readonly'];
-      this.params = params;
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
+      ([params, data]) => {
+        this.stand = data['stand'];
+        this.readonlyForm = data['readonly'];
+        this.params = params;
 
-      this.loadRelationshipsOptions();
+        this.loadRelationshipsOptions();
 
-      if (this.stand) {
-        this.editForm = this.standFormService.createStandFormGroup(this.stand);
+        if (this.stand) {
+          this.editForm = this.standFormService.createStandFormGroup(this.stand);
 
-        if (this.readonlyForm) {
-          this.readOnlyBack();
-        } else {
-          this.writeBack();
+          if (this.readonlyForm) {
+            this.readOnlyBack();
+          } else {
+            this.writeBack();
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   readOnlyBack(): void {
@@ -110,23 +121,38 @@ export class StandUpdateComponent implements OnInit {
           if (this.params.get('idParticipation')) {
             this.editForm
               .get('participation')
-              ?.setValue(participations.find(participation => participation.id === this.params.get('idParticipation')));
+              ?.setValue(
+                participations.find(
+                  (participation) => participation.id === this.params.get('idParticipation'),
+                ),
+              );
           }
 
-          return this.participationService.addParticipationsOptionsIfMissing<IParticipation>(participations, this.stand?.participation);
+          return this.participationService.addParticipationsOptionsIfMissing<IParticipation>(
+            participations,
+            this.stand?.participation,
+          );
         }),
       )
-      .subscribe((participations: IParticipation[]) => (this.participationsOptions = participations));
+      .subscribe(
+        (participations: IParticipation[]) => (this.participationsOptions = participations),
+      );
 
     this.dimensionStandService
       .query()
       .pipe(map((res: HttpResponse<IDimensionStand[]>) => res.body ?? []))
       .pipe(
         map((dimensionStands: IDimensionStand[]) =>
-          this.dimensionStandService.addDimensionsOptionsIfMissing<IDimensionStand>(dimensionStands, this.stand?.dimension),
+          this.dimensionStandService.addDimensionsOptionsIfMissing<IDimensionStand>(
+            dimensionStands,
+            this.stand?.dimension,
+          ),
         ),
       )
-      .subscribe((dimensionStands: IDimensionStand[]) => (this.dimensionsOptions = dimensionStands));
+      .subscribe(
+        (dimensionStands: IDimensionStand[]) =>
+          (this.dimensionsOptions = sortDimensionStand(dimensionStands)),
+      );
   }
 
   get getDescription(): FormControl {
@@ -153,5 +179,11 @@ export class StandUpdateComponent implements OnInit {
     return this.editForm.get('nbChair') as FormControl;
   }
 
+  get getPosition(): FormControl {
+    return this.editForm.get('position') as FormControl;
+  }
+
   protected readonly ErrorModel = ErrorModel;
+  protected readonly getExhibitorName = getExhibitorName;
+  protected readonly getFormattedExhibitorName = getFormattedExhibitorName;
 }

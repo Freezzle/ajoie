@@ -15,8 +15,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -28,33 +31,27 @@ public class InvoicingPlan implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @Column(name = "generation_date")
-    private Instant generationDate = Instant.now();
+    @Column(name = "generation_date") private Instant generationDate = Instant.now();
 
-    @Column(name = "billing_number", nullable = false)
-    private String billingNumber;
+    @Column(name = "issued_date") private Instant issuedDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "state")
-    private State state = State.CURRENT;
+    @Column(name = "expiration_date") private Instant expirationDate;
+
+    @Column(name = "billing_number", nullable = false) private String billingNumber;
+
+    @Enumerated(EnumType.STRING) @Column(name = "state") private State state = State.DRAFT;
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
-    @OrderBy("position ASC")
-    private Set<Invoice> invoices = new HashSet<>();
+    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id") @OrderBy("position ASC") private Set<Invoice>
+            invoices = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
-    @OrderBy("billingDate ASC")
+    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id") @OrderBy("billingDate ASC")
     private Set<Payment> payments = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER) @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
     private Participation participation;
 
     public UUID getId() {
@@ -145,6 +142,22 @@ public class InvoicingPlan implements Serializable {
         return this;
     }
 
+    public Instant getIssuedDate() {
+        return issuedDate;
+    }
+
+    public void setIssuedDate(Instant issuedDate) {
+        this.issuedDate = issuedDate;
+    }
+
+    public Instant getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Instant expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
     public State getState() {
         return state;
     }
@@ -162,7 +175,22 @@ public class InvoicingPlan implements Serializable {
     }
 
     public Double getTotal() {
-        return getInvoicesTotal() + getPaymentsTotal();
+        return getInvoicesTotal() - getPaymentsTotal();
+    }
+
+    public static Instant calculateExpirationDate(InvoicingPlan invoicingPlan) {
+        if (invoicingPlan.getParticipation().getNeedArrangment()) {
+            return invoicingPlan.getParticipation().getSalon().getEndingDate();
+        }
+
+        LocalDateTime fixedExpirationDate = LocalDateTime.of(2025, 4, 30, 0, 0, 0);
+        LocalDateTime deadline = fixedExpirationDate.minusDays(30); // 31.03.2025
+
+        if (!LocalDateTime.now().isAfter(deadline)) {
+            return fixedExpirationDate.toInstant(ZoneOffset.UTC);
+        } else {
+            return LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC);
+        }
     }
 
     @Override
@@ -184,18 +212,7 @@ public class InvoicingPlan implements Serializable {
 
     @Override
     public String toString() {
-        return (
-            "InvoicingPlan{" +
-            "id=" +
-            id +
-            ", generationDate=" +
-            generationDate +
-            ", billingNumber='" +
-            billingNumber +
-            '\'' +
-            ", state=" +
-            state +
-            '}'
-        );
+        return ("InvoicingPlan{" + "id=" + id + ", generationDate=" + generationDate + ", billingNumber='" +
+                billingNumber + '\'' + ", state=" + state + '}');
     }
 }

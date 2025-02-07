@@ -23,12 +23,14 @@ export type ConferenceFilterFormGroup = {
 export class ConferenceFormService {
   createFilterFormGroup(): FormGroup<ConferenceFilterFormGroup> {
     return new FormGroup<ConferenceFilterFormGroup>({
-      fullName: new FormControl(null),
-      status: new FormControl('IN_VERIFICATION'),
+      fullName: new FormControl(),
+      status: new FormControl(),
     });
   }
 
-  createConferenceFormGroup(conference: IConference | NewConference): FormGroup<ConferenceFormGroup> {
+  createConferenceFormGroup(
+    conference: IConference | NewConference,
+  ): FormGroup<ConferenceFormGroup> {
     const conferenceRawValue = {
       ...this.getFormDefaults(),
       ...conference,
@@ -36,7 +38,10 @@ export class ConferenceFormService {
     return new FormGroup<ConferenceFormGroup>({
       id: new FormControl(conferenceRawValue.id),
       title: new FormControl(conferenceRawValue.title, [Validators.required]),
-      description: new FormControl(conferenceRawValue.description, [Validators.required, Validators.maxLength(500)]),
+      description: new FormControl(conferenceRawValue.description, [
+        Validators.required,
+        Validators.maxLength(500),
+      ]),
       status: new FormControl(conferenceRawValue.status, Validators.required),
       extraInformation: new FormControl(conferenceRawValue.extraInformation),
       participation: new FormControl(conferenceRawValue.participation, Validators.required),

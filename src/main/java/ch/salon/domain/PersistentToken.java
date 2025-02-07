@@ -8,6 +8,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -20,27 +21,17 @@ public class PersistentToken implements Serializable {
 
     private static final int MAX_USER_AGENT_LEN = 255;
 
-    @Id
-    private String series;
+    @Id private String series;
 
-    @JsonIgnore
-    @NotNull
-    @Column(name = "token_value", nullable = false)
-    private String tokenValue;
+    @JsonIgnore @NotNull @Column(name = "token_value", nullable = false) private String tokenValue;
 
-    @Column(name = "token_date")
-    private LocalDate tokenDate;
+    @Column(name = "token_date") private LocalDate tokenDate;
 
-    @Size(min = 0, max = 39)
-    @Column(name = "ip_address", length = 39)
-    private String ipAddress;
+    @Size(min = 0, max = 39) @Column(name = "ip_address", length = 39) private String ipAddress;
 
-    @Column(name = "user_agent")
-    private String userAgent;
+    @Column(name = "user_agent") private String userAgent;
 
-    @JsonIgnore
-    @ManyToOne
-    private User user;
+    @JsonIgnore @ManyToOne private User user;
 
     public String getSeries() {
         return series;
@@ -112,23 +103,8 @@ public class PersistentToken implements Serializable {
 
     @Override
     public String toString() {
-        return (
-            "PersistentToken{" +
-            "series='" +
-            series +
-            '\'' +
-            ", tokenValue='" +
-            tokenValue +
-            '\'' +
-            ", tokenDate=" +
-            tokenDate +
-            ", ipAddress='" +
-            ipAddress +
-            '\'' +
-            ", userAgent='" +
-            userAgent +
-            '\'' +
-            "}"
-        );
+        return ("PersistentToken{" + "series='" + series + '\'' + ", tokenValue='" + tokenValue + '\'' +
+                ", tokenDate=" + tokenDate + ", ipAddress='" + ipAddress + '\'' + ", userAgent='" + userAgent + '\'' +
+                "}");
     }
 }

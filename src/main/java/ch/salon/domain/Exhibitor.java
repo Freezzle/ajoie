@@ -6,7 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.UUID;
 
 @Entity
@@ -16,33 +18,23 @@ public class Exhibitor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @NotNull
-    @Column(name = "full_name", nullable = false)
-    private String fullName;
+    @NotNull @Column(name = "language", nullable = false) private String language = Locale.FRENCH.getLanguage();
 
-    @Column(name = "therapist_name", nullable = false)
-    private String therapistName;
+    @NotNull @Column(name = "full_name", nullable = false) private String fullName;
 
-    @NotNull
-    @Column(name = "email", nullable = false)
-    private String email;
+    @Column(name = "therapist_name", nullable = false) private String therapistName;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    @NotNull @Column(name = "email", nullable = false) private String email;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "phone_number") private String phoneNumber;
 
-    @Column(name = "npa_localite")
-    private String npaLocalite;
+    @Column(name = "address") private String address;
 
-    @Column(name = "extra_information")
-    private String extraInformation;
+    @Column(name = "npa_localite") private String npaLocalite;
+
+    @Column(name = "extra_information") private String extraInformation;
 
     public UUID getId() {
         return this.id;
@@ -89,6 +81,14 @@ public class Exhibitor implements Serializable {
     public Exhibitor email(String email) {
         this.setEmail(email);
         return this;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(@NotNull String language) {
+        this.language = language;
     }
 
     public String getPhoneNumber() {
@@ -162,32 +162,8 @@ public class Exhibitor implements Serializable {
 
     @Override
     public String toString() {
-        return (
-            "Exhibitor{" +
-            "id=" +
-            id +
-            ", fullName='" +
-            fullName +
-            '\'' +
-            ", therapistName='" +
-            therapistName +
-            '\'' +
-            ", email='" +
-            email +
-            '\'' +
-            ", phoneNumber='" +
-            phoneNumber +
-            '\'' +
-            ", address='" +
-            address +
-            '\'' +
-            ", npaLocalite='" +
-            npaLocalite +
-            '\'' +
-            ", extraInformation='" +
-            extraInformation +
-            '\'' +
-            '}'
-        );
+        return ("Exhibitor{" + "id=" + id + ", fullName='" + fullName + '\'' + ", therapistName='" + therapistName +
+                '\'' + ", email='" + email + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address +
+                '\'' + ", npaLocalite='" + npaLocalite + '\'' + ", extraInformation='" + extraInformation + '\'' + '}');
     }
 }

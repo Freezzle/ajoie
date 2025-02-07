@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { combineLatest, filter, switchMap, tap } from 'rxjs';
+import { combineLatest, filter, Observable, of, switchMap, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
@@ -8,7 +8,7 @@ import { SortByDirective, SortDirective } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
-import { IParticipation } from '../participation.model';
+import { IInfoInvoice, IParticipation } from '../participation.model';
 import { ParticipationService } from '../service/participation.service';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
@@ -19,6 +19,7 @@ import { Status } from '../../enumerations/status.model';
 import { ParticipationFilterFormGroup, ParticipationFormService } from '../update/participation-form.service';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { finalize } from 'rxjs/operators';
+import { containExhibitorName, getExhibitorName } from '../../exhibitor/exhibitor.model';
 
 @Component({
   standalone: true,
@@ -47,30 +48,39 @@ export class ParticipationComponent implements OnInit {
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
 
-  participations?: IParticipation[];
+  participations: IParticipation[] = [];
   isLoading = false;
   statusValues = Object.keys(Status);
   params: any;
-  filters: FormGroup<ParticipationFilterFormGroup> = this.participationFormService.createFilterFormGroup();
+  filters: FormGroup<ParticipationFilterFormGroup> =
+    this.participationFormService.createFilterFormGroup();
+  private infoInvoices: { [key: string]: Observable<IInfoInvoice> } = {};
 
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
-      this.params = params;
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
+      ([params, data]) => {
+        this.params = params;
 
-      if (!this.participations || this.participations.length === 0) {
-        this.actionFilter();
-      }
-    });
+        if (!this.participations || this.participations.length === 0) {
+          this.actionFilter();
+        }
+      },
+    );
   }
 
   delete(participation: IParticipation): void {
-    const modalRef = this.modalService.open(DeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    const modalRef = this.modalService.open(DeleteDialogComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
     modalRef.componentInstance.translateKey = 'participation.delete.question';
-    modalRef.componentInstance.translateValues = { fullName: participation.exhibitor?.fullName };
+    modalRef.componentInstance.translateValues = {
+      fullName: getExhibitorName(participation.exhibitor),
+    };
 
     modalRef.closed
       .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
+        filter((reason) => reason === ITEM_DELETED_EVENT),
         switchMap(() => this.participationService.delete(participation.id)),
         tap(() => this.actionFilter()), // Recharge les données
       )
@@ -87,21 +97,42 @@ export class ParticipationComponent implements OnInit {
     this.participationService
       .query(this.params.get('idSalon'))
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(result => {
+      .subscribe((result) => {
         this.participations = result.body ?? [];
+
+        this.loadInfoInvoice();
 
         const fullNameFilter = this.filters.get('fullName')?.value;
         if (fullNameFilter && fullNameFilter.length > 0) {
-          this.participations = this.participations?.filter(participation =>
-            participation.exhibitor?.fullName?.toLocaleLowerCase().includes(fullNameFilter.toLocaleLowerCase()),
+          this.participations = this.participations?.filter((participation) =>
+            containExhibitorName(participation.exhibitor, fullNameFilter),
           );
         }
 
         const statusFilter = this.filters.get('status')?.value;
         if (statusFilter && statusFilter.length > 0) {
-          this.participations = this.participations?.filter(participation => participation.status?.includes(statusFilter));
+          this.participations = this.participations?.filter((participation) =>
+            participation.status?.includes(statusFilter),
+          );
         }
       });
+  }
+
+  loadInfoInvoice(): void {
+    this.participations?.forEach((participation) => {
+      this.participationService
+        .getInfoInvoice(participation.id)
+        .pipe(
+          tap((infoInvoice) => {
+            this.infoInvoices[participation.id] = of(infoInvoice);
+          }),
+        )
+        .subscribe();
+    });
+  }
+
+  getInfoInvoice(idParticipation: string): Observable<IInfoInvoice> {
+    return this.infoInvoices[idParticipation] ? this.infoInvoices[idParticipation] : of();
   }
 
   refresh(): void {

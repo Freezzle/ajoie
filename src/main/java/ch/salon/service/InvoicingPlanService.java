@@ -1,7 +1,5 @@
 package ch.salon.service;
 
-import static ch.salon.domain.enumeration.Type.*;
-
 import ch.salon.domain.Conference;
 import ch.salon.domain.Invoice;
 import ch.salon.domain.InvoicingPlan;
@@ -13,6 +11,7 @@ import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
+import ch.salon.domain.enumeration.Status;
 import ch.salon.domain.enumeration.Type;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.InvoiceRepository;
@@ -21,6 +20,7 @@ import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.PaymentRepository;
 import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
+import ch.salon.service.document.InvoiceDocumentCreator;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.PaymentDTO;
@@ -30,6 +30,11 @@ import ch.salon.service.mapper.InvoiceMapper;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.service.mapper.PaymentMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.MessageSource;
+import org.springframework.core.io.InputStreamSource;
+import org.springframework.stereotype.Service;
+
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -39,9 +44,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Service;
+
+import static ch.salon.domain.enumeration.Type.CONFERENCE;
+import static ch.salon.domain.enumeration.Type.MEAL1;
+import static ch.salon.domain.enumeration.Type.MEAL2;
+import static ch.salon.domain.enumeration.Type.MEAL3;
+import static ch.salon.domain.enumeration.Type.SHARED;
+import static ch.salon.domain.enumeration.Type.STAND;
 
 @Service
 public class InvoicingPlanService {
@@ -61,21 +70,16 @@ public class InvoicingPlanService {
 
     private final MessageSource messageSource;
     private final InvoiceEmailCreator invoiceEmailCreator;
+    private final InvoiceDocumentCreator invoiceDocumentCreator;
     private final InvoiceReceiptEmailCreator invoiceReceiptEmailCreator;
 
-    public InvoicingPlanService(
-        SalonRepository salonRepository,
-        ParticipationRepository participationRepository,
-        InvoicingPlanRepository invoicingPlanRepository,
-        StandRepository standRepository,
-        ConferenceRepository conferenceRepository,
-        MessageSource messageSource,
-        EventLogService eventLogService,
-        PaymentRepository paymentRepository,
-        InvoiceRepository invoiceRepository,
-        InvoiceEmailCreator invoiceEmailCreator,
-        InvoiceReceiptEmailCreator invoiceReceiptEmailCreator
-    ) {
+    public InvoicingPlanService(SalonRepository salonRepository, ParticipationRepository participationRepository,
+                                InvoicingPlanRepository invoicingPlanRepository, StandRepository standRepository,
+                                ConferenceRepository conferenceRepository, MessageSource messageSource,
+                                EventLogService eventLogService, PaymentRepository paymentRepository,
+                                InvoiceRepository invoiceRepository, InvoiceEmailCreator invoiceEmailCreator,
+                                InvoiceReceiptEmailCreator invoiceReceiptEmailCreator,
+                                InvoiceDocumentCreator invoiceDocumentCreator) {
         this.participationRepository = participationRepository;
         this.salonRepository = salonRepository;
         this.invoicingPlanRepository = invoicingPlanRepository;
@@ -87,6 +91,7 @@ public class InvoicingPlanService {
         this.invoiceRepository = invoiceRepository;
         this.invoiceEmailCreator = invoiceEmailCreator;
         this.invoiceReceiptEmailCreator = invoiceReceiptEmailCreator;
+        this.invoiceDocumentCreator = invoiceDocumentCreator;
     }
 
     public void sendInvoiceReceipt(UUID idInvoicingPlan) throws Exception {
@@ -94,19 +99,50 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
 
         invoiceReceiptEmailCreator.fillInvoicingPlan(invoicingPlan);
         invoiceReceiptEmailCreator.sendEmailSync();
 
-        eventLogService.eventFromSystem(
-            "La quittance #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
-            EventType.EMAIL,
-            EntityType.PARTICIPATION,
-            invoicingPlan.getParticipation().getId()
-        );
+        eventLogService.eventFromSystem("La quittance #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
+                                        EventType.EMAIL, EntityType.PARTICIPATION,
+                                        invoicingPlan.getParticipation().getId());
+    }
+
+    public void payInvoice(UUID idInvoicingPlan) {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
+
+        invoicingPlan.setState(State.PAID);
+        eventLogService.eventFromSystem("La facture #" + invoicingPlan.getBillingNumber() + " a été payé.",
+                                        EventType.EMAIL, EntityType.PARTICIPATION,
+                                        invoicingPlan.getParticipation().getId());
+
+        invoicingPlanRepository.save(invoicingPlan);
+    }
+
+    public void cancelInvoice(UUID idInvoicingPlan) {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
+
+        invoicingPlan.setState(State.CANCELLED);
+        eventLogService.eventFromSystem("La facture #" + invoicingPlan.getBillingNumber() + " a été annulé.",
+                                        EventType.EMAIL, EntityType.PARTICIPATION,
+                                        invoicingPlan.getParticipation().getId());
+
+        invoicingPlanRepository.save(invoicingPlan);
     }
 
     public void sendInvoice(UUID idInvoicingPlan) throws Exception {
@@ -114,22 +150,39 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
+
+        invoicingPlan.setIssuedDate(Instant.now());
+        invoicingPlan.setExpirationDate(InvoicingPlan.calculateExpirationDate(invoicingPlan));
+        invoicingPlan.setState(State.ISSUED);
 
         invoiceEmailCreator.fillInvoicingPlan(invoicingPlan);
         invoiceEmailCreator.sendEmailSync();
 
-        eventLogService.eventFromSystem(
-            "La facture #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
-            EventType.EMAIL,
-            EntityType.PARTICIPATION,
-            invoicingPlan.getParticipation().getId()
-        );
+        eventLogService.eventFromSystem("La facture #" + invoicingPlan.getBillingNumber() + " a été envoyée.",
+                                        EventType.EMAIL, EntityType.PARTICIPATION,
+                                        invoicingPlan.getParticipation().getId());
 
-        invoicingPlan.setState(State.CLOSED);
         invoicingPlanRepository.save(invoicingPlan);
+    }
+
+    public InputStreamSource downloadInvoice(UUID idInvoicingPlan) throws Exception {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
+
+        invoicingPlan.setIssuedDate(Instant.now());
+        invoicingPlan.setExpirationDate(InvoicingPlan.calculateExpirationDate(invoicingPlan));
+        invoiceDocumentCreator.fillInvoicingPlan(invoicingPlan);
+        // Don't update the incoing plan, it's just to adapt data for preview
+
+        return invoiceDocumentCreator.generate();
     }
 
     public Optional<InvoiceDTO> createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {
@@ -137,9 +190,9 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
 
         Invoice invoiceToCreate = InvoiceMapper.INSTANCE.toEntity(invoiceDTO);
         invoiceToCreate.setDefaultAmount(invoiceDTO.getCustomAmount());
@@ -150,10 +203,7 @@ public class InvoicingPlanService {
 
         this.eventLogService.eventFromSystem(
                 "Une ligne de facture a été ajoutée dans la facture #" + invoicingPlan.getBillingNumber(),
-                EventType.EVENT,
-                EntityType.PARTICIPATION,
-                invoicingPlan.getParticipation().getId()
-            );
+                EventType.EVENT, EntityType.PARTICIPATION, invoicingPlan.getParticipation().getId());
 
         return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceToCreate));
     }
@@ -163,24 +213,20 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Invoice invoiceFound = invoicingPlan
-            .getInvoices()
-            .stream()
-            .filter(invoice -> invoice.getId().equals(idInvoice))
-            .findFirst()
-            .orElseThrow();
+        Invoice invoiceFound = invoicingPlan.getInvoices()
+                                            .stream()
+                                            .filter(invoice -> invoice.getId().equals(idInvoice))
+                                            .findFirst()
+                                            .orElseThrow();
 
         if (!Objects.equals(invoiceFound.getCustomAmount(), invoiceDTO.getCustomAmount())) {
             this.eventLogService.eventFromSystem(
                     "Une ligne de facture a été changée dans la facture #" + invoicingPlan.getBillingNumber(),
-                    EventType.EVENT,
-                    EntityType.PARTICIPATION,
-                    invoicingPlan.getParticipation().getId()
-                );
+                    EventType.EVENT, EntityType.PARTICIPATION, invoicingPlan.getParticipation().getId());
         }
 
         invoiceFound.setLabel(invoiceDTO.getLabel());
@@ -195,12 +241,13 @@ public class InvoicingPlanService {
         return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceFound));
     }
 
+    public void deleteInvoicingPlan(UUID idInvoicingPlan) {
+        this.invoicingPlanRepository.deleteById(idInvoicingPlan);
+    }
+
     public Optional<PaymentDTO> createPayment(UUID idInvoicingPlan, PaymentDTO paymentDTO) {
         if (paymentDTO.getId() != null) {
             throw new BadRequestAlertException("A new payment cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        if (paymentDTO.getAmount() >= 0.00) {
-            paymentDTO.setAmount(paymentDTO.getAmount() * -1);
         }
 
         InvoicingPlan invoicingPlan = invoicingPlanRepository.getReferenceById(idInvoicingPlan);
@@ -211,11 +258,8 @@ public class InvoicingPlanService {
         invoicingPlan = this.invoicingPlanRepository.save(invoicingPlan);
 
         this.eventLogService.eventFromSystem(
-                "Un paiement a été ajouté dans la facture #" + invoicingPlan.getBillingNumber(),
-                EventType.PAYMENT,
-                EntityType.PARTICIPATION,
-                invoicingPlan.getParticipation().getId()
-            );
+                "Un paiement a été ajouté dans la facture #" + invoicingPlan.getBillingNumber(), EventType.PAYMENT,
+                EntityType.PARTICIPATION, invoicingPlan.getParticipation().getId());
 
         return Optional.of(PaymentMapper.INSTANCE.toDto(payment));
     }
@@ -225,37 +269,28 @@ public class InvoicingPlanService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        InvoicingPlan invoicingPlan = invoicingPlanRepository
-            .findById(idInvoicingPlan)
-            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        InvoicingPlan invoicingPlan = invoicingPlanRepository.findById(idInvoicingPlan)
+                                                             .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Payment paymentFound = invoicingPlan
-            .getPayments()
-            .stream()
-            .filter(payment -> payment.getId().equals(idPayment))
-            .findFirst()
-            .orElseThrow();
+        Payment paymentFound = invoicingPlan.getPayments()
+                                            .stream()
+                                            .filter(payment -> payment.getId().equals(idPayment))
+                                            .findFirst()
+                                            .orElseThrow();
 
         if (!Objects.equals(paymentDTO.getAmount(), paymentFound.getAmount())) {
             this.eventLogService.eventFromSystem(
-                    "Un paiement a été changée dans la facture #" + invoicingPlan.getBillingNumber(),
-                    EventType.EVENT,
-                    EntityType.PARTICIPATION,
-                    invoicingPlan.getParticipation().getId()
-                );
+                    "Un paiement a été changée dans la facture #" + invoicingPlan.getBillingNumber(), EventType.EVENT,
+                    EntityType.PARTICIPATION, invoicingPlan.getParticipation().getId());
         }
 
         paymentFound.setPaymentMode(paymentDTO.getPaymentMode());
         paymentFound.setBillingDate(paymentDTO.getBillingDate());
         paymentFound.setExtraInformation(paymentDTO.getExtraInformation());
+        paymentFound.setAmount(paymentDTO.getAmount());
 
-        if (paymentDTO.getAmount() >= 0.00) {
-            paymentFound.setAmount(paymentDTO.getAmount() * -1);
-        } else {
-            paymentFound.setAmount(paymentDTO.getAmount());
-        }
-
-        invoicingPlan = invoicingPlanRepository.save(invoicingPlan);
+        invoicingPlanRepository.save(invoicingPlan);
 
         return Optional.of(PaymentMapper.INSTANCE.toDto(paymentFound));
     }
@@ -263,29 +298,24 @@ public class InvoicingPlanService {
     public void deletePayment(UUID idInvoicingPlan, UUID idPayment) {
         InvoicingPlan invoicingPlan = invoicingPlanRepository.getReferenceById(idInvoicingPlan);
 
-        Payment paymentFound = invoicingPlan
-            .getPayments()
-            .stream()
-            .filter(payment -> payment.getId().equals(idPayment))
-            .findFirst()
-            .orElseThrow();
+        Payment paymentFound = invoicingPlan.getPayments()
+                                            .stream()
+                                            .filter(payment -> payment.getId().equals(idPayment))
+                                            .findFirst()
+                                            .orElseThrow();
 
         invoicingPlan.removePayment(paymentFound);
 
         this.invoicingPlanRepository.save(invoicingPlan);
         this.eventLogService.eventFromSystem(
-                "Un paiement a été supprimé dans la facture #" + invoicingPlan.getBillingNumber(),
-                EventType.PAYMENT,
-                EntityType.PARTICIPATION,
-                invoicingPlan.getParticipation().getId()
-            );
+                "Un paiement a été supprimé dans la facture #" + invoicingPlan.getBillingNumber(), EventType.PAYMENT,
+                EntityType.PARTICIPATION, invoicingPlan.getParticipation().getId());
     }
 
     public List<InvoicingPlanDTO> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
             List<InvoicingPlan> invoicingPlans = invoicingPlanRepository.findByParticipationIdOrderByBillingNumberDesc(
-                UUID.fromString(idParticipation)
-            );
+                    UUID.fromString(idParticipation));
             return invoicingPlans.stream().map(InvoicingPlanMapper.INSTANCE::toDto).toList();
         }
 
@@ -298,15 +328,15 @@ public class InvoicingPlanService {
         }
 
         Participation participation = participationRepository.findById(UUID.fromString(idParticipation)).orElseThrow();
-        if (participation.getIsBillingClosed()) {
+        if (participation.getStatus() == Status.PAID) {
             return;
         }
 
-        final InvoicingPlan lastPlan = invoicingPlanRepository
-            .findByParticipationIdOrderByBillingNumberDesc(participation.getId())
-            .stream()
-            .max(Comparator.comparing(InvoicingPlan::getBillingNumber))
-            .orElse(null);
+        final InvoicingPlan lastPlan =
+                invoicingPlanRepository.findByParticipationIdOrderByBillingNumberDesc(participation.getId())
+                                       .stream()
+                                       .max(Comparator.comparing(InvoicingPlan::getBillingNumber))
+                                       .orElse(null);
 
         InvoicingPlan currentInvoicingPlan;
         Set<Invoice> lockedInvoices = new HashSet<>();
@@ -316,7 +346,7 @@ public class InvoicingPlanService {
             currentInvoicingPlan = new InvoicingPlan();
             currentInvoicingPlan.setParticipation(participation);
             currentInvoicingPlan.setBillingNumber(participation.getClientNumber() + "-" + "001");
-        } else if (lastPlan.getState() == State.CLOSED) {
+        } else if (lastPlan.getState() != State.DRAFT) {
             currentInvoicingPlan = new InvoicingPlan();
             currentInvoicingPlan.setParticipation(participation);
             currentInvoicingPlan.setBillingNumber(incrementBillingNumber(lastPlan.getBillingNumber()));
@@ -342,34 +372,21 @@ public class InvoicingPlanService {
             position = processStand(stand, salon, lockedInvoices, position);
         }
 
-        for (Conference conference : conferences.stream().filter(conference -> !conference.getStatus().isInvalidStatus()).toList()) {
+        for (Conference conference : conferences.stream()
+                                                .filter(conference -> !conference.getStatus().isInvalidStatus())
+                                                .toList()) {
             position = processConference(conference, salon, lockedInvoices, position);
         }
 
-        position = processMeal(
-            MEAL1,
-            participation.getNbMeal1(),
-            messageSource.getMessage("invoice.saturday-midday.label", null, Locale.FRENCH),
-            salon.getPriceMeal1(),
-            lockedInvoices,
-            position
-        );
-        position = processMeal(
-            MEAL2,
-            participation.getNbMeal2(),
-            messageSource.getMessage("invoice.saturday-evening.label", null, Locale.FRENCH),
-            salon.getPriceMeal2(),
-            lockedInvoices,
-            position
-        );
-        processMeal(
-            MEAL3,
-            participation.getNbMeal3(),
-            messageSource.getMessage("invoice.sunday-midday.label", null, Locale.FRENCH),
-            salon.getPriceMeal3(),
-            lockedInvoices,
-            position
-        );
+        position = processMeal(MEAL1, participation.getNbMeal1(),
+                               messageSource.getMessage("invoice.saturday-midday.label", null, Locale.FRENCH),
+                               salon.getPriceMeal1(), lockedInvoices, position);
+        position = processMeal(MEAL2, participation.getNbMeal2(),
+                               messageSource.getMessage("invoice.saturday-evening.label", null, Locale.FRENCH),
+                               salon.getPriceMeal2(), lockedInvoices, position);
+        processMeal(MEAL3, participation.getNbMeal3(),
+                    messageSource.getMessage("invoice.sunday-midday.label", null, Locale.FRENCH), salon.getPriceMeal3(),
+                    lockedInvoices, position);
 
         currentInvoicingPlan.getInvoices().clear();
         lockedInvoices.forEach(currentInvoicingPlan::addInvoice);
@@ -378,73 +395,57 @@ public class InvoicingPlanService {
     }
 
     private void copyLockedInvoices(InvoicingPlan plan, Set<Invoice> lockedInvoices) {
-        plan
-            .getInvoices()
-            .forEach(invoice -> {
-                if (invoice.getLock()) {
-                    lockedInvoices.add(new Invoice(invoice));
-                }
-            });
+        plan.getInvoices().forEach(invoice -> {
+            if (invoice.getLock()) {
+                lockedInvoices.add(new Invoice(invoice));
+            }
+        });
     }
 
     private void copyPayments(InvoicingPlan plan, Set<Payment> payments) {
-        plan
-            .getPayments()
-            .forEach(payment -> {
-                payments.add(new Payment(payment));
-            });
+        plan.getPayments().forEach(payment -> {
+            payments.add(new Payment(payment));
+        });
     }
 
     private void removeObsoleteStandInvoices(Set<Invoice> lockedInvoices, List<Stand> stands) {
         stands.forEach(stand -> {
             if (stand.getStatus().isInvalidStatus()) {
-                lockedInvoices.removeIf(invoice -> (invoice.getType().isFromStand()) && stand.getId().equals(invoice.getReferenceId()));
+                lockedInvoices.removeIf(
+                        invoice -> (invoice.getType().isFromStand()) && stand.getId().equals(invoice.getReferenceId()));
             }
         });
 
-        lockedInvoices.removeIf(
-            invoice ->
-                (invoice.getType().isFromStand()) && stands.stream().map(Stand::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
-        );
+        lockedInvoices.removeIf(invoice -> (invoice.getType().isFromStand()) && stands.stream().map(Stand::getId)
+                                                                                      .noneMatch(id -> id.equals(
+                                                                                              invoice.getReferenceId())));
     }
 
     private Long processStand(Stand stand, Salon salon, Set<Invoice> lockedInvoices, Long position) {
-        Double defaultPrice = stand.getDimension() == null
-            ? 0
-            : salon
-                .getPriceStandSalons()
-                .stream()
-                .filter(priceStand -> priceStand.getDimension().getId().equals(stand.getDimension().getId()))
-                .findFirst()
-                .map(PriceStandSalon::getPrice)
-                .orElse(0.0);
+        Double defaultPrice = stand.getDimension() == null ? 0 : salon.getPriceStandSalons()
+                                                                      .stream()
+                                                                      .filter(priceStand -> priceStand.getDimension()
+                                                                                                      .getId()
+                                                                                                      .equals(stand.getDimension()
+                                                                                                                   .getId()))
+                                                                      .findFirst()
+                                                                      .map(PriceStandSalon::getPrice)
+                                                                      .orElse(0.0);
 
         position += 1;
 
-        Object[] args = { (stand.getDimension() != null ? stand.getDimension().getDimension() : "") };
+        Object[] args = {(stand.getDimension() != null ? stand.getDimension().getDimension() : "")};
 
-        updateOrCreateInvoice(
-            lockedInvoices,
-            stand.getId(),
-            STAND,
-            messageSource.getMessage("invoice.stand.label", args, Locale.FRENCH),
-            1L,
-            defaultPrice,
-            position
-        );
+        updateOrCreateInvoice(lockedInvoices, stand.getId(), STAND,
+                              messageSource.getMessage("invoice.stand.label", args, Locale.FRENCH), 1L, defaultPrice,
+                              position);
 
         if (stand.getShared()) {
             position += 1;
 
-            updateOrCreateInvoice(
-                lockedInvoices,
-                stand.getId(),
-                SHARED,
-                messageSource.getMessage("invoice.shared.label", args, Locale.FRENCH),
-                1L,
-                salon.getPriceSharingStand(),
-                position
-            );
+            updateOrCreateInvoice(lockedInvoices, stand.getId(), SHARED,
+                                  messageSource.getMessage("invoice.shared.label", args, Locale.FRENCH), 1L,
+                                  salon.getPriceSharingStand(), position);
         }
 
         return position;
@@ -453,25 +454,24 @@ public class InvoicingPlanService {
     private void removeObsoleteConferenceInvoices(Set<Invoice> lockedInvoices, List<Conference> conferences) {
         conferences.forEach(conference -> {
             if (conference.getStatus().isInvalidStatus()) {
-                lockedInvoices.removeIf(
-                    invoice -> (invoice.getType().isFromConference()) && conference.getId().equals(invoice.getReferenceId())
-                );
+                lockedInvoices.removeIf(invoice -> (invoice.getType().isFromConference()) &&
+                                                   conference.getId().equals(invoice.getReferenceId()));
             }
         });
 
-        lockedInvoices.removeIf(
-            invoice ->
-                invoice.getType().isFromConference() &&
-                conferences.stream().map(Conference::getId).noneMatch(id -> id.equals(invoice.getReferenceId()))
-        );
+        lockedInvoices.removeIf(invoice -> invoice.getType().isFromConference() && conferences.stream()
+                                                                                              .map(Conference::getId)
+                                                                                              .noneMatch(
+                                                                                                      id -> id.equals(
+                                                                                                              invoice.getReferenceId())));
     }
 
     private Long processConference(Conference conference, Salon salon, Set<Invoice> lockedInvoices, Long position) {
-        Invoice lockedInvoice = lockedInvoices
-            .stream()
-            .filter(invoice -> invoice.getType() == CONFERENCE && invoice.getReferenceId().equals(conference.getId()))
-            .findFirst()
-            .orElse(null);
+        Invoice lockedInvoice = lockedInvoices.stream()
+                                              .filter(invoice -> invoice.getType() == CONFERENCE &&
+                                                                 invoice.getReferenceId().equals(conference.getId()))
+                                              .findFirst()
+                                              .orElse(null);
 
         position += 1;
 
@@ -479,30 +479,23 @@ public class InvoicingPlanService {
             lockedInvoice.setPosition(position);
             lockedInvoice.setDefaultAmount(salon.getPriceConference());
         } else {
-            lockedInvoices.add(
-                createInvoice(
-                    conference.getId(),
-                    CONFERENCE,
-                    messageSource.getMessage("invoice.conference.label", null, Locale.FRENCH),
-                    1L,
-                    salon.getPriceConference(),
-                    position
-                )
-            );
+            lockedInvoices.add(createInvoice(conference.getId(), CONFERENCE,
+                                             messageSource.getMessage("invoice.conference.label", null, Locale.FRENCH),
+                                             1L, salon.getPriceConference(), position));
         }
 
         return position;
     }
 
-    private Long processMeal(Type type, Long mealCount, String description, Double price, Set<Invoice> lockedInvoices, Long position) {
+    private Long processMeal(Type type, Long mealCount, String description, Double price, Set<Invoice> lockedInvoices,
+                             Long position) {
         if (mealCount != null && mealCount > 0) {
             position += 1;
 
-            Invoice invoiceMealLocked = lockedInvoices
-                .stream()
-                .filter(invoice -> invoice.getType() == type && invoice.getLock())
-                .findFirst()
-                .orElse(null);
+            Invoice invoiceMealLocked = lockedInvoices.stream()
+                                                      .filter(invoice -> invoice.getType() == type && invoice.getLock())
+                                                      .findFirst()
+                                                      .orElse(null);
             if (invoiceMealLocked != null) {
                 invoiceMealLocked.setPosition(position);
                 invoiceMealLocked.setDefaultAmount(price);
@@ -517,20 +510,13 @@ public class InvoicingPlanService {
         return position;
     }
 
-    private void updateOrCreateInvoice(
-        Set<Invoice> lockedInvoices,
-        UUID referenceId,
-        Type type,
-        String description,
-        Long quantity,
-        Double defaultAmount,
-        Long position
-    ) {
-        Invoice lockedInvoice = lockedInvoices
-            .stream()
-            .filter(invoice -> invoice.getType() == type && invoice.getReferenceId().equals(referenceId))
-            .findFirst()
-            .orElse(null);
+    private void updateOrCreateInvoice(Set<Invoice> lockedInvoices, UUID referenceId, Type type, String description,
+                                       Long quantity, Double defaultAmount, Long position) {
+        Invoice lockedInvoice = lockedInvoices.stream()
+                                              .filter(invoice -> invoice.getType() == type &&
+                                                                 invoice.getReferenceId().equals(referenceId))
+                                              .findFirst()
+                                              .orElse(null);
 
         if (lockedInvoice != null) {
             lockedInvoice.setPosition(position);
@@ -540,7 +526,8 @@ public class InvoicingPlanService {
         }
     }
 
-    private Invoice createInvoice(UUID referenceId, Type type, String label, Long quantity, Double defaultAmount, Long position) {
+    private Invoice createInvoice(UUID referenceId, Type type, String label, Long quantity, Double defaultAmount,
+                                  Long position) {
         defaultAmount = defaultAmount != null ? defaultAmount : 0;
 
         Invoice invoice = new Invoice();

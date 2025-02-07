@@ -1,5 +1,17 @@
 {
   "stand": {
+    "category": {
+      "label": "Catégorie",
+      "list": {
+        "ARTISANAT": "Artisanat",
+        "ENERGETIC": "Energétique",
+        "MEDIUMNITY": "Médiumnité / Voyance",
+        "MISCELLANEOUS": "Autres",
+        "NONE": "Aucun",
+        "THERAPIST": "Thérapeute",
+        "null": ""
+      }
+    },
     "create": "Création d'un nouveau stand",
     "delete": {
       "question": "Êtes-vous certain de vouloir supprimer le stand \"{{description}}\" ?"
@@ -15,13 +27,15 @@
     "needElectricity": "Avec électricité ?",
     "notFound": "Aucun stand",
     "participation": "Participation",
+    "position": "Position",
     "shared": "Partagé ?",
     "status": {
       "label": "Statut",
       "list": {
         "ACCEPTED": "Accepté",
         "CANCELED": "Annulé",
-        "IN_VERIFICATION": "En cours",
+        "IN_VERIFICATION": "En vérification",
+        "PAID": "Payé",
         "REFUSED": "Refusé",
         "null": " "
       }

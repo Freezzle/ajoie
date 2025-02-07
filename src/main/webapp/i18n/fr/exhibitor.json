@@ -14,6 +14,14 @@
       "therapistName": "Nom de thérapeute"
     },
     "fullName": "Nom complet",
+    "language": {
+      "list": {
+        "de": "Allemand",
+        "en": "Anglais",
+        "fr": "Français",
+        "label": "Langue"
+      }
+    },
     "notFound": "Aucun exposant",
     "npaLocalite": "Npa et localité",
     "phoneNumber": "N° de tél",

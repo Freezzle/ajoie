@@ -8,11 +8,12 @@ import ch.salon.service.dto.ExhibitorDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.ExhibitorMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ExhibitorService {
@@ -23,11 +24,8 @@ public class ExhibitorService {
     private final EventLogRepository eventLogRepository;
     private final EventLogService eventLogService;
 
-    public ExhibitorService(
-        ExhibitorRepository exhibitorRepository,
-        EventLogRepository eventLogRepository,
-        EventLogService eventLogService
-    ) {
+    public ExhibitorService(ExhibitorRepository exhibitorRepository, EventLogRepository eventLogRepository,
+                            EventLogService eventLogService) {
         this.exhibitorRepository = exhibitorRepository;
         this.eventLogRepository = eventLogRepository;
         this.eventLogService = eventLogService;
@@ -68,20 +66,10 @@ public class ExhibitorService {
         exhibitorRepository.deleteById(id);
     }
 
-    public void createEventLog(UUID idExhibitor, EventLogDTO eventLogDTO) {
-        this.eventLogService.eventFromUser(
-                eventLogDTO.getLabel(),
-                eventLogDTO.getType(),
-                EntityType.EXHIBITOR,
-                idExhibitor,
-                eventLogDTO.getReferenceDate()
-            );
-    }
-
     public List<EventLogDTO> findAllEventLogs(UUID idExhibitor) {
         return this.eventLogService.findAllEventLog(EntityType.EXHIBITOR, idExhibitor)
-            .stream()
-            .map(EventLogMapper.INSTANCE::toDto)
-            .toList();
+                                   .stream()
+                                   .map(EventLogMapper.INSTANCE::toDto)
+                                   .toList();
     }
 }

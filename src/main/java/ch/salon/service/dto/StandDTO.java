@@ -1,6 +1,8 @@
 package ch.salon.service.dto;
 
+import ch.salon.domain.enumeration.Category;
 import ch.salon.domain.enumeration.Status;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -26,6 +28,8 @@ public class StandDTO implements Serializable {
 
     private Boolean needElectricity;
 
+    private Category category;
+
     private Status status;
 
     private String extraInformation;
@@ -34,7 +38,10 @@ public class StandDTO implements Serializable {
 
     private DimensionStandLightDTO dimension;
 
-    public StandDTO() {}
+    private Long position;
+
+    public StandDTO() {
+    }
 
     public UUID getId() {
         return id;
@@ -122,6 +129,22 @@ public class StandDTO implements Serializable {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
     }
 
     public String getExtraInformation() {

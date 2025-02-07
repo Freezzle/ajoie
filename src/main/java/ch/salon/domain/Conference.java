@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,28 +24,17 @@ public class Conference implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @NotNull
-    @Column(name = "title", nullable = false)
-    private String title;
+    @NotNull @Column(name = "title", nullable = false) private String title;
 
-    @NotNull
-    @Column(name = "description", nullable = false)
-    private String description;
+    @NotNull @Column(name = "description", nullable = false) private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private Status status;
+    @Enumerated(EnumType.STRING) @Column(name = "status") private Status status;
 
-    @Column(name = "extra_information")
-    private String extraInformation;
+    @Column(name = "extra_information") private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
     private Participation participation;
 
     public UUID getId() {
@@ -121,11 +111,8 @@ public class Conference implements Serializable {
     }
 
     public static boolean hasDifference(Conference conf1, Conference conf2) {
-        return (
-            (conf1 == null && conf2 != null) ||
-            (conf1 != null && conf2 == null) ||
-            (conf1 != null && conf2 != null && (!Objects.equals(conf1.getStatus(), conf2.getStatus())))
-        );
+        return ((conf1 == null && conf2 != null) || (conf1 != null && conf2 == null) ||
+                (conf1 != null && conf2 != null && (!Objects.equals(conf1.getStatus(), conf2.getStatus()))));
     }
 
     @Override
@@ -147,24 +134,8 @@ public class Conference implements Serializable {
 
     @Override
     public String toString() {
-        return (
-            "Conference{" +
-            "id=" +
-            id +
-            ", title='" +
-            title +
-            '\'' +
-            ", description='" +
-            description +
-            '\'' +
-            ", status=" +
-            status +
-            ", extraInformation='" +
-            extraInformation +
-            '\'' +
-            ", participation=" +
-            participation +
-            '}'
-        );
+        return ("Conference{" + "id=" + id + ", title='" + title + '\'' + ", description='" + description + '\'' +
+                ", status=" + status + ", extraInformation='" + extraInformation + '\'' + ", participation=" +
+                participation + '}');
     }
 }

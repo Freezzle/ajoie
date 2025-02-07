@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IStand } from '../stand.model';
 import { StandService } from '../service/stand.service';
@@ -16,6 +16,7 @@ import { StandFilterFormGroup, StandFormService } from '../update/stand-form.ser
 import { Status } from '../../enumerations/status.model';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { finalize } from 'rxjs/operators';
+import { containExhibitorName, getExhibitorName } from '../../exhibitor/exhibitor.model';
 
 @Component({
   standalone: true,
@@ -42,29 +43,36 @@ export class StandComponent implements OnInit {
   protected standFormService = inject(StandFormService);
 
   statusValues = Object.keys(Status);
-  stands?: IStand[];
+  stands: IStand[] = [];
   isLoading = false;
   params: any;
-  filters: StandFilterFormGroup = this.standFormService.createFilterFormGroup();
+  filters: FormGroup<StandFilterFormGroup> = this.standFormService.createFilterFormGroup();
 
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
-      this.params = params;
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
+      ([params, data]) => {
+        this.params = params;
 
-      if (!this.stands || this.stands.length === 0) {
-        this.actionFilter();
-      }
-    });
+        if (!this.stands || this.stands.length === 0) {
+          this.actionFilter();
+        }
+      },
+    );
   }
 
   delete(stand: IStand): void {
-    const modalRef = this.modalService.open(DeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    const modalRef = this.modalService.open(DeleteDialogComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
     modalRef.componentInstance.translateKey = 'stand.delete.question';
-    modalRef.componentInstance.translateValues = { description: stand.participation?.exhibitor?.fullName };
+    modalRef.componentInstance.translateValues = {
+      description: getExhibitorName(stand.participation?.exhibitor),
+    };
 
     modalRef.closed
       .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
+        filter((reason) => reason === ITEM_DELETED_EVENT),
         switchMap(() => this.standService.delete(stand.id)),
         tap(() => this.actionFilter()), // Recharge les données
       )
@@ -85,19 +93,19 @@ export class StandComponent implements OnInit {
     this.standService
       .query(queryObject)
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(result => {
+      .subscribe((result) => {
         this.stands = result.body ?? [];
 
         const fullNameFilter = this.filters.get('fullName')?.value;
         if (fullNameFilter && fullNameFilter.length > 0) {
-          this.stands = this.stands?.filter(stand =>
-            stand.participation?.exhibitor?.fullName?.toLocaleLowerCase().includes(fullNameFilter.toLocaleLowerCase()),
+          this.stands = this.stands?.filter((stand) =>
+            containExhibitorName(stand.participation?.exhibitor, fullNameFilter),
           );
         }
 
         const statusFilter = this.filters.get('status')?.value;
         if (statusFilter && statusFilter.length > 0) {
-          this.stands = this.stands?.filter(stand => stand.status?.includes(statusFilter));
+          this.stands = this.stands?.filter((stand) => stand.status?.includes(statusFilter));
         }
       });
   }
@@ -110,4 +118,6 @@ export class StandComponent implements OnInit {
   previousState(): void {
     window.history.back();
   }
+
+  protected readonly getExhibitorName = getExhibitorName;
 }

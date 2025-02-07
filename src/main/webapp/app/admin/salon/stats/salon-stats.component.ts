@@ -7,9 +7,10 @@ import { ISalon, ISalonStats } from '../salon.model';
 import { SortByDirective, SortDirective } from '../../../shared/sort';
 import { SalonService } from '../service/salon.service';
 import { mergeMap } from 'rxjs/operators';
+import { combineLatest, EMPTY, Observable, of } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
-import { EMPTY, Observable, of } from 'rxjs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Status } from '../../enumerations/status.model';
 
 @Component({
   standalone: true,
@@ -31,24 +32,37 @@ export class SalonStatsComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
 
   salon = input<ISalon | null>(null);
-  stats$: Observable<ISalonStats> | undefined;
+  combinedStats$: Observable<ISalonStats[]> | undefined;
   selectedFile: File | null = null;
-
   protected salonService = inject(SalonService);
 
   ngOnInit(): void {
     this.loadStats();
   }
 
+  dimensionStandsEntries(dimension: Record<string, number>): [string, number][] {
+    return Object.entries(dimension);
+  }
+
   loadStats(): void {
-    this.stats$ = this.salonService.stats(this.salon()!.id).pipe(
-      mergeMap((stats: HttpResponse<ISalonStats>) => {
-        if (stats.body) {
-          return of(stats.body);
-        }
-        return EMPTY;
-      }),
-    );
+    this.combinedStats$ = combineLatest([
+      this.salonService.stats(this.salon()!.id, [Status.IN_VERIFICATION]).pipe(
+        mergeMap((stats: HttpResponse<ISalonStats>) => {
+          if (stats.body) {
+            return of(stats.body);
+          }
+          return EMPTY;
+        }),
+      ),
+      this.salonService.stats(this.salon()!.id, [Status.ACCEPTED, Status.PAID]).pipe(
+        mergeMap((stats: HttpResponse<ISalonStats>) => {
+          if (stats.body) {
+            return of(stats.body);
+          }
+          return EMPTY;
+        }),
+      ),
+    ]);
   }
 
   onFileSelected(event: Event): void {
@@ -58,7 +72,7 @@ export class SalonStatsComponent implements OnInit {
     }
   }
 
-  generate(): void {
+  importFile(): void {
     if (this.selectedFile == null) {
       return;
     }

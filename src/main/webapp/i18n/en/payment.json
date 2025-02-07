@@ -4,6 +4,7 @@
       "list": {
         "BANK": "Bancaire",
         "CASH": "Argent comptant",
+        "DISCOUNT": "Réduction",
         "OTHER": "Autre",
         "SERVICE": "Service rendu",
         "null": "Inconnu"

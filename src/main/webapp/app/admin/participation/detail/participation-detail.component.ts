@@ -20,6 +20,9 @@ import { State } from '../../enumerations/state.model';
 import { InvoicingPlanService } from '../service/invoicing-plan.service';
 import dayjs from 'dayjs/esm';
 import { Mode } from '../../enumerations/mode.model';
+import { Status } from '../../enumerations/status.model';
+import { Dayjs } from 'dayjs';
+import { getExhibitorName } from '../../exhibitor/exhibitor.model';
 
 @Component({
   standalone: true,
@@ -83,6 +86,46 @@ export class ParticipationDetailComponent implements OnInit {
     });
   }
 
+  payInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
+    this.isSending = true;
+    this.invoicingPlanService.payInvoicingPlanm(invoicingPlan.id).subscribe(() => {
+      this.loadInvoicePlans();
+      this.loadEventLogs();
+      this.isSending = false;
+    });
+  }
+
+  cancelInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
+    this.isSending = true;
+    this.invoicingPlanService.cancelInvoicingPlan(invoicingPlan.id).subscribe(() => {
+      this.loadInvoicePlans();
+      this.loadEventLogs();
+      this.isSending = false;
+    });
+  }
+
+  deleteInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
+    this.isSending = true;
+    this.invoicingPlanService.deleteInvoicingPlan(invoicingPlan.id).subscribe(() => {
+      this.loadInvoicePlans();
+      this.loadEventLogs();
+      this.isSending = false;
+    });
+  }
+
+  downloadInvoice(invoicingPlan: IInvoicingPlan): void {
+    this.invoicingPlanService.downloadInvoice(invoicingPlan.id).subscribe(
+      blob => {
+        const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+        window.open(url);
+
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+        }, 5000);
+      },
+    );
+  }
+
   sendInvoiceReceipt(invoicingPlan: IInvoicingPlan): void {
     this.isSending = true;
     this.invoicingPlanService.sendInvoiceReceipt(invoicingPlan.id).subscribe(() => {
@@ -113,8 +156,7 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   onAmountPaymentChange(event: any, payment: IPayment): void {
-    const inputValue = Number(event.target.value);
-    payment.amount = payment.amount = inputValue > 0 ? -inputValue : inputValue;
+    payment.amount = Number(event.target.value);
   }
 
   onExtraInformationPaymentChange(event: any, payment: IPayment): void {
@@ -128,11 +170,12 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   totalPayments(payments: IPayment[]): number {
-    return payments.map(payment => Number(payment.amount ?? 0)).reduce((previousValue, defaultAmount) => previousValue + defaultAmount, 0);
+    return payments.map(payment => Number(payment.amount ?? 0))
+      .reduce((previousValue, defaultAmount) => previousValue + defaultAmount, 0);
   }
 
   remainingTotal(invoicingPlan: IInvoicingPlan): number {
-    return this.totalInvoices(invoicingPlan.invoices ?? []) + this.totalPayments(invoicingPlan.payments ?? []);
+    return this.totalInvoices(invoicingPlan.invoices ?? []) - this.totalPayments(invoicingPlan.payments ?? []);
   }
 
   loadInvoicePlans(): void {
@@ -277,11 +320,13 @@ export class ParticipationDetailComponent implements OnInit {
   }
 
   mustPaymentBeReadMode(payment: IPayment, invoicingPlan: IInvoicingPlan): boolean {
-    return !!payment.readMode || invoicingPlan.state === State.CLOSED || !!this.participation()?.isBillingClosed;
+    return !!payment.readMode || (invoicingPlan.state !== State.DRAFT && invoicingPlan.state !== State.ISSUED) ||
+           this.participation()?.status === Status.PAID;
   }
 
   mustBeReadMode(invoice: IInvoice, invoicingPlan: IInvoicingPlan): boolean {
-    return !!invoice.readMode || invoicingPlan.state === State.CLOSED || !!this.participation()?.isBillingClosed;
+    return !!invoice.readMode || (invoicingPlan.state !== State.DRAFT && invoicingPlan.state !== State.ISSUED) ||
+           this.participation()?.status === Status.PAID;
   }
 
   mustDisableSendButton(invoicingPlan: IInvoicingPlan): boolean {
@@ -291,4 +336,45 @@ export class ParticipationDetailComponent implements OnInit {
       !invoicingPlan.payments?.every((pay: IPayment) => pay.readMode)
     );
   }
+
+  showPrintInvoice(state: State | null | undefined): boolean {
+    return state === State.DRAFT || state === State.PAID || state === State.ISSUED;
+  }
+
+  showSendInvoice(state: State | null | undefined): boolean {
+    return state === State.DRAFT;
+  }
+
+  showReSendInvoice(state: State | null | undefined): boolean {
+    return state === State.ISSUED || state === State.PAID;
+  }
+
+  showSendInvoiceReceipt(state: State | null | undefined): boolean {
+    return state === State.ISSUED || state === State.PAID;
+  }
+
+  showCloseInvoice(state: State | null | undefined): boolean {
+    return state === State.ISSUED;
+  }
+
+  showCancelInvoice(state: State | null | undefined): boolean {
+    return state === State.ISSUED;
+  }
+
+  showRemoveDraft(state: State | null | undefined): boolean {
+    return state === State.DRAFT;
+  }
+
+  showRefreshInvoice(index: number, state: State | null | undefined): boolean {
+    return state === State.DRAFT && index === 0;
+  }
+
+  showCreateNewDraft(index: number, state: State | null | undefined): boolean {
+    return state !== State.DRAFT && index === 0;
+  }
+
+  protected readonly Status = Status;
+  protected readonly Dayjs = Dayjs;
+  protected readonly dayjs = dayjs;
+  protected readonly getExhibitorName = getExhibitorName;
 }

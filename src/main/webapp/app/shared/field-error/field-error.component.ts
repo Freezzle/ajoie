@@ -15,5 +15,6 @@ export class FieldErrorComponent {
   formControlElement = input.required<FormControl>();
   errors = input<ErrorModel[]>();
 
-  constructor() {}
+  constructor() {
+  }
 }

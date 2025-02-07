@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { combineLatest } from 'rxjs';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { combineLatest, Observable, of } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -11,12 +11,24 @@ import { ExhibitorService } from '../service/exhibitor.service';
 import { ExhibitorFormGroup, ExhibitorFormService } from './exhibitor-form.service';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
 import { ErrorModel } from '../../../shared/field-error/error.model';
+import { LANGUAGES } from '../../../config/language.constants';
+import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
+import StatusPipe from '../../../shared/pipe/status.pipe';
+import { IParticipation } from '../../participation/participation.model';
 
 @Component({
   standalone: true,
   selector: 'jhi-exhibitor-update',
   templateUrl: './exhibitor-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent],
+  imports: [
+    SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FieldErrorComponent,
+    ColorStatusPipe,
+    StatusPipe,
+    RouterLink,
+  ],
 })
 export class ExhibitorUpdateComponent implements OnInit {
   protected exhibitorService = inject(ExhibitorService);
@@ -26,23 +38,37 @@ export class ExhibitorUpdateComponent implements OnInit {
   isSaving = false;
   exhibitor: IExhibitor | null = null;
   readonlyForm = false;
-  editForm: FormGroup<ExhibitorFormGroup> = this.exhibitorFormService.createExhibitorFormGroup({ id: null });
+  editForm: FormGroup<ExhibitorFormGroup> = this.exhibitorFormService.createExhibitorFormGroup({
+    id: null,
+    language: 'fr',
+  });
+  languageValues = LANGUAGES;
+
+  participations$: Observable<IParticipation[]> = of([]);
 
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
-      this.readonlyForm = data['readonly'];
-      this.exhibitor = data['exhibitor'];
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
+      ([params, data]) => {
+        this.exhibitor = data['exhibitor'];
+        this.readonlyForm = data['readonly'];
 
-      if (this.exhibitor) {
-        this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.exhibitor);
+        if (this.exhibitor) {
+          this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.exhibitor);
 
-        if (this.readonlyForm) {
-          this.readOnlyBack();
-        } else {
-          this.writeBack();
+          if (this.readonlyForm) {
+            this.readOnlyBack();
+          } else {
+            this.writeBack();
+          }
+
+          this.loadRelationships(this.exhibitor.id);
         }
-      }
-    });
+      },
+    );
+  }
+
+  loadRelationships(idExhibitor: string): void {
+    this.participations$ = this.exhibitorService.findParticipations(idExhibitor);
   }
 
   readOnlyBack(): void {
@@ -74,7 +100,9 @@ export class ExhibitorUpdateComponent implements OnInit {
       this.exhibitorService
         .create(exhibitor)
         .pipe(finalize(() => (this.isSaving = false)))
-        .subscribe();
+        .subscribe(() => {
+          this.previousState();
+        });
     }
   }
 
@@ -84,6 +112,10 @@ export class ExhibitorUpdateComponent implements OnInit {
 
   get getEmail(): FormControl {
     return this.editForm.get('email') as FormControl;
+  }
+
+  get getLanguage(): FormControl {
+    return this.editForm.get('language') as FormControl;
   }
 
   get getPhoneNumber(): FormControl {

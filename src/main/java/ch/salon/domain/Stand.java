@@ -1,5 +1,6 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.Category;
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
@@ -12,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,52 +25,38 @@ public class Stand implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @NotNull
-    @Column(name = "description", nullable = false)
-    private String description;
+    @NotNull @Column(name = "description", nullable = false) private String description;
 
-    @Column(name = "website")
-    private String website;
+    @Column(name = "website") private String website;
 
-    @Column(name = "instagram")
-    private String instagram;
+    @Column(name = "instagram") private String instagram;
 
-    @Column(name = "facebook")
-    private String facebook;
+    @Column(name = "facebook") private String facebook;
 
-    @Column(name = "url_picture")
-    private String urlPicture;
+    @Column(name = "url_picture") private String urlPicture;
 
-    @Column(name = "shared")
-    private Boolean shared;
+    @Column(name = "shared") private Boolean shared;
 
-    @Column(name = "nb_table")
-    private Long nbTable;
+    @Column(name = "nb_table") private Long nbTable;
 
-    @Column(name = "nb_chair")
-    private Long nbChair;
+    @Column(name = "nb_chair") private Long nbChair;
 
-    @Column(name = "need_electricity")
-    private Boolean needElectricity;
+    @Enumerated(EnumType.STRING) @Column(name = "category") private Category category;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private Status status;
+    @Column(name = "need_electricity") private Boolean needElectricity;
 
-    @Column(name = "extra_information")
-    private String extraInformation;
+    @Enumerated(EnumType.STRING) @Column(name = "status") private Status status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "exhibitor", "salon" }, allowSetters = true)
+    @Column(name = "position") private Long position;
+
+    @Column(name = "extra_information") private String extraInformation;
+
+    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
     private Participation participation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private DimensionStand dimension;
+    @ManyToOne(fetch = FetchType.LAZY) private DimensionStand dimension;
 
     public UUID getId() {
         return this.id;
@@ -138,6 +126,14 @@ public class Stand implements Serializable {
         return this;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public Boolean getShared() {
         return this.shared;
     }
@@ -149,6 +145,14 @@ public class Stand implements Serializable {
     public Stand shared(Boolean shared) {
         this.setShared(shared);
         return this;
+    }
+
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
     }
 
     public Long getNbTable() {
@@ -243,15 +247,11 @@ public class Stand implements Serializable {
     }
 
     public static boolean hasDifference(Stand stand1, Stand stand2) {
-        return (
-            (stand1 == null && stand2 != null) ||
-            (stand1 != null && stand2 == null) ||
-            (stand1 != null &&
-                stand2 != null &&
-                (!Objects.equals(stand1.getDimension().getId(), stand2.getDimension().getId()) ||
-                    !Objects.equals(stand1.getShared(), stand2.getShared()) ||
-                    !Objects.equals(stand1.getStatus(), stand2.getStatus())))
-        );
+        return ((stand1 == null && stand2 != null) || (stand1 != null && stand2 == null) ||
+                (stand1 != null && stand2 != null &&
+                 (!Objects.equals(stand1.getDimension().getId(), stand2.getDimension().getId()) ||
+                  !Objects.equals(stand1.getShared(), stand2.getShared()) ||
+                  !Objects.equals(stand1.getStatus(), stand2.getStatus()))));
     }
 
     @Override
@@ -273,43 +273,10 @@ public class Stand implements Serializable {
 
     @Override
     public String toString() {
-        return (
-            "Stand{" +
-            "id=" +
-            id +
-            ", description='" +
-            description +
-            '\'' +
-            ", website='" +
-            website +
-            '\'' +
-            ", instagram='" +
-            instagram +
-            '\'' +
-            ", facebook='" +
-            facebook +
-            '\'' +
-            ", urlPicture='" +
-            urlPicture +
-            '\'' +
-            ", shared=" +
-            shared +
-            ", nbTable=" +
-            nbTable +
-            ", nbChair=" +
-            nbChair +
-            ", needElectricity=" +
-            needElectricity +
-            ", status=" +
-            status +
-            ", extraInformation='" +
-            extraInformation +
-            '\'' +
-            ", participation=" +
-            participation +
-            ", dimension=" +
-            dimension +
-            '}'
-        );
+        return ("Stand{" + "id=" + id + ", description='" + description + '\'' + ", website='" + website + '\'' +
+                ", instagram='" + instagram + '\'' + ", facebook='" + facebook + '\'' + ", urlPicture='" + urlPicture +
+                '\'' + ", shared=" + shared + ", nbTable=" + nbTable + ", nbChair=" + nbChair + ", needElectricity=" +
+                needElectricity + ", status=" + status + ", category=" + category + ", extraInformation='" +
+                extraInformation + '\'' + ", participation=" + participation + ", dimension=" + dimension + '}');
     }
 }

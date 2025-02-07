@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -18,17 +19,11 @@ public class PriceStandSalon implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @NotNull
-    @Column(name = "price", nullable = false)
-    private Double price;
+    @NotNull @Column(name = "price", nullable = false) private Double price;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private DimensionStand dimension;
+    @ManyToOne(fetch = FetchType.EAGER) private DimensionStand dimension;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 

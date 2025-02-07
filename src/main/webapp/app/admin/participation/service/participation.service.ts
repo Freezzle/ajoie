@@ -6,7 +6,7 @@ import dayjs from 'dayjs/esm';
 
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { IInvoicingPlan, IParticipation, NewParticipation } from '../participation.model';
+import { IInfoInvoice, IInvoicingPlan, IParticipation, NewParticipation } from '../participation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ParticipationService {
@@ -25,7 +25,8 @@ export class ParticipationService {
   update(participation: IParticipation): Observable<HttpResponse<IParticipation>> {
     const copy = this.convertDateFromClient(participation);
     return this.http
-      .put<IParticipation>(`${this.resourceUrl}/${this.getParticipationIdentifier(participation)}`, copy, { observe: 'response' })
+      .put<IParticipation>(`${this.resourceUrl}/${this.getParticipationIdentifier(participation)}`, copy,
+        { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
@@ -45,6 +46,10 @@ export class ParticipationService {
     return this.http.delete(`${this.resourceUrl}/${idParticipation}`, { observe: 'response' });
   }
 
+  getInfoInvoice(idParticipation: string): Observable<IInfoInvoice> {
+    return this.http.get<IInfoInvoice>(`${this.resourceUrl}/${idParticipation}/info-invoice`);
+  }
+
   getInvoicingPlans(idParticipation: string): Observable<HttpResponse<IInvoicingPlan[]>> {
     return this.http.get<IInvoicingPlan[]>(`${this.resourceUrl}/${idParticipation}/invoicing-plans`, {
       observe: 'response',
@@ -52,7 +57,8 @@ export class ParticipationService {
   }
 
   generateInvoices(idParticipation: string): Observable<HttpResponse<{}>> {
-    return this.http.patch(`${this.resourceUrl}/${idParticipation}/refresh-invoicing-plans`, {}, { observe: 'response' });
+    return this.http.patch(`${this.resourceUrl}/${idParticipation}/refresh-invoicing-plans`, {},
+      { observe: 'response' });
   }
 
   getEventLogs(idParticipation: string): Observable<HttpResponse<any>> {
@@ -111,7 +117,8 @@ export class ParticipationService {
   protected convertDateFromServer(restParticipation: IParticipation): IParticipation {
     return {
       ...restParticipation,
-      registrationDate: restParticipation.registrationDate ? dayjs(restParticipation.registrationDate) : undefined,
+      registrationDate: restParticipation.registrationDate ? dayjs(restParticipation.registrationDate) :
+                        undefined,
     };
   }
 }

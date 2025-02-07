@@ -12,11 +12,11 @@ export type ExhibitorFormGroup = {
   address: FormControl<IExhibitor['address']>;
   npaLocalite: FormControl<IExhibitor['npaLocalite']>;
   extraInformation: FormControl<IExhibitor['extraInformation']>;
+  language: FormControl<IExhibitor['language']>;
 };
 
 export type ExhibitorFilterFormGroup = {
   fullName: FormControl<IExhibitor['fullName']>;
-  therapistName: FormControl<IExhibitor['therapistName']>;
   email: FormControl<IExhibitor['email']>;
 };
 
@@ -25,7 +25,6 @@ export class ExhibitorFormService {
   createFilterFormGroup(): FormGroup<ExhibitorFilterFormGroup> {
     return new FormGroup<ExhibitorFilterFormGroup>({
       fullName: new FormControl(),
-      therapistName: new FormControl(),
       email: new FormControl(),
     });
   }
@@ -50,6 +49,7 @@ export class ExhibitorFormService {
       address: new FormControl(exhibitorRawValue.address),
       npaLocalite: new FormControl(exhibitorRawValue.npaLocalite),
       extraInformation: new FormControl(exhibitorRawValue.extraInformation),
+      language: new FormControl(exhibitorRawValue.language, [Validators.required]),
     });
   }
 

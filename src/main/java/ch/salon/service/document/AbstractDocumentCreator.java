@@ -1,16 +1,17 @@
 package ch.salon.service.document;
 
 import com.lowagie.text.pdf.BaseFont;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.w3c.tidy.Tidy;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 
 public abstract class AbstractDocumentCreator {
 
@@ -42,14 +43,15 @@ public abstract class AbstractDocumentCreator {
         String xHtml = convertToXhtml(renderedHtmlContent);
 
         ITextRenderer renderer = new ITextRenderer();
-        renderer.getFontResolver().addFont("/templates/document/common/Code39.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        renderer.getFontResolver()
+                .addFont("/templates/document/common/Code39.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
         // Fill styles & co in the XHTML
         String baseUrl = FileSystems.getDefault()
-            .getPath("src", "main", "resources", "templates", "document", "common")
-            .toUri()
-            .toURL()
-            .toString();
+                                    .getPath("src", "main", "resources", "templates", "document", "common")
+                                    .toUri()
+                                    .toURL()
+                                    .toString();
         renderer.setDocumentFromString(xHtml, baseUrl);
         renderer.layout();
 

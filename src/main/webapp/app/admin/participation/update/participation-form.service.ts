@@ -17,9 +17,10 @@ export type ParticipationFormGroup = {
   acceptedChart: FormControl<IParticipation['acceptedChart']>;
   acceptedContract: FormControl<IParticipation['acceptedContract']>;
   needArrangment: FormControl<IParticipation['needArrangment']>;
-  isBillingClosed: FormControl<IParticipation['isBillingClosed']>;
   status: FormControl<IParticipation['status']>;
   offer: FormControl<IParticipation['offer']>;
+  crushOfHeart: FormControl<IParticipation['crushOfHeart']>;
+  guestOfHonor: FormControl<IParticipation['guestOfHonor']>;
   additionnalInformation: FormControl<IParticipation['additionnalInformation']>;
   extraInformation: FormControl<IParticipation['extraInformation']>;
   exhibitor: FormControl<IParticipation['exhibitor']>;
@@ -36,11 +37,13 @@ export class ParticipationFormService {
   createFilterFormGroup(): FormGroup<ParticipationFilterFormGroup> {
     return new FormGroup<ParticipationFilterFormGroup>({
       fullName: new FormControl(),
-      status: new FormControl('IN_VERIFICATION'),
+      status: new FormControl(),
     });
   }
 
-  createParticipationFormGroup(participation: IParticipation | NewParticipation = { id: null }): FormGroup<ParticipationFormGroup> {
+  createParticipationFormGroup(
+    participation: IParticipation | NewParticipation = { id: null },
+  ): FormGroup<ParticipationFormGroup> {
     const participationRawValue = {
       ...this.getFormDefaults(),
       ...participation,
@@ -48,16 +51,32 @@ export class ParticipationFormService {
 
     return new FormGroup<ParticipationFormGroup>({
       id: new FormControl({ value: participationRawValue.id, disabled: true }),
-      registrationDate: new FormControl(participationRawValue.registrationDate?.format(DATE_FORMAT), Validators.required),
-      nbMeal1: new FormControl(participationRawValue.nbMeal1, [Validators.required, CustomValidatorModel.onlyNumbers]),
-      nbMeal2: new FormControl(participationRawValue.nbMeal2, [Validators.required, CustomValidatorModel.onlyNumbers]),
-      nbMeal3: new FormControl(participationRawValue.nbMeal3, [Validators.required, CustomValidatorModel.onlyNumbers]),
+      registrationDate: new FormControl(
+        participationRawValue.registrationDate?.format(DATE_FORMAT),
+        Validators.required,
+      ),
+      nbMeal1: new FormControl(participationRawValue.nbMeal1, [
+        Validators.required,
+        CustomValidatorModel.onlyNumbers,
+      ]),
+      nbMeal2: new FormControl(participationRawValue.nbMeal2, [
+        Validators.required,
+        CustomValidatorModel.onlyNumbers,
+      ]),
+      nbMeal3: new FormControl(participationRawValue.nbMeal3, [
+        Validators.required,
+        CustomValidatorModel.onlyNumbers,
+      ]),
       acceptedChart: new FormControl(participationRawValue.acceptedChart, Validators.required),
-      acceptedContract: new FormControl(participationRawValue.acceptedContract, Validators.required),
+      acceptedContract: new FormControl(
+        participationRawValue.acceptedContract,
+        Validators.required,
+      ),
       needArrangment: new FormControl(participationRawValue.needArrangment, Validators.required),
-      isBillingClosed: new FormControl(participationRawValue.isBillingClosed, Validators.required),
       status: new FormControl(participationRawValue.status, Validators.required),
       offer: new FormControl(participationRawValue.offer),
+      crushOfHeart: new FormControl(participationRawValue.crushOfHeart),
+      guestOfHonor: new FormControl(participationRawValue.guestOfHonor),
       additionnalInformation: new FormControl(participationRawValue.additionnalInformation),
       extraInformation: new FormControl(participationRawValue.extraInformation),
       exhibitor: new FormControl(participationRawValue.exhibitor, Validators.required),
@@ -75,7 +94,7 @@ export class ParticipationFormService {
 
   private getFormDefaults(): Pick<
     NewParticipation,
-    'id' | 'registrationDate' | 'acceptedChart' | 'acceptedContract' | 'needArrangment' | 'isBillingClosed' | 'status'
+    'id' | 'registrationDate' | 'acceptedChart' | 'acceptedContract' | 'needArrangment' | 'status'
   > {
     return {
       id: null,
@@ -83,7 +102,6 @@ export class ParticipationFormService {
       acceptedChart: false,
       acceptedContract: false,
       needArrangment: false,
-      isBillingClosed: false,
       status: Status.IN_VERIFICATION,
     };
   }

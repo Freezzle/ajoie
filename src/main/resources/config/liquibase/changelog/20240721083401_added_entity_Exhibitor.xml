@@ -7,10 +7,13 @@
     <!--
         Added the entity Exhibitor.
     -->
-    <changeSet id="20240721083401-1" author="jhipster">
+    <changeSet id="20240721083401-1" author="claudedy">
         <createTable tableName="exhibitor">
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="language" type="varchar(20)">
+                <constraints nullable="false"/>
             </column>
             <column name="full_name" type="varchar(100)">
                 <constraints nullable="false"/>

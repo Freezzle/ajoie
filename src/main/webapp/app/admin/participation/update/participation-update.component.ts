@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { combineLatest, EMPTY, filter, Observable, of, switchMap, tap } from 'rxjs';
+import { combineLatest, EMPTY, filter, Observable, of, switchMap } from 'rxjs';
 import { finalize, map, mergeMap } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -20,7 +20,7 @@ import { IStand } from '../../stand/stand.model';
 import { StandService } from '../../stand/service/stand.service';
 import { ISalon } from '../../salon/salon.model';
 import { SalonService } from '../../salon/service/salon.service';
-import { IExhibitor } from '../../exhibitor/exhibitor.model';
+import { getExhibitorName, getFullExhibitorName, IExhibitor } from '../../exhibitor/exhibitor.model';
 import { ExhibitorService } from '../../exhibitor/service/exhibitor.service';
 import { Status } from '../../enumerations/status.model';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
@@ -31,7 +31,8 @@ import { ErrorModel } from '../../../shared/field-error/error.model';
   standalone: true,
   selector: 'jhi-participation-update',
   templateUrl: './participation-update.component.html',
-  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe, FieldErrorComponent],
+  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
+            FieldErrorComponent],
 })
 export class ParticipationUpdateComponent implements OnInit {
   protected participationService = inject(ParticipationService);
@@ -52,9 +53,11 @@ export class ParticipationUpdateComponent implements OnInit {
   params: any;
   exhibitorsOptions: IExhibitor[] = [];
   salonsSharedCollection: ISalon[] = [];
-  editForm: FormGroup<ParticipationFormGroup> = this.participationFormService.createParticipationFormGroup({ id: null });
+  editForm: FormGroup<ParticipationFormGroup> = this.participationFormService.createParticipationFormGroup(
+    { id: null });
 
-  compareExhibitor = (o1: IExhibitor | null, o2: IExhibitor | null): boolean => this.exhibitorService.compareExhibitor(o1, o2);
+  compareExhibitor = (o1: IExhibitor | null,
+                      o2: IExhibitor | null): boolean => this.exhibitorService.compareExhibitor(o1, o2);
 
   ngOnInit(): void {
     combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
@@ -65,16 +68,9 @@ export class ParticipationUpdateComponent implements OnInit {
       this.loadRelationshipsOptions();
 
       if (this.participation) {
-        this.editForm = this.participationFormService.createParticipationFormGroup(this.participation);
-
+        this.convertToForm(this.participation);
         this.loadConferences();
         this.loadStands();
-
-        if (this.readonlyForm) {
-          this.readOnlyBack();
-        } else {
-          this.writeBack();
-        }
       }
     });
   }
@@ -101,14 +97,14 @@ export class ParticipationUpdateComponent implements OnInit {
         .update(participation)
         .pipe(finalize(() => (this.isSaving = false)))
         .subscribe(() => {
-          this.previousState();
+          this.readOnlyBack();
         });
     } else {
       this.participationService
         .create(participation)
         .pipe(finalize(() => (this.isSaving = false)))
         .subscribe(() => {
-          this.previousState();
+          this.readOnlyBack();
         });
     }
   }
@@ -122,23 +118,47 @@ export class ParticipationUpdateComponent implements OnInit {
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
         switchMap(() => this.conferenceService.delete(conference.id)),
-        tap(() => this.loadConferences()), // Recharge les données
       )
-      .subscribe();
+      .subscribe(() => {
+        this.loadParticipation();
+        this.loadConferences();
+      });
   }
 
   deleteStand(stand: IStand): void {
     const modalRef = this.modalService.open(DeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.translateKey = 'stand.delete.question';
-    modalRef.componentInstance.translateValues = { description: stand.participation?.exhibitor?.fullName };
+    modalRef.componentInstance.translateValues = { description: getExhibitorName(stand.participation?.exhibitor) };
 
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
         switchMap(() => this.standService.delete(stand.id)),
-        tap(() => this.loadStands()), // Recharge les données
       )
-      .subscribe();
+      .subscribe(() => {
+        this.loadParticipation();
+        this.loadStands();
+      });
+  }
+
+  protected convertToForm(participation: IParticipation): void {
+    this.participation = participation;
+    this.editForm = this.participationFormService.createParticipationFormGroup(participation);
+    if (this.readonlyForm) {
+      this.readOnlyBack();
+    } else {
+      this.writeBack();
+    }
+  }
+
+  protected loadParticipation(): void {
+    if (this.participation?.id) {
+      this.participationService.find(this.participation.id).subscribe((res: HttpResponse<IParticipation>) => {
+        if (res.body) {
+          this.convertToForm(res.body);
+        }
+      });
+    }
   }
 
   protected loadConferences(): void {
@@ -177,7 +197,8 @@ export class ParticipationUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IExhibitor[]>) => res.body ?? []))
       .pipe(
         map((exhibitors: IExhibitor[]) =>
-          this.exhibitorService.addExhibitorOptionsIfMissing<IExhibitor>(exhibitors, this.participation?.exhibitor),
+          this.exhibitorService.addExhibitorOptionsIfMissing<IExhibitor>(exhibitors,
+            this.participation?.exhibitor),
         ),
       )
       .subscribe((exhibitors: IExhibitor[]) => (this.exhibitorsOptions = exhibitors));
@@ -188,7 +209,8 @@ export class ParticipationUpdateComponent implements OnInit {
       .pipe(
         map((salons: ISalon[]) => {
           if (this.params.get('idSalon')) {
-            this.editForm.get('salon')?.setValue(salons.find(salon => salon.id === this.params.get('idSalon')));
+            this.editForm.get('salon')
+              ?.setValue(salons.find(salon => salon.id === this.params.get('idSalon')));
           }
           return this.salonService.addSalonOptionsIfMissing<ISalon>(salons, this.participation?.salon);
         }),
@@ -221,4 +243,6 @@ export class ParticipationUpdateComponent implements OnInit {
   }
 
   protected readonly ErrorModel = ErrorModel;
+  protected readonly getExhibitorName = getExhibitorName;
+  protected readonly getFullExhibitorName = getFullExhibitorName;
 }

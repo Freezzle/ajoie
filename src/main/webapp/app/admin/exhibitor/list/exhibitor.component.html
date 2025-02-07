@@ -2,7 +2,7 @@
   <h2 id="page-heading">
     <span jhiTranslate="exhibitor.title">Les exposants</span>
 
-    <hr />
+    <hr/>
 
     <div class="d-flex justify-content-between mt-3">
       <span>
@@ -14,32 +14,11 @@
 
       <span [formGroup]="filters" class="row">
         <div class="col-auto">
-          <input
-            (blur)="actionFilter()"
-            class="form-control"
-            formControlName="fullName"
-            placeholder="{{ 'exhibitor.filter.fullName' | translate }}"
-            type="text"
-          />
-        </div>
-        <div class="col-auto">
-          <input
-            (blur)="actionFilter()"
-            class="form-control"
-            formControlName="therapistName"
-            placeholder="{{ 'exhibitor.filter.therapistName' | translate }}"
-            type="text"
-          />
+          <input (blur)="actionFilter()" class="form-control" formControlName="fullName" [placeholder]="'exhibitor.filter.fullName' | translate" type="text"/>
         </div>
         <div class="col-auto">
           <div class="col-auto">
-            <input
-              (blur)="actionFilter()"
-              class="form-control"
-              formControlName="email"
-              placeholder="{{ 'exhibitor.filter.email' | translate }}"
-              type="text"
-            />
+            <input (blur)="actionFilter()" class="form-control" formControlName="email" [placeholder]="'exhibitor.filter.email' | translate" type="text"/>
           </div>
         </div>
       </span>
@@ -56,74 +35,72 @@
         </button>
       </span>
     </div>
-    <hr />
+    <hr/>
   </h2>
 
   <jhi-alert-error></jhi-alert-error>
 
-  @if (exhibitors) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-hover" aria-describedby="page-heading">
-        <thead class="thead-primary">
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="fullName">
-              <div class="d-flex">
-                <span jhiTranslate="exhibitor.fullName">Nom complet</span>
+  <div class="table-responsive table-entities" id="entities">
+    <table aria-describedby="page-heading" class="table table-hover">
+      <thead class="thead-primary">
+        <tr (sortChange)="navigateToWithComponentValues($event)" [sortState]="sortState" jhiSort>
+          <th jhiSortBy="fullName" scope="col">
+            <div class="d-flex">
+              <span jhiTranslate="exhibitor.fullName">Nom complet</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="therapistName">
-              <div class="d-flex">
-                <span jhiTranslate="exhibitor.therapistName">Nom de thérapeute</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th jhiSortBy="therapistName" scope="col">
+            <div class="d-flex">
+              <span jhiTranslate="exhibitor.therapistName">Nom de thérapeute</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="email">
-              <div class="d-flex">
-                <span jhiTranslate="exhibitor.email">Email</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th jhiSortBy="email" scope="col">
+            <div class="d-flex">
+              <span jhiTranslate="exhibitor.email">Email</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="phoneNumber">
-              <div class="d-flex">
-                <span jhiTranslate="exhibitor.phoneNumber">Téléphone</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th jhiSortBy="phoneNumber" scope="col">
+            <div class="d-flex">
+              <span jhiTranslate="exhibitor.phoneNumber">Téléphone</span>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (exhibitors?.length === 0) {
+          <tr>
+            <td colspan="4">
+              <span jhiTranslate="exhibitor.notFound">Aucun exposant</span>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @if (exhibitors.length === 0) {
+        } @else {
+          @for (exhibitor of exhibitors; track $index) {
             <tr>
-              <td colspan="4">
-                <span jhiTranslate="exhibitor.notFound">Aucun exposant</span>
+              <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.fullName }}</td>
+              <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.therapistName }}</td>
+              <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.email }}</td>
+              <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.phoneNumber }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm">
+                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                    <span jhiTranslate="common.delete"></span>
+                  </button>
+                </div>
               </td>
             </tr>
-          } @else {
-            @for (exhibitor of exhibitors; track $index) {
-              <tr>
-                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.fullName }}</td>
-                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.therapistName }}</td>
-                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.email }}</td>
-                <td class="go-detail" [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.phoneNumber }}</td>
-                <td class="text-end">
-                  <div class="btn-group">
-                    <button type="submit" (click)="delete(exhibitor)" class="btn btn-danger btn-sm">
-                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                      <span jhiTranslate="common.delete"></span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
           }
-        </tbody>
-      </table>
-    </div>
-  }
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

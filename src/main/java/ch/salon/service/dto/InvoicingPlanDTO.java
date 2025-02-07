@@ -1,6 +1,7 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.State;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -11,6 +12,8 @@ public class InvoicingPlanDTO implements Serializable {
 
     private UUID id;
     private Instant generationDate;
+    private Instant issuedDate;
+    private Instant expirationDate;
     private State state;
     private String billingNumber;
     private Set<InvoiceDTO> invoices = new HashSet<>();
@@ -75,5 +78,21 @@ public class InvoicingPlanDTO implements Serializable {
 
     public void setPayments(Set<PaymentDTO> payments) {
         this.payments = payments;
+    }
+
+    public Instant getIssuedDate() {
+        return issuedDate;
+    }
+
+    public void setIssuedDate(Instant issuedDate) {
+        this.issuedDate = issuedDate;
+    }
+
+    public Instant getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Instant expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }

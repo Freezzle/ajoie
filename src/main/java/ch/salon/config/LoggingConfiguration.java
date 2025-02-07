@@ -11,7 +11,9 @@ import tech.jhipster.config.JHipsterProperties;
 import java.util.HashMap;
 import java.util.Map;
 
-import static tech.jhipster.config.logging.LoggingUtils.*;
+import static tech.jhipster.config.logging.LoggingUtils.addContextListener;
+import static tech.jhipster.config.logging.LoggingUtils.addJsonConsoleAppender;
+import static tech.jhipster.config.logging.LoggingUtils.addLogstashTcpSocketAppender;
 
 /*
  * Configures the console and Logstash log appenders from the app properties

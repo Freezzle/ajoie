@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity Stand.
+    -->
+    <changeSet id="20250223-2" author="claudedy">
+
+        <addForeignKeyConstraint baseColumnNames="salon_id"
+                                 baseTableName="floor_plan_salon"
+                                 constraintName="fk_floor_plan_salon__salon_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="salon"
+        />
+    </changeSet>
+</databaseChangeLog>

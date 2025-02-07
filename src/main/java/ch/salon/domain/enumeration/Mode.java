@@ -7,5 +7,6 @@ public enum Mode {
     BANK,
     CASH,
     SERVICE,
+    DISCOUNT,
     OTHER,
 }

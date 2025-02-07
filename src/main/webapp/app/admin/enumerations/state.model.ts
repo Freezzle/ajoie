@@ -1,4 +1,6 @@
 export enum State {
-    CURRENT = 'CURRENT',
-    CLOSED = 'CLOSED',
+  DRAFT = 'DRAFT',
+  ISSUED = 'ISSUED',
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED',
 }

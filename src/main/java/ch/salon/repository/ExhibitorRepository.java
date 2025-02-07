@@ -1,9 +1,10 @@
 package ch.salon.repository;
 
 import ch.salon.domain.Exhibitor;
-import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 @Repository

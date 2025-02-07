@@ -5,7 +5,7 @@
         <span jhiTranslate="salon.statistiques">Statistiques</span>
       </h2>
 
-      <hr />
+      <hr/>
 
       <div class="d-flex justify-content-between mt-3">
         <span class="d-flex col-7 align-items-center">
@@ -16,129 +16,294 @@
         </span>
         <span class="d-flex col-5 justify-content-end justify-content-end">
           <span class="d-flex col-8 justify-content-end">
-            <input type="file" id="fileUpload" class="form-control form-control-sm me-2" (change)="onFileSelected($event)" #fileInput />
+            <input type="file" id="fileUpload" class="form-control form-control-sm me-2" (change)="onFileSelected($event)" #fileInput/>
           </span>
           <span class="d-flex col-auto justify-content-end">
-            <button type="submit" class="btn btn-primary btn-sm" (click)="generate()">
+            <button type="submit" class="btn btn-primary btn-sm" (click)="importFile()">
               <span jhiTranslate="common.import">Importer</span>
             </button>
           </span>
         </span>
       </div>
 
-      <hr />
+      <hr/>
     </div>
-
-    <div class="row" *ngIf="stats$ | async; let stats">
+    <div class="row" *ngIf="combinedStats$ | async; let combinedStats">
       <div class="col form-2-box">
-        <div class="row">
-          <div class="col-4">
-            <!-- MENU DES STANDS FIELDSET -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.stands">Les stands</legend>
+        <fieldset class="form-group border p-3 form-1-box">
+          <div class="row">
+            <div class="col-4">
+              <legend class="w-auto">Organisation</legend>
               <div class="row">
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standAccepted">Accepté</div>
-                <div class="col-2">
-                  <button class="btn btn-success" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandValidated }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standInVerification">En cours</div>
-                <div class="col-2">
-                  <button class="btn btn-warning" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandInTreatment }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standRefused">Refusé</div>
-                <div class="col-2">
-                  <button class="btn btn-danger" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandRefused }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.standCanceled">Annulé</div>
-                <div class="col-2">
-                  <button class="btn btn-danger" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbStandRefused }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-              </div>
-            </fieldset>
-          </div>
-          <div class="col-4">
-            <!-- FACTURATION DES STANDS VALIDES -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.billings">Facturation des participations acceptés</legend>
-              <div class="row">
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingPaid">Payé</div>
-                <div class="col-2">
-                  <button class="btn btn-success" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbParticipationAcceptedPaid }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.billingUnpaid">Impayé</div>
-                <div class="col-2">
-                  <button class="btn btn-warning" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbParticipationAcceptedUnpaid }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-              </div>
-            </fieldset>
-          </div>
-          <div class="col-4">
-            <!-- REPAS COMMANDES PAR STANDS VALIDES -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.meals">Repas des participations acceptés</legend>
-              <div class="row">
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal1">Samedi midi</div>
-                <div class="col-2">
-                  <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbMealSaturdayMidday }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal2">Samedi soir</div>
-                <div class="col-2">
-                  <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbMealSaturdayEvening }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-                <div class="col-4 align-content-center" jhiTranslate="salon.stats.meal3">Dimanche midi</div>
-                <div class="col-2">
-                  <button class="btn btn-secondary" style="width: 80px; font-size: 16px">
-                    <span>{{ stats.nbMealSundayMidday }}</span>
-                  </button>
-                </div>
-                <div class="col-6">&nbsp;</div>
-              </div>
-            </fieldset>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-4">
-            <!-- DIMENSIONS DES STANDS VALIDES -->
-            <fieldset class="form-group border p-3 form-1-box">
-              <legend class="w-auto px-2" jhiTranslate="salon.stats.dimensions">Dimensions des stands acceptés</legend>
-              <div class="row">
-                @for (dimension of stats.dimensionStats; track $index) {
-                  <div class="col-4 align-content-center">{{ dimension['dimension'] }}</div>
-                  <div class="col-2">
-                    <button class="btn btn-secondary">
-                      <span>{{ dimension['nb'] }}</span>
-                    </button>
+                <div class="col-12">
+                  <div class="row">
+                    <div class="col-8">Nombre de tables</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].standInfo.nbTable }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].standInfo.nbTable }}</span>
+                      </button>
+                    </div>
                   </div>
-                  <div class="col-6">&nbsp;</div>
-                }
+                  <div class="row">
+                    <div class="col-8">Nombre de chaises</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].standInfo.nbChair }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].standInfo.nbChair }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre d'électricité</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].standInfo.nbElectricity }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].standInfo.nbElectricity }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre d'offres</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].standInfo.nbOffer }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].standInfo.nbOffer }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre de repas 1</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].nbMeal1 }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].nbMeal1 }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre de repas 2</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].nbMeal2 }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].nbMeal2 }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre de repas 3</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].nbMeal3 }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].nbMeal3 }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </fieldset>
+            </div>
+
+            <div class="col-4">
+              <legend class="w-auto">Participations</legend>
+              <div class="row">
+                <div class="col-12">
+                  <div class="row">
+                    <div class="col-8">Nombre de stands</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].nbStands }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].nbStands }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre de conférences</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].nbConference }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].nbConference }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre de coup de coeur</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].nbCrushOfHeart }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].nbCrushOfHeart }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Nombre d'invité d'honneur</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].nbGuestOfHonor }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].nbGuestOfHonor }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-4">
+              <legend class="w-auto">Facturation</legend>
+              <div class="row">
+                <div class="col-12">
+                  <div class="row">
+                    <div class="col-8">Payé</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].facturation.paid }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].facturation.paid }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Réduction offert</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].facturation.discount }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].facturation.discount }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-8">Totals</div>
+                    <div class="col-2">
+                      <button class="btn btn-warning w-100">
+                        <span>{{ combinedStats[0].facturation.expected }}</span>
+                      </button>
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-secondary w-100">
+                        <span>{{ combinedStats[1].facturation.expected }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <br/>
+          <div class="row">
+            <div class="col-4">
+              <legend class="w-auto">Catégories des stands</legend>
+              <div class="row">
+                <div class="col-6">
+                  @for (category of dimensionStandsEntries(combinedStats[0].categoriesStands); track $index) {
+                    <div class="row">
+                      <div class="col-8">{{ 'stand.category.list.' + category[0] | translate }}</div>
+                      <div class="col-4">
+                        <button class="btn btn-warning w-100">
+                          <span>{{ category[1] }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="col-6">
+                  @for (category of dimensionStandsEntries(combinedStats[1].categoriesStands); track $index) {
+                    <div class="row">
+                      <div class="col-8">{{ 'stand.category.list.' + category[0] | translate }}</div>
+                      <div class="col-4">
+                        <button class="btn btn-secondary w-100">
+                          <span>{{ category[1] }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="col-4">
+              <legend class="w-auto">Dimensions des stands</legend>
+              <div class="row">
+                <div class="col-6">
+                  @for (dimension of dimensionStandsEntries(combinedStats[0].dimensionStands); track $index) {
+                    <div class="row">
+                      <div class="col-8">{{ dimension[0] }}</div>
+                      <div class="col-4">
+                        <button class="btn btn-warning w-100">
+                          <span>{{ dimension[1] }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="col-6">
+                  @for (dimension of dimensionStandsEntries(combinedStats[1].dimensionStands); track $index) {
+                    <div class="row">
+                      <div class="col-8">{{ dimension[0] }}</div>
+                      <div class="col-4">
+                        <button class="btn btn-secondary w-100">
+                          <span>{{ dimension[1] }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
       </div>
     </div>
   }

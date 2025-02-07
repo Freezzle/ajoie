@@ -16,13 +16,19 @@ export class ConferenceService {
   }
 
   update(conference: IConference): Observable<HttpResponse<IConference>> {
-    return this.http.put<IConference>(`${this.resourceUrl}/${this.getConferenceIdentifier(conference)}`, conference, {
-      observe: 'response',
-    });
+    return this.http.put<IConference>(
+      `${this.resourceUrl}/${this.getConferenceIdentifier(conference)}`,
+      conference,
+      {
+        observe: 'response',
+      },
+    );
   }
 
   find(idConference: string): Observable<HttpResponse<IConference>> {
-    return this.http.get<IConference>(`${this.resourceUrl}/${idConference}`, { observe: 'response' });
+    return this.http.get<IConference>(`${this.resourceUrl}/${idConference}`, {
+      observe: 'response',
+    });
   }
 
   query(req?: any): Observable<HttpResponse<IConference[]>> {

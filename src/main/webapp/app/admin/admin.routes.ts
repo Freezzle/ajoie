@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { Authority } from '../config/authority.constants';
-/* jhipster-needle-add-admin-module-import - JHipster will add admin modules imports here */
 
 const routes: Routes = [
   {
@@ -75,7 +74,6 @@ const routes: Routes = [
     },
     loadChildren: () => import('./volunteer/volunteer.routes'),
   },
-  /* jhipster-needle-add-admin-route - JHipster will add admin routes here */
 ];
 
 export default routes;

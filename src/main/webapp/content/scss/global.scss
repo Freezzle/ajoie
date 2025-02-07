@@ -37,14 +37,13 @@ Generic styles
 /* other generic styles */
 
 .jh-global {
-  margin-left: 20%;
-  margin-right: 20%;
+  margin-left: 10%;
+  margin-right: 10%;
   background-color: #d9def4;
 }
 
 .jh-card {
   padding: 1.5%;
-  margin-top: 20px;
   border: none;
 }
 
@@ -255,7 +254,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 .table {
-  border: 1px solid rgba($primary, 0.4);
+  border: 1px solid rgba($secondary, 0.75);
 }
 
 .table td {
@@ -288,12 +287,12 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 .form-control {
   background-color: #ffeccb;
-  border: 1px dashed $primary;
+  border: 1px solid $darkgrey;
 }
 
 .form-control:disabled {
-  background-color: #fff;
-  border: 1px dashed $secondary;
+  background-color: #e6e6e6;
+  border: 1px dashed $grey;
 }
 
 /* SWITCH CHECKBOX */
@@ -351,10 +350,6 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   overflow-y: auto;
 }
 
-.log-row {
-  height: 1.4rem;
-}
-
 /* TABLE SECTION FOR INVOICES */
 
 .table-section {
@@ -378,4 +373,29 @@ label::after {
 /* Afficher l'astérisque si le field-error contient une erreur */
 div:has(field-error) > label::after {
   display: inline; /* Afficher l'astérisque rouge */
+}
+
+.nav-tabs .nav-link {
+  border-radius: 0;
+}
+
+.nav-tabs .nav-link.active {
+  border-radius: 0;
+  background-color: $darkgrey;
+  color: $light;
+  border: 1px solid $darkgrey;
+  margin-bottom: calc(-1 * var(--bs-nav-tabs-border-width));
+}
+
+.btn-group.active .dropdown-toggle {
+  border-radius: 0;
+  background-color: $darkgrey;
+  color: $light;
+  border: 1px solid $darkgrey;
+  margin-bottom: calc(-1 * var(--bs-nav-tabs-border-width));
+}
+
+.btn-group.active .dropdown-item:hover {
+  background-color: $darkgrey;
+  color: $light;
 }

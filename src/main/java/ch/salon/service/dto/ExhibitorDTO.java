@@ -7,6 +7,8 @@ public class ExhibitorDTO implements Serializable {
 
     private UUID id;
 
+    private String language;
+
     private String fullName;
 
     private String therapistName;
@@ -87,5 +89,13 @@ public class ExhibitorDTO implements Serializable {
 
     public void setExtraInformation(String extraInformation) {
         this.extraInformation = extraInformation;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

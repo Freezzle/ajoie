@@ -13,14 +13,7 @@
             </span>
           </a>
         </li>
-        <li
-          *jhiHasAnyAuthority="['ROLE_ADMIN', 'ROLE_ADMIN_BUSINESS']"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="nav-item dropdown pointer"
-          display="dynamic"
-          ngbDropdown
-          routerLinkActive="active"
-        >
+        <li *jhiHasAnyAuthority="['ROLE_ADMIN', 'ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }" class="nav-item dropdown pointer" display="dynamic" ngbDropdown routerLinkActive="active">
           <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="admin-menu" ngbDropdownToggle>
             <span>
               <fa-icon icon="users-cog"></fa-icon>
@@ -36,24 +29,17 @@
               </li>
             }
             <li *jhiHasAnyAuthority="['ROLE_ADMIN']">
-              <a
-                (click)="collapseNavbar()"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="dropdown-item"
-                routerLink="/admin/authorities"
-                routerLinkActive="active"
-              >
+              <a (click)="collapseNavbar()" [routerLinkActiveOptions]="{ exact: true }" class="dropdown-item" routerLink="/admin/authorities" routerLinkActive="active">
                 <span jhiTranslate="global.menu.admin.authority">Authority</span>
               </a>
             </li>
-            <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
             <li *jhiHasAnyAuthority="['ROLE_ADMIN']">
               <a (click)="collapseNavbar()" class="dropdown-item" routerLink="/admin/user-management" routerLinkActive="active">
                 <span jhiTranslate="global.menu.admin.userManagement">Utilisateurs</span>
               </a>
             </li>
             <li *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']">
-              <a (click)="collapseNavbar()" class="dropdown-item" routerLink="/admin/exhibitors" routerLinkActive="active">
+              <a (click)="collapseNavbar()" class="dropdown-item" [routerLink]="['/admin', 'exhibitors']" routerLinkActive="active">
                 <fa-icon [fixedWidth]="true" icon="users"></fa-icon>
                 <span jhiTranslate="global.menu.admin.exhibitors">Exposants</span>
               </a>
@@ -77,25 +63,13 @@
             <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="languagesnavBarDropdown">
               @for (language of languages; track $index) {
                 <li>
-                  <a
-                    class="dropdown-item"
-                    [jhiActiveMenu]="language"
-                    href="javascript:void(0);"
-                    (click)="changeLanguage(language); collapseNavbar()"
-                    >{{ language | findLanguageFromKey }}</a
-                  >
+                  <a class="dropdown-item" [jhiActiveMenu]="language" href="javascript:void(0);" (click)="changeLanguage(language); collapseNavbar()">{{ language | findLanguageFromKey }}</a>
                 </li>
               }
             </ul>
           </li>
         }
-        <li
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="nav-item dropdown pointer"
-          display="dynamic"
-          ngbDropdown
-          routerLinkActive="active"
-        >
+        <li [routerLinkActiveOptions]="{ exact: true }" class="nav-item dropdown pointer" display="dynamic" ngbDropdown routerLinkActive="active">
           <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="account-menu" ngbDropdownToggle>
             @if (!account()?.imageUrl) {
               <span>
@@ -104,7 +78,7 @@
               </span>
             } @else {
               <span>
-                <img [src]="account()!.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
+                <img [src]="account()!.imageUrl" class="profile-image rounded-circle" alt="Avatar"/>
               </span>
             }
           </a>

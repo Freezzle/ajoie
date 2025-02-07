@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -16,19 +17,21 @@ public class DimensionStand implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @NotNull
-    @Column(name = "dimension", nullable = false)
-    private String dimension;
+    @NotNull @Column(name = "dimension", nullable = false) private String dimension;
 
-    public DimensionStand() {}
+    @NotNull @Column(name = "width_meter", nullable = false) private Double widthMeter;
 
-    public DimensionStand(String dimension) {
+    @NotNull @Column(name = "height_meter", nullable = false) private Double heightMeter;
+
+    public DimensionStand() {
+    }
+
+    public DimensionStand(String dimension, Double widthMeter, Double heightMeter) {
         this.dimension = dimension;
+        this.widthMeter = widthMeter;
+        this.heightMeter = heightMeter;
     }
 
     public UUID getId() {
@@ -55,6 +58,22 @@ public class DimensionStand implements Serializable {
     public DimensionStand dimension(String dimension) {
         this.setDimension(dimension);
         return this;
+    }
+
+    public @NotNull Double getWidthMeter() {
+        return widthMeter;
+    }
+
+    public void setWidthMeter(@NotNull Double widthMeter) {
+        this.widthMeter = widthMeter;
+    }
+
+    public @NotNull Double getHeightMeter() {
+        return heightMeter;
+    }
+
+    public void setHeightMeter(@NotNull Double heightMeter) {
+        this.heightMeter = heightMeter;
     }
 
     @Override

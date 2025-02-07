@@ -1,6 +1,7 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Type;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;

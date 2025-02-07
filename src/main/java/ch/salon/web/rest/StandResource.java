@@ -1,17 +1,9 @@
 package ch.salon.web.rest;
 
-import static ch.salon.service.StandService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.*;
-import static tech.jhipster.web.util.HeaderUtil.*;
-
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.StandService;
 import ch.salon.service.dto.StandDTO;
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +21,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.ResponseUtil;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.UUID;
+
+import static ch.salon.service.StandService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
+import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
+import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
+import static tech.jhipster.web.util.HeaderUtil.createEntityUpdateAlert;
+
 @RestController
 @RequestMapping("/api/stands")
 @Transactional
@@ -37,8 +42,7 @@ public class StandResource {
     private static final Logger log = LoggerFactory.getLogger(StandResource.class);
     private final StandService standService;
 
-    @Value("${jhipster.clientApp.name}")
-    private String applicationName;
+    @Value("${jhipster.clientApp.name}") private String applicationName;
 
     public StandResource(StandService standService) {
         this.standService = standService;
@@ -51,30 +55,27 @@ public class StandResource {
 
         UUID id = standService.create(stand);
 
-        return created(new URI("/api/stands/" + id))
-            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .body(stand);
+        return created(new URI("/api/stands/" + id)).headers(
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stand);
     }
 
     @PutMapping("/{idStand}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<StandDTO> updateStand(
-        @PathVariable(value = "idStand", required = false) final UUID idStand,
-        @Valid @RequestBody StandDTO stand
-    ) {
+    public ResponseEntity<StandDTO> updateStand(@PathVariable(value = "idStand", required = false) final UUID idStand,
+                                                @Valid @RequestBody StandDTO stand) {
         log.debug("REST request to update Stand : {}, {}", idStand, stand);
 
         stand = standService.update(idStand, stand);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stand.getId().toString())).body(stand);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stand.getId().toString()))
+                   .body(stand);
     }
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<StandDTO> getAllStands(
-        @RequestParam(name = "idSalon", required = false) String idSalon,
-        @RequestParam(name = "idParticipation", required = false) String idParticipation
-    ) {
+    public List<StandDTO> getAllStands(@RequestParam(name = "idSalon", required = false) String idSalon,
+                                       @RequestParam(name = "idParticipation", required = false)
+                                       String idParticipation) {
         log.debug("REST request to get all Stands");
 
         return standService.findAll(idSalon, idParticipation);
@@ -95,6 +96,7 @@ public class StandResource {
 
         standService.delete(idStand);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idStand.toString())).build();
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idStand.toString()))
+                          .build();
     }
 }

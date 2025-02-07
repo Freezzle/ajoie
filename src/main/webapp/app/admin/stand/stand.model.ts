@@ -1,6 +1,7 @@
 import { IParticipation } from '../participation/participation.model';
 import { IDimensionStand } from '../dimension-stand/dimension-stand.model';
 import { Status } from '../enumerations/status.model';
+import { Category } from '../enumerations/category.model';
 
 export interface IStand {
   id: string;
@@ -14,9 +15,11 @@ export interface IStand {
   nbChair?: number | null;
   needElectricity?: boolean | null;
   status?: keyof typeof Status | null;
+  category?: keyof typeof Category | null;
   extraInformation?: string | null;
   participation?: IParticipation | null;
   dimension?: IDimensionStand | null;
+  position?: number | null;
 }
 
 export type NewStand = Omit<IStand, 'id'> & { id: null };

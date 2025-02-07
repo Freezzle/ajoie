@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -23,56 +24,39 @@ public class Participation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @Column(name = "client_number")
-    private String clientNumber;
+    @Column(name = "client_number") private String clientNumber;
 
-    @Column(name = "registration_date")
-    private Instant registrationDate;
+    @Column(name = "registration_date") private Instant registrationDate;
 
-    @Column(name = "nb_meal_1")
-    private Long nbMeal1;
+    @Column(name = "nb_meal_1") private Long nbMeal1;
 
-    @Column(name = "nb_meal_2")
-    private Long nbMeal2;
+    @Column(name = "nb_meal_2") private Long nbMeal2;
 
-    @Column(name = "nb_meal_3")
-    private Long nbMeal3;
+    @Column(name = "nb_meal_3") private Long nbMeal3;
 
-    @Column(name = "accepted_chart")
-    private Boolean acceptedChart;
+    @Column(name = "accepted_chart") private Boolean acceptedChart;
 
-    @Column(name = "accepted_contract")
-    private Boolean acceptedContract;
+    @Column(name = "accepted_contract") private Boolean acceptedContract;
 
-    @Column(name = "need_arrangment")
-    private Boolean needArrangment;
+    @Column(name = "need_arrangment") private Boolean needArrangment;
 
-    @Column(name = "is_billing_closed")
-    private Boolean isBillingClosed;
+    @Column(name = "offer") private String offer;
 
-    @Column(name = "offer")
-    private String offer;
+    @Column(name = "additional_information") private String additionnalInformation;
 
-    @Column(name = "additional_information")
-    private String additionnalInformation;
+    @Enumerated(EnumType.STRING) @Column(name = "status") private Status status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private Status status;
+    @Column(name = "guest_of_honor") private Boolean guestOfHonor;
 
-    @Column(name = "extra_information")
-    private String extraInformation;
+    @Column(name = "crush_of_heart") private Boolean crushOfHeart;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Exhibitor exhibitor;
+    @Column(name = "extra_information") private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "priceStandSalons" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER) private Exhibitor exhibitor;
+
+    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
 
     public UUID getId() {
@@ -112,14 +96,6 @@ public class Participation implements Serializable {
     public Participation nbMeal1(Long nbMeal1) {
         this.setNbMeal1(nbMeal1);
         return this;
-    }
-
-    public Boolean getBillingClosed() {
-        return isBillingClosed;
-    }
-
-    public void setBillingClosed(Boolean billingClosed) {
-        isBillingClosed = billingClosed;
     }
 
     public String getOffer() {
@@ -203,19 +179,6 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public Boolean getIsBillingClosed() {
-        return this.isBillingClosed;
-    }
-
-    public void setIsBillingClosed(Boolean isBillingClosed) {
-        this.isBillingClosed = isBillingClosed;
-    }
-
-    public Participation isBillingClosed(Boolean isBillingClosed) {
-        this.setIsBillingClosed(isBillingClosed);
-        return this;
-    }
-
     public Status getStatus() {
         return this.status;
     }
@@ -268,6 +231,22 @@ public class Participation implements Serializable {
         return this;
     }
 
+    public Boolean getGuestOfHonor() {
+        return guestOfHonor;
+    }
+
+    public void setGuestOfHonor(Boolean guestOfHonor) {
+        this.guestOfHonor = guestOfHonor;
+    }
+
+    public Boolean getCrushOfHeart() {
+        return crushOfHeart;
+    }
+
+    public void setCrushOfHeart(Boolean crushOfHeart) {
+        this.crushOfHeart = crushOfHeart;
+    }
+
     public String getClientNumber() {
         return clientNumber;
     }
@@ -277,15 +256,10 @@ public class Participation implements Serializable {
     }
 
     public static boolean hasDifference(Participation part1, Participation part2) {
-        return (
-            (part1 == null && part2 != null) ||
-            (part1 != null && part2 == null) ||
-            (part1 != null &&
-                part2 != null &&
-                (!Objects.equals(part1.getNbMeal1(), part2.getNbMeal1()) ||
-                    !Objects.equals(part1.getNbMeal2(), part2.getNbMeal2()) ||
-                    !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3())))
-        );
+        return ((part1 == null && part2 != null) || (part1 != null && part2 == null) ||
+                (part1 != null && part2 != null && (!Objects.equals(part1.getNbMeal1(), part2.getNbMeal1()) ||
+                                                    !Objects.equals(part1.getNbMeal2(), part2.getNbMeal2()) ||
+                                                    !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3()))));
     }
 
     @Override
@@ -307,41 +281,10 @@ public class Participation implements Serializable {
 
     @Override
     public String toString() {
-        return (
-            "Participation{" +
-            "id=" +
-            getId() +
-            ", registrationDate='" +
-            getRegistrationDate() +
-            "'" +
-            ", clientNumber='" +
-            getClientNumber() +
-            "'" +
-            ", nbMeal1=" +
-            getNbMeal1() +
-            ", nbMeal2=" +
-            getNbMeal2() +
-            ", nbMeal3=" +
-            getNbMeal3() +
-            ", acceptedChart='" +
-            getAcceptedChart() +
-            "'" +
-            ", acceptedContract='" +
-            getAcceptedContract() +
-            "'" +
-            ", needArrangment='" +
-            getNeedArrangment() +
-            "'" +
-            ", isBillingClosed='" +
-            getIsBillingClosed() +
-            "'" +
-            ", status='" +
-            getStatus() +
-            "'" +
-            ", extraInformation='" +
-            getExtraInformation() +
-            "'" +
-            "}"
-        );
+        return ("Participation{" + "id=" + getId() + ", registrationDate='" + getRegistrationDate() + "'" +
+                ", clientNumber='" + getClientNumber() + "'" + ", nbMeal1=" + getNbMeal1() + ", nbMeal2=" +
+                getNbMeal2() + ", nbMeal3=" + getNbMeal3() + ", acceptedChart='" + getAcceptedChart() + "'" +
+                ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangment='" + getNeedArrangment() +
+                "'" + ", status='" + getStatus() + "'" + ", extraInformation='" + getExtraInformation() + "'" + "}");
     }
 }

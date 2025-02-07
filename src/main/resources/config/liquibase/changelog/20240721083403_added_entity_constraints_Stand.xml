@@ -6,7 +6,7 @@
     <!--
         Added the constraints for entity Stand.
     -->
-    <changeSet id="20240721083403-2" author="jhipster">
+    <changeSet id="20240721083403-2" author="claudedy">
 
         <addForeignKeyConstraint baseColumnNames="participation_id"
                                  baseTableName="stand"

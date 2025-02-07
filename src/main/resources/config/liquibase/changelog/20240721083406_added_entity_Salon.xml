@@ -7,7 +7,7 @@
     <!--
         Added the entity Salon.
     -->
-    <changeSet id="20240721083406-1" author="jhipster">
+    <changeSet id="20240721083406-1" author="claudedy">
         <createTable tableName="salon">
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>

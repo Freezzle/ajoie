@@ -10,29 +10,25 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.domain.Persistable;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.springframework.data.domain.Persistable;
 
 /**
  * A Authority.
  */
 @Entity
 @Table(name = "jhi_authority")
-@JsonIgnoreProperties(value = { "new", "id" })
+@JsonIgnoreProperties(value = {"new", "id"})
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Authority implements Serializable, Persistable<String> {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull
-    @Size(max = 50)
-    @Id
-    @Column(name = "name", length = 50, nullable = false)
-    private String name;
+    @NotNull @Size(max = 50) @Id @Column(name = "name", length = 50, nullable = false) private String name;
 
-    @Transient
-    private boolean isPersisted;
+    @Transient private boolean isPersisted;
 
     public String getName() {
         return this.name;

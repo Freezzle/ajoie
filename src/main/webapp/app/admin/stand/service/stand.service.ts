@@ -17,7 +17,8 @@ export class StandService {
   }
 
   update(stand: IStand): Observable<HttpResponse<IStand>> {
-    return this.http.put<IStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand, { observe: 'response' });
+    return this.http.put<IStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand,
+      { observe: 'response' });
   }
 
   find(idStand: string): Observable<HttpResponse<IStand>> {

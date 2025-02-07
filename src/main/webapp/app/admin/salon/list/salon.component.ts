@@ -34,7 +34,7 @@ export class SalonComponent implements OnInit {
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
 
-  salons?: ISalon[];
+  salons: ISalon[] = [];
   isLoading = false;
 
   ngOnInit(): void {
@@ -44,13 +44,16 @@ export class SalonComponent implements OnInit {
   }
 
   delete(salon: ISalon): void {
-    const modalRef = this.modalService.open(DeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    const modalRef = this.modalService.open(DeleteDialogComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
     modalRef.componentInstance.translateKey = 'salon.delete.question';
     modalRef.componentInstance.translateValues = { id: salon.place };
 
     modalRef.closed
       .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
+        filter((reason) => reason === ITEM_DELETED_EVENT),
         switchMap(() => this.salonService.delete(salon.id)),
         tap(() => this.load()), // Recharge les données
       )
@@ -63,7 +66,7 @@ export class SalonComponent implements OnInit {
     this.salonService
       .query()
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(result => {
+      .subscribe((result) => {
         this.salons = result.body ?? [];
       });
   }

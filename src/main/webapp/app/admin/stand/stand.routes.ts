@@ -1,50 +1,50 @@
-import {Routes} from '@angular/router';
+import { Routes } from '@angular/router';
 
-import {UserRouteAccessService} from 'app/core/auth/user-route-access.service';
-import {StandComponent} from './list/stand.component';
-import {StandUpdateComponent} from './update/stand-update.component';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { StandComponent } from './list/stand.component';
+import { StandUpdateComponent } from './update/stand-update.component';
 import StandResolve from './route/stand-routing-resolve.service';
 
 const standRoute: Routes = [
-    {
-        path: '',
-        component: StandComponent,
-        data: {},
-        canActivate: [UserRouteAccessService],
+  {
+    path: '',
+    component: StandComponent,
+    data: {},
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':idStand/view',
+    component: StandUpdateComponent,
+    resolve: {
+      stand: StandResolve,
     },
-    {
-        path: ':idStand/view',
-        component: StandUpdateComponent,
-        resolve: {
-            stand: StandResolve,
-        },
-        data: {
-            readonly: true,
-        },
-        canActivate: [UserRouteAccessService],
+    data: {
+      readonly: true,
     },
-    {
-        path: 'new',
-        component: StandUpdateComponent,
-        resolve: {
-            stand: StandResolve,
-        },
-        data: {
-            readonly: false,
-        },
-        canActivate: [UserRouteAccessService],
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'new',
+    component: StandUpdateComponent,
+    resolve: {
+      stand: StandResolve,
     },
-    {
-        path: ':idStand/edit',
-        component: StandUpdateComponent,
-        resolve: {
-            stand: StandResolve,
-        },
-        data: {
-            readonly: false,
-        },
-        canActivate: [UserRouteAccessService],
+    data: {
+      readonly: false,
     },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: ':idStand/edit',
+    component: StandUpdateComponent,
+    resolve: {
+      stand: StandResolve,
+    },
+    data: {
+      readonly: false,
+    },
+    canActivate: [UserRouteAccessService],
+  },
 ];
 
 export default standRoute;

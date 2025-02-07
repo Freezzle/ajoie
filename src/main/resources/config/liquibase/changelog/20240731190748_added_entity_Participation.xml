@@ -7,7 +7,7 @@
     <!--
         Added the entity Participation.
     -->
-    <changeSet id="20240731190748-1" author="jhipster">
+    <changeSet id="20240731190748-1" author="claudedy">
         <createTable tableName="participation">
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
@@ -36,14 +36,17 @@
             <column name="need_arrangment" type="boolean">
                 <constraints nullable="true"/>
             </column>
-            <column name="is_billing_closed" type="boolean">
-                <constraints nullable="true"/>
-            </column>
             <column name="status" type="varchar(100)">
                 <constraints nullable="true"/>
             </column>
             <column name="offer" type="varchar(500)">
                 <constraints nullable="true"/>
+            </column>
+            <column name="guest_of_honor" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="crush_of_heart" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
             </column>
             <column name="additional_information" type="varchar(500)">
                 <constraints nullable="true"/>

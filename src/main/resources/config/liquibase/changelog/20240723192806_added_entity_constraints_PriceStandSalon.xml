@@ -6,7 +6,7 @@
     <!--
         Added the constraints for entity PriceStandSalon.
     -->
-    <changeSet id="20240723192806-2" author="jhipster">
+    <changeSet id="20240723192806-2" author="claudedy">
 
         <addForeignKeyConstraint baseColumnNames="salon_id"
                                  baseTableName="price_stand_salon"

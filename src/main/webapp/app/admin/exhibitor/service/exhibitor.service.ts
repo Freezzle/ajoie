@@ -6,6 +6,7 @@ import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IExhibitor, NewExhibitor } from '../exhibitor.model';
+import { IParticipation } from '../../participation/participation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ExhibitorService {
@@ -18,11 +19,16 @@ export class ExhibitorService {
   }
 
   update(exhibitor: IExhibitor): Observable<HttpResponse<IExhibitor>> {
-    return this.http.put<IExhibitor>(`${this.resourceUrl}/${this.getExhibitorIdentifier(exhibitor)}`, exhibitor, { observe: 'response' });
+    return this.http.put<IExhibitor>(`${this.resourceUrl}/${this.getExhibitorIdentifier(exhibitor)}`, exhibitor,
+      { observe: 'response' });
   }
 
   find(idExhibitor: string): Observable<HttpResponse<IExhibitor>> {
     return this.http.get<IExhibitor>(`${this.resourceUrl}/${idExhibitor}`, { observe: 'response' });
+  }
+
+  findParticipations(idExhibitor: string): Observable<IParticipation[]> {
+    return this.http.get<IParticipation[]>(`${this.resourceUrl}/${idExhibitor}/participations`);
   }
 
   query(req?: any): Observable<HttpResponse<IExhibitor[]>> {
@@ -48,7 +54,8 @@ export class ExhibitorService {
   ): Type[] {
     const exhibitors: Type[] = exhibitorsToCheck.filter(isPresent);
     if (exhibitors.length > 0) {
-      const exhibitorCollectionIdentifiers = exhibitorCollection.map(exhibitorItem => this.getExhibitorIdentifier(exhibitorItem));
+      const exhibitorCollectionIdentifiers = exhibitorCollection.map(
+        exhibitorItem => this.getExhibitorIdentifier(exhibitorItem));
       const exhibitorsToAdd = exhibitors.filter(exhibitorItem => {
         const exhibitorIdentifier = this.getExhibitorIdentifier(exhibitorItem);
         if (exhibitorCollectionIdentifiers.includes(exhibitorIdentifier)) {

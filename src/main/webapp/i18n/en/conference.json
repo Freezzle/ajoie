@@ -14,7 +14,8 @@
       "list": {
         "ACCEPTED": "Accepté",
         "CANCELED": "Annulé",
-        "IN_VERIFICATION": "En cours",
+        "IN_VERIFICATION": "En vérification",
+        "PAID": "Payé",
         "REFUSED": "Refusé",
         "null": " "
       }

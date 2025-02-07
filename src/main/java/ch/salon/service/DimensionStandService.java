@@ -4,8 +4,9 @@ import ch.salon.domain.DimensionStand;
 import ch.salon.repository.DimensionStandRepository;
 import ch.salon.service.dto.DimensionStandDTO;
 import ch.salon.service.mapper.DimensionStandMapper;
-import java.util.List;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DimensionStandService {
@@ -21,13 +22,14 @@ public class DimensionStandService {
     public List<DimensionStandDTO> findAll() {
         List<DimensionStand> dimensionStands = dimensionStandRepository.findAll();
         if (dimensionStands.isEmpty()) {
-            dimensionStands.add(new DimensionStand("2 m x 2 m"));
-            dimensionStands.add(new DimensionStand("2.5 m x 2 m"));
-            dimensionStands.add(new DimensionStand("2.5 m x 2 m (possible de vendre des deux côtés)"));
-            dimensionStands.add(new DimensionStand("3 m x 2 m"));
-            dimensionStands.add(new DimensionStand("3 m x 2.5 m"));
-            dimensionStands.add(new DimensionStand("4 m x 2 m"));
-            dimensionStands.add(new DimensionStand("Autres"));
+            dimensionStands.add(new DimensionStand("2 m x 2 m", 2.0, 2.0));
+            dimensionStands.add(new DimensionStand("2.5 m x 2 m", 2.5, 2.0));
+            dimensionStands.add(new DimensionStand("2.5 m x 2 m (Ventes sur deux côtés)", 2.5, 2.0));
+            dimensionStands.add(new DimensionStand("3 m x 2 m", 3.0, 2.0));
+            dimensionStands.add(new DimensionStand("3 m x 2.5 m", 3.0, 2.5));
+            dimensionStands.add(new DimensionStand("4 m x 2 m", 4.0, 2.0));
+            dimensionStands.add(new DimensionStand("4 m x 2.5 m", 4.0, 2.5));
+            dimensionStands.add(new DimensionStand("4 m x 3 m", 4.0, 3.0));
 
             dimensionStands = dimensionStandRepository.saveAll(dimensionStands);
         }

@@ -14,6 +14,7 @@
     "refresh": "Reset",
     "save": "Sauvegarder",
     "show": "Show {{otherEntity}}",
+    "validate": "Valider",
     "validation": {
       "datetimelocal": "Ce champ doit être une date et une heure.",
       "max": "Ce champ doit être inférieur à {{max}}.",

@@ -1,0 +1,7 @@
+{
+  "floorPlan": {
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer le plan \"{{floorName}}\" ?"
+    }
+  }
+}

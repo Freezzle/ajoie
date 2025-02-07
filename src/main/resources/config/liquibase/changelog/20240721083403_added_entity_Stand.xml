@@ -7,7 +7,7 @@
     <!--
         Added the entity Stand.
     -->
-    <changeSet id="20240721083403-1" author="jhipster">
+    <changeSet id="20240721083403-1" author="claudedy">
         <createTable tableName="stand">
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
@@ -39,6 +39,9 @@
             <column name="need_electricity" type="boolean">
                 <constraints nullable="true"/>
             </column>
+            <column name="category" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
             <column name="status" type="varchar(100)">
                 <constraints nullable="true"/>
             </column>
@@ -51,7 +54,9 @@
             <column name="dimension_id" type="${uuidType}">
                 <constraints nullable="true"/>
             </column>
-
+            <column name="position" type="bigint">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
     </changeSet>
 

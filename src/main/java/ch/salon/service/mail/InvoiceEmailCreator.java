@@ -3,8 +3,6 @@ package ch.salon.service.mail;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.service.document.InvoiceDocumentCreator;
 import ch.salon.utils.DateUtils;
-import java.util.Locale;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamSource;
@@ -13,6 +11,9 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.util.Locale;
+import java.util.Map;
+
 @Component
 public class InvoiceEmailCreator extends AbstractEmailCreator {
 
@@ -20,12 +21,9 @@ public class InvoiceEmailCreator extends AbstractEmailCreator {
     private final MessageSource messageSource;
     private InvoicingPlan invoicingPlan;
 
-    public InvoiceEmailCreator(
-        InvoiceDocumentCreator invoiceDocumentCreator,
-        MessageSource messageSource,
-        JavaMailSender javaMailSender,
-        @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine
-    ) {
+    public InvoiceEmailCreator(InvoiceDocumentCreator invoiceDocumentCreator, MessageSource messageSource,
+                               JavaMailSender javaMailSender,
+                               @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine) {
         super(javaMailSender, mailTemplateEngine);
         this.invoiceDocumentCreator = invoiceDocumentCreator;
         this.messageSource = messageSource;
@@ -37,7 +35,7 @@ public class InvoiceEmailCreator extends AbstractEmailCreator {
 
     @Override
     protected String getTranslatedSubject() {
-        Object[] args = { invoicingPlan.getParticipation().getSalon().getPlace() };
+        Object[] args = {invoicingPlan.getParticipation().getSalon().getPlace()};
         return this.messageSource.getMessage("email.invoice.title", args, getContext().getLocale());
     }
 
@@ -62,8 +60,11 @@ public class InvoiceEmailCreator extends AbstractEmailCreator {
         context.setVariable("salon", invoicingPlan.getParticipation().getSalon().getPlace());
         context.setVariable("billingNumber", invoicingPlan.getBillingNumber());
         context.setVariable("fullName", invoicingPlan.getParticipation().getExhibitor().getFullName());
-        context.setVariable("startDate", DateUtils.instantToIso(invoicingPlan.getParticipation().getSalon().getStartingDate()));
-        context.setVariable("endDate", DateUtils.instantToIso(invoicingPlan.getParticipation().getSalon().getEndingDate()));
+        context.setVariable("arrangement", invoicingPlan.getParticipation().getNeedArrangment());
+        context.setVariable("startDate",
+                            DateUtils.instantToIso(invoicingPlan.getParticipation().getSalon().getStartingDate()));
+        context.setVariable("endDate",
+                            DateUtils.instantToIso(invoicingPlan.getParticipation().getSalon().getEndingDate()));
         return context;
     }
 

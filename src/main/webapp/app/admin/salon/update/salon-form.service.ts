@@ -55,15 +55,15 @@ export class SalonFormService {
       priceSharingStand: new FormControl(salonRawValue.priceSharingStand),
       priceStandSalons: new FormArray<FormGroup<PriceStandGroup>>(
         salonRawValue.priceStandSalons
-          ? salonRawValue.priceStandSalons.map(
-              priceStand =>
-                new FormGroup<PriceStandGroup>({
-                  id: new FormControl(priceStand.id),
-                  price: new FormControl(priceStand.price),
-                  dimension: new FormControl(priceStand.dimension),
-                }),
-            )
-          : ([] as FormGroup<PriceStandGroup>[]),
+        ? salonRawValue.priceStandSalons.map(
+          priceStand =>
+            new FormGroup<PriceStandGroup>({
+              id: new FormControl(priceStand.id),
+              price: new FormControl(priceStand.price),
+              dimension: new FormControl(priceStand.dimension),
+            }),
+        )
+        : ([] as FormGroup<PriceStandGroup>[]),
       ),
       extraInformation: new FormControl(salonRawValue.extraInformation),
     });

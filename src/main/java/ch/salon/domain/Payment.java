@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -20,27 +21,18 @@ public class Payment implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private UUID id;
+    @Id @GeneratedValue @Column(name = "id") private UUID id;
 
-    @NotNull
-    @Column(name = "amount", nullable = false)
-    private Double amount;
+    @NotNull @Column(name = "amount", nullable = false) private Double amount;
 
-    @NotNull
-    @Column(name = "billing_date", nullable = false)
-    private Instant billingDate;
+    @NotNull @Column(name = "billing_date", nullable = false) private Instant billingDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_mode")
-    private Mode paymentMode;
+    @Enumerated(EnumType.STRING) @Column(name = "payment_mode") private Mode paymentMode;
 
-    @Column(name = "extra_information")
-    private String extraInformation;
+    @Column(name = "extra_information") private String extraInformation;
 
-    public Payment() {}
+    public Payment() {
+    }
 
     public Payment(Payment payment) {
         this.amount = payment.getAmount();
@@ -133,22 +125,8 @@ public class Payment implements Serializable {
 
     @Override
     public String toString() {
-        return (
-            "Payment{" +
-            "id=" +
-            getId() +
-            ", amount=" +
-            getAmount() +
-            ", billingDate='" +
-            getBillingDate() +
-            "'" +
-            ", paymentMode='" +
-            getPaymentMode() +
-            "'" +
-            ", extraInformation='" +
-            getExtraInformation() +
-            "'" +
-            "}"
-        );
+        return ("Payment{" + "id=" + getId() + ", amount=" + getAmount() + ", billingDate='" + getBillingDate() + "'" +
+                ", paymentMode='" + getPaymentMode() + "'" + ", extraInformation='" + getExtraInformation() + "'" +
+                "}");
     }
 }

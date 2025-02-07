@@ -5,18 +5,32 @@ import { finalize } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IPriceStandSalon, ISalon } from '../salon.model';
+import { IPriceStandSalon, ISalon, sortPriceStandSalon } from '../salon.model';
 import { SalonService } from '../service/salon.service';
 import { SalonFormGroup, SalonFormService } from './salon-form.service';
 import { DimensionStandService } from '../../dimension-stand/service/dimension-stand.service';
 import { ErrorModel } from '../../../shared/field-error/error.model';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
+import { State } from '../../enumerations/state.model';
+import { Status } from '../../enumerations/status.model';
+import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
+import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
+import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
 
 @Component({
   standalone: true,
   selector: 'jhi-salon-update',
   templateUrl: './salon-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterLink, FieldErrorComponent],
+  imports: [
+    SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterLink,
+    FieldErrorComponent,
+    ColorLockBooleanPipe,
+    FormatMediumDatePipe,
+    LockBooleanPipe,
+  ],
 })
 export class SalonUpdateComponent implements OnInit {
   protected salonService = inject(SalonService);
@@ -32,10 +46,9 @@ export class SalonUpdateComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ salon, readonly }) => {
       this.salon = salon as ISalon;
-
       this.readonlyForm = readonly;
 
-      this.dimensionStandService.query().subscribe(dimensions => {
+      this.dimensionStandService.query().subscribe((dimensions) => {
         if (!this.salon) {
           this.salon = {} as ISalon;
         }
@@ -45,12 +58,21 @@ export class SalonUpdateComponent implements OnInit {
             this.salon.priceStandSalons = [];
           }
 
-          dimensions.body.forEach(dimensionParam => {
-            if (!this.salon?.priceStandSalons?.map(priceStand => priceStand.dimension?.id).includes(dimensionParam.id)) {
-              this.salon?.priceStandSalons?.push({ price: null, dimension: dimensionParam } as IPriceStandSalon);
+          dimensions.body.forEach((dimensionParam) => {
+            if (
+              !this.salon?.priceStandSalons
+                ?.map((priceStand) => priceStand.dimension?.id)
+                .includes(dimensionParam.id)
+            ) {
+              this.salon?.priceStandSalons?.push({
+                price: null,
+                dimension: dimensionParam,
+              } as IPriceStandSalon);
             }
           });
         }
+
+        sortPriceStandSalon(this.salon.priceStandSalons ?? []);
 
         this.editForm = this.salonFormService.createSalonFormGroup(this.salon);
 
@@ -115,4 +137,6 @@ export class SalonUpdateComponent implements OnInit {
   }
 
   protected readonly ErrorModel = ErrorModel;
+  protected readonly State = State;
+  protected readonly Status = Status;
 }

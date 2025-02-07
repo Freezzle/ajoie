@@ -1,12 +1,7 @@
 import { ApplicationConfig, importProvidersFrom, inject, LOCALE_ID } from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
 import {
-  NavigationError,
-  provideRouter,
-  Router,
-  RouterFeatures,
-  TitleStrategy,
-  withComponentInputBinding,
+  NavigationError, provideRouter, Router, RouterFeatures, TitleStrategy, withComponentInputBinding,
   withNavigationErrorHandler,
 } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -19,7 +14,6 @@ import './config/dayjs';
 import { TranslationModule } from 'app/shared/language/translation.module';
 import { httpInterceptorProviders } from './core/interceptor';
 import routes from './app.routes';
-// jhipster-needle-angular-add-module-import JHipster will add new module here
 import { NgbDateDayjsAdapter } from './config/datepicker-adapter';
 import { AppPageTitleStrategy } from './app-page-title-strategy';
 
@@ -54,6 +48,5 @@ export const appConfig: ApplicationConfig = {
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
     httpInterceptorProviders,
     { provide: TitleStrategy, useClass: AppPageTitleStrategy },
-    // jhipster-needle-angular-add-module JHipster will add new module here
   ],
 };

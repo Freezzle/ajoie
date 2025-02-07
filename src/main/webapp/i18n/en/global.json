@@ -59,7 +59,6 @@
         "database": "Base de données",
         "exhibitors": "Exposants",
         "health": "Diagnostics",
-        "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)",
         "logs": "Logs",
         "main": "Administration",
         "metrics": "Métriques",
@@ -72,7 +71,6 @@
         "dimensionStand": "Dimensions",
         "exhibitor": "Exposants",
         "invoice": "Factures",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "main": "Entités",
         "participation": "Participations",
         "payment": "Paiements",
@@ -81,7 +79,6 @@
         "stand": "Stands"
       },
       "home": "Accueil",
-      "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "language": "Langue"
     },
     "messages": {

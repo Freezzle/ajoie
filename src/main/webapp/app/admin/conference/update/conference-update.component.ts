@@ -15,6 +15,7 @@ import { ParticipationService } from '../../participation/service/participation.
 import { Status } from '../../enumerations/status.model';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
 import { ErrorModel } from '../../../shared/field-error/error.model';
+import { getExhibitorName, getFormattedExhibitorName } from '../../exhibitor/exhibitor.model';
 
 @Component({
   standalone: true,
@@ -34,29 +35,33 @@ export class ConferenceUpdateComponent implements OnInit {
   readonlyForm = false;
   params: any;
   participationsOptions: IParticipation[] = [];
-  editForm: FormGroup<ConferenceFormGroup> = this.conferenceFormService.createConferenceFormGroup({ id: null });
+  editForm: FormGroup<ConferenceFormGroup> = this.conferenceFormService.createConferenceFormGroup({
+    id: null,
+  });
 
   compareParticipation = (o1: IParticipation | null, o2: IParticipation | null): boolean =>
     this.participationService.compareParticipation(o1, o2);
 
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
-      this.params = params;
-      this.readonlyForm = data['readonly'];
-      this.conference = data['conference'];
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
+      ([params, data]) => {
+        this.params = params;
+        this.readonlyForm = data['readonly'];
+        this.conference = data['conference'];
 
-      this.loadRelationshipsOptions();
+        this.loadRelationshipsOptions();
 
-      if (this.conference) {
-        this.editForm = this.conferenceFormService.createConferenceFormGroup(this.conference);
+        if (this.conference) {
+          this.editForm = this.conferenceFormService.createConferenceFormGroup(this.conference);
 
-        if (this.readonlyForm) {
-          this.readOnlyBack();
-        } else {
-          this.writeBack();
+          if (this.readonlyForm) {
+            this.readOnlyBack();
+          } else {
+            this.writeBack();
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   readOnlyBack(): void {
@@ -75,6 +80,7 @@ export class ConferenceUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
+
     const conference = this.conferenceFormService.getConference(this.editForm);
     if (conference.id !== null) {
       this.conferenceService
@@ -118,7 +124,11 @@ export class ConferenceUpdateComponent implements OnInit {
           if (this.params.get('idParticipation')) {
             this.editForm
               .get('participation')
-              ?.setValue(participations.find(participation => participation.id === this.params.get('idParticipation')));
+              ?.setValue(
+                participations.find(
+                  (participation) => participation.id === this.params.get('idParticipation'),
+                ),
+              );
           }
 
           return this.participationService.addParticipationsOptionsIfMissing<IParticipation>(
@@ -127,8 +137,12 @@ export class ConferenceUpdateComponent implements OnInit {
           );
         }),
       )
-      .subscribe((participations: IParticipation[]) => (this.participationsOptions = participations));
+      .subscribe(
+        (participations: IParticipation[]) => (this.participationsOptions = participations),
+      );
   }
 
   protected readonly ErrorModel = ErrorModel;
+  protected readonly getExhibitorName = getExhibitorName;
+  protected readonly getFormattedExhibitorName = getFormattedExhibitorName;
 }

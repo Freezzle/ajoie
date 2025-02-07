@@ -17,9 +17,9 @@
             <span th:utext="#{document.invoice.reference}"></span>
             <b>[[${reference}]]</b><br />
             <span th:text="#{document.invoice.send-date}"></span>
-            [[${#temporals.format(sentDate, 'dd.MM.yyyy')}]]<br />
+            [[${sentDate}]]<br />
             <span th:text="#{document.invoice.expiration-date}"></span>
-            [[${#temporals.format(expirationDate, 'dd.MM.yyyy')}]]<br />
+            [[${expirationDate}]]<br />
           </td>
           <td class="top-right">
             <span th:utext="#{document.invoice.contacts}"></span>
@@ -58,21 +58,20 @@
         <tr>
           <td colspan="4">&nbsp;</td>
         </tr>
-        <tr th:if="${hasPaidSomething}">
-          <td class="center-left padding-left-5" th:text="#{document.invoice.table.line.received-payments}" />
-          <td class="center-right">&nbsp;</td>
-          <td class="center-center">&nbsp;</td>
-          <td class="center-right padding-right-5" th:text="${#numbers.formatDecimal(paymentsTotal, 1, 2, 'POINT')}" />
+
+        <tr th:each="payment: ${payments}" th:if="${hasPaidSomething}">
+          <td class="center-left padding-left-5" colspan="3" th:text="${payment.getExtraInformation()}" />
+          <td class="center-right padding-right-5" th:text="-${#numbers.formatDecimal(payment.getAmount(), 1, 2, 'POINT')}" />
         </tr>
         <tr th:if="${hasPaidSomething}">
           <td colspan="4">&nbsp;</td>
         </tr>
         <tr class="bg">
-          <td
-            class="top-left padding-left-5 padding-bottom-5 padding-top-5"
-            colspan="3"
-            th:utext="${total < 0} ? #{document.invoice.table.line.negative-remaining-amount} : #{document.invoice.table.line.positive-remaining-amount}"
-          ></td>
+          <td class="top-left padding-left-5 padding-bottom-5 padding-top-5" colspan="3">
+            <span th:if="${total < 0}" th:utext="#{document.invoice.table.line.negative-remaining-amount}"></span>
+            <span th:if="${total > 0}" th:utext="#{document.invoice.table.line.positive-remaining-amount}"></span>
+            <span th:if="${total == 0}" th:utext="#{document.invoice.table.line.no-remaining-amount}"></span>
+          </td>
           <td class="top-right padding-right-5 padding-bottom-5 padding-top-5">
             <b>[[${#numbers.formatDecimal(total, 1, 2, 'POINT')}]]</b>
           </td>
@@ -80,13 +79,14 @@
       </table>
       <br />
       <br />
-      <div>
+      <div th:if="${total > 0}">
         <span th:utext="#{document.invoice.important.title}"></span>
         <hr class="border-thin" />
         <div class="padding-left-5">
           <span th:utext="#{document.invoice.important.text1}"></span>
           <br />
-          <span th:utext="#{document.invoice.important.text2}"></span>
+          <span th:if="${!arrangement}" th:utext="#{document.invoice.important.text2(${expirationDate})}"></span>
+          <span th:if="${arrangement}" th:utext="#{document.invoice.important.text2.arrangement(${expirationDate})}"></span>
         </div>
         <br />
         <span th:utext="#{document.invoice.bank-detail.title}"></span>

@@ -1,8 +1,6 @@
 package ch.salon.service.mail;
 
 import ch.salon.domain.User;
-import java.util.Locale;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamSource;
@@ -12,6 +10,9 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
 
+import java.util.Locale;
+import java.util.Map;
+
 @Component
 public class PasswordResetEmailCreator extends AbstractEmailCreator {
 
@@ -19,12 +20,9 @@ public class PasswordResetEmailCreator extends AbstractEmailCreator {
     private final JHipsterProperties jHipsterProperties;
     private User user;
 
-    public PasswordResetEmailCreator(
-        MessageSource messageSource,
-        JavaMailSender javaMailSender,
-        @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine,
-        JHipsterProperties jHipsterProperties
-    ) {
+    public PasswordResetEmailCreator(MessageSource messageSource, JavaMailSender javaMailSender,
+                                     @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine,
+                                     JHipsterProperties jHipsterProperties) {
         super(javaMailSender, mailTemplateEngine);
         this.messageSource = messageSource;
         this.jHipsterProperties = jHipsterProperties;

@@ -2,7 +2,7 @@
   <h2 id="page-heading">
     <span jhiTranslate="stand.title">Les stands</span>
 
-    <hr />
+    <hr/>
 
     <div class="d-flex justify-content-between mt-3">
       <span>
@@ -14,13 +14,7 @@
 
       <span [formGroup]="filters" class="row">
         <div class="col-auto">
-          <input
-            (blur)="actionFilter()"
-            class="form-control"
-            formControlName="fullName"
-            placeholder="{{ 'exhibitor.filter.fullName' | translate }}"
-            type="text"
-          />
+          <input (blur)="actionFilter()" [placeholder]="'exhibitor.filter.fullName' | translate" class="form-control" formControlName="fullName" type="text"/>
         </div>
         <div class="col-auto">
           <select (change)="actionFilter()" class="form-control" formControlName="status">
@@ -45,70 +39,80 @@
       </span>
     </div>
 
-    <hr />
+    <hr/>
   </h2>
 
   <jhi-alert-error></jhi-alert-error>
 
-  @if (stands) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-hover" aria-describedby="page-heading">
-        <thead class="thead-primary">
+  <div class="table-responsive table-entities" id="entities">
+    <table aria-describedby="page-heading" class="table table-hover">
+      <thead class="thead-primary">
+        <tr>
+          <th class="col-auto">
+            <span jhiTranslate="stand.participation">Participation</span>
+          </th>
+          <th class="col-5">
+            <span jhiTranslate="stand.description">Description</span>
+          </th>
+          <th class="col-auto">
+            <span jhiTranslate="stand.position">Position</span>
+          </th>
+          <th class="col-1">
+            <span jhiTranslate="stand.category.label">Catégorie</span>
+          </th>
+          <th class="col-auto">
+            <span jhiTranslate="stand.dimension">Dimension</span>
+          </th>
+          <th class="col-auto text-center">
+            <span jhiTranslate="stand.status.label">Statut</span>
+          </th>
+          <th class="col-auto">&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (stands.length === 0) {
           <tr>
-            <th class="col-auto">
-              <span jhiTranslate="stand.participation">Participation</span>
-            </th>
-            <th class="col-7">
-              <span jhiTranslate="stand.description">Description</span>
-            </th>
-            <th class="col-auto">
-              <span jhiTranslate="stand.dimension">Dimension</span>
-            </th>
-            <th class="col-auto text-center">
-              <span jhiTranslate="stand.status.label">Statut</span>
-            </th>
-            <th class="col-auto">&nbsp;</th>
+            <td colspan="5">
+              <span jhiTranslate="stand.notFound">Aucun Stand</span>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @if (stands.length === 0) {
+        } @else {
+          @for (stand of stands; track $index) {
             <tr>
-              <td colspan="5">
-                <span jhiTranslate="stand.notFound">Aucun Stand</span>
+              <td>
+                @if (stand.participation) {
+                  <a [routerLink]="[
+                      '/admin/salons',
+                      params.get('idSalon'),
+                      'participations',
+                      stand.participation.id,
+                      'view',
+                    ]"> {{ getExhibitorName(stand.participation.exhibitor) }} </a>
+                }
+              </td>
+              <td class="go-detail truncate" [routerLink]="['./', stand.id, 'view']">{{ stand.description }}</td>
+              <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
+                {{ stand.position }}
+              </td>
+              <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
+                {{ 'stand.category.list.' + stand.category | translate }}
+              </td>
+              <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
+              <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
+                <fa-icon [icon]="stand.status | status" [class]="stand.status | colorStatus" [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm">
+                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                    <span jhiTranslate="common.delete"></span>
+                  </button>
+                </div>
               </td>
             </tr>
-          } @else {
-            @for (stand of stands; track $index) {
-              <tr>
-                <td>
-                  @if (stand.participation) {
-                    <a [routerLink]="['/admin/salons', params.get('idSalon'), 'participations', stand.participation.id, 'view']">
-                      {{ stand.participation.exhibitor?.fullName }}
-                    </a>
-                  }
-                </td>
-                <td class="go-detail truncate" [routerLink]="['./', stand.id, 'view']">{{ stand.description }}</td>
-                <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
-                <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
-                  <fa-icon
-                    icon="{{ stand.status | status }}"
-                    class="{{ stand.status | colorStatus }}"
-                    title="{{ 'stand.status.list.' + stand.status | translate }}"
-                  ></fa-icon>
-                </td>
-                <td class="text-end">
-                  <div class="btn-group">
-                    <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm">
-                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                      <span jhiTranslate="common.delete"></span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
           }
-        </tbody>
-      </table>
-    </div>
-  }
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

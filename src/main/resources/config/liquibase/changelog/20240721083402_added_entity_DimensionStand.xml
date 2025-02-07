@@ -7,7 +7,7 @@
     <!--
         Added the entity DimensionStand.
     -->
-    <changeSet id="20240721083402-1" author="jhipster">
+    <changeSet id="20240721083402-1" author="claudedy">
         <createTable tableName="dimension_stand">
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
@@ -15,7 +15,12 @@
             <column name="dimension" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-
+            <column name="width_meter" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="height_meter" type="double">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 

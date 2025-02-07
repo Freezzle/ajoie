@@ -7,7 +7,7 @@ public class PriceStandDTO implements Serializable {
 
     private UUID id;
     private Double price;
-    private DimensionStandLightDTO dimension;
+    private DimensionStandDTO dimension;
 
     public PriceStandDTO() {
         // Empty constructor needed for Jackson.
@@ -29,11 +29,11 @@ public class PriceStandDTO implements Serializable {
         this.price = price;
     }
 
-    public DimensionStandLightDTO getDimension() {
+    public DimensionStandDTO getDimension() {
         return dimension;
     }
 
-    public void setDimension(DimensionStandLightDTO dimension) {
+    public void setDimension(DimensionStandDTO dimension) {
         this.dimension = dimension;
     }
 }

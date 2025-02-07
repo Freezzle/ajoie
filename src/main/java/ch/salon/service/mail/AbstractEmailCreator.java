@@ -1,12 +1,7 @@
 package ch.salon.service.mail;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.MailException;
@@ -16,6 +11,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public abstract class AbstractEmailCreator {
 
@@ -65,8 +66,8 @@ public abstract class AbstractEmailCreator {
         return mailTemplateEngine.process(getTemplateName(), getContext());
     }
 
-    private MimeMessageHelper getMimeMessageHelper(MimeMessage mimeMessage, boolean withAttachments, String content)
-        throws MessagingException, IOException {
+    private MimeMessageHelper getMimeMessageHelper(MimeMessage mimeMessage, boolean withAttachments,
+                                                   String content) throws MessagingException, IOException {
         MimeMessageHelper message = new MimeMessageHelper(mimeMessage, withAttachments, UTF_8.name());
 
         // FIXME CHANGE THAT LATER

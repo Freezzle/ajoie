@@ -1,18 +1,12 @@
 package ch.salon.web.rest;
 
-import static ch.salon.service.ExhibitorService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.*;
-import static tech.jhipster.web.util.HeaderUtil.*;
-
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ExhibitorService;
+import ch.salon.service.ParticipationService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.ExhibitorDTO;
+import ch.salon.service.dto.ParticipationDTO;
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +23,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.ResponseUtil;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static ch.salon.service.ExhibitorService.ENTITY_NAME;
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
+import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
+import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
+import static tech.jhipster.web.util.HeaderUtil.createEntityUpdateAlert;
+
 /**
  * REST controller for managing {@link ch.salon.domain.Exhibitor}.
  */
@@ -39,37 +47,47 @@ public class ExhibitorResource {
 
     private static final Logger log = LoggerFactory.getLogger(ExhibitorResource.class);
     private final ExhibitorService exhibitorService;
+    private final ParticipationService participationService;
 
-    @Value("${jhipster.clientApp.name}")
-    private String applicationName;
+    @Value("${jhipster.clientApp.name}") private String applicationName;
 
-    public ExhibitorResource(ExhibitorService exhibitorService) {
+    public ExhibitorResource(ExhibitorService exhibitorService, ParticipationService participationService) {
         this.exhibitorService = exhibitorService;
+        this.participationService = participationService;
     }
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<ExhibitorDTO> createExhibitor(@Valid @RequestBody ExhibitorDTO exhibitor) throws URISyntaxException {
+    public ResponseEntity<ExhibitorDTO> createExhibitor(
+            @Valid @RequestBody ExhibitorDTO exhibitor) throws URISyntaxException {
         log.debug("REST request to save Exhibitor : {}", exhibitor);
 
         UUID id = exhibitorService.create(exhibitor);
 
-        return created(new URI("/api/exhibitors/" + id))
-            .headers(createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .body(exhibitor);
+        return created(new URI("/api/exhibitors/" + id)).headers(
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(exhibitor);
     }
 
     @PutMapping("/{idExhibitor}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<ExhibitorDTO> updateExhibitor(
-        @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor,
-        @Valid @RequestBody ExhibitorDTO exhibitor
-    ) throws URISyntaxException {
+            @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor,
+            @Valid @RequestBody ExhibitorDTO exhibitor) throws URISyntaxException {
         log.debug("REST request to update Exhibitor : {}, {}", idExhibitor, exhibitor);
 
         exhibitor = exhibitorService.update(idExhibitor, exhibitor);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, exhibitor.getId().toString())).body(exhibitor);
+        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, exhibitor.getId().toString()))
+                   .body(exhibitor);
+    }
+
+    @GetMapping("/{idExhibitor}/participations")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<List<ParticipationDTO>> getParticipationsFromExhibitor(
+            @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor) throws URISyntaxException {
+        List<ParticipationDTO> participations = participationService.getParticipationsFromExhibitor(idExhibitor);
+
+        return ResponseUtil.wrapOrNotFound(Optional.of(participations));
     }
 
     @GetMapping("")
@@ -95,20 +113,8 @@ public class ExhibitorResource {
 
         exhibitorService.delete(idExhibitor);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idExhibitor.toString())).build();
-    }
-
-    @PostMapping("/{idExhibitor}/events")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Void> createEventLog(
-        @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor,
-        @Valid @RequestBody EventLogDTO eventLogDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to save eventLog : {}", eventLogDTO);
-
-        exhibitorService.createEventLog(idExhibitor, eventLogDTO);
-
-        return noContent().build();
+        return noContent().headers(
+                createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idExhibitor.toString())).build();
     }
 
     @GetMapping("/{idExhibitor}/events")

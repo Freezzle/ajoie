@@ -4,7 +4,7 @@
       <span *ngIf="exhibitor?.id" jhiTranslate="exhibitor.edit">Modification d'un exposant</span>
       <span *ngIf="!exhibitor?.id" jhiTranslate="exhibitor.create">Création d'un nouvel exposant</span>
 
-      <hr />
+      <hr/>
 
       <div class="d-flex justify-content-between mt-3">
         <span>
@@ -20,29 +20,17 @@
             <span jhiTranslate="common.edit">Edit</span>
           </button>
 
-          <button
-            (click)="readOnlyBack()"
-            *ngIf="!readonlyForm && exhibitor?.id"
-            class="btn btn-secondary btn-sm"
-            id="cancel-save"
-            type="button"
-          >
+          <button (click)="readOnlyBack()" *ngIf="!readonlyForm && exhibitor?.id" class="btn btn-secondary btn-sm" id="cancel-save" type="button">
             <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
             <span jhiTranslate="common.cancel">Cancel</span>
           </button>
-          <button
-            *ngIf="!readonlyForm"
-            [disabled]="editForm.invalid || isSaving"
-            class="btn btn-primary btn-sm"
-            id="save-entity"
-            type="submit"
-          >
+          <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity" type="submit">
             <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
             <span jhiTranslate="common.save">Save</span>
           </button>
         </span>
       </div>
-      <hr />
+      <hr/>
     </h2>
 
     <div>
@@ -55,58 +43,125 @@
           <div class="row">
             <div class="col-sm-6 fw-bold align-content-center position-relative">
               <label for="field_fullName" jhiTranslate="exhibitor.fullName">Nom complet</label>
-              <input class="form-control" formControlName="fullName" id="field_fullName" name="fullName" />
+              <input class="form-control" formControlName="fullName" id="field_fullName" name="fullName"/>
 
               <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getFullName"></field-error>
             </div>
             <div class="col-sm-6 fw-bold align-content-center position-relative">
               <label for="field_therapist_name" jhiTranslate="exhibitor.therapistName">Nom de thérapeute</label>
-              <input class="form-control" formControlName="therapistName" id="field_therapist_name" name="therapistName" />
+              <input class="form-control" formControlName="therapistName" id="field_therapist_name" name="therapistName"/>
             </div>
           </div>
           <div class="row mt-3">
-            <div class="col-sm-6 fw-bold align-content-center position-relative">
+            <div class="col-sm-5 fw-bold align-content-center position-relative">
               <label for="field_email" jhiTranslate="exhibitor.email">Email</label>
-              <input class="form-control" formControlName="email" id="field_email" name="email" />
+              <input class="form-control" formControlName="email" id="field_email" name="email"/>
 
               <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getEmail"></field-error>
             </div>
 
-            <div class="col-sm-6 fw-bold align-content-center position-relative">
+            <div class="col-sm-5 fw-bold align-content-center position-relative">
               <label for="field_phoneNumber" jhiTranslate="exhibitor.phoneNumber">Téléphone</label>
-              <input class="form-control" formControlName="phoneNumber" id="field_phoneNumber" name="phoneNumber" />
+              <input class="form-control" formControlName="phoneNumber" id="field_phoneNumber" name="phoneNumber"/>
 
-              <field-error
-                [errors]="[
-                  ErrorModel.custom('invalidPhoneNumber', 'common.validation.pattern', { pattern: '(+33|0)XXXYYYZZZ | (+41|0)XXYYYZZAA' }),
-                ]"
-                [formControlElement]="getPhoneNumber"
-              ></field-error>
+              <field-error [errors]="[
+                  ErrorModel.custom('invalidPhoneNumber', 'common.validation.pattern', {
+                    pattern: '(+33|0)XXXYYYZZZ | (+41|0)XXYYYZZAA',
+                  }),
+                ]" [formControlElement]="getPhoneNumber"></field-error>
+            </div>
+
+            <div class="col-sm-2 fw-bold align-content-center position-relative">
+              <label for="field_language" jhiTranslate="exhibitor.language.list.label">Langue</label>
+              <select class="form-control" formControlName="language" id="field_language" name="language">
+                @for (language of languageValues; track $index) {
+                  <option [value]="language">{{ 'exhibitor.language.list.' + language | translate }}</option>
+                }
+              </select>
+
+              <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getLanguage"></field-error>
             </div>
           </div>
 
           <div class="row mt-3">
             <div class="col-sm-6 fw-bold align-content-center">
               <label for="field_address" jhiTranslate="exhibitor.address">Addresse</label>
-              <input class="form-control" formControlName="address" id="field_address" name="address" type="text" />
+              <input class="form-control" formControlName="address" id="field_address" name="address" type="text"/>
             </div>
 
             <div class="col-sm-6 fw-bold align-content-center">
-              <label class="form-label" for="field_npaLocalite" jhiTranslate="exhibitor.npaLocalite">Npa Localite</label>
-              <input class="form-control" formControlName="npaLocalite" id="field_npaLocalite" name="npaLocalite" type="text" />
+              <label class="form-label" for="field_npaLocalite" jhiTranslate="exhibitor.npaLocalite">Npa Localite </label>
+              <input class="form-control" formControlName="npaLocalite" id="field_npaLocalite" name="npaLocalite" type="text"/>
             </div>
           </div>
 
           <div class="row mt-3">
             <div class="col-sm-12 fw-bold align-content-center">
               <label for="field_extraInformation" jhiTranslate="exhibitor.extraInformation">Extra Information</label>
-              <textarea
-                class="form-control"
-                formControlName="extraInformation"
-                id="field_extraInformation"
-                name="extraInformation"
-                rows="3"
-              ></textarea>
+              <textarea class="form-control" formControlName="extraInformation" id="field_extraInformation" name="extraInformation" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-12 mt-3">
+        <div class="card h-100">
+          <h5 class="card-header" jhiTranslate="participation.title">Les participations</h5>
+          <div *ngIf="!readonlyForm" class="card-body">
+            <div class="row">
+              <div class="col-sm-12 align-content-center">
+                <label jhiTranslate="participation.cannot-show">No data can be shown during editing a participation </label>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="readonlyForm" class="card-body">
+            <div class="row">
+              <!-- STANDS LIST -->
+
+              <div *ngIf="participations$ | async; let participations">
+                <div>
+                  <div class="table-responsive table-entities" id="entities-participations">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                      <thead class="thead-primary">
+                        <tr>
+                          <th class="col-8">
+                            <span jhiTranslate="salon.place">Salon</span>
+                          </th>
+                          <th class="col-4 text-center">
+                            <span jhiTranslate="participation.status.label">Statut</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (participations.length === 0) {
+                          <tr>
+                            <td colspan="4">
+                              <span jhiTranslate="participation.notFound">Aucune participation</span>
+                            </td>
+                          </tr>
+                        } @else {
+                          @for (participation of participations; track $index) {
+                            <tr>
+                              <td class="go-detail" [routerLink]="[
+                                  '/admin',
+                                  'salons',
+                                  participation.salon?.id,
+                                  'participations',
+                                  participation.id,
+                                  'view',
+                                ]">{{ participation.salon?.place }}
+                              </td>
+                              <td class="go-detail text-center">
+                                <fa-icon [icon]="participation.status | status" [class]="participation.status | colorStatus" [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
+                              </td>
+                            </tr>
+                          }
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -2,8 +2,6 @@ package ch.salon.service.mail;
 
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.service.document.InvoiceReceiptDocumentCreator;
-import java.util.Locale;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamSource;
@@ -12,6 +10,9 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.util.Locale;
+import java.util.Map;
+
 @Component
 public class InvoiceReceiptEmailCreator extends AbstractEmailCreator {
 
@@ -19,12 +20,9 @@ public class InvoiceReceiptEmailCreator extends AbstractEmailCreator {
     private final MessageSource messageSource;
     private InvoicingPlan invoicingPlan;
 
-    public InvoiceReceiptEmailCreator(
-        InvoiceReceiptDocumentCreator invoiceReceiptDocumentCreator,
-        MessageSource messageSource,
-        JavaMailSender javaMailSender,
-        @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine
-    ) {
+    public InvoiceReceiptEmailCreator(InvoiceReceiptDocumentCreator invoiceReceiptDocumentCreator,
+                                      MessageSource messageSource, JavaMailSender javaMailSender,
+                                      @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine) {
         super(javaMailSender, mailTemplateEngine);
         this.invoiceReceiptDocumentCreator = invoiceReceiptDocumentCreator;
         this.messageSource = messageSource;
@@ -36,7 +34,7 @@ public class InvoiceReceiptEmailCreator extends AbstractEmailCreator {
 
     @Override
     protected String getTranslatedSubject() {
-        Object[] args = { invoicingPlan.getParticipation().getSalon().getPlace() };
+        Object[] args = {invoicingPlan.getParticipation().getSalon().getPlace()};
         return this.messageSource.getMessage("email.invoice-receipt.title", args, getContext().getLocale());
     }
 
@@ -67,6 +65,7 @@ public class InvoiceReceiptEmailCreator extends AbstractEmailCreator {
     @Override
     public Map<String, InputStreamSource> getAttachments() throws Exception {
         this.invoiceReceiptDocumentCreator.fillInvoicingPlan(invoicingPlan);
-        return Map.of("Quittance_" + invoicingPlan.getBillingNumber() + ".pdf", invoiceReceiptDocumentCreator.generate());
+        return Map.of("Quittance_" + invoicingPlan.getBillingNumber() + ".pdf",
+                      invoiceReceiptDocumentCreator.generate());
     }
 }

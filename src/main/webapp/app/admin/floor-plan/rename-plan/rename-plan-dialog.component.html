@@ -1,0 +1,26 @@
+<form (ngSubmit)="confirmAdd()" name="addForm">
+  <div class="modal-header">
+    <h4 class="modal-title">Renommer le plan</h4>
+  </div>
+
+  <div class="modal-body">
+    <jhi-alert-error></jhi-alert-error>
+    <div class="row">
+      <div class="col-sm-12 fw-bold align-content-center position-relative">
+        <label for="field_name">Nom du plan</label> <input class="form-control" [(ngModel)]="floorName" id="field_name" name="name" type="text"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button (click)="cancel()" class="btn btn-secondary" data-dismiss="modal" type="button">
+      <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+      <span jhiTranslate="common.cancel">Cancel</span>
+    </button>
+
+    <button class="btn btn-primary" id="jhi-confirm-add" type="submit">
+      <fa-icon [title]="'common.validate' | translate" icon="check"></fa-icon>
+      <span jhiTranslate="common.validate">Valider</span>
+    </button>
+  </div>
+</form>

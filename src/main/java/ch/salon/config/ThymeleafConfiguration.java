@@ -1,11 +1,12 @@
 package ch.salon.config;
 
-import java.nio.charset.StandardCharsets;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class ThymeleafConfiguration {

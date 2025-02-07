@@ -4,7 +4,7 @@
       <span *ngIf="salon?.id" jhiTranslate="salon.edit">Modification d'un salon</span>
       <span *ngIf="!salon?.id" jhiTranslate="salon.create">Création d'un nouveau salon</span>
 
-      <hr />
+      <hr/>
 
       <div class="d-flex justify-content-between mt-3">
         <span>
@@ -21,6 +21,10 @@
 
           <a *ngIf="readonlyForm" [routerLink]="['../participations']" class="btn btn-warning btn-sm">
             <span class="d-inline" jhiTranslate="salon.participations">Participations</span>
+          </a>
+
+          <a *ngIf="readonlyForm" [routerLink]="['../floor-plan']" class="btn btn-warning btn-sm">
+            <span class="d-inline" jhiTranslate="salon.floorPlan">Plan de la salle</span>
           </a>
 
           <a *ngIf="readonlyForm" [routerLink]="['../stands']" class="btn btn-warning btn-sm">
@@ -41,29 +45,17 @@
             <span jhiTranslate="common.edit">Edit</span>
           </button>
 
-          <button
-            (click)="readOnlyBack()"
-            *ngIf="!readonlyForm && salon?.id"
-            class="btn btn-secondary btn-sm"
-            id="cancel-save"
-            type="button"
-          >
+          <button (click)="readOnlyBack()" *ngIf="!readonlyForm && salon?.id" class="btn btn-secondary btn-sm" id="cancel-save" type="button">
             <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
             <span jhiTranslate="common.cancel">Cancel</span>
           </button>
-          <button
-            *ngIf="!readonlyForm"
-            [disabled]="editForm.invalid || isSaving"
-            class="btn btn-primary btn-sm"
-            id="save-entity"
-            type="submit"
-          >
+          <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity" type="submit">
             <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
             <span jhiTranslate="common.save">Save</span>
           </button>
         </span>
       </div>
-      <hr />
+      <hr/>
     </h2>
 
     <div>
@@ -77,55 +69,28 @@
           <div class="row">
             <div class="col-sm-12 fw-bold align-content-center position-relative">
               <label for="field_place" jhiTranslate="salon.place">Nom du salon</label>
-              <input class="form-control" formControlName="place" id="field_place" name="place" type="text" />
+              <input class="form-control" formControlName="place" id="field_place" name="place" type="text"/>
 
-              <field-error
-                [errors]="[ErrorModel.required(), ErrorModel.minlength(5), ErrorModel.maxlength(50)]"
-                [formControlElement]="getPlace"
-              ></field-error>
+              <field-error [errors]="[ErrorModel.required(), ErrorModel.minlength(5), ErrorModel.maxlength(50)]" [formControlElement]="getPlace"></field-error>
             </div>
           </div>
           <div class="row mt-3">
             <div class="col-sm-4 fw-bold align-content-center position-relative">
               <label for="field_referenceNumber" jhiTranslate="salon.referenceNumber">N° de référence</label>
-              <input
-                class="form-control"
-                formControlName="referenceNumber"
-                id="field_referenceNumber"
-                name="referenceNumber"
-                [maxLength]="10"
-                type="text"
-              />
-              <field-error
-                [errors]="[ErrorModel.required(), ErrorModel.maxlength(10)]"
-                [formControlElement]="getReferenceNumber"
-              ></field-error>
+              <input [maxLength]="10" class="form-control" formControlName="referenceNumber" id="field_referenceNumber" name="referenceNumber" type="text"/>
+              <field-error [errors]="[ErrorModel.required(), ErrorModel.maxlength(10)]" [formControlElement]="getReferenceNumber"></field-error>
             </div>
 
             <div class="col-sm-4 fw-bold align-content-center position-relative">
               <label for="field_startingDate" jhiTranslate="salon.startingDate">Date de début</label>
-              <input
-                class="form-control"
-                formControlName="startingDate"
-                id="field_startingDate"
-                name="startingDate"
-                placeholder="DD.MM.YYYY"
-                type="date"
-              />
+              <input class="form-control" formControlName="startingDate" id="field_startingDate" name="startingDate" placeholder="DD.MM.YYYY" type="date"/>
 
               <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getStartingDate"></field-error>
             </div>
 
             <div class="col-sm-4 fw-bold align-content-center position-relative">
               <label for="field_endingDate" jhiTranslate="salon.endingDate">Date de fin</label>
-              <input
-                class="form-control"
-                formControlName="endingDate"
-                id="field_endingDate"
-                name="endingDate"
-                placeholder="DD.MM.YYYY"
-                type="date"
-              />
+              <input class="form-control" formControlName="endingDate" id="field_endingDate" name="endingDate" placeholder="DD.MM.YYYY" type="date"/>
 
               <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getEndingDate"></field-error>
             </div>
@@ -133,20 +98,14 @@
           <div class="row mt-3">
             <div class="col-sm-12 fw-bold align-content-center">
               <label for="field_extraInformation" jhiTranslate="salon.extraInformation">Extra Information</label>
-              <textarea
-                class="form-control"
-                formControlName="extraInformation"
-                id="field_extraInformation"
-                name="extraInformation"
-                rows="3"
-              ></textarea>
+              <textarea class="form-control" formControlName="extraInformation" id="field_extraInformation" name="extraInformation" rows="3"></textarea>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <br />
+    <br/>
 
     <div class="card">
       <h5 class="card-header" jhiTranslate="salon.prices">Configuration des prix</h5>
@@ -154,50 +113,63 @@
         <div class="row mt-1">
           <div class="col-sm-6 fw-bold align-content-center">
             <label for="field_priceConference" jhiTranslate="salon.priceConference">Price Conference</label>
-            <input class="form-control" formControlName="priceConference" id="field_priceConference" name="priceConference" type="number" />
+            <input class="form-control" formControlName="priceConference" id="field_priceConference" name="priceConference" type="number"/>
           </div>
 
           <div class="col-sm-6 fw-bold align-content-center">
             <label for="field_priceSharingStand" jhiTranslate="salon.priceSharingStand">Price Sharing Stand</label>
-            <input
-              class="form-control"
-              formControlName="priceSharingStand"
-              id="field_priceSharingStand"
-              name="priceSharingStand"
-              type="number"
-            />
+            <input class="form-control" formControlName="priceSharingStand" id="field_priceSharingStand" name="priceSharingStand" type="number"/>
           </div>
         </div>
         <div class="row mt-3 align-content-center">
           <div class="col-sm-4 fw-bold align-content-center">
             <label for="field_priceMeal1" jhiTranslate="salon.priceMeal1">Price Meal 1</label>
-            <input class="form-control" formControlName="priceMeal1" id="field_priceMeal1" name="priceMeal1" type="number" />
+            <input class="form-control" formControlName="priceMeal1" id="field_priceMeal1" name="priceMeal1" type="number"/>
           </div>
 
           <div class="col-sm-4 fw-bold align-content-center">
             <label for="field_priceMeal2" jhiTranslate="salon.priceMeal2">Price Meal 2</label>
-            <input class="form-control" formControlName="priceMeal2" id="field_priceMeal2" name="priceMeal2" type="number" />
+            <input class="form-control" formControlName="priceMeal2" id="field_priceMeal2" name="priceMeal2" type="number"/>
           </div>
 
           <div class="col-sm-4 fw-bold align-content-center">
             <label for="field_priceMeal3" jhiTranslate="salon.priceMeal3">Price Meal 3</label>
-            <input class="form-control" formControlName="priceMeal3" id="field_priceMeal3" name="priceMeal3" type="number" />
+            <input class="form-control" formControlName="priceMeal3" id="field_priceMeal3" name="priceMeal3" type="number"/>
           </div>
         </div>
 
-        <hr />
+        <hr/>
 
         <div formArrayName="priceStandSalons">
-          <div
-            *ngFor="let priceStand of editForm.controls['priceStandSalons'].controls; let i = index"
-            [formGroupName]="i"
-            class="row mt-3 align-content-center"
-          >
-            <div class="col-sm-5 fw-bold align-content-center">{{ priceStand.value.dimension?.dimension }}</div>
-            <div class="col-sm-7 align-content-center">
-              <input class="form-control" formControlName="price" id="{{ 'field_price' + i }}" name="price" type="number" />
-            </div>
-          </div>
+          <table aria-describedby="page-heading" class="table table-hover">
+            <thead class="thead-primary">
+              <tr>
+                <th class="col-auto">
+                  <span>Libellé de la dimension</span>
+                </th>
+                <th class="col-1 text-center">
+                  <span>Longueur (m)</span>
+                </th>
+                <th class="col-1 text-center">
+                  <span>Hauteur (m)</span>
+                </th>
+                <th class="col-2 text-center">
+                  <span>Prix</span>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody style="border: 1px solid grey">
+              <tr *ngFor="let priceStand of editForm.controls['priceStandSalons'].controls; let i = index" [formGroupName]="i">
+                <td>{{ priceStand.value.dimension?.dimension }}</td>
+                <td class="text-center">{{ priceStand.value.dimension?.widthMeter }}</td>
+                <td class="text-center">{{ priceStand.value.dimension?.heightMeter }}</td>
+                <td class="text-center">
+                  <input class="form-control" formControlName="price" [id]="'field_price' + i" name="price" type="number"/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -27,16 +27,33 @@ export interface IPriceStandSalon {
 export type NewPriceStandSalon = Omit<IPriceStandSalon, 'id'> & { id: null };
 
 export interface ISalonStats {
-  nbStandValidated: 0;
-  nbStandInTreatment: 0;
-  nbStandRefused: 0;
+  dimensionStands: Record<string, number>;
+  nbConference: number;
+  nbStands: number;
+  nbMeal1: number;
+  nbMeal2: number;
+  nbMeal3: number;
+  nbGuestOfHonor: number;
+  nbCrushOfHeart: number;
+  standInfo: {
+    nbTable: number;
+    nbChair: number;
+    nbElectricity: number;
+    nbOffer: number;
+  };
+  categoriesStands: Record<string, number>;
+  facturation: {
+    paid: number;
+    discount: number;
+    expected: number;
+  };
+}
 
-  nbMealSaturdayMidday: 0;
-  nbMealSaturdayEvening: 0;
-  nbMealSundayMidday: 0;
-
-  nbParticipationAcceptedPaid: 0;
-  nbParticipationAcceptedUnpaid: 0;
-
-  dimensionStats: [];
+export function sortPriceStandSalon(priceStands: IPriceStandSalon[]): IPriceStandSalon[] {
+  return priceStands.sort((a, b) => {
+    if (a?.dimension?.widthMeter === b?.dimension?.widthMeter) {
+      return a?.dimension?.heightMeter ?? 0 - (b?.dimension?.heightMeter ?? 0);
+    }
+    return (a?.dimension?.widthMeter ?? 0) - (b?.dimension?.widthMeter ?? 0);
+  });
 }
