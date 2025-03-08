@@ -2,9 +2,9 @@ import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ParticipationComponent } from './list/participation.component';
-import { ParticipationDetailComponent } from './detail/participation-detail.component';
+import { BillingComponent } from './billing/billing.component';
 import { ParticipationUpdateComponent } from './update/participation-update.component';
-import ParticipationResolve from './route/participation-routing-resolve.service';
+import ParticipationResolve from './service/participation-routing-resolve.service';
 import conferenceRoutes from '../conference/conference.routes';
 import standRoutes from '../stand/stand.routes';
 
@@ -27,8 +27,8 @@ const participationRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':idParticipation/billings',
-    component: ParticipationDetailComponent,
+    path: ':idParticipation/billing',
+    component: BillingComponent,
     resolve: {
       participation: ParticipationResolve,
     },

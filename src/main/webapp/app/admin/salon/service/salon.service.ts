@@ -6,10 +6,11 @@ import dayjs from 'dayjs/esm';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { ISalon, ISalonStats, NewSalon } from '../salon.model';
+import { ISalon, NewSalon, TimeSlotMap } from '../model/salon.interface';
 import { isPresent } from '../../../core/util/operators';
 import { Status } from '../../enumerations/status.model';
 import { IDimensionStand } from '../../dimension-stand/dimension-stand.model';
+import { ISalonStats } from '../model/salon-stats.interface';
 
 @Injectable({ providedIn: 'root' })
 export class SalonService {
@@ -91,6 +92,10 @@ export class SalonService {
       return of([]);
     }
     return this.http.get<IDimensionStand[]>(`${this.resourceUrl}/${idSalon}/dimension-stands`);
+  }
+
+  getTimeSlots(idSalon: string | null): Observable<TimeSlotMap> {
+    return this.http.get<TimeSlotMap>(`${this.resourceUrl}/${idSalon}/time-slots`);
   }
 
   protected convertResponseFromServer(res: HttpResponse<ISalon>): HttpResponse<ISalon> {

@@ -1,0 +1,73 @@
+@import "content/scss/bootstrap-variables";
+
+.switch {
+  position: relative;
+  width: 50px; /* Taille initiale (sera ajustée selon l'écran) */
+  height: 30px; /* Hauteur de la barre cylindrique */
+  display: inline-block;
+}
+
+.switch-checkbox {
+  display: none;
+}
+
+/* Barre cylindrique */
+
+.switch-label {
+  position: relative;
+  display: block;
+  background-color: $secondary;
+  border-radius: 60px; /* Donne l'effet cylindrique */
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 1px solid black;
+}
+
+/* L'élément qui se déplace dans la barre */
+.switch-btn {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  width: 20px; /* Taille du petit rond */
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.switch-label .switch-btn {
+  border: 1px solid black;
+}
+
+.switch-label.disabled .switch-btn {
+  border: 1px dashed $dark;
+}
+
+/* Quand le switch est activé */
+.switch-checkbox:not(.checked) + .switch-label {
+  background-color: #e6e6e6;
+}
+
+.switch-checkbox:checked + .switch-label {
+  background-color: $secondary;
+}
+
+.switch-checkbox:not(.checked) + .switch-label.disabled {
+  background-color: #e6e6e6;
+  border: 1px dashed $dark;
+  cursor: default;
+}
+
+.switch-checkbox:checked + .switch-label.disabled {
+  background-color: $secondary;
+  border: 1px dashed $dark;
+  cursor: default;
+}
+
+/* Déplacement du bouton lorsque activé */
+.switch-checkbox:checked + .switch-label .switch-btn {
+  transform: translate(100%, -50%); /* Déplacement du bouton à droite */
+}

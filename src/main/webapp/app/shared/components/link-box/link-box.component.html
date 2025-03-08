@@ -1,3 +1,4 @@
-<a [class.disabled]="isDisabled" [routerLink]="links" class="btn {{colorClass}} btn-sm">
+<a [class.disabled]="isDisabled" [routerLink]="links" class="btn {{colorButton}} btn-sm">
+  <fa-icon *ngIf="faIcon" [icon]="faIcon" [animation]="faIconAnimation" [title]="translateKey | translate"></fa-icon>
   <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>
 </a>

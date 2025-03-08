@@ -8,7 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {ParticipationMapper.class, DimensionStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = {ParticipationMapper.class, DimensionStandMapper.class},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface StandMapper {
     StandMapper INSTANCE = Mappers.getMapper(StandMapper.class);
 
@@ -18,6 +19,7 @@ public interface StandMapper {
 
     StandLightDTO toLightDto(Stand stand);
 
-    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "description",
+             ignore = true)
     Stand toLightEntity(StandLightDTO stand);
 }

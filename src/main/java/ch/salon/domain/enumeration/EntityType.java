@@ -2,5 +2,9 @@ package ch.salon.domain.enumeration;
 
 public enum EntityType {
     EXHIBITOR,
-    PARTICIPATION
+    PARTICIPATION,
+    INVOICE,
+    SALON,
+    STAND,
+    CONFERENCE
 }

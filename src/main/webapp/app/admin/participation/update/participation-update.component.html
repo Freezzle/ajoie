@@ -1,38 +1,49 @@
 <div>
   <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
     <h2 id="page-heading">
-      <span *ngIf="participation?.id" jhiTranslate="participation.edit">Détail d'une participation</span>
-      <span *ngIf="!participation?.id" jhiTranslate="participation.create">Création d'une nouvelle participation</span>
-      <hr/>
-      <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-            <span jhiTranslate="common.back">Back</span>
-          </button>
-        </span>
-        <span>
-          <a *ngIf="readonlyForm" [routerLink]="['../billings']" class="btn btn-warning btn-sm">
-            <span class="d-none d-md-inline" jhiTranslate="participation.billing.title">Plans de facturation</span>
-          </a>
-        </span>
-        <span>
-          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-            <span jhiTranslate="common.edit">Edit</span>
-          </button>
-
-          <button (click)="readOnlyBack()" *ngIf="!readonlyForm && participation?.id" class="btn btn-secondary btn-sm" id="cancel-save" type="button">
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-            <span jhiTranslate="common.cancel">Cancel</span>
-          </button>
-          <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity" type="submit">
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-            <span jhiTranslate="common.save">Save</span>
-          </button>
-        </span>
+      <div class="d-flex justify-content-center">
+        <span *ngIf="editForm.controls.id.value" jhiTranslate="participation.edit">Détail d'une participation</span>
+        <span *ngIf="!editForm.controls.id.value" jhiTranslate="participation.create">Création d'une nouvelle participation</span>
       </div>
       <hr/>
+
+      <div class="d-flex justify-content-between mt-3">
+        <span>
+          <button-box (clickedEvent)="previousState()"
+                      [isDisabled]="isLoading"
+                      faIcon="arrow-left"
+                      translateKey="common.back"/>
+        </span>
+
+        <span>
+          <link-box *ngIf="isReadOnly"
+                    [isDisabled]="isLoading"
+                    [links]="['../billing']"
+                    translateKey="participation.billing.title"
+                    type="warning"/>
+        </span>
+
+        <span>
+          <button-box (clickedEvent)="activateEditMode()"
+                      *ngIf="isReadOnly"
+                      [isDisabled]="isLoading"
+                      faIcon="pencil-alt"
+                      translateKey="common.edit"/>
+
+          <button-box (clickedEvent)="activateReadOnlyMode()"
+                      *ngIf="editForm.controls.id.value && !isReadOnly"
+                      [isDisabled]="isLoading"
+                      faIcon="ban"
+                      translateKey="common.cancel"
+                      type="secondary"/>
+
+          <button-box *ngIf="!isReadOnly"
+                      [isDisabled]="editForm.invalid || isLoading"
+                      [isSubmit]="true"
+                      faIcon="floppy-disk"
+                      translateKey="common.save"/>
+        </span>
+      </div>
     </h2>
 
     <div>
@@ -40,302 +51,225 @@
       <jhi-alert></jhi-alert>
 
       <div class="row">
-        <div class="col-sm-12">
+        <div class="mt-3 col-12">
           <div class="card">
             <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
             <div class="card-body">
               <div class="row">
-                <div class="col-sm-4 fw-bold position-relative">
-                  <label for="field_exhibitor" jhiTranslate="participation.exhibitor">Exhibitor</label>
-                  <select [compareWith]="compareExhibitor" class="form-control" formControlName="exhibitor" id="field_exhibitor" name="exhibitor">
-                    @for (exhibitorOption of exhibitorsOptions; track $index) {
-                      <option [ngValue]="exhibitorOption">{{ getFullExhibitorName(exhibitorOption) }}</option>
-                    }
-                  </select>
-
-                  <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getExhibitor"></field-error>
+                <div class="mt-3 col-sm-12 col-lg-3">
+                  <typeahead-box [formatterFunction]="formatterExhibitor"
+                                 [options]="exhibitorsOptions"
+                                 fieldName="exhibitor"
+                                 formControlName="exhibitor"
+                                 translateKey="participation.exhibitor"/>
                 </div>
-                <div class="col-sm-4 fw-bold position-relative">
-                  <label for="field_registrationDate" jhiTranslate="participation.registrationDate">Date d'inscription </label>
-                  <input class="form-control" formControlName="registrationDate" id="field_registrationDate" name="registrationDate" placeholder="DD.MM.YYYY" type="date"/>
-
-                  <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getRegistrationDate"></field-error>
+                <div class="mt-3 col-sm-12 col-lg-3">
+                  <text-box fieldName="therapistName" formControlName="therapistName" translateKey="exhibitor.therapistName"/>
                 </div>
-                <div class="col-sm-4 fw-bold position-relative">
-                  <label for="field_status" jhiTranslate="participation.status.label">Statut</label>
-                  <select class="form-control" formControlName="status" id="field_status" name="status">
-                    @for (status of statusValues; track $index) {
-                      <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
-                    }
-                  </select>
-
-                  <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getStatus"></field-error>
+                <div class="mt-3 col-sm-6 col-lg-3">
+                  <date-box fieldName="registrationDate" formControlName="registrationDate" translateKey="participation.registrationDate"/>
                 </div>
-              </div>
-
-              <!-- MEALS -->
-              <div class="row mt-3">
-                <div class="col-sm-4 fw-bold position-relative">
-                  <label for="field_nbMeal1" jhiTranslate="participation.nbMeal1">Repas samedi midi</label>
-                  <input class="form-control" formControlName="nbMeal1" id="field_nbMeal1" name="nbMeal1" type="number"/>
-
-                  <field-error [errors]="[ErrorModel.required(), ErrorModel.number()]" [formControlElement]="getMeal1"></field-error>
+                <div class="mt-3 col-sm-6 col-lg-3">
+                  <select-box [formatterFunction]="formatterStatus"
+                              [needTranslation]="true"
+                              [options]="statusValues"
+                              fieldName="status"
+                              formControlName="status"
+                              translateKey="participation.status.label"/>
+                </div>
+                <div class="mt-3 col-sm-4 col-lg-4">
+                  <number-box fieldName="nbMeal1" formControlName="nbMeal1" translateKey="participation.nbMeal1"/>
                 </div>
 
-                <div class="col-sm-4 fw-bold position-relative">
-                  <label for="field_nbMeal2" jhiTranslate="participation.nbMeal2">Repas samedi soir</label>
-                  <input class="form-control" formControlName="nbMeal2" id="field_nbMeal2" name="nbMeal2" type="number"/>
-
-                  <field-error [errors]="[ErrorModel.required(), ErrorModel.number()]" [formControlElement]="getMeal2"></field-error>
+                <div class="mt-3 col-sm-4 col-lg-4">
+                  <number-box fieldName="nbMeal2" formControlName="nbMeal2" translateKey="participation.nbMeal2"/>
                 </div>
 
-                <div class="col-sm-4 fw-bold position-relative">
-                  <label for="field_nbMeal3" jhiTranslate="participation.nbMeal3">Repas dimanche midi</label>
-                  <input class="form-control" formControlName="nbMeal3" id="field_nbMeal3" name="nbMeal3" type="number"/>
-
-                  <field-error [errors]="[ErrorModel.required(), ErrorModel.number()]" [formControlElement]="getMeal3"></field-error>
+                <div class="mt-3 col-sm-4 col-lg-4">
+                  <number-box fieldName="nbMeal3" formControlName="nbMeal3" translateKey="participation.nbMeal3"/>
                 </div>
-              </div>
-
-              <!-- BOOLEAN STUFFS -->
-              <div class="row mt-3">
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <div>
-                    <label for="field_acceptedChart" jhiTranslate="participation.acceptedChart">Charte accepté ?</label>
-                  </div>
-
-                  <div class="switch">
-                    <input class="switch-checkbox" formControlName="acceptedChart" id="field_acceptedChart" name="acceptedChart" type="checkbox"/>
-                    <label class="switch-label" for="field_acceptedChart">
-                      <span class="switch-inner"></span>
-                      <span class="switch-btn"></span>
-                    </label>
-                  </div>
+                <div class="mt-3 col-sm-4 col-xl-2">
+                  <checkbox-box fieldName="acceptedChart" formControlName="acceptedChart" translateKey="participation.acceptedChart"/>
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <div>
-                    <label for="field_acceptedContract" jhiTranslate="participation.acceptedContract">Contrat accepté ? </label>
-                  </div>
+                <div class="mt-3 col-sm-4 col-xl-2">
+                  <checkbox-box fieldName="acceptedContract" formControlName="acceptedContract" translateKey="participation.acceptedContract"/>
+                </div>
+                <div class="mt-3 col-sm-4 col-xl-2">
+                  <checkbox-box fieldName="needArrangement" formControlName="needArrangement" translateKey="participation.needArrangement"/>
+                </div>
+                <div class="mt-3 col-sm-4 col-xl-2">
+                  <checkbox-box fieldName="crushOfHeart" formControlName="crushOfHeart" translateKey="participation.crushOfHeart"/>
+                </div>
+                <div class="mt-3 col-sm-4 col-xl-2">
+                  <checkbox-box fieldName="guestOfHonor" formControlName="guestOfHonor" translateKey="participation.guestOfHonor"/>
+                </div>
 
-                  <div class="switch">
-                    <input class="switch-checkbox" formControlName="acceptedContract" id="field_acceptedContract" name="acceptedContract" type="checkbox"/>
-                    <label class="switch-label" for="field_acceptedContract">
-                      <span class="switch-inner"></span>
-                      <span class="switch-btn"></span>
-                    </label>
+                <div class="mt-3 col-12">
+                  <div class="d-flex flex-column flex-sm-row align-items-start gap-1 gap-sm-4">
+                    <div class="flex-shrink-0">
+                      <checkbox-box
+                        fieldName="hasOffer"
+                        formControlName="hasOffer"
+                        translateKey="participation.hasOffer"/>
+                    </div>
+
+                    <div class="flex-grow-1 w-100" *ngIf="editForm.controls.hasOffer.value">
+                      <text-box
+                        fieldName="offer"
+                        formControlName="offer"
+                        translateKey="participation.offer"
+                        class="w-100"/>
+                    </div>
                   </div>
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <div>
-                    <label for="field_needArrangment" jhiTranslate="participation.needArrangment">Avec arrangement ? </label>
-                  </div>
 
-                  <div class="switch">
-                    <input class="switch-checkbox" formControlName="needArrangment" id="field_needArrangment" name="needArrangment" type="checkbox"/>
-                    <label class="switch-label" for="field_needArrangment">
-                      <span class="switch-inner"></span>
-                      <span class="switch-btn"></span>
-                    </label>
-                  </div>
+                <div class="mt-3 col-12">
+                  <textarea-box fieldName="additionnalInformation"
+                                formControlName="additionnalInformation"
+                                translateKey="participation.additionnalInformation"/>
                 </div>
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <div>
-                    <label for="field_crushOfHeart" jhiTranslate="participation.crushOfHeart">Coup de coeur ?</label>
-                  </div>
-
-                  <div class="switch">
-                    <input class="switch-checkbox" formControlName="crushOfHeart" id="field_crushOfHeart" name="crushOfHeart" type="checkbox"/>
-                    <label class="switch-label" for="field_crushOfHeart">
-                      <span class="switch-inner"></span>
-                      <span class="switch-btn"></span>
-                    </label>
-                  </div>
-                </div>
-                <div class="col-sm-2 fw-bold align-content-center">
-                  <div>
-                    <label for="field_guestOfHonor" jhiTranslate="participation.guestOfHonor">Invité d'honneur ?</label>
-                  </div>
-
-                  <div class="switch">
-                    <input class="switch-checkbox" formControlName="guestOfHonor" id="field_guestOfHonor" name="guestOfHonor" type="checkbox"/>
-                    <label class="switch-label" for="field_guestOfHonor">
-                      <span class="switch-inner"></span>
-                      <span class="switch-btn"></span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <!-- OFFER -->
-              <div class="row mt-2">
-                <div class="col-sm-12 fw-bold align-content-center">
-                  <label for="field_offer" jhiTranslate="participation.offer">Offre de soin</label>
-                  <textarea class="form-control" formControlName="offer" id="field_offer" name="offer" rows="3"></textarea>
-                </div>
-              </div>
-
-              <!-- ADDITIONNAL INFO -->
-              <div class="row mt-2">
-                <div class="col-sm-12 fw-bold align-content-center">
-                  <label for="field_additionnalInformation" jhiTranslate="participation.additionnalInformation">Complément d'information </label>
-                  <textarea class="form-control" formControlName="additionnalInformation" id="field_additionnalInformation" name="additionnalInformation" rows="3"></textarea>
-                </div>
-              </div>
-
-              <!-- EXTRA INFO -->
-              <div class="row mt-2">
-                <div class="col-sm-12 fw-bold align-content-center">
-                  <label for="field_extraInformation" jhiTranslate="participation.extraInformation">Extra Information </label>
-                  <textarea class="form-control" formControlName="extraInformation" id="field_extraInformation" name="extraInformation" rows="3"></textarea>
+                <div class="mt-3 col-12">
+                  <textarea-box fieldName="extraInformation" formControlName="extraInformation" translateKey="participation.extraInformation"/>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="col-sm-6 mt-3">
+        <div class="mt-3 col-lg-6">
           <div class="card h-100">
             <h5 class="card-header" jhiTranslate="stand.title">Les stands</h5>
-            <div *ngIf="!readonlyForm" class="card-body">
+            <div *ngIf="!isReadOnly" class="card-body">
               <div class="row">
                 <div class="col-sm-12 align-content-center">
                   <label jhiTranslate="participation.cannot-show">No data can be shown during editing a participation </label>
                 </div>
               </div>
             </div>
-            <div *ngIf="readonlyForm" class="card-body">
-              <div class="row">
-                <!-- STANDS LIST -->
-
-                <div *ngIf="stands$ | async; let stands">
-                  <div>
-                    <div class="d-flex justify-content-end">
-                      <button [routerLink]="['../stands/new']" class="btn btn-success btn-sm" id="jh-create-stand" type="button">
-                        <fa-icon icon="plus"></fa-icon>
-                        <span jhiTranslate="common.create">Créer</span>
-                      </button>
-                    </div>
-                    <div class="table-responsive table-entities" id="entities-stands">
-                      <table aria-describedby="page-heading" class="table table-hover">
-                        <thead class="thead-primary">
+            <div *ngIf="isReadOnly" class="card-body">
+              <div *ngIf="stands$ | async; let stands">
+                <div>
+                  <div class="d-flex justify-content-end">
+                    <link-box [links]="['../stands/new']" faIcon="plus" translateKey="common.create" type="success"/>
+                  </div>
+                  <div class="table-responsive table-entities" id="entities-stands">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                      <thead class="thead-primary">
+                        <tr>
+                          <th class="width-50">
+                            <span jhiTranslate="stand.description">Description</span>
+                          </th>
+                          <th class="width-15">
+                            <span jhiTranslate="stand.dimension">Dimension</span>
+                          </th>
+                          <th class="width-10 text-center">
+                            <span jhiTranslate="stand.status.label">Statut</span>
+                          </th>
+                          <th class="width-10">&nbsp;</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (stands.length === 0) {
                           <tr>
-                            <th class="col-6">
-                              <span jhiTranslate="stand.description">Description</span>
-                            </th>
-                            <th class="col-auto">
-                              <span jhiTranslate="stand.dimension">Dimension</span>
-                            </th>
-                            <th class="col-auto text-center">
-                              <span jhiTranslate="stand.status.label">Statut</span>
-                            </th>
-                            <th class="col-auto">&nbsp;</th>
+                            <td colspan="4">
+                              <span jhiTranslate="stand.notFound">Aucun stand</span>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          @if (stands.length === 0) {
+                        } @else {
+                          @for (stand of stands; track $index) {
                             <tr>
-                              <td colspan="4">
-                                <span jhiTranslate="stand.notFound">Aucun stand</span>
+                              <td class="go-detail truncate"
+                                  [routerLink]="['../stands', stand.id, 'view']">{{ stand.description }}
+                              </td>
+                              <td class="go-detail" [routerLink]="['../stands', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
+                              <td class="go-detail text-center" [routerLink]="['../stands', stand.id, 'view']">
+                                <fa-icon [icon]="stand.status | status"
+                                         [class]="stand.status | colorStatus"
+                                         [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
+                              </td>
+                              <td class="text-end">
+                                <div class="btn-group">
+                                  <button-box (clickedEvent)="deleteEntity(stand, 'stand')"
+                                              [showText]="false"
+                                              type="danger"
+                                              translateKey="common.delete"
+                                              faIcon="times"/>
+                                </div>
                               </td>
                             </tr>
-                          } @else {
-                            @for (stand of stands; track $index) {
-                              <tr>
-                                <td class="go-detail" [routerLink]="['../stands', stand.id, 'view']">{{ stand.description }}
-                                </td>
-                                <td class="go-detail" [routerLink]="['../stands', stand.id, 'view']">{{ stand.dimension?.dimension }}
-                                </td>
-                                <td class="go-detail text-center" [routerLink]="['../stands', stand.id, 'view']">
-                                  <fa-icon [icon]="stand.status | status" [class]="stand.status | colorStatus" [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
-                                </td>
-                                <td class="text-end">
-                                  <div class="btn-group">
-                                    <button type="button" (click)="deleteStand(stand)" class="btn btn-danger btn-sm">
-                                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                      <span jhiTranslate="common.delete"></span>
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            }
                           }
-                        </tbody>
-                      </table>
-                    </div>
+                        }
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-sm-6 mt-3">
+        <div class="mt-3 col-lg-6">
           <div class="card h-100">
             <h5 class="card-header" jhiTranslate="conference.title">Les conférences</h5>
-            <div *ngIf="!readonlyForm" class="card-body">
-              <div class="row">
-                <div class="col-sm-12 align-content-center">
+            <div class="card-body">
+              @if (!isReadOnly) {
+                <div class="col-12 align-content-center">
                   <label jhiTranslate="participation.cannot-show">No data can be shown during editing a participation </label>
                 </div>
-              </div>
-            </div>
-            <div *ngIf="readonlyForm" class="card-body">
-              <div class="row">
-                <!-- CONFERENCES LIST -->
+              } @else {
+                <div *ngIf="conferences$ | async; let conferences" class="col-12">
+                  <div class="d-flex justify-content-end">
+                    <link-box [links]="['../conferences/new']" faIcon="plus" translateKey="common.create" type="success"/>
+                  </div>
 
-                <div *ngIf="conferences$ | async; let conferences" class="col-sm-12">
-                  <div>
-                    <div class="d-flex justify-content-end">
-                      <button [routerLink]="['../conferences/new']" class="btn btn-success btn-sm" id="jh-create-entity" type="button">
-                        <fa-icon icon="plus"></fa-icon>
-                        <span jhiTranslate="common.create">Créer</span>
-                      </button>
-                    </div>
-
-                    <div class="table-responsive table-entities" id="entities">
-                      <table aria-describedby="page-heading" class="table table-hover">
-                        <thead class="thead-primary">
+                  <div class="table-responsive table-entities" id="entities">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                      <thead class="thead-primary">
+                        <tr>
+                          <th class="width-80">
+                            <span jhiTranslate="conference.title">Title</span>
+                          </th>
+                          <th class="width-10 text-center">
+                            <span jhiTranslate="conference.status.label">Status</span>
+                          </th>
+                          <th class="width-10">&nbsp;</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (conferences.length === 0) {
                           <tr>
-                            <th class="col-6">
-                              <span jhiTranslate="conference.title">Title</span>
-                            </th>
-                            <th class="col-auto text-center">
-                              <span jhiTranslate="conference.status.label">Status</span>
-                            </th>
-                            <th class="col-auto">&nbsp;</th>
+                            <td colspan="3">
+                              <span jhiTranslate="conference.notFound">Aucune conference</span>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          @if (conferences.length === 0) {
+                        } @else {
+                          @for (conference of conferences; track $index) {
                             <tr>
-                              <td colspan="3">
-                                <span jhiTranslate="conference.notFound">Aucune conference</span>
+                              <td class="go-detail truncate"
+                                  style="white-space: nowrap"
+                                  [routerLink]="['../conferences', conference.id, 'view']">{{ conference.title }}
+                              </td>
+                              <td class="go-detail text-center" [routerLink]="['../conferences', conference.id, 'view']">
+                                <fa-icon [icon]="conference.status | status"
+                                         [class]="conference.status | colorStatus"
+                                         [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
+                              </td>
+                              <td class="text-end">
+                                <div class="btn-group">
+                                  <button-box (clickedEvent)="deleteEntity(conference, 'conference')"
+                                              [showText]="false"
+                                              type="danger"
+                                              translateKey="common.delete"
+                                              faIcon="times"/>
+                                </div>
                               </td>
                             </tr>
-                          } @else {
-                            @for (conference of conferences; track $index) {
-                              <tr>
-                                <td class="go-detail" [routerLink]="['../conferences', conference.id, 'view']">{{ conference.title }}
-                                </td>
-                                <td class="go-detail text-center" [routerLink]="['../conferences', conference.id, 'view']">
-                                  <fa-icon [icon]="conference.status | status" [class]="conference.status | colorStatus" [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
-                                </td>
-                                <td class="text-end">
-                                  <div class="btn-group">
-                                    <button type="button" (click)="deleteConference(conference)" class="btn btn-danger btn-sm">
-                                      <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                      <span jhiTranslate="common.delete"></span>
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            }
                           }
-                        </tbody>
-                      </table>
-                    </div>
+                        }
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
         </div>

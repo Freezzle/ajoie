@@ -1,10 +1,14 @@
-import { IStand } from '../stand/stand.model';
+import { IStand } from '../stand/model/stand.interface';
 import { IDimensionStand, sortDimensionStand } from '../dimension-stand/dimension-stand.model';
 import { Category } from '../enumerations/category.model';
 
 export interface IFloorPlan {
-  id: string;
+  id: string | null;
   name: string;
+  data: IFloorPlanData;
+}
+
+export interface IFloorPlanData {
   cells: GridCell[][];
   widthMeter: number;
   heightMeter: number;
@@ -26,11 +30,16 @@ export interface DimensionCell {
   rows: number;
   color: string;
   stand?: IStand | null;
+  position: number | null;
 }
 
 export interface IFloorPlanLight {
-  id: string;
+  id: string | null;
   name: string;
+  data: IFloorPlanDataLight;
+}
+
+export interface IFloorPlanDataLight {
   cells: GridCellLight[][];
   widthMeter: number;
   heightMeter: number;
@@ -49,6 +58,7 @@ export interface DimensionCellLight {
   cols: number;
   rows: number;
   stand?: Pick<IStand, 'id'> | null;
+  position: number | null;
 }
 
 export function mapDimensionCell(dimension?: DimensionCell | null): DimensionCellLight | null {
@@ -60,6 +70,7 @@ export function mapDimensionCell(dimension?: DimensionCell | null): DimensionCel
     cols: dimension.cols,
     rows: dimension.rows,
     stand: dimension.stand ? { id: dimension.stand.id } : null,
+    position: dimension.position,
   };
 }
 
@@ -76,10 +87,16 @@ export function mapFloorPlan(floorPlan: IFloorPlan): IFloorPlanLight {
   return {
     id: floorPlan.id,
     name: floorPlan.name,
-    cells: floorPlan.cells.map((row) => row.map((cell) => mapGridCell(cell))),
-    widthMeter: floorPlan.widthMeter,
-    heightMeter: floorPlan.heightMeter,
-    spacingMeter: floorPlan.spacingMeter,
+    data: mapFloorPlanData(floorPlan.data),
+  };
+}
+
+export function mapFloorPlanData(floorPlanData: IFloorPlanData): IFloorPlanDataLight {
+  return {
+    cells: floorPlanData.cells.map((row) => row.map((cell) => mapGridCell(cell))),
+    widthMeter: floorPlanData.widthMeter,
+    heightMeter: floorPlanData.heightMeter,
+    spacingMeter: floorPlanData.spacingMeter,
   };
 }
 
@@ -106,6 +123,7 @@ export function mapDimensionCellLight(
     dimension: dimensionFound.dimension,
     color: getColorStand(standFound ?? null),
     stand: standFound,
+    position: dimension.position,
   };
 }
 
@@ -123,7 +141,7 @@ export function getColorStand(stand: IStand | null): string {
   } else if (stand?.category === Category.MEDIUMNITY) {
     return '#D4C1E1';
   } else if (stand?.category === Category.MISCELLANEOUS) {
-    return '#C1D9E1';
+    return '#ffe8b5';
   } else {
     return '#DDDDDD';
   }
@@ -138,14 +156,12 @@ export function mapGridCellLight(
     id: gridCellLight.id,
     firstCell: gridCellLight.firstCell,
     colorHighlight: 'white',
-    dimension: mapDimensionCellLight(dimensionCells, stands, gridCellLight.dimension),
-    unusable: gridCellLight.unusable,
+    dimension: gridCellLight.firstCell ? mapDimensionCellLight(dimensionCells, stands, gridCellLight.dimension) : null,
+    unusable: !!gridCellLight.id,
   };
 }
 
-export function convertAvailableDimensionCells(
-  dimensionStands: IDimensionStand[],
-): DimensionCell[] {
+export function convertAvailableDimensionCells(dimensionStands: IDimensionStand[]): DimensionCell[] {
   const dimensions = [] as DimensionCell[];
 
   sortDimensionStand(dimensionStands).forEach((dimension) => {
@@ -157,37 +173,34 @@ export function convertAvailableDimensionCells(
       cols: dimension.heightMeter * 2,
       rows: dimension.widthMeter * 2,
     } as DimensionCell);
-
-    if (dimension.widthMeter !== dimension.heightMeter) {
-      dimensions.push({
-        idDimension: dimension.id,
-        dimension: dimension.dimension,
-        stand: null,
-        color: getColorStand(null),
-        cols: dimension.widthMeter * 2,
-        rows: dimension.heightMeter * 2,
-      } as DimensionCell);
-    }
   });
 
   return dimensions;
 }
 
-export function mapFloorPlanLight(
-  floorPlanLight: IFloorPlanLight,
+export function mapFloorPlanDataLight(
+  floorPlanDataLight: IFloorPlanDataLight,
   dimensionCells: DimensionCell[],
   stands: IStand[],
-): IFloorPlan {
+): IFloorPlanData {
   return {
-    id: floorPlanLight.id,
-    name: floorPlanLight.name,
-    cells: floorPlanLight.cells.map((row) =>
+    cells: floorPlanDataLight.cells.map((row) =>
       row.map((cell) => mapGridCellLight(cell, dimensionCells, stands)),
     ),
-    widthMeter: floorPlanLight.widthMeter,
-    heightMeter: floorPlanLight.heightMeter,
-    spacingMeter: floorPlanLight.spacingMeter,
-  } as IFloorPlan;
+    widthMeter: floorPlanDataLight.widthMeter,
+    heightMeter: floorPlanDataLight.heightMeter,
+    spacingMeter: floorPlanDataLight.spacingMeter,
+  };
+}
+
+export function mapFloorPlanLight(floorPlan: IFloorPlanLight, dimensionCells: DimensionCell[],
+                                  stands: IStand[]): IFloorPlan {
+
+  return {
+    id: floorPlan.id,
+    name: floorPlan.name,
+    data: mapFloorPlanDataLight(floorPlan.data, dimensionCells, stands),
+  };
 }
 
 export interface ContextMenu {

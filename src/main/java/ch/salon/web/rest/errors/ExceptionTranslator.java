@@ -51,7 +51,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private static final boolean CASUAL_CHAIN_ENABLED = false;
     private final Environment env;
 
-    @Value("${jhipster.clientApp.name}") private String applicationName;
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     public ExceptionTranslator(Environment env) {
         this.env = env;
@@ -119,7 +120,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         Map<String, Object> problemProperties = problem.getProperties();
         if (problemProperties == null || !problemProperties.containsKey(MESSAGE_KEY)) {
             problem.setProperty(MESSAGE_KEY, getMappedMessageKey(err) != null ? getMappedMessageKey(err) :
-                    "error.http." + problem.getStatus());
+                "error.http." + problem.getStatus());
         }
 
         if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) {
@@ -137,8 +138,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private String extractTitle(Throwable err, int statusCode) {
-        return getCustomizedTitle(err) != null ? getCustomizedTitle(err) : extractTitleForResponseStatus(err,
-                                                                                                         statusCode);
+        return
+            getCustomizedTitle(err) != null ? getCustomizedTitle(err) : extractTitleForResponseStatus(err, statusCode);
     }
 
     private List<FieldErrorVM> getFieldErrors(MethodArgumentNotValidException ex) {
@@ -147,7 +148,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
                  .stream()
                  .map(f -> new FieldErrorVM(f.getObjectName().replaceFirst("DTO$", ""), f.getField(),
                                             StringUtils.isNotBlank(
-                                                    f.getDefaultMessage()) ? f.getDefaultMessage() : f.getCode()))
+                                                f.getDefaultMessage()) ? f.getDefaultMessage() : f.getCode()))
                  .toList();
     }
 
@@ -245,8 +246,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private HttpHeaders buildHeaders(Throwable err) {
         return err instanceof BadRequestAlertException badRequestAlertException ? HeaderUtil.createFailureAlert(
-                applicationName, true, badRequestAlertException.getEntityName(), badRequestAlertException.getErrorKey(),
-                badRequestAlertException.getMessage()) : null;
+            applicationName, true, badRequestAlertException.getEntityName(), badRequestAlertException.getErrorKey(),
+            badRequestAlertException.getMessage()) : null;
     }
 
     public Optional<ProblemDetailWithCause> buildCause(final Throwable throwable, NativeWebRequest request) {

@@ -14,6 +14,7 @@ public class InvoicingPlanDTO implements Serializable {
     private Instant generationDate;
     private Instant issuedDate;
     private Instant expirationDate;
+    private Boolean needArrangement;
     private State state;
     private String billingNumber;
     private Set<InvoiceDTO> invoices = new HashSet<>();
@@ -94,5 +95,13 @@ public class InvoicingPlanDTO implements Serializable {
 
     public void setExpirationDate(Instant expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public Boolean getNeedArrangement() {
+        return needArrangement;
+    }
+
+    public void setNeedArrangement(Boolean needArrangement) {
+        this.needArrangement = needArrangement;
     }
 }

@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { StandComponent } from './list/stand.component';
 import { StandUpdateComponent } from './update/stand-update.component';
-import StandResolve from './route/stand-routing-resolve.service';
+import StandResolve from './service/stand-routing-resolve.service';
 
 const standRoute: Routes = [
   {

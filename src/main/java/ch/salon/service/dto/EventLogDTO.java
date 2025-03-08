@@ -4,6 +4,8 @@ import ch.salon.domain.enumeration.EventType;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class EventLogDTO implements Serializable {
@@ -12,10 +14,19 @@ public class EventLogDTO implements Serializable {
     private Instant referenceDate;
     private EventType type;
     private String label;
+    private Map<String, String> extraAttributes = new HashMap<>();
     private boolean fromSystem = true;
 
     public EventLogDTO() {
         // Empty constructor needed for Jackson.
+    }
+
+    public Map<String, String> getExtraAttributes() {
+        return extraAttributes;
+    }
+
+    public void setExtraAttributes(Map<String, String> extraAttributes) {
+        this.extraAttributes = extraAttributes;
     }
 
     public UUID getId() {

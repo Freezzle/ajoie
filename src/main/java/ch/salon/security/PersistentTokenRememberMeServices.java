@@ -169,8 +169,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     private PersistentToken getPersistentToken(String[] cookieTokens) {
         if (cookieTokens.length != 2) {
             throw new InvalidCookieException(
-                    "Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) +
-                    "'");
+                "Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
         }
         String presentedSeries = cookieTokens[0];
         String presentedToken = cookieTokens[1];
@@ -186,7 +185,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             // Token doesn't match series value. Delete this session and throw an exception.
             persistentTokenRepository.deleteById(token.getSeries());
             throw new CookieTheftException(
-                    "Invalid remember-me token (Series/token) mismatch. Implies previous " + "cookie theft attack.");
+                "Invalid remember-me token (Series/token) mismatch. Implies previous " + "cookie theft attack.");
         }
         if (token.getTokenDate().plusDays(TOKEN_VALIDITY_DAYS).isBefore(LocalDate.now())) {
             persistentTokenRepository.deleteById(token.getSeries());

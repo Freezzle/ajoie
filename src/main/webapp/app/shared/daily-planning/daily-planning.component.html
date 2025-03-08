@@ -1,51 +1,19 @@
-<div class="planner">
-  <div class="header full-width-line">
-    <div class="cell header-cell">{{ title }}</div>
-  </div>
-
-  <div class="header">
-    <div class="cell header-cell">
-      <button (click)="actionOpenEditing()" *ngIf="readMode" class="btn btn-primary btn-sm">
-        <fa-icon icon="pencil-alt"></fa-icon>
-      </button>
-      <button (click)="actionCancelEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
-        <fa-icon icon="ban"></fa-icon>
-      </button>
-      <button (click)="actionEmitAndCloseEditing()" *ngIf="!readMode" class="btn btn-primary btn-sm">
-        <fa-icon icon="floppy-disk"></fa-icon>
-      </button>
+<div class="overflow-auto">
+  <div [style]="{'grid-template-columns': '9em repeat(' + timeslots.length + ', minmax(9em, 9em))'}" class="grid">
+    <div></div>
+    <div *ngFor="let timeslot of timeslots" class="header border border-dark  bg-light text-dark">
+      <div class="content-slot">{{ timeslot.label }}</div>
     </div>
-    @for (column of columnNames; track $index) {
-      <div class="cell header-cell">{{ column }}</div>
-    }
-  </div>
 
-  @for (line of editingLines; track $index) {
-    <div class="row">
-      <div class="cell fw-bold">
-        <b>{{ line.label }}</b>
-      </div>
-      @for (square of line.squares; track $index) {
-        <div class="cell {{ !square.usable ? 'unusable' : '' }}">
-          @if (square.used) {
-            @if (!readMode) {
-              <div class="event {{ getColorClass(square.type) }}">
-                <span class="edit-button" (click)="editEvent(square)">
-                  <fa-icon icon="repeat"></fa-icon>
-                </span>
-                <span class="delete-button" (click)="removeEvent(square)">
-                  <fa-icon icon="times"></fa-icon>
-                </span>
-              </div>
-            } @else {
-              <div class="read-event {{ getColorClass(square.type) }}">{{ square.type }}</div>
-            }
-          } @else {
-            <div *ngIf="square.usable && !readMode" class="add-button" (click)="addEvent(square)">&nbsp;</div>
-            <div class="empty-event" *ngIf="!square.usable || readMode">&nbsp;</div>
-          }
+    <ng-container *ngFor="let line of _lines">
+      <div class="border border-dark p-1 font-semibold sticky-col bg-light text-dark">{{ line.label }}</div>
+      <div (click)="assignPosition(line.idLine, timeslot.id)" *ngFor="let timeslot of timeslots"
+           [ngClass]="computeClasses(line.idLine, timeslot.id)"
+           class="slot border border-dark text-center">
+        <div [ngStyle]="computeStyles(line.idLine, timeslot.id)" class="content-slot text-dark">
+          {{ getTimeSlot(line.idLine, timeslot.id)?.category === 'Unavailable' ? '' : getTimeSlot(line.idLine, timeslot.id)?.category }}
         </div>
-      }
-    </div>
-  }
+      </div>
+    </ng-container>
+  </div>
 </div>

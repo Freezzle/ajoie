@@ -11,6 +11,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IAuthority } from '../authority.model';
 import { AuthorityService, EntityArrayResponseType } from '../service/authority.service';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
 
 @Component({
   standalone: true,
@@ -25,6 +26,7 @@ import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dial
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    ButtonBoxComponent,
   ],
 })
 export class AuthorityComponent implements OnInit {

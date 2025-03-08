@@ -11,6 +11,7 @@ import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Mode;
+import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.FloorPlanSalonRepository;
@@ -66,6 +67,9 @@ public class SalonService {
     }
 
     public UUID create(SalonDTO salon) {
+        if (salon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
         if (salon.getId() != null) {
             throw new BadRequestAlertException("A new salon cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -74,18 +78,17 @@ public class SalonService {
     }
 
     public SalonDTO update(final UUID id, SalonDTO salon) {
-        if (salon.getId() == null) {
+        if (id == null || salon.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, salon.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        Salon salonFound = salonRepository.getReferenceById(id);
-
-        if (salonFound == null) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        Salon salonFound = salonRepository.findById(id)
+                                          .orElseThrow(
+                                              () -> new BadRequestAlertException("Entity not found", ENTITY_NAME,
+                                                                                 "idnotfound"));
 
         if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
             salon.setPriceStandSalons(salonFound.getPriceStandSalons()
@@ -97,11 +100,9 @@ public class SalonService {
         Salon salonToUpdate = SalonMapper.INSTANCE.toEntity(salon);
         if (Salon.hasDifference(salonFound, salonToUpdate)) {
             participationRepository.findBySalonIdOrderByRegistrationDateDesc(salonFound.getId())
-                                   .forEach(participation -> {
-                                       eventLogService.eventFromSystem("Attention : Le salon a changé des prix.",
-                                                                       EventType.EVENT, EntityType.PARTICIPATION,
-                                                                       participation.getId());
-                                   });
+                                   .forEach(participation -> eventLogService.eventFromSystem(
+                                       "Attention : Le salon a changé des prix.", EventType.EVENT,
+                                       EntityType.PARTICIPATION, participation.getId(), null));
         }
 
         return SalonMapper.INSTANCE.toDto(salonRepository.save(salonToUpdate));
@@ -112,15 +113,31 @@ public class SalonService {
     }
 
     public Optional<SalonDTO> get(UUID id) {
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         return salonRepository.findById(id).map(SalonMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         salonRepository.deleteById(id);
     }
 
     public List<DimensionStandDTO> getDimensionStands(UUID idSalon) {
-        Salon salon = this.salonRepository.getReferenceById(idSalon);
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        Salon salon = this.salonRepository.findById(idSalon)
+                                          .orElseThrow(
+                                              () -> new BadRequestAlertException("Entity not found", ENTITY_NAME,
+                                                                                 "idnotfound"));
+
         return salon.getPriceStandSalons()
                     .stream()
                     .map(PriceStandSalon::getDimension)
@@ -128,25 +145,54 @@ public class SalonService {
                     .toList();
     }
 
-    public FloorPlanSalonDTO createFloorPlanSalon(UUID idSalon, String data) {
+    public FloorPlanSalonDTO createFloorPlanSalon(UUID idSalon, FloorPlanSalonDTO floorPlanDto) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         FloorPlanSalon floorPlanSalon = new FloorPlanSalon();
+        floorPlanSalon.setName(floorPlanDto.getName());
         floorPlanSalon.setSalon(this.salonRepository.getReferenceById(idSalon));
-        floorPlanSalon.setData(data);
+        floorPlanSalon.setData(floorPlanDto.getData());
 
         return FloorPlanSalonMapper.INSTANCE.toDto(this.floorPlanSalonRepository.save(floorPlanSalon));
     }
 
     public void deleteFloorPlanSalon(UUID idSalon, UUID idFloorPlan) {
-        this.floorPlanSalonRepository.deleteById(idFloorPlan);
+        if (idSalon == null || idFloorPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        FloorPlanSalon floorPlan = this.floorPlanSalonRepository.findById(idFloorPlan).orElseThrow();
+
+        if (!floorPlan.getSalon().getId().equals(idSalon)) {
+            throw new BadRequestAlertException("Invalid idSalon", ENTITY_NAME, "doesntMatchs");
+        }
+
+        this.floorPlanSalonRepository.delete(floorPlan);
     }
 
-    public FloorPlanSalonDTO updateFloorPlanSalon(UUID idSalon, UUID idFloorPlan, String data) {
-        FloorPlanSalon floorPlanSalon = this.floorPlanSalonRepository.getReferenceById(idFloorPlan);
-        floorPlanSalon.setData(data);
-        return FloorPlanSalonMapper.INSTANCE.toDto(this.floorPlanSalonRepository.save(floorPlanSalon));
+    public FloorPlanSalonDTO updateFloorPlanSalon(UUID idSalon, UUID idFloorPlan, FloorPlanSalonDTO floorPlanSalonDTO) {
+        if (idSalon == null || idFloorPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        FloorPlanSalon floorPlan = this.floorPlanSalonRepository.findById(idFloorPlan).orElseThrow();
+
+        if (!floorPlan.getSalon().getId().equals(idSalon)) {
+            throw new BadRequestAlertException("Invalid idSalon", ENTITY_NAME, "doesntMatchs");
+        }
+
+        floorPlan.setName(floorPlanSalonDTO.getName());
+        floorPlan.setData(floorPlanSalonDTO.getData());
+        return FloorPlanSalonMapper.INSTANCE.toDto(this.floorPlanSalonRepository.save(floorPlan));
     }
 
     public List<FloorPlanSalonDTO> getFloorPlanSalon(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         return this.floorPlanSalonRepository.findBySalonId(idSalon)
                                             .stream()
                                             .map(FloorPlanSalonMapper.INSTANCE::toDto)
@@ -154,10 +200,14 @@ public class SalonService {
     }
 
     public SalonStatistiques getStatistiques(UUID idSalon, List<Status> statuses) {
+        if (idSalon == null || statuses == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         SalonStatistiques stats = new SalonStatistiques();
 
         List<Stand> stands =
-                standRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
+            standRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
         stats.setNbStands(stands.size());
 
         // Dimensions Stand
@@ -179,27 +229,24 @@ public class SalonService {
         stats.setCategoriesStands(categories);
 
         List<Conference> conferences =
-                this.conferenceRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
+            this.conferenceRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
         stats.setNbConference(conferences.size());
 
         List<Participation> participationsSalon =
-                this.participationRepository.findBySalonIdAndStatusIn(idSalon, statuses);
+            this.participationRepository.findBySalonIdAndStatusIn(idSalon, statuses);
 
         stats.setNbMeal1(
-                participationsSalon.stream().map(Participation::getNbMeal1).reduce(Long::sum).orElse(0L).intValue());
+            participationsSalon.stream().map(Participation::getNbMeal1).reduce(Long::sum).orElse(0L).intValue());
         stats.setNbMeal2(
-                participationsSalon.stream().map(Participation::getNbMeal2).reduce(Long::sum).orElse(0L).intValue());
+            participationsSalon.stream().map(Participation::getNbMeal2).reduce(Long::sum).orElse(0L).intValue());
         stats.setNbMeal3(
-                participationsSalon.stream().map(Participation::getNbMeal3).reduce(Long::sum).orElse(0L).intValue());
+            participationsSalon.stream().map(Participation::getNbMeal3).reduce(Long::sum).orElse(0L).intValue());
 
         StandInfoStats infoStats = new StandInfoStats();
         infoStats.setNbTable(stands.stream().map(Stand::getNbTable).reduce(Long::sum).orElse(0L));
         infoStats.setNbChair(stands.stream().map(Stand::getNbChair).reduce(Long::sum).orElse(0L));
         infoStats.setNbElectricity(stands.stream().filter(Stand::getNeedElectricity).count());
-        infoStats.setNbOffer(participationsSalon.stream()
-                                                .filter(stand -> stand.getOffer() != null &&
-                                                                 !stand.getOffer().toLowerCase().contains("non"))
-                                                .count());
+        infoStats.setNbOffer(participationsSalon.stream().filter(Participation::getHasOffer).count());
         stats.setStandInfo(infoStats);
 
         stats.setNbCrushOfHeart((int) participationsSalon.stream().filter(Participation::getCrushOfHeart).count());
@@ -209,27 +256,32 @@ public class SalonService {
         Double offered = 0.00;
         Double total = 0.00;
 
-        for (Participation participation : participationsSalon) {
-            InvoicingPlan invoicingPlan =
-                    invoicingPlanRepository.findFirstByParticipationIdOrderByBillingNumberDesc(participation.getId());
+        List<InvoicingPlan> invoicingPlans =
+            invoicingPlanRepository.findByParticipation_IdInAndParticipation_Salon_IdOrderByBillingNumberDesc(
+                participationsSalon.stream().map(Participation::getId).toList(), idSalon);
 
-            if (invoicingPlan == null) {
+        for (InvoicingPlan invoicingPlan : invoicingPlans) {
+            if (invoicingPlan == null || ((!statuses.contains(Status.CANCELED) && !statuses.contains(Status.REFUSED)) &&
+                                          invoicingPlan.getState() == State.CANCELLED)) {
                 continue;
             }
 
-            offered += invoicingPlan.getPayments()
-                                    .stream()
-                                    .filter(payment -> payment.getPaymentMode() == Mode.DISCOUNT)
-                                    .map(Payment::getAmount)
-                                    .reduce(Double::sum)
-                                    .orElse(0.00);
+            offered += invoicingPlan.getReductionsTotal();
+
             paid += invoicingPlan.getPayments()
                                  .stream()
                                  .filter(payment -> payment.getPaymentMode() != Mode.DISCOUNT)
                                  .map(Payment::getAmount)
                                  .reduce(Double::sum)
                                  .orElse(0.00);
-            total += invoicingPlan.getInvoicesTotal();
+
+            total += invoicingPlan.getInvoicesTotal() - invoicingPlan.getPayments()
+                                                                     .stream()
+                                                                     .filter(payment -> payment.getPaymentMode() ==
+                                                                                        Mode.DISCOUNT)
+                                                                     .map(Payment::getAmount)
+                                                                     .reduce(Double::sum)
+                                                                     .orElse(0.00);
         }
 
         FacturationStats facturationStats = new FacturationStats();

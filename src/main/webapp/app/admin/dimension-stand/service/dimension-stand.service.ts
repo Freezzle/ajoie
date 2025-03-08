@@ -19,7 +19,7 @@ export class DimensionStandService {
   }
 
   update(dimensionStand: IDimensionStand): Observable<HttpResponse<IDimensionStand>> {
-    return this.http.put<IDimensionStand>(`${this.resourceUrl}/${this.getDimensionStandIdentifier(dimensionStand)}`,
+    return this.http.put<IDimensionStand>(`${this.resourceUrl}/${getDimensionStandIdentifier(dimensionStand)}`,
       dimensionStand, {
         observe: 'response',
       });
@@ -29,21 +29,13 @@ export class DimensionStandService {
     return this.http.get<IDimensionStand>(`${this.resourceUrl}/${idDimension}`, { observe: 'response' });
   }
 
-  query(req?: any): Observable<HttpResponse<IDimensionStand[]>> {
+  query(req?: any): Observable<IDimensionStand[]> {
     const options = createRequestOption(req);
-    return this.http.get<IDimensionStand[]>(this.resourceUrl, { params: options, observe: 'response' });
+    return this.http.get<IDimensionStand[]>(this.resourceUrl, { params: options });
   }
 
   delete(idDimension: string): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${idDimension}`, { observe: 'response' });
-  }
-
-  getDimensionStandIdentifier(dimensionStand: Pick<IDimensionStand, 'id'>): string {
-    return dimensionStand.id;
-  }
-
-  compareDimensionStand(o1: Pick<IDimensionStand, 'id'> | null, o2: Pick<IDimensionStand, 'id'> | null): boolean {
-    return o1 && o2 ? this.getDimensionStandIdentifier(o1) === this.getDimensionStandIdentifier(o2) : o1 === o2;
   }
 
   addDimensionsOptionsIfMissing<Type extends Pick<IDimensionStand, 'id'>>(
@@ -53,10 +45,10 @@ export class DimensionStandService {
     const dimensionStands: Type[] = dimensionStandsToCheck.filter(isPresent);
     if (dimensionStands.length > 0) {
       const dimensionStandCollectionIdentifiers = dimensionStandCollection.map(dimensionStandItem =>
-        this.getDimensionStandIdentifier(dimensionStandItem),
+        getDimensionStandIdentifier(dimensionStandItem),
       );
       const dimensionStandsToAdd = dimensionStands.filter(dimensionStandItem => {
-        const dimensionStandIdentifier = this.getDimensionStandIdentifier(dimensionStandItem);
+        const dimensionStandIdentifier = getDimensionStandIdentifier(dimensionStandItem);
         if (dimensionStandCollectionIdentifiers.includes(dimensionStandIdentifier)) {
           return false;
         }
@@ -67,4 +59,17 @@ export class DimensionStandService {
     }
     return dimensionStandCollection;
   }
+}
+
+export function getDimensionStandIdentifier(dimensionStand: Pick<IDimensionStand, 'id'>): string {
+  return dimensionStand.id;
+}
+
+export function compareDimensionStand(o1: Pick<IDimensionStand, 'id'> | null,
+                                      o2: Pick<IDimensionStand, 'id'> | null): boolean {
+  return o1 && o2 ? getDimensionStandIdentifier(o1) === getDimensionStandIdentifier(o2) : o1 === o2;
+}
+
+export function formatterDimensionStand(dimension: IDimensionStand | null): string {
+  return dimension?.dimension ?? '';
 }

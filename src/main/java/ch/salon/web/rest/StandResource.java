@@ -42,7 +42,8 @@ public class StandResource {
     private static final Logger log = LoggerFactory.getLogger(StandResource.class);
     private final StandService standService;
 
-    @Value("${jhipster.clientApp.name}") private String applicationName;
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     public StandResource(StandService standService) {
         this.standService = standService;
@@ -56,12 +57,13 @@ public class StandResource {
         UUID id = standService.create(stand);
 
         return created(new URI("/api/stands/" + id)).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stand);
+            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stand);
     }
 
     @PutMapping("/{idStand}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<StandDTO> updateStand(@PathVariable(value = "idStand", required = false) final UUID idStand,
+    public ResponseEntity<StandDTO> updateStand(@PathVariable(value = "idStand",
+                                                              required = false) final UUID idStand,
                                                 @Valid @RequestBody StandDTO stand) {
         log.debug("REST request to update Stand : {}, {}", idStand, stand);
 
@@ -73,9 +75,10 @@ public class StandResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<StandDTO> getAllStands(@RequestParam(name = "idSalon", required = false) String idSalon,
-                                       @RequestParam(name = "idParticipation", required = false)
-                                       String idParticipation) {
+    public List<StandDTO> getAllStands(@RequestParam(name = "idSalon",
+                                                     required = false) UUID idSalon,
+                                       @RequestParam(name = "idParticipation",
+                                                     required = false) UUID idParticipation) {
         log.debug("REST request to get all Stands");
 
         return standService.findAll(idSalon, idParticipation);

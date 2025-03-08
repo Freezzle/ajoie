@@ -4,17 +4,21 @@ import ch.salon.domain.EventLog;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.repository.EventLogRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @Transactional(value = Transactional.TxType.REQUIRES_NEW)
 public class EventLogService {
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final EventLogRepository eventLogRepository;
 
@@ -23,20 +27,17 @@ public class EventLogService {
     }
 
     @Async
-    public void eventFromSystem(String label, EventType eventType, EntityType entityType, UUID referenceId) {
-        this.eventLogRepository.save(instance(label, eventType, entityType, referenceId, Instant.now(), true));
-    }
-
-    @Async
     public void eventFromSystem(String label, EventType eventType, EntityType entityType, UUID referenceId,
-                                Instant referenceDate) {
-        this.eventLogRepository.save(instance(label, eventType, entityType, referenceId, referenceDate, true));
+                                Map<String, String> extraAttributes) {
+        this.eventLogRepository.save(
+            instance(label, eventType, entityType, referenceId, Instant.now(), extraAttributes, true));
     }
 
     @Async
     public void eventFromUser(String label, EventType eventType, EntityType entityType, UUID referenceId,
-                              Instant referenceDate) {
-        this.eventLogRepository.save(instance(label, eventType, entityType, referenceId, referenceDate, false));
+                              Instant referenceDate, Map<String, String> extraAttributes) {
+        this.eventLogRepository.save(
+            instance(label, eventType, entityType, referenceId, referenceDate, extraAttributes, false));
     }
 
     public List<EventLog> findAllEventLog(EntityType entityType, UUID referenceId) {
@@ -44,8 +45,8 @@ public class EventLogService {
                                                                                                  referenceId);
     }
 
-    private static EventLog instance(String label, EventType eventType, EntityType entityType, UUID referenceId,
-                                     Instant referenceDate, boolean fromSystem) {
+    private EventLog instance(String label, EventType eventType, EntityType entityType, UUID referenceId,
+                              Instant referenceDate, Map<String, String> extraAttributes, boolean fromSystem) {
         EventLog eventLog = new EventLog();
         eventLog.setLabel(label);
         eventLog.setType(eventType);
@@ -53,6 +54,14 @@ public class EventLogService {
         eventLog.setReferenceId(referenceId);
         eventLog.setReferenceDate(referenceDate);
         eventLog.setFromSystem(fromSystem);
+
+        if (extraAttributes != null && !extraAttributes.isEmpty()) {
+            try {
+                eventLog.setPayloadJson(objectMapper.writeValueAsString(extraAttributes));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Erreur JSON", e);
+            }
+        }
 
         return eventLog;
     }

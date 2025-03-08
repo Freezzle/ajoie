@@ -17,6 +17,10 @@
       "label": "Factures",
       "notFound": "Aucune facture"
     },
+    "needArrangement": {
+      "checked": "Plan avec arrangement",
+      "unchecked": "Plan sans arrangement"
+    },
     "payments": {
       "label": "Paiements",
       "notFound": "Aucun paiement"
@@ -24,13 +28,14 @@
     "receipt": {
       "send": "Quittance par e-mail"
     },
-    "resend": "Renvoyer facture par e-mail",
+    "resendByEmail": "Renvoyer par email",
     "result": "Résultat",
-    "send": "Facture par e-mail",
+    "sendByEmail": "Envoyer par email",
     "sent": "Facture envoyé",
     "state": {
       "CANCELLED": "Annulé",
       "DRAFT": "Brouillon",
+      "ISOLATED": "Brouillon isolé",
       "ISSUED": "Soumit",
       "PAID": "Payé"
     },

@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -25,38 +26,61 @@ public class Stand implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @NotNull @Column(name = "description", nullable = false) private String description;
+    @NotNull
+    @Column(name = "description",
+            nullable = false)
+    private String description;
 
-    @Column(name = "website") private String website;
+    @Column(name = "website")
+    private String website;
 
-    @Column(name = "instagram") private String instagram;
+    @Column(name = "instagram")
+    private String instagram;
 
-    @Column(name = "facebook") private String facebook;
+    @Column(name = "facebook")
+    private String facebook;
 
-    @Column(name = "url_picture") private String urlPicture;
+    @Column(name = "url_picture")
+    private String urlPicture;
 
-    @Column(name = "shared") private Boolean shared;
+    @Column(name = "shared")
+    private Boolean shared;
 
-    @Column(name = "nb_table") private Long nbTable;
+    @Column(name = "nb_table")
+    private Long nbTable;
 
-    @Column(name = "nb_chair") private Long nbChair;
+    @Column(name = "nb_chair")
+    private Long nbChair;
 
-    @Enumerated(EnumType.STRING) @Column(name = "category") private Category category;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private Category category;
 
-    @Column(name = "need_electricity") private Boolean needElectricity;
+    @Column(name = "need_electricity")
+    private Boolean needElectricity;
 
-    @Enumerated(EnumType.STRING) @Column(name = "status") private Status status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 
-    @Column(name = "position") private Long position;
+    @Column(name = "extra_information")
+    private String extraInformation;
 
-    @Column(name = "extra_information") private String extraInformation;
-
-    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"exhibitor", "salon"},
+                          allowSetters = true)
     private Participation participation;
 
-    @ManyToOne(fetch = FetchType.LAZY) private DimensionStand dimension;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private DimensionStand dimension;
+
+    @Column(name = "registration_date")
+    private Instant registrationDate;
 
     public UUID getId() {
         return this.id;
@@ -69,6 +93,14 @@ public class Stand implements Serializable {
     public Stand id(UUID id) {
         this.setId(id);
         return this;
+    }
+
+    public Instant getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Instant registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public String getDescription() {
@@ -145,14 +177,6 @@ public class Stand implements Serializable {
     public Stand shared(Boolean shared) {
         this.setShared(shared);
         return this;
-    }
-
-    public Long getPosition() {
-        return position;
-    }
-
-    public void setPosition(Long position) {
-        this.position = position;
     }
 
     public Long getNbTable() {

@@ -1,0 +1,22 @@
+<div *ngIf="translateKey">
+  <label [for]="'field_' + fieldName" class="fw-bold">
+    {{ translateKey | translate }}
+    <span *ngIf="isFormControlUsed && control!.hasValidator(Validators.required)" class="red-icon">*</span>
+  </label>
+</div>
+
+<div class="switch">
+  <input type="checkbox"
+         [checked]="value"
+         [disabled]="forceDisabled || disabled"
+         [id]="'field_' + fieldName"
+         [ngClass]="{'invalid': isFormControlUsed && control!.invalid && control!.touched}"
+         (change)="onInput($event)"
+         class="switch-checkbox"/>
+
+  <label [for]="'field_' + fieldName" class="switch-label {{ (forceDisabled || disabled) ? 'disabled' : ''}}">
+    <span class="switch-inner"></span>
+    <span class="switch-btn"></span>
+  </label>
+</div>
+<error-box *ngIf="isFormControlUsed && this.control.errors" [formControlElement]="this.control"/>

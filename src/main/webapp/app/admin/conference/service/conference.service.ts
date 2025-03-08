@@ -3,7 +3,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IConference, NewConference } from '../conference.model';
+import { IConference, NewConference } from '../model/conference.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ConferenceService {
@@ -11,18 +11,12 @@ export class ConferenceService {
   protected applicationConfigService = inject(ApplicationConfigService);
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/conferences');
 
-  create(conference: NewConference): Observable<HttpResponse<IConference>> {
-    return this.http.post<IConference>(this.resourceUrl, conference, { observe: 'response' });
+  create(conference: NewConference): Observable<IConference> {
+    return this.http.post<IConference>(this.resourceUrl, conference);
   }
 
-  update(conference: IConference): Observable<HttpResponse<IConference>> {
-    return this.http.put<IConference>(
-      `${this.resourceUrl}/${this.getConferenceIdentifier(conference)}`,
-      conference,
-      {
-        observe: 'response',
-      },
-    );
+  update(conference: IConference): Observable<IConference> {
+    return this.http.put<IConference>(`${this.resourceUrl}/${this.getConferenceIdentifier(conference)}`, conference);
   }
 
   find(idConference: string): Observable<HttpResponse<IConference>> {
@@ -31,13 +25,13 @@ export class ConferenceService {
     });
   }
 
-  query(req?: any): Observable<HttpResponse<IConference[]>> {
+  query(req?: any): Observable<IConference[]> {
     const options = createRequestOption(req);
-    return this.http.get<IConference[]>(this.resourceUrl, { params: options, observe: 'response' });
+    return this.http.get<IConference[]>(this.resourceUrl, { params: options });
   }
 
-  delete(idConference: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${idConference}`, { observe: 'response' });
+  delete(idConference: string): Observable<{}> {
+    return this.http.delete(`${this.resourceUrl}/${idConference}`);
   }
 
   getConferenceIdentifier(conference: Pick<IConference, 'id'>): string {

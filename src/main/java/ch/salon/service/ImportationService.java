@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -107,7 +108,6 @@ public class ImportationService {
                 String exhibitorEmail = sanitize(csvRecord, EXHIBITOR_EMAIL, true, false, false, true);
                 String exhibitorFamilyName = sanitize(csvRecord, EXHIBITOR_FAMILY_NAME, true, true, true, true);
                 String exhibitorFirstName = sanitize(csvRecord, EXHIBITOR_FIRSTNAME, true, true, true, true);
-                String exhibitorName = sanitize(csvRecord, EXHIBITOR_NAME, true, true, true, true);
                 String exhibitorAddress = sanitize(csvRecord, EXHIBITOR_ADDRESS, true, true, false, true);
                 String exhibitorNpaLocalite = sanitize(csvRecord, EXHIBITOR_NPA_LOCALITE, true, true, true, true);
                 String exhibitorPhone = sanitize(csvRecord, EXHIBITOR_PHONE_NUMBER, false, false, false, true);
@@ -122,8 +122,8 @@ public class ImportationService {
                 Exhibitor currentExhibitor = exhibitorRepository.findByEmail(exhibitorEmail);
                 if (currentExhibitor == null) {
                     currentExhibitor = new Exhibitor();
+                    currentExhibitor.setRegistrationDate(Instant.now());
                     currentExhibitor.setEmail(sub100(exhibitorEmail));
-                    currentExhibitor.setTherapistName(sub100(exhibitorName));
                     currentExhibitor.setFullName(sub100(exhibitorFirstName + " " + exhibitorFamilyName));
                     currentExhibitor.setAddress(sub100(exhibitorAddress));
                     currentExhibitor.setNpaLocalite(sub100(exhibitorNpaLocalite));
@@ -133,28 +133,31 @@ public class ImportationService {
                     currentExhibitor = exhibitorRepository.save(currentExhibitor);
                 }
 
+                String participationName = sanitize(csvRecord, EXHIBITOR_NAME, false, true, false, true);
                 String participationMeal1 = sanitize(csvRecord, STAND_MEAL_1, false, false, false, true);
                 String participationMeal2 = sanitize(csvRecord, STAND_MEAL_2, false, false, false, true);
                 String participationMeal3 = sanitize(csvRecord, STAND_MEAL_3, false, false, false, true);
                 String contract = sanitize(csvRecord, STAND_ACCEPTED_CONTRACT, true, false, false, true);
                 String chart = sanitize(csvRecord, STAND_ACCEPTED_CHART, true, false, false, true);
                 String participationAdditionnal =
-                        sanitize(csvRecord, PARTICIPATION_COMPLEMENT, false, true, false, true);
+                    sanitize(csvRecord, PARTICIPATION_COMPLEMENT, false, true, false, true);
                 String participationOffer = sanitize(csvRecord, PARTICIPATION_OFFRE_SOIN, false, true, false, true);
 
                 Participation currentParticipation = new Participation();
-                currentParticipation.setClientNumber(ParticipationService.getClientNumber(
-                        participationRepository.findMaxClientNumber(currentSalon.getId()),
-                        currentSalon.getReferenceNumber()));
+                currentParticipation.setClientNumber(Participation.incrementClientNumber(
+                    participationRepository.findMaxClientNumber(currentSalon.getId()),
+                    currentSalon.getReferenceNumber()));
 
                 currentParticipation.setSalon(currentSalon);
                 currentParticipation.setExhibitor(currentExhibitor);
+                currentParticipation.setTherapistName(sub100(participationName));
                 currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim()));
                 currentParticipation.setNbMeal2(Long.parseLong(participationMeal2.trim()));
                 currentParticipation.setNbMeal3(Long.parseLong(participationMeal3.trim()));
                 currentParticipation.setAcceptedContract(contract.contains("accepte"));
                 currentParticipation.setAdditionnalInformation(participationAdditionnal);
-                currentParticipation.setOffer(participationOffer);
+                currentParticipation.setHasOffer(participationOffer.equalsIgnoreCase("oui"));
+                currentParticipation.setOffer(null);
                 currentParticipation.setCrushOfHeart(false);
                 currentParticipation.setGuestOfHonor(false);
                 currentParticipation.setAcceptedChart(chart.contains("accepte"));
@@ -163,7 +166,7 @@ public class ImportationService {
                 LocalDateTime localDateTime = LocalDateTime.parse(standRegistrationDate, formatter);
                 currentParticipation.setRegistrationDate(localDateTime.toInstant(ZoneOffset.UTC));
                 currentParticipation.setStatus(Status.IN_VERIFICATION);
-                currentParticipation.setNeedArrangment(false);
+                currentParticipation.setNeedArrangement(false);
                 currentParticipation.setExtraInformation(null);
 
                 String standDescription = sanitize(csvRecord, STAND_DESCRIPTION, false, true, false, true);
@@ -179,6 +182,7 @@ public class ImportationService {
                 String standUrlPicture = sanitize(csvRecord, EXHIBITOR_URL_PICTURE, false, false, false, true);
 
                 Stand currentStand = new Stand();
+                currentStand.setRegistrationDate(Instant.now());
                 currentStand.setParticipation(currentParticipation);
                 currentStand.setDescription(sub500(standDescription));
                 currentStand.setWebsite(sub100(standWebsite));
@@ -188,9 +192,9 @@ public class ImportationService {
                 currentStand.setDimension(findDimension(dimensionStands, standDimension));
                 currentStand.setShared(standSharing.equalsIgnoreCase("oui"));
                 currentStand.setNbTable(standNbTable.contains("Aucune") ? 0 : Long.parseLong(
-                        standNbTable.replaceAll("\"", "").substring(0, 1)));
+                    standNbTable.replaceAll("\"", "").substring(0, 1)));
                 currentStand.setNbChair(standNbChair.contains("Aucune") ? 0 : Long.parseLong(
-                        standNbChair.replaceAll("\"", "").substring(0, 1)));
+                    standNbChair.replaceAll("\"", "").substring(0, 1)));
                 currentStand.setNeedElectricity(standElectricity.contains("oui"));
                 currentStand.setStatus(Status.IN_VERIFICATION);
                 currentStand.setExtraInformation(null);
@@ -202,6 +206,7 @@ public class ImportationService {
 
                 if (standConference.contains("oui")) {
                     Conference currentConference = new Conference();
+                    currentConference.setRegistrationDate(Instant.now());
                     currentConference.setParticipation(currentParticipation);
                     currentConference.setTitle(sub500(conferenceTitre));
                     currentConference.setDescription(sub500(conferenceDescription));

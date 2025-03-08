@@ -1,27 +1,32 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { combineLatest, of } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ConferenceService } from '../service/conference.service';
-import { IConference } from '../conference.model';
-import { ConferenceFormGroup, ConferenceFormService } from './conference-form.service';
-import { IParticipation } from '../../participation/participation.model';
-import { ParticipationService } from '../../participation/service/participation.service';
-import { Status } from '../../enumerations/status.model';
+import { IConference } from '../model/conference.interface';
+import { ConferenceFormGroup, ConferenceFormService } from '../service/conference-form.service';
+import { getFormattedParticipationName, IParticipation } from '../../participation/model/participation.interface';
+import { formatterParticipation, ParticipationService } from '../../participation/service/participation.service';
+import { compareStatus, formatterStatus, Status } from '../../enumerations/status.model';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
 import { ErrorModel } from '../../../shared/field-error/error.model';
-import { getExhibitorName, getFormattedExhibitorName } from '../../exhibitor/exhibitor.model';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { TextareaBoxComponent } from '../../../shared/components/textarea-box/textarea-box.component';
+import { TextBoxComponent } from '../../../shared/components/text-box/text-box.component';
+import { SelectBoxComponent } from '../../../shared/components/select-box/select-box.component';
+import { TypeaheadBoxComponent } from '../../../shared/components/typeahead-box/typeahead-box.component';
 
 @Component({
   standalone: true,
   selector: 'jhi-conference-update',
   templateUrl: './conference-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent,
+            TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, TypeaheadBoxComponent],
 })
 export class ConferenceUpdateComponent implements OnInit {
   protected conferenceService = inject(ConferenceService);
@@ -29,48 +34,50 @@ export class ConferenceUpdateComponent implements OnInit {
   protected participationService = inject(ParticipationService);
   protected activatedRoute = inject(ActivatedRoute);
 
-  isSaving = false;
-  conference: IConference | null = null;
+  isLoading = false;
+  isReadOnly = false;
+
+  initialConference: IConference | null = null;
   statusValues = Object.keys(Status);
-  readonlyForm = false;
   params: any;
   participationsOptions: IParticipation[] = [];
   editForm: FormGroup<ConferenceFormGroup> = this.conferenceFormService.createConferenceFormGroup({
     id: null,
   });
 
-  compareParticipation = (o1: IParticipation | null, o2: IParticipation | null): boolean =>
-    this.participationService.compareParticipation(o1, o2);
-
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
-      ([params, data]) => {
+    this.activateReadOnlyMode(false);
+
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data])
+      .pipe(
+        map(([params, data]) => ({
+          params,
+          isReadOnly: data['readonly'],
+          initialConference: data['conference'] as IConference,
+        })),
+      )
+      .subscribe(({ params, isReadOnly, initialConference }) => {
         this.params = params;
-        this.readonlyForm = data['readonly'];
-        this.conference = data['conference'];
+        this.isReadOnly = isReadOnly;
+        this.initialConference = { ...initialConference };
 
-        this.loadRelationshipsOptions();
+        this.editForm = this.conferenceFormService.createConferenceFormGroup(initialConference);
+        this.loadRelationshipsOptions(initialConference);
 
-        if (this.conference) {
-          this.editForm = this.conferenceFormService.createConferenceFormGroup(this.conference);
-
-          if (this.readonlyForm) {
-            this.readOnlyBack();
-          } else {
-            this.writeBack();
-          }
-        }
-      },
-    );
+        isReadOnly ? this.activateReadOnlyMode(false) : this.activateEditMode();
+      });
   }
 
-  readOnlyBack(): void {
-    this.readonlyForm = true;
+  activateReadOnlyMode(reset: boolean = true): void {
+    this.isReadOnly = true;
+    if (reset) {
+      this.editForm = this.conferenceFormService.createConferenceFormGroup(this.initialConference!);
+    }
     this.editForm.disable();
   }
 
-  writeBack(): void {
-    this.readonlyForm = false;
+  activateEditMode(): void {
+    this.isReadOnly = false;
     this.editForm.enable();
   }
 
@@ -79,70 +86,48 @@ export class ConferenceUpdateComponent implements OnInit {
   }
 
   save(): void {
-    this.isSaving = true;
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+    this.isLoading = true;
 
     const conference = this.conferenceFormService.getConference(this.editForm);
-    if (conference.id !== null) {
-      this.conferenceService
-        .update(conference)
-        .pipe(finalize(() => (this.isSaving = false)))
-        .subscribe(() => {
-          this.previousState();
-        });
-    } else {
-      this.conferenceService
-        .create(conference)
-        .pipe(finalize(() => (this.isSaving = false)))
-        .subscribe(() => {
-          this.previousState();
-        });
+
+    const saveOperation = conference.id != null
+                          ? this.conferenceService.update(conference)
+                          : this.conferenceService.create(conference);
+
+    saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
+  }
+
+  private loadRelationshipsOptions(conference: IConference): void {
+    const idSalon = this.params.get('idSalon');
+    const idParticipation = this.params.get('idParticipation');
+
+    if (!idSalon) {
+      return;
     }
-  }
 
-  get getTitle(): FormControl {
-    return this.editForm.get('title') as FormControl;
-  }
-
-  get getDescription(): FormControl {
-    return this.editForm.get('description') as FormControl;
-  }
-
-  get getParticipation(): FormControl {
-    return this.editForm.get('participation') as FormControl;
-  }
-
-  get getStatus(): FormControl {
-    return this.editForm.get('status') as FormControl;
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.participationService
-      .query(this.params.get('idSalon'))
-      .pipe(map((res: HttpResponse<IParticipation[]>) => res.body ?? []))
+    this.participationService.query(idSalon)
       .pipe(
-        map((participations: IParticipation[]) => {
-          if (this.params.get('idParticipation')) {
-            this.editForm
-              .get('participation')
-              ?.setValue(
-                participations.find(
-                  (participation) => participation.id === this.params.get('idParticipation'),
-                ),
-              );
+        map((res: HttpResponse<IParticipation[]>) => res.body ?? []),
+        map((participations) => {
+          if (idParticipation) {
+            this.editForm.get('participation')?.setValue(
+              participations.find(p => p.id === idParticipation) || null,
+            );
           }
-
-          return this.participationService.addParticipationsOptionsIfMissing<IParticipation>(
-            participations,
-            this.conference?.participation,
-          );
+          return this.participationService.addParticipationsOptionsIfMissing(participations, conference?.participation);
         }),
+        catchError(() => of([])),
       )
-      .subscribe(
-        (participations: IParticipation[]) => (this.participationsOptions = participations),
-      );
+      .subscribe((participations) => (this.participationsOptions = participations));
   }
 
   protected readonly ErrorModel = ErrorModel;
-  protected readonly getExhibitorName = getExhibitorName;
-  protected readonly getFormattedExhibitorName = getFormattedExhibitorName;
+  protected readonly getFormattedParticipationName = getFormattedParticipationName;
+  protected readonly formatterParticipation = formatterParticipation;
+  protected readonly formatterStatus = formatterStatus;
+  protected readonly compareStatus = compareStatus;
 }

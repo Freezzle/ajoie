@@ -1,26 +1,28 @@
 <div>
   <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
     <h2 id="page-heading">
-      <span *ngIf="!authority?.name" jhiTranslate="authority.create">Création d'une nouvelle authorité</span>
 
+      <div class="d-flex justify-content-center">
+        <span *ngIf="!authority?.name" jhiTranslate="authority.create">Création d'une nouvelle authorité</span>
+      </div>
       <hr/>
 
       <div class="d-flex justify-content-between mt-3">
         <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-            <span jhiTranslate="common.back">Back</span>
-          </button>
+          <button-box (clickedEvent)="previousState()"
+                      faIcon="arrow-left"
+                      [isDisabled]="isLoading"
+                      translateKey="common.back"/>
         </span>
 
         <span>
-          <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity" type="submit">
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-            <span jhiTranslate="common.save">Save</span>
-          </button>
+          <button-box *ngIf="!isReadOnly"
+                      faIcon="floppy-disk"
+                      [isDisabled]="editForm.invalid || isLoading"
+                      [isSubmit]="true"
+                      translateKey="common.save"/>
         </span>
       </div>
-      <hr/>
     </h2>
 
     <div>

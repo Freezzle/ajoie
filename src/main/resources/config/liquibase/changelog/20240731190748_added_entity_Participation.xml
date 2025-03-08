@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity Participation.
@@ -33,11 +33,14 @@
             <column name="accepted_contract" type="boolean">
                 <constraints nullable="true"/>
             </column>
-            <column name="need_arrangment" type="boolean">
+            <column name="need_arrangement" type="boolean">
                 <constraints nullable="true"/>
             </column>
             <column name="status" type="varchar(100)">
                 <constraints nullable="true"/>
+            </column>
+            <column name="has_offer" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
             </column>
             <column name="offer" type="varchar(500)">
                 <constraints nullable="true"/>
@@ -48,7 +51,7 @@
             <column name="crush_of_heart" type="boolean" defaultValue="false">
                 <constraints nullable="false"/>
             </column>
-            <column name="additional_information" type="varchar(500)">
+            <column name="additional_information" type="varchar(1000)">
                 <constraints nullable="true"/>
             </column>
             <column name="extra_information" type="varchar(500)">

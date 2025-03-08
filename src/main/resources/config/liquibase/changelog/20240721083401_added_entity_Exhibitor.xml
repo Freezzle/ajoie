@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity Exhibitor.
@@ -12,14 +12,14 @@
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="registration_date" type="${datetimeType}">
+                <constraints nullable="true"/>
+            </column>
             <column name="language" type="varchar(20)">
                 <constraints nullable="false"/>
             </column>
             <column name="full_name" type="varchar(100)">
                 <constraints nullable="false"/>
-            </column>
-            <column name="therapist_name" type="varchar(100)">
-                <constraints nullable="true"/>
             </column>
             <column name="email" type="varchar(100)">
                 <constraints nullable="false" unique="true"/>
@@ -40,5 +40,16 @@
         </createTable>
     </changeSet>
 
-
+    <changeSet id="add-billing-address" author="freezzle">
+        <addColumn tableName="exhibitor">
+            <column name="billing_address_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="exhibitor">
+            <column name="different_billing_address" type="boolean" defaultValue="false">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

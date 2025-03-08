@@ -4,7 +4,7 @@ import { UserRouteAccessService } from 'app/core/auth/user-route-access.service'
 import { SalonComponent } from './list/salon.component';
 import { SalonStatsComponent } from './stats/salon-stats.component';
 import { SalonUpdateComponent } from './update/salon-update.component';
-import SalonResolve from './route/salon-routing-resolve.service';
+import SalonResolve from './service/salon-routing-resolve.service';
 import conferenceRoutes from '../conference/conference.routes';
 import standRoutes from '../stand/stand.routes';
 import participationRoutes from '../participation/participation.routes';
@@ -79,7 +79,7 @@ const salonRoute: Routes = [
     children: floorPlanRoutes,
   },
   {
-    path: ':idSalon/volunteers',
+    path: ':idSalon/planning-volunteers',
     children: volunteerRoutes,
   },
 ];

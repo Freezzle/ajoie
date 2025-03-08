@@ -36,15 +36,22 @@ Generic styles
 
 /* other generic styles */
 
+@media screen and (min-width: 1281px) {
+  .jh-global {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+}
+
 .jh-global {
-  margin-left: 10%;
-  margin-right: 10%;
-  background-color: #d9def4;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .jh-card {
   padding: 1.5%;
-  border: none;
+  height: 100%;
+  background-color: #f4f7e9;
 }
 
 .error {
@@ -220,7 +227,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 .grey-icon {
-  color: $secondary;
+  color: #C6C6C6FF;
 }
 
 .green-icon {
@@ -233,6 +240,10 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 .red-icon {
   color: $danger;
+}
+
+.white-icon {
+  color: white;
 }
 
 /* ACCORDION */
@@ -265,11 +276,26 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   cursor: pointer;
 }
 
+.table td.clipboard {
+  cursor: pointer;
+}
+
+.table td.clipboard:hover {
+  background-color: $secondary;
+}
+
 .truncate {
   white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
   overflow: hidden; /* Cache le texte qui déborde du conteneur */
   text-overflow: ellipsis; /* Remplace le texte tronqué par "..." */
   max-width: 500px; /* Fixe une largeur maximale pour la cellule */
+}
+
+.truncate-small {
+  white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
+  overflow: hidden; /* Cache le texte qui déborde du conteneur */
+  text-overflow: ellipsis; /* Remplace le texte tronqué par "..." */
+  max-width: 300px; /* Fixe une largeur maximale pour la cellule */
 }
 
 /* CARD */
@@ -292,56 +318,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 .form-control:disabled {
   background-color: #e6e6e6;
-  border: 1px dashed $grey;
-}
-
-/* SWITCH CHECKBOX */
-
-.switch {
-  position: relative;
-  width: 50px; /* Taille initiale (sera ajustée selon l'écran) */
-  height: 30px; /* Hauteur de la barre cylindrique */
-  display: inline-block;
-}
-
-.switch-checkbox {
-  display: none;
-}
-
-/* Barre cylindrique */
-
-.switch-label {
-  position: relative;
-  display: block;
-  background-color: $secondary;
-  border-radius: 60px; /* Donne l'effet cylindrique */
-  height: 100%;
-  width: 100%;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-/* L'élément qui se déplace dans la barre */
-.switch-btn {
-  position: absolute;
-  top: 50%;
-  left: 10%;
-  transform: translateY(-50%);
-  width: 20px; /* Taille du petit rond */
-  height: 20px;
-  background-color: #fff;
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-}
-
-/* Quand le switch est activé */
-.switch-checkbox:checked + .switch-label {
-  background-color: $primary;
-}
-
-/* Déplacement du bouton lorsque activé */
-.switch-checkbox:checked + .switch-label .switch-btn {
-  transform: translate(105%, -50%); /* Déplacement du bouton à droite */
+  border: 1px dashed $dark;
 }
 
 /* LOG EVENT */
@@ -398,4 +375,58 @@ div:has(field-error) > label::after {
 .btn-group.active .dropdown-item:hover {
   background-color: $darkgrey;
   color: $light;
+}
+
+.dropdown-items {
+  .dropdown-item.active {
+    background-color: $warning;
+    color: $white;
+  }
+
+  .dropdown-item {
+    color: #555555;
+  }
+
+  .dropdown-item:disabled {
+    color: #a5a5a5;
+  }
+
+  .dropdown-item:focus,
+  .dropdown-item:hover {
+    background-color: $primary;
+    color: $white;
+  }
+
+  .dropdown-item.dropdown-item-danger:focus,
+  .dropdown-item.dropdown-item-danger:hover {
+    background-color: $danger;
+    color: $white;
+  }
+}
+
+ngb-typeahead-window.dropdown-menu {
+  max-height: 20em !important;
+  overflow-y: auto;
+}
+
+ngb-typeahead-window.dropdown-menu .dropdown-item {
+  color: $darkgrey;
+}
+
+ngb-typeahead-window.dropdown-menu .dropdown-item:hover {
+  background-color: $primary;
+  color: $white;
+}
+
+ngb-typeahead-window.dropdown-menu .dropdown-item .ngb-highlight {
+  color: $primary;
+}
+
+ngb-typeahead-window.dropdown-menu .dropdown-item:hover .ngb-highlight {
+  color: $white;
+}
+
+.page-item.active .page-link {
+  color: white;
+  background-color: $primary;
 }

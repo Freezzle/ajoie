@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -23,27 +24,41 @@ public class Invoice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @Column(name = "position") private Long position;
+    @Column(name = "position")
+    private Long position;
 
-    @Column(name = "generation_date") private Instant generationDate = Instant.now();
+    @Column(name = "generation_date")
+    private Instant generationDate = Instant.now();
 
-    @Column(name = "reference_id") private UUID referenceId;
+    @Column(name = "reference_id")
+    private UUID referenceId;
 
-    @Enumerated(EnumType.STRING) @Column(name = "type") private Type type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private Type type;
 
-    @Column(name = "label") private String label;
+    @Column(name = "label")
+    private String label;
 
-    @Column(name = "default_amount") private Double defaultAmount;
+    @Column(name = "default_amount")
+    private Double defaultAmount;
 
-    @Column(name = "custom_amount") private Double customAmount;
+    @Column(name = "custom_amount")
+    private Double customAmount;
 
-    @Column(name = "quantity") private Long quantity;
+    @Column(name = "quantity")
+    private Long quantity;
 
-    @Column(name = "lock") private Boolean lock;
+    @Column(name = "lock")
+    private Boolean lock;
 
-    @Column(name = "extra_information") private String extraInformation;
+    @Column(name = "extra_information")
+    private String extraInformation;
 
     public Invoice() {
     }
@@ -103,6 +118,14 @@ public class Invoice implements Serializable {
 
     public Double getDefaultAmount() {
         return this.defaultAmount;
+    }
+
+    public boolean hasDifference() {
+        return !BigDecimal.valueOf(getDifference()).equals(BigDecimal.ZERO);
+    }
+
+    private Double getDifference() {
+        return this.defaultAmount - this.customAmount;
     }
 
     public void setDefaultAmount(Double defaultAmount) {
@@ -188,6 +211,10 @@ public class Invoice implements Serializable {
 
     public void setPosition(Long position) {
         this.position = position;
+    }
+
+    public Double getTotalDifference() {
+        return this.quantity * this.getDifference();
     }
 
     public Double getTotalAmount() {

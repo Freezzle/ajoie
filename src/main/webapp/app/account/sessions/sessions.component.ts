@@ -5,11 +5,15 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { Session } from './session.model';
 import { SessionsService } from './sessions.service';
+import { ButtonBoxComponent } from '../../shared/components/button-box/button-box.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LinkBoxComponent } from '../../shared/components/link-box/link-box.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   standalone: true,
   selector: 'jhi-sessions',
-  imports: [SharedModule],
+  imports: [SharedModule, ButtonBoxComponent, FormsModule, LinkBoxComponent, ReactiveFormsModule],
   templateUrl: './sessions.component.html',
 })
 export default class SessionsComponent implements OnInit {
@@ -17,6 +21,8 @@ export default class SessionsComponent implements OnInit {
   error = false;
   success = false;
   sessions: Session[] = [];
+
+  isLoading = false;
 
   private sessionsService = inject(SessionsService);
   private accountService = inject(AccountService);
@@ -30,13 +36,20 @@ export default class SessionsComponent implements OnInit {
   invalidate(series: string): void {
     this.error = false;
     this.success = false;
+    this.isLoading = true;
 
-    this.sessionsService.delete(encodeURIComponent(series)).subscribe(
-      () => {
-        this.success = true;
-        this.sessionsService.findAll().subscribe(sessions => (this.sessions = sessions));
-      },
-      () => (this.error = true),
-    );
+    this.sessionsService.delete(encodeURIComponent(series))
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe(
+        () => {
+          this.success = true;
+          this.sessionsService.findAll().subscribe(sessions => (this.sessions = sessions));
+        },
+        () => (this.error = true),
+      );
+  }
+
+  previousState(): void {
+    window.history.back();
   }
 }

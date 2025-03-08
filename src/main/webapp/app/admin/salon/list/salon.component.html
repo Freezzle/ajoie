@@ -1,31 +1,31 @@
 <div>
   <h2 id="page-heading">
-    <span jhiTranslate="salon.title">Les salons</span>
-
+    <div class="d-flex justify-content-center">
+      <span jhiTranslate="salon.title">Les salons</span>
+    </div>
     <hr/>
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-          <span jhiTranslate="common.back">Back</span>
-        </button>
+        <button-box (clickedEvent)="previousState()"
+                    faIcon="arrow-left"
+                    [isDisabled]="isLoading"
+                    translateKey="common.back"/>
       </span>
 
       <span>
-        <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
+        <button-box (clickedEvent)="load()"
+                    faIcon="sync"
+                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [isDisabled]="isLoading"
+                    translateKey="common.refresh"/>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
+        <link-box [links]="['./new']" type="success"
+                  translateKey="common.create"
+                  faIcon="plus"
+                  [isDisabled]="isLoading"/>
       </span>
     </div>
-
-    <hr/>
   </h2>
 
   <jhi-alert-error></jhi-alert-error>
@@ -73,10 +73,8 @@
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <button type="submit" (click)="delete(salon)" class="btn btn-danger btn-sm">
-                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                    <span jhiTranslate="common.delete"></span>
-                  </button>
+                  <button-box (clickedEvent)="delete(salon)" type="danger"
+                              [showText]="false" translateKey="common.delete" faIcon="times"/>
                 </div>
               </td>
             </tr>
@@ -85,4 +83,6 @@
       </tbody>
     </table>
   </div>
+
+  <jhi-pagination (pageChanged)="refreshSalons($event)" [collectionSize]="salons.length"/>
 </div>

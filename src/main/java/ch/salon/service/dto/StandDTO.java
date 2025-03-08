@@ -38,8 +38,6 @@ public class StandDTO implements Serializable {
 
     private DimensionStandLightDTO dimension;
 
-    private Long position;
-
     public StandDTO() {
     }
 
@@ -137,14 +135,6 @@ public class StandDTO implements Serializable {
 
     public void setCategory(Category category) {
         this.category = category;
-    }
-
-    public Long getPosition() {
-        return position;
-    }
-
-    public void setPosition(Long position) {
-        this.position = position;
     }
 
     public String getExtraInformation() {

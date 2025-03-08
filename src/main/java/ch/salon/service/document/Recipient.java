@@ -16,13 +16,22 @@ public class Recipient implements Serializable {
     private Locale language;
 
     public Recipient(Exhibitor exhibitor) {
-        this.enterpriseName = exhibitor.getTherapistName();
-        this.fullName = exhibitor.getFullName();
-        this.street = exhibitor.getAddress();
-        this.city = exhibitor.getNpaLocalite();
-        this.country = ""; // FIXME : COUNTRY ON EXHIBITOR
+
+        if (exhibitor.getDifferentBillingAddress() && exhibitor.getBillingAddress() != null) {
+            this.enterpriseName = exhibitor.getBillingAddress().getFormalLine();
+            this.fullName = exhibitor.getBillingAddress().getFullName();
+            this.street = exhibitor.getBillingAddress().getAddress();
+            this.city = exhibitor.getBillingAddress().getNpaLocalite();
+            this.country = ""; // FIXME : COUNTRY ON EXHIBITOR
+        } else {
+            this.fullName = exhibitor.getFullName();
+            this.street = exhibitor.getAddress();
+            this.city = exhibitor.getNpaLocalite();
+            this.country = ""; // FIXME : COUNTRY ON EXHIBITOR
+        }
+
         this.language = StringUtils.isNotBlank(exhibitor.getLanguage()) ? Locale.forLanguageTag(
-                exhibitor.getLanguage()) : Locale.FRENCH;
+            exhibitor.getLanguage()) : Locale.FRENCH;
     }
 
     public String getEnterpriseName() {

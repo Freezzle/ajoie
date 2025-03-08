@@ -6,6 +6,7 @@ import java.util.UUID;
 public class FloorPlanSalonDTO implements Serializable {
 
     private UUID id;
+    private String name;
     private String data;
 
     public FloorPlanSalonDTO() {
@@ -26,5 +27,13 @@ public class FloorPlanSalonDTO implements Serializable {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

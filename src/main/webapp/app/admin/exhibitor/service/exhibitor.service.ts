@@ -5,8 +5,9 @@ import { Observable } from 'rxjs';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IExhibitor, NewExhibitor } from '../exhibitor.model';
-import { IParticipation } from '../../participation/participation.model';
+import { getFirstExhibitorName, IExhibitor, NewExhibitor } from '../model/exhibitor.interface';
+import { IParticipation } from '../../participation/model/participation.interface';
+import { removeAccents } from '../../../shared/utils/string.util';
 
 @Injectable({ providedIn: 'root' })
 export class ExhibitorService {
@@ -14,13 +15,12 @@ export class ExhibitorService {
   protected applicationConfigService = inject(ApplicationConfigService);
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/exhibitors');
 
-  create(exhibitor: NewExhibitor): Observable<HttpResponse<IExhibitor>> {
-    return this.http.post<IExhibitor>(this.resourceUrl, exhibitor, { observe: 'response' });
+  create(exhibitor: NewExhibitor): Observable<IExhibitor> {
+    return this.http.post<IExhibitor>(this.resourceUrl, exhibitor);
   }
 
-  update(exhibitor: IExhibitor): Observable<HttpResponse<IExhibitor>> {
-    return this.http.put<IExhibitor>(`${this.resourceUrl}/${this.getExhibitorIdentifier(exhibitor)}`, exhibitor,
-      { observe: 'response' });
+  update(exhibitor: IExhibitor): Observable<IExhibitor> {
+    return this.http.put<IExhibitor>(`${this.resourceUrl}/${getExhibitorIdentifier(exhibitor)}`, exhibitor);
   }
 
   find(idExhibitor: string): Observable<HttpResponse<IExhibitor>> {
@@ -36,16 +36,8 @@ export class ExhibitorService {
     return this.http.get<IExhibitor[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(idExhibitor: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${idExhibitor}`, { observe: 'response' });
-  }
-
-  getExhibitorIdentifier(exhibitor: Pick<IExhibitor, 'id'>): string {
-    return exhibitor.id;
-  }
-
-  compareExhibitor(o1: Pick<IExhibitor, 'id'> | null, o2: Pick<IExhibitor, 'id'> | null): boolean {
-    return o1 && o2 ? this.getExhibitorIdentifier(o1) === this.getExhibitorIdentifier(o2) : o1 === o2;
+  delete(idExhibitor: string): Observable<{}> {
+    return this.http.delete(`${this.resourceUrl}/${idExhibitor}`);
   }
 
   addExhibitorOptionsIfMissing<Type extends Pick<IExhibitor, 'id'>>(
@@ -55,9 +47,9 @@ export class ExhibitorService {
     const exhibitors: Type[] = exhibitorsToCheck.filter(isPresent);
     if (exhibitors.length > 0) {
       const exhibitorCollectionIdentifiers = exhibitorCollection.map(
-        exhibitorItem => this.getExhibitorIdentifier(exhibitorItem));
+        exhibitorItem => getExhibitorIdentifier(exhibitorItem));
       const exhibitorsToAdd = exhibitors.filter(exhibitorItem => {
-        const exhibitorIdentifier = this.getExhibitorIdentifier(exhibitorItem);
+        const exhibitorIdentifier = getExhibitorIdentifier(exhibitorItem);
         if (exhibitorCollectionIdentifiers.includes(exhibitorIdentifier)) {
           return false;
         }
@@ -68,4 +60,16 @@ export class ExhibitorService {
     }
     return exhibitorCollection;
   }
+}
+
+export function getExhibitorIdentifier(exhibitor: Pick<IExhibitor, 'id'>): string {
+  return exhibitor.id;
+}
+
+export function compareExhibitor(o1: Pick<IExhibitor, 'id'> | null, o2: Pick<IExhibitor, 'id'> | null): boolean {
+  return o1 && o2 ? getExhibitorIdentifier(o1) === getExhibitorIdentifier(o2) : o1 === o2;
+}
+
+export function formatterExhibitor(exhibitor: IExhibitor | null): string {
+  return removeAccents(getFirstExhibitorName(exhibitor));
 }

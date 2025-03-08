@@ -21,17 +21,30 @@ public class PersistentToken implements Serializable {
 
     private static final int MAX_USER_AGENT_LEN = 255;
 
-    @Id private String series;
+    @Id
+    private String series;
 
-    @JsonIgnore @NotNull @Column(name = "token_value", nullable = false) private String tokenValue;
+    @JsonIgnore
+    @NotNull
+    @Column(name = "token_value",
+            nullable = false)
+    private String tokenValue;
 
-    @Column(name = "token_date") private LocalDate tokenDate;
+    @Column(name = "token_date")
+    private LocalDate tokenDate;
 
-    @Size(min = 0, max = 39) @Column(name = "ip_address", length = 39) private String ipAddress;
+    @Size(min = 0,
+          max = 39)
+    @Column(name = "ip_address",
+            length = 39)
+    private String ipAddress;
 
-    @Column(name = "user_agent") private String userAgent;
+    @Column(name = "user_agent")
+    private String userAgent;
 
-    @JsonIgnore @ManyToOne private User user;
+    @JsonIgnore
+    @ManyToOne
+    private User user;
 
     public String getSeries() {
         return series;

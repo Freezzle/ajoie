@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
@@ -21,19 +22,35 @@ public class EventLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @Column(name = "reference_date") private Instant referenceDate = Instant.now();
+    @Column(name = "reference_date")
+    private Instant referenceDate = Instant.now();
 
-    @Enumerated(EnumType.STRING) @Column(name = "type") private EventType type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private EventType type;
 
-    @Column(name = "label") private String label;
+    @Column(name = "label")
+    private String label;
 
-    @Column(name = "from_system") private boolean fromSystem = true;
+    @Column(name = "from_system")
+    private boolean fromSystem = true;
 
-    @Enumerated(EnumType.STRING) @Column private EntityType entityType;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private EntityType entityType;
 
-    @Column(name = "reference_id") private UUID referenceId;
+    @Column(name = "reference_id")
+    private UUID referenceId;
+
+    @Lob
+    @Column(name = "data",
+            columnDefinition = "text")
+    private String payloadJson;
 
     public UUID getId() {
         return id;
@@ -89,6 +106,14 @@ public class EventLog implements Serializable {
 
     public void setReferenceId(UUID referenceId) {
         this.referenceId = referenceId;
+    }
+
+    public String getPayloadJson() {
+        return payloadJson;
+    }
+
+    public void setPayloadJson(String payloadJson) {
+        this.payloadJson = payloadJson;
     }
 
     @Override

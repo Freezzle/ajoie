@@ -18,21 +18,38 @@
         <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
           <div class="mb-3 position-relative">
             <label class="form-label" for="firstName" jhiTranslate="settings.form.firstname">Prénom</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" [placeholder]="'settings.form.firstname.placeholder' | translate" formControlName="firstName"/>
+            <input type="text"
+                   class="form-control"
+                   id="firstName"
+                   name="firstName"
+                   [placeholder]="'settings.form.firstname.placeholder' | translate"
+                   formControlName="firstName"/>
 
-            <field-error [formControlElement]="getFirstName" [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"></field-error>
+            <field-error [formControlElement]="getFirstName"
+                         [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"></field-error>
           </div>
 
           <div class="mb-3 position-relative">
             <label class="form-label" for="lastName" jhiTranslate="settings.form.lastname">Nom</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" [placeholder]="'settings.form.lastname.placeholder' | translate" formControlName="lastName"/>
+            <input type="text"
+                   class="form-control"
+                   id="lastName"
+                   name="lastName"
+                   [placeholder]="'settings.form.lastname.placeholder' | translate"
+                   formControlName="lastName"/>
 
-            <field-error [formControlElement]="getLastName" [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"></field-error>
+            <field-error [formControlElement]="getLastName"
+                         [errors]="[ErrorModel.required(), ErrorModel.minlength(1), ErrorModel.maxlength(50)]"></field-error>
           </div>
 
           <div class="mb-3 position-relative">
             <label class="form-label" for="email" jhiTranslate="global.form.email.label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" [placeholder]="'global.form.email.placeholder' | translate" formControlName="email"/>
+            <input type="email"
+                   class="form-control"
+                   id="email"
+                   name="email"
+                   [placeholder]="'global.form.email.placeholder' | translate"
+                   formControlName="email"/>
 
             <field-error [formControlElement]="getEmail" [errors]="[
                 ErrorModel.required(),

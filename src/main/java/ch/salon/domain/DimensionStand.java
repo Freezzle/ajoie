@@ -17,13 +17,25 @@ public class DimensionStand implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @NotNull @Column(name = "dimension", nullable = false) private String dimension;
+    @NotNull
+    @Column(name = "dimension",
+            nullable = false)
+    private String dimension;
 
-    @NotNull @Column(name = "width_meter", nullable = false) private Double widthMeter;
+    @NotNull
+    @Column(name = "width_meter",
+            nullable = false)
+    private Double widthMeter;
 
-    @NotNull @Column(name = "height_meter", nullable = false) private Double heightMeter;
+    @NotNull
+    @Column(name = "height_meter",
+            nullable = false)
+    private Double heightMeter;
 
     public DimensionStand() {
     }

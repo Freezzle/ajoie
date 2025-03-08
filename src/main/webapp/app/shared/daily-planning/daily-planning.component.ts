@@ -1,117 +1,98 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { Square } from './planning.model';
+import { Component, Input, OnInit } from '@angular/core';
+import { NgClass, NgForOf, NgIf, NgStyle } from '@angular/common';
+import { ButtonBoxComponent } from '../components/button-box/button-box.component';
+import TranslateDirective from '../language/translate.directive';
+import { TimeSlot } from '../../admin/salon/model/salon.interface';
 import { Line } from './line.model';
-import dayjs from 'dayjs/esm';
-import { Dayjs } from 'dayjs';
+import { Square } from './square.model';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 @Component({
-  imports: [DatePipe, FaIconComponent, CommonModule],
   selector: 'daily-planning',
-  standalone: true,
-  styleUrl: './daily-planning.component.scss',
   templateUrl: './daily-planning.component.html',
+  styleUrls: ['./daily-planning.component.scss'],
+  standalone: true,
+  imports: [
+    NgForOf,
+    NgClass,
+    NgStyle,
+    ButtonBoxComponent,
+    NgIf,
+    TranslateDirective,
+    FaIconComponent,
+  ],
 })
 export class DailyPlanningComponent implements OnInit {
-  @Input() day: Dayjs = dayjs();
-  @Input() title: string = 'Planning';
-  @Input() columnNames: string[] = [];
+  @Input() timeslots: TimeSlot[] = [];
+  @Input() categories: string[] = [];
   @Input() lines: Line[] = [];
-  @Input() types: string[] = [];
-  @Input() intervalHour: number = 1;
-  colors: string[] = ['event-first', 'event-second', 'event-third', 'event-fourth', 'event-fifth', 'event-sixth'];
-  editingLines: Line[] = [];
-  @Output() finalLines = new EventEmitter<Line[]>();
-  readMode: boolean = true;
 
-  constructor() {
-  }
+  _lines: Line[] = [];
+
+  positionColors: string[] = [];
 
   ngOnInit() {
-    this.init();
+    this.positionColors = this.generateColorPalette(this.categories.length);
+
+    this._lines = [...this.lines];
   }
 
-  addEvent(square: Square): void {
-    square.used = true;
-    square.type = this.types[0];
+  assignPosition(line: string, idColumn: string): void {
+    const current = this.getTimeSlot(line, idColumn);
+    if (!current || current.category === 'Unavailable') {
+      return;
+    }
+
+    const nextIndex = (this.categories.indexOf(current.category) + 1) % (this.categories.length);
+    current.category = this.categories[nextIndex];
   }
 
-  editEvent(squareToEdit: Square): void {
-    const index = this.types.indexOf(squareToEdit.type || this.types[0]);
+  computeClasses(line: string, idColumn: string) {
+    return {
+      'unavailable-time': this.getTimeSlot(line, idColumn)?.category === 'Unavailable',
+    };
+  }
 
-    if (index + 1 === this.types.length) {
-      squareToEdit.type = this.types[0];
+  computeStyles(line: string, idColumn: string) {
+    const current = this.getTimeSlot(line, idColumn);
+    if (!current || current.category === 'Unavailable') {
+      return;
+    }
+
+    const index = this.categories.indexOf(current.category);
+    return { 'background-color': index >= 0 ? this.positionColors[index] : 'transparent' };
+  }
+
+  getTimeSlot(idLine: string, idColumn: string): Square | undefined {
+    return this._lines.find(line => line.idLine === idLine)?.squares?.find(square => square.idColumn === idColumn);
+  }
+
+  getIcon(idLine: string, idColumn: string): string {
+    const current = this.getTimeSlot(idLine, idColumn);
+
+    if (current?.category === 'Cuisine') {
+      return 'fire-burner';
+    } else if (current?.category === 'Vaisselle') {
+      return 'shower';
+    } else if (current?.category === 'Buvette') {
+      return 'money-bill';
+    } else if (current?.category === 'Pause') {
+      return 'mug-hot';
+    } else if (current?.category === 'Unavailable') {
+      return 'user-slash';
     } else {
-      squareToEdit.type = this.types[index + 1];
+      return 'minus';
     }
   }
 
-  removeEvent(square: Square): void {
-    square.used = false;
-    square.type = this.types[0];
-  }
-
-  getColorClass(type: string): string {
-    return this.colors[this.types.indexOf(type)];
-  }
-
-  actionOpenEditing(): void {
-    this.readMode = false;
-  }
-
-  actionCancelEditing(): void {
-    this.readMode = true;
-    this.init();
-  }
-
-  actionEmitAndCloseEditing(): void {
-    this.readMode = true;
-    this.finalLines.emit(this.editingLines);
-  }
-
-  protected init() {
-    if (!this.columnNames.length) {
-      this.columnNames = Array.from({ length: 10 / this.intervalHour }, (_, i) => 9 + i + 'h');
+  private generateColorPalette(count: number): string[] {
+    const baseColors = ['#C1D9E1', '#C1E1C1', '#FFDDC1',
+                        '#D4C1E1', '#e3e8e3', '#DDDDDD',
+    ];
+    const palette: string[] = [];
+    for (let i = 0; i < count; i++) {
+      palette.push(baseColors[i % baseColors.length]);
     }
-
-    if (!this.types.length) {
-      this.types = ['-'];
-    } else if (this.types.length > this.colors.length) {
-      throw new Error('Reach out the size of' + this.colors.length + ' maximum types.');
-    }
-
-    this.editingLines = [];
-    this.lines.forEach(line => {
-      const newLine = {
-        label: line.label,
-        squares: [],
-        unusableColumns: line.unusableColumns,
-      } as Line;
-
-      this.editingLines.push(newLine);
-
-      for (let i = 0; i < this.columnNames.length; i++) {
-        const squareFound = line.squares.find(square => square.column === i);
-        if (!squareFound) {
-          const emptySquare: Square = {
-            column: i,
-            type: this.types[0],
-            usable: !line.unusableColumns.includes(i),
-            used: false,
-          };
-
-          newLine.squares.push(emptySquare);
-        } else {
-          const newSquare: Square = {
-            column: squareFound.column,
-            type: squareFound.type,
-            usable: squareFound.usable,
-            used: squareFound.used,
-          };
-          newLine.squares.push(newSquare);
-        }
-      }
-    });
+    return palette;
   }
 }

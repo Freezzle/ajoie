@@ -21,11 +21,22 @@ public class FloorPlanSalon implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @Lob @Column(name = "data", columnDefinition = "text") private String data;
+    @Column(name = "name")
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
+    @Lob
+    @Column(name = "data",
+            columnDefinition = "text")
+    private String data;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"priceStandSalons"},
+                          allowSetters = true)
     private Salon salon;
 
     public UUID getId() {
@@ -50,6 +61,14 @@ public class FloorPlanSalon implements Serializable {
 
     public void setSalon(Salon salon) {
         this.salon = salon;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

@@ -1,20 +1,19 @@
 <div>
-  @if (account) {
-    <h2 id="session-page-heading" jhiTranslate="sessions.title" [translateValues]="{ username: account.login }">
-      Sessions actives de [<strong>{{ account.login }}</strong>] </h2>
-  }
-
-  @if (success) {
-    <div class="alert alert-success" jhiTranslate="sessions.messages.success">
-      <strong>La session a été invalidée !</strong>
+  <h2 id="page-heading">
+    <div class="d-flex justify-content-center">
+      <span>Sessions actives</span>
     </div>
-  }
+    <hr/>
 
-  @if (error) {
-    <div class="alert alert-danger" jhiTranslate="sessions.messages.error">
-      <strong>Une erreur est survenue !</strong> La session ne peut pas être invalidée.
+    <div class="d-flex justify-content-between mt-3">
+      <span>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
+      </span>
     </div>
-  }
+  </h2>
 
   <div class="table-responsive">
     <table aria-describedby="session-page-heading" class="table table-striped">

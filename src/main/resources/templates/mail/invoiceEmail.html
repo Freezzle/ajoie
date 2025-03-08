@@ -1,24 +1,25 @@
 <html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title th:text="#{email.invoice.title(${salon})}"></title>
-    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-  </head>
-  <body>
-    <p>
-      Nous avons le plaisir de t’envoyer
-      <u>ta facture en pièce jointe</u>, établie avec soin à partir des informations que tu nous as fournies lors de ton inscription.
-    </p>
-    <p th:if="${arrangement}">
-      Un arrangement a été conclu pour que le paiement puisse être effectué au plus tard le jour du salon. Tu peux donc dès à présent te
-      préparer sereinement à cette belle aventure qui se déroulera du
-      <strong th:text="${startDate}"></strong> au <strong th:text="${endDate}"></strong> !
-    </p>
-    <p th:if="${!arrangement}">
-      Dès réception de ton paiement, nous te confirmerons officiellement ta participation par email. Tu pourras alors te préparer
-      sereinement à cette belle aventure qui se déroulera du
-      <strong th:text="${startDate}"></strong> au <strong th:text="${endDate}"></strong> !
-    </p>
+<head>
+  <title th:text="#{email.invoice.title(${salon})}"></title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+  <p>
+    Tu trouveras en pièce jointe ta facture, soigneusement préparée à partir des informations que tu nous as transmises lors de ton inscription. 🙌
+  </p>
+  <p th:if="${arrangement}">
+    Il a été convenu que tu pourras effectuer ton paiement au plus tard le jour du salon.
+    Tu peux donc te préparer dès à présent, en toute sérénité, à cette belle aventure qui se déroulera du
+    <strong th:text="${startDate}"></strong> au <strong th:text="${endDate}"></strong> ! 😊
+  </p>
+  <p th:if="${!arrangement}">
+    Dès que nous aurons reçu ton paiement, tu recevras une confirmation officielle par e-mail.
+    Tu pourras alors te préparer en toute sérénité à cette belle aventure qui se déroulera du
+    <strong th:text="${startDate}"></strong> au <strong th:text="${endDate}"></strong> ! 😊
+  </p>
 
-    <div th:include="common/footer::footer"></div>
-  </body>
+  <p>Au plaisir de te retrouver très bientôt !</p>
+
+  <div th:include="common/footer::footer"></div>
+</body>
 </html>

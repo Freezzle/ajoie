@@ -8,6 +8,8 @@ import { IUser } from '../user-management.model';
 import { UserManagementService } from '../service/user-management.service';
 import { ErrorModel } from '../../../shared/field-error/error.model';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { CheckboxBoxComponent } from '../../../shared/components/checkbox-box/checkbox-box.component';
 
 const userTemplate = {} as IUser;
 
@@ -20,14 +22,15 @@ const newUser: IUser = {
   standalone: true,
   selector: 'jhi-user-mgmt-update',
   templateUrl: './user-management-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent,
+            CheckboxBoxComponent],
 })
 export default class UserManagementUpdateComponent implements OnInit {
   languages = LANGUAGES;
   user: IUser | null = null;
   authorities = signal<string[]>([]);
-  isSaving = signal(false);
-  readonlyForm = false;
+  isLoading = signal(false);
+  isReadOnly = false;
 
   editForm = new FormGroup({
     id: new FormControl(userTemplate.id),
@@ -66,22 +69,22 @@ export default class UserManagementUpdateComponent implements OnInit {
       this.user = user;
 
       if (readonly) {
-        this.readOnlyBack();
+        this.activateReadOnlyMode();
       } else {
-        this.writeBack();
+        this.activateEditMode();
       }
     });
 
     this.userService.authorities().subscribe(authorities => this.authorities.set(authorities));
   }
 
-  readOnlyBack(): void {
-    this.readonlyForm = true;
+  activateReadOnlyMode(): void {
+    this.isReadOnly = true;
     this.editForm.disable();
   }
 
-  writeBack(): void {
-    this.readonlyForm = false;
+  activateEditMode(): void {
+    this.isReadOnly = false;
     this.editForm.enable();
   }
 
@@ -90,7 +93,7 @@ export default class UserManagementUpdateComponent implements OnInit {
   }
 
   save(): void {
-    this.isSaving.set(true);
+    this.isLoading.set(true);
     const user = this.editForm.getRawValue();
     if (user.id !== null) {
       this.userService.update(user).subscribe({
@@ -106,12 +109,12 @@ export default class UserManagementUpdateComponent implements OnInit {
   }
 
   private onSaveSuccess(): void {
-    this.isSaving.set(false);
+    this.isLoading.set(false);
     this.previousState();
   }
 
   private onSaveError(): void {
-    this.isSaving.set(false);
+    this.isLoading.set(false);
   }
 
   get getLogin(): FormControl {

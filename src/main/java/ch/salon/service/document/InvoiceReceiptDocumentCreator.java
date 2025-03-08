@@ -2,25 +2,23 @@ package ch.salon.service.document;
 
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.utils.DateUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.Instant;
 import java.util.Locale;
 
 @Component
-public class InvoiceReceiptDocumentCreator extends AbstractDocumentCreator {
+public class InvoiceReceiptDocumentCreator implements IDocumentCreatorContract {
 
     private final MessageSource messageSource;
+    private final DocumentCreator documentCreator;
     private InvoicingPlan invoicingPlan;
 
-    public InvoiceReceiptDocumentCreator(
-            @Qualifier("documentTemplateEngine") SpringTemplateEngine documentTemplateEngine,
-            MessageSource messageSource) {
-        super(documentTemplateEngine);
+    public InvoiceReceiptDocumentCreator(DocumentCreator documentCreator, MessageSource messageSource) {
+        this.documentCreator = documentCreator;
         this.messageSource = messageSource;
     }
 
@@ -28,16 +26,23 @@ public class InvoiceReceiptDocumentCreator extends AbstractDocumentCreator {
         this.invoicingPlan = invoicingPlan;
     }
 
+
     @Override
-    protected String getTemplateName() {
+    public InputStreamSource generate() throws Exception {
+        return this.documentCreator.generate(this);
+    }
+
+    @Override
+    public String getTemplateName() {
         return "invoice-receipt";
     }
 
     @Override
-    protected Context getContext() {
+    public Context getContext() {
         Context context = new Context(Locale.FRENCH);
 
         Recipient recipient = new Recipient(invoicingPlan.getParticipation().getExhibitor());
+        recipient.setEnterpriseName(invoicingPlan.getParticipation().getTherapistName());
         Sender sender = new Sender(invoicingPlan.getParticipation().getSalon()); // FIXME + logo
 
         /* HEADER */
@@ -52,7 +57,7 @@ public class InvoiceReceiptDocumentCreator extends AbstractDocumentCreator {
         context.setVariable("invoiceDate", DateUtils.instantToIso(invoicingPlan.getIssuedDate()));
 
         context.setVariable("contact", "Claude Pascal / Grillon Nathalie");
-        context.setVariable("phone", "+41 79 964 78 75 / +41 79 690 18 71");
+        context.setVariable("phone", "+41 79 768 60 84 / +41 79 690 18 71");
 
         context.setVariable("invoices", invoicingPlan.getInvoices());
         context.setVariable("payments", invoicingPlan.getPayments());

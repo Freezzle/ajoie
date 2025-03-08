@@ -1,0 +1,20 @@
+<label *ngIf="translateKey" [for]="'field_' + fieldName" class="fw-bold">{{ translateKey | translate }}
+  <span *ngIf="this.control?.hasValidator(Validators.required)" class="red-icon">*</span>
+</label>
+<select [compareWith]="compareFunction"
+        [formControl]="control"
+        [id]="'field_' + fieldName"
+        [ngClass]="{'invalid': this.control.invalid && this.control.touched}"
+        [value]="value"
+        (input)="onInput($event)"
+        class="form-control">
+  <option *ngIf="withEmptyOption" [ngValue]="null"></option>
+  @for (currentOption of options; track $index) {
+    @if (needTranslation) {
+      <option [ngValue]="currentOption">{{ formatterFunction(currentOption) | translate }}</option>
+    } @else {
+      <option [ngValue]="currentOption">{{ formatterFunction(currentOption) }}</option>
+    }
+  }
+</select>
+<error-box *ngIf="this.control.errors" [formControlElement]="this.control"/>

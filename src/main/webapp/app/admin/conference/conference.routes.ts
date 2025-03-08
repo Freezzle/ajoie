@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ConferenceComponent } from './list/conference.component';
 import { ConferenceUpdateComponent } from './update/conference-update.component';
-import ConferenceResolve from './route/conference-routing-resolve.service';
+import ConferenceResolve from './service/conference-routing-resolve.service';
 
 const conferenceRoute: Routes = [
   {

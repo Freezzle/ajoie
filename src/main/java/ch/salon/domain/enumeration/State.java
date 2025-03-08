@@ -5,7 +5,16 @@ package ch.salon.domain.enumeration;
  */
 public enum State {
     DRAFT,
+    ISOLATED,
     ISSUED,
     PAID,
-    CANCELLED,
+    CANCELLED;
+
+    public boolean isDraft() {
+        return this == DRAFT || this == ISOLATED;
+    }
+
+    public boolean isNotDraft() {
+        return !isDraft();
+    }
 }

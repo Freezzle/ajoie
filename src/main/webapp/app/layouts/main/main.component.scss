@@ -1,0 +1,12 @@
+@import "content/scss/bootstrap-variables";
+
+.app-layout {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+}

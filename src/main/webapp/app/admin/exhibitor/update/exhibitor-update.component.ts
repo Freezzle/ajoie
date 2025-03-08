@@ -1,20 +1,23 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest, Observable, of } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { IExhibitor } from '../exhibitor.model';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExhibitorService } from '../service/exhibitor.service';
-import { ExhibitorFormGroup, ExhibitorFormService } from './exhibitor-form.service';
+import { ExhibitorFormGroup, ExhibitorFormService } from '../service/exhibitor-form.service';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
 import { ErrorModel } from '../../../shared/field-error/error.model';
-import { LANGUAGES } from '../../../config/language.constants';
+import { formatterLanguage, LANGUAGES } from '../../../config/language.constants';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
-import { IParticipation } from '../../participation/participation.model';
+import { IParticipation } from '../../participation/model/participation.interface';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { TextBoxComponent } from '../../../shared/components/text-box/text-box.component';
+import { TextareaBoxComponent } from '../../../shared/components/textarea-box/textarea-box.component';
+import { SelectBoxComponent } from '../../../shared/components/select-box/select-box.component';
+import { IExhibitor } from '../model/exhibitor.interface';
 
 @Component({
   standalone: true,
@@ -28,6 +31,10 @@ import { IParticipation } from '../../participation/participation.model';
     ColorStatusPipe,
     StatusPipe,
     RouterLink,
+    ButtonBoxComponent,
+    TextBoxComponent,
+    TextareaBoxComponent,
+    SelectBoxComponent,
   ],
 })
 export class ExhibitorUpdateComponent implements OnInit {
@@ -35,49 +42,51 @@ export class ExhibitorUpdateComponent implements OnInit {
   protected exhibitorFormService = inject(ExhibitorFormService);
   protected activatedRoute = inject(ActivatedRoute);
 
-  isSaving = false;
-  exhibitor: IExhibitor | null = null;
-  readonlyForm = false;
+  isLoading = false;
+  isReadOnly = false;
+
+  initialExhibitor: IExhibitor | null = null;
   editForm: FormGroup<ExhibitorFormGroup> = this.exhibitorFormService.createExhibitorFormGroup({
     id: null,
     language: 'fr',
+    differentBillingAddress: false,
   });
-  languageValues = LANGUAGES;
 
+  languageValues = LANGUAGES;
   participations$: Observable<IParticipation[]> = of([]);
 
   ngOnInit(): void {
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
-      ([params, data]) => {
-        this.exhibitor = data['exhibitor'];
-        this.readonlyForm = data['readonly'];
+    this.activateReadOnlyMode();
 
-        if (this.exhibitor) {
-          this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.exhibitor);
+    combineLatest([this.activatedRoute.data])
+      .pipe(
+        map(([data]) => ({
+          isReadOnly: data['readonly'],
+          initialExhibitor: data['exhibitor'] as IExhibitor,
+        })),
+      )
+      .subscribe(({ isReadOnly, initialExhibitor }) => {
+          this.isReadOnly = isReadOnly;
+          this.initialExhibitor = { ...initialExhibitor };
 
-          if (this.readonlyForm) {
-            this.readOnlyBack();
-          } else {
-            this.writeBack();
-          }
+          this.editForm = this.exhibitorFormService.createExhibitorFormGroup(initialExhibitor);
+          this.loadRelationships(this.editForm.controls.id.value);
 
-          this.loadRelationships(this.exhibitor.id);
-        }
-      },
-    );
+          isReadOnly ? this.activateReadOnlyMode(false) : this.activateEditMode();
+        },
+      );
   }
 
-  loadRelationships(idExhibitor: string): void {
-    this.participations$ = this.exhibitorService.findParticipations(idExhibitor);
-  }
-
-  readOnlyBack(): void {
-    this.readonlyForm = true;
+  activateReadOnlyMode(reset: boolean = true): void {
+    this.isReadOnly = true;
+    if (reset) {
+      this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.initialExhibitor!);
+    }
     this.editForm.disable();
   }
 
-  writeBack(): void {
-    this.readonlyForm = false;
+  activateEditMode(): void {
+    this.isReadOnly = false;
     this.editForm.enable();
   }
 
@@ -85,42 +94,28 @@ export class ExhibitorUpdateComponent implements OnInit {
     window.history.back();
   }
 
-  save(): void {
-    this.isSaving = true;
-
-    const exhibitor = this.exhibitorFormService.getExhibitor(this.editForm);
-    if (exhibitor.id !== null) {
-      this.exhibitorService
-        .update(exhibitor)
-        .pipe(finalize(() => (this.isSaving = false)))
-        .subscribe(() => {
-          this.previousState();
-        });
-    } else {
-      this.exhibitorService
-        .create(exhibitor)
-        .pipe(finalize(() => (this.isSaving = false)))
-        .subscribe(() => {
-          this.previousState();
-        });
+  loadRelationships(idExhibitor: string | null): void {
+    if (!idExhibitor) {
+      return;
     }
+    this.participations$ = this.exhibitorService.findParticipations(idExhibitor);
   }
 
-  get getFullName(): FormControl {
-    return this.editForm.get('fullName') as FormControl;
-  }
+  save(): void {
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+    this.isLoading = true;
+    const exhibitor = this.exhibitorFormService.getExhibitor(this.editForm);
 
-  get getEmail(): FormControl {
-    return this.editForm.get('email') as FormControl;
-  }
+    const saveOperation = exhibitor.id != null
+                          ? this.exhibitorService.update(exhibitor)
+                          : this.exhibitorService.create(exhibitor);
 
-  get getLanguage(): FormControl {
-    return this.editForm.get('language') as FormControl;
-  }
-
-  get getPhoneNumber(): FormControl {
-    return this.editForm.get('phoneNumber') as FormControl;
+    saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
   }
 
   protected readonly ErrorModel = ErrorModel;
+  protected readonly formatterLanguage = formatterLanguage;
 }

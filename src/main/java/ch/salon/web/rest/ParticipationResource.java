@@ -7,7 +7,6 @@ import ch.salon.service.ParticipationService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.web.rest.dto.InfoInvoice;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +47,8 @@ public class ParticipationResource {
     private final ParticipationService participationService;
     private final InvoicingPlanService invoicingPlanService;
 
-    @Value("${jhipster.clientApp.name}") private String applicationName;
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     public ParticipationResource(ParticipationService participationService, InvoicingPlanService invoicingPlanService) {
         this.participationService = participationService;
@@ -58,28 +58,30 @@ public class ParticipationResource {
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Participation> createParticipation(
-            @RequestBody Participation participation) throws URISyntaxException {
+        @RequestBody Participation participation) throws URISyntaxException {
         log.debug("REST request to save Participation : {}", participation);
 
         UUID id = participationService.create(participation);
 
         return created(new URI("/api/participations/" + id)).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(participation);
+            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(participation);
     }
 
     @GetMapping("/{idParticipation}/info-invoice")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<InfoInvoice> getInfoFromInvoicing(
-            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation) {
+    public ResponseEntity<InfoInvoice> getInfoFromInvoicing(@PathVariable(value = "idParticipation",
+                                                                          required = false)
+                                                            final UUID idParticipation) {
 
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(participationService.getInfoInvoice(idParticipation)));
     }
 
     @PutMapping("/{idParticipation}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Participation> updateParticipation(
-            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
-            @RequestBody Participation participation) throws URISyntaxException {
+    public ResponseEntity<Participation> updateParticipation(@PathVariable(value = "idParticipation",
+                                                                           required = false) final UUID idParticipation,
+                                                             @RequestBody
+                                                             Participation participation) throws URISyntaxException {
         log.debug("REST request to update Participation : {}, {}", idParticipation, participation);
 
         participation = participationService.update(idParticipation, participation);
@@ -104,13 +106,13 @@ public class ParticipationResource {
         participationService.delete(idParticipation);
 
         return noContent().headers(
-                createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idParticipation.toString())).build();
+            createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idParticipation.toString())).build();
     }
 
     @GetMapping("/{idParticipation}/invoicing-plans")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<InvoicingPlanDTO> getAllInvoicingPlans(
-            @PathVariable(name = "idParticipation", required = false) String idParticipation) {
+    public List<InvoicingPlanDTO> getAllInvoicingPlans(@PathVariable(name = "idParticipation",
+                                                                     required = false) String idParticipation) {
         log.debug("REST request to get all InvoicingPlans");
 
         return invoicingPlanService.findAll(idParticipation);
@@ -118,29 +120,17 @@ public class ParticipationResource {
 
     @PatchMapping("/{idParticipation}/refresh-invoicing-plans")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public void generateInvoicingPlan(
-            @PathVariable(name = "idParticipation", required = false) String idParticipation) {
+    public void generateInvoicingPlan(@PathVariable(name = "idParticipation",
+                                                    required = false) String idParticipation) {
         log.debug("REST request to get all Participations");
 
         invoicingPlanService.refreshInvoicingPlans(idParticipation);
     }
 
-    @PostMapping("/{idParticipation}/events")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Void> createEventLog(
-            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
-            @Valid @RequestBody EventLogDTO eventLogDTO) throws URISyntaxException {
-        log.debug("REST request to save eventLog : {}", eventLogDTO);
-
-        participationService.createEventLog(idParticipation, eventLogDTO);
-
-        return noContent().build();
-    }
-
     @GetMapping("/{idParticipation}/events")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<EventLogDTO> getAllLogs(
-            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation) {
+    public List<EventLogDTO> getAllLogs(@PathVariable(value = "idParticipation",
+                                                      required = false) final UUID idParticipation) {
         log.debug("REST request to get all EventLogs");
 
         return participationService.findAllEventLogs(idParticipation);

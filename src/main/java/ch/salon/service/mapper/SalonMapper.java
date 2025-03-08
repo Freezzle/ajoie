@@ -8,7 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = {PriceStandMapper.class},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SalonMapper {
     SalonMapper INSTANCE = Mappers.getMapper(SalonMapper.class);
 
@@ -18,6 +19,7 @@ public interface SalonMapper {
 
     SalonLightDTO toLightDto(Salon salon);
 
-    @Mapping(target = "place", ignore = true)
+    @Mapping(target = "place",
+             ignore = true)
     Salon toLightEntity(SalonLightDTO salon);
 }

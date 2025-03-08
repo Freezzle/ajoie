@@ -2,6 +2,7 @@ package ch.salon.repository;
 
 import ch.salon.domain.Conference;
 import ch.salon.domain.enumeration.Status;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,9 +12,13 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 @Repository
 public interface ConferenceRepository extends JpaRepository<Conference, UUID> {
-    List<Conference> findByParticipationSalonId(UUID salonId);
 
-    List<Conference> findByParticipationId(UUID participationId);
+    @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress"})
+    List<Conference> findByParticipationSalonIdOrderByRegistrationDateDesc(UUID salonId);
 
+    @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress"})
+    List<Conference> findByParticipationIdOrderByRegistrationDateDesc(UUID participationId);
+
+    @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress"})
     List<Conference> findByStatusInAndParticipation_SalonId(List<Status> statuses, UUID participationId);
 }

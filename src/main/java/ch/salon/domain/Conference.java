@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,18 +25,35 @@ public class Conference implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @NotNull @Column(name = "title", nullable = false) private String title;
+    @NotNull
+    @Column(name = "title",
+            nullable = false)
+    private String title;
 
-    @NotNull @Column(name = "description", nullable = false) private String description;
+    @NotNull
+    @Column(name = "description",
+            nullable = false)
+    private String description;
 
-    @Enumerated(EnumType.STRING) @Column(name = "status") private Status status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 
-    @Column(name = "extra_information") private String extraInformation;
+    @Column(name = "extra_information")
+    private String extraInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"exhibitor", "salon"},
+                          allowSetters = true)
     private Participation participation;
+
+    @Column(name = "registration_date")
+    private Instant registrationDate;
 
     public UUID getId() {
         return this.id;
@@ -43,6 +61,14 @@ public class Conference implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public Instant getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Instant registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public Conference id(UUID id) {

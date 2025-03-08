@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity Stand.
@@ -11,6 +11,9 @@
         <createTable tableName="stand">
             <column name="id" type="${uuidType}">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="registration_date" type="${datetimeType}">
+                <constraints nullable="true"/>
             </column>
             <column name="description" type="varchar(500)">
                 <constraints nullable="false"/>
@@ -52,9 +55,6 @@
                 <constraints nullable="true"/>
             </column>
             <column name="dimension_id" type="${uuidType}">
-                <constraints nullable="true"/>
-            </column>
-            <column name="position" type="bigint">
                 <constraints nullable="true"/>
             </column>
         </createTable>

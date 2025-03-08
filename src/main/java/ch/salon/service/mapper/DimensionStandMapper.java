@@ -18,6 +18,7 @@ public interface DimensionStandMapper {
 
     DimensionStandLightDTO toLightDto(DimensionStand dimensionStand);
 
-    @Mapping(target = "dimension", ignore = true)
+    @Mapping(target = "dimension",
+             ignore = true)
     DimensionStand toLightEntity(DimensionStandLightDTO dimensionStand);
 }

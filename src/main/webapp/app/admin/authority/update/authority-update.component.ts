@@ -12,17 +12,18 @@ import { AuthorityService } from '../service/authority.service';
 import { AuthorityFormGroup, AuthorityFormService } from './authority-form.service';
 import { ErrorModel } from '../../../shared/field-error/error.model';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
 
 @Component({
   standalone: true,
   selector: 'jhi-authority-update',
   templateUrl: './authority-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent],
 })
 export class AuthorityUpdateComponent implements OnInit {
-  isSaving = false;
+  isLoading = false;
   authority: IAuthority | null = null;
-  readonlyForm = false;
+  isReadOnly = false;
 
   protected authorityService = inject(AuthorityService);
   protected authorityFormService = inject(AuthorityFormService);
@@ -32,13 +33,13 @@ export class AuthorityUpdateComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ authority, readonly }) => {
-      this.readonlyForm = readonly;
+      this.isReadOnly = readonly;
 
       this.updateForm(authority);
-      if (this.readonlyForm) {
-        this.readOnlyBack();
+      if (this.isReadOnly) {
+        this.activateReadOnlyMode();
       } else {
-        this.writeBack();
+        this.activateEditMode();
       }
     });
   }
@@ -48,18 +49,18 @@ export class AuthorityUpdateComponent implements OnInit {
   }
 
   save(): void {
-    this.isSaving = true;
+    this.isLoading = true;
     const authority = this.authorityFormService.getAuthority(this.editForm);
     this.subscribeToSaveResponse(this.authorityService.create(authority));
   }
 
-  readOnlyBack(): void {
-    this.readonlyForm = true;
+  activateReadOnlyMode(): void {
+    this.isReadOnly = true;
     this.editForm.disable();
   }
 
-  writeBack(): void {
-    this.readonlyForm = false;
+  activateEditMode(): void {
+    this.isReadOnly = false;
     this.editForm.enable();
   }
 
@@ -79,7 +80,7 @@ export class AuthorityUpdateComponent implements OnInit {
   }
 
   protected onSaveFinalize(): void {
-    this.isSaving = false;
+    this.isLoading = false;
   }
 
   protected updateForm(authority: IAuthority): void {

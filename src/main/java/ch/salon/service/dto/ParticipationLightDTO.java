@@ -9,6 +9,7 @@ public class ParticipationLightDTO implements Serializable {
 
     private UUID id;
     private ExhibitorLightDTO exhibitor;
+    private String therapistName;
     private Status status;
 
     public ParticipationLightDTO() {
@@ -21,6 +22,14 @@ public class ParticipationLightDTO implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getTherapistName() {
+        return therapistName;
+    }
+
+    public void setTherapistName(String therapistName) {
+        this.therapistName = therapistName;
     }
 
     public ExhibitorLightDTO getExhibitor() {

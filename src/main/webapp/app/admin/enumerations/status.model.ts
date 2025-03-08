@@ -5,3 +5,12 @@ export enum Status {
   ACCEPTED = 'ACCEPTED',
   PAID = 'PAID',
 }
+
+export function formatterStatus(status: Status | null): string {
+  return 'stand.status.list.' + status ?? '';
+}
+
+export function compareStatus(o1: Status, o2: Status): boolean {
+  console.log(o1, o2);
+  return o1 === o2;
+}

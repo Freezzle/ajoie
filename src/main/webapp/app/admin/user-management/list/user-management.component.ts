@@ -18,6 +18,8 @@ import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { LinkBoxComponent } from '../../../shared/components/link-box/link-box.component';
 
 @Component({
   standalone: true,
@@ -33,6 +35,8 @@ import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
     StatusPipe,
     CheckBoolPipe,
     ColorBoolPipe,
+    ButtonBoxComponent,
+    LinkBoxComponent,
   ],
 })
 export default class UserManagementComponent implements OnInit {

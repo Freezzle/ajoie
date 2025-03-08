@@ -26,7 +26,8 @@ public class LiquibaseConfiguration {
 
     private final Environment env;
 
-    @Value("${application.liquibase.async-start:true}") private Boolean asyncStart;
+    @Value("${application.liquibase.async-start:true}")
+    private Boolean asyncStart;
 
     public LiquibaseConfiguration(Environment env) {
         this.env = env;
@@ -39,14 +40,14 @@ public class LiquibaseConfiguration {
                                      ObjectProvider<DataSource> dataSource, DataSourceProperties dataSourceProperties) {
         SpringLiquibase liquibase;
         if (Boolean.TRUE.equals(asyncStart)) {
-            liquibase = SpringLiquibaseUtil.createAsyncSpringLiquibase(this.env, executor,
-                                                                       liquibaseDataSource.getIfAvailable(),
-                                                                       liquibaseProperties, dataSource.getIfUnique(),
-                                                                       dataSourceProperties);
+            liquibase =
+                SpringLiquibaseUtil.createAsyncSpringLiquibase(this.env, executor, liquibaseDataSource.getIfAvailable(),
+                                                               liquibaseProperties, dataSource.getIfUnique(),
+                                                               dataSourceProperties);
         } else {
             liquibase =
-                    SpringLiquibaseUtil.createSpringLiquibase(liquibaseDataSource.getIfAvailable(), liquibaseProperties,
-                                                              dataSource.getIfUnique(), dataSourceProperties);
+                SpringLiquibaseUtil.createSpringLiquibase(liquibaseDataSource.getIfAvailable(), liquibaseProperties,
+                                                          dataSource.getIfUnique(), dataSourceProperties);
         }
         liquibase.setChangeLog("classpath:config/liquibase/master.xml");
         liquibase.setContexts(liquibaseProperties.getContexts());

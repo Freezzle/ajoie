@@ -1,5 +1,6 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.Mode;
 import ch.salon.domain.enumeration.State;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
@@ -31,27 +32,50 @@ public class InvoicingPlan implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @Column(name = "generation_date") private Instant generationDate = Instant.now();
+    @Column(name = "generation_date")
+    private Instant generationDate = Instant.now();
 
-    @Column(name = "issued_date") private Instant issuedDate;
+    @Column(name = "issued_date")
+    private Instant issuedDate;
 
-    @Column(name = "expiration_date") private Instant expirationDate;
+    @Column(name = "expiration_date")
+    private Instant expirationDate;
 
-    @Column(name = "billing_number", nullable = false) private String billingNumber;
+    @Column(name = "billing_number",
+            nullable = false)
+    private String billingNumber;
 
-    @Enumerated(EnumType.STRING) @Column(name = "state") private State state = State.DRAFT;
+    @Column(name = "need_arrangement")
+    private Boolean needArrangement = false;
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id") @OrderBy("position ASC") private Set<Invoice>
-            invoices = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    private State state = State.DRAFT;
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id") @OrderBy("billingDate ASC")
+    @OneToMany(fetch = FetchType.EAGER,
+               orphanRemoval = true,
+               cascade = CascadeType.ALL)
+    @JoinColumn(name = "invoicing_plan_id",
+                referencedColumnName = "id")
+    @OrderBy("position ASC")
+    private Set<Invoice> invoices = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER,
+               orphanRemoval = true,
+               cascade = CascadeType.ALL)
+    @JoinColumn(name = "invoicing_plan_id",
+                referencedColumnName = "id")
+    @OrderBy("billingDate ASC")
     private Set<Payment> payments = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER) @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = {"exhibitor", "salon"},
+                          allowSetters = true)
     private Participation participation;
 
     public UUID getId() {
@@ -174,12 +198,24 @@ public class InvoicingPlan implements Serializable {
         return getPayments().stream().map(Payment::getAmount).reduce(0.00, Double::sum);
     }
 
+    public Double getReductionsTotal() {
+        Double totalDiscount = getPayments().stream()
+                                            .filter(payment -> payment.getPaymentMode() == Mode.DISCOUNT)
+                                            .map(Payment::getAmount)
+                                            .reduce(0.00, Double::sum);
+
+        return totalDiscount + getInvoices().stream()
+                                            .filter(Invoice::hasDifference)
+                                            .map(Invoice::getTotalDifference)
+                                            .reduce(0.00, Double::sum);
+    }
+
     public Double getTotal() {
         return getInvoicesTotal() - getPaymentsTotal();
     }
 
     public static Instant calculateExpirationDate(InvoicingPlan invoicingPlan) {
-        if (invoicingPlan.getParticipation().getNeedArrangment()) {
+        if (invoicingPlan.getNeedArrangement()) {
             return invoicingPlan.getParticipation().getSalon().getEndingDate();
         }
 
@@ -191,6 +227,14 @@ public class InvoicingPlan implements Serializable {
         } else {
             return LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC);
         }
+    }
+
+    public Boolean getNeedArrangement() {
+        return needArrangement;
+    }
+
+    public void setNeedArrangement(Boolean arrangement) {
+        this.needArrangement = arrangement;
     }
 
     @Override

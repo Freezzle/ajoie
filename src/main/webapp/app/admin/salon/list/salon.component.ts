@@ -8,10 +8,14 @@ import { SortByDirective, SortDirective } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
-import { ISalon } from '../salon.model';
+import { ISalon } from '../model/salon.interface';
 import { SalonService } from '../service/salon.service';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { finalize } from 'rxjs/operators';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { LinkBoxComponent } from '../../../shared/components/link-box/link-box.component';
+import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PaginationEvent } from '../../../shared/pagination/pagination-event.interface';
 
 @Component({
   standalone: true,
@@ -26,6 +30,9 @@ import { finalize } from 'rxjs/operators';
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    ButtonBoxComponent,
+    LinkBoxComponent,
+    PaginationComponent,
   ],
 })
 export class SalonComponent implements OnInit {
@@ -34,6 +41,7 @@ export class SalonComponent implements OnInit {
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
 
+  salonsPaginated: ISalon[] = [];
   salons: ISalon[] = [];
   isLoading = false;
 
@@ -73,5 +81,10 @@ export class SalonComponent implements OnInit {
 
   previousState(): void {
     window.history.back();
+  }
+
+  refreshSalons(event: PaginationEvent): void {
+    this.salonsPaginated = this.salons.slice((event.page - 1) * event.pageSize,
+      (event.page - 1) * event.pageSize + event.pageSize);
   }
 }

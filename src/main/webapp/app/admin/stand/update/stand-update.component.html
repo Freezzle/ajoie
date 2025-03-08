@@ -1,36 +1,40 @@
 <div>
   <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
     <h2 id="page-heading">
-      <span *ngIf="stand?.id" jhiTranslate="stand.edit">Modification d'un stand</span>
-      <span *ngIf="!stand?.id" jhiTranslate="stand.create">Création d'un nouveau stand</span>
-
+      <div class="d-flex justify-content-center">
+        <span *ngIf="editForm.controls.id.value" jhiTranslate="stand.edit">Modification d'un stand</span>
+        <span *ngIf="!editForm.controls.id.value" jhiTranslate="stand.create">Création d'un nouveau stand</span>
+      </div>
       <hr/>
 
       <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-            <span jhiTranslate="common.back">Back</span>
-          </button>
-        </span>
+
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
 
         <span>
-          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-            <span jhiTranslate="common.edit">Edit</span>
-          </button>
+          <button-box (clickedEvent)="activateEditMode()"
+                      *ngIf="isReadOnly"
+                      [isDisabled]="isLoading"
+                      faIcon="pencil-alt"
+                      translateKey="common.edit"/>
 
-          <button (click)="readOnlyBack()" *ngIf="!readonlyForm && stand?.id" class="btn btn-secondary btn-sm" id="cancel-save" type="button">
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-            <span jhiTranslate="common.cancel">Cancel</span>
-          </button>
-          <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity" type="submit">
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-            <span jhiTranslate="common.save">Save</span>
-          </button>
+          <button-box (clickedEvent)="activateReadOnlyMode()"
+                      *ngIf="editForm.controls.id.value && !isReadOnly"
+                      [isDisabled]="isLoading"
+                      faIcon="ban"
+                      translateKey="common.cancel"
+                      type="secondary"/>
+
+          <button-box *ngIf="!isReadOnly"
+                      [isDisabled]="editForm.invalid || isLoading"
+                      [isSubmit]="true"
+                      faIcon="floppy-disk"
+                      translateKey="common.save"/>
         </span>
       </div>
-      <hr/>
     </h2>
 
     <div>
@@ -42,137 +46,70 @@
         <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
         <div class="card-body">
           <div class="row">
-            <div class="col-sm-12 fw-bold align-content-center position-relative">
-              <label for="field_description" jhiTranslate="stand.description">Description</label>
-              <textarea class="form-control" formControlName="description" id="field_description" name="description" rows="6"></textarea>
-              <small class="fw-light">({{ this.editForm.get('description')?.value?.length }} / 500)</small>
-              <field-error [errors]="[ErrorModel.required(), ErrorModel.maxlength(500)]" [formControlElement]="getDescription"></field-error>
+            <div class="mt-3 col-12">
+              <textarea-box [maxLength]="500"
+                            [rows]="6"
+                            [showCounter]="true"
+                            fieldName="description"
+                            formControlName="description"
+                            translateKey="stand.description"/>
             </div>
-          </div>
-
-          <!-- PARTICIPATION / DIMENSION / STATUS -->
-
-          <div class="row mt-3">
-            <div class="col-sm-4 fw-bold align-content-center position-relative">
-              <label for="field_dimension" jhiTranslate="stand.dimension">Dimension</label>
-              <select [compareWith]="compareDimensionStand" class="form-control" formControlName="dimension" id="field_dimension" name="dimension">
-                <option [ngValue]="null"></option>
-                @for (dimensionStandOption of dimensionsOptions; track $index) {
-                  <option [ngValue]="dimensionStandOption">{{ dimensionStandOption.dimension }}</option>
-                }
-              </select>
-              <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getDimension"></field-error>
+            <div class="mt-3 col-lg-4">
+              <typeahead-box [formatterFunction]="formatterDimensionStand"
+                             [options]="dimensionsOptions"
+                             fieldName="dimension"
+                             formControlName="dimension"
+                             translateKey="stand.dimension"/>
             </div>
-            <div class="col-sm-4 fw-bold align-content-center position-relative">
-              <label for="field_participation" jhiTranslate="stand.participation">Participation</label>
-              <select [compareWith]="compareParticipation" class="form-control" formControlName="participation" id="field_participation" name="participation">
-                @for (participationOption of participationsOptions; track $index) {
-                  <option [ngValue]="participationOption">
-                    {{ getFormattedExhibitorName(participationOption.exhibitor) }}
-                  </option>
-                }
-              </select>
-              <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getParticipation"></field-error>
+            <div class="mt-3 col-lg-4">
+              <typeahead-box [formatterFunction]="formatterParticipation"
+                             [options]="participationsOptions"
+                             fieldName="participation"
+                             formControlName="participation"
+                             translateKey="stand.participation"/>
             </div>
-            <div class="col-sm-4 fw-bold align-content-center position-relative">
-              <label for="field_status" jhiTranslate="stand.status.label">Status</label>
-              <select class="form-control" formControlName="status" id="field_status" name="status">
-                @for (status of statusValues; track $index) {
-                  <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
-                }
-              </select>
-
-              <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getStatus"></field-error>
+            <div class="mt-3 col-lg-4">
+              <select-box [formatterFunction]="formatterStatus"
+                          [needTranslation]="true"
+                          [options]="statusValues"
+                          fieldName="status"
+                          formControlName="status"
+                          translateKey="stand.status.label"/>
             </div>
-          </div>
-
-          <!-- WEBSITE / SOCIAL MEDIA -->
-
-          <div class="row mt-3">
-            <div class="col-sm-12 fw-bold align-content-center">
-              <label for="field_website" jhiTranslate="stand.website">Website</label>
-              <input class="form-control" formControlName="website" id="field_website" name="website" type="text"/>
+            <div class="mt-3 col-lg-4">
+              <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
             </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-6 fw-bold align-content-center">
-              <label for="field_instagram" jhiTranslate="stand.instagram">Instagram</label>
-              <input class="form-control" formControlName="instagram" id="field_instagram" name="instagram" type="text"/>
+            <div class="mt-3 col-lg-4">
+              <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
             </div>
-            <div class="col-sm-6 fw-bold align-content-center">
-              <label for="field_facebook" jhiTranslate="stand.facebook">Facebook</label>
-              <input class="form-control" formControlName="facebook" id="field_facebook" name="facebook" type="text"/>
+            <div class="mt-3 col-lg-4">
+              <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
             </div>
-          </div>
-
-          <!-- URL PICTURE -->
-
-          <div class="row mt-3">
-            <div class="col-sm-12 fw-bold align-content-center">
-              <label for="field_urlPicture" jhiTranslate="stand.urlPicture">Url Picture</label>
-              <input class="form-control" formControlName="urlPicture" id="field_urlPicture" name="urlPicture" type="text"/>
+            <div class="mt-3 col-12">
+              <text-box fieldName="urlPicture" formControlName="urlPicture" translateKey="stand.urlPicture"/>
             </div>
-          </div>
-
-          <!-- SHARED / ELECTRICITY / TABLE / CHAIR -->
-
-          <div class="row mt-3">
-            <div class="col-sm-2 fw-bold position-relative">
-              <label for="field_nbTable" jhiTranslate="stand.nbTable">Nb Table</label>
-              <input class="form-control" formControlName="nbTable" id="field_nbTable" name="nbTable" type="number"/>
-              <field-error [errors]="[ErrorModel.required(), ErrorModel.number()]" [formControlElement]="getTable"></field-error>
+            <div class="mt-3 col-lg-4">
+              <number-box fieldName="nbTable" formControlName="nbTable" translateKey="stand.nbTable"/>
             </div>
-            <div class="col-sm-2 fw-bold align-content-center position-relative">
-              <label for="field_nbChair" jhiTranslate="stand.nbChair">Nb Chair</label>
-              <input class="form-control" formControlName="nbChair" id="field_nbChair" name="nbChair" type="number"/>
-              <field-error [errors]="[ErrorModel.required(), ErrorModel.number()]" [formControlElement]="getChair"></field-error>
+            <div class="mt-3 col-lg-4">
+              <number-box fieldName="nbChair" formControlName="nbChair" translateKey="stand.nbChair"/>
             </div>
-            <div class="col-sm-2 fw-bold position-relative">
-              <label for="field_category" jhiTranslate="stand.category.label">Status</label>
-              <select class="form-control" formControlName="category" id="field_category" name="category">
-                <option [ngValue]="null">{{ 'stand.category.list.null' | translate }}</option>
-                @for (category of categoryValues; track $index) {
-                  <option [value]="category">{{ 'stand.category.list.' + category | translate }}</option>
-                }
-              </select>
+            <div class="mt-3 col-lg-4">
+              <select-box [formatterFunction]="formatterCategory"
+                          [needTranslation]="true"
+                          [options]="categoryValues"
+                          fieldName="category"
+                          formControlName="category"
+                          translateKey="stand.category.label"/>
             </div>
-            <div class="col-sm-2 fw-bold align-content-center position-relative">
-              <label for="field_position" jhiTranslate="stand.position">Position</label>
-              <input class="form-control" formControlName="position" id="field_position" name="position" type="number"/>
+            <div class="mt-3 col-6 col-lg-4">
+              <checkbox-box fieldName="needElectricity" formControlName="needElectricity" translateKey="stand.needElectricity"/>
             </div>
-            <div class="col-sm-2 fw-bold">
-              <div>
-                <label for="field_needElectricity" jhiTranslate="stand.needElectricity">Need Electricity</label>
-              </div>
-              <div class="switch">
-                <input class="switch-checkbox" formControlName="needElectricity" id="field_needElectricity" name="needElectricity" type="checkbox"/>
-                <label class="switch-label" for="field_needElectricity">
-                  <span class="switch-inner"></span>
-                  <span class="switch-btn"></span>
-                </label>
-              </div>
+            <div class="mt-3 col-6 col-lg-4">
+              <checkbox-box fieldName="shared" formControlName="shared" translateKey="stand.shared"/>
             </div>
-            <div class="col-sm-2 fw-bold">
-              <div>
-                <label for="field_shared" jhiTranslate="stand.shared">Shared</label>
-              </div>
-              <div class="switch">
-                <input class="switch-checkbox" formControlName="shared" id="field_shared" name="shared" type="checkbox"/>
-                <label class="switch-label" for="field_shared">
-                  <span class="switch-inner"></span>
-                  <span class="switch-btn"></span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- EXTRA INFO -->
-
-          <div class="row mt-3">
-            <div class="col-sm-12 fw-bold">
-              <label for="field_extraInformation" jhiTranslate="stand.extraInformation">Extra Information</label>
-              <textarea class="form-control" formControlName="extraInformation" id="field_extraInformation" name="extraInformation" rows="3"></textarea>
-              <small class="fw-light">({{ this.editForm.get('extraInformation')?.value?.length }} / 500)</small>
+            <div class="mt-3 col-12">
+              <textarea-box fieldName="extraInformation" formControlName="extraInformation" translateKey="stand.extraInformation"/>
             </div>
           </div>
         </div>

@@ -1,21 +1,21 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
-import { getExhibitorName, getFirstExhibitorName, getFormattedExhibitorName } from '../../exhibitor/exhibitor.model';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { getFirstExhibitorName } from '../../exhibitor/model/exhibitor.interface';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import {
   AddPlanInfo, ContextMenu, convertAvailableDimensionCells, DimensionCell, getColorStand, GridCell, IFloorPlan,
-  mapFloorPlan, mapFloorPlanLight,
+  IFloorPlanData, mapFloorPlan, mapFloorPlanLight,
 } from '../floor-plan.model';
-import { IStand } from '../../stand/stand.model';
+import { IStand } from '../../stand/model/stand.interface';
 import { v4 } from 'uuid';
 import { StandService } from '../../stand/service/stand.service';
 import SharedModule from '../../../shared/shared.module';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FloorPlanService } from '../service/floor-plan.service';
 import { combineLatest, filter, forkJoin, Observable } from 'rxjs';
-import { ISalon } from '../../salon/salon.model';
+import { ISalon } from '../../salon/model/salon.interface';
 import { SalonService } from '../../salon/service/salon.service';
 import { finalize, map } from 'rxjs/operators';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ITEM_ADDED_EVENT, ITEM_DELETED_EVENT, ITEM_UPDATED_EVENT } from '../../../config/navigation.constants';
 import { RenamePlanDialogComponent } from '../rename-plan/rename-plan-dialog.component';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -23,16 +23,25 @@ import { AddPlanDialogComponent } from '../add-plan/add-plan-dialog.component';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
 import { LinkBoxComponent } from '../../../shared/components/link-box/link-box.component';
+import { NumberBoxComponent } from '../../../shared/components/number-box/number-box.component';
+import { CommonModule } from '@angular/common';
+import { CheckboxBoxComponent } from '../../../shared/components/checkbox-box/checkbox-box.component';
+import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
+import StatusPipe from '../../../shared/pipe/status.pipe';
+import { Status } from '../../enumerations/status.model';
+import { getFormattedParticipationName } from '../../participation/model/participation.interface';
 
 @Component({
   standalone: true,
   selector: 'jhi-floor-plan',
   templateUrl: './floor-plan-detail.component.html',
   styleUrl: './floor-plan-detail.component.scss',
-  imports: [SharedModule, RouterModule, CdkDragHandle, CdkDrag, CdkDropList, CdkDropListGroup, FormsModule,
-            ReactiveFormsModule, ButtonBoxComponent, LinkBoxComponent],
+  imports: [SharedModule, CommonModule, RouterModule, CdkDragHandle, CdkDrag, CdkDropList, CdkDropListGroup,
+            FormsModule,
+            ReactiveFormsModule, ButtonBoxComponent, LinkBoxComponent, NumberBoxComponent, CheckboxBoxComponent,
+            ColorStatusPipe, StatusPipe],
 })
-export class FloorPlanDetailComponent implements OnInit {
+export class FloorPlanDetailComponent implements OnInit, OnDestroy {
   protected modalService = inject(NgbModal);
   private salonService = inject(SalonService);
   private standService = inject(StandService);
@@ -62,9 +71,117 @@ export class FloorPlanDetailComponent implements OnInit {
   gridCellPopOver: GridCell | null = null;
   floorPlansToRemove: string[] = [];
 
-  readonlyForm = true;
+  isNumberAttribution: FormControl<boolean | null> = new FormControl<boolean>(false);
+  automaticallyIncrementNumber: FormControl<boolean | null> = new FormControl<boolean>(true);
+
+  nextPosition: FormControl<number | null> = new FormControl<number>(1);
+  isReadOnly = true;
+
+  displayFullname = false;
+  displayTechnical = false;
+  showDimensions = false;
+  showAvailableStands = false;
+  displayHeader = true;
+
+  isDragging = false;
+  draggingCell: GridCell | null = null;
+
+  resetPalette(): void {
+    this.showDimensions = false;
+    this.showAvailableStands = false;
+    this.isNumberAttribution.setValue(false);
+    this.automaticallyIncrementNumber.setValue(true);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('keydown', this.handleKeydown);
+  }
+
+  handleKeydown = (event: KeyboardEvent): void => {
+    if (this.isDragging && event.code === 'KeyR' && this.draggingCell?.dimension) {
+      event.preventDefault();
+      this.changeRotation(this.draggingCell.dimension);
+      this.clearHighlights();
+    }
+  };
 
   ngOnInit(): void {
+    window.addEventListener('keydown', this.handleKeydown);
+    this.initializeState();
+
+    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
+      this.salon = data['salon'];
+
+      if (this.salon?.id) {
+        this.isLoading = true;
+        combineLatest([
+          this.standService.query({ idSalon: this.salon.id }).pipe(map(response => response ?? [])),
+          this.floorPlanService.load(this.salon.id),
+          this.salonService.getDimensionStands(this.salon?.id ?? null),
+        ]).pipe(finalize(() => this.isLoading = false))
+          .subscribe(([stands, floorPlans, dimensionStands]) => {
+            this.availableDimensions = convertAvailableDimensionCells(dimensionStands);
+            this.stands = stands;
+            this.availableStands = stands.filter(
+              stand => stand.status !== Status.CANCELED && stand.status !== Status.REFUSED);
+
+            if (floorPlans.length > 0) {
+              floorPlans.forEach(floorPlan => {
+                this.floorPlans.push(mapFloorPlanLight(floorPlan, this.availableDimensions, this.stands));
+
+                this.availableStands = this.availableStands.filter(
+                  stand => !floorPlan.data.cells.flatMap(row => row.flatMap(column => column.dimension?.stand?.id))
+                    .includes(stand.id));
+              });
+            } else {
+              this.floorPlans.push({
+                id: null,
+                name: 'default',
+                data: {
+                  cells: Array.from({ length: 30 }, () =>
+                    Array.from(
+                      { length: 60 },
+                      () =>
+                        ({
+                          id: null,
+                          firstCell: false,
+                          colorHighlight: this.DEFAULT_HIGHLIGHT,
+                          dimension: null,
+                          unusable: false,
+                        }) as GridCell,
+                    ),
+                  ),
+                  widthMeter: 30,
+                  heightMeter: 15,
+                  spacingMeter: 0.5,
+                } as IFloorPlanData,
+              });
+            }
+
+            this.indexActiveFloorPlan = 0;
+            this.sizeRealCell = 1 / this.getActiveFloorPlanData().spacingMeter;
+            this.nbWidthTiles = this.getActiveFloorPlanData().widthMeter * this.sizeRealCell;
+            this.nbHeightTiles = this.getActiveFloorPlanData().heightMeter * this.sizeRealCell;
+
+            let max = 0;
+            for (const plan of floorPlans) {
+              for (const row of plan.data.cells) {
+                for (const cell of row) {
+                  const position = cell.dimension?.position;
+                  if (typeof position === 'number' && position > max) {
+                    max = position;
+                  }
+                }
+              }
+            }
+
+            this.nextPosition.setValue(Number(max + 1));
+          });
+      }
+    });
+  }
+
+  private initializeState(): void {
     this.contextMenu = { printable: 'CLOSED', x: 0, y: 0, cell: {} as GridCell } as ContextMenu;
     this.stands = [];
     this.availableDimensions = [];
@@ -73,72 +190,25 @@ export class FloorPlanDetailComponent implements OnInit {
     this.floorPlans = [];
     this.indexActiveFloorPlan = 0;
     this.floorPlansToRemove = [];
-
-    combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(([params, data]) => {
-      this.salon = data['salon'];
-
-      if (this.salon?.id) {
-        this.isLoading = true;
-        combineLatest([
-          this.standService.query({ idSalon: this.salon.id }).pipe(map(response => response.body ?? [])),
-          this.floorPlanService.load(this.salon.id),
-          this.salonService.getDimensionStands(this.salon?.id ?? null),
-        ]).pipe(finalize(() => this.isLoading = false))
-          .subscribe(([stands, floorPlans, dimensionStands]) => {
-            this.availableDimensions = convertAvailableDimensionCells(dimensionStands);
-            this.stands = stands;
-            this.availableStands = stands;
-
-            if (floorPlans.length > 0) {
-              floorPlans.forEach(floorPlan => {
-                this.floorPlans.push(mapFloorPlanLight(floorPlan, this.availableDimensions, this.stands));
-
-                this.availableStands = this.availableStands.filter(
-                  stand => !floorPlan.cells.flatMap(row => row.flatMap(column => column.dimension?.stand?.id))
-                    .includes(stand.id));
-              });
-            } else {
-              this.floorPlans.push({
-                name: 'default',
-                cells: Array.from({ length: 30 }, () =>
-                  Array.from(
-                    { length: 60 },
-                    () =>
-                      ({
-                        id: null,
-                        firstCell: false,
-                        colorHighlight: this.DEFAULT_HIGHLIGHT,
-                        dimension: null,
-                        unusable: false,
-                      }) as GridCell,
-                  ),
-                ),
-                widthMeter: 30,
-                heightMeter: 15,
-                spacingMeter: 0.5,
-              } as IFloorPlan);
-            }
-
-            this.indexActiveFloorPlan = 0;
-            this.sizeRealCell = 1 / this.getActiveFloorPlan().spacingMeter;
-            this.nbWidthTiles = this.getActiveFloorPlan().widthMeter * this.sizeRealCell;
-            this.nbHeightTiles = this.getActiveFloorPlan().heightMeter * this.sizeRealCell;
-          });
-      }
-    });
+    this.resetPalette();
   }
 
-  readOnlyBack(): void {
-    this.readonlyForm = true;
+  activateReadOnlyMode(): void {
+    this.isReadOnly = true;
     this.ngOnInit();
   }
 
-  writeBack(): void {
-    this.readonlyForm = false;
+  activateEditMode(): void {
+    this.isReadOnly = false;
+    this.resetPalette();
   }
 
   getActiveFloorPlan(): IFloorPlan {
     return this.floorPlans[this.indexActiveFloorPlan];
+  }
+
+  getActiveFloorPlanData(): IFloorPlanData {
+    return this.getActiveFloorPlan().data;
   }
 
   outOfBound(col: number, row: number, shape: any) {
@@ -152,7 +222,7 @@ export class FloorPlanDetailComponent implements OnInit {
 
     for (let i = 0; i < shape.rows; i++) {
       for (let j = 0; j < shape.cols; j++) {
-        if (this.getActiveFloorPlan().cells[row + i][col + j].id) {
+        if (this.getCell(row + i, col + j).unusable) {
           return false;
         }
       }
@@ -165,11 +235,14 @@ export class FloorPlanDetailComponent implements OnInit {
 
     for (let i = 0; i < dimension.rows; i++) {
       for (let j = 0; j < dimension.cols; j++) {
+        const cellFound = this.getCell(row + i, col + j);
         if (i === 0 && j === 0) {
-          this.getActiveFloorPlan().cells[row + i][col + j].firstCell = true;
+          cellFound.firstCell = true;
+          cellFound.dimension = dimension;
         }
-        this.getActiveFloorPlan().cells[row + i][col + j].id = uuid;
-        this.getActiveFloorPlan().cells[row + i][col + j].dimension = dimension;
+
+        cellFound.unusable = true;
+        cellFound.id = uuid;
       }
     }
   }
@@ -179,23 +252,13 @@ export class FloorPlanDetailComponent implements OnInit {
       return;
     }
 
-    let hasAlreadyDeassign = false;
+    this.forEachCell(cell => {
+      if (cell.id === shapeId) {
+        this.unassignCell(cell);
+        this.resetCell(cell);
+      }
+    });
 
-    this.getActiveFloorPlan().cells.forEach(row =>
-      row.forEach(cell => {
-        if (cell.id === shapeId) {
-          if (cell.dimension?.stand && !hasAlreadyDeassign) {
-            this.availableStands.push(JSON.parse(JSON.stringify(cell.dimension.stand)) as IStand);
-            hasAlreadyDeassign = true;
-          }
-
-          cell.id = null;
-          cell.dimension = null;
-          cell.colorHighlight = this.DEFAULT_HIGHLIGHT;
-          cell.firstCell = false;
-        }
-      }),
-    );
     this.contextMenu.printable = 'CLOSED';
   }
 
@@ -204,23 +267,21 @@ export class FloorPlanDetailComponent implements OnInit {
       return;
     }
 
-    let hasDone = false;
+    this.forEachCell(cell => {
+      if (cell.id === shapeId) {
+        this.unassignCell(cell);
+      }
+    });
 
-    this.getActiveFloorPlan().cells.forEach(row =>
-      row.forEach(cell => {
-        if (cell.id === shapeId) {
-          if (cell.dimension?.stand && !hasDone) {
-            this.availableStands.push(JSON.parse(JSON.stringify(cell.dimension.stand)) as IStand);
-            cell.dimension.stand = null;
-            cell.dimension.color = getColorStand(cell.dimension.stand);
-            hasDone = true;
-          } else if (cell.dimension?.stand) {
-            cell.dimension.stand = null;
-          }
-        }
-      }),
-    );
     this.contextMenu.printable = 'CLOSED';
+  }
+
+  private unassignCell(cell: GridCell) {
+    if (cell.dimension?.stand) {
+      this.availableStands.push(JSON.parse(JSON.stringify(cell.dimension.stand)) as IStand);
+      cell.dimension.stand = null;
+      cell.dimension.color = getColorStand(cell.dimension.stand);
+    }
   }
 
   assign(givenStand: IStand, givenCell: GridCell | null) {
@@ -228,14 +289,12 @@ export class FloorPlanDetailComponent implements OnInit {
       return;
     }
 
-    this.getActiveFloorPlan().cells.forEach(row =>
-      row.forEach(cell => {
-        if (cell.dimension && cell.id === givenCell.id) {
-          cell.dimension.stand = JSON.parse(JSON.stringify(givenStand)) as IStand;
-          cell.dimension.color = getColorStand(cell.dimension.stand);
-        }
-      }),
-    );
+    this.forEachCell(cell => {
+      if (cell.dimension && cell.id === givenCell.id) {
+        cell.dimension.stand = JSON.parse(JSON.stringify(givenStand)) as IStand;
+        cell.dimension.color = getColorStand(cell.dimension.stand);
+      }
+    });
 
     this.availableStands = this.availableStands.filter(stand => stand.id !== givenStand.id);
     this.contextMenu.printable = 'CLOSED';
@@ -243,13 +302,12 @@ export class FloorPlanDetailComponent implements OnInit {
 
   openContextMenu(event: MouseEvent, row: number, col: number) {
     event.preventDefault();
-    if (this.readonlyForm) {
+    if (this.isReadOnly) {
       return;
     }
 
-    const cell = this.getActiveFloorPlan().cells[row][col];
+    const cell = this.getCell(row, col);
     if (cell?.id) {
-      const gridRect = this.gridContainer.nativeElement.getBoundingClientRect();
       // Calculer la position relative au conteneur
       const x = event.clientX + (this.gridContainer ? this.gridContainer.nativeElement.scrollLeft : 0);
       const y = event.clientY + (this.gridContainer ? this.gridContainer.nativeElement.scrollTop : 0);
@@ -292,26 +350,45 @@ export class FloorPlanDetailComponent implements OnInit {
     const row = Math.floor(y / this.PIXELS);
     const col = Math.floor(x / this.PIXELS);
 
-    if (this.outOfBound(row, col, dimensionCell)) {
-      return;
-    }
-
     if (this.canPlaceShape(row, col, dimensionCell)) {
       this.placeShape(row, col, dimensionCell);
     }
   }
 
-  cellDrop(event: CdkDragDrop<any>, rowIndex: number, colIndex: number) {
-    const shape = event.item.data;
+  startDragging(data: GridCell) {
+    this.isDragging = true;
+    this.draggingCell = data;
 
-    if (!shape) {
-      return;
-    }
+    this.forEachCell(cell => {
+      if (cell.id === data.id) {
+        if (!cell.firstCell) {
+          cell.id = null;
+          cell.dimension = null;
+        }
+        cell.colorHighlight = this.DEFAULT_HIGHLIGHT;
+        cell.unusable = false;
+      }
+    });
+  }
 
-    // Check if shape fits in grid
-    if (this.canPlaceShape(rowIndex, colIndex, shape)) {
-      this.placeShape(rowIndex, colIndex, shape);
-    }
+  finishDragging(data: GridCell) {
+    this.isDragging = false;
+
+    this.forEachCell(cell => {
+      if (cell.id === data.id) {
+        this.resetCell(cell);
+      }
+    });
+
+    this.draggingCell = null;
+  }
+
+  private resetCell(cell: GridCell) {
+    cell.id = null;
+    cell.firstCell = false;
+    cell.dimension = null;
+    cell.colorHighlight = this.DEFAULT_HIGHLIGHT;
+    cell.unusable = false;
   }
 
   highlightCells(event: any) {
@@ -331,11 +408,12 @@ export class FloorPlanDetailComponent implements OnInit {
     if (this.outOfBound(row, col, shape) || !this.canPlaceShape(row, col, shape)) {
       for (let i = 0; i < shape.rows; i++) {
         for (let j = 0; j < shape.cols; j++) {
-          if (row < 0 || row + i >= this.getActiveFloorPlan().cells.length || col < 0 || col + j >=
-              this.getActiveFloorPlan().cells[0].length) {
+          if (row < 0 || row + i >= this.getActiveFloorPlanData().cells.length || col < 0 || col + j >=
+              this.getActiveFloorPlanData().cells[0].length) {
             continue;
           }
-          this.getActiveFloorPlan().cells[row + i][col + j].colorHighlight = 'rgb(255, 0, 0, 0.5)';
+
+          this.getCell(row + i, col + j).colorHighlight = 'rgb(255, 0, 0, 0.5)';
         }
       }
       return;
@@ -343,13 +421,15 @@ export class FloorPlanDetailComponent implements OnInit {
 
     for (let i = 0; i < shape.rows; i++) {
       for (let j = 0; j < shape.cols; j++) {
-        this.getActiveFloorPlan().cells[row + i][col + j].colorHighlight = 'rgb(255,255,0,0.5)';
+        this.getCell(row + i, col + j).colorHighlight = 'rgb(255,255,0,0.5)';
       }
     }
   }
 
   clearHighlights() {
-    this.getActiveFloorPlan().cells.forEach(row => row.forEach(cell => (cell.colorHighlight = this.DEFAULT_HIGHLIGHT)));
+    this.forEachCell(cell => {
+      cell.colorHighlight = this.DEFAULT_HIGHLIGHT;
+    });
   }
 
   previousState(): void {
@@ -357,6 +437,8 @@ export class FloorPlanDetailComponent implements OnInit {
   }
 
   save(): void {
+    this.resetPalette();
+
     this.isLoading = true;
 
     const observables: Observable<any>[] = [
@@ -367,11 +449,13 @@ export class FloorPlanDetailComponent implements OnInit {
           }
 
           const floorToSave = mapFloorPlan(floorPlan);
-          return floorToSave.id
-                 ? this.floorPlanService.save(this.salon.id, floorToSave.id, JSON.stringify(floorToSave))
-                 : this.floorPlanService.create(this.salon.id, JSON.stringify(floorToSave));
-        })
-        .filter((obs): obs is Observable<any> => obs !== null), // Type assertion pour éviter les erreurs
+
+          if (floorToSave.id) {
+            return this.floorPlanService.save(this.salon.id, floorToSave.id, floorToSave);
+          } else {
+            return this.floorPlanService.create(this.salon.id, floorToSave);
+          }
+        }).filter((obs): obs is Observable<any> => obs !== null),
 
       ...this.floorPlansToRemove
         .map(floorPlanToRemoveId => (this.salon?.id ? this.floorPlanService.delete(this.salon.id, floorPlanToRemoveId) :
@@ -382,10 +466,10 @@ export class FloorPlanDetailComponent implements OnInit {
     if (observables.length > 0) {
       forkJoin(observables)
         .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe(() => this.readOnlyBack());
+        .subscribe(() => this.activateReadOnlyMode());
     } else {
       this.isLoading = false;
-      this.readOnlyBack();
+      this.activateReadOnlyMode();
     }
 
   }
@@ -403,24 +487,28 @@ export class FloorPlanDetailComponent implements OnInit {
 
         const spacingMultiply = (1 / info.spacingMeter);
         this.floorPlans.push({
+          id: null,
           name: info.name,
-          cells: Array.from({ length: info.heightMeter * spacingMultiply }, () =>
-            Array.from(
-              { length: info.widthMeter * spacingMultiply },
-              () =>
-                ({
-                  id: null,
-                  firstCell: false,
-                  colorHighlight: this.DEFAULT_HIGHLIGHT,
-                  dimension: null,
-                  unusable: false,
-                }) as GridCell,
+          data: {
+            cells: Array.from({ length: info.heightMeter * spacingMultiply }, () =>
+              Array.from(
+                { length: info.widthMeter * spacingMultiply },
+                () =>
+                  ({
+                    id: null,
+                    firstCell: false,
+                    colorHighlight: this.DEFAULT_HIGHLIGHT,
+                    dimension: null,
+                    unusable: false,
+                  }) as GridCell,
+              ),
             ),
-          ),
-          widthMeter: info.widthMeter,
-          heightMeter: info.heightMeter,
-          spacingMeter: info.spacingMeter,
-        } as IFloorPlan);
+            widthMeter: info.widthMeter,
+            heightMeter: info.heightMeter,
+            spacingMeter: info.spacingMeter,
+          } as IFloorPlanData,
+        });
+
         this.changePlanView(this.floorPlans.length - 1);
       });
   }
@@ -430,7 +518,7 @@ export class FloorPlanDetailComponent implements OnInit {
       return;
     }
     this.indexActiveFloorPlan = index;
-    const activeFloorPlan = this.getActiveFloorPlan();
+    const activeFloorPlan = this.getActiveFloorPlanData();
     this.sizeRealCell = 1 / activeFloorPlan.spacingMeter;
     this.nbWidthTiles = activeFloorPlan.widthMeter * this.sizeRealCell;
     this.nbHeightTiles = activeFloorPlan.heightMeter * this.sizeRealCell;
@@ -463,7 +551,7 @@ export class FloorPlanDetailComponent implements OnInit {
       .subscribe(() => {
         if (this.salon?.id) {
           if (this.getActiveFloorPlan().id) {
-            this.floorPlansToRemove.push(this.getActiveFloorPlan().id);
+            this.floorPlansToRemove.push(this.getActiveFloorPlan().id!);
           }
           this.floorPlans.splice(this.indexActiveFloorPlan, 1);
           this.indexActiveFloorPlan = this.indexActiveFloorPlan - 1;
@@ -471,8 +559,78 @@ export class FloorPlanDetailComponent implements OnInit {
       });
   }
 
-  protected readonly getExhibitorName = getExhibitorName;
-  protected readonly getFormattedExhibitorName = getFormattedExhibitorName;
+  onClickNumberAttribution(cell: GridCell): void {
+    if (this.isReadOnly || !this.isNumberAttribution.value || !cell?.dimension) {
+      return;
+    }
+
+    const currentPosition = Number(this.nextPosition.value ?? 0);
+
+    if (currentPosition === 0) {
+      cell.dimension.position = null;
+    } else {
+      cell.dimension.position = currentPosition;
+
+      if (this.automaticallyIncrementNumber.value) {
+        this.nextPosition.setValue(currentPosition + 1);
+      }
+    }
+  }
+
+  changeAttributionMode(): void {
+    if (this.isReadOnly) {
+      return;
+    }
+    this.isNumberAttribution.setValue(!this.isNumberAttribution.getRawValue());
+
+    if (this.isNumberAttribution.value) {
+      this.displayHeader = true;
+    }
+  }
+
+  changeRotationAvailableDimensions(): void {
+    this.availableDimensions = this.availableDimensions.map(dimension => {
+      this.changeRotation(dimension);
+      return dimension;
+    });
+  }
+
+  private changeRotation(dimension: DimensionCell) {
+    const rows = dimension.rows;
+    const cols = dimension.cols;
+    dimension.cols = rows;
+    dimension.rows = cols;
+  }
+
+  private forEachCell(callback: (cell: GridCell) => void): void {
+    this.getActiveFloorPlanData().cells.forEach(row => row.forEach(cell => callback(cell)));
+  }
+
+  private getCell(row: number, col: number): GridCell {
+    return this.getActiveFloorPlanData().cells[row][col];
+  }
+
+  changeAutoIncrement(): void {
+    if (this.isReadOnly || !this.isNumberAttribution.value) {
+      return;
+    }
+
+    this.automaticallyIncrementNumber.setValue(!this.automaticallyIncrementNumber.getRawValue());
+  }
+
+  changeDisplayName(): void {
+    this.displayFullname = !this.displayFullname;
+  }
+
+  changeTechnicalInfo(): void {
+    this.displayTechnical = !this.displayTechnical;
+  }
+
+  changeHeader(): void {
+    this.displayHeader = !this.displayHeader;
+  }
+
+  protected readonly getFormattedParticipationName = getFormattedParticipationName;
   protected readonly getFirstExhibitorName = getFirstExhibitorName;
   protected readonly getColorStand = getColorStand;
 }

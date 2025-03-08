@@ -4,7 +4,7 @@ import { UserRouteAccessService } from 'app/core/auth/user-route-access.service'
 import { AuthorityComponent } from './list/authority.component';
 import { AuthorityUpdateComponent } from './update/authority-update.component';
 import AuthorityResolve from './route/authority-routing-resolve.service';
-import SalonResolve from '../salon/route/salon-routing-resolve.service';
+import SalonResolve from '../salon/service/salon-routing-resolve.service';
 
 const authorityRoute: Routes = [
   {

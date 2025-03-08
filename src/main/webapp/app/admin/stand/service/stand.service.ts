@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IStand, NewStand } from '../stand.model';
+import { IStand, NewStand } from '../model/stand.interface';
 
 @Injectable({ providedIn: 'root' })
 export class StandService {
@@ -12,26 +12,25 @@ export class StandService {
   protected applicationConfigService = inject(ApplicationConfigService);
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/stands');
 
-  create(stand: NewStand): Observable<HttpResponse<IStand>> {
-    return this.http.post<IStand>(this.resourceUrl, stand, { observe: 'response' });
+  create(stand: NewStand): Observable<IStand> {
+    return this.http.post<IStand>(this.resourceUrl, stand);
   }
 
-  update(stand: IStand): Observable<HttpResponse<IStand>> {
-    return this.http.put<IStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand,
-      { observe: 'response' });
+  update(stand: IStand): Observable<IStand> {
+    return this.http.put<IStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand);
   }
 
   find(idStand: string): Observable<HttpResponse<IStand>> {
     return this.http.get<IStand>(`${this.resourceUrl}/${idStand}`, { observe: 'response' });
   }
 
-  query(req?: any): Observable<HttpResponse<IStand[]>> {
+  query(req?: any): Observable<IStand[]> {
     const options = createRequestOption(req);
-    return this.http.get<IStand[]>(this.resourceUrl, { params: options, observe: 'response' });
+    return this.http.get<IStand[]>(this.resourceUrl, { params: options });
   }
 
-  delete(idStand: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${idStand}`, { observe: 'response' });
+  delete(idStand: string): Observable<{}> {
+    return this.http.delete(`${this.resourceUrl}/${idStand}`);
   }
 
   getStandIdentifier(stand: Pick<IStand, 'id'>): string {

@@ -20,7 +20,6 @@ import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.ParticipationMapper;
 import ch.salon.web.rest.dto.InfoInvoice;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -63,37 +62,46 @@ public class ParticipationService {
     }
 
     public UUID create(Participation participation) {
+        if (participation == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         if (participation.getId() != null) {
             throw new BadRequestAlertException("A new participation cannot already have an ID", ENTITY_NAME,
                                                "idexists");
         }
 
-        Salon salonFound = salonRepository.getReferenceById(participation.getSalon().getId());
-        if (salonFound == null) {
-            throw new BadRequestAlertException("No salon for the given Id", ENTITY_NAME, "idnotfound");
-        }
+        Salon salonFound = salonRepository.findById(participation.getSalon().getId())
+                                          .orElseThrow(() -> new BadRequestAlertException("No salon for the given Id",
+                                                                                          ENTITY_NAME, "idnotfound"));
 
-        participation.setClientNumber(getClientNumber(participationRepository.findMaxClientNumber(salonFound.getId()),
-                                                      salonFound.getReferenceNumber()));
+        String maxNumber = participationRepository.findMaxClientNumber(salonFound.getId());
+        participation.setClientNumber(Participation.incrementClientNumber(maxNumber, salonFound.getReferenceNumber()));
         return participationRepository.save(participation).getId();
     }
 
     public InfoInvoice getInfoInvoice(UUID id) {
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         List<InvoicingPlan> invoicings = this.invoicingPlanRepository.findByParticipationIdOrderByBillingNumberDesc(id);
 
         if (!invoicings.isEmpty()) {
             InfoInvoice infoInvoice = new InfoInvoice();
-            infoInvoice.setHasDraftInvoices(
-                    invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.DRAFT));
+            infoInvoice.setHasDraftInvoices(invoicings.stream()
+                                                      .anyMatch(
+                                                          invoicingPlan -> invoicingPlan.getState() == State.DRAFT ||
+                                                                           invoicingPlan.getState() == State.ISOLATED));
             infoInvoice.setHasWaitingInvoices(
-                    invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.ISSUED));
+                invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.ISSUED));
             infoInvoice.setHasExpiredInvoices(invoicings.stream()
-                                                        .anyMatch(invoicingPlan ->
-                                                                          invoicingPlan.getState() == State.ISSUED &&
-                                                                          invoicingPlan.getExpirationDate() != null &&
-                                                                          Instant.now()
-                                                                                 .isAfter(
-                                                                                         invoicingPlan.getExpirationDate())));
+                                                        .anyMatch(
+                                                            invoicingPlan -> invoicingPlan.getState() == State.ISSUED &&
+                                                                             invoicingPlan.getExpirationDate() !=
+                                                                             null && Instant.now()
+                                                                                            .isAfter(
+                                                                                                invoicingPlan.getExpirationDate())));
 
             return infoInvoice;
         }
@@ -102,50 +110,62 @@ public class ParticipationService {
     }
 
     public Participation update(final UUID id, Participation participation) {
-        if (participation.getId() == null) {
+        if (id == null || participation.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
         if (!Objects.equals(id, participation.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
-        Participation existingParticipation = participationRepository.getReferenceById(id);
-        if (existingParticipation == null) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+
+        Participation existingParticipation = participationRepository.findById(id)
+                                                                     .orElseThrow(() -> new BadRequestAlertException(
+                                                                         "Entity not found", ENTITY_NAME,
+                                                                         "idnotfound"));
 
         if (Participation.hasDifference(participation, existingParticipation)) {
             this.eventLogService.eventFromSystem("Des éléments de la participation ont changé.", EventType.EVENT,
-                                                 EntityType.PARTICIPATION, participation.getId());
+                                                 EntityType.PARTICIPATION, participation.getId(), null);
         }
 
         return participationRepository.save(participation);
     }
 
     public List<ParticipationDTO> getParticipationsFromExhibitor(UUID idExhibitor) {
+        if (idExhibitor == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         return this.participationRepository.findByExhibitorIdOrderByRegistrationDateDesc(idExhibitor)
                                            .stream()
                                            .map(ParticipationMapper.INSTANCE::toDto)
                                            .toList();
     }
 
-    public List<Participation> findAll(String idSalon) {
-        if (StringUtils.isNotBlank(idSalon)) {
-            return participationRepository.findBySalonIdOrderByRegistrationDateDesc(UUID.fromString(idSalon));
+    public List<Participation> findAll(UUID idSalon) {
+        if (idSalon != null) {
+            return participationRepository.findBySalonIdOrderByRegistrationDateDesc(idSalon);
         }
 
         throw new IllegalStateException("No filter given");
     }
 
     public void adaptStatusFromChildren(UUID idParticipation) {
-        Participation participation = participationRepository.getReferenceById(idParticipation);
-        if (participation == null) {
-            throw new IllegalStateException("No participation found");
+        if (idParticipation == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+
+        Participation participation = participationRepository.findById(idParticipation)
+                                                             .orElseThrow(
+                                                                 () -> new BadRequestAlertException("Entity not found",
+                                                                                                    ENTITY_NAME,
+                                                                                                    "idnotfound"));
         Status currentStatus = participation.getStatus();
 
-        List<Stand> stands = this.standRepository.findByParticipationId(idParticipation);
+        List<Stand> stands = this.standRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation);
         Set<Status> standsStatus = stands.stream().map(Stand::getStatus).collect(Collectors.toSet());
-        List<Conference> conferences = this.conferenceRepository.findByParticipationId(idParticipation);
+        List<Conference> conferences =
+            this.conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation);
         Set<Status> conferencesStatus = conferences.stream().map(Conference::getStatus).collect(Collectors.toSet());
 
         Status statusToChange;
@@ -170,11 +190,40 @@ public class ParticipationService {
 
         if (currentStatus != statusToChange) {
             this.eventLogService.eventFromSystem(
-                    "Le statut de la participation a changé de " + currentStatus + " à " + statusToChange + ".",
-                    EventType.EVENT, EntityType.PARTICIPATION, participation.getId());
+                "Le statut de la participation a changé de " + currentStatus + " à " + statusToChange + ".",
+                EventType.EVENT, EntityType.PARTICIPATION, participation.getId(), null);
+
             participation.setStatus(statusToChange);
+
             participationRepository.save(participation);
         }
+    }
+
+    public Optional<Participation> get(UUID id) {
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        return participationRepository.findById(id);
+    }
+
+    public void delete(UUID id) {
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        participationRepository.deleteById(id);
+    }
+
+    public List<EventLogDTO> findAllEventLogs(UUID idParticipation) {
+        if (idParticipation == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation)
+                                   .stream()
+                                   .map(EventLogMapper.INSTANCE::toDto)
+                                   .toList();
     }
 
     private boolean isAllOf(Set<Status> stands, Set<Status> conferences, Status status) {
@@ -185,39 +234,5 @@ public class ParticipationService {
     private boolean isAnyOf(Set<Status> stands, Set<Status> conferences, Status status) {
         return (stands.stream().anyMatch(statusStand -> statusStand == status) ||
                 conferences.stream().anyMatch(statusConf -> statusConf == status));
-    }
-
-    public Optional<Participation> get(UUID id) {
-        return participationRepository.findById(id);
-    }
-
-    public void delete(UUID id) {
-        participationRepository.deleteById(id);
-    }
-
-    public void createEventLog(UUID idExhibitor, EventLogDTO eventLogDTO) {
-        this.eventLogService.eventFromUser(eventLogDTO.getLabel(), eventLogDTO.getType(), EntityType.PARTICIPATION,
-                                           idExhibitor, eventLogDTO.getReferenceDate());
-    }
-
-    public List<EventLogDTO> findAllEventLogs(UUID idParticipation) {
-        return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation)
-                                   .stream()
-                                   .map(EventLogMapper.INSTANCE::toDto)
-                                   .toList();
-    }
-
-    public static String getClientNumber(String clientNumberMax, String referenceSalon) {
-        int number = 100;
-        if (clientNumberMax != null) {
-            String[] split = clientNumberMax.split("-");
-            number = Integer.parseInt(split[split.length - 1]);
-        }
-
-        // Incrémenter le nombre
-        number = number + 1;
-
-        // Reformater le numéro incrémenté avec le même nombre de chiffres
-        return referenceSalon + "-" + String.format("%03d", number);
     }
 }

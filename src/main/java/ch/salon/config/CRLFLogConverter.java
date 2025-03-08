@@ -26,7 +26,7 @@ public class CRLFLogConverter extends CompositeConverter<ILoggingEvent> {
     public static final Marker CRLF_SAFE_MARKER = MarkerFactory.getMarker("CRLF_SAFE");
 
     private static final String[] SAFE_LOGGERS =
-            {"org.hibernate", "org.springframework.boot.autoconfigure", "org.springframework.boot.diagnostics",};
+        {"org.hibernate", "org.springframework.boot.autoconfigure", "org.springframework.boot.diagnostics",};
     private static final Map<String, AnsiElement> ELEMENTS;
 
     static {

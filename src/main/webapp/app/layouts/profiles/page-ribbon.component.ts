@@ -9,12 +9,13 @@ import { ProfileService } from './profile.service';
   standalone: true,
   selector: 'jhi-page-ribbon',
   template: `
-		@if (ribbonEnv$ | async; as ribbonEnv) {
-			<div class="ribbon">
-				<a href="" [jhiTranslate]="'global.ribbon.' + (ribbonEnv ?? '')">{{ {dev: 'Développement'}[ribbonEnv ?? ''] }}</a>
-			</div>
-		}
-    `,
+    @if (ribbonEnv$ | async; as ribbonEnv) {
+      <div class="ribbon">
+        <a href=""
+           [jhiTranslate]="'global.ribbon.' + (ribbonEnv ?? '')">{{ { dev: 'Développement' }[ribbonEnv ?? ''] }}</a>
+      </div>
+    }
+  `,
   styleUrl: './page-ribbon.component.scss',
   imports: [SharedModule],
 })

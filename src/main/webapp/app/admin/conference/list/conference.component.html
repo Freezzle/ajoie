@@ -1,20 +1,25 @@
 <div>
   <h2 id="page-heading">
-    <span jhiTranslate="conference.title">Les conférences</span>
-
+    <div class="d-flex justify-content-center">
+      <span jhiTranslate="conference.title">Les conférences</span>
+    </div>
     <hr/>
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-          <span jhiTranslate="common.back">Back</span>
-        </button>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
       </span>
 
       <span [formGroup]="filters" class="row">
         <div class="col-auto">
-          <input (blur)="actionFilter()" class="form-control" formControlName="fullName" placeholder="'exhibitor.filter.fullName' | translate" type="text"/>
+          <input (blur)="actionFilter()"
+                 [placeholder]="'exhibitor.filter.fullName' | translate"
+                 class="form-control"
+                 formControlName="fullName"
+                 type="text"/>
         </div>
         <div class="col-auto">
           <select (change)="actionFilter()" class="form-control" formControlName="status">
@@ -27,19 +32,18 @@
       </span>
 
       <span>
-        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
+        <button-box (clickedEvent)="refresh()"
+                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [isDisabled]="isLoading"
+                    faIcon="sync"
+                    translateKey="common.refresh"/>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
+        <link-box [isDisabled]="isLoading" [links]="['./new']"
+                  faIcon="plus"
+                  translateKey="common.create"
+                  type="success"/>
       </span>
     </div>
-
-    <hr/>
   </h2>
 
   <jhi-alert-error></jhi-alert-error>
@@ -61,16 +65,16 @@
         </tr>
       </thead>
       <tbody>
-        @if (conferences?.length === 0) {
+        @if (conferences.length === 0) {
           <tr>
             <td colspan="4">
               <span jhiTranslate="conference.notFound">Aucune Conference</span>
             </td>
           </tr>
         } @else {
-          @for (conference of conferences; track $index) {
+          @for (conference of conferencesPaginated; track $index) {
             <tr>
-              <td>
+              <td class="go-detail" [routerLink]="['./', conference.id, 'view']">
                 @if (conference.participation) {
                   <a [routerLink]="[
                       '/admin/salons',
@@ -78,19 +82,21 @@
                       'participations',
                       conference.participation.id,
                       'view',
-                    ]"> {{ getExhibitorName(conference.participation.exhibitor) }} </a>
+                    ]"
+                     (click)="$event.stopPropagation()">
+                    {{ getFormattedParticipationName(conference.participation) }} </a>
                 }
               </td>
               <td class="go-detail truncate" [routerLink]="['./', conference.id, 'view']">{{ conference.title }}</td>
               <td class="go-detail text-center" [routerLink]="['./', conference.id, 'view']">
-                <fa-icon [icon]="conference.status | status" [class]="conference.status | colorStatus" [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
+                <fa-icon [icon]="conference.status | status"
+                         [class]="conference.status | colorStatus"
+                         [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <button type="button" (click)="delete(conference)" class="btn btn-danger btn-sm">
-                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                    <span jhiTranslate="common.delete"></span>
-                  </button>
+                  <button-box (clickedEvent)="delete(conference)" type="danger"
+                              [showText]="false" translateKey="common.delete" faIcon="times"/>
                 </div>
               </td>
             </tr>
@@ -99,4 +105,6 @@
       </tbody>
     </table>
   </div>
+
+  <jhi-pagination (pageChanged)="refreshConferences($event)" [collectionSize]="this.conferences.length"/>
 </div>

@@ -7,3 +7,8 @@ export const LANGUAGES: string[] = [
   'en',
   'de',
 ];
+
+
+export function formatterLanguage(language: string | null): string {
+  return 'exhibitor.language.list.' + language ?? '';
+}

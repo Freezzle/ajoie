@@ -1,13 +1,17 @@
 package ch.salon.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -18,23 +22,47 @@ public class Exhibitor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @NotNull @Column(name = "language", nullable = false) private String language = Locale.FRENCH.getLanguage();
+    @NotNull
+    @Column(name = "language",
+            nullable = false)
+    private String language = Locale.FRENCH.getLanguage();
 
-    @NotNull @Column(name = "full_name", nullable = false) private String fullName;
+    @NotNull
+    @Column(name = "full_name",
+            nullable = false)
+    private String fullName;
 
-    @Column(name = "therapist_name", nullable = false) private String therapistName;
+    @NotNull
+    @Column(name = "email",
+            nullable = false)
+    private String email;
 
-    @NotNull @Column(name = "email", nullable = false) private String email;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
-    @Column(name = "phone_number") private String phoneNumber;
+    @Column(name = "address")
+    private String address;
 
-    @Column(name = "address") private String address;
+    @Column(name = "npa_localite")
+    private String npaLocalite;
 
-    @Column(name = "npa_localite") private String npaLocalite;
+    @Column(name = "extra_information")
+    private String extraInformation;
 
-    @Column(name = "extra_information") private String extraInformation;
+    @Column(name = "different_billing_address")
+    private Boolean differentBillingAddress = false;
+
+    @ManyToOne(fetch = FetchType.EAGER,
+               cascade = CascadeType.ALL)
+    private Address billingAddress;
+
+    @Column(name = "registration_date")
+    private Instant registrationDate;
 
     public UUID getId() {
         return this.id;
@@ -44,17 +72,17 @@ public class Exhibitor implements Serializable {
         this.id = id;
     }
 
+    public Instant getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Instant registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
     public Exhibitor id(UUID id) {
         this.setId(id);
         return this;
-    }
-
-    public String getTherapistName() {
-        return therapistName;
-    }
-
-    public void setTherapistName(String therapistName) {
-        this.therapistName = therapistName;
     }
 
     public String getFullName() {
@@ -143,6 +171,22 @@ public class Exhibitor implements Serializable {
         return this;
     }
 
+    public Boolean getDifferentBillingAddress() {
+        return differentBillingAddress;
+    }
+
+    public void setDifferentBillingAddress(Boolean differentBillingAddress) {
+        this.differentBillingAddress = differentBillingAddress;
+    }
+
+    public Address getBillingAddress() {
+        return billingAddress;
+    }
+
+    public void setBillingAddress(Address billingAddress) {
+        this.billingAddress = billingAddress;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -162,8 +206,8 @@ public class Exhibitor implements Serializable {
 
     @Override
     public String toString() {
-        return ("Exhibitor{" + "id=" + id + ", fullName='" + fullName + '\'' + ", therapistName='" + therapistName +
-                '\'' + ", email='" + email + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address +
-                '\'' + ", npaLocalite='" + npaLocalite + '\'' + ", extraInformation='" + extraInformation + '\'' + '}');
+        return ("Exhibitor{" + "id=" + id + ", fullName='" + fullName + '\'' + ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address + '\'' + ", npaLocalite='" +
+                npaLocalite + '\'' + ", extraInformation='" + extraInformation + '\'' + '}');
     }
 }

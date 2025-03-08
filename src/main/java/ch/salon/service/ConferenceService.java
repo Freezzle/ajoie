@@ -8,9 +8,9 @@ import ch.salon.service.dto.ConferenceDTO;
 import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.mapper.ConferenceMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,21 +33,23 @@ public class ConferenceService {
     }
 
     public UUID create(ConferenceDTO conference) {
-        if (conference.getId() != null) {
+        if (conference == null || conference.getId() != null) {
             throw new BadRequestAlertException("A new conference cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Conference entity = ConferenceMapper.INSTANCE.toEntity(conference);
+        entity.setRegistrationDate(Instant.now());
+        entity = conferenceRepository.save(entity);
 
-        Conference conferenceCreated = conferenceRepository.save(ConferenceMapper.INSTANCE.toEntity(conference));
         this.eventLogService.eventFromSystem("Une conférence a été ajoutée.", EventType.EVENT, EntityType.PARTICIPATION,
-                                             conferenceCreated.getParticipation().getId());
+                                             entity.getParticipation().getId(), null);
 
-        this.participationService.adaptStatusFromChildren(conferenceCreated.getParticipation().getId());
+        this.participationService.adaptStatusFromChildren(entity.getParticipation().getId());
 
-        return conferenceCreated.getId();
+        return entity.getId();
     }
 
     public ConferenceDTO update(final UUID id, ConferenceDTO conference) {
-        if (conference.getId() == null) {
+        if (conference == null || id == null || conference.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
@@ -55,17 +57,16 @@ public class ConferenceService {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        Conference conferenceExisting = this.conferenceRepository.getReferenceById(id);
-        if (conferenceExisting == null) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        Conference conferenceExisting = this.conferenceRepository.findById(id)
+                                                                 .orElseThrow(() -> new BadRequestAlertException(
+                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
 
         Conference conferenceToUpdate = ConferenceMapper.INSTANCE.toEntity(conference);
 
         if (Conference.hasDifference(conferenceToUpdate, conferenceExisting)) {
             this.eventLogService.eventFromSystem("Des éléments d'une conférence ont changé.", EventType.EVENT,
                                                  EntityType.PARTICIPATION,
-                                                 conferenceExisting.getParticipation().getId());
+                                                 conferenceExisting.getParticipation().getId(), null);
         }
 
         conferenceToUpdate = conferenceRepository.save(conferenceToUpdate);
@@ -74,14 +75,14 @@ public class ConferenceService {
         return ConferenceMapper.INSTANCE.toDto(conferenceToUpdate);
     }
 
-    public List<ConferenceDTO> findAll(String idSalon, String idParticipation) {
-        if (StringUtils.isNotBlank(idParticipation)) {
-            return conferenceRepository.findByParticipationId(UUID.fromString(idParticipation))
+    public List<ConferenceDTO> findAll(UUID idSalon, UUID idParticipation) {
+        if (idParticipation != null) {
+            return conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation)
                                        .stream()
                                        .map(ConferenceMapper.INSTANCE::toDto)
                                        .toList();
-        } else if (StringUtils.isNotBlank(idSalon)) {
-            return conferenceRepository.findByParticipationSalonId(UUID.fromString(idSalon))
+        } else if (idSalon != null) {
+            return conferenceRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon)
                                        .stream()
                                        .map(ConferenceMapper.INSTANCE::toDto)
                                        .toList();
@@ -91,15 +92,24 @@ public class ConferenceService {
     }
 
     public Optional<ConferenceDTO> get(UUID id) {
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         return conferenceRepository.findById(id).map(ConferenceMapper.INSTANCE::toDto);
     }
 
     public void delete(UUID id) {
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         UUID idParticipation =
-                get(id).map(ConferenceDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
+            get(id).map(ConferenceDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
+
         conferenceRepository.deleteById(id);
         this.eventLogService.eventFromSystem("Une conférence a été supprimée.", EventType.EVENT,
-                                             EntityType.PARTICIPATION, idParticipation);
+                                             EntityType.PARTICIPATION, idParticipation, null);
         this.participationService.adaptStatusFromChildren(idParticipation);
     }
 }

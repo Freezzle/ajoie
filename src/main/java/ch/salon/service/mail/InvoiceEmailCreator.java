@@ -60,7 +60,7 @@ public class InvoiceEmailCreator extends AbstractEmailCreator {
         context.setVariable("salon", invoicingPlan.getParticipation().getSalon().getPlace());
         context.setVariable("billingNumber", invoicingPlan.getBillingNumber());
         context.setVariable("fullName", invoicingPlan.getParticipation().getExhibitor().getFullName());
-        context.setVariable("arrangement", invoicingPlan.getParticipation().getNeedArrangment());
+        context.setVariable("arrangement", invoicingPlan.getNeedArrangement());
         context.setVariable("startDate",
                             DateUtils.instantToIso(invoicingPlan.getParticipation().getSalon().getStartingDate()));
         context.setVariable("endDate",

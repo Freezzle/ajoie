@@ -12,6 +12,8 @@ public class ParticipationDTO implements Serializable {
 
     private String clientNumber;
 
+    private String therapistName;
+
     private Instant registrationDate;
 
     private Long nbMeal1;
@@ -24,7 +26,9 @@ public class ParticipationDTO implements Serializable {
 
     private Boolean acceptedContract;
 
-    private Boolean needArrangment;
+    private Boolean needArrangement;
+
+    private Boolean hasOffer;
 
     private String offer;
 
@@ -51,6 +55,14 @@ public class ParticipationDTO implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getTherapistName() {
+        return therapistName;
+    }
+
+    public void setTherapistName(String therapistName) {
+        this.therapistName = therapistName;
     }
 
     public String getClientNumber() {
@@ -109,12 +121,12 @@ public class ParticipationDTO implements Serializable {
         this.acceptedContract = acceptedContract;
     }
 
-    public Boolean getNeedArrangment() {
-        return needArrangment;
+    public Boolean getNeedArrangement() {
+        return needArrangement;
     }
 
-    public void setNeedArrangment(Boolean needArrangment) {
-        this.needArrangment = needArrangment;
+    public void setNeedArrangement(Boolean needArrangement) {
+        this.needArrangement = needArrangement;
     }
 
     public Status getStatus() {
@@ -179,5 +191,13 @@ public class ParticipationDTO implements Serializable {
 
     public void setSalon(SalonLightDTO salon) {
         this.salon = salon;
+    }
+
+    public Boolean getHasOffer() {
+        return hasOffer;
+    }
+
+    public void setHasOffer(Boolean hasOffer) {
+        this.hasOffer = hasOffer;
     }
 }

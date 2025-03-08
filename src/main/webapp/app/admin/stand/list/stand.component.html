@@ -1,20 +1,25 @@
 <div>
   <h2 id="page-heading">
-    <span jhiTranslate="stand.title">Les stands</span>
-
+    <div class="d-flex justify-content-center">
+      <span jhiTranslate="stand.title">Les stands</span>
+    </div>
     <hr/>
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-          <span jhiTranslate="common.back">Back</span>
-        </button>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
       </span>
 
-      <span [formGroup]="filters" class="row">
+      <span *ngIf="standardView" [formGroup]="filters" class="row">
         <div class="col-auto">
-          <input (blur)="actionFilter()" [placeholder]="'exhibitor.filter.fullName' | translate" class="form-control" formControlName="fullName" type="text"/>
+          <input (blur)="actionFilter()"
+                 [placeholder]="'exhibitor.filter.fullName' | translate"
+                 class="form-control"
+                 formControlName="fullName"
+                 type="text"/>
         </div>
         <div class="col-auto">
           <select (change)="actionFilter()" class="form-control" formControlName="status">
@@ -26,25 +31,36 @@
         </div>
       </span>
 
-      <span>
-        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
+      <span *ngIf="!standardView">
+        <button-box (clickedEvent)="standardView = true"
+                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [isDisabled]="isLoading"
+                    faIcon="sync"
+                    translateKey="stand.viewStandard"/>
+      </span>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
+      <span *ngIf="standardView">
+        <button-box (clickedEvent)="changeTechnicalView()"
+                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [isDisabled]="isLoading"
+                    faIcon="sync"
+                    translateKey="stand.viewClipboard"/>
+
+        <button-box (clickedEvent)="refresh()"
+                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [isDisabled]="isLoading"
+                    faIcon="sync"
+                    translateKey="common.refresh"/>
+
+        <link-box [isDisabled]="isLoading" [links]="['./new']"
+                  faIcon="plus"
+                  translateKey="common.create"
+                  type="success"/>
       </span>
     </div>
-
-    <hr/>
   </h2>
 
-  <jhi-alert-error></jhi-alert-error>
-
-  <div class="table-responsive table-entities" id="entities">
+  <div *ngIf="standardView" class="table-responsive table-entities" id="entities">
     <table aria-describedby="page-heading" class="table table-hover">
       <thead class="thead-primary">
         <tr>
@@ -53,9 +69,6 @@
           </th>
           <th class="col-5">
             <span jhiTranslate="stand.description">Description</span>
-          </th>
-          <th class="col-auto">
-            <span jhiTranslate="stand.position">Position</span>
           </th>
           <th class="col-1">
             <span jhiTranslate="stand.category.label">Catégorie</span>
@@ -77,36 +90,29 @@
             </td>
           </tr>
         } @else {
-          @for (stand of stands; track $index) {
+          @for (stand of standsPaginated; track $index) {
             <tr>
-              <td>
+              <td class="go-detail" [routerLink]="['./', stand.id, 'view']">
                 @if (stand.participation) {
-                  <a [routerLink]="[
-                      '/admin/salons',
-                      params.get('idSalon'),
-                      'participations',
-                      stand.participation.id,
-                      'view',
-                    ]"> {{ getExhibitorName(stand.participation.exhibitor) }} </a>
+                  <a [routerLink]="['/admin','salons',params.get('idSalon'),
+                  'participations',stand.participation.id,'view']"
+                     (click)="$event.stopPropagation()">{{ getFormattedParticipationName(stand.participation) }}</a>
                 }
               </td>
               <td class="go-detail truncate" [routerLink]="['./', stand.id, 'view']">{{ stand.description }}</td>
-              <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
-                {{ stand.position }}
-              </td>
               <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
                 {{ 'stand.category.list.' + stand.category | translate }}
               </td>
               <td class="go-detail" [routerLink]="['./', stand.id, 'view']">{{ stand.dimension?.dimension }}</td>
               <td class="go-detail text-center" [routerLink]="['./', stand.id, 'view']">
-                <fa-icon [icon]="stand.status | status" [class]="stand.status | colorStatus" [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
+                <fa-icon [icon]="stand.status | status"
+                         [class]="stand.status | colorStatus"
+                         [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <button type="button" (click)="delete(stand)" class="btn btn-danger btn-sm">
-                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                    <span jhiTranslate="common.delete"></span>
-                  </button>
+                  <button-box (clickedEvent)="delete(stand)" type="danger"
+                              [showText]="false" translateKey="common.delete" faIcon="times"/>
                 </div>
               </td>
             </tr>
@@ -115,4 +121,43 @@
       </tbody>
     </table>
   </div>
+
+  <div *ngIf="!standardView" class="table-responsive table-entities">
+    <table class="table table-hover">
+      <thead class="thead-primary">
+        <tr>
+          <th>Nom de thérapeute</th>
+          <th>Nom complet</th>
+          <th>Description</th>
+          <th>Site internet</th>
+          <th>Facebook</th>
+          <th>Instagram</th>
+          <th>Url Image</th>
+          <th>Catégorie</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stand of stands">
+          <td class="{{stand.participation?.therapistName ? 'clipboard' : ''}} truncate-small"
+              (click)="clipboard(stand.participation?.therapistName)">{{ stand.participation?.therapistName ?? '' }}
+          </td>
+          <td class="{{stand.participation?.exhibitor ? 'clipboard' : ''}} truncate-small"
+              (click)="clipboard(getFirstExhibitorName(stand.participation?.exhibitor))">{{ getFirstExhibitorName(stand.participation?.exhibitor) }}
+          </td>
+          <td class="{{stand.description ? 'clipboard' : ''}} truncate-small"
+              (click)="clipboard(stand.description)">{{ stand.description ?? '' }}
+          </td>
+          <td class="{{stand.website ? 'clipboard' : ''}} truncate-small" (click)="clipboard(stand.website)">{{ stand.website ?? '' }}</td>
+          <td class="{{stand.facebook ? 'clipboard' : ''}} truncate-small" (click)="clipboard(stand.facebook)">{{ stand.facebook ?? '' }}</td>
+          <td class="{{stand.instagram ? 'clipboard' : ''}} truncate-small" (click)="clipboard(stand.instagram)">{{ stand.instagram ?? '' }}</td>
+          <td class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small" (click)="clipboard(stand.urlPicture)">{{ stand.urlPicture ?? '' }}</td>
+          <td class="truncate-small">{{ stand.category ? (formatterCategory(Category[stand.category]) | translate) : '' }}</td>
+          <td class="truncate-small">{{ stand.status ? (formatterStatus(Status[stand.status]) | translate) : '' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <jhi-pagination *ngIf="standardView" (pageChanged)="refreshStands($event)" [collectionSize]="stands.length"/>
 </div>

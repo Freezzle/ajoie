@@ -24,39 +24,67 @@ public class Participation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @Column(name = "client_number") private String clientNumber;
+    @Column(name = "client_number")
+    private String clientNumber;
 
-    @Column(name = "registration_date") private Instant registrationDate;
+    @Column(name = "therapist_name",
+            nullable = false)
+    private String therapistName;
 
-    @Column(name = "nb_meal_1") private Long nbMeal1;
+    @Column(name = "registration_date")
+    private Instant registrationDate;
 
-    @Column(name = "nb_meal_2") private Long nbMeal2;
+    @Column(name = "nb_meal_1")
+    private Long nbMeal1;
 
-    @Column(name = "nb_meal_3") private Long nbMeal3;
+    @Column(name = "nb_meal_2")
+    private Long nbMeal2;
 
-    @Column(name = "accepted_chart") private Boolean acceptedChart;
+    @Column(name = "nb_meal_3")
+    private Long nbMeal3;
 
-    @Column(name = "accepted_contract") private Boolean acceptedContract;
+    @Column(name = "accepted_chart")
+    private Boolean acceptedChart;
 
-    @Column(name = "need_arrangment") private Boolean needArrangment;
+    @Column(name = "accepted_contract")
+    private Boolean acceptedContract;
 
-    @Column(name = "offer") private String offer;
+    @Column(name = "need_arrangement")
+    private Boolean needArrangement;
 
-    @Column(name = "additional_information") private String additionnalInformation;
+    @Column(name = "has_offer")
+    private Boolean hasOffer;
 
-    @Enumerated(EnumType.STRING) @Column(name = "status") private Status status;
+    @Column(name = "offer")
+    private String offer;
 
-    @Column(name = "guest_of_honor") private Boolean guestOfHonor;
+    @Column(name = "additional_information")
+    private String additionnalInformation;
 
-    @Column(name = "crush_of_heart") private Boolean crushOfHeart;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 
-    @Column(name = "extra_information") private String extraInformation;
+    @Column(name = "guest_of_honor")
+    private Boolean guestOfHonor;
 
-    @ManyToOne(fetch = FetchType.EAGER) private Exhibitor exhibitor;
+    @Column(name = "crush_of_heart")
+    private Boolean crushOfHeart;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
+    @Column(name = "extra_information")
+    private String extraInformation;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Exhibitor exhibitor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"priceStandSalons"},
+                          allowSetters = true)
     private Salon salon;
 
     public UUID getId() {
@@ -71,6 +99,15 @@ public class Participation implements Serializable {
         this.setId(id);
         return this;
     }
+
+    public String getTherapistName() {
+        return therapistName;
+    }
+
+    public void setTherapistName(String therapistName) {
+        this.therapistName = therapistName;
+    }
+
 
     public Instant getRegistrationDate() {
         return this.registrationDate;
@@ -166,16 +203,16 @@ public class Participation implements Serializable {
         return this;
     }
 
-    public Boolean getNeedArrangment() {
-        return this.needArrangment;
+    public Boolean getNeedArrangement() {
+        return this.needArrangement;
     }
 
-    public void setNeedArrangment(Boolean needArrangment) {
-        this.needArrangment = needArrangment;
+    public void setNeedArrangement(Boolean needArrangement) {
+        this.needArrangement = needArrangement;
     }
 
-    public Participation needArrangment(Boolean needArrangment) {
-        this.setNeedArrangment(needArrangment);
+    public Participation needArrangement(Boolean needArrangement) {
+        this.setNeedArrangement(needArrangement);
         return this;
     }
 
@@ -255,11 +292,33 @@ public class Participation implements Serializable {
         this.clientNumber = clientNumber;
     }
 
+    public Boolean getHasOffer() {
+        return hasOffer;
+    }
+
+    public void setHasOffer(Boolean hasOffer) {
+        this.hasOffer = hasOffer;
+    }
+
     public static boolean hasDifference(Participation part1, Participation part2) {
         return ((part1 == null && part2 != null) || (part1 != null && part2 == null) ||
                 (part1 != null && part2 != null && (!Objects.equals(part1.getNbMeal1(), part2.getNbMeal1()) ||
                                                     !Objects.equals(part1.getNbMeal2(), part2.getNbMeal2()) ||
                                                     !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3()))));
+    }
+
+    public static String incrementClientNumber(String clientNumberMax, String referenceSalon) {
+        int number = 100;
+        if (clientNumberMax != null) {
+            String[] split = clientNumberMax.split("-");
+            number = Integer.parseInt(split[split.length - 1]);
+        }
+
+        // Incrémenter le nombre
+        number = number + 1;
+
+        // Reformater le numéro incrémenté avec le même nombre de chiffres
+        return referenceSalon + "-" + String.format("%03d", number);
     }
 
     @Override
@@ -284,7 +343,7 @@ public class Participation implements Serializable {
         return ("Participation{" + "id=" + getId() + ", registrationDate='" + getRegistrationDate() + "'" +
                 ", clientNumber='" + getClientNumber() + "'" + ", nbMeal1=" + getNbMeal1() + ", nbMeal2=" +
                 getNbMeal2() + ", nbMeal3=" + getNbMeal3() + ", acceptedChart='" + getAcceptedChart() + "'" +
-                ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangment='" + getNeedArrangment() +
+                ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangement='" + getNeedArrangement() +
                 "'" + ", status='" + getStatus() + "'" + ", extraInformation='" + getExtraInformation() + "'" + "}");
     }
 }

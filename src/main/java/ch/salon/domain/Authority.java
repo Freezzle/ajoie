@@ -26,9 +26,16 @@ public class Authority implements Serializable, Persistable<String> {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull @Size(max = 50) @Id @Column(name = "name", length = 50, nullable = false) private String name;
+    @NotNull
+    @Size(max = 50)
+    @Id
+    @Column(name = "name",
+            length = 50,
+            nullable = false)
+    private String name;
 
-    @Transient private boolean isPersisted;
+    @Transient
+    private boolean isPersisted;
 
     public String getName() {
         return this.name;

@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
-import { IFloorPlan } from '../floor-plan.model';
+import { Observable } from 'rxjs';
+import { IFloorPlanDataLight, IFloorPlanLight } from '../floor-plan.model';
 import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from '../../../core/config/application-config.service';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class FloorPlanService {
@@ -10,30 +11,38 @@ export class FloorPlanService {
   protected applicationConfigService = inject(ApplicationConfigService);
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/salons');
 
-  create(idSalon: string, floorPlanJson: string): Observable<IFloorPlan> {
-    return this.http.post<{ id: string, data: any }>(`${this.resourceUrl}/${idSalon}/floor-plan`,
-        { id: null, data: floorPlanJson })
-      .pipe(map(result => this.mapFloorPlanFromBackend(result)));
+  create(idSalon: string, floorPlan: IFloorPlanLight): Observable<IFloorPlanLight> {
+    return this.http.post<IFloorPlanLight>(`${this.resourceUrl}/${idSalon}/floor-plan`,
+      this.mapFloorPlanToBackend(floorPlan));
   }
 
-  save(idSalon: string, idFloorPlan: string, floorPlanJson: string): Observable<IFloorPlan> {
-    return this.http.put<{ id: string, data: any }>(`${this.resourceUrl}/${idSalon}/floor-plan/${idFloorPlan}`,
-      { id: idFloorPlan, data: floorPlanJson }).pipe(map(result => this.mapFloorPlanFromBackend(result)));
+  save(idSalon: string, idFloorPlan: string, floorPlan: IFloorPlanLight): Observable<IFloorPlanLight> {
+    return this.http.put<IFloorPlanLight>(
+      `${this.resourceUrl}/${idSalon}/floor-plan/${idFloorPlan}`, this.mapFloorPlanToBackend(floorPlan));
   }
 
-  delete(idSalon: string, idFloorPlan: string): Observable<IFloorPlan> {
-    return this.http.delete<IFloorPlan>(`${this.resourceUrl}/${idSalon}/floor-plan/${idFloorPlan}`);
+  delete(idSalon: string, idFloorPlan: string): Observable<void> {
+    return this.http.delete<void>(`${this.resourceUrl}/${idSalon}/floor-plan/${idFloorPlan}`);
   }
 
-  load(idSalon: string): Observable<IFloorPlan[]> {
-    return this.http.get<{ id: string, data: any }[]>(`${this.resourceUrl}/${idSalon}/floor-plan`)
-      .pipe(map(results => results.map(result => this.mapFloorPlanFromBackend(result))));
+  load(idSalon: string): Observable<IFloorPlanLight[]> {
+    return this.http.get<IFloorPlanLight[]>(`${this.resourceUrl}/${idSalon}/floor-plan`)
+      .pipe(map(floors => floors.map(this.mapFloorPlanFromBackend)));
   }
 
-  private mapFloorPlanFromBackend(result: { id: string, data: any }): IFloorPlan {
-    const floorPlan = JSON.parse(result.data) as IFloorPlan;
-    floorPlan.id = result.id ?? null;
-    floorPlan.name = floorPlan.name ?? 'default';
-    return floorPlan;
+  private mapFloorPlanFromBackend(result: { id: string | null, name: string, data: any }): IFloorPlanLight {
+    return {
+      id: result.id,
+      name: result.name,
+      data: JSON.parse(result.data) as IFloorPlanDataLight,
+    };
+  }
+
+  private mapFloorPlanToBackend(result: IFloorPlanLight): { id: string | null, name: string, data: any } {
+    return {
+      id: result.id,
+      name: result.name,
+      data: JSON.stringify(result.data),
+    };
   }
 }

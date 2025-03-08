@@ -71,7 +71,7 @@ public class AccountResource {
 
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         activationEmailCreator.fillUser(user);
-        activationEmailCreator.sendEmailAsync();
+        activationEmailCreator.sendEmailSync();
     }
 
     @GetMapping("/activate")
@@ -101,7 +101,7 @@ public class AccountResource {
     public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
                                         .orElseThrow(
-                                                () -> new AccountResourceException("Current user login not found"));
+                                            () -> new AccountResourceException("Current user login not found"));
 
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
@@ -130,10 +130,10 @@ public class AccountResource {
     public List<PersistentToken> getCurrentSessions() {
         return persistentTokenRepository.findByUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()
                                                                                                .orElseThrow(
-                                                                                                       () -> new AccountResourceException(
-                                                                                                               "Current user login not found")))
+                                                                                                   () -> new AccountResourceException(
+                                                                                                       "Current user login not found")))
                                                                   .orElseThrow(() -> new AccountResourceException(
-                                                                          "User could not be found")));
+                                                                      "User could not be found")));
     }
 
     @DeleteMapping("/account/sessions/{series}")
@@ -144,7 +144,7 @@ public class AccountResource {
                      .flatMap(u -> persistentTokenRepository.findByUser(u)
                                                             .stream()
                                                             .filter(persistentToken -> StringUtils.equals(
-                                                                    persistentToken.getSeries(), decodedSeries))
+                                                                persistentToken.getSeries(), decodedSeries))
                                                             .findAny())
                      .ifPresent(t -> persistentTokenRepository.deleteById(decodedSeries));
     }
@@ -169,7 +169,7 @@ public class AccountResource {
         }
 
         Optional<User> user =
-                userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
+            userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
 
         if (user.isEmpty()) {
             throw new AccountResourceException("No user was found for this reset key");

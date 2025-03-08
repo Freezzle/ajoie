@@ -1,0 +1,12 @@
+<label *ngIf="translateKey" [for]="'field_' + fieldName" class="fw-bold">{{ translateKey | translate }}
+  <span *ngIf="this.control?.hasValidator(Validators.required)" class="red-icon">*</span>
+</label>
+<input (blur)="onTouched()"
+       (input)="onInput($event)"
+       [disabled]="disabled"
+       [id]="'field_' + fieldName"
+       [ngClass]="{'invalid': this.control.invalid && this.control.touched}"
+       [value]="value"
+       class="form-control"
+       type="text"/>
+<error-box *ngIf="this.control.errors" [formControlElement]="this.control"/>

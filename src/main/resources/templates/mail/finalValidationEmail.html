@@ -1,0 +1,17 @@
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="#{email.invoice.title(${salon})}"></title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+  <p>Ton inscription est désormais <strong>officiellement validée</strong> !</p>
+  <p>
+    Nous avons hâte de t’accueillir au salon <strong th:text="${salon}"></strong> qui se tiendra du <strong th:text="${startDate}"></strong> au
+    <strong th:text="${endDate}"></strong> !
+  </p>
+  <p>En attendant ce beau moment de partage, nous te souhaitons une semaine douce et remplie de belles énergies. 🌱</p>
+
+  <div th:include="common/footer::footer"></div>
+</body>
+</html>
+💛

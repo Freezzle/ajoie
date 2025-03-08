@@ -8,7 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = {AddressMapper.class},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ExhibitorMapper {
     ExhibitorMapper INSTANCE = Mappers.getMapper(ExhibitorMapper.class);
 
@@ -18,6 +19,7 @@ public interface ExhibitorMapper {
 
     ExhibitorLightDTO toLightDto(Exhibitor exhibitor);
 
-    @Mapping(target = "fullName", ignore = true)
+    @Mapping(target = "fullName",
+             ignore = true)
     Exhibitor toLightEntity(ExhibitorLightDTO exhibitor);
 }

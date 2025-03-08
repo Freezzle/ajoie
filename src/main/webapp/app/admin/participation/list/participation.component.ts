@@ -8,7 +8,9 @@ import { SortByDirective, SortDirective } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
-import { IInfoInvoice, IParticipation } from '../participation.model';
+import {
+  containsParticipationName, getFormattedParticipationName, IInfoInvoice, IParticipation,
+} from '../model/participation.interface';
 import { ParticipationService } from '../service/participation.service';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
@@ -16,10 +18,14 @@ import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import FilterComponent from '../../../shared/filter/filter.component';
 import { Status } from '../../enumerations/status.model';
-import { ParticipationFilterFormGroup, ParticipationFormService } from '../update/participation-form.service';
+import { ParticipationFilterFormGroup, ParticipationFormService } from '../service/participation-form.service';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { finalize } from 'rxjs/operators';
-import { containExhibitorName, getExhibitorName } from '../../exhibitor/exhibitor.model';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { LinkBoxComponent } from '../../../shared/components/link-box/link-box.component';
+import ItemCountComponent from '../../../shared/pagination/item-count.component';
+import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PaginationEvent } from '../../../shared/pagination/pagination-event.interface';
 
 @Component({
   standalone: true,
@@ -40,6 +46,10 @@ import { containExhibitorName, getExhibitorName } from '../../exhibitor/exhibito
     ColorBoolPipe,
     FilterComponent,
     ReactiveFormsModule,
+    ButtonBoxComponent,
+    LinkBoxComponent,
+    ItemCountComponent,
+    PaginationComponent,
   ],
 })
 export class ParticipationComponent implements OnInit {
@@ -49,6 +59,7 @@ export class ParticipationComponent implements OnInit {
   protected modalService = inject(NgbModal);
 
   participations: IParticipation[] = [];
+  participationsPaginated: IParticipation[] = [];
   isLoading = false;
   statusValues = Object.keys(Status);
   params: any;
@@ -58,7 +69,7 @@ export class ParticipationComponent implements OnInit {
 
   ngOnInit(): void {
     combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
-      ([params, data]) => {
+      ([params]) => {
         this.params = params;
 
         if (!this.participations || this.participations.length === 0) {
@@ -75,7 +86,7 @@ export class ParticipationComponent implements OnInit {
     });
     modalRef.componentInstance.translateKey = 'participation.delete.question';
     modalRef.componentInstance.translateValues = {
-      fullName: getExhibitorName(participation.exhibitor),
+      fullName: getFormattedParticipationName(participation),
     };
 
     modalRef.closed
@@ -105,7 +116,7 @@ export class ParticipationComponent implements OnInit {
         const fullNameFilter = this.filters.get('fullName')?.value;
         if (fullNameFilter && fullNameFilter.length > 0) {
           this.participations = this.participations?.filter((participation) =>
-            containExhibitorName(participation.exhibitor, fullNameFilter),
+            containsParticipationName(participation, fullNameFilter),
           );
         }
 
@@ -115,6 +126,8 @@ export class ParticipationComponent implements OnInit {
             participation.status?.includes(statusFilter),
           );
         }
+
+        this.refreshParticipations({ page: 1, pageSize: 10 });
       });
   }
 
@@ -142,5 +155,10 @@ export class ParticipationComponent implements OnInit {
 
   previousState(): void {
     window.history.back();
+  }
+
+  refreshParticipations(event: PaginationEvent): void {
+    this.participationsPaginated = this.participations.slice((event.page - 1) * event.pageSize,
+      (event.page - 1) * event.pageSize + event.pageSize);
   }
 }

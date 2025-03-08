@@ -1,17 +1,18 @@
 {
   "salon": {
-    "conferences": "Conférences",
+    "conferences": "Les conférences",
     "create": "Création d'un nouveau salon",
     "delete": {
       "question": "Êtes-vous certain de vouloir supprimer le salon \"{{id}}\" ?"
     },
-    "edit": "Détail d'un salon",
+    "edit": "Détail du salon",
     "endingDate": "Date de fin",
     "extraInformation": "Commentaire",
-    "floorPlan": "Plan de la salle",
+    "floorPlan": "Gestion de la salle",
     "notFound": "Aucun salon",
-    "participations": "Participations",
+    "participations": "Les participations",
     "place": "Nom du salon",
+    "planningVolunteers": "Planning des bénévoles",
     "priceConference": "Conférence",
     "priceMeal1": "Repas samedi midi",
     "priceMeal2": "Repas samedi soir",
@@ -19,7 +20,7 @@
     "priceSharingStand": "Co-exposant",
     "prices": "Configuration des prix",
     "referenceNumber": "N° de référence",
-    "stands": "Stands",
+    "stands": "Les stands",
     "startingDate": "Date de début",
     "statistiques": "Statistiques du salon",
     "stats": {
@@ -38,7 +39,6 @@
       "stands": "Stands",
       "title": "Statistiques"
     },
-    "title": "Les salons",
-    "volunteers": "Bénévoles"
+    "title": "Les salons"
   }
 }

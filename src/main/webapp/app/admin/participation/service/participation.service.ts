@@ -6,7 +6,11 @@ import dayjs from 'dayjs/esm';
 
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { IInfoInvoice, IInvoicingPlan, IParticipation, NewParticipation } from '../participation.model';
+import {
+  getFormattedParticipationName, IInfoInvoice, IParticipation, NewParticipation,
+} from '../model/participation.interface';
+import { removeAccents } from '../../../shared/utils/string.util';
+import { IInvoicingPlan } from '../model/invoicing-plan.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ParticipationService {
@@ -25,7 +29,7 @@ export class ParticipationService {
   update(participation: IParticipation): Observable<HttpResponse<IParticipation>> {
     const copy = this.convertDateFromClient(participation);
     return this.http
-      .put<IParticipation>(`${this.resourceUrl}/${this.getParticipationIdentifier(participation)}`, copy,
+      .put<IParticipation>(`${this.resourceUrl}/${getParticipationIdentifier(participation)}`, copy,
         { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
@@ -65,14 +69,6 @@ export class ParticipationService {
     return this.http.get<any[]>(`${this.resourceUrl}/${idParticipation}/events`, { observe: 'response' });
   }
 
-  getParticipationIdentifier(participation: Pick<IParticipation, 'id'>): string {
-    return participation.id;
-  }
-
-  compareParticipation(o1: Pick<IParticipation, 'id'> | null, o2: Pick<IParticipation, 'id'> | null): boolean {
-    return o1 && o2 ? this.getParticipationIdentifier(o1) === this.getParticipationIdentifier(o2) : o1 === o2;
-  }
-
   addParticipationsOptionsIfMissing<Type extends Pick<IParticipation, 'id'>>(
     participationCollection: Type[],
     ...participationsToCheck: (Type | null | undefined)[]
@@ -80,10 +76,10 @@ export class ParticipationService {
     const participations: Type[] = participationsToCheck.filter(isPresent);
     if (participations.length > 0) {
       const participationCollectionIdentifiers = participationCollection.map(participationItem =>
-        this.getParticipationIdentifier(participationItem),
+        getParticipationIdentifier(participationItem),
       );
       const participationsToAdd = participations.filter(participationItem => {
-        const participationIdentifier = this.getParticipationIdentifier(participationItem);
+        const participationIdentifier = getParticipationIdentifier(participationItem);
         if (participationCollectionIdentifiers.includes(participationIdentifier)) {
           return false;
         }
@@ -121,4 +117,17 @@ export class ParticipationService {
                         undefined,
     };
   }
+}
+
+export function getParticipationIdentifier(participation: Pick<IParticipation, 'id'>): string {
+  return participation.id;
+}
+
+export function compareParticipation(o1: Pick<IParticipation, 'id'> | null,
+                                     o2: Pick<IParticipation, 'id'> | null): boolean {
+  return o1 && o2 ? getParticipationIdentifier(o1) === getParticipationIdentifier(o2) : o1 === o2;
+}
+
+export function formatterParticipation(participation: IParticipation): string {
+  return removeAccents(getFormattedParticipationName(participation));
 }

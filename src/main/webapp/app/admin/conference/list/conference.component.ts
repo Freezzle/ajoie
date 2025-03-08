@@ -7,15 +7,21 @@ import SharedModule from 'app/shared/shared.module';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
-import { IConference } from '../conference.model';
+import { IConference } from '../model/conference.interface';
 import { ConferenceService } from '../service/conference.service';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import { Status } from '../../enumerations/status.model';
-import { ConferenceFilterFormGroup, ConferenceFormService } from '../update/conference-form.service';
+import { ConferenceFilterFormGroup, ConferenceFormService } from '../service/conference-form.service';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { finalize } from 'rxjs/operators';
-import { containExhibitorName, getExhibitorName } from '../../exhibitor/exhibitor.model';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { LinkBoxComponent } from '../../../shared/components/link-box/link-box.component';
+import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PaginationEvent } from '../../../shared/pagination/pagination-event.interface';
+import {
+  containsParticipationName, getFormattedParticipationName,
+} from '../../participation/model/participation.interface';
 
 @Component({
   standalone: true,
@@ -31,6 +37,9 @@ import { containExhibitorName, getExhibitorName } from '../../exhibitor/exhibito
     StatusPipe,
     ColorStatusPipe,
     ReactiveFormsModule,
+    ButtonBoxComponent,
+    LinkBoxComponent,
+    PaginationComponent,
   ],
 })
 export class ConferenceComponent implements OnInit {
@@ -39,7 +48,8 @@ export class ConferenceComponent implements OnInit {
   protected conferenceService = inject(ConferenceService);
   protected conferenceFormService = inject(ConferenceFormService);
 
-  conferences?: IConference[] = [];
+  conferences: IConference[] = [];
+  conferencesPaginated: IConference[] = [];
   isLoading = false;
   params: any;
   statusValues = Object.keys(Status);
@@ -91,12 +101,12 @@ export class ConferenceComponent implements OnInit {
       .query(queryObject)
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe((result) => {
-        this.conferences = result.body ?? [];
+        this.conferences = result ?? [];
 
         const fullNameFilter = this.filters.get('fullName')?.value;
         if (fullNameFilter && fullNameFilter.length > 0) {
           this.conferences = this.conferences?.filter((conference) =>
-            containExhibitorName(conference.participation?.exhibitor, fullNameFilter),
+            containsParticipationName(conference.participation, fullNameFilter),
           );
         }
 
@@ -106,6 +116,8 @@ export class ConferenceComponent implements OnInit {
             conference.status?.includes(statusFilter),
           );
         }
+
+        this.refreshConferences({ page: 1, pageSize: 10 });
       });
   }
 
@@ -118,5 +130,10 @@ export class ConferenceComponent implements OnInit {
     window.history.back();
   }
 
-  protected readonly getExhibitorName = getExhibitorName;
+  refreshConferences(event: PaginationEvent): void {
+    this.conferencesPaginated = this.conferences.slice((event.page - 1) * event.pageSize,
+      (event.page - 1) * event.pageSize + event.pageSize);
+  }
+
+  protected readonly getFormattedParticipationName = getFormattedParticipationName;
 }

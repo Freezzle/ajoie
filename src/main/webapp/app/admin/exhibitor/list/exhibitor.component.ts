@@ -8,11 +8,15 @@ import { SortByDirective, SortDirective, SortService, type SortState, sortStateS
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
-import { containExhibitorName, getExhibitorName, IExhibitor } from '../exhibitor.model';
+import { containsExhibitorName, getFirstExhibitorName, IExhibitor } from '../model/exhibitor.interface';
 import { ExhibitorService } from '../service/exhibitor.service';
-import { ExhibitorFilterFormGroup, ExhibitorFormService } from '../update/exhibitor-form.service';
+import { ExhibitorFilterFormGroup, ExhibitorFormService } from '../service/exhibitor-form.service';
 import { DeleteDialogComponent } from '../../../shared/delete-dialog/delete-dialog.component';
 import { finalize } from 'rxjs/operators';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { LinkBoxComponent } from '../../../shared/components/link-box/link-box.component';
+import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PaginationEvent } from '../../../shared/pagination/pagination-event.interface';
 
 @Component({
   standalone: true,
@@ -28,6 +32,9 @@ import { finalize } from 'rxjs/operators';
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
     ReactiveFormsModule,
+    ButtonBoxComponent,
+    LinkBoxComponent,
+    PaginationComponent,
   ],
 })
 export class ExhibitorComponent implements OnInit {
@@ -42,7 +49,8 @@ export class ExhibitorComponent implements OnInit {
   sortState = sortStateSignal({});
 
   isLoading = false;
-  exhibitors?: IExhibitor[] = [];
+  exhibitors: IExhibitor[] = [];
+  exhibitorsPaginated: IExhibitor[] = [];
   filters: FormGroup<ExhibitorFilterFormGroup> = this.exhibitorFormService.createFilterFormGroup();
 
   ngOnInit(): void {
@@ -64,7 +72,7 @@ export class ExhibitorComponent implements OnInit {
       backdrop: 'static',
     });
     modalRef.componentInstance.translateKey = 'exhibitor.delete.question';
-    modalRef.componentInstance.translateValues = { id: getExhibitorName(exhibitor) };
+    modalRef.componentInstance.translateValues = { id: getFirstExhibitorName(exhibitor) };
 
     modalRef.closed
       .pipe(
@@ -96,7 +104,7 @@ export class ExhibitorComponent implements OnInit {
         const fullNameFilter = this.filters.get('fullName')?.value;
         if (fullNameFilter && fullNameFilter.length > 0) {
           this.exhibitors = this.exhibitors?.filter((exhibitor) =>
-            containExhibitorName(exhibitor, fullNameFilter),
+            containsExhibitorName(exhibitor, fullNameFilter),
           );
         }
 
@@ -106,6 +114,8 @@ export class ExhibitorComponent implements OnInit {
             exhibitor.email?.includes(emailFilter),
           );
         }
+
+        this.refreshExhibitors({ page: 1, pageSize: 10 });
       });
   }
 
@@ -140,5 +150,10 @@ export class ExhibitorComponent implements OnInit {
   protected sorting(data: IExhibitor[]): IExhibitor[] {
     const { predicate, order } = this.sortState();
     return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
+  }
+
+  refreshExhibitors(event: PaginationEvent): void {
+    this.exhibitorsPaginated = this.exhibitors.slice((event.page - 1) * event.pageSize,
+      (event.page - 1) * event.pageSize + event.pageSize);
   }
 }

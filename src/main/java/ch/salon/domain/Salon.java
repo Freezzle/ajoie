@@ -29,32 +29,56 @@ public class Salon implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue @Column(name = "id") private UUID id;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private UUID id;
 
-    @Column(length = 10) private String referenceNumber;
+    @Column(length = 10)
+    private String referenceNumber;
 
-    @NotNull @Column(name = "place", nullable = false) private String place;
+    @NotNull
+    @Column(name = "place",
+            nullable = false)
+    private String place;
 
-    @NotNull @Column(name = "starting_date", nullable = false) private Instant startingDate;
+    @NotNull
+    @Column(name = "starting_date",
+            nullable = false)
+    private Instant startingDate;
 
-    @NotNull @Column(name = "ending_date", nullable = false) private Instant endingDate;
+    @NotNull
+    @Column(name = "ending_date",
+            nullable = false)
+    private Instant endingDate;
 
-    @Column(name = "price_meal_1") private Double priceMeal1;
+    @Column(name = "price_meal_1")
+    private Double priceMeal1;
 
-    @Column(name = "price_meal_2") private Double priceMeal2;
+    @Column(name = "price_meal_2")
+    private Double priceMeal2;
 
-    @Column(name = "price_meal_3") private Double priceMeal3;
+    @Column(name = "price_meal_3")
+    private Double priceMeal3;
 
-    @Column(name = "price_conference") private Double priceConference;
+    @Column(name = "price_conference")
+    private Double priceConference;
 
-    @Column(name = "price_sharing_stand") private Double priceSharingStand;
+    @Column(name = "price_sharing_stand")
+    private Double priceSharingStand;
 
-    @Column(name = "extra_information") private String extraInformation;
+    @Column(name = "extra_information")
+    private String extraInformation;
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL,
-               targetEntity = PriceStandSalon.class) @JoinColumn(name = "salon_id", referencedColumnName = "id")
-    @JsonIgnoreProperties(value = {"dimension"}, allowSetters = true) private Set<PriceStandSalon> priceStandSalons =
-            new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER,
+               orphanRemoval = true,
+               cascade = CascadeType.ALL,
+               targetEntity = PriceStandSalon.class)
+    @JoinColumn(name = "salon_id",
+                referencedColumnName = "id")
+    @JsonIgnoreProperties(value = {"dimension"},
+                          allowSetters = true)
+    private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
 
     public UUID getId() {
         return this.id;
@@ -82,10 +106,10 @@ public class Salon implements Serializable {
 
     public static boolean hasPriceStandChanged(Set<PriceStandSalon> oldPrices, Set<PriceStandSalon> newPrices) {
         Map<UUID, PriceStandSalon> oldPriceMap =
-                oldPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+            oldPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
 
         Map<UUID, PriceStandSalon> newPriceMap =
-                newPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+            newPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
 
         // Vérification des éléments manquants et des changements de prix
         for (UUID id : oldPriceMap.keySet()) {
@@ -248,6 +272,15 @@ public class Salon implements Serializable {
     public Salon removePriceStandSalon(PriceStandSalon priceStandSalon) {
         this.priceStandSalons.remove(priceStandSalon);
         return this;
+    }
+
+    public Double getPriceStand(DimensionStand dimension) {
+        return this.getPriceStandSalons()
+                   .stream()
+                   .filter(priceStand -> priceStand.getDimension().getId().equals(dimension.getId()))
+                   .map(PriceStandSalon::getPrice)
+                   .findFirst()
+                   .orElse(null);
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -39,7 +39,8 @@ public class AuthorityResource {
     private static final String ENTITY_NAME = "authority";
     private final AuthorityRepository authorityRepository;
 
-    @Value("${jhipster.clientApp.name}") private String applicationName;
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     public AuthorityResource(AuthorityRepository authorityRepository) {
         this.authorityRepository = authorityRepository;
@@ -48,7 +49,7 @@ public class AuthorityResource {
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Authority> createAuthority(
-            @Valid @RequestBody Authority authority) throws URISyntaxException {
+        @Valid @RequestBody Authority authority) throws URISyntaxException {
         log.debug("REST request to save Authority : {}", authority);
 
         if (authorityRepository.existsById(authority.getName())) {
@@ -57,7 +58,7 @@ public class AuthorityResource {
 
         authority = authorityRepository.save(authority);
         return created(new URI("/api/authorities/" + authority.getName())).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, authority.getName())).body(authority);
+            createEntityCreationAlert(applicationName, true, ENTITY_NAME, authority.getName())).body(authority);
     }
 
     @GetMapping("")

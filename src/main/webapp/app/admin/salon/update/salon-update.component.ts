@@ -1,13 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
+
+import { combineLatest, of } from 'rxjs';
 
 import SharedModule from 'app/shared/shared.module';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IPriceStandSalon, ISalon, sortPriceStandSalon } from '../salon.model';
+import { ISalon } from '../model/salon.interface';
 import { SalonService } from '../service/salon.service';
-import { SalonFormGroup, SalonFormService } from './salon-form.service';
+import { SalonFormGroup, SalonFormService } from '../service/salon-form.service';
 import { DimensionStandService } from '../../dimension-stand/service/dimension-stand.service';
 import { ErrorModel } from '../../../shared/field-error/error.model';
 import { FieldErrorComponent } from '../../../shared/field-error/field-error.component';
@@ -16,6 +18,13 @@ import { Status } from '../../enumerations/status.model';
 import ColorLockBooleanPipe from '../../../shared/pipe/color-lock-boolean.pipe';
 import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
+import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { TextBoxComponent } from '../../../shared/components/text-box/text-box.component';
+import { TextareaBoxComponent } from '../../../shared/components/textarea-box/textarea-box.component';
+import { DateBoxComponent } from '../../../shared/components/date-box/date-box.component';
+import { LinkBoxComponent } from '../../../shared/components/link-box/link-box.component';
+import { NumberBoxComponent } from '../../../shared/components/number-box/number-box.component';
+import { IPriceStandSalon, sortPriceStandSalon } from '../model/price-stand-salon.interface';
 
 @Component({
   standalone: true,
@@ -30,6 +39,12 @@ import LockBooleanPipe from '../../../shared/pipe/lock-boolean.pipe';
     ColorLockBooleanPipe,
     FormatMediumDatePipe,
     LockBooleanPipe,
+    ButtonBoxComponent,
+    TextBoxComponent,
+    TextareaBoxComponent,
+    DateBoxComponent,
+    LinkBoxComponent,
+    NumberBoxComponent,
   ],
 })
 export class SalonUpdateComponent implements OnInit {
@@ -38,60 +53,61 @@ export class SalonUpdateComponent implements OnInit {
   protected dimensionStandService = inject(DimensionStandService);
   protected activatedRoute = inject(ActivatedRoute);
 
-  isSaving = false;
-  salon: ISalon | null = null;
-  readonlyForm = false;
+  isLoading = false;
+  initialSalon: ISalon | null = null;
+  isReadOnly = true;
   editForm: FormGroup<SalonFormGroup> = this.salonFormService.createSalonFormGroup({ id: null });
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(({ salon, readonly }) => {
-      this.salon = salon as ISalon;
-      this.readonlyForm = readonly;
+    this.activateReadOnlyMode(false);
 
-      this.dimensionStandService.query().subscribe((dimensions) => {
-        if (!this.salon) {
-          this.salon = {} as ISalon;
-        }
+    combineLatest([this.activatedRoute.data])
+      .pipe(
+        switchMap(([data]) => {
+          this.initialSalon = data['salon'] as ISalon;
+          this.isReadOnly = data['readonly'];
 
-        if (dimensions.body) {
-          if (!this.salon.priceStandSalons) {
-            this.salon.priceStandSalons = [];
-          }
+          return this.dimensionStandService.query().pipe(
+            catchError(() => of([])),
+          );
+        }),
+      )
+      .subscribe((dimensions) => {
+        this.processSalonData(dimensions ?? []);
 
-          dimensions.body.forEach((dimensionParam) => {
-            if (
-              !this.salon?.priceStandSalons
-                ?.map((priceStand) => priceStand.dimension?.id)
-                .includes(dimensionParam.id)
-            ) {
-              this.salon?.priceStandSalons?.push({
-                price: null,
-                dimension: dimensionParam,
-              } as IPriceStandSalon);
-            }
-          });
-        }
+        this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon!);
 
-        sortPriceStandSalon(this.salon.priceStandSalons ?? []);
-
-        this.editForm = this.salonFormService.createSalonFormGroup(this.salon);
-
-        if (this.readonlyForm) {
-          this.readOnlyBack();
-        } else {
-          this.writeBack();
-        }
+        this.isReadOnly ? this.activateReadOnlyMode() : this.activateEditMode();
       });
-    });
   }
 
-  readOnlyBack(): void {
-    this.readonlyForm = true;
+  private processSalonData(dimensions: any[]): void {
+    if (!this.initialSalon) {
+      this.initialSalon = {} as ISalon;
+      this.initialSalon.priceStandSalons = [];
+    }
+
+    const existingIds = new Set(this.initialSalon.priceStandSalons?.map(ps => ps.dimension?.id) ?? []);
+
+    this.initialSalon.priceStandSalons = [
+      ...(this.initialSalon.priceStandSalons ?? []),
+      ...dimensions.filter(dim => !existingIds.has(dim.id))
+        .map(dim => ({ price: null, dimension: dim } as IPriceStandSalon)),
+    ];
+
+    sortPriceStandSalon(this.initialSalon.priceStandSalons);
+  }
+
+  activateReadOnlyMode(reset: boolean = true): void {
+    this.isReadOnly = true;
+    if (reset) {
+      this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon!);
+    }
     this.editForm.disable();
   }
 
-  writeBack(): void {
-    this.readonlyForm = false;
+  activateEditMode(): void {
+    this.isReadOnly = false;
     this.editForm.enable();
   }
 
@@ -100,40 +116,19 @@ export class SalonUpdateComponent implements OnInit {
   }
 
   save(): void {
-    this.isSaving = true;
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+    this.isLoading = true;
 
     const salon = this.salonFormService.getSalon(this.editForm);
-    if (salon.id !== null) {
-      this.salonService
-        .update(salon)
-        .pipe(finalize(() => (this.isSaving = false)))
-        .subscribe(() => {
-          this.previousState();
-        });
-    } else {
-      this.salonService
-        .create(salon)
-        .pipe(finalize(() => (this.isSaving = false)))
-        .subscribe(() => {
-          this.previousState();
-        });
-    }
-  }
 
-  get getPlace(): FormControl {
-    return this.editForm.get('place') as FormControl;
-  }
+    const saveOperation = salon.id != null
+                          ? this.salonService.update(salon)
+                          : this.salonService.create(salon);
 
-  get getReferenceNumber(): FormControl {
-    return this.editForm.get('referenceNumber') as FormControl;
-  }
-
-  get getStartingDate(): FormControl {
-    return this.editForm.get('startingDate') as FormControl;
-  }
-
-  get getEndingDate(): FormControl {
-    return this.editForm.get('endingDate') as FormControl;
+    saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
   }
 
   protected readonly ErrorModel = ErrorModel;

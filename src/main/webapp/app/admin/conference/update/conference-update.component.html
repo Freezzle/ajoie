@@ -1,36 +1,42 @@
 <div>
   <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
     <h2 id="page-heading">
-      <span *ngIf="conference?.id" jhiTranslate="conference.edit">Modification d'une conférence</span>
-      <span *ngIf="!conference?.id" jhiTranslate="conference.create">Création d'une nouvelle conférence</span>
+      <div class="d-flex justify-content-center">
+        <span *ngIf="editForm.controls.id.value" jhiTranslate="conference.edit">Modification d'une conférence</span>
+        <span *ngIf="!editForm.controls.id.value" jhiTranslate="conference.create">Création d'une nouvelle conférence</span>
+      </div>
 
       <hr/>
 
       <div class="d-flex justify-content-between mt-3">
         <span>
-          <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-            <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-            <span jhiTranslate="common.back">Back</span>
-          </button>
+          <button-box (clickedEvent)="previousState()"
+                      [isDisabled]="isLoading"
+                      faIcon="arrow-left"
+                      translateKey="common.back"/>
         </span>
 
         <span>
-          <button (click)="writeBack()" *ngIf="readonlyForm" class="btn btn-primary btn-sm" id="edit-entity" type="button">
-            <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
-            <span jhiTranslate="common.edit">Edit</span>
-          </button>
+          <button-box (clickedEvent)="activateEditMode()"
+                      *ngIf="isReadOnly"
+                      [isDisabled]="isLoading"
+                      faIcon="pencil-alt"
+                      translateKey="common.edit"/>
 
-          <button (click)="readOnlyBack()" *ngIf="!readonlyForm && conference?.id" class="btn btn-secondary btn-sm" id="cancel-save" type="button">
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-            <span jhiTranslate="common.cancel">Cancel</span>
-          </button>
-          <button *ngIf="!readonlyForm" [disabled]="editForm.invalid || isSaving" class="btn btn-primary btn-sm" id="save-entity" type="submit">
-            <fa-icon [title]="'common.save' | translate" icon="floppy-disk"></fa-icon>
-            <span jhiTranslate="common.save">Save</span>
-          </button>
+          <button-box (clickedEvent)="activateReadOnlyMode()"
+                      *ngIf="editForm.controls.id.value && !isReadOnly"
+                      [isDisabled]="isLoading"
+                      faIcon="ban"
+                      translateKey="common.cancel"
+                      type="secondary"/>
+
+          <button-box *ngIf="!isReadOnly"
+                      [isDisabled]="editForm.invalid || isLoading"
+                      [isSubmit]="true"
+                      faIcon="floppy-disk"
+                      translateKey="common.save"/>
         </span>
       </div>
-      <hr/>
     </h2>
 
     <div>
@@ -41,50 +47,35 @@
         <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
         <div class="card-body">
           <div class="row">
-            <div class="col-sm-12 fw-bold align-content-center position-relative">
-              <label for="field_title" jhiTranslate="conference.titleField">Titre</label>
-              <textarea class="form-control" formControlName="title" id="field_title" name="title" rows="1"></textarea>
-
-              <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getTitle"></field-error>
+            <div class="mt-3 col-12">
+              <text-box fieldName="title" formControlName="title" translateKey="conference.titleField"/>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12 fw-bold align-content-center position-relative">
-              <label for="field_description" jhiTranslate="conference.description">Description</label>
-              <textarea class="form-control" formControlName="description" id="field_description" name="description" rows="6"></textarea>
-
-              <field-error [errors]="[ErrorModel.required(), ErrorModel.maxlength(500)]" [formControlElement]="getDescription"></field-error>
+            <div class="mt-3 col-12">
+              <textarea-box [rows]="6"
+                            [showCounter]="true"
+                            [maxLength]="500"
+                            fieldName="description" formControlName="description" translateKey="conference.description"/>
             </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-6 fw-bold align-content-center position-relative">
-              <label for="field_participation" jhiTranslate="conference.participation">Participation</label>
-              <select [compareWith]="compareParticipation" class="form-control" formControlName="participation" id="field_participation" name="participation">
-                @for (participationOption of participationsOptions; track $index) {
-                  <option [ngValue]="participationOption">{{
-                      getFormattedExhibitorName(participationOption.exhibitor)
-                    }}
-                  </option>
-                }
-              </select>
-
-              <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getParticipation"></field-error>
+            <div class="mt-3 col-lg-6">
+              <typeahead-box [formatterFunction]="formatterParticipation"
+                             [options]="participationsOptions"
+                             fieldName="participation"
+                             formControlName="participation"
+                             translateKey="conference.participation"/>
             </div>
-            <div class="col-sm-6 fw-bold align-content-center position-relative">
-              <label for="field_status" jhiTranslate="conference.status.label">Status</label>
-              <select class="form-control" formControlName="status" id="field_status" name="status">
-                @for (status of statusValues; track $index) {
-                  <option [value]="status">{{ 'conference.status.list.' + status | translate }}</option>
-                }
-              </select>
-
-              <field-error [errors]="[ErrorModel.required()]" [formControlElement]="getStatus"></field-error>
+            <div class="mt-3 col-lg-6">
+              <select-box [formatterFunction]="formatterStatus"
+                          [options]="statusValues"
+                          [needTranslation]="true"
+                          fieldName="status"
+                          formControlName="status"
+                          translateKey="conference.status.label"/>
             </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-sm-12 fw-bold align-content-center">
-              <label for="field_extraInformation" jhiTranslate="conference.extraInformation">Extra Information</label>
-              <textarea class="form-control" formControlName="extraInformation" id="field_extraInformation" name="extraInformation" rows="3"></textarea>
+            <div class="mt-3 col-12">
+              <textarea-box [rows]="3"
+                            fieldName="extraInformation"
+                            formControlName="extraInformation"
+                            translateKey="conference.extraInformation"/>
             </div>
           </div>
         </div>

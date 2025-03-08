@@ -42,6 +42,8 @@
     },
     "title": "Les stands",
     "urlPicture": "Url de l'image",
+    "viewClipboard": "Liste technique",
+    "viewStandard": "Vue standard",
     "website": "Site internet"
   }
 }

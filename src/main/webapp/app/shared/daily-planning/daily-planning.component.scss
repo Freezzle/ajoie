@@ -1,140 +1,60 @@
-@import 'content/scss/global';
+@import 'content/scss/bootstrap-variables';
 
-/* Conteneur principal */
-.planner {
-  display: table;
-  width: 70%;
-  border-collapse: collapse; /* Supprimer l'espace entre les cellules */
-  table-layout: fixed; /* Assure que toutes les colonnes aient une largeur égale */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 0.25em 0.5em;
 }
 
-.full-width-line {
-  display: table-row;
-  width: 100%;
-  text-align: center;
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .grid {
+    font-size: 0.85rem;
+  }
 }
 
-/* En-tête de la grille */
+.grid {
+  display: grid;
+}
+
 .header {
-  display: table-row;
-  font-weight: bold;
-  background-color: $primary; /* Couleur de fond pour l'en-tête */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25em 0.5em;
+}
+
+.unavailable-time {
+  background-color: #cccccc;
   color: white;
 }
 
-.header .header-cell {
-  display: table-cell;
-  padding: 5px;
-  text-align: center;
-  border: 1px solid $primary;
-}
-
-/* Contenu de chaque ligne (pour chaque bénévole) */
-.row {
-  display: table-row;
-}
-
-.row .cell {
-  display: table-cell;
-  padding: 0;
-  text-align: center;
-  border: 1px solid #666666;
-  vertical-align: middle; /* Centrage vertical des cellules */
-}
-
-/* Pour l'affichage des événements (à l'intérieur des cellules) */
-.event {
+.slot {
   display: flex;
-  justify-content: space-between;
-  border: 1px solid transparent;
   align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255);
 }
 
-.read-event {
-  color: $black;
-  border: 1px solid transparent;
-  height: 100%;
+.slot:not(.unavailable-time) {
+  user-select: none;
+  color: white;
+
+  &:hover {
+    color: black;
+    cursor: pointer;
+  }
 }
 
-.result-event {
-  color: $black;
-  border: 1px solid transparent;
-  height: 100%;
-}
-
-.empty-event {
-  border: 1px solid transparent;
-  height: 100%;
-}
-
-/* Bouton de addition dans les événements */
-.add-button {
-  position: relative;
-  background: $white;
-  color: #bbbbbb;
-  height: 100%;
-}
-
-.add-button:hover {
-  position: relative;
-  background: lightgray;
-  color: $primary;
-}
-
-/* Bouton de suppression dans les événements */
-.delete-button {
-  position: relative;
-  color: $black;
-  width: 50%;
-  top: 0;
-  right: 0;
-}
-
-.delete-button:hover {
-  color: $danger;
-  background: white;
-}
-
-/* Bouton de modification dans les événements */
-.edit-button {
-  position: relative;
-  color: $black;
-  width: 50%;
-  top: 0;
-  left: 0;
-}
-
-.edit-button:hover {
-  color: $primary;
-  background: white;
-}
-
-.unusable {
-  background-color: #666666; /* Couleur de fond */
-  background-image: radial-gradient(black 10%, transparent 20%); /* Création des points */
-  background-size: 0.4rem 0.4rem; /* Taille des points */
-}
-
-.event-first {
-  background-color: #a1d6b2;
-}
-
-.event-second {
-  background-color: #cedf9f;
-}
-
-.event-third {
-  background-color: #f1f3c2;
-}
-
-.event-fourth {
-  background-color: #e8b86d;
-}
-
-.event-fifth {
-  background-color: #ef9c66;
-}
-
-.event-sixth {
-  background-color: #f5bcc5;
+.content-slot {
+  width: 100%;
+  height: auto;
+  padding: 0.5em;
+  text-align: center;
 }

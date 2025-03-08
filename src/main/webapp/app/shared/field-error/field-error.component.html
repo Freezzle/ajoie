@@ -1,7 +1,4 @@
-@if (formControlElement() &&
-formControlElement().errors &&
-formControlElement().invalid &&
-(formControlElement().dirty || formControlElement().touched)) {
+@if (formControlElement() && formControlElement().errors && formControlElement().invalid && (formControlElement().dirty || formControlElement().touched)) {
   <div class="invalid-tooltip">
     @for (error of errors(); track $index) {
       @if (error.errorKey && formControlElement().errors?.[error.errorKey]) {

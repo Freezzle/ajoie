@@ -22,7 +22,8 @@ public class DimensionStandResource {
     private static final Logger log = LoggerFactory.getLogger(DimensionStandResource.class);
     private final DimensionStandService dimensionStandService;
 
-    @Value("${jhipster.clientApp.name}") private String applicationName;
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
 
     public DimensionStandResource(DimensionStandService dimensionStandService) {
         this.dimensionStandService = dimensionStandService;

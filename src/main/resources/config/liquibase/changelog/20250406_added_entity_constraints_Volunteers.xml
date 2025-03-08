@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250406-1" author="freezzle">
+        <addUniqueConstraint columnNames="volunteer_id, time_slot_id" constraintName="uc_volunteer_slot_date"
+                             tableName="volunteer_availability"/>
+
+        <addForeignKeyConstraint baseColumnNames="volunteer_id"
+                                 baseTableName="volunteer_availability"
+                                 constraintName="fk_volunteer_availability_volunteer"
+                                 referencedColumnNames="id"
+                                 referencedTableName="volunteer"
+        />
+
+        <addForeignKeyConstraint baseColumnNames="time_slot_id"
+                                 baseTableName="volunteer_availability"
+                                 constraintName="fk_volunteer_availability_timeslot"
+                                 referencedColumnNames="id"
+                                 referencedTableName="time_slot"
+        />
+    </changeSet>
+
+    <changeSet id="20250406-2" author="freezzle">
+        <addForeignKeyConstraint baseColumnNames="salon_id"
+                                 baseTableName="time_slot"
+                                 constraintName="fk_timeslot_salon"
+                                 referencedColumnNames="id"
+                                 referencedTableName="salon"
+        />
+    </changeSet>
+</databaseChangeLog>

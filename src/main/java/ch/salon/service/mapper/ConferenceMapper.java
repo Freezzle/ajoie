@@ -8,7 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {ParticipationMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = {ParticipationMapper.class},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ConferenceMapper {
     ConferenceMapper INSTANCE = Mappers.getMapper(ConferenceMapper.class);
 
@@ -18,6 +19,7 @@ public interface ConferenceMapper {
 
     ConferenceLightDTO toLightDto(Conference conference);
 
-    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "title",
+             ignore = true)
     Conference toLightEntity(ConferenceLightDTO conference);
 }

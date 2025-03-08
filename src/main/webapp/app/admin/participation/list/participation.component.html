@@ -1,20 +1,25 @@
 <div>
   <h2 id="page-heading">
-    <span jhiTranslate="participation.title">Les participations</span>
-
+    <div class="d-flex justify-content-center">
+      <span jhiTranslate="participation.title">Les participations</span>
+    </div>
     <hr/>
 
     <div class="d-flex justify-content-between mt-3">
       <span>
-        <button (click)="previousState()" class="btn btn-primary btn-sm" type="button">
-          <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-          <span jhiTranslate="common.back">Back</span>
-        </button>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
       </span>
 
       <span [formGroup]="filters" class="row">
         <div class="col-auto">
-          <input (blur)="actionFilter()" [placeholder]="'exhibitor.filter.fullName' | translate" class="form-control" formControlName="fullName" type="text"/>
+          <input (blur)="actionFilter()"
+                 [placeholder]="'exhibitor.filter.fullName' | translate"
+                 class="form-control"
+                 formControlName="fullName"
+                 type="text"/>
         </div>
         <div class="col-auto">
           <select (change)="actionFilter()" class="form-control" formControlName="status">
@@ -27,19 +32,18 @@
       </span>
 
       <span>
-        <button (click)="refresh()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
+        <button-box (clickedEvent)="refresh()"
+                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [isDisabled]="isLoading"
+                    faIcon="sync"
+                    translateKey="common.refresh"/>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
+        <link-box [isDisabled]="isLoading" [links]="['./new']"
+                  faIcon="plus"
+                  translateKey="common.create"
+                  type="success"/>
       </span>
     </div>
-
-    <hr/>
   </h2>
 
   <div class="table-responsive table-entities" id="entities">
@@ -47,16 +51,19 @@
       <thead class="thead-primary">
         <tr>
           <th class="col-auto">
+            <span jhiTranslate="exhibitor.fullName">Nom complet</span>
+          </th>
+          <th class="col-auto">
             <span jhiTranslate="exhibitor.therapistName">Nom de thérapeute</span>
           </th>
           <th class="col-auto">
-            <span jhiTranslate="exhibitor.fullName">Nom complet</span>
+            <span>Commentaire</span>
           </th>
           <th class="col-1 text-center">
             <span jhiTranslate="participation.registrationDate">Date d'inscription</span>
           </th>
           <th class="col-auto text-center">
-            <span jhiTranslate="participation.needArrangment">Avec arrangement ?</span>
+            <span jhiTranslate="participation.needArrangement">Avec arrangement ?</span>
           </th>
           <th class="col-auto text-center">
             <span jhiTranslate="participation.status.label">Statut</span>
@@ -75,48 +82,55 @@
             </td>
           </tr>
         } @else {
-          @for (participation of participations; track $index) {
+          @for (participation of participationsPaginated; track $index) {
             <tr>
-              <td>
+              <td class="go-detail" [routerLink]="['./', participation.id, 'view']">
                 @if (participation.exhibitor) {
-                  <a [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']">{{
-                      participation.exhibitor.therapistName
-                    }}</a>
+                  <a [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']"
+                     (click)="$event.stopPropagation()">
+                    {{ participation.exhibitor.fullName }}
+                  </a>
                 }
               </td>
               <td class="go-detail" [routerLink]="['./', participation.id, 'view']">
-                @if (participation.exhibitor) {
-                  {{ participation.exhibitor.fullName }}
-                  <fa-icon *ngIf="participation.crushOfHeart" icon="heart" class="red-icon"></fa-icon>
-                  <fa-icon *ngIf="participation.guestOfHonor" icon="star" class="orange-icon"></fa-icon>
-                }
+                {{ participation.therapistName }}
+                <fa-icon *ngIf="participation.crushOfHeart" icon="heart" class="red-icon"></fa-icon>
+                <fa-icon *ngIf="participation.guestOfHonor" icon="star" class="orange-icon"></fa-icon>
+              </td>
+              <td class="go-detail" [routerLink]="['./', participation.id, 'view']">
+                <fa-icon *ngIf="participation.extraInformation" icon="note-sticky" class="orange-icon" [title]="participation.extraInformation"/>
               </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 {{ participation.registrationDate | formatMediumDate }}
               </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                @if (participation.needArrangment) {
-                  <fa-icon icon="triangle-exclamation" class="orange-icon"></fa-icon>
-                } @else {
-                  &nbsp;
-                }
+                <fa-icon *ngIf="participation.needArrangement" icon="handshake-simple" class="red-icon"></fa-icon>
               </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                <fa-icon [icon]="participation.status | status" [class]="participation.status | colorStatus" [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
+                <fa-icon [icon]="participation.status | status"
+                         [class]="participation.status | colorStatus"
+                         [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
               </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 <span *ngIf="getInfoInvoice(participation.id) | async as infoInvoice">
-                  <fa-icon *ngIf="infoInvoice.hasDraftInvoices" icon="sheet-plastic" [title]="'invoicingPlan.drafts' | translate" class="blue-icon"></fa-icon>
-                  <fa-icon *ngIf="infoInvoice.hasWaitingInvoices" icon="file-import" [title]="'invoicingPlan.waitingPayments' | translate" class="green-icon"></fa-icon>
-                  <fa-icon *ngIf="infoInvoice.hasExpiredInvoices" icon="clock" [title]="'invoicingPlan.expirations' | translate" class="red-icon"></fa-icon>
+                  <fa-icon *ngIf="infoInvoice.hasDraftInvoices"
+                           icon="sheet-plastic"
+                           [title]="'invoicingPlan.drafts' | translate"
+                           class="blue-icon"></fa-icon>
+                  <fa-icon *ngIf="infoInvoice.hasWaitingInvoices"
+                           icon="file-import"
+                           [title]="'invoicingPlan.waitingPayments' | translate"
+                           class="green-icon"></fa-icon>
+                  <fa-icon *ngIf="infoInvoice.hasExpiredInvoices"
+                           icon="clock"
+                           [title]="'invoicingPlan.expirations' | translate"
+                           class="red-icon"></fa-icon>
                 </span>
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <button type="button" (click)="delete(participation)" class="btn btn-danger btn-sm">
-                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                    <span jhiTranslate="common.delete"></span>
-                  </button>
+                  <button-box (clickedEvent)="delete(participation)" type="danger"
+                              [showText]="false" translateKey="common.delete" faIcon="times"/>
                 </div>
               </td>
             </tr>
@@ -125,4 +139,7 @@
       </tbody>
     </table>
   </div>
+
+  <jhi-pagination (pageChanged)="refreshParticipations($event)" [collectionSize]="participations.length"/>
+
 </div>

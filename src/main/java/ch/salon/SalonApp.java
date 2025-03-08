@@ -46,7 +46,7 @@ public class SalonApp {
 
     private static void logApplicationStartup(Environment env) {
         String protocol =
-                Optional.ofNullable(env.getProperty("server.ssl.key-store")).map(key -> "https").orElse("http");
+            Optional.ofNullable(env.getProperty("server.ssl.key-store")).map(key -> "https").orElse("http");
         String applicationName = env.getProperty("spring.application.name");
         String serverPort = env.getProperty("server.port");
         String contextPath = Optional.ofNullable(env.getProperty("server.servlet.context-path"))
@@ -59,7 +59,7 @@ public class SalonApp {
             log.warn("The host name could not be determined, using `localhost` as fallback");
         }
         log.info(CRLFLogConverter.CRLF_SAFE_MARKER, """
-                                                    
+
                                                     ----------------------------------------------------------
                                                     \tApplication '{}' is running! Access URLs:
                                                     \tLocal: \t\t{}://localhost:{}{}

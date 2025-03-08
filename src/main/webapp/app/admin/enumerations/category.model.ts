@@ -6,3 +6,7 @@ export enum Category {
   MISCELLANEOUS = 'MISCELLANEOUS',
   NONE = 'NONE',
 }
+
+export function formatterCategory(category: Category | null): string {
+  return 'stand.category.list.' + category ?? '';
+}

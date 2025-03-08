@@ -1,65 +1,52 @@
 <div class="row">
   <h2 id="page-heading">
-    <span jhiTranslate="salon.floorPlan">Plan de la salle</span>
+    <div class="d-flex justify-content-center">
+      <span jhiTranslate="salon.floorPlan">Plan de la salle</span>
+    </div>
 
     <hr/>
 
     <div class="d-flex justify-content-between mt-3">
       <span class="col-3">
         <button-box (clickedEvent)="previousState()"
-                    *ngIf="readonlyForm"
-                    [colorClass]="'btn-primary'"
-                    [faIcon]="'arrow-left'"
+                    *ngIf="isReadOnly"
                     [isDisabled]="isLoading"
-                    [translateKey]="'common.back'"/>
-      </span>
-
-      <span class="text-center col-6">
-        <link-box [colorClass]="'btn-warning'" [isDisabled]="isLoading" [links]="['../participations']" [translateKey]="'salon.participations'"/>
-        <link-box [colorClass]="'btn-warning'" [isDisabled]="isLoading" [links]="['../stands']" [translateKey]="'salon.stands'"/>
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
       </span>
 
       <span class="text-end col-3">
-        <button-box (clickedEvent)="writeBack()"
-                    *ngIf="readonlyForm"
-                    [colorClass]="'btn-primary'"
-                    [faIcon]="'pencil-alt'"
+        <button-box (clickedEvent)="activateEditMode()"
+                    *ngIf="isReadOnly"
                     [isDisabled]="isLoading"
-                    [translateKey]="'common.edit'"/>
+                    faIcon="pencil-alt"
+                    translateKey="common.edit"/>
 
-        <button-box (clickedEvent)="readOnlyBack()"
-                    *ngIf="!readonlyForm"
-                    [colorClass]="'btn-secondary'"
-                    [faIcon]="'ban'"
+        <button-box (clickedEvent)="activateReadOnlyMode()"
+                    *ngIf="!isReadOnly"
                     [isDisabled]="isLoading"
-                    [translateKey]="'common.cancel'"/>
+                    faIcon="ban"
+                    translateKey="common.cancel"
+                    type="secondary"/>
 
         <button-box (clickedEvent)="save()"
-                    *ngIf="!readonlyForm"
-                    [colorClass]="'btn-primary'"
-                    [faIcon]="'floppy-disk'"
+                    *ngIf="!isReadOnly"
                     [isDisabled]="isLoading"
                     [isSubmit]="true"
-                    [translateKey]="'common.save'"/>
+                    faIcon="floppy-disk"
+                    translateKey="common.save"/>
       </span>
     </div>
-    <hr/>
   </h2>
 
   <jhi-alert></jhi-alert>
 
   <div class="col-md-12 container">
-    <div class="row upper-grid-area d-flex">
+    <div class="row upper-grid-area">
 
       <!-- ############ HEADERS ############ -->
-
-      <div class="col-2 title-side-column">
-        <h3 style="margin:0;color:white;">Stand disponibles</h3>
-      </div>
-      <div class="col-8 text-center">
-
-        <!-- FLOOR PLANS -->
-        <span class="d-flex justify-content-center">
+      <div class="col-12">
+        <div class="d-flex justify-content-center">
           <ul class="nav nav-tabs" id="tabId" role="tablist">
             <li *ngFor="let floorPlan of this.floorPlans; let floorIndex = index" class="nav-item" role="presentation">
               <div class="btn-group">
@@ -71,7 +58,7 @@
                         type="button">
                   {{ floorPlan.name }}
                 </button>
-                <div *ngIf="!readonlyForm && this.indexActiveFloorPlan === floorIndex"
+                <div *ngIf="!isReadOnly && this.indexActiveFloorPlan === floorIndex"
                      class="btn-group {{ this.indexActiveFloorPlan === floorIndex ? 'active' : '' }}"
                      ngbDropdown
                      role="group">
@@ -89,71 +76,238 @@
                 </div>
               </div>
             </li>
-            <li *ngIf="!readonlyForm" class="nav-item" role="presentation">
+            <li *ngIf="!isReadOnly" class="nav-item" role="presentation">
               <button (click)="openAddDialog()" [class.disabled]="this.isLoading" class="nav-link" id="add-tab" role="tab" type="button">
                 +
               </button>
             </li>
           </ul>
-        </span>
-      </div>
-      <div class="col-2 title-side-column">
-        <h3 style="margin:0;color:white;">Dimensions</h3>
+        </div>
       </div>
 
-      <!-- ############ CONTENTS ############ -->
-
-      <div class="col-2 side-column">
-
-        <!-- AVAILABLE STANDS -->
-        <div class="row text-center stands-list">
-          <div *ngFor="let standRemaining of availableStands" [style.background-color]="getColorStand(standRemaining)" class="stand-item">
-            <span [title]="standRemaining.dimension?.dimension">
+      <!-- ############ PANELS ############ -->
+      <div *ngIf="!showDimensions && showAvailableStands" class="col-2 side-column">
+        <div class="text-center stands-list">
+          <div *ngFor="let standRemaining of availableStands" class="stand-item">
+            <div [style.background-color]="getColorStand(standRemaining)">
               {{ getFirstExhibitorName(standRemaining.participation?.exhibitor) }}
-            </span>
+            </div>
+            <div class="stand-description">
+              <div>{{ standRemaining.dimension?.dimension }}</div>
+              <div>{{ 'participation.status.list.' + standRemaining.participation?.status | translate }}</div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-8 main-column">
+      <div *ngIf="!showAvailableStands && showDimensions" class="col-2 side-column">
 
-        <!-- DRAWING PLACE -->
-        <div class="tab-content" id="tabContentId">
+        <button-box (clickedEvent)="changeRotationAvailableDimensions()"
+                    [showText]="false"
+                    faIcon="rotate"
+                    style="position: absolute;"
+                    translateKey="floorPlan.changeRotation"/>
+
+        <!-- DIMENSIONS -->
+        <div #shapesDropList
+             (cdkDropListDropped)="drop($event)"
+             [cdkDropListDisabled]="isReadOnly"
+             cdkDropList
+             cdkDropListSortingDisabled
+             class="row shapes-container">
+          <div (cdkDragMoved)="highlightCells($event)"
+               *ngFor="let dimension of availableDimensions"
+               [cdkDragData]="dimension"
+               [cdkDragDisabled]="isReadOnly"
+               cdkDrag
+               class="col-12 shape-container">
+            <div [class.disabled]="isReadOnly"
+                 [style.height.px]="dimension.rows * this.PIXELS"
+                 [style.width.px]="dimension.cols * this.PIXELS"
+                 cdkDragHandle
+                 class="draggable">
+              {{ dimension.dimension }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ############ DRAWING ############ -->
+      <div class="col-10 main-column">
+        <div class="drawing-area">
           <div class="content-around-drawing">
-            <table #gridDropList (cdkDropListDropped)="drop($event)" cdkDropList class="grid">
+            <div class="palette">
+              <div class="block-icon">
+                <fa-icon (click)="showAvailableStands = !showAvailableStands; showDimensions = false"
+                         [class]="showAvailableStands ? 'icon-active' : 'icon-inactive'"
+                         icon="person"
+                         style="cursor:pointer;"
+                />
+                <div *ngIf="!isReadOnly">
+                  <fa-icon (click)="showDimensions = !showDimensions; showAvailableStands = false"
+                           [class]="showDimensions ? 'icon-active' : 'icon-inactive'"
+                           icon="map-location-dot"
+                           style="cursor:pointer;"
+                  />
+                </div>
+                <hr/>
+              </div>
+              <div class="block-icon">
+                <div>
+                  <fa-icon (click)="changeHeader()"
+                           [class]="displayHeader ? 'icon-active' : 'icon-inactive'"
+                           icon="pager"
+                           style="cursor:pointer;"
+                  />
+                </div>
+
+                <div>
+                  <fa-icon (click)="changeTechnicalInfo()"
+                           [class]="displayTechnical ? 'icon-active' : 'icon-inactive'"
+                           [ngbTooltip]="'floorPlan.technicalInfo' | translate"
+                           [openDelay]="500"
+                           icon="circle-info"
+                           placement="start"
+                           style="cursor:pointer;"
+                  />
+                </div>
+                <hr/>
+              </div>
+              <div class="block-icon">
+                <fa-icon (click)="changeDisplayName()"
+                         [class]="displayFullname ? 'icon-active' : 'icon-inactive'"
+                         [ngbTooltip]="'floorPlan.displayName' | translate"
+                         [openDelay]="500"
+                         icon="signature"
+                         placement="start"
+                         style="cursor:pointer;"
+                />
+                <hr/>
+              </div>
+              <div *ngIf="!isReadOnly" class="block-icon">
+                <fa-icon (click)="changeAttributionMode()"
+                         [class]="isNumberAttribution.value ? 'icon-active' : 'icon-inactive'"
+                         [ngbTooltip]="'floorPlan.attributionMode' | translate"
+                         [openDelay]="500"
+                         icon="location-dot"
+                         placement="start"
+                         style="cursor:pointer;"
+                />
+                <input *ngIf="isNumberAttribution.value"
+                       [formControl]="nextPosition" [ngbTooltip]="'floorPlan.nextPosition' | translate"
+                       [openDelay]="500"
+                       placement="start"
+                       style="min-width:2em;width:2em;max-width:3em; border:1px dashed grey;text-align: center;"
+                />
+                <fa-icon (click)="changeAutoIncrement()"
+                         *ngIf="isNumberAttribution.value"
+                         [class]="automaticallyIncrementNumber.value ? 'icon-active' : 'icon-inactive'"
+                         [ngbTooltip]="'floorPlan.automaticallyIncrementNumber' | translate"
+                         [openDelay]="500"
+                         icon="wand-magic-sparkles"
+                         placement="start"
+                         style="cursor:pointer;"/>
+                <hr/>
+              </div>
+            </div>
+            <table #gridDropList cdkDropList class="grid">
               <tbody>
                 @if (!this.isLoading && this.getActiveFloorPlan()) {
-                  <tr *ngFor="let row of this.getActiveFloorPlan().cells; let rowIndex = index">
-                    <td (cdkDropListDropped)="cellDrop($event, rowIndex, colIndex)"
+                  <tr *ngFor="let row of this.getActiveFloorPlanData().cells; let rowIndex = index">
+                    <td (cdkDropListDropped)="drop($event)"
                         (contextmenu)="openContextMenu($event, rowIndex, colIndex)"
                         *ngFor="let cell of row; let colIndex = index"
                         [attr.data-shape-id]="cell.id"
                         [ngStyle]="{ 'background-color': cell.colorHighlight }"
                         cdkDropList
                         class="cell">
-                      <div *ngIf="cell.firstCell && cell.dimension"
-                           [style.background-color]="cell.dimension.color"
-                           [style.height.px]="cell.dimension.rows * PIXELS"
-                           [style.width.px]="cell.dimension.cols * PIXELS"
-                           [title]="cell.dimension.dimension"
+                      <div *ngIf="cell.dimension"
+                           [style.background-color]="cell.dimension!.color"
+                           [style.height.px]="cell.dimension!.rows * PIXELS"
+                           [style.width.px]="cell.dimension!.cols * PIXELS"
                            class="shape-fixed"
+                           cdkDrag
+                           (cdkDragStarted)="startDragging(cell)"
+                           (cdkDragEnded)="finishDragging(cell)"
+                           (cdkDragMoved)="highlightCells($event)"
+                           [style.cursor]="showDimensions ? 'move' : 'pointer'"
+                           [cdkDragDisabled]="isReadOnly || !showDimensions"
+                           [cdkDragData]="cell.dimension"
                            #popover="ngbPopover"
                            triggers="manual"
-                           (click)="togglePopover(popover, cell)"
+                           (click)="(!isReadOnly && isNumberAttribution.value) ? onClickNumberAttribution(cell) : togglePopover(popover, cell)"
                            [ngbPopover]="popoverContent"
                            popoverTitle="Détails du Stand"
                            [autoClose]="'outside'">
-                        <span *ngIf="!cell.dimension?.stand">
-                          {{ cell.dimension.dimension }}
-                        </span>
-                        <span *ngIf="cell.dimension?.stand">
-                          <ng-container *ngIf="cell.dimension.stand?.dimension?.id !== cell?.dimension?.idDimension">
-                            <fa-icon class="red-icon" icon="warning"></fa-icon>
-                            <br/>
-                          </ng-container>
-                          <ng-container *ngIf="cell.dimension.stand?.participation?.exhibitor?.fullName">
-                            {{ cell.dimension.stand?.participation?.exhibitor?.fullName }}
-                          </ng-container>
-                        </span>
+
+                        <div class="shape-inside" *ngIf="cell.dimension as dimension">
+                          <div class="business-info" *ngIf="!displayTechnical">
+                            <span *ngIf="!dimension.stand">
+                              {{ dimension.dimension }}
+                            </span>
+
+                            <div *ngIf="dimension.stand?.participation as participation">
+                              @if (displayFullname) {
+                                {{ participation.therapistName }}
+                              } @else {
+                                {{ getFirstExhibitorName(participation.exhibitor) }}
+                              }
+                            </div>
+                          </div>
+                          <div *ngIf="displayHeader" class="technical-header">
+                            <div class="technical-info-item">
+                              @if (dimension.stand && dimension.stand.dimension?.id !== dimension.idDimension) {
+                                <fa-icon [title]="'floorPlan.differentDimension' | translate"
+                                         class="red-icon" icon="warning"></fa-icon>
+                              }
+                            </div>
+
+                            <div class="technical-info-item">
+                              @if (dimension.stand?.participation; as participation) {
+                                <fa-icon [title]="'participation.status.list.' + participation.status | translate"
+                                         [icon]="participation.status | status"
+                                         [class]="participation.status | colorStatus"></fa-icon>
+                              }
+                            </div>
+
+                            <div class="technical-info-item">
+                              @if (dimension.position; as position) {
+                                <span [title]="'stand.position' | translate">{{ position }}</span>
+                              }
+                            </div>
+                          </div>
+                          <div *ngIf="displayTechnical" class="technical-info">
+                            <div class="technical-info-item">&nbsp;</div>
+                            <div class="technical-info-item">&nbsp;</div>
+                            <div class="technical-info-item">&nbsp;</div>
+
+                            @if (dimension.stand; as stand) {
+                              <div class="technical-info-item" [title]="'stand.needElectricity' | translate">
+                                <fa-icon [class]="stand.needElectricity ? 'orange-icon' : 'grey-icon'" icon="bolt-lightning"></fa-icon>
+                              </div>
+
+                              <div class="technical-info-item" [title]="'stand.nbChair' | translate">
+                                @if (stand.nbChair ?? 0 > 0) {
+                                  {{ stand.nbChair }}
+                                  <fa-icon class="green-icon" icon="chair"></fa-icon>
+                                } @else {
+                                  <fa-icon class="grey-icon" icon="chair"></fa-icon>
+                                }
+                              </div>
+
+                              <div class="technical-info-item" [title]="'stand.nbTable' | translate">
+                                @if (stand.nbTable ?? 0 > 0) {
+                                  {{ stand.nbTable }}
+                                  <fa-icon class="green-icon" icon="cube"></fa-icon>
+                                } @else {
+                                  <fa-icon class="grey-icon" icon="cube"></fa-icon>
+                                }
+                              </div>
+
+                              <div class="technical-info-item" [title]="'stand.shared' | translate">
+                                <fa-icon [class]="stand.shared ? 'green-icon' : 'grey-icon'" icon="people-arrows"></fa-icon>
+                              </div>
+                            }
+                          </div>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -171,32 +325,6 @@
           </div>
         </div>
       </div>
-      <div class="col-2 side-column">
-
-        <!-- DIMENSIONS -->
-        <div #shapesDropList
-             (cdkDropListDropped)="drop($event)"
-             [cdkDropListDisabled]="readonlyForm"
-             cdkDropList
-             cdkDropListSortingDisabled
-             class="row shapes-container">
-          <div (cdkDragMoved)="highlightCells($event)"
-               *ngFor="let dimension of availableDimensions"
-               [cdkDragData]="dimension"
-               [cdkDragDisabled]="readonlyForm"
-               cdkDrag
-               class="col-6 shape-container">
-            <div [class.disabled]="readonlyForm"
-                 [ngStyle]="{ 'background-color': 'rgb(255, 255, 255, 0.3)', 'margin-right': '5px' }"
-                 [style.height.px]="dimension.rows * this.PIXELS"
-                 [style.width.px]="dimension.cols * this.PIXELS"
-                 cdkDragHandle
-                 class="draggable">
-              {{ dimension.dimension }}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ############ POPINS ############ -->
@@ -205,26 +333,34 @@
     <ng-template #popoverContent>
       <div *ngIf="gridCellPopOver" class="popover-parent">
         @if (gridCellPopOver.dimension?.stand; as stand) {
-          <strong>Thérapeute :</strong> {{ stand.participation?.exhibitor?.therapistName || 'Non défini' }}<br/>
-          <strong>Nom :</strong> {{ stand.participation?.exhibitor?.fullName || 'Non défini' }}<br/>
+          <strong>Thérapeute :</strong> {{ stand.participation?.therapistName ?? 'Non défini' }}<br/>
+          <strong>Nom :</strong> {{ stand.participation?.exhibitor?.fullName ?? 'Non défini' }}<br/>
           <strong>Catégorie :</strong> {{ 'stand.category.list.' + stand.category | translate }}<br/>
-          <strong>Dimension sur plan:</strong> {{ gridCellPopOver.dimension?.dimension || 'Inconnu' }}<br/>
-          <strong>Dimension participation:</strong> {{ stand.dimension?.dimension || 'Inconnu' }}<br/>
+          <strong>Dimension sur plan:</strong> {{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}<br/>
+          <strong>Dimension participation:</strong> {{ stand.dimension?.dimension ?? 'Inconnu' }}<br/>
           <strong>Status :</strong> {{ 'participation.status.list.' + stand.participation?.status | translate }}<br/>
+          <hr/>
+          <link-box *ngIf="stand.participation && isReadOnly"
+                    translateKey="common.view"
+                    faIcon="link"
+                    [links]="['../', 'participations', stand.participation.id, 'view']"/>
         } @else {
-          <p><strong>Dimension:</strong> {{ gridCellPopOver.dimension?.dimension || 'Inconnu' }}</p>
+          <p><strong>Dimension:</strong> {{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</p>
         }
       </div>
     </ng-template>
 
     <!-- CONTEXT MENU -->
-    <div *ngIf="contextMenu.printable !== 'CLOSED' && !readonlyForm"
+    <div *ngIf="contextMenu.printable !== 'CLOSED' && !isReadOnly"
          [style.left.px]="contextMenu.x"
          [style.top.px]="contextMenu.y"
          class="context-menu">
       <div class="menu-item">{{ contextMenu.cell?.dimension?.dimension }}</div>
       <div *ngIf="contextMenu.printable === 'MAIN' && !contextMenu.cell?.dimension?.stand">
-        <button (click)="contextMenu.printable = 'ASSIGNATION'" class="btn btn-outline-primary btn-sm w-100">Attribuer à...</button>
+        <button [disabled]="!availableStands.length"
+                (click)="contextMenu.printable = 'ASSIGNATION'"
+                class="btn btn-outline-primary btn-sm w-100">Attribuer à...
+        </button>
       </div>
       @if (contextMenu.printable === 'ASSIGNATION' && !contextMenu.cell?.dimension?.stand) {
         <div *ngFor="let stand of this.availableStands">
@@ -232,7 +368,7 @@
                   [ngClass]="stand.dimension?.id === contextMenu.cell?.dimension?.idDimension ? 'btn-outline-primary' : 'btn-outline-warning'"
                   (click)="assign(stand, contextMenu.cell ?? null)"
                   style="width: 100%">
-            {{ getFormattedExhibitorName(stand.participation?.exhibitor ?? null) }}
+            {{ getFormattedParticipationName(stand.participation ?? null) }}
           </button>
         </div>
       }

@@ -11,8 +11,6 @@ public class ExhibitorDTO implements Serializable {
 
     private String fullName;
 
-    private String therapistName;
-
     private String email;
 
     private String phoneNumber;
@@ -22,6 +20,10 @@ public class ExhibitorDTO implements Serializable {
     private String npaLocalite;
 
     private String extraInformation;
+
+    private Boolean differentBillingAddress;
+
+    private AddressDTO billingAddress;
 
     public ExhibitorDTO() {
         // Empty constructor needed for Jackson.
@@ -41,14 +43,6 @@ public class ExhibitorDTO implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public String getTherapistName() {
-        return therapistName;
-    }
-
-    public void setTherapistName(String therapistName) {
-        this.therapistName = therapistName;
     }
 
     public String getEmail() {
@@ -97,5 +91,21 @@ public class ExhibitorDTO implements Serializable {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public Boolean getDifferentBillingAddress() {
+        return differentBillingAddress;
+    }
+
+    public void setDifferentBillingAddress(Boolean differentBillingAddress) {
+        this.differentBillingAddress = differentBillingAddress;
+    }
+
+    public AddressDTO getBillingAddress() {
+        return billingAddress;
+    }
+
+    public void setBillingAddress(AddressDTO billingAddress) {
+        this.billingAddress = billingAddress;
     }
 }
