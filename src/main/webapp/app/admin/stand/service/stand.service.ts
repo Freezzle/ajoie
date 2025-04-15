@@ -10,7 +10,7 @@ import { IStand, NewStand } from '../model/stand.interface';
 export class StandService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/stands');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/stands');
 
   create(stand: NewStand): Observable<IStand> {
     return this.http.post<IStand>(this.resourceUrl, stand);

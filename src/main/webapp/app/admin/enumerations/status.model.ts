@@ -3,7 +3,8 @@ export enum Status {
   CANCELED = 'CANCELED',
   IN_VERIFICATION = 'IN_VERIFICATION',
   ACCEPTED = 'ACCEPTED',
-  PAID = 'PAID',
+  VALIDATED = 'VALIDATED',
+  CLOSED = 'CLOSED',
 }
 
 export function formatterStatus(status: Status | null): string {
@@ -11,6 +12,5 @@ export function formatterStatus(status: Status | null): string {
 }
 
 export function compareStatus(o1: Status, o2: Status): boolean {
-  console.log(o1, o2);
   return o1 === o2;
 }

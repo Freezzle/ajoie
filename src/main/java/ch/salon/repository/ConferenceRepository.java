@@ -21,4 +21,6 @@ public interface ConferenceRepository extends JpaRepository<Conference, UUID> {
 
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress"})
     List<Conference> findByStatusInAndParticipation_SalonId(List<Status> statuses, UUID participationId);
+
+    boolean existsStandByParticipationIdAndStatusIn(UUID participationId, Status... statuses);
 }

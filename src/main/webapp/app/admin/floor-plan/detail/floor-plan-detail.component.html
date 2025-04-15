@@ -256,7 +256,7 @@
                             <div class="technical-info-item">
                               @if (dimension.stand && dimension.stand.dimension?.id !== dimension.idDimension) {
                                 <fa-icon [title]="'floorPlan.differentDimension' | translate"
-                                         class="red-icon" icon="warning"></fa-icon>
+                                         class="danger-icon" icon="warning"></fa-icon>
                               }
                             </div>
 
@@ -281,13 +281,13 @@
 
                             @if (dimension.stand; as stand) {
                               <div class="technical-info-item" [title]="'stand.needElectricity' | translate">
-                                <fa-icon [class]="stand.needElectricity ? 'orange-icon' : 'grey-icon'" icon="bolt-lightning"></fa-icon>
+                                <fa-icon [class]="stand.needElectricity ? 'warning-icon' : 'grey-icon'" icon="bolt-lightning"></fa-icon>
                               </div>
 
                               <div class="technical-info-item" [title]="'stand.nbChair' | translate">
                                 @if (stand.nbChair ?? 0 > 0) {
                                   {{ stand.nbChair }}
-                                  <fa-icon class="green-icon" icon="chair"></fa-icon>
+                                  <fa-icon class="success-icon" icon="chair"></fa-icon>
                                 } @else {
                                   <fa-icon class="grey-icon" icon="chair"></fa-icon>
                                 }
@@ -296,14 +296,14 @@
                               <div class="technical-info-item" [title]="'stand.nbTable' | translate">
                                 @if (stand.nbTable ?? 0 > 0) {
                                   {{ stand.nbTable }}
-                                  <fa-icon class="green-icon" icon="cube"></fa-icon>
+                                  <fa-icon class="success-icon" icon="cube"></fa-icon>
                                 } @else {
                                   <fa-icon class="grey-icon" icon="cube"></fa-icon>
                                 }
                               </div>
 
                               <div class="technical-info-item" [title]="'stand.shared' | translate">
-                                <fa-icon [class]="stand.shared ? 'green-icon' : 'grey-icon'" icon="people-arrows"></fa-icon>
+                                <fa-icon [class]="stand.shared ? 'success-icon' : 'grey-icon'" icon="people-arrows"></fa-icon>
                               </div>
                             }
                           </div>
@@ -339,6 +339,7 @@
           <strong>Dimension sur plan:</strong> {{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}<br/>
           <strong>Dimension participation:</strong> {{ stand.dimension?.dimension ?? 'Inconnu' }}<br/>
           <strong>Status :</strong> {{ 'participation.status.list.' + stand.participation?.status | translate }}<br/>
+          <strong>Commentaire :</strong> {{ stand.participation?.extraInformation }}<br/>
           <hr/>
           <link-box *ngIf="stand.participation && isReadOnly"
                     translateKey="common.view"

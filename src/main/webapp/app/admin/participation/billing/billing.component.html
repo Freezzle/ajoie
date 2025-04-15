@@ -20,12 +20,20 @@
     </h2>
 
     <div class="row">
-      <div class="mt-3 col-sm-6">
+      <div class="mt-3 col-sm-12">
         <div class="card h-100">
-          <h5 class="card-header" jhiTranslate="participation.billing.details">Détails</h5>
+          <div class="card-header d-flex justify-content-between">
+            <h5 class="mb-0" jhiTranslate="participation.billing.details">Détails</h5>
+            <fa-icon
+              (click)="openHistoryModal()"
+              [title]="'event.buttonTitle' | translate"
+              class="clickable"
+              icon="clock-rotate-left">
+            </fa-icon>
+          </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-lg-6 fw-bold">
+              <div class="mt-3 col-md-3 fw-bold">
                 <label for="field_exhibitor" jhiTranslate="participation.exhibitor">Exposant</label>
                 <input type="text"
                        class="form-control"
@@ -33,7 +41,7 @@
                        value="{{ getFormattedParticipationName(participation()) }}"
                        disabled/>
               </div>
-              <div class="col-lg-6 fw-bold">
+              <div class="mt-3 col-md-3 fw-bold">
                 <label for="field_email" jhiTranslate="exhibitor.email">Email</label>
                 <input type="text"
                        class="form-control"
@@ -41,13 +49,13 @@
                        value="{{ participation()!.exhibitor?.email }}"
                        disabled/>
               </div>
-              <div class="mt-3 col-6">
+              <div class="mt-3 col-md-3">
                 <checkbox-box [value]="participation()!.needArrangement ?? false"
                               [forceDisabled]="true"
                               fieldName="needArrangement"
                               translateKey="participation.needArrangement"/>
               </div>
-              <div class="mt-3 col-6 fw-bold align-content-center">
+              <div class="mt-3 col-md-3 fw-bold align-content-center">
                 <label for="field_status" jhiTranslate="participation.status.label">Status</label>
                 <input type="text"
                        class="form-control"
@@ -55,7 +63,7 @@
                        value="{{ 'participation.status.list.' + (participation()!.status ?? 'null') | translate }}"
                        disabled/>
               </div>
-              <div class="mt-3 col-sm-12 fw-bold align-content-center">
+              <div class="mt-3 col-12 fw-bold align-content-center">
                 <label for="field_extraInformation" jhiTranslate="participation.extraInformation">Information complémentaire </label>
 
                 <textarea class="form-control"
@@ -65,27 +73,6 @@
                           value="{{ participation()!.extraInformation }}"
                           disabled></textarea>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-3 col-sm-6">
-        <div class="card h-100">
-          <h5 class="card-header" jhiTranslate="participation.billing.events">Evénements</h5>
-          <div class="card-body log-container">
-            <div class="table-responsive table-entities" id="entities">
-              <table aria-describedby="page-heading" class="table table-hover">
-                <tbody>
-                  <tr *ngFor="let eventLog of eventLogs$ | async; let i = index">
-                    <td class="width-20 align-content-center">{{ eventLog.referenceDate | formatMediumDatetime }}</td>
-                    <td class="width-5 align-content-center">
-                      <fa-icon [icon]="eventLog.type | eventType"></fa-icon>
-                    </td>
-                    <td class="width-75 align-content-center" style="white-space: nowrap">{{ eventLog.label }}</td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
@@ -129,7 +116,7 @@
                             <div>Expire le <u>{{ invoicingPlan.expirationDate | formatMediumDate }}</u>
                               <fa-icon *ngIf="isIssuedState(invoicingPlan) && isDateExpired(invoicingPlan)"
                                        icon="clock"
-                                       class="red-icon"></fa-icon>
+                                       class="danger-icon"></fa-icon>
                             </div>
                           }
                         </div>
@@ -150,7 +137,7 @@
                       <div class="col-6 align-content-center">
                         @if (invoicingPlan.needArrangement) {
                           <fa-icon icon="handshake-simple"
-                                   class="red-icon"
+                                   class="danger-icon"
                                    [title]="'invoicingPlan.needArrangement.checked' | translate"></fa-icon>
                         } @else {
                           <fa-icon icon="handshake-simple"
@@ -173,53 +160,8 @@
                         </button>
 
                         <div *ngIf="showInvoicingAction(invoicingPlan)" ngbDropdown class="d-inline-block dropdown-items">
-                          <button type="button" class="btn btn-outline-primary" id="factureList" ngbDropdownToggle>Facture</button>
-                          <div ngbDropdownMenu>
-                            <button ngbDropdownItem
-                                    (click)="downloadInvoice(invoicingPlan)">
-                              <span>Prévisualiser</span>
-                            </button>
-                            <button *ngIf="showReSendInvoice(invoicingPlan)"
-                                    ngbDropdownItem
-                                    [disabled]="mustDisableSendButton(invoicingPlan)"
-                                    (click)="sendInvoice(invoicingPlan)">
-                              <span jhiTranslate="invoicingPlan.resendByEmail">Renvoyer par email</span>
-                            </button>
-                            <button *ngIf="showSendInvoice(invoicingPlan)"
-                                    ngbDropdownItem
-                                    [disabled]="mustDisableSendButton(invoicingPlan)"
-                                    (click)="sendInvoice(invoicingPlan)">
-                              <span jhiTranslate="invoicingPlan.sendByEmail">Envoyer par email</span>
-                            </button>
-                            <button *ngIf="showSendInvoice(invoicingPlan)"
-                                    ngbDropdownItem
-                                    [disabled]="mustDisableSendButton(invoicingPlan)">
-                              <span>Facture soumise sans envoi (en travaux)</span>
-                            </button>
-                          </div>
-                        </div>
 
-                        <div *ngIf="showReceiptAction(invoicingPlan)" ngbDropdown class="d-inline-block dropdown-items">
-                          <button type="button" class="btn btn-outline-primary" id="receipt" ngbDropdownToggle>Quittance</button>
-                          <div ngbDropdownMenu>
-                            <button ngbDropdownItem>
-                              <span>Prévisualiser (en travaux)</span>
-                            </button>
-                            <button *ngIf="showSendInvoiceReceipt(invoicingPlan)"
-                                    ngbDropdownItem
-                                    [disabled]="mustDisableSendButton(invoicingPlan)"
-                                    (click)="sendInvoiceReceipt(invoicingPlan)">
-                              <span jhiTranslate="invoicingPlan.sendByEmail">Envoyer par email</span>
-                            </button>
-                            <button *ngIf="showSendInvoiceReceipt(invoicingPlan)"
-                                    ngbDropdownItem>
-                              <span>Quittance soumise sans envoi (en travaux)</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        <div *ngIf="showActions(invoicingPlan)" ngbDropdown class="d-inline-block dropdown-items">
-                          <button type="button" class="btn btn-outline-primary" id="actionList" ngbDropdownToggle>Actions</button>
+                          <button type="button" class="btn btn-outline-primary" id="factureList" ngbDropdownToggle>Actions</button>
                           <div ngbDropdownMenu>
                             <button *ngIf="showDeactivateArrangement(invoicingPlan)"
                                     [disabled]="mustDisableSendButton(invoicingPlan)"
@@ -240,23 +182,12 @@
                                     (click)="startSplit(invoicingPlan)">
                               <span>Fractionner la facture</span>
                             </button>
-                            <button *ngIf="showCloseInvoice(invoicingPlan)"
-                                    [disabled]="mustDisableSendButton(invoicingPlan) || this.remainingTotal(invoicingPlan) != 0.00"
-                                    ngbDropdownItem
-                                    (click)="payInvoicingPlan(invoicingPlan)">
-                              <span>Clôturer la facture</span>
-                            </button>
-                            <button *ngIf="showCancelInvoice(invoicingPlan)" [disabled]="mustDisableSendButton(invoicingPlan)"
-                                    ngbDropdownItem
-                                    class="dropdown-item-danger"
-                                    (click)="cancelInvoicingPlan(invoicingPlan)">
-                              <span>Annuler la facture</span>
-                            </button>
-                            <button *ngIf="showRemoveDraft(invoicingPlan)" [disabled]="mustDisableSendButton(invoicingPlan)"
-                                    ngbDropdownItem
-                                    class="dropdown-item-danger"
-                                    (click)="deleteInvoicingPlan(invoicingPlan)">
-                              <span>Supprimer brouillon</span>
+                            <button *ngFor="let action of invoicingPlan.availableActions" ngbDropdownItem
+                                    [disabled]="action.disabled || disableActionButton(invoicingPlan)"
+                                    (click)="clickAction(action, invoicingPlan)">
+                              <fa-icon *ngIf="action.type === 'EMAIL'" icon="envelope"/>
+                              <fa-icon *ngIf="action.type === 'DOWNLOAD'" icon="file-pdf"/>
+                              <span>{{ action.labelKey | translate }}</span>
                             </button>
                           </div>
                         </div>
@@ -364,7 +295,7 @@
                                     </td>
                                     <td class="text-center">{{ invoice.quantity }}</td>
                                     <td class="text-center">
-                                      {{ (invoice.quantity ?? 0) * (invoice.customAmount ?? 0) | currency: 'CHF' }}
+                                      {{ (invoice.quantity ?? 1) * (invoice.customAmount ?? 0) | currency: 'CHF' }}
                                     </td>
                                     <td>
                                       <input type="text"

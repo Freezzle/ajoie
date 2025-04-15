@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -32,9 +33,10 @@ import java.util.stream.Collectors;
 
 import static ch.salon.domain.enumeration.Status.ACCEPTED;
 import static ch.salon.domain.enumeration.Status.CANCELED;
+import static ch.salon.domain.enumeration.Status.CLOSED;
 import static ch.salon.domain.enumeration.Status.IN_VERIFICATION;
-import static ch.salon.domain.enumeration.Status.PAID;
 import static ch.salon.domain.enumeration.Status.REFUSED;
+import static ch.salon.domain.enumeration.Status.VALIDATED;
 
 @Service
 public class ParticipationService {
@@ -68,7 +70,7 @@ public class ParticipationService {
 
         if (participation.getId() != null) {
             throw new BadRequestAlertException("A new participation cannot already have an ID", ENTITY_NAME,
-                                               "idexists");
+                                               "id.exists");
         }
 
         Salon salonFound = salonRepository.findById(participation.getSalon().getId())
@@ -77,7 +79,12 @@ public class ParticipationService {
 
         String maxNumber = participationRepository.findMaxClientNumber(salonFound.getId());
         participation.setClientNumber(Participation.incrementClientNumber(maxNumber, salonFound.getReferenceNumber()));
-        return participationRepository.save(participation).getId();
+        UUID idParticipation = participationRepository.save(participation).getId();
+
+        this.eventLogService.eventFromSystem("Participation crée", EventType.EVENT, EntityType.PARTICIPATION,
+                                             idParticipation, null);
+
+        return idParticipation;
     }
 
     public InfoInvoice getInfoInvoice(UUID id) {
@@ -123,9 +130,42 @@ public class ParticipationService {
                                                                          "Entity not found", ENTITY_NAME,
                                                                          "idnotfound"));
 
-        if (Participation.hasDifference(participation, existingParticipation)) {
-            this.eventLogService.eventFromSystem("Des éléments de la participation ont changé.", EventType.EVENT,
-                                                 EntityType.PARTICIPATION, participation.getId(), null);
+        if (Participation.diffArrangement(participation, existingParticipation)) {
+            if (participation.getNeedArrangement()) {
+                this.eventLogService.eventFromSystem("Un arrangement est activé", EventType.EVENT,
+                                                     EntityType.PARTICIPATION, participation.getId(), null);
+            } else {
+                this.eventLogService.eventFromSystem("Un arrangement est désactivé", EventType.EVENT,
+                                                     EntityType.PARTICIPATION, participation.getId(), null);
+            }
+        }
+
+        if (Participation.diffMeal(1, participation, existingParticipation)) {
+            this.eventLogService.eventFromSystem("Le nombre de repas du samedi midi a changé", EventType.EVENT,
+                                                 EntityType.PARTICIPATION, participation.getId(),
+                                                 Map.of("old_meal", existingParticipation.getNbMeal1().toString(),
+                                                        "new_meal", participation.getNbMeal1().toString()));
+        }
+
+        if (Participation.diffMeal(2, participation, existingParticipation)) {
+            this.eventLogService.eventFromSystem("Le nombre de repas du samedi soir a changé", EventType.EVENT,
+                                                 EntityType.PARTICIPATION, participation.getId(),
+                                                 Map.of("old_meal", existingParticipation.getNbMeal2().toString(),
+                                                        "new_meal", participation.getNbMeal2().toString()));
+        }
+
+        if (Participation.diffMeal(3, participation, existingParticipation)) {
+            this.eventLogService.eventFromSystem("Le nombre de repas du dimanche midi a changé", EventType.EVENT,
+                                                 EntityType.PARTICIPATION, participation.getId(),
+                                                 Map.of("old_meal", existingParticipation.getNbMeal3().toString(),
+                                                        "new_meal", participation.getNbMeal3().toString()));
+        }
+
+        if (Participation.diffStatus(participation, existingParticipation)) {
+            this.eventLogService.eventFromSystem(
+                "Le statut de la participation a changé en '" + participation.getStatus().name().toLowerCase() + "'",
+                EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
+                Map.of("old_status", existingParticipation.getStatus().name().toLowerCase()));
         }
 
         return participationRepository.save(participation);
@@ -175,11 +215,14 @@ public class ParticipationService {
         } else if (isAnyOf(standsStatus, conferencesStatus, ACCEPTED)) {
             // If one in accepted mode (and none in verification mode due to the previous condition), so participation is accepted
             statusToChange = ACCEPTED;
-        } else if (isAnyOf(standsStatus, conferencesStatus, PAID)) {
-            // If one in paid mode (and none in verification/accepted mode due to the previous condition), so participation is paid
-            statusToChange = PAID;
+        } else if (isAnyOf(standsStatus, conferencesStatus, VALIDATED)) {
+            // If one in validated mode (and none in verification/accepted mode due to the previous condition), so participation is validated
+            statusToChange = VALIDATED;
+        } else if (isAnyOf(standsStatus, conferencesStatus, CLOSED)) {
+            // If one in closed mode (and none in verification/accepted/validated mode due to the previous condition), so participation is closed
+            statusToChange = CLOSED;
         } else if (isAnyOf(standsStatus, conferencesStatus, REFUSED)) {
-            // If one in refused mode (and none in verification/accepted mode due to the previous conditions), so participation is refused
+            // If one in refused mode (and none in verification/accepted/validated/closed mode due to the previous conditions), so participation is refused
             statusToChange = REFUSED;
         } else if (isAllOf(standsStatus, conferencesStatus, CANCELED)) {
             // if none in verification/accepted/refused mode, so participation is canceled
@@ -190,8 +233,9 @@ public class ParticipationService {
 
         if (currentStatus != statusToChange) {
             this.eventLogService.eventFromSystem(
-                "Le statut de la participation a changé de " + currentStatus + " à " + statusToChange + ".",
-                EventType.EVENT, EntityType.PARTICIPATION, participation.getId(), null);
+                "Le statut de la participation a changé en '" + statusToChange.name().toLowerCase() + "'",
+                EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
+                Map.of("old_status", currentStatus.name()));
 
             participation.setStatus(statusToChange);
 

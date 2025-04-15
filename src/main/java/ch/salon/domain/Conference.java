@@ -136,9 +136,17 @@ public class Conference implements Serializable {
         return this;
     }
 
-    public static boolean hasDifference(Conference conf1, Conference conf2) {
-        return ((conf1 == null && conf2 != null) || (conf1 != null && conf2 == null) ||
-                (conf1 != null && conf2 != null && (!Objects.equals(conf1.getStatus(), conf2.getStatus()))));
+    public static boolean diffStatus(Conference conf1, Conference conf2) {
+        if (conf1 == null && conf2 != null) {
+            return true;
+        }
+        if (conf1 != null && conf2 == null) {
+            return true;
+        }
+        if (conf1 != null && conf2 != null) {
+            return !Objects.equals(conf1.getStatus(), conf2.getStatus());
+        }
+        return false;
     }
 
     @Override

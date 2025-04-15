@@ -8,7 +8,7 @@ import { IInvoice, IPayment } from '../model/invoicing-plan.interface';
 export class InvoicingPlanService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/invoicing-plans');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/invoicing-plans');
 
   createInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
     return this.http.post<IInvoice>(`${this.resourceUrl}/${idInvoicingPlan}/invoices`, invoice,
@@ -37,31 +37,6 @@ export class InvoicingPlanService {
 
   deletePayment(idInvoicingPlan: string, idPayment: string): Observable<HttpResponse<void>> {
     return this.http.delete<void>(`${this.resourceUrl}/${idInvoicingPlan}/payments/${idPayment}`,
-      { observe: 'response' });
-  }
-
-  sendInvoice(idInvoicingPlan: string): Observable<HttpResponse<{}>> {
-    return this.http.patch<{}>(`${this.resourceUrl}/${idInvoicingPlan}/send-invoice`, {}, { observe: 'response' });
-  }
-
-  payInvoicingPlanm(idInvoicingPlan: string): Observable<HttpResponse<void>> {
-    return this.http.patch<void>(`${this.resourceUrl}/${idInvoicingPlan}/pay`, {}, { observe: 'response' });
-  }
-
-  cancelInvoicingPlan(idInvoicingPlan: string): Observable<HttpResponse<void>> {
-    return this.http.patch<void>(`${this.resourceUrl}/${idInvoicingPlan}/cancel`, {}, { observe: 'response' });
-  }
-
-  deleteInvoicingPlan(idInvoicingPlan: string): Observable<HttpResponse<void>> {
-    return this.http.delete<void>(`${this.resourceUrl}/${idInvoicingPlan}`, { observe: 'response' });
-  }
-
-  downloadInvoice(idInvoicingPlan: string): Observable<Blob> {
-    return this.http.get(`${this.resourceUrl}/${idInvoicingPlan}/download-invoice`, { responseType: 'blob' });
-  }
-
-  sendInvoiceReceipt(idInvoicingPlan: string): Observable<HttpResponse<{}>> {
-    return this.http.patch<{}>(`${this.resourceUrl}/${idInvoicingPlan}/send-invoice-receipt`, {},
       { observe: 'response' });
   }
 

@@ -1,5 +1,6 @@
 package ch.salon.repository;
 
+import ch.salon.aop.logging.RepositoryAction;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.enumeration.State;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @SuppressWarnings("unused")
 @Repository
+@RepositoryAction("billing")
 public interface InvoicingPlanRepository extends JpaRepository<InvoicingPlan, UUID> {
 
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress", "invoices", "payments"})

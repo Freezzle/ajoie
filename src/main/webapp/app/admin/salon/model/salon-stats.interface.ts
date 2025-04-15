@@ -15,8 +15,10 @@ export interface ISalonStats {
   };
   categoriesStands: Record<string, number>;
   facturation: {
-    paid: number;
+    total: number;
     discount: number;
     expected: number;
+    paid: number;
+    remaining: number;
   };
 }

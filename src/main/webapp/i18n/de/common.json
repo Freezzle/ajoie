@@ -14,6 +14,7 @@
     "open": "Ouvrir",
     "refresh": "Reset",
     "save": "Sauvegarder",
+    "send": "Envoyer",
     "show": "Show {{otherEntity}}",
     "validate": "Valider",
     "validation": {

@@ -23,7 +23,7 @@ public class TimeSlot {
     @Column(name = "id")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = {"priceStandSalons"},
                           allowSetters = true)
     private Salon salon;

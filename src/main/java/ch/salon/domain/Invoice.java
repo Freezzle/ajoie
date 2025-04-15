@@ -60,6 +60,9 @@ public class Invoice implements Serializable {
     @Column(name = "extra_information")
     private String extraInformation;
 
+    @Column(name = "reduction")
+    private boolean reduction = false;
+
     public Invoice() {
     }
 
@@ -75,6 +78,7 @@ public class Invoice implements Serializable {
         this.customAmount = invoice.getCustomAmount();
         this.lock = invoice.getLock();
         this.extraInformation = invoice.getExtraInformation();
+        this.reduction = invoice.reduction;
     }
 
     public UUID getId() {
@@ -217,8 +221,21 @@ public class Invoice implements Serializable {
         return this.quantity * this.getDifference();
     }
 
+    public Double getTotalDefaultAmount() {
+        return this.quantity * this.defaultAmount;
+    }
+
     public Double getTotalAmount() {
         return this.quantity * this.customAmount;
+    }
+
+
+    public void setReduction(boolean reduction) {
+        this.reduction = reduction;
+    }
+
+    public Boolean isReduction() {
+        return this.reduction;
     }
 
     @Override

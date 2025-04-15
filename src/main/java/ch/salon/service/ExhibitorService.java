@@ -35,7 +35,7 @@ public class ExhibitorService {
         }
 
         if (exhibitor.getId() != null) {
-            throw new BadRequestAlertException("A new exhibitor cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new exhibitor cannot already have an ID", ENTITY_NAME, "id.exists");
         }
         Exhibitor entity = ExhibitorMapper.INSTANCE.toEntity(exhibitor);
         entity.setRegistrationDate(Instant.now());

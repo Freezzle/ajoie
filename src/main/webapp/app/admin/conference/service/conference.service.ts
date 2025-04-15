@@ -9,7 +9,7 @@ import { IConference, NewConference } from '../model/conference.interface';
 export class ConferenceService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/conferences');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/conferences');
 
   create(conference: NewConference): Observable<IConference> {
     return this.http.post<IConference>(this.resourceUrl, conference);

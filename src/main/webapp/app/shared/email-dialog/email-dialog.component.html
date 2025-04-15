@@ -1,0 +1,38 @@
+<form (ngSubmit)="submit()" [formGroup]="form">
+  <div class="modal-header">
+    <h4 class="modal-title" jhiTranslate="common.send">Envoyer</h4>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="mt-3 col-12 col-sm-6">
+        <text-box fieldName="from" formControlName="from" translateKey="email.from"/>
+      </div>
+      <div class="mt-3 col-12 col-sm-6">
+        <text-box fieldName="to" formControlName="to" translateKey="email.to"/>
+      </div>
+      <div class="mt-3 col-12">
+        <text-box fieldName="subject" formControlName="subject" translateKey="email.subject"/>
+      </div>
+      <div class="mt-3 col-12">
+        <quill-editor
+          [modules]="quillModules"
+          style="width: 100%"
+          formControlName="body"
+          theme="snow">
+        </quill-editor>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button (click)="cancel()" class="btn btn-secondary" data-dismiss="modal" type="button">
+      <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
+      <span jhiTranslate="common.cancel">Cancel</span>
+    </button>
+
+    <button class="btn btn-primary" id="jhi-confirm-send" type="submit">
+      <span jhiTranslate="common.send">Envoyer</span>
+    </button>
+  </div>
+</form>

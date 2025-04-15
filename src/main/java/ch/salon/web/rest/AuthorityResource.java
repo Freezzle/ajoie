@@ -53,7 +53,7 @@ public class AuthorityResource {
         log.debug("REST request to save Authority : {}", authority);
 
         if (authorityRepository.existsById(authority.getName())) {
-            throw new BadRequestAlertException("authority already exists", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("authority already exists", ENTITY_NAME, "id.exists");
         }
 
         authority = authorityRepository.save(authority);

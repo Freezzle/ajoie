@@ -16,8 +16,8 @@ import { IInvoicingPlan } from '../model/invoicing-plan.interface';
 export class ParticipationService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/participations');
-  protected salonResourceUrl = this.applicationConfigService.getEndpointFor('api/salons');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/participations');
+  protected salonResourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
 
   create(participation: NewParticipation): Observable<HttpResponse<IParticipation>> {
     const copy = this.convertDateFromClient(participation);

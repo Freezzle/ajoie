@@ -12,7 +12,7 @@ export class DimensionStandService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
 
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/dimension-stands');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/dimension-stands');
 
   create(dimensionStand: NewDimensionStand): Observable<HttpResponse<IDimensionStand>> {
     return this.http.post<IDimensionStand>(this.resourceUrl, dimensionStand, { observe: 'response' });

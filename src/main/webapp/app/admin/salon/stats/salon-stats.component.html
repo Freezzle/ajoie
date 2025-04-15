@@ -35,9 +35,6 @@
                 <span>Participations</span>
               </th>
               <th class="width-10 text-center">
-                <span>Annulé/Refusé</span>
-              </th>
-              <th class="width-10 text-center">
                 <span>En cours</span>
               </th>
               <th class="width-10 text-center">
@@ -48,25 +45,21 @@
           <tbody>
             <tr>
               <td>Nombre de stands</td>
-              <td class="text-center">{{ combinedStats[2].nbStands }}</td>
               <td class="text-center">{{ combinedStats[0].nbStands }}</td>
               <td class="text-center">{{ combinedStats[1].nbStands }}</td>
             </tr>
             <tr>
               <td>Nombre de conférences</td>
-              <td class="text-center">{{ combinedStats[2].nbConference }}</td>
               <td class="text-center">{{ combinedStats[0].nbConference }}</td>
               <td class="text-center">{{ combinedStats[1].nbConference }}</td>
             </tr>
             <tr>
               <td>Nombre de coups de coeur</td>
-              <td class="text-center">{{ combinedStats[2].nbCrushOfHeart }}</td>
               <td class="text-center">{{ combinedStats[0].nbCrushOfHeart }}</td>
               <td class="text-center">{{ combinedStats[1].nbCrushOfHeart }}</td>
             </tr>
             <tr>
               <td>Nombre d'invités d'honneur</td>
-              <td class="text-center">{{ combinedStats[2].nbGuestOfHonor }}</td>
               <td class="text-center">{{ combinedStats[0].nbGuestOfHonor }}</td>
               <td class="text-center">{{ combinedStats[1].nbGuestOfHonor }}</td>
             </tr>
@@ -81,9 +74,6 @@
                 <span>Facturations</span>
               </th>
               <th class="width-10 text-center">
-                <span>Annulé/Refusé</span>
-              </th>
-              <th class="width-10 text-center">
                 <span>En cours</span>
               </th>
               <th class="width-10 text-center">
@@ -93,25 +83,31 @@
           </thead>
           <tbody>
             <tr>
-              <td>Payé</td>
-              <td class="text-center">{{ combinedStats[2].facturation.paid }}</td>
-              <td class="text-center">{{ combinedStats[0].facturation.paid }}</td>
-              <td class="text-center">{{ combinedStats[1].facturation.paid }}</td>
+              <td>Totaux des prestations</td>
+              <td class="text-center">{{ combinedStats[0].facturation.total }}</td>
+              <td class="text-center">{{ combinedStats[1].facturation.total }}</td>
             </tr>
             <tr>
-              <td>Réduction</td>
-              <td class="text-center">{{ combinedStats[2].facturation.discount }}</td>
+              <td>Réductions appliquées</td>
               <td class="text-center">{{ combinedStats[0].facturation.discount }}</td>
               <td class="text-center">{{ combinedStats[1].facturation.discount }}</td>
             </tr>
             <tr>
-              <td>Facture totale attendue</td>
-              <td class="text-center">{{ combinedStats[2].facturation.expected }}</td>
+              <td>Totaux réels attendus</td>
               <td class="text-center">{{ combinedStats[0].facturation.expected }}</td>
               <td class="text-center">{{ combinedStats[1].facturation.expected }}</td>
             </tr>
             <tr>
-              <td></td>
+              <td>Paiements réels</td>
+              <td class="text-center">{{ combinedStats[0].facturation.paid }}</td>
+              <td class="text-center">{{ combinedStats[1].facturation.paid }}</td>
+            </tr>
+            <tr>
+              <td>Restant à payer</td>
+              <td class="text-center">{{ combinedStats[0].facturation.remaining }}</td>
+              <td class="text-center">{{ combinedStats[1].facturation.remaining }}</td>
+            </tr>
+            <tr>
               <td></td>
               <td></td>
               <td class="text-center" *ngIf="calculateFacturation(combinedStats[1].facturation); let factuGraph">
@@ -143,9 +139,6 @@
                 <span>Organisation</span>
               </th>
               <th class="width-10 text-center">
-                <span>Annulé/Refusé</span>
-              </th>
-              <th class="width-10 text-center">
                 <span>En cours</span>
               </th>
               <th class="width-10 text-center">
@@ -156,43 +149,36 @@
           <tbody>
             <tr>
               <td>Nombre de tables</td>
-              <td class="text-center">{{ combinedStats[2].standInfo.nbTable }}</td>
               <td class="text-center">{{ combinedStats[0].standInfo.nbTable }}</td>
               <td class="text-center">{{ combinedStats[1].standInfo.nbTable }}</td>
             </tr>
             <tr>
               <td>Nombre de chaises</td>
-              <td class="text-center">{{ combinedStats[2].standInfo.nbChair }}</td>
               <td class="text-center">{{ combinedStats[0].standInfo.nbChair }}</td>
               <td class="text-center">{{ combinedStats[1].standInfo.nbChair }}</td>
             </tr>
             <tr>
               <td>Nombre d'électricité</td>
-              <td class="text-center">{{ combinedStats[2].standInfo.nbElectricity }}</td>
               <td class="text-center">{{ combinedStats[0].standInfo.nbElectricity }}</td>
               <td class="text-center">{{ combinedStats[1].standInfo.nbElectricity }}</td>
             </tr>
             <tr>
               <td>Nombre d'offres</td>
-              <td class="text-center">{{ combinedStats[2].standInfo.nbOffer }}</td>
               <td class="text-center">{{ combinedStats[0].standInfo.nbOffer }}</td>
               <td class="text-center">{{ combinedStats[1].standInfo.nbOffer }}</td>
             </tr>
             <tr>
               <td>Nombre de repas samedi midi</td>
-              <td class="text-center">{{ combinedStats[2].nbMeal1 }}</td>
               <td class="text-center">{{ combinedStats[0].nbMeal1 }}</td>
               <td class="text-center">{{ combinedStats[1].nbMeal1 }}</td>
             </tr>
             <tr>
               <td>Nombre de repas samedi soir</td>
-              <td class="text-center">{{ combinedStats[2].nbMeal2 }}</td>
               <td class="text-center">{{ combinedStats[0].nbMeal2 }}</td>
               <td class="text-center">{{ combinedStats[1].nbMeal2 }}</td>
             </tr>
             <tr>
               <td>Nombre de repas dimanche midi</td>
-              <td class="text-center">{{ combinedStats[2].nbMeal3 }}</td>
               <td class="text-center">{{ combinedStats[0].nbMeal3 }}</td>
               <td class="text-center">{{ combinedStats[1].nbMeal3 }}</td>
             </tr>
@@ -207,9 +193,6 @@
                 <span>Catégories des stands</span>
               </th>
               <th class="width-10 text-center">
-                <span>Annulé/Refusé</span>
-              </th>
-              <th class="width-10 text-center">
                 <span>En cours</span>
               </th>
               <th class="width-10 text-center">
@@ -221,7 +204,6 @@
             @for (category of packStatsByKey(combinedStats[0].categoriesStands, combinedStats[1].categoriesStands, combinedStats[2].categoriesStands); track $index) {
               <tr>
                 <td>{{ 'stand.category.list.' + category[0] | translate }}</td>
-                <td class="text-center">{{ category[1][1] }}</td>
                 <td class="text-center">{{ category[1][2] }}</td>
                 <td class="text-center">{{ category[1][0] }}</td>
               </tr>
@@ -238,9 +220,6 @@
                 <span>Dimensions des stands</span>
               </th>
               <th class="width-10 text-center">
-                <span>Annulé/Refusé</span>
-              </th>
-              <th class="width-10 text-center">
                 <span>En cours</span>
               </th>
               <th class="width-10 text-center">
@@ -252,7 +231,6 @@
             @for (dimension of packStatsByKey(combinedStats[0].dimensionStands, combinedStats[1].dimensionStands, combinedStats[2].dimensionStands); track $index) {
               <tr>
                 <td>{{ dimension[0] }}</td>
-                <td class="text-center">{{ dimension[1][1] }}</td>
                 <td class="text-center">{{ dimension[1][2] }}</td>
                 <td class="text-center">{{ dimension[1][0] }}</td>
               </tr>

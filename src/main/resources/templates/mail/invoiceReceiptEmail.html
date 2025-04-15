@@ -1,16 +1,18 @@
 <html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title th:text="#{email.invoice-receipt.title(${salon})}"></title>
-    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-  </head>
-  <body>
-    <p th:text="#{email.invoice-receipt.greeting(${fullName})}"></p>
-    <br />
-    <p th:utext="#{email.invoice-receipt.text1}"></p>
-    <p th:utext="#{email.invoice-receipt.text2}"></p>
-    <br />
-    <p th:utext="#{email.invoice-receipt.text3}"></p>
+<head>
+  <title th:text="#{email.invoice-receipt.title(${salon})}"></title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+  <p>
+    Nous avons le plaisir de t’envoyer ta quittance en pièce jointe !
+    Elle fait office de confirmation officielle de ton paiement 😊
+  </p>
+  <p>
+    Si tu as la moindre question ou besoin d’un complément d’information, n’hésite pas à nous contacter.
+  </p>
+  <p>Avec toute notre bienveillance.</p>
 
-    <div th:include="common/footer::footer"></div>
-  </body>
+  <div th:include="common/footer::footer"></div>
+</body>
 </html>

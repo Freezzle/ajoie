@@ -16,7 +16,7 @@ import { ISalonStats } from '../model/salon-stats.interface';
 export class SalonService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/salons');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
 
   create(salon: NewSalon): Observable<HttpResponse<ISalon>> {
     const copy = this.convertDateFromClient(salon);

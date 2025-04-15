@@ -300,11 +300,50 @@ public class Participation implements Serializable {
         this.hasOffer = hasOffer;
     }
 
-    public static boolean hasDifference(Participation part1, Participation part2) {
-        return ((part1 == null && part2 != null) || (part1 != null && part2 == null) ||
-                (part1 != null && part2 != null && (!Objects.equals(part1.getNbMeal1(), part2.getNbMeal1()) ||
-                                                    !Objects.equals(part1.getNbMeal2(), part2.getNbMeal2()) ||
-                                                    !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3()))));
+    public static boolean diffMeal(int indexMeal, Participation part1, Participation part2) {
+        if (part1 == null && part2 != null) {
+            return true;
+        }
+        if (part1 != null && part2 == null) {
+            return true;
+        }
+        if (part1 != null && part2 != null) {
+            if (indexMeal == 1) {
+                return !Objects.equals(part1.getNbMeal1(), part2.getNbMeal1());
+            } else if (indexMeal == 2) {
+                return !Objects.equals(part1.getNbMeal2(), part2.getNbMeal2());
+            } else {
+                return !Objects.equals(part1.getNbMeal3(), part2.getNbMeal3());
+            }
+        }
+        return false;
+    }
+
+    public static boolean diffArrangement(Participation part1, Participation part2) {
+        if (part1 == null && part2 != null) {
+            return true;
+        }
+        if (part1 != null && part2 == null) {
+            return true;
+        }
+        if (part1 != null && part2 != null) {
+            return !Objects.equals(part1.getNeedArrangement(), part2.getNeedArrangement());
+        }
+        return false;
+    }
+
+
+    public static boolean diffStatus(Participation part1, Participation part2) {
+        if (part1 == null && part2 != null) {
+            return true;
+        }
+        if (part1 != null && part2 == null) {
+            return true;
+        }
+        if (part1 != null && part2 != null) {
+            return !Objects.equals(part1.getStatus(), part2.getStatus());
+        }
+        return false;
     }
 
     public static String incrementClientNumber(String clientNumberMax, String referenceSalon) {

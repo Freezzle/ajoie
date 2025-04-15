@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 export class FloorPlanService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/salons');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
 
   create(idSalon: string, floorPlan: IFloorPlanLight): Observable<IFloorPlanLight> {
     return this.http.post<IFloorPlanLight>(`${this.resourceUrl}/${idSalon}/floor-plan`,

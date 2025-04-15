@@ -6,6 +6,8 @@ import ch.salon.domain.Exhibitor;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
+import ch.salon.domain.enumeration.EntityType;
+import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.DimensionStandRepository;
@@ -68,6 +70,7 @@ public class ImportationService {
     private static final int STAND_ACCEPTED_CONTRACT = 25;
     private static final int STAND_ACCEPTED_CHART = 26;
     private static final int EXHIBITOR_URL_PICTURE = 27;
+
     private final SalonRepository salonRepository;
     private final StandRepository standRepository;
     private final ExhibitorRepository exhibitorRepository;
@@ -75,12 +78,13 @@ public class ImportationService {
     private final DimensionStandRepository dimensionStandRepository;
     private final ParticipationRepository participationRepository;
     private final InvoicingPlanService invoiceService;
+    private final EventLogService eventLogService;
 
     public ImportationService(SalonRepository salonRepository, StandRepository standRepository,
                               ExhibitorRepository exhibitorRepository, ConferenceRepository conferenceRepository,
                               DimensionStandRepository dimensionStandRepository,
                               ParticipationRepository participationRepository,
-                              InvoicingPlanService invoicingPlanService) {
+                              InvoicingPlanService invoicingPlanService, EventLogService eventLogService) {
         this.salonRepository = salonRepository;
         this.standRepository = standRepository;
         this.exhibitorRepository = exhibitorRepository;
@@ -88,6 +92,7 @@ public class ImportationService {
         this.dimensionStandRepository = dimensionStandRepository;
         this.participationRepository = participationRepository;
         this.invoiceService = invoicingPlanService;
+        this.eventLogService = eventLogService;
     }
 
     public void importData(String idSalon, InputStream file) {
@@ -151,9 +156,12 @@ public class ImportationService {
                 currentParticipation.setSalon(currentSalon);
                 currentParticipation.setExhibitor(currentExhibitor);
                 currentParticipation.setTherapistName(sub100(participationName));
-                currentParticipation.setNbMeal1(Long.parseLong(participationMeal1.trim()));
-                currentParticipation.setNbMeal2(Long.parseLong(participationMeal2.trim()));
-                currentParticipation.setNbMeal3(Long.parseLong(participationMeal3.trim()));
+                currentParticipation.setNbMeal1(
+                    Long.parseLong(StringUtils.isEmpty(participationMeal1.trim()) ? "0" : participationMeal1.trim()));
+                currentParticipation.setNbMeal2(
+                    Long.parseLong(StringUtils.isEmpty(participationMeal2.trim()) ? "0" : participationMeal2.trim()));
+                currentParticipation.setNbMeal3(
+                    Long.parseLong(StringUtils.isEmpty(participationMeal3.trim()) ? "0" : participationMeal3.trim()));
                 currentParticipation.setAcceptedContract(contract.contains("accepte"));
                 currentParticipation.setAdditionnalInformation(participationAdditionnal);
                 currentParticipation.setHasOffer(participationOffer.equalsIgnoreCase("oui"));
@@ -215,6 +223,9 @@ public class ImportationService {
                 }
 
                 currentParticipation = participationRepository.save(currentParticipation);
+
+                this.eventLogService.eventFromSystem("Participation crée", EventType.EVENT, EntityType.PARTICIPATION,
+                                                     currentParticipation.getId(), null);
 
                 invoiceService.refreshInvoicingPlans(currentParticipation.getId().toString());
             }

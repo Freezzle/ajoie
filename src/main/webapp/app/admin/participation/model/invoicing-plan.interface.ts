@@ -2,6 +2,7 @@ import dayjs from 'dayjs/esm';
 import { State } from '../../enumerations/state.model';
 import { Type } from '../../enumerations/type.model';
 import { Mode } from '../../enumerations/mode.model';
+import { AvailableAction } from '../../../shared/model/available-action';
 
 export interface IInvoicingPlan {
   id: string;
@@ -13,6 +14,7 @@ export interface IInvoicingPlan {
   state?: State | null;
   invoices?: IInvoice[];
   payments?: IPayment[];
+  availableActions: AvailableAction[];
 }
 
 export interface IInvoice {

@@ -270,12 +270,45 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public static boolean hasDifference(Stand stand1, Stand stand2) {
-        return ((stand1 == null && stand2 != null) || (stand1 != null && stand2 == null) ||
-                (stand1 != null && stand2 != null &&
-                 (!Objects.equals(stand1.getDimension().getId(), stand2.getDimension().getId()) ||
-                  !Objects.equals(stand1.getShared(), stand2.getShared()) ||
-                  !Objects.equals(stand1.getStatus(), stand2.getStatus()))));
+    public static boolean diffDimension(Stand stand1, Stand stand2) {
+        if (stand1 == null && stand2 != null) {
+            return true;
+        }
+        if (stand1 != null && stand2 == null) {
+            return true;
+        }
+        if (stand1 != null && stand2 != null) {
+            UUID dim1Id = stand1.getDimension().getId();
+            UUID dim2Id = stand2.getDimension().getId();
+            return !Objects.equals(dim1Id, dim2Id);
+        }
+        return false;
+    }
+
+    public static boolean diffShared(Stand stand1, Stand stand2) {
+        if (stand1 == null && stand2 != null) {
+            return true;
+        }
+        if (stand1 != null && stand2 == null) {
+            return true;
+        }
+        if (stand1 != null && stand2 != null) {
+            return !Objects.equals(stand1.getShared(), stand2.getShared());
+        }
+        return false;
+    }
+
+    public static boolean diffStatus(Stand stand1, Stand stand2) {
+        if (stand1 == null && stand2 != null) {
+            return true;
+        }
+        if (stand1 != null && stand2 == null) {
+            return true;
+        }
+        if (stand1 != null && stand2 != null) {
+            return !Objects.equals(stand1.getStatus(), stand2.getStatus());
+        }
+        return false;
     }
 
     @Override

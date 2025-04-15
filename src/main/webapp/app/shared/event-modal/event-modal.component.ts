@@ -1,0 +1,42 @@
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+import SharedModule from 'app/shared/shared.module';
+import { EventLog } from './event.interface';
+import EventTypePipe from '../pipe/event-type.pipe';
+import { ButtonBoxComponent } from '../components/button-box/button-box.component';
+import HasAnyAuthorityDirective from '../auth/has-any-authority.directive';
+import { EventService } from './event.service';
+
+@Component({
+  standalone: true,
+  templateUrl: './event-modal.component.html',
+  styleUrl: './event-modal.component.scss',
+  imports: [SharedModule, ReactiveFormsModule, EventTypePipe, ButtonBoxComponent, HasAnyAuthorityDirective],
+})
+export class EventModalComponent implements OnInit {
+
+  @Input() events: EventLog[] = [];
+
+  private eventService = inject(EventService);
+
+  constructor(public activeModal: NgbActiveModal) {
+  }
+
+  ngOnInit() {
+  }
+
+  onDelete(id: string) {
+    this.eventService.deleteEvent(id).subscribe(() => {
+      const indexOf = this.events.findIndex(event => event.id === id);
+      if (indexOf !== -1) {
+        this.events.splice(indexOf, 1);
+      }
+    });
+  }
+
+  close() {
+    this.activeModal.dismiss();
+  }
+}

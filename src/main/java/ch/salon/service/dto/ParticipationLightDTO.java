@@ -11,6 +11,7 @@ public class ParticipationLightDTO implements Serializable {
     private ExhibitorLightDTO exhibitor;
     private String therapistName;
     private Status status;
+    private String extraInformation;
 
     public ParticipationLightDTO() {
         // Empty constructor needed for Jackson.
@@ -46,5 +47,13 @@ public class ParticipationLightDTO implements Serializable {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getExtraInformation() {
+        return extraInformation;
+    }
+
+    public void setExtraInformation(String extraInformation) {
+        this.extraInformation = extraInformation;
     }
 }

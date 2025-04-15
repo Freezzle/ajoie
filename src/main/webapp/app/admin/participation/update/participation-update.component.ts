@@ -35,6 +35,11 @@ import { TextareaBoxComponent } from '../../../shared/components/textarea-box/te
 import { CheckboxBoxComponent } from '../../../shared/components/checkbox-box/checkbox-box.component';
 import { TypeaheadBoxComponent } from '../../../shared/components/typeahead-box/typeahead-box.component';
 import { IConference } from '../../conference/model/conference.interface';
+import { ActionsService } from '../../common/actions.service';
+import { AvailableAction } from '../../../shared/model/available-action';
+import { EmailDialogComponent } from '../../../shared/email-dialog/email-dialog.component';
+import { EmailMessage } from '../../../shared/email-dialog/email-message';
+import { EventModalComponent } from '../../../shared/event-modal/event-modal.component';
 
 @Component({
   standalone: true,
@@ -53,6 +58,7 @@ export class ParticipationUpdateComponent implements OnInit {
   protected salonService = inject(SalonService);
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
+  protected actionsService = inject(ActionsService);
 
   isLoading = false;
   isReadOnly = false;
@@ -66,6 +72,7 @@ export class ParticipationUpdateComponent implements OnInit {
   salonsSharedCollection: ISalon[] = [];
   editForm: FormGroup<ParticipationFormGroup> = this.participationFormService.createParticipationFormGroup(
     { id: null });
+  availableActions: Observable<AvailableAction[]> = of([]);
 
   ngOnInit(): void {
     this.activateReadOnlyMode();
@@ -84,6 +91,7 @@ export class ParticipationUpdateComponent implements OnInit {
   }
 
   private workReload(isReadOnly: boolean, params: any, participation: IParticipation) {
+    console.log('workReload');
     this.isReadOnly = isReadOnly;
     this.initialParticipation = { ...participation };
     this.params = params;
@@ -93,12 +101,14 @@ export class ParticipationUpdateComponent implements OnInit {
 
     if (participation) {
       this.loadRelationships(participation!.id);
+      this.availableActions = this.actionsService.getAvailableActions('participation', participation.id);
     }
 
     isReadOnly ? this.activateReadOnlyMode(false) : this.activateEditMode();
   }
 
   private reload(idParticipation: string): void {
+    console.log('reload');
     this.participationService.find(idParticipation).subscribe(participation => {
       this.workReload(this.isReadOnly, this.params, participation.body!);
     });
@@ -123,6 +133,9 @@ export class ParticipationUpdateComponent implements OnInit {
   }
 
   save(): void {
+    if (this.isReadOnly) {
+      return;
+    }
     if (this.editForm.invalid) {
       this.editForm.markAllAsTouched();
       return;
@@ -136,9 +149,8 @@ export class ParticipationUpdateComponent implements OnInit {
                           : this.participationService.create(participation);
 
     saveOperation.pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(() => {
-        this.activateReadOnlyMode(false);
-        this.reload(this.initialParticipation!.id!);
+      .subscribe((participation) => {
+        this.workReload(true, this.params, participation.body!);
       });
   }
 
@@ -202,6 +214,58 @@ export class ParticipationUpdateComponent implements OnInit {
         }),
       )
       .subscribe((salons: ISalon[]) => (this.salonsSharedCollection = salons));
+  }
+
+  clickAction(action: AvailableAction): void {
+    if (action.type === 'EMAIL') {
+      this.openEmailPopup(action, this.initialParticipation!.id);
+    } else if (action.type === 'DOWNLOAD') {
+      this.isLoading = true;
+      this.actionsService.downloadAction(action.contextCode, this.initialParticipation!.id)
+        .pipe(finalize(() => this.isLoading = false)).subscribe(blob => {
+        const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+        window.open(url);
+
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+        }, 5000);
+      });
+    } else if (action.type === 'BUSINESS') {
+      this.isLoading = true;
+      this.actionsService.businessAction(action.contextCode, this.initialParticipation!.id)
+        .pipe(finalize(() => this.isLoading = false)).subscribe(() => {
+        this.reload(this.initialParticipation!.id!);
+      });
+    } else {
+      console.warn('Action type unknown : ' + action.type);
+    }
+  }
+
+  openEmailPopup(action: AvailableAction, id: string) {
+    this.actionsService.templateEmailAction(action.contextCode, id).subscribe(template => {
+      const modalRef = this.modalService.open(EmailDialogComponent, { size: 'xl' });
+      modalRef.componentInstance.template = template;
+      modalRef.componentInstance.context = action.contextCode;
+      modalRef.componentInstance.entityId = id;
+
+      modalRef.result.then((result: EmailMessage) => {
+        if (result) {
+          this.isLoading = true;
+          this.actionsService.emailAction(action.contextCode, id, result)
+            .pipe(finalize(() => this.isLoading = false)).subscribe(() => {
+            this.reload(this.initialParticipation!.id!);
+          });
+        }
+      }).catch(() => {
+      });
+    });
+  }
+
+  openHistoryModal(): void {
+    this.participationService.getEventLogs(this.initialParticipation!.id).subscribe(events => {
+      const modalRef = this.modalService.open(EventModalComponent, { size: 'lg' });
+      modalRef.componentInstance.events = events.body ?? [];
+    });
   }
 
   protected readonly ErrorModel = ErrorModel;

@@ -8,9 +8,10 @@ public enum Status {
     CANCELED,
     IN_VERIFICATION,
     ACCEPTED,
-    PAID;
+    VALIDATED,
+    CLOSED;
 
     public boolean isInvalidStatus() {
-        return REFUSED == this || CANCELED == this || PAID == this;
+        return REFUSED == this || CANCELED == this || CLOSED == this;
     }
 }

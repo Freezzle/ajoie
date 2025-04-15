@@ -194,6 +194,22 @@ public class InvoicingPlan implements Serializable {
         return getInvoices().stream().map(Invoice::getTotalAmount).reduce(0.00, Double::sum);
     }
 
+    public Double getInvoicesDefaultTotal() {
+        return getInvoices().stream()
+                            .filter(i -> !i.isReduction())
+                            .map(Invoice::getTotalDefaultAmount)
+                            .reduce(0.00, Double::sum);
+    }
+
+    public Double getPaymentTotal() {
+        return this.getPayments()
+                   .stream()
+                   .filter(payment -> payment.getPaymentMode() != Mode.DISCOUNT)
+                   .map(Payment::getAmount)
+                   .reduce(Double::sum)
+                   .orElse(0.00);
+    }
+
     public Double getPaymentsTotal() {
         return getPayments().stream().map(Payment::getAmount).reduce(0.00, Double::sum);
     }
@@ -202,11 +218,18 @@ public class InvoicingPlan implements Serializable {
         Double totalDiscount = getPayments().stream()
                                             .filter(payment -> payment.getPaymentMode() == Mode.DISCOUNT)
                                             .map(Payment::getAmount)
+                                            .map(Math::abs)
                                             .reduce(0.00, Double::sum);
 
-        return totalDiscount + getInvoices().stream()
-                                            .filter(Invoice::hasDifference)
+        totalDiscount += getInvoices().stream()
+                                      .filter(Invoice::isReduction)
+                                      .map(Invoice::getTotalAmount)
+                                      .map(Math::abs)
+                                      .reduce(0.00, Double::sum);
+
+        return totalDiscount + getInvoices().stream().filter(Invoice::hasDifference).filter(in -> !in.isReduction())
                                             .map(Invoice::getTotalDifference)
+                                            .map(Math::abs)
                                             .reduce(0.00, Double::sum);
     }
 

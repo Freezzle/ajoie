@@ -14,7 +14,7 @@
       "could.not.extract": "Impossible d'extraire le fichier",
       "not.image": "Le fichier doit être une image et non du type \"{{ fileType }}\""
     },
-    "idexists": "Une nouvelle entité {{entityName}} ne peut pas avoir d'identifiant !",
+    "id.exists": "Une nouvelle entité {{entityName}} ne peut pas avoir d'identifiant !",
     "idinvalid": "Invalid Id",
     "idnotfound": "ID cannot be found",
     "idnull": "Identifiant invalide",

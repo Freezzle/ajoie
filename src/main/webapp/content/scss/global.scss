@@ -222,23 +222,27 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 /* ICONS */
 
-.blue-icon {
+.primary-icon {
   color: $primary;
+}
+
+.golden-icon {
+  color: #efbf00;
 }
 
 .grey-icon {
   color: #C6C6C6FF;
 }
 
-.green-icon {
+.success-icon {
   color: $success;
 }
 
-.orange-icon {
+.warning-icon {
   color: $warning;
 }
 
-.red-icon {
+.danger-icon {
   color: $danger;
 }
 
@@ -312,13 +316,20 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 /* FORM CONTROL */
 
 .form-control {
-  background-color: #ffeccb;
+  background-color: #fffddc;
   border: 1px solid $darkgrey;
-}
 
-.form-control:disabled {
-  background-color: #e6e6e6;
-  border: 1px dashed $dark;
+  &:focus {
+    background-color: #ffffff;
+    border: 1px solid $darkgrey;
+    outline: 0;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    background-color: #e6e6e6;
+    border: 1px dashed $dark;
+  }
 }
 
 /* LOG EVENT */
@@ -429,4 +440,8 @@ ngb-typeahead-window.dropdown-menu .dropdown-item:hover .ngb-highlight {
 .page-item.active .page-link {
   color: white;
   background-color: $primary;
+}
+
+.clickable {
+  cursor: pointer;
 }

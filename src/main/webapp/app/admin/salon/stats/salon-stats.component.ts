@@ -88,7 +88,7 @@ export class SalonStatsComponent implements OnInit {
           return EMPTY;
         }),
       ),
-      this.salonService.stats(this.salon()!.id, [Status.ACCEPTED, Status.PAID]).pipe(
+      this.salonService.stats(this.salon()!.id, [Status.ACCEPTED, Status.VALIDATED, Status.CLOSED]).pipe(
         mergeMap((stats: HttpResponse<ISalonStats>) => {
           if (stats.body) {
             return of(stats.body);
@@ -133,11 +133,11 @@ export class SalonStatsComponent implements OnInit {
     window.history.back();
   }
 
-  calculateFacturation(stat: { paid: number, discount: number, expected: number }): [number, number, number] {
-    const sumTotal = stat.expected + stat.discount;
-
-    const resultPaid = stat.paid / sumTotal * 100;
-    const resultDiscount = stat.discount / sumTotal * 100;
+  calculateFacturation(stat: {
+    paid: number, discount: number, expected: number, total: number, remaining: number
+  }): [number, number, number] {
+    const resultDiscount = stat.discount / stat.total * 100;
+    const resultPaid = (stat.paid / (stat.total)) * 100;
     const remaining = 100 - resultDiscount - resultPaid;
 
     return [remaining, resultPaid, resultDiscount];

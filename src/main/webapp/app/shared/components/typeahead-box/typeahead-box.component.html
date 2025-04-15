@@ -1,5 +1,5 @@
 <label [for]="'field_' + fieldName" class="fw-bold">{{ translateKey ?? '' | translate }}
-  <span *ngIf="this.controlDir.control?.hasValidator(Validators.required)" class="red-icon">*</span>
+  <span *ngIf="this.controlDir.control?.hasValidator(Validators.required)" class="danger-icon">*</span>
 </label>
 <input
   [formControl]="control"

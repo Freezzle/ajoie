@@ -8,14 +8,16 @@ import { Status } from '../../admin/enumerations/status.model';
 export default class StatusPipe implements PipeTransform {
   transform(value: string | Status | null | undefined): string {
     if (value === Status.ACCEPTED) {
-      return 'circle-check';
+      return 'check';
     } else if (value === Status.REFUSED) {
       return 'ban';
     } else if (value === Status.IN_VERIFICATION) {
-      return 'eye';
+      return 'hourglass-half';
     } else if (value === Status.CANCELED) {
-      return 'trash-can';
-    } else if (value === Status.PAID) {
+      return 'times-circle';
+    } else if (value === Status.VALIDATED) {
+      return 'calendar-check';
+    } else if (value === Status.CLOSED) {
       return 'piggy-bank';
     } else {
       return '';

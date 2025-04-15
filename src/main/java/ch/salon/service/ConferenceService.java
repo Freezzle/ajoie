@@ -12,9 +12,18 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
+import static ch.salon.web.rest.errors.ErrorBusinessKey.ENTITY_NOTFOUND;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.ID_EXISTS;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.ID_INVALID;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.ID_NULL;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.OBJ_NULL;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.PARTICIPATION_LINK_NULL;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.PARTICIPATION_NOTFOUND;
 
 @Service
 public class ConferenceService {
@@ -33,14 +42,28 @@ public class ConferenceService {
     }
 
     public UUID create(ConferenceDTO conference) {
-        if (conference == null || conference.getId() != null) {
-            throw new BadRequestAlertException("A new conference cannot already have an ID", ENTITY_NAME, "idexists");
+        if (conference == null) {
+            throw new BadRequestAlertException("A new conference must not be null", ENTITY_NAME, OBJ_NULL);
         }
+
+        if (conference.getId() != null) {
+            throw new BadRequestAlertException("A new conference cannot already have an ID", ENTITY_NAME, ID_EXISTS);
+        }
+
+        if (conference.getParticipation() == null || conference.getParticipation().getId() == null) {
+            throw new BadRequestAlertException("A new conference must be attached to a participation", ENTITY_NAME,
+                                               PARTICIPATION_LINK_NULL);
+        }
+
+        if (participationService.get(conference.getParticipation().getId()).isEmpty()) {
+            throw new BadRequestAlertException("Participation does not exist", ENTITY_NAME, PARTICIPATION_NOTFOUND);
+        }
+
         Conference entity = ConferenceMapper.INSTANCE.toEntity(conference);
         entity.setRegistrationDate(Instant.now());
         entity = conferenceRepository.save(entity);
 
-        this.eventLogService.eventFromSystem("Une conférence a été ajoutée.", EventType.EVENT, EntityType.PARTICIPATION,
+        this.eventLogService.eventFromSystem("Une conférence a été ajoutée", EventType.EVENT, EntityType.PARTICIPATION,
                                              entity.getParticipation().getId(), null);
 
         this.participationService.adaptStatusFromChildren(entity.getParticipation().getId());
@@ -49,27 +72,33 @@ public class ConferenceService {
     }
 
     public ConferenceDTO update(final UUID id, ConferenceDTO conference) {
-        if (conference == null || id == null || conference.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        if (conference == null) {
+            throw new BadRequestAlertException("A conference must not be null", ENTITY_NAME, OBJ_NULL);
+        }
+
+        if (id == null || conference.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, ID_NULL);
         }
 
         if (!Objects.equals(id, conference.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, ID_INVALID);
         }
 
         Conference conferenceExisting = this.conferenceRepository.findById(id)
                                                                  .orElseThrow(() -> new BadRequestAlertException(
-                                                                     "Entity not found", ENTITY_NAME, "idnotfound"));
+                                                                     "Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
 
         Conference conferenceToUpdate = ConferenceMapper.INSTANCE.toEntity(conference);
 
-        if (Conference.hasDifference(conferenceToUpdate, conferenceExisting)) {
-            this.eventLogService.eventFromSystem("Des éléments d'une conférence ont changé.", EventType.EVENT,
-                                                 EntityType.PARTICIPATION,
-                                                 conferenceExisting.getParticipation().getId(), null);
+        if (Conference.diffStatus(conferenceToUpdate, conferenceExisting)) {
+            this.eventLogService.eventFromSystem(
+                "Le statut d'une conférence a changé en '" + conferenceToUpdate.getStatus().name().toLowerCase() + "'",
+                EventType.EVENT, EntityType.PARTICIPATION, conferenceExisting.getParticipation().getId(),
+                Map.of("old_status", conferenceExisting.getStatus().name()));
         }
 
         conferenceToUpdate = conferenceRepository.save(conferenceToUpdate);
+
         this.participationService.adaptStatusFromChildren(conferenceToUpdate.getParticipation().getId());
 
         return ConferenceMapper.INSTANCE.toDto(conferenceToUpdate);
@@ -93,7 +122,7 @@ public class ConferenceService {
 
     public Optional<ConferenceDTO> get(UUID id) {
         if (id == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+            throw new BadRequestAlertException("Id null", ENTITY_NAME, ID_NULL);
         }
 
         return conferenceRepository.findById(id).map(ConferenceMapper.INSTANCE::toDto);
@@ -101,7 +130,7 @@ public class ConferenceService {
 
     public void delete(UUID id) {
         if (id == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+            throw new BadRequestAlertException("Id null", ENTITY_NAME, ID_NULL);
         }
 
         UUID idParticipation =

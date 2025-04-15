@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,14 +35,14 @@ public class StandService {
 
     public UUID create(StandDTO stand) {
         if (stand == null || stand.getId() != null) {
-            throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "id.exists");
         }
 
         Stand entity = StandMapper.INSTANCE.toEntity(stand);
         entity.setRegistrationDate(Instant.now());
         entity = standRepository.save(entity);
 
-        this.eventLogService.eventFromSystem("Un stand a été ajoutée.", EventType.EVENT, EntityType.PARTICIPATION,
+        this.eventLogService.eventFromSystem("Un stand a été ajouté", EventType.EVENT, EntityType.PARTICIPATION,
                                              entity.getParticipation().getId(), null);
         this.participationService.adaptStatusFromChildren(entity.getParticipation().getId());
 
@@ -64,10 +65,32 @@ public class StandService {
 
         Stand standToUpdate = StandMapper.INSTANCE.toEntity(stand);
 
-        if (Stand.hasDifference(standToUpdate, standExisting)) {
-            this.eventLogService.eventFromSystem("Des éléments d'un stand ont changé.", EventType.EVENT,
+        if (Stand.diffDimension(standToUpdate, standExisting)) {
+            this.eventLogService.eventFromSystem("Un stand a changé de dimension", EventType.EVENT,
                                                  EntityType.PARTICIPATION, standExisting.getParticipation().getId(),
-                                                 null);
+                                                 Map.of("old_dimension",
+                                                        standExisting.getDimension().getId().toString(),
+                                                        "new_dimension",
+                                                        standExisting.getDimension().getId().toString()));
+        }
+
+        if (Stand.diffShared(standToUpdate, standExisting)) {
+            if (standToUpdate.getShared()) {
+                this.eventLogService.eventFromSystem("Un stand a un co-exposant", EventType.EVENT,
+                                                     EntityType.PARTICIPATION, standExisting.getParticipation().getId(),
+                                                     null);
+            } else {
+                this.eventLogService.eventFromSystem("Un stand n'a plus de co-exposant", EventType.EVENT,
+                                                     EntityType.PARTICIPATION, standExisting.getParticipation().getId(),
+                                                     null);
+            }
+        }
+
+        if (Stand.diffStatus(standToUpdate, standExisting)) {
+            this.eventLogService.eventFromSystem(
+                "Le statut d'un stand a changé en '" + standToUpdate.getStatus().name().toLowerCase() + "'",
+                EventType.EVENT, EntityType.PARTICIPATION, standExisting.getParticipation().getId(),
+                Map.of("old_status", standExisting.getStatus().name()));
         }
 
         standToUpdate = standRepository.save(standToUpdate);
@@ -107,7 +130,7 @@ public class StandService {
 
         UUID idParticipation = get(id).map(StandDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
         standRepository.deleteById(id);
-        this.eventLogService.eventFromSystem("Un stand a été supprimée.", EventType.EVENT, EntityType.PARTICIPATION,
+        this.eventLogService.eventFromSystem("Un stand a été supprimé", EventType.EVENT, EntityType.PARTICIPATION,
                                              idParticipation, null);
         this.participationService.adaptStatusFromChildren(idParticipation);
     }

@@ -16,6 +16,10 @@ public class BadRequestAlertException extends ErrorResponseException {
 
     private final String errorKey;
 
+    public BadRequestAlertException(String defaultMessage, String entityName, ErrorBusinessKey errorKey) {
+        this(ErrorConstants.DEFAULT_TYPE, defaultMessage, entityName, errorKey.getMessageKey());
+    }
+
     public BadRequestAlertException(String defaultMessage, String entityName, String errorKey) {
         this(ErrorConstants.DEFAULT_TYPE, defaultMessage, entityName, errorKey);
     }

@@ -6,5 +6,5 @@ import { ApplicationConfigService } from '../../../core/config/application-confi
 export class VolunteerService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/volunteers');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/volunteers');
 }

@@ -1,7 +1,7 @@
 package ch.salon.domain.enumeration;
 
 /**
- * The Status enumeration.
+ * The State enumeration.
  */
 public enum State {
     DRAFT,

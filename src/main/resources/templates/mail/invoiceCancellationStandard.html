@@ -1,0 +1,18 @@
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="#{email.invoice.title(${salon})}"></title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+  <p>
+    Nous confirmons l’annulation de ta participation au salon. 🙌
+  </p>
+  <p>
+    Nous te souhaitons plein de succès dans tes projets présents et futurs,
+    et espérons avoir la joie de te recroiser lors d’une prochaine édition — ici ou ailleurs ! 😊
+  </p>
+  <p>Avec toute notre bienveillance.</p>
+
+  <div th:include="common/footer::footer"></div>
+</body>
+</html>

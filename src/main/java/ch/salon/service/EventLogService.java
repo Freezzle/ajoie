@@ -7,7 +7,6 @@ import ch.salon.repository.EventLogRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -16,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@Transactional(value = Transactional.TxType.REQUIRES_NEW)
+@Transactional(value = Transactional.TxType.REQUIRED)
 public class EventLogService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -26,14 +25,12 @@ public class EventLogService {
         this.eventLogRepository = eventLogRepository;
     }
 
-    @Async
     public void eventFromSystem(String label, EventType eventType, EntityType entityType, UUID referenceId,
                                 Map<String, String> extraAttributes) {
         this.eventLogRepository.save(
             instance(label, eventType, entityType, referenceId, Instant.now(), extraAttributes, true));
     }
 
-    @Async
     public void eventFromUser(String label, EventType eventType, EntityType entityType, UUID referenceId,
                               Instant referenceDate, Map<String, String> extraAttributes) {
         this.eventLogRepository.save(
@@ -41,8 +38,8 @@ public class EventLogService {
     }
 
     public List<EventLog> findAllEventLog(EntityType entityType, UUID referenceId) {
-        return this.eventLogRepository.findAllByEntityTypeAndReferenceIdOrderByReferenceDateDesc(entityType,
-                                                                                                 referenceId);
+        return this.eventLogRepository.findAllByEntityTypeAndReferenceIdOrderByReferenceDateAsc(entityType,
+                                                                                                referenceId);
     }
 
     private EventLog instance(String label, EventType eventType, EntityType entityType, UUID referenceId,

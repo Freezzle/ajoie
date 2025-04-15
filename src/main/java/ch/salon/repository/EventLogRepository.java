@@ -11,5 +11,5 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 @Repository
 public interface EventLogRepository extends JpaRepository<EventLog, UUID> {
-    List<EventLog> findAllByEntityTypeAndReferenceIdOrderByReferenceDateDesc(EntityType entityType, UUID id);
+    List<EventLog> findAllByEntityTypeAndReferenceIdOrderByReferenceDateAsc(EntityType entityType, UUID id);
 }

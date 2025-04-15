@@ -7,7 +7,7 @@ import { getFormattedParticipationName, IParticipation } from '../model/particip
 import { IInvoice, IInvoicingPlan, IPayment } from '../model/invoicing-plan.interface';
 import { ParticipationService } from '../service/participation.service';
 import { EMPTY, Observable, of } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { finalize, mergeMap } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
@@ -24,6 +24,12 @@ import { Mode } from '../../enumerations/mode.model';
 import { Status } from '../../enumerations/status.model';
 import { CheckboxBoxComponent } from '../../../shared/components/checkbox-box/checkbox-box.component';
 import { ButtonBoxComponent } from '../../../shared/components/button-box/button-box.component';
+import { AvailableAction } from '../../../shared/model/available-action';
+import { EmailMessage } from '../../../shared/email-dialog/email-message';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EmailDialogComponent } from '../../../shared/email-dialog/email-dialog.component';
+import { ActionsService } from '../../common/actions.service';
+import { EventModalComponent } from '../../../shared/event-modal/event-modal.component';
 
 @Component({
   standalone: true,
@@ -51,7 +57,6 @@ export class BillingComponent implements OnInit {
   participation = input<IParticipation | null>(null);
 
   invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
-  eventLogs$: Observable<any[]> | undefined;
   isLoading = false;
   modeValues = Object.keys(Mode);
   selectedInvoices: string[] = [];
@@ -61,113 +66,55 @@ export class BillingComponent implements OnInit {
   protected readonly State = State;
   protected participationService = inject(ParticipationService);
   protected invoicingPlanService = inject(InvoicingPlanService);
+  protected actionsService = inject(ActionsService);
+  protected modalService = inject(NgbModal);
 
   ngOnInit(): void {
     this.loadInvoicePlans();
-    this.loadEventLogs();
   }
 
   previousState(): void {
     window.history.back();
   }
 
-  generate(): void {
-    this.participationService.generateInvoices(this.participation()!.id).subscribe(() => {
-      this.loadInvoicePlans();
-    });
+  loadInvoicePlans(): void {
+    this.invoicingPlans$ = this.participationService.getInvoicingPlans(this.participation()!.id).pipe(
+      mergeMap((invoicingPlans: HttpResponse<IInvoicingPlan[]>) => {
+        if (invoicingPlans.body) {
+          const invoicingPlansList = invoicingPlans.body;
+
+
+          invoicingPlansList.forEach(ipl => {
+            this.actionsService.getAvailableActions('billing', ipl.id).subscribe((result) => {
+              ipl.availableActions = result;
+            });
+          });
+
+          invoicingPlansList.forEach(ipl => {
+            ipl.invoices?.forEach(invoice => {
+              invoice.readMode = true;
+            });
+          });
+
+          invoicingPlansList.forEach(ipl => {
+            ipl.payments?.forEach(payment => {
+              payment.readMode = true;
+            });
+          });
+
+          return of(invoicingPlansList);
+        } else {
+          return EMPTY;
+        }
+      }),
+    );
   }
 
   hasDiffCustomAndDefault(invoice: IInvoice): boolean {
     return Number(invoice.customAmount ?? 0) !== Number(invoice.defaultAmount ?? 0);
   }
 
-  sendInvoice(invoicingPlan: IInvoicingPlan): void {
-    this.isLoading = true;
-    this.invoicingPlanService.sendInvoice(invoicingPlan.id).subscribe(() => {
-      this.loadInvoicePlans();
-      this.loadEventLogs();
-      this.isLoading = false;
-    });
-  }
-
-  payInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
-    this.isLoading = true;
-    this.invoicingPlanService.payInvoicingPlanm(invoicingPlan.id).subscribe(() => {
-      this.loadInvoicePlans();
-      this.loadEventLogs();
-      this.isLoading = false;
-    });
-  }
-
-  cancelInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
-    this.isLoading = true;
-    this.invoicingPlanService.cancelInvoicingPlan(invoicingPlan.id).subscribe(() => {
-      this.loadInvoicePlans();
-      this.loadEventLogs();
-      this.isLoading = false;
-    });
-  }
-
-  deleteInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
-    this.isLoading = true;
-    this.invoicingPlanService.deleteInvoicingPlan(invoicingPlan.id).subscribe(() => {
-      this.loadInvoicePlans();
-      this.loadEventLogs();
-      this.isLoading = false;
-    });
-  }
-
-  downloadInvoice(invoicingPlan: IInvoicingPlan): void {
-    this.invoicingPlanService.downloadInvoice(invoicingPlan.id).subscribe(
-      blob => {
-        const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
-        window.open(url);
-
-        setTimeout(() => {
-          window.URL.revokeObjectURL(url);
-        }, 5000);
-      },
-    );
-  }
-
-  sendInvoiceReceipt(invoicingPlan: IInvoicingPlan): void {
-    this.isLoading = true;
-    this.invoicingPlanService.sendInvoiceReceipt(invoicingPlan.id).subscribe(() => {
-      this.loadInvoicePlans();
-      this.loadEventLogs();
-      this.isLoading = false;
-    });
-  }
-
-  startSplit(invoicingPlan: IInvoicingPlan): void {
-    this.selectedInvoices = [];
-    this.invoicePlanOnSplitMode = invoicingPlan.id;
-  }
-
-  cancelSplit(invoicingPlan: IInvoicingPlan): void {
-    if (invoicingPlan) {
-      this.selectedInvoices = [];
-      this.invoicePlanOnSplitMode = null;
-    }
-  }
-
-  isPlanOnSplitMode(invoicingPlan: IInvoicingPlan): boolean {
-    return invoicingPlan.id === this.invoicePlanOnSplitMode;
-  }
-
-  validateSplit(invoicingPlan: IInvoicingPlan): void {
-    if (invoicingPlan) {
-      this.invoicingPlanService.splitInvoicingPlan(invoicingPlan?.id, this.selectedInvoices)
-        .subscribe(() => {
-          this.selectedInvoices = [];
-          this.invoicePlanOnSplitMode = null;
-          this.loadInvoicePlans();
-        });
-    }
-  }
-
   onSelectInvoice(invoice: IInvoice) {
-    console.log('selected');
     if (invoice.selected) {
       invoice.selected = false;
       this.selectedInvoices = this.selectedInvoices.filter(inv => inv !== invoice.id);
@@ -220,37 +167,6 @@ export class BillingComponent implements OnInit {
     return this.totalInvoices(invoicingPlan.invoices ?? []) - this.totalPayments(invoicingPlan.payments ?? []);
   }
 
-  loadInvoicePlans(): void {
-    this.invoicingPlans$ = this.participationService.getInvoicingPlans(this.participation()!.id).pipe(
-      mergeMap((invoicingPlans: HttpResponse<IInvoicingPlan[]>) => {
-        if (invoicingPlans.body) {
-          const invoicingPlansList = invoicingPlans.body;
-
-          invoicingPlansList.forEach(ipl => {
-            ipl.invoices?.forEach(invoice => {
-              invoice.readMode = true;
-            });
-          });
-
-          invoicingPlansList.forEach(ipl => {
-            ipl.payments?.forEach(payment => {
-              payment.readMode = true;
-            });
-          });
-
-          return of(invoicingPlansList);
-        } else {
-          return EMPTY;
-        }
-      }),
-    );
-  }
-
-  loadEventLogs(): void {
-    this.eventLogs$ = this.participationService.getEventLogs(this.participation()!.id).pipe(
-      mergeMap((events: HttpResponse<any[]>) => events?.body ? of(events.body) : EMPTY));
-  }
-
   updateInvoice(invoicingPlan: IInvoicingPlan, invoice: IInvoice): void {
     invoice.readMode = true;
 
@@ -271,7 +187,6 @@ export class BillingComponent implements OnInit {
       invoice.extraInformation = invoiceResponse.body.extraInformation;
       invoice.generationDate = invoiceResponse.body.generationDate;
       invoice.lock = invoiceResponse.body.lock;
-      this.loadEventLogs();
     }
   }
 
@@ -298,7 +213,6 @@ export class BillingComponent implements OnInit {
       payment.extraInformation = paymentResponse.body.extraInformation;
       payment.billingDate = paymentResponse.body.billingDate;
       payment.amount = paymentResponse.body.amount;
-      this.loadEventLogs();
     }
   }
 
@@ -354,19 +268,7 @@ export class BillingComponent implements OnInit {
   mustPaymentBeDisabled(payment: IPayment, invoicingPlan: IInvoicingPlan): boolean {
     return !!payment.readMode ||
            (!this.isDraftState(invoicingPlan) && invoicingPlan.state !== State.ISSUED)
-           || this.participation()?.status === Status.PAID;
-  }
-
-  activateArrangement(invoicingPlan: IInvoicingPlan): void {
-    this.invoicingPlanService.switchArrangement(invoicingPlan.id).subscribe(() => {
-      invoicingPlan.needArrangement = true;
-    });
-  }
-
-  deactivateArrangement(invoicingPlan: IInvoicingPlan): void {
-    this.invoicingPlanService.switchArrangement(invoicingPlan.id).subscribe(() => {
-      invoicingPlan.needArrangement = false;
-    });
+           || this.participation()?.status === Status.CLOSED;
   }
 
   isInvoiceEditable(invoice: IInvoice): boolean {
@@ -376,7 +278,16 @@ export class BillingComponent implements OnInit {
   mustInvoiceBeDisabled(invoice: IInvoice, invoicingPlan: IInvoicingPlan): boolean {
     return !!invoice.readMode ||
            (!this.isDraftState(invoicingPlan) && invoicingPlan.state !== State.ISSUED)
-           || this.participation()?.status === Status.PAID;
+           || this.participation()?.status === Status.CLOSED;
+  }
+
+  disableActionButton(invoicingPlan: IInvoicingPlan): boolean {
+    return (
+      this.isLoading ||
+      this.isPlanOnSplitMode(invoicingPlan) ||
+      !invoicingPlan.invoices?.every((inv: IInvoice) => inv.readMode) ||
+      !invoicingPlan.payments?.every((pay: IPayment) => pay.readMode)
+    );
   }
 
   mustDisableSendButton(invoicingPlan: IInvoicingPlan): boolean {
@@ -392,42 +303,101 @@ export class BillingComponent implements OnInit {
     return this.isDraftState(invoicingPlan);
   }
 
-  showSendInvoice(invoicingPlan: IInvoicingPlan): boolean {
-    return this.isDraftState(invoicingPlan);
-  }
-
-  showReSendInvoice(invoicingPlan: IInvoicingPlan): boolean {
-    return invoicingPlan.state === State.ISSUED || invoicingPlan.state === State.PAID;
-  }
-
-  showSendInvoiceReceipt(invoicingPlan: IInvoicingPlan): boolean {
-    return invoicingPlan.state === State.ISSUED || invoicingPlan.state === State.PAID;
-  }
-
-  showCloseInvoice(invoicingPlan: IInvoicingPlan): boolean {
-    return this.isIssuedState(invoicingPlan);
-  }
-
   showInvoicingAction(invoicingPlan: IInvoicingPlan): boolean {
     return !this.isPlanOnSplitMode(invoicingPlan);
   }
 
-  showReceiptAction(invoicingPlan: IInvoicingPlan): boolean {
-    return !this.isPlanOnSplitMode(invoicingPlan) &&
-           (invoicingPlan.state === State.ISSUED || invoicingPlan.state === State.PAID);
+  openEmailPopup(action: AvailableAction, id: string) {
+    this.actionsService.templateEmailAction(action.contextCode, id).subscribe(template => {
+      const modalRef = this.modalService.open(EmailDialogComponent, { size: 'xl' });
+      modalRef.componentInstance.template = template;
+      modalRef.componentInstance.context = action.contextCode;
+      modalRef.componentInstance.entityId = id;
+
+      modalRef.result.then((result: EmailMessage) => {
+        if (result) {
+          this.isLoading = true;
+          this.actionsService.emailAction(action.contextCode, id, result)
+            .pipe(finalize(() => this.isLoading = false)).subscribe(() => {
+            this.loadInvoicePlans();
+          });
+        }
+      }).catch(() => {
+      });
+    });
   }
 
-  showActions(invoicingPlan: IInvoicingPlan): boolean {
-    return !this.isPlanOnSplitMode(invoicingPlan) &&
-           (invoicingPlan.state !== State.CANCELLED && invoicingPlan.state !== State.PAID);
+  clickAction(action: AvailableAction, invoicingPlan: IInvoicingPlan) {
+    if (action.type === 'EMAIL') {
+      this.openEmailPopup(action, invoicingPlan.id);
+    } else if (action.type === 'DOWNLOAD') {
+      this.isLoading = true;
+      this.actionsService.downloadAction(action.contextCode, invoicingPlan.id)
+        .pipe(finalize(() => this.isLoading = false)).subscribe(blob => {
+        const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+        window.open(url);
+
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+        }, 5000);
+      });
+    } else if (action.type === 'BUSINESS') {
+      this.isLoading = true;
+      this.actionsService.businessAction(action.contextCode, invoicingPlan.id)
+        .pipe(finalize(() => this.isLoading = false)).subscribe(() => {
+        this.loadInvoicePlans();
+      });
+    } else {
+      console.warn('Action type unknown : ' + action.type);
+    }
+  }
+
+  generate(): void {
+    this.participationService.generateInvoices(this.participation()!.id).subscribe(() => {
+      this.loadInvoicePlans();
+    });
+  }
+
+  startSplit(invoicingPlan: IInvoicingPlan): void {
+    this.selectedInvoices = [];
+    this.invoicePlanOnSplitMode = invoicingPlan.id;
+  }
+
+  cancelSplit(invoicingPlan: IInvoicingPlan): void {
+    if (invoicingPlan) {
+      this.selectedInvoices = [];
+      this.invoicePlanOnSplitMode = null;
+    }
+  }
+
+  isPlanOnSplitMode(invoicingPlan: IInvoicingPlan): boolean {
+    return invoicingPlan.id === this.invoicePlanOnSplitMode;
+  }
+
+  validateSplit(invoicingPlan: IInvoicingPlan): void {
+    if (invoicingPlan) {
+      this.invoicingPlanService.splitInvoicingPlan(invoicingPlan?.id, this.selectedInvoices)
+        .subscribe(() => {
+          this.selectedInvoices = [];
+          this.invoicePlanOnSplitMode = null;
+          this.loadInvoicePlans();
+        });
+    }
+  }
+
+  activateArrangement(invoicingPlan: IInvoicingPlan): void {
+    this.invoicingPlanService.switchArrangement(invoicingPlan.id).subscribe(() => {
+      invoicingPlan.needArrangement = true;
+    });
+  }
+
+  deactivateArrangement(invoicingPlan: IInvoicingPlan): void {
+    this.invoicingPlanService.switchArrangement(invoicingPlan.id).subscribe(() => {
+      invoicingPlan.needArrangement = false;
+    });
   }
 
   showCreateInvoice(invoicingPlan: IInvoicingPlan): boolean {
-    return this.isDraftState(invoicingPlan) && !this.isInvoicingPlanBlocked(invoicingPlan) &&
-           !this.isPlanOnSplitMode(invoicingPlan);
-  }
-
-  showInvoiceActions(invoicingPlan: IInvoicingPlan): boolean {
     return this.isDraftState(invoicingPlan) && !this.isInvoicingPlanBlocked(invoicingPlan) &&
            !this.isPlanOnSplitMode(invoicingPlan);
   }
@@ -438,18 +408,15 @@ export class BillingComponent implements OnInit {
            !this.isPlanOnSplitMode(invoicingPlan);
   }
 
+  showInvoiceActions(invoicingPlan: IInvoicingPlan): boolean {
+    return this.isDraftState(invoicingPlan) && !this.isInvoicingPlanBlocked(invoicingPlan) &&
+           !this.isPlanOnSplitMode(invoicingPlan);
+  }
+
   showPaymentActions(invoicingPlan: IInvoicingPlan): boolean {
     return (this.isDraftState(invoicingPlan) || this.isIssuedState(invoicingPlan)) &&
            !this.isInvoicingPlanBlocked(invoicingPlan) &&
            !this.isPlanOnSplitMode(invoicingPlan);
-  }
-
-  showCancelInvoice(invoicingPlan: IInvoicingPlan): boolean {
-    return this.isIssuedState(invoicingPlan);
-  }
-
-  showRemoveDraft(invoicingPlan: IInvoicingPlan): boolean {
-    return this.isDraftState(invoicingPlan);
   }
 
   showDeactivateArrangement(invoicingPlan: IInvoicingPlan): boolean {
@@ -474,7 +441,14 @@ export class BillingComponent implements OnInit {
 
   isInvoicingPlanBlocked(invoicingPlan: IInvoicingPlan): boolean {
     return invoicingPlan.state === State.CANCELLED || invoicingPlan.state === State.PAID
-           || this.participation()?.status === Status.PAID;
+           || this.participation()?.status === Status.CLOSED;
+  }
+
+  openHistoryModal(): void {
+    this.participationService.getEventLogs(this.participation()!.id).subscribe(events => {
+      const modalRef = this.modalService.open(EventModalComponent, { size: 'lg' });
+      modalRef.componentInstance.events = events.body ?? [];
+    });
   }
 
   protected readonly Status = Status;

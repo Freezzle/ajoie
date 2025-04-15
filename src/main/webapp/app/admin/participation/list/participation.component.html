@@ -57,6 +57,9 @@
             <span jhiTranslate="exhibitor.therapistName">Nom de thérapeute</span>
           </th>
           <th class="col-auto">
+            <span jhiTranslate="exhibitor.phoneNumber">Numéro de téléphone</span>
+          </th>
+          <th class="col-auto">
             <span>Commentaire</span>
           </th>
           <th class="col-1 text-center">
@@ -94,17 +97,20 @@
               </td>
               <td class="go-detail" [routerLink]="['./', participation.id, 'view']">
                 {{ participation.therapistName }}
-                <fa-icon *ngIf="participation.crushOfHeart" icon="heart" class="red-icon"></fa-icon>
-                <fa-icon *ngIf="participation.guestOfHonor" icon="star" class="orange-icon"></fa-icon>
+                <fa-icon *ngIf="participation.crushOfHeart" icon="heart" class="danger-icon"></fa-icon>
+                <fa-icon *ngIf="participation.guestOfHonor" icon="star" class="warning-icon"></fa-icon>
               </td>
               <td class="go-detail" [routerLink]="['./', participation.id, 'view']">
-                <fa-icon *ngIf="participation.extraInformation" icon="note-sticky" class="orange-icon" [title]="participation.extraInformation"/>
+                {{ participation.exhibitor?.phoneNumber ?? '' }}
+              </td>
+              <td class="go-detail" [routerLink]="['./', participation.id, 'view']">
+                <fa-icon *ngIf="participation.extraInformation" icon="note-sticky" class="warning-icon" [title]="participation.extraInformation"/>
               </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 {{ participation.registrationDate | formatMediumDate }}
               </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                <fa-icon *ngIf="participation.needArrangement" icon="handshake-simple" class="red-icon"></fa-icon>
+                <fa-icon *ngIf="participation.needArrangement" icon="handshake-simple" class="danger-icon"></fa-icon>
               </td>
               <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
                 <fa-icon [icon]="participation.status | status"
@@ -116,15 +122,15 @@
                   <fa-icon *ngIf="infoInvoice.hasDraftInvoices"
                            icon="sheet-plastic"
                            [title]="'invoicingPlan.drafts' | translate"
-                           class="blue-icon"></fa-icon>
+                           class="primary-icon"></fa-icon>
                   <fa-icon *ngIf="infoInvoice.hasWaitingInvoices"
                            icon="file-import"
                            [title]="'invoicingPlan.waitingPayments' | translate"
-                           class="green-icon"></fa-icon>
+                           class="success-icon"></fa-icon>
                   <fa-icon *ngIf="infoInvoice.hasExpiredInvoices"
                            icon="clock"
                            [title]="'invoicingPlan.expirations' | translate"
-                           class="red-icon"></fa-icon>
+                           class="danger-icon"></fa-icon>
                 </span>
               </td>
               <td class="text-end">

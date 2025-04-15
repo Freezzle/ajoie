@@ -4,13 +4,11 @@ import ch.salon.domain.Conference;
 import ch.salon.domain.FloorPlanSalon;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
-import ch.salon.domain.Payment;
 import ch.salon.domain.PriceStandSalon;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
-import ch.salon.domain.enumeration.Mode;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
@@ -71,7 +69,7 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (salon.getId() != null) {
-            throw new BadRequestAlertException("A new salon cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new salon cannot already have an ID", ENTITY_NAME, "id.exists");
         }
 
         return salonRepository.save(SalonMapper.INSTANCE.toEntity(salon)).getId();
@@ -261,33 +259,22 @@ public class SalonService {
                 participationsSalon.stream().map(Participation::getId).toList(), idSalon);
 
         for (InvoicingPlan invoicingPlan : invoicingPlans) {
-            if (invoicingPlan == null || ((!statuses.contains(Status.CANCELED) && !statuses.contains(Status.REFUSED)) &&
-                                          invoicingPlan.getState() == State.CANCELLED)) {
+
+            if (invoicingPlan == null || invoicingPlan.getState() == State.CANCELLED) {
                 continue;
             }
 
+            total += invoicingPlan.getInvoicesDefaultTotal();
             offered += invoicingPlan.getReductionsTotal();
-
-            paid += invoicingPlan.getPayments()
-                                 .stream()
-                                 .filter(payment -> payment.getPaymentMode() != Mode.DISCOUNT)
-                                 .map(Payment::getAmount)
-                                 .reduce(Double::sum)
-                                 .orElse(0.00);
-
-            total += invoicingPlan.getInvoicesTotal() - invoicingPlan.getPayments()
-                                                                     .stream()
-                                                                     .filter(payment -> payment.getPaymentMode() ==
-                                                                                        Mode.DISCOUNT)
-                                                                     .map(Payment::getAmount)
-                                                                     .reduce(Double::sum)
-                                                                     .orElse(0.00);
+            paid += invoicingPlan.getPaymentTotal();
         }
 
         FacturationStats facturationStats = new FacturationStats();
-        facturationStats.setPaid(paid);
+        facturationStats.setTotal(total);
         facturationStats.setDiscount(offered);
-        facturationStats.setExpected(total);
+        facturationStats.setExpected(total - offered);
+        facturationStats.setPaid(paid);
+        facturationStats.setRemaining(total - offered - paid);
         stats.setFacturation(facturationStats);
 
         return stats;

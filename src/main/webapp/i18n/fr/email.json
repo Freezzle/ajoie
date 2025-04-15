@@ -1,0 +1,7 @@
+{
+  "email": {
+    "from": "Expéditeur",
+    "subject": "Titre",
+    "to": "Destinataire"
+  }
+}

@@ -4,7 +4,7 @@
     "acceptedContract": "Contrat accepté ?",
     "additionnalInformation": "Complément d'information",
     "billing": {
-      "details": "Détails",
+      "details": "Détails de la participation",
       "events": "Evénements",
       "title": "Facturations"
     },
@@ -31,9 +31,10 @@
       "list": {
         "ACCEPTED": "Accepté",
         "CANCELED": "Annulé",
+        "CLOSED": "Clôturé",
         "IN_VERIFICATION": "En vérification",
-        "PAID": "Payé",
         "REFUSED": "Refusé",
+        "VALIDATED": "Validé",
         "null": " "
       }
     },

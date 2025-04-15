@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.w3c.tidy.Tidy;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 
@@ -23,9 +25,9 @@ public class DocumentCreator {
         this.documentTemplateEngine = documentTemplateEngine;
     }
 
-    public InputStreamSource generate(IDocumentCreatorContract instance) throws Exception {
+    public InputStreamSource build(String templateName, Context context) throws IOException {
         // Populate template HTML with data
-        String renderedHtmlContent = documentTemplateEngine.process(instance.getTemplateName(), instance.getContext());
+        String renderedHtmlContent = documentTemplateEngine.process(templateName, context);
         // Convert HTML to XHTML
         String xHtml = convertToXhtml(renderedHtmlContent);
 

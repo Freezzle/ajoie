@@ -13,7 +13,7 @@ import { removeAccents } from '../../../shared/utils/string.util';
 export class ExhibitorService {
   protected http = inject(HttpClient);
   protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/exhibitors');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/exhibitors');
 
   create(exhibitor: NewExhibitor): Observable<IExhibitor> {
     return this.http.post<IExhibitor>(this.resourceUrl, exhibitor);

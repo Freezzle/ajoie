@@ -1,7 +1,7 @@
 <div *ngIf="translateKey">
   <label [for]="'field_' + fieldName" class="fw-bold">
     {{ translateKey | translate }}
-    <span *ngIf="isFormControlUsed && control!.hasValidator(Validators.required)" class="red-icon">*</span>
+    <span *ngIf="isFormControlUsed && control!.hasValidator(Validators.required)" class="danger-icon">*</span>
   </label>
 </div>
 

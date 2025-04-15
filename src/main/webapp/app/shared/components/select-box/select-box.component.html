@@ -1,5 +1,5 @@
 <label *ngIf="translateKey" [for]="'field_' + fieldName" class="fw-bold">{{ translateKey | translate }}
-  <span *ngIf="this.control?.hasValidator(Validators.required)" class="red-icon">*</span>
+  <span *ngIf="this.control?.hasValidator(Validators.required)" class="danger-icon">*</span>
 </label>
 <select [compareWith]="compareFunction"
         [formControl]="control"
