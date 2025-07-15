@@ -32,8 +32,8 @@ public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPl
 
     @Override
     public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState().isNotDraft() &&
-               payload.getState() != State.CANCELLED ? SupportType.ALLOWED : SupportType.REJECTED;
+        return payload != null && payload.getState().isNotDraft() && payload.getState() != State.CANCELLED ?
+                SupportType.ALLOWED : SupportType.REJECTED;
     }
 
     @Override
@@ -44,8 +44,8 @@ public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPl
 
         Context thymeleafCtxt = new Context(recipient.getLanguage());
         /* HEADER */
-        thymeleafCtxt.setVariable("headerTitle", this.messageSource.getMessage("document.invoice-receipt.header", null,
-                                                                               Locale.FRENCH));
+        thymeleafCtxt.setVariable("headerTitle",
+                this.messageSource.getMessage("document.invoice-receipt.header", null, Locale.FRENCH));
         thymeleafCtxt.setVariable("recipient", recipient);
         thymeleafCtxt.setVariable("sender", sender);
 
@@ -54,8 +54,8 @@ public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPl
         thymeleafCtxt.setVariable("sentDate", DateUtils.instantToIso(Instant.now()));
         thymeleafCtxt.setVariable("invoiceDate", DateUtils.instantToIso(payload.getIssuedDate()));
 
-        thymeleafCtxt.setVariable("contact", "Claude Pascal / Grillon Nathalie");
-        thymeleafCtxt.setVariable("phone", "+41 79 768 60 84 / +41 79 690 18 71");
+        thymeleafCtxt.setVariable("contact", "Claude Pascal / Claude Charlène / Claude Dylan");
+        thymeleafCtxt.setVariable("phone", "+41797686084 / +33783246337 / +41799647875");
 
         thymeleafCtxt.setVariable("invoices", payload.getInvoices());
         thymeleafCtxt.setVariable("payments", payload.getPayments());

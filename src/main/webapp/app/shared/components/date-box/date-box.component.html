@@ -1,13 +1,21 @@
-<label *ngIf="translateKey" [for]="'field_' + fieldName" class="fw-bold">{{ translateKey | translate }}
-  <span *ngIf="this.controlDir.control?.hasValidator(Validators.required)" class="danger-icon">*</span>
-</label>
-<input (blur)="onTouched()"
-       (input)="onInput($event)"
-       [disabled]="disabled"
-       [id]="'field_' + fieldName"
-       [ngClass]="{'invalid': this.controlDir.control?.invalid && this.controlDir.control?.touched}"
-       [value]="value"
-       class="form-control"
-       placeholder="DD.MM.YYYY"
-       type="date"/>
-<error-box *ngIf="this.control.errors" [formControlElement]="this.control"/>
+<p-iftalabel>
+    <p-datepicker
+            [formControl]="control"
+            [inputId]="'field_' + fieldName"
+            [invalid]="controlDir.control?.invalid && controlDir.control?.touched"
+            showIcon
+            [firstDayOfWeek]="1"
+            [dateFormat]="'dd.mm.yy'"
+            iconDisplay="input"
+            fluid></p-datepicker>
+    @if (translateKey) {
+        <label [for]="'field_' + fieldName">{{ translateKey | translate }}
+            @if (control.hasValidator(Validators.required)) {
+                <span class="danger-icon">*</span>
+            }
+        </label>
+    }
+</p-iftalabel>
+@if (control.errors) {
+    <error-box [formControlElement]="control"/>
+}

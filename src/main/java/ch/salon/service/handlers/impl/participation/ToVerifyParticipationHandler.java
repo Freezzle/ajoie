@@ -23,8 +23,8 @@ public class ToVerifyParticipationHandler implements BusinessActionHandler<Parti
 
     @Override
     public SupportType supports(Participation payload, Map<String, Object> context) {
-        return payload != null &&
-               payload.getStatus() != Status.IN_VERIFICATION ? SupportType.ALLOWED : SupportType.REJECTED;
+        return payload != null && payload.getStatus() != Status.IN_VERIFICATION ? SupportType.ALLOWED :
+                SupportType.REJECTED;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class ToVerifyParticipationHandler implements BusinessActionHandler<Parti
         Status oldStatus = Status.valueOf(payload.getStatus().name());
         payload.setStatus(Status.IN_VERIFICATION);
         eventLogService.eventFromSystem("Participation en vérification", EventType.ACTION, EntityType.PARTICIPATION,
-                                        payload.getId(), Map.of("old_status", oldStatus.name()));
+                payload.getId(), Map.of("old_status", oldStatus.name()));
     }
 
     @Override

@@ -48,8 +48,8 @@ public class AuthorityResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<Authority> createAuthority(
-        @Valid @RequestBody Authority authority) throws URISyntaxException {
+    public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority)
+            throws URISyntaxException {
         log.debug("REST request to save Authority : {}", authority);
 
         if (authorityRepository.existsById(authority.getName())) {
@@ -58,7 +58,7 @@ public class AuthorityResource {
 
         authority = authorityRepository.save(authority);
         return created(new URI("/api/authorities/" + authority.getName())).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, authority.getName())).body(authority);
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, authority.getName())).body(authority);
     }
 
     @GetMapping("")

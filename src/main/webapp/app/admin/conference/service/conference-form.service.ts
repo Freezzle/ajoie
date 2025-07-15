@@ -1,59 +1,47 @@
-import { Injectable } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {Injectable} from '@angular/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 
-import { IConference, NewConference } from '../model/conference.interface';
-import { Status } from '../../enumerations/status.model';
-import { IExhibitor } from '../../exhibitor/model/exhibitor.interface';
+import {IConference} from '../model/conference.interface';
+import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 
 export type ConferenceFormGroup = {
-  id: FormControl<IConference['id'] | NewConference['id']>;
-  title: FormControl<IConference['title']>;
-  description: FormControl<IConference['description']>;
-  status: FormControl<IConference['status']>;
-  extraInformation: FormControl<IConference['extraInformation']>;
-  participation: FormControl<IConference['participation']>;
+    id: FormControl<IConference['id'] | null>;
+    title: FormControl<IConference['title'] | null>;
+    description: FormControl<IConference['description'] | null>;
+    status: FormControl<IConference['status'] | null>;
+    extraInformation: FormControl<IConference['extraInformation'] | null>;
+    participation: FormControl<IConference['participation'] | null>;
 };
 
 export type ConferenceFilterFormGroup = {
-  fullName: FormControl<IExhibitor['fullName']>;
-  status: FormControl<IConference['status']>;
+    fullName: FormControl<IExhibitor['fullName'] | null>;
+    status: FormControl<IConference['status'] | null>;
 };
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class ConferenceFormService {
-  createFilterFormGroup(): FormGroup<ConferenceFilterFormGroup> {
-    return new FormGroup<ConferenceFilterFormGroup>({
-      fullName: new FormControl(),
-      status: new FormControl(),
-    });
-  }
+    createFilterFormGroup(): FormGroup<ConferenceFilterFormGroup> {
+        return new FormGroup<ConferenceFilterFormGroup>({
+            fullName: new FormControl(null),
+            status: new FormControl(null),
+        });
+    }
 
-  createConferenceFormGroup(conference: IConference | NewConference): FormGroup<ConferenceFormGroup> {
-    const conferenceRawValue = {
-      ...this.getFormDefaults(),
-      ...conference,
-    };
-    return new FormGroup<ConferenceFormGroup>({
-      id: new FormControl(conferenceRawValue.id),
-      title: new FormControl(conferenceRawValue.title, [Validators.required]),
-      description: new FormControl(conferenceRawValue.description, [
-        Validators.required,
-        Validators.maxLength(500),
-      ]),
-      status: new FormControl(conferenceRawValue.status, Validators.required),
-      extraInformation: new FormControl(conferenceRawValue.extraInformation),
-      participation: new FormControl(conferenceRawValue.participation, Validators.required),
-    });
-  }
+    createConferenceFormGroup(conference: IConference | null): FormGroup<ConferenceFormGroup> {
+        return new FormGroup<ConferenceFormGroup>({
+            id: new FormControl(conference?.id ?? null),
+            title: new FormControl(conference?.title ?? null, [Validators.required]),
+            description: new FormControl(conference?.description ?? null, [
+                Validators.required,
+                Validators.maxLength(500),
+            ]),
+            status: new FormControl(conference?.status ?? null, Validators.required),
+            extraInformation: new FormControl(conference?.extraInformation ?? null),
+            participation: new FormControl(conference?.participation ?? null, Validators.required),
+        });
+    }
 
-  getConference(form: FormGroup<ConferenceFormGroup>): IConference | NewConference {
-    return form.getRawValue() as IConference | NewConference;
-  }
-
-  private getFormDefaults(): Pick<NewConference, 'id' | 'status'> {
-    return {
-      id: null,
-      status: Status.IN_VERIFICATION,
-    };
-  }
+    getConference(form: FormGroup<ConferenceFormGroup>): IConference {
+        return form.getRawValue() as IConference;
+    }
 }

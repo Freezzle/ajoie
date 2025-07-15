@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251102100000-1" author="claudedy">
+        <createTable tableName="workshop">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="registration_date" type="${datetimeType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="title" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="extra_information" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="participation_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+
+</databaseChangeLog>

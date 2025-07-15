@@ -1,119 +1,141 @@
 <div>
-  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <h2 id="page-heading">
-      <div class="d-flex justify-content-center">
-        <span *ngIf="editForm.controls.id.value" jhiTranslate="stand.edit">Modification d'un stand</span>
-        <span *ngIf="!editForm.controls.id.value" jhiTranslate="stand.create">Création d'un nouveau stand</span>
-      </div>
-      <hr/>
+    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+        <h2 id="page-heading">
+            <div class="d-flex justify-content-center">
+                @if (editForm.controls.id.value) {
+                    <span jhiTranslate="stand.edit">Modification d'un stand</span>
+                }
+                @if (!editForm.controls.id.value) {
+                    <span jhiTranslate="stand.create">Création d'un nouveau stand</span>
+                }
+            </div>
+            <hr/>
 
-      <div class="d-flex justify-content-between mt-3">
+            <div class="d-flex justify-content-between mt-3">
 
-        <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading"
-                    faIcon="arrow-left"
-                    translateKey="common.back"/>
+                <button-box (clickedEvent)="previousState()"
+                            [isDisabled]="isLoading"
+                            faIcon="arrow-left"
+                            translateKey="common.back"/>
 
-        <span>
-          <button-box (clickedEvent)="activateEditMode()"
-                      *ngIf="isReadOnly"
-                      [isDisabled]="isLoading"
-                      faIcon="pencil-alt"
-                      translateKey="common.edit"/>
+                <span>
+            @if (isReadOnly) {
+                <button-box (clickedEvent)="activateEditMode()"
+                            [isDisabled]="isLoading"
+                            faIcon="pencil-alt"
+                            translateKey="common.edit"/>
+            }
 
-          <button-box (clickedEvent)="activateReadOnlyMode()"
-                      *ngIf="editForm.controls.id.value && !isReadOnly"
-                      [isDisabled]="isLoading"
-                      faIcon="ban"
-                      translateKey="common.cancel"
-                      type="secondary"/>
+                    @if (editForm.controls.id.value && !isReadOnly) {
+                        <button-box (clickedEvent)="activateReadOnlyMode()"
+                                    [isDisabled]="isLoading"
+                                    faIcon="ban"
+                                    translateKey="common.cancel"
+                                    type="secondary"/>
+                    }
 
-          <button-box *ngIf="!isReadOnly"
-                      [isDisabled]="editForm.invalid || isLoading"
-                      [isSubmit]="true"
-                      faIcon="floppy-disk"
-                      translateKey="common.save"/>
-        </span>
-      </div>
-    </h2>
+                    @if (!isReadOnly) {
+                        <button-box [isDisabled]="editForm.invalid || isLoading"
+                                    [isSubmit]="true"
+                                    faIcon="floppy-disk"
+                                    translateKey="common.save"/>
+                    }
+          </span>
+            </div>
+        </h2>
 
-    <div>
-      <jhi-alert-error></jhi-alert-error>
+        <div>
+            <jhi-alert-error></jhi-alert-error>
 
-      <jhi-alert></jhi-alert>
+            <jhi-alert></jhi-alert>
 
-      <div class="card">
-        <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="mt-3 col-12">
-              <textarea-box [maxLength]="500"
-                            [rows]="6"
-                            [showCounter]="true"
-                            fieldName="description"
-                            formControlName="description"
-                            translateKey="stand.description"/>
+            <div class="card">
+                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mt-3 col-12">
+                            <textarea-box [maxLength]="500"
+                                          [rows]="6"
+                                          [showCounter]="true"
+                                          fieldName="description"
+                                          formControlName="description"
+                                          translateKey="stand.description"/>
+                        </div>
+                        <div class="mt-3 col-sm-6 col-lg-4 d-flex">
+                            <select-box [formatterFunction]="formatterParticipation"
+                                        [options]="participationsOptions"
+                                        fieldName="participation"
+                                        formControlName="participation"
+                                        translateKey="stand.participation"
+                                        class="w-100"/>
+                            @if (isReadOnly && !!editForm.controls.participation.value?.id) {
+                                <link-box class="align-content-center"
+                                          [modeButton]="false"
+                                          style="background-color: #e6e6e6;border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"
+                                          [links]="['/admin', 'salons', params.get('idSalon'), 'participations', editForm.controls.participation.value?.id ?? '' ,'view']"
+                                          [showText]="false"
+                                          faIcon="link"/>
+                            }
+                        </div>
+                        <div class="mt-3 col-sm-6 col-lg-4">
+                            <select-box [formatterFunction]="formatterDimensionStand"
+                                        [options]="dimensionsOptions"
+                                        fieldName="dimension"
+                                        formControlName="dimension"
+                                        translateKey="stand.dimension"/>
+                        </div>
+                        <div class="mt-3 col-6 col-lg-4">
+                            <select-box [formatterFunction]="formatterStatus"
+                                        [needTranslation]="true"
+                                        [options]="statusValues"
+                                        fieldName="status"
+                                        formControlName="status"
+                                        translateKey="stand.status.label"/>
+                        </div>
+                        <div class="mt-3 col-6 col-lg-4">
+                            <select-box [formatterFunction]="formatterCategory"
+                                        [needTranslation]="true"
+                                        [options]="categoryValues"
+                                        fieldName="category"
+                                        formControlName="category"
+                                        translateKey="stand.category.label"/>
+                        </div>
+                        <div class="mt-3 col-6 col-lg-4">
+                            <number-box fieldName="nbTable" formControlName="nbTable" translateKey="stand.nbTable"/>
+                        </div>
+                        <div class="mt-3 col-6 col-lg-4">
+                            <number-box fieldName="nbChair" formControlName="nbChair" translateKey="stand.nbChair"/>
+                        </div>
+                        <div class="mt-3 col-lg-4">
+                            <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
+                        </div>
+                        <div class="mt-3 col-lg-4">
+                            <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
+                        </div>
+                        <div class="mt-3 col-lg-4">
+                            <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
+                        </div>
+                        <div class="mt-3 col-12">
+                            <text-box fieldName="urlPicture"
+                                      formControlName="urlPicture"
+                                      translateKey="stand.urlPicture"/>
+                        </div>
+                        <div class="mt-3 col-6 col-lg-4">
+                            <checkbox-box fieldName="needElectricity"
+                                          formControlName="needElectricity"
+                                          translateKey="stand.needElectricity"/>
+                        </div>
+                        <div class="mt-3 col-6 col-lg-4">
+                            <checkbox-box fieldName="shared" formControlName="shared" translateKey="stand.shared"/>
+                        </div>
+                        <div class="mt-3 col-12">
+                            <textarea-box fieldName="extraInformation"
+                                          formControlName="extraInformation"
+                                          translateKey="stand.extraInformation"/>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="mt-3 col-lg-4">
-              <typeahead-box [formatterFunction]="formatterDimensionStand"
-                             [options]="dimensionsOptions"
-                             fieldName="dimension"
-                             formControlName="dimension"
-                             translateKey="stand.dimension"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <typeahead-box [formatterFunction]="formatterParticipation"
-                             [options]="participationsOptions"
-                             fieldName="participation"
-                             formControlName="participation"
-                             translateKey="stand.participation"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <select-box [formatterFunction]="formatterStatus"
-                          [needTranslation]="true"
-                          [options]="statusValues"
-                          fieldName="status"
-                          formControlName="status"
-                          translateKey="stand.status.label"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
-            </div>
-            <div class="mt-3 col-12">
-              <text-box fieldName="urlPicture" formControlName="urlPicture" translateKey="stand.urlPicture"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <number-box fieldName="nbTable" formControlName="nbTable" translateKey="stand.nbTable"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <number-box fieldName="nbChair" formControlName="nbChair" translateKey="stand.nbChair"/>
-            </div>
-            <div class="mt-3 col-lg-4">
-              <select-box [formatterFunction]="formatterCategory"
-                          [needTranslation]="true"
-                          [options]="categoryValues"
-                          fieldName="category"
-                          formControlName="category"
-                          translateKey="stand.category.label"/>
-            </div>
-            <div class="mt-3 col-6 col-lg-4">
-              <checkbox-box fieldName="needElectricity" formControlName="needElectricity" translateKey="stand.needElectricity"/>
-            </div>
-            <div class="mt-3 col-6 col-lg-4">
-              <checkbox-box fieldName="shared" formControlName="shared" translateKey="stand.shared"/>
-            </div>
-            <div class="mt-3 col-12">
-              <textarea-box fieldName="extraInformation" formControlName="extraInformation" translateKey="stand.extraInformation"/>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </form>
+    </form>
 </div>

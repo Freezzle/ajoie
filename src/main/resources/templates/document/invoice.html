@@ -1,109 +1,121 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <link href="styles.css" media="all" rel="stylesheet" type="text/css" />
-  </head>
+<head>
+    <meta charset="UTF-8"/>
+    <link href="styles.css" media="all" rel="stylesheet" type="text/css"/>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-  <body>
-    <div class="header" th:include="common/header::header"></div>
+        .body {
+            position: relative;
+            min-height: 100%;
+            padding-bottom: 300px; /* réserve de place pour le bloc total>0 */
+            box-sizing: border-box;
+        }
 
-    <div class="letterhead" th:include="common/letterhead::letterhead"></div>
+        .total-section {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin-top: auto;
+        }
 
-    <div class="body">
-      <table class="padding-all-5">
+        @media print {
+            .total-section {
+                position: fixed;
+                bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header" th:include="common/header::header"></div>
+<div class="letterhead" th:include="common/letterhead::letterhead"></div>
+<div class="body">
+    <table class="padding-all-5">
         <tr>
-          <td class="top-left">
-            <span th:utext="#{document.invoice.reference}"></span>
-            <b>[[${reference}]]</b><br />
-            <span th:text="#{document.invoice.send-date}"></span>
-            [[${sentDate}]]<br />
-            <span th:text="#{document.invoice.expiration-date}"></span>
-            [[${expirationDate}]]<br />
-          </td>
-          <td class="top-right">
-            <span th:utext="#{document.invoice.contacts}"></span>
-            <br />
-            [[${contact}]]<br />
-            [[${phone}]]
-          </td>
+            <td class="top-left">
+                <span th:utext="#{document.invoice.reference}"></span>
+                [[${reference}]]<br/>
+                <span th:utext="#{document.invoice.send-date}"></span>
+                [[${sentDate}]]<br/>
+                <span th:utext="#{document.invoice.expiration-date}"></span>
+                [[${expirationDate}]]<br/>
+            </td>
+            <td class="top-right">
+                <span th:utext="#{document.invoice.contacts}"></span>
+                <br/>
+                [[${contact}]]<br/>
+                [[${phone}]]
+            </td>
         </tr>
-      </table>
-      <br />
-      <table class="padding-all-5">
+    </table>
+    <br/>
+    <table class="padding-all-5">
         <thead class="bg">
-          <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40">
+        <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40">
             <span th:utext="#{document.invoice.table.header.description}"></span>
-          </td>
-          <td class="bottom-right width-20 padding-top-5 padding-bottom-5">
+        </td>
+        <td class="bottom-right width-20 padding-top-5 padding-bottom-5">
             <span th:utext="#{document.invoice.table.header.price}"></span>
-          </td>
-          <td class="bottom-center width-10 padding-top-5 padding-bottom-5">
+        </td>
+        <td class="bottom-center width-10 padding-top-5 padding-bottom-5">
             <span th:utext="#{document.invoice.table.header.quantity}"></span>
-          </td>
-          <td class="bottom-right padding-right-5 width-30 padding-top-5 padding-bottom-5">
+        </td>
+        <td class="bottom-right padding-right-5 width-30 padding-top-5 padding-bottom-5">
             <span th:utext="#{document.invoice.table.header.amount}"></span>
-          </td>
+        </td>
         </thead>
-
         <tr>
-          <td colspan="4">&nbsp;</td>
+            <td colspan="4">&nbsp;</td>
         </tr>
         <tr th:each="invoice: ${invoices}">
-          <td class="center-left padding-left-5" th:text="${invoice.getLabel()}" />
-          <td class="center-right" th:text="${#numbers.formatDecimal(invoice.getCustomAmount(), 1, 2, 'POINT')}" />
-          <td class="center-center" th:text="${invoice.getQuantity()}" />
-          <td class="center-right padding-right-5" th:text="${#numbers.formatDecimal(invoice.getTotalAmount(), 1, 2, 'POINT')}" />
+            <td class="center-left padding-left-5" th:text="${invoice.getLabel()}"/>
+            <td class="center-right" th:text="${#numbers.formatDecimal(invoice.getCustomAmount(), 1, 2, 'POINT')}"/>
+            <td class="center-center" th:text="${invoice.getQuantity()}"/>
+            <td class="center-right padding-right-5"
+                th:text="${#numbers.formatDecimal(invoice.getTotalAmount(), 1, 2, 'POINT')}"/>
         </tr>
         <tr>
-          <td colspan="4">&nbsp;</td>
+            <td colspan="4">&nbsp;</td>
         </tr>
-
         <tr th:each="payment: ${payments}" th:if="${hasPaidSomething}">
-          <td class="center-left padding-left-5" colspan="3" th:text="${payment.getExtraInformation()}" />
-          <td class="center-right padding-right-5" th:text="-${#numbers.formatDecimal(payment.getAmount(), 1, 2, 'POINT')}" />
+            <td class="center-left padding-left-5" colspan="3" th:text="${payment.getExtraInformation()}"/>
+            <td class="center-right padding-right-5"
+                th:text="-${#numbers.formatDecimal(payment.getAmount(), 1, 2, 'POINT')}"/>
         </tr>
         <tr th:if="${hasPaidSomething}">
-          <td colspan="4">&nbsp;</td>
+            <td colspan="4">&nbsp;</td>
         </tr>
         <tr class="bg">
-          <td class="top-left padding-left-5 padding-bottom-5 padding-top-5" colspan="3">
-            <span th:if="${total < 0}" th:utext="#{document.invoice.table.line.negative-remaining-amount}"></span>
-            <span th:if="${total > 0}" th:utext="#{document.invoice.table.line.positive-remaining-amount}"></span>
-            <span th:if="${total == 0}" th:utext="#{document.invoice.table.line.no-remaining-amount}"></span>
-          </td>
-          <td class="top-right padding-right-5 padding-bottom-5 padding-top-5">
-            <b>[[${#numbers.formatDecimal(total, 1, 2, 'POINT')}]]</b>
-          </td>
+            <td class="top-left padding-left-5 padding-bottom-5 padding-top-5" colspan="3">
+                <span th:if="${total < 0}" th:utext="#{document.invoice.table.line.negative-remaining-amount}"></span>
+                <span th:if="${total > 0}" th:utext="#{document.invoice.table.line.positive-remaining-amount}"></span>
+                <span th:if="${total == 0}" th:utext="#{document.invoice.table.line.no-remaining-amount}"></span>
+            </td>
+            <td class="top-right padding-right-5 padding-bottom-5 padding-top-5">
+                <b>CHF [[${#numbers.formatDecimal(total, 1, 2, 'POINT')}]]</b>
+            </td>
         </tr>
-      </table>
-      <br />
-      <br />
-      <div th:if="${total > 0}">
-        <span th:utext="#{document.invoice.important.title}"></span>
-        <hr class="border-thin" />
-        <div class="padding-left-5">
-          <span th:utext="#{document.invoice.important.text1}"></span>
-          <br />
-          <span th:if="${!arrangement}" th:utext="#{document.invoice.important.text2(${expirationDate})}"></span>
-          <span th:if="${arrangement}" th:utext="#{document.invoice.important.text2.arrangement(${expirationDate})}"></span>
-        </div>
-        <br />
-        <span th:utext="#{document.invoice.bank-detail.title}"></span>
-        <hr class="border-thin" />
-        <div class="padding-left-5">
-          [[${iban}]]<br />
-          [[${sender.getEnterpriseName()}]]<br />
-          [[${sender.getStreet()}]]<br />
-          [[${sender.getCity()}]]<br />
-        </div>
-      </div>
-
-      <br />
-      <div>
-        <p th:utext="#{document.invoice.text.final(${sender.getEnterpriseName()})}"></p>
-      </div>
+    </table>
+    <br/>
+    <p th:utext="#{document.invoice.important.title}"></p>
+    <div class="padding-left-5">
+        <p th:utext="#{document.invoice.important.text1}"></p>
+        <br/>
+        <p th:if="${arrangement}"
+              th:utext="#{document.invoice.important.text2.arrangement(${expirationDate})}"></p>
     </div>
-    <div class="footer" th:include="common/footer::footer"></div>
-  </body>
+    <br/>
+    <br/>
+    <div th:if="${total > 0}" class="total-section">
+        <img th:src="${qrBillDataUri}" alt="Swiss QR" style="width:100%;"/>
+    </div>
+</div>
+</body>
 </html>

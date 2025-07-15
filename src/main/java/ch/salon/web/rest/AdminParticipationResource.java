@@ -53,8 +53,7 @@ public class AdminParticipationResource {
     private String applicationName;
 
     public AdminParticipationResource(ParticipationService participationService,
-                                      InvoicingPlanService invoicingPlanService,
-                                      EventLogRepository eventLogRepository) {
+            InvoicingPlanService invoicingPlanService, EventLogRepository eventLogRepository) {
         this.participationService = participationService;
         this.invoicingPlanService = invoicingPlanService;
         this.eventLogRepository = eventLogRepository;
@@ -62,31 +61,29 @@ public class AdminParticipationResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Participation> createParticipation(
-        @RequestBody Participation participation) throws URISyntaxException {
+    public ResponseEntity<Participation> createParticipation(@RequestBody Participation participation)
+            throws URISyntaxException {
         log.debug("REST request to save Participation : {}", participation);
 
         UUID id = participationService.create(participation);
 
         return created(new URI("/api/admin/participations/" + id)).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(participation);
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(participation);
     }
 
     @GetMapping("/{idParticipation}/info-invoice")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<InfoInvoice> getInfoFromInvoicing(@PathVariable(value = "idParticipation",
-                                                                          required = false)
-                                                            final UUID idParticipation) {
+    public ResponseEntity<InfoInvoice> getInfoFromInvoicing(
+            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation) {
 
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(participationService.getInfoInvoice(idParticipation)));
     }
 
     @PutMapping("/{idParticipation}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Participation> updateParticipation(@PathVariable(value = "idParticipation",
-                                                                           required = false) final UUID idParticipation,
-                                                             @RequestBody
-                                                             Participation participation) throws URISyntaxException {
+    public ResponseEntity<Participation> updateParticipation(
+            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
+            @RequestBody Participation participation) throws URISyntaxException {
         log.debug("REST request to update Participation : {}, {}", idParticipation, participation);
 
         participation = participationService.update(idParticipation, participation);
@@ -111,13 +108,13 @@ public class AdminParticipationResource {
         participationService.delete(idParticipation);
 
         return noContent().headers(
-            createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idParticipation.toString())).build();
+                createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idParticipation.toString())).build();
     }
 
     @GetMapping("/{idParticipation}/invoicing-plans")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<InvoicingPlanDTO> getAllInvoicingPlans(@PathVariable(name = "idParticipation",
-                                                                     required = false) String idParticipation) {
+    public List<InvoicingPlanDTO> getAllInvoicingPlans(
+            @PathVariable(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all InvoicingPlans");
 
         return invoicingPlanService.findAll(idParticipation);
@@ -125,8 +122,8 @@ public class AdminParticipationResource {
 
     @PatchMapping("/{idParticipation}/refresh-invoicing-plans")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public void generateInvoicingPlan(@PathVariable(name = "idParticipation",
-                                                    required = false) String idParticipation) {
+    public void generateInvoicingPlan(
+            @PathVariable(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all Participations");
 
         invoicingPlanService.refreshInvoicingPlans(idParticipation);
@@ -134,8 +131,8 @@ public class AdminParticipationResource {
 
     @GetMapping("/{idParticipation}/events")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<EventLogDTO> getAllLogs(@PathVariable(value = "idParticipation",
-                                                      required = false) final UUID idParticipation) {
+    public List<EventLogDTO> getAllLogs(
+            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation) {
         log.debug("REST request to get all EventLogs");
 
         return participationService.findAllEventLogs(idParticipation);

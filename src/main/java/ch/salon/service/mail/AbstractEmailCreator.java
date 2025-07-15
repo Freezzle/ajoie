@@ -50,7 +50,7 @@ public abstract class AbstractEmailCreator {
         try {
             Map<String, InputStreamSource> attachments = getAttachments() != null ? getAttachments() : new HashMap<>();
 
-            MimeMessageHelper message = getMimeMessageHelper(mimeMessage, !attachments.isEmpty(), getHtmlContent());
+            MimeMessageHelper message = getMimeMessageHelper(mimeMessage, true, getHtmlContent());
 
             for (Map.Entry<String, InputStreamSource> entry : attachments.entrySet()) {
                 message.addAttachment(entry.getKey(), entry.getValue());
@@ -66,8 +66,8 @@ public abstract class AbstractEmailCreator {
         return mailTemplateEngine.process(getTemplateName(), getContext());
     }
 
-    private MimeMessageHelper getMimeMessageHelper(MimeMessage mimeMessage, boolean withAttachments,
-                                                   String content) throws MessagingException, IOException {
+    private MimeMessageHelper getMimeMessageHelper(MimeMessage mimeMessage, boolean withAttachments, String content)
+            throws MessagingException, IOException {
         MimeMessageHelper message = new MimeMessageHelper(mimeMessage, withAttachments, UTF_8.name());
 
         // FIXME CHANGE THAT LATER

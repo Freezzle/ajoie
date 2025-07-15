@@ -1,40 +1,40 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { createRequestOption } from 'app/core/request/request-util';
-import { IConference, NewConference } from '../model/conference.interface';
+import {inject, Injectable} from '@angular/core';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {ApplicationConfigService} from 'app/core/config/application-config.service';
+import {createRequestOption} from 'app/core/request/request-util';
+import {IConference} from '../model/conference.interface';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class ConferenceService {
-  protected http = inject(HttpClient);
-  protected applicationConfigService = inject(ApplicationConfigService);
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/conferences');
+    protected http = inject(HttpClient);
+    protected applicationConfigService = inject(ApplicationConfigService);
+    protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/conferences');
 
-  create(conference: NewConference): Observable<IConference> {
-    return this.http.post<IConference>(this.resourceUrl, conference);
-  }
+    create(conference: IConference): Observable<IConference> {
+        return this.http.post<IConference>(this.resourceUrl, conference);
+    }
 
-  update(conference: IConference): Observable<IConference> {
-    return this.http.put<IConference>(`${this.resourceUrl}/${this.getConferenceIdentifier(conference)}`, conference);
-  }
+    update(conference: IConference): Observable<IConference> {
+        return this.http.put<IConference>(`${this.resourceUrl}/${this.getConferenceIdentifier(conference)}`, conference);
+    }
 
-  find(idConference: string): Observable<HttpResponse<IConference>> {
-    return this.http.get<IConference>(`${this.resourceUrl}/${idConference}`, {
-      observe: 'response',
-    });
-  }
+    find(idConference: string): Observable<HttpResponse<IConference>> {
+        return this.http.get<IConference>(`${this.resourceUrl}/${idConference}`, {
+            observe: 'response',
+        });
+    }
 
-  query(req?: any): Observable<IConference[]> {
-    const options = createRequestOption(req);
-    return this.http.get<IConference[]>(this.resourceUrl, { params: options });
-  }
+    query(req?: any): Observable<IConference[]> {
+        const options = createRequestOption(req);
+        return this.http.get<IConference[]>(this.resourceUrl, {params: options});
+    }
 
-  delete(idConference: string): Observable<{}> {
-    return this.http.delete(`${this.resourceUrl}/${idConference}`);
-  }
+    delete(idConference: string): Observable<{}> {
+        return this.http.delete(`${this.resourceUrl}/${idConference}`);
+    }
 
-  getConferenceIdentifier(conference: Pick<IConference, 'id'>): string {
-    return conference.id;
-  }
+    getConferenceIdentifier(conference: Pick<IConference, 'id'>): string {
+        return conference.id;
+    }
 }

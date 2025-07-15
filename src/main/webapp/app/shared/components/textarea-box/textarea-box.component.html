@@ -1,15 +1,28 @@
-<label *ngIf="translateKey" [for]="'field_' + fieldName" class="fw-bold">{{ translateKey | translate }}
-  <span *ngIf="this.control?.hasValidator(Validators.required)" class="danger-icon">*</span>
-</label>
-<textarea (blur)="onTouched()"
-          (input)="onInput($event)"
-          [disabled]="disabled"
-          [id]="'field_' + fieldName" [ngClass]="{'invalid': this.control.invalid && this.control.touched}"
-          [value]="value"
-          class="form-control"
-          rows="{{rows}}"
-          type="text"></textarea>
+<p-iftalabel>
+    <textarea pTextarea
+              id="over_label"
+              [formControl]="control"
+              rows="5"
+              [invalid]="control.invalid && control.touched"
+              cols="30"
+              fluid></textarea>
 
-<small *ngIf="showCounter && maxLength" class="fw-light">({{ this.control.value?.length ?? 0 }} / {{ maxLength }})</small>
-<small *ngIf="showCounter && !maxLength" class="fw-light">({{ this.control.value?.length ?? 0 }})</small>
-<error-box *ngIf="this.control.errors" [formControlElement]="this.control"/>
+    @if (translateKey) {
+        <label [for]="'field_' + fieldName">
+            {{ translateKey | translate }}
+            @if (control.hasValidator(Validators.required)) {
+                <span class="danger-icon">*</span>
+            }
+        </label>
+    }
+</p-iftalabel>
+
+@if (control.errors) {
+    <error-box [formControlElement]="control"/>
+}
+@if (showCounter && maxLength) {
+    <small class="fw-light">({{ control.value?.length ?? 0 }} / {{ maxLength }})</small>
+}
+@if (showCounter && !maxLength) {
+    <small class="fw-light">({{ control.value?.length ?? 0 }})</small>
+}

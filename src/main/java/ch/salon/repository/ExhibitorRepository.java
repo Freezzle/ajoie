@@ -15,5 +15,10 @@ public interface ExhibitorRepository extends JpaRepository<Exhibitor, UUID> {
     @EntityGraph(attributePaths = {"billingAddress"})
     List<Exhibitor> findByOrderByRegistrationDateDesc();
 
+    List<Exhibitor> findAllByPhoneNumberIsEndingWithIgnoreCase(String phoneNumber);
+
+    List<Exhibitor> findAllByFullNameContainingIgnoreCaseAndFullNameContainingIgnoreCase(String firstName,
+            String lastName);
+
     Exhibitor findByEmail(String email);
 }

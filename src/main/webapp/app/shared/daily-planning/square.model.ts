@@ -1,4 +1,4 @@
 export interface Square {
-  idColumn: string;
-  category: string;
+    idColumn: string;
+    category: string;
 }

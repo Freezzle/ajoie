@@ -37,4 +37,12 @@
         </createTable>
         <dropDefaultValue tableName="invoicing_plan" columnName="generation_date" columnDataType="${datetimeType}"/>
     </changeSet>
+
+    <changeSet id="202511161111-1" author="dylan">
+        <addColumn tableName="invoicing_plan">
+            <column name="invoice_sending_method" type="varchar(50)" defaultValue="EMAIL">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

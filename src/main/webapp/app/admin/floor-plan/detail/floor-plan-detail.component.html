@@ -8,33 +8,37 @@
 
     <div class="d-flex justify-content-between mt-3">
       <span class="col-3">
-        <button-box (clickedEvent)="previousState()"
-                    *ngIf="isReadOnly"
-                    [isDisabled]="isLoading"
-                    faIcon="arrow-left"
-                    translateKey="common.back"/>
+        @if (isReadOnly) {
+          <button-box (clickedEvent)="previousState()"
+            [isDisabled]="isLoading"
+            faIcon="arrow-left"
+            translateKey="common.back"/>
+        }
       </span>
 
       <span class="text-end col-3">
-        <button-box (clickedEvent)="activateEditMode()"
-                    *ngIf="isReadOnly"
-                    [isDisabled]="isLoading"
-                    faIcon="pencil-alt"
-                    translateKey="common.edit"/>
+        @if (isReadOnly) {
+          <button-box (clickedEvent)="activateEditMode()"
+            [isDisabled]="isLoading"
+            faIcon="pencil-alt"
+            translateKey="common.edit"/>
+        }
 
-        <button-box (clickedEvent)="activateReadOnlyMode()"
-                    *ngIf="!isReadOnly"
-                    [isDisabled]="isLoading"
-                    faIcon="ban"
-                    translateKey="common.cancel"
-                    type="secondary"/>
+        @if (!isReadOnly) {
+          <button-box (clickedEvent)="activateReadOnlyMode()"
+            [isDisabled]="isLoading"
+            faIcon="ban"
+            translateKey="common.cancel"
+            type="secondary"/>
+        }
 
-        <button-box (clickedEvent)="save()"
-                    *ngIf="!isReadOnly"
-                    [isDisabled]="isLoading"
-                    [isSubmit]="true"
-                    faIcon="floppy-disk"
-                    translateKey="common.save"/>
+        @if (!isReadOnly) {
+          <button-box (clickedEvent)="save()"
+            [isDisabled]="isLoading"
+            [isSubmit]="true"
+            faIcon="floppy-disk"
+            translateKey="common.save"/>
+        }
       </span>
     </div>
   </h2>
@@ -48,345 +52,438 @@
       <div class="col-12">
         <div class="d-flex justify-content-center">
           <ul class="nav nav-tabs" id="tabId" role="tablist">
-            <li *ngFor="let floorPlan of this.floorPlans; let floorIndex = index" class="nav-item" role="presentation">
-              <div class="btn-group">
-                <button (click)="changePlanView(floorIndex)"
-                        [class.disabled]="this.isLoading"
-                        class="nav-link {{ this.indexActiveFloorPlan === floorIndex ? 'active' : '' }}"
-                        id="floorPlan-tab-{{ floorIndex }}"
-                        role="tab"
-                        type="button">
-                  {{ floorPlan.name }}
-                </button>
-                <div *ngIf="!isReadOnly && this.indexActiveFloorPlan === floorIndex"
-                     class="btn-group {{ this.indexActiveFloorPlan === floorIndex ? 'active' : '' }}"
-                     ngbDropdown
-                     role="group">
-                  <button [class.disabled]="this.isLoading" class="btn btn-outline-primary" ngbDropdownToggle type="button">
-                    <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+            @for (floorPlan of floorPlans; track floorPlan; let floorIndex = $index) {
+              <li class="nav-item"
+                role="presentation">
+                <div class="btn-group">
+                  <button (click)="changePlanView(floorIndex)"
+                    [class.disabled]="isLoading"
+                    class="nav-link {{ indexActiveFloorPlan === floorIndex ? 'active' : '' }}"
+                    id="floorPlan-tab-{{ floorIndex }}"
+                    role="tab"
+                    type="button">
+                    {{ floorPlan.name }}
                   </button>
-                  <div class="dropdown-menu" ngbDropdownMenu>
-                    <button (click)="rename()" [class.disabled]="this.isLoading" id="rename-tab" ngbDropdownItem>
-                      Renommer
-                    </button>
-                    <button (click)="delete()" [class.disabled]="this.isLoading" id="delete-tab" ngbDropdownItem>
-                      Supprimer
-                    </button>
-                  </div>
+                  @if (!isReadOnly && indexActiveFloorPlan === floorIndex) {
+                    <div
+                      class="btn-group {{ indexActiveFloorPlan === floorIndex ? 'active' : '' }}"
+                      ngbDropdown
+                      role="group">
+                      <button [class.disabled]="isLoading" class="btn btn-outline-primary"
+                        ngbDropdownToggle
+                        type="button">
+                        <fa-icon [title]="'common.edit' | translate" icon="pencil-alt"></fa-icon>
+                      </button>
+                      <div class="dropdown-menu" ngbDropdownMenu>
+                        @if (canMoveFloorPlan('right')) {
+                          <button
+                            (click)="movePositionFloorPlan('right')"
+                            [class.disabled]="isLoading" id="rename-tab" ngbDropdownItem>
+                            Déplacer ->
+                          </button>
+                        }
+                        @if (canMoveFloorPlan('left')) {
+                          <button (click)="movePositionFloorPlan('left')"
+                            [class.disabled]="isLoading" id="rename-tab" ngbDropdownItem>
+                            <- Déplacer
+                          </button>
+                        }
+                        <button (click)="rename()" [class.disabled]="isLoading" id="rename-tab"
+                          ngbDropdownItem>
+                          Renommer
+                        </button>
+                        <button (click)="delete()" [class.disabled]="isLoading" id="delete-tab"
+                          ngbDropdownItem>
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+                  }
                 </div>
-              </div>
-            </li>
-            <li *ngIf="!isReadOnly" class="nav-item" role="presentation">
-              <button (click)="openAddDialog()" [class.disabled]="this.isLoading" class="nav-link" id="add-tab" role="tab" type="button">
-                +
-              </button>
-            </li>
+              </li>
+            }
+            @if (!isReadOnly) {
+              <li class="nav-item" role="presentation">
+                <button (click)="openAddDialog()" [class.disabled]="isLoading" class="nav-link"
+                  id="add-tab"
+                  role="tab" type="button">
+                  +
+                </button>
+              </li>
+            }
           </ul>
         </div>
       </div>
 
       <!-- ############ PANELS ############ -->
-      <div *ngIf="!showDimensions && showAvailableStands" class="col-2 side-column">
-        <div class="text-center stands-list">
-          <div *ngFor="let standRemaining of availableStands" class="stand-item">
-            <div [style.background-color]="getColorStand(standRemaining)">
-              {{ getFirstExhibitorName(standRemaining.participation?.exhibitor) }}
-            </div>
-            <div class="stand-description">
-              <div>{{ standRemaining.dimension?.dimension }}</div>
-              <div>{{ 'participation.status.list.' + standRemaining.participation?.status | translate }}</div>
-            </div>
+      @if (!showDimensions && showAvailableStands) {
+        <div class="col-2 side-column">
+          <div class="text-center stands-list">
+            @for (standRemaining of availableStands; track standRemaining) {
+              <div class="stand-item">
+                <div [style.background-color]="getColorStand(standRemaining)">
+                  {{ getFirstExhibitorName(standRemaining.participation.exhibitor) }}
+                </div>
+                <div class="stand-description">
+                  <div>{{ standRemaining.dimension.dimension }}</div>
+                  <div>{{ 'participation.status.list.' + standRemaining.participation.status | translate }}</div>
+                </div>
+              </div>
+            }
           </div>
         </div>
-      </div>
-      <div *ngIf="!showAvailableStands && showDimensions" class="col-2 side-column">
-
-        <button-box (clickedEvent)="changeRotationAvailableDimensions()"
-                    [showText]="false"
-                    faIcon="rotate"
-                    style="position: absolute;"
-                    translateKey="floorPlan.changeRotation"/>
-
-        <!-- DIMENSIONS -->
-        <div #shapesDropList
-             (cdkDropListDropped)="drop($event)"
-             [cdkDropListDisabled]="isReadOnly"
-             cdkDropList
-             cdkDropListSortingDisabled
-             class="row shapes-container">
-          <div (cdkDragMoved)="highlightCells($event)"
-               *ngFor="let dimension of availableDimensions"
-               [cdkDragData]="dimension"
-               [cdkDragDisabled]="isReadOnly"
-               cdkDrag
-               class="col-12 shape-container">
-            <div [class.disabled]="isReadOnly"
-                 [style.height.px]="dimension.rows * this.PIXELS"
-                 [style.width.px]="dimension.cols * this.PIXELS"
-                 cdkDragHandle
-                 class="draggable">
-              {{ dimension.dimension }}
+      }
+      @if (!showAvailableStands && showDimensions) {
+        <div class="col-2 side-column">
+          <button-box (clickedEvent)="changeRotationAvailableDimensions()"
+            [showText]="false"
+            faIcon="rotate"
+            style="position: absolute;"
+            translateKey="floorPlan.changeRotation"/>
+            <!-- DIMENSIONS -->
+            <div #shapesDropList
+              (cdkDropListDropped)="drop($event)"
+              [cdkDropListDisabled]="isReadOnly"
+              cdkDropList
+              cdkDropListSortingDisabled
+              class="row shapes-container">
+              @for (dimension of availableDimensions; track dimension) {
+                <div (cdkDragMoved)="highlightCells($event)"
+                  [cdkDragData]="dimension"
+                  [cdkDragDisabled]="isReadOnly"
+                  (cdkDragStarted)="isDragging = true"
+                  (cdkDragEnded)="isDragging = false"
+                  cdkDrag
+                  class="col-12 shape-container">
+                  <div [class.disabled]="isReadOnly"
+                    [style.height.px]="dimension.rows * PIXELS"
+                    [style.width.px]="dimension.cols * PIXELS"
+                    [class.dragging]="isDragging"
+                    cdkDragHandle
+                    class="draggable">
+                    {{ dimension.dimension }}
+                  </div>
+                </div>
+              }
             </div>
           </div>
-        </div>
-      </div>
-      <!-- ############ DRAWING ############ -->
-      <div class="col-10 main-column">
-        <div class="drawing-area">
-          <div class="content-around-drawing">
-            <div class="palette">
-              <div class="block-icon">
-                <fa-icon (click)="showAvailableStands = !showAvailableStands; showDimensions = false"
-                         [class]="showAvailableStands ? 'icon-active' : 'icon-inactive'"
-                         icon="person"
-                         style="cursor:pointer;"
-                />
-                <div *ngIf="!isReadOnly">
-                  <fa-icon (click)="showDimensions = !showDimensions; showAvailableStands = false"
-                           [class]="showDimensions ? 'icon-active' : 'icon-inactive'"
-                           icon="map-location-dot"
-                           style="cursor:pointer;"
-                  />
-                </div>
-                <hr/>
-              </div>
-              <div class="block-icon">
-                <div>
-                  <fa-icon (click)="changeHeader()"
-                           [class]="displayHeader ? 'icon-active' : 'icon-inactive'"
-                           icon="pager"
-                           style="cursor:pointer;"
-                  />
-                </div>
+        }
+        <!-- ############ DRAWING ############ -->
+        <div class="col-10 main-column">
+          <div class="drawing-area">
+            <div class="content-around-drawing">
+              <div class="palette">
+                <div class="block-icon">
+                  <fa-icon (click)="showAvailableStands = !showAvailableStands; showDimensions = false"
+                    [class]="showAvailableStands ? 'icon-active' : 'icon-inactive'"
+                    icon="person"
+                    style="cursor:pointer;"
+                    />
+                    @if (!isReadOnly) {
+                      <div>
+                        <fa-icon (click)="showDimensions = !showDimensions; showAvailableStands = false"
+                          [class]="showDimensions ? 'icon-active' : 'icon-inactive'"
+                          icon="map-location-dot"
+                          style="cursor:pointer;"
+                          />
+                        </div>
+                      }
+                      <hr/>
+                    </div>
+                    <div class="block-icon">
+                      <div>
+                        <fa-icon (click)="changeHeader()"
+                          [class]="displayHeader ? 'icon-active' : 'icon-inactive'"
+                          icon="pager"
+                          style="cursor:pointer;"
+                          />
+                        </div>
 
-                <div>
-                  <fa-icon (click)="changeTechnicalInfo()"
-                           [class]="displayTechnical ? 'icon-active' : 'icon-inactive'"
-                           [ngbTooltip]="'floorPlan.technicalInfo' | translate"
-                           [openDelay]="500"
-                           icon="circle-info"
-                           placement="start"
-                           style="cursor:pointer;"
-                  />
-                </div>
-                <hr/>
-              </div>
-              <div class="block-icon">
-                <fa-icon (click)="changeDisplayName()"
-                         [class]="displayFullname ? 'icon-active' : 'icon-inactive'"
-                         [ngbTooltip]="'floorPlan.displayName' | translate"
-                         [openDelay]="500"
-                         icon="signature"
-                         placement="start"
-                         style="cursor:pointer;"
-                />
-                <hr/>
-              </div>
-              <div *ngIf="!isReadOnly" class="block-icon">
-                <fa-icon (click)="changeAttributionMode()"
-                         [class]="isNumberAttribution.value ? 'icon-active' : 'icon-inactive'"
-                         [ngbTooltip]="'floorPlan.attributionMode' | translate"
-                         [openDelay]="500"
-                         icon="location-dot"
-                         placement="start"
-                         style="cursor:pointer;"
-                />
-                <input *ngIf="isNumberAttribution.value"
-                       [formControl]="nextPosition" [ngbTooltip]="'floorPlan.nextPosition' | translate"
-                       [openDelay]="500"
-                       placement="start"
-                       style="min-width:2em;width:2em;max-width:3em; border:1px dashed grey;text-align: center;"
-                />
-                <fa-icon (click)="changeAutoIncrement()"
-                         *ngIf="isNumberAttribution.value"
-                         [class]="automaticallyIncrementNumber.value ? 'icon-active' : 'icon-inactive'"
-                         [ngbTooltip]="'floorPlan.automaticallyIncrementNumber' | translate"
-                         [openDelay]="500"
-                         icon="wand-magic-sparkles"
-                         placement="start"
-                         style="cursor:pointer;"/>
-                <hr/>
-              </div>
-            </div>
-            <table #gridDropList cdkDropList class="grid">
-              <tbody>
-                @if (!this.isLoading && this.getActiveFloorPlan()) {
-                  <tr *ngFor="let row of this.getActiveFloorPlanData().cells; let rowIndex = index">
-                    <td (cdkDropListDropped)="drop($event)"
-                        (contextmenu)="openContextMenu($event, rowIndex, colIndex)"
-                        *ngFor="let cell of row; let colIndex = index"
-                        [attr.data-shape-id]="cell.id"
-                        [ngStyle]="{ 'background-color': cell.colorHighlight }"
-                        cdkDropList
-                        class="cell">
-                      <div *ngIf="cell.dimension"
-                           [style.background-color]="cell.dimension!.color"
-                           [style.height.px]="cell.dimension!.rows * PIXELS"
-                           [style.width.px]="cell.dimension!.cols * PIXELS"
-                           class="shape-fixed"
-                           cdkDrag
-                           (cdkDragStarted)="startDragging(cell)"
-                           (cdkDragEnded)="finishDragging(cell)"
-                           (cdkDragMoved)="highlightCells($event)"
-                           [style.cursor]="showDimensions ? 'move' : 'pointer'"
-                           [cdkDragDisabled]="isReadOnly || !showDimensions"
-                           [cdkDragData]="cell.dimension"
-                           #popover="ngbPopover"
-                           triggers="manual"
-                           (click)="(!isReadOnly && isNumberAttribution.value) ? onClickNumberAttribution(cell) : togglePopover(popover, cell)"
-                           [ngbPopover]="popoverContent"
-                           popoverTitle="Détails du Stand"
-                           [autoClose]="'outside'">
-
-                        <div class="shape-inside" *ngIf="cell.dimension as dimension">
-                          <div class="business-info" *ngIf="!displayTechnical">
-                            <span *ngIf="!dimension.stand">
-                              {{ dimension.dimension }}
-                            </span>
-
-                            <div *ngIf="dimension.stand?.participation as participation">
-                              @if (displayFullname) {
-                                {{ participation.therapistName }}
-                              } @else {
-                                {{ getFirstExhibitorName(participation.exhibitor) }}
-                              }
-                            </div>
+                        <div>
+                          <fa-icon (click)="changeTechnicalInfo()"
+                            [class]="displayTechnical ? 'icon-active' : 'icon-inactive'"
+                            [ngbTooltip]="'floorPlan.technicalInfo' | translate"
+                            [openDelay]="500"
+                            icon="circle-info"
+                            placement="start"
+                            style="cursor:pointer;"
+                            />
                           </div>
-                          <div *ngIf="displayHeader" class="technical-header">
-                            <div class="technical-info-item">
-                              @if (dimension.stand && dimension.stand.dimension?.id !== dimension.idDimension) {
-                                <fa-icon [title]="'floorPlan.differentDimension' | translate"
-                                         class="danger-icon" icon="warning"></fa-icon>
-                              }
-                            </div>
-
-                            <div class="technical-info-item">
-                              @if (dimension.stand?.participation; as participation) {
-                                <fa-icon [title]="'participation.status.list.' + participation.status | translate"
-                                         [icon]="participation.status | status"
-                                         [class]="participation.status | colorStatus"></fa-icon>
-                              }
-                            </div>
-
-                            <div class="technical-info-item">
-                              @if (dimension.position; as position) {
-                                <span [title]="'stand.position' | translate">{{ position }}</span>
-                              }
-                            </div>
+                          <hr/>
+                        </div>
+                        <div class="block-icon">
+                          <fa-icon (click)="changeDisplayName()"
+                            [class]="displayFullname ? 'icon-active' : 'icon-inactive'"
+                            [ngbTooltip]="'floorPlan.displayName' | translate"
+                            [openDelay]="500"
+                            icon="signature"
+                            placement="start"
+                            style="cursor:pointer;"
+                            />
+                            <hr/>
                           </div>
-                          <div *ngIf="displayTechnical" class="technical-info">
-                            <div class="technical-info-item">&nbsp;</div>
-                            <div class="technical-info-item">&nbsp;</div>
-                            <div class="technical-info-item">&nbsp;</div>
-
-                            @if (dimension.stand; as stand) {
-                              <div class="technical-info-item" [title]="'stand.needElectricity' | translate">
-                                <fa-icon [class]="stand.needElectricity ? 'warning-icon' : 'grey-icon'" icon="bolt-lightning"></fa-icon>
-                              </div>
-
-                              <div class="technical-info-item" [title]="'stand.nbChair' | translate">
-                                @if (stand.nbChair ?? 0 > 0) {
-                                  {{ stand.nbChair }}
-                                  <fa-icon class="success-icon" icon="chair"></fa-icon>
-                                } @else {
-                                  <fa-icon class="grey-icon" icon="chair"></fa-icon>
+                          @if (!isReadOnly) {
+                            <div class="block-icon">
+                              <fa-icon (click)="changeAttributionMode()"
+                                [class]="isNumberAttribution.value ? 'icon-active' : 'icon-inactive'"
+                                [ngbTooltip]="'floorPlan.attributionMode' | translate"
+                                [openDelay]="500"
+                                icon="location-dot"
+                                placement="start"
+                                style="cursor:pointer;"
+                                />
+                                @if (isNumberAttribution.value) {
+                                  <input
+                                    [formControl]="nextPosition" [ngbTooltip]="'floorPlan.nextPosition' | translate"
+                                    [openDelay]="500"
+                                    placement="start"
+                                    style="min-width:2em;width:2em;max-width:3em; border:1px dashed grey;text-align: center;"
+                                    />
                                 }
-                              </div>
-
-                              <div class="technical-info-item" [title]="'stand.nbTable' | translate">
-                                @if (stand.nbTable ?? 0 > 0) {
-                                  {{ stand.nbTable }}
-                                  <fa-icon class="success-icon" icon="cube"></fa-icon>
-                                } @else {
-                                  <fa-icon class="grey-icon" icon="cube"></fa-icon>
+                                @if (isNumberAttribution.value) {
+                                  <fa-icon (click)="changeAutoIncrement()"
+                                    [class]="automaticallyIncrementNumber.value ? 'icon-active' : 'icon-inactive'"
+                                    [ngbTooltip]="'floorPlan.automaticallyIncrementNumber' | translate"
+                                    [openDelay]="500"
+                                    icon="wand-magic-sparkles"
+                                    placement="start"
+                                    style="cursor:pointer;"/>
                                 }
-                              </div>
-
-                              <div class="technical-info-item" [title]="'stand.shared' | translate">
-                                <fa-icon [class]="stand.shared ? 'success-icon' : 'grey-icon'" icon="people-arrows"></fa-icon>
+                                <hr/>
                               </div>
                             }
                           </div>
+                          <table #gridDropList cdkDropList class="grid">
+                            <tbody>
+                              @if (!isLoading && getActiveFloorPlan()) {
+                                @for (row of getActiveFloorPlanData().cells; track row; let rowIndex = $index) {
+                                  <tr>
+                                    @for (cell of row; track cell; let colIndex = $index) {
+                                      <td (cdkDropListDropped)="drop($event)"
+                                        (contextmenu)="openContextMenu($event, rowIndex, colIndex)"
+                                        [attr.data-shape-id]="cell.id"
+                                        [ngStyle]="{ 'background-color': cell.colorHighlight }"
+                                        cdkDropList
+                                        class="cell">
+                                        @if (cell.dimension) {
+                                          <div
+                                            [style.background-color]="cell.dimension!.color"
+                                            [style.height.px]="cell.dimension!.rows * PIXELS"
+                                            [style.width.px]="cell.dimension!.cols * PIXELS"
+                                            class="shape-fixed no-selection"
+                                            cdkDrag
+                                            (cdkDragStarted)="startDragging(cell)"
+                                            (cdkDragEnded)="finishDragging(cell)"
+                                            [class.dragging]="isDragging"
+                                            (cdkDragMoved)="highlightCells($event)"
+                                            [style.cursor]="showDimensions ? 'move' : 'pointer'"
+                                            [cdkDragDisabled]="isReadOnly || !showDimensions"
+                                            [cdkDragData]="cell.dimension"
+                                            #popover="ngbPopover"
+                                            triggers="manual"
+                                            (click)="(!isReadOnly && isNumberAttribution.value) ? onClickNumberAttribution(cell) : togglePopover(popover, cell)"
+                                            [ngbPopover]="popoverContent"
+                                            popoverTitle="Détails du Stand"
+                                            [autoClose]="'outside'">
+                                            @if (cell.dimension; as dimension) {
+                                              <div class="shape-inside">
+                                                @if (!displayTechnical) {
+                                                  <div class="business-info">
+                                                    @if (!dimension.stand) {
+                                                      <span>
+                                                        {{ dimension.dimension }}
+                                                      </span>
+                                                    }
+                                                    @if (dimension.stand?.participation; as participation) {
+                                                      <div>
+                                                        @if (displayFullname) {
+                                                          {{ participation.therapistName }}
+                                                        } @else {
+                                                          {{ getFirstExhibitorName(participation.exhibitor) }}
+                                                        }
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                }
+                                                @if (displayHeader) {
+                                                  <div class="technical-header">
+                                                    <div class="technical-info-item">
+                                                      @if (dimension.stand && dimension.stand.dimension.id !== dimension.idDimension) {
+                                                        <fa-icon
+                                                          [title]="'floorPlan.differentDimension' | translate"
+                                                        class="danger-icon" icon="warning"></fa-icon>
+                                                      }
+                                                    </div>
+                                                    <div class="technical-info-item">
+                                                      @if (dimension.stand?.participation; as participation) {
+                                                        <fa-icon
+                                                          [title]="'participation.status.list.' + participation.status | translate"
+                                                          [icon]="participation.status | status"
+                                                        [class]="participation.status | colorStatus"></fa-icon>
+                                                      }
+                                                    </div>
+                                                    <div class="technical-info-item">
+                                                      @if (dimension.position; as position) {
+                                                        <span [title]="'stand.position' | translate">{{ position }}</span>
+                                                      }
+                                                    </div>
+                                                  </div>
+                                                }
+                                                @if (displayTechnical) {
+                                                  <div class="technical-info">
+                                                    <div class="technical-info-item">&nbsp;</div>
+                                                    <div class="technical-info-item">&nbsp;</div>
+                                                    <div class="technical-info-item">&nbsp;</div>
+                                                    @if (dimension.stand; as stand) {
+                                                      <div class="technical-info-item"
+                                                        [title]="'stand.needElectricity' | translate">
+                                                        <fa-icon
+                                                          [class]="stand.needElectricity ? 'warning-icon' : 'grey-icon'"
+                                                        icon="bolt-lightning"></fa-icon>
+                                                      </div>
+                                                      <div class="technical-info-item"
+                                                        [title]="'stand.nbChair' | translate">
+                                                        @if (stand.nbChair > 0) {
+                                                          {{ stand.nbChair }}
+                                                          <fa-icon class="success-icon" icon="chair"></fa-icon>
+                                                        } @else {
+                                                          <fa-icon class="grey-icon" icon="chair"></fa-icon>
+                                                        }
+                                                      </div>
+                                                      <div class="technical-info-item"
+                                                        [title]="'stand.nbTable' | translate">
+                                                        @if (stand.nbTable > 0) {
+                                                          {{ stand.nbTable }}
+                                                          <fa-icon class="success-icon" icon="cube"></fa-icon>
+                                                        } @else {
+                                                          <fa-icon class="grey-icon" icon="cube"></fa-icon>
+                                                        }
+                                                      </div>
+                                                      <div class="technical-info-item"
+                                                        [title]="'stand.shared' | translate">
+                                                        <fa-icon
+                                                          [class]="stand.shared ? 'success-icon' : 'grey-icon'"
+                                                        icon="people-arrows"></fa-icon>
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                }
+                                              </div>
+                                            }
+                                          </div>
+                                        }
+                                      </td>
+                                    }
+                                  </tr>
+                                }
+                              } @else if (isLoading) {
+                                <tr>
+                                  <td>Chargement en cours...</td>
+                                </tr>
+                              } @else {
+                                <tr>
+                                  <td>Aucun plan trouvé. Veuiller en créer un !</td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
                         </div>
                       </div>
-                    </td>
-                  </tr>
-                } @else if (this.isLoading) {
-                  <tr>
-                    <td>Chargement en cours...</td>
-                  </tr>
-                } @else {
-                  <tr>
-                    <td>Aucun plan trouvé. Veuiller en créer un !</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+                    </div>
+                  </div>
 
-    <!-- ############ POPINS ############ -->
+                  <!-- ############ POPINS ############ -->
 
-    <!-- POPOVER -->
-    <ng-template #popoverContent>
-      <div *ngIf="gridCellPopOver" class="popover-parent">
-        @if (gridCellPopOver.dimension?.stand; as stand) {
-          <strong>Thérapeute :</strong> {{ stand.participation?.therapistName ?? 'Non défini' }}<br/>
-          <strong>Nom :</strong> {{ stand.participation?.exhibitor?.fullName ?? 'Non défini' }}<br/>
-          <strong>Catégorie :</strong> {{ 'stand.category.list.' + stand.category | translate }}<br/>
-          <strong>Dimension sur plan:</strong> {{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}<br/>
-          <strong>Dimension participation:</strong> {{ stand.dimension?.dimension ?? 'Inconnu' }}<br/>
-          <strong>Status :</strong> {{ 'participation.status.list.' + stand.participation?.status | translate }}<br/>
-          <strong>Commentaire :</strong> {{ stand.participation?.extraInformation }}<br/>
-          <hr/>
-          <link-box *ngIf="stand.participation && isReadOnly"
-                    translateKey="common.view"
-                    faIcon="link"
-                    [links]="['../', 'participations', stand.participation.id, 'view']"/>
-        } @else {
-          <p><strong>Dimension:</strong> {{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</p>
-        }
-      </div>
-    </ng-template>
+                  <!-- POPOVER -->
+                  <ng-template #popoverContent>
+                    @if (gridCellPopOver) {
+                      <div class="popover-parent">
+                        @if (gridCellPopOver.dimension?.stand; as stand) {
+                          <strong>Thérapeute :</strong> {{ stand.participation.therapistName }}<br/>
+                          <strong>Nom :</strong> {{ stand.participation.exhibitor.fullName }}<br/>
+                          <strong>Catégorie :</strong> {{ 'stand.category.list.' + stand.category | translate }}<br/>
+                          <strong>Dimension sur plan:</strong> {{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}<br/>
+                          <strong>Dimension participation:</strong> {{ stand.dimension.dimension }}<br/>
+                          <strong>Status
+                          :</strong> {{ 'participation.status.list.' + stand.participation.status | translate }}<br/>
+                          <strong>Commentaire :</strong> {{ stand.participation.extraInformation ?? '' }}<br/>
+                          <hr/>
+                          <div class="d-flex justify-content-center gap-2">
+                            @if (stand.participation && isReadOnly) {
+                              <link-box
+                                translateKey="common.view"
+                                faIcon="link"
+                                [links]="['../', 'participations', stand.participation.id, 'view']"/>
+                            }
+                            @if (stand.participation && isReadOnly) {
+                              <link-box
+                                translateKey="participation.billing.title"
+                                faIcon="link"
+                                [links]="['../', 'participations', stand.participation.id, 'billing']"/>
+                            }
+                          </div>
+                        } @else {
+                          <p><strong>Dimension:</strong> {{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</p>
+                        }
+                      </div>
+                    }
+                  </ng-template>
 
-    <!-- CONTEXT MENU -->
-    <div *ngIf="contextMenu.printable !== 'CLOSED' && !isReadOnly"
-         [style.left.px]="contextMenu.x"
-         [style.top.px]="contextMenu.y"
-         class="context-menu">
-      <div class="menu-item">{{ contextMenu.cell?.dimension?.dimension }}</div>
-      <div *ngIf="contextMenu.printable === 'MAIN' && !contextMenu.cell?.dimension?.stand">
-        <button [disabled]="!availableStands.length"
-                (click)="contextMenu.printable = 'ASSIGNATION'"
-                class="btn btn-outline-primary btn-sm w-100">Attribuer à...
-        </button>
-      </div>
-      @if (contextMenu.printable === 'ASSIGNATION' && !contextMenu.cell?.dimension?.stand) {
-        <div *ngFor="let stand of this.availableStands">
-          <button class="btn btn-sm"
-                  [ngClass]="stand.dimension?.id === contextMenu.cell?.dimension?.idDimension ? 'btn-outline-primary' : 'btn-outline-warning'"
-                  (click)="assign(stand, contextMenu.cell ?? null)"
-                  style="width: 100%">
-            {{ getFormattedParticipationName(stand.participation ?? null) }}
-          </button>
-        </div>
-      }
-      <div *ngIf="contextMenu.printable === 'MAIN' && contextMenu.cell?.dimension?.stand">
-        <button (click)="unassign(contextMenu.cell?.id ?? null)" class="btn btn-outline-warning btn-sm w-100">Désattribuer</button>
-      </div>
-      <div *ngIf="contextMenu.printable === 'MAIN'">
-        <button (click)="removeShapeById(contextMenu.cell?.id ?? null)" class="btn btn-outline-danger btn-sm w-100">
-          Supprimer le stand
-        </button>
-      </div>
-      <div *ngIf="contextMenu.printable === 'MAIN'">
-        <button (click)="contextMenu.printable = 'CLOSED'" class="btn btn-outline-info btn-sm w-100">Annuler</button>
-      </div>
-      <div *ngIf="contextMenu.printable === 'ASSIGNATION'">
-        <button (click)="contextMenu.printable = 'MAIN'" class="btn btn-outline-info btn-sm w-100">Retour</button>
-      </div>
-    </div>
-  </div>
-</div>
+                  <!-- CONTEXT MENU -->
+                  @if (contextMenu.printable !== 'CLOSED' && !isReadOnly) {
+                    <div
+                      [style.left.px]="contextMenu.x"
+                      [style.top.px]="contextMenu.y"
+                      class="context-menu">
+                      <div class="menu-item">{{ contextMenu.cell?.dimension?.dimension }}</div>
+                      @if (contextMenu.printable === 'MAIN' && !contextMenu.cell?.dimension?.stand) {
+                        <div>
+                          <button [disabled]="!availableStands.length"
+                            (click)="contextMenu.printable = 'ASSIGNATION'"
+                            class="btn btn-outline-primary btn-sm w-100">Attribuer à...
+                          </button>
+                        </div>
+                      }
+                      @if (contextMenu.printable === 'ASSIGNATION' && !contextMenu.cell?.dimension?.stand) {
+                        @for (stand of availableStands; track stand) {
+                          <div>
+                            <button class="btn btn-sm"
+                              [ngClass]="stand.dimension.id === contextMenu.cell?.dimension?.idDimension ? 'btn-outline-primary' : 'btn-outline-warning'"
+                              (click)="assign(stand, contextMenu.cell ?? null)"
+                              style="width: 100%">
+                              {{ getFormattedParticipationName(stand.participation) }}
+                            </button>
+                          </div>
+                        }
+                      }
+                      @if (contextMenu.printable === 'MAIN' && contextMenu.cell?.dimension?.stand) {
+                        <div>
+                          <button (click)="unassign(contextMenu.cell?.id ?? null)" class="btn btn-outline-warning btn-sm w-100">
+                            Désattribuer
+                          </button>
+                        </div>
+                      }
+                      @if (contextMenu.printable === 'MAIN') {
+                        <div>
+                          <button (click)="removeShapeById(contextMenu.cell?.id ?? null)"
+                            class="btn btn-outline-danger btn-sm w-100">
+                            Supprimer le stand
+                          </button>
+                        </div>
+                      }
+                      @if (contextMenu.printable === 'MAIN') {
+                        <div>
+                          <button (click)="contextMenu.printable = 'CLOSED'" class="btn btn-outline-info btn-sm w-100">Annuler
+                          </button>
+                        </div>
+                      }
+                      @if (contextMenu.printable === 'ASSIGNATION') {
+                        <div>
+                          <button (click)="contextMenu.printable = 'MAIN'" class="btn btn-outline-info btn-sm w-100">Retour
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>

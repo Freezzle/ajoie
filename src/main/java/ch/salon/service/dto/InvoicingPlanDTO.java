@@ -1,5 +1,6 @@
 package ch.salon.service.dto;
 
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
 
 import java.io.Serializable;
@@ -15,6 +16,7 @@ public class InvoicingPlanDTO implements Serializable {
     private Instant issuedDate;
     private Instant expirationDate;
     private Boolean needArrangement;
+    private InvoiceSendingMethod invoiceSendingMethod;
     private State state;
     private String billingNumber;
     private Set<InvoiceDTO> invoices = new HashSet<>();
@@ -103,5 +105,13 @@ public class InvoicingPlanDTO implements Serializable {
 
     public void setNeedArrangement(Boolean needArrangement) {
         this.needArrangement = needArrangement;
+    }
+
+    public InvoiceSendingMethod getInvoiceSendingMethod() {
+        return invoiceSendingMethod;
+    }
+
+    public void setInvoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
+        this.invoiceSendingMethod = invoiceSendingMethod;
     }
 }

@@ -1,18 +1,30 @@
-import { IDimensionStand } from '../../dimension-stand/dimension-stand.model';
-
 export interface IPriceStandSalon {
-  id: string;
-  price?: number | null;
-  dimension?: IDimensionStand | null;
+    id: string;
+    price: number;
+    dimension: string;
+    heightMeter: number;
+    widthMeter: number;
 }
 
-export type NewPriceStandSalon = Omit<IPriceStandSalon, 'id'> & { id: null };
-
 export function sortPriceStandSalon(priceStands: IPriceStandSalon[]): IPriceStandSalon[] {
-  return priceStands.sort((a, b) => {
-    if (a?.dimension?.widthMeter === b?.dimension?.widthMeter) {
-      return a?.dimension?.heightMeter ?? 0 - (b?.dimension?.heightMeter ?? 0);
-    }
-    return (a?.dimension?.widthMeter ?? 0) - (b?.dimension?.widthMeter ?? 0);
-  });
+    return priceStands.sort((a, b) => {
+        const widthA = a?.widthMeter ?? 0;
+        const widthB = b?.widthMeter ?? 0;
+        const heightA = a?.heightMeter ?? 0;
+        const heightB = b?.heightMeter ?? 0;
+        const nameA = a?.dimension?.toLowerCase() ?? '';
+        const nameB = b?.dimension?.toLowerCase() ?? '';
+
+        if (widthA !== widthB) {
+            return widthA - widthB;
+        }
+        if (heightA !== heightB) {
+            return heightA - heightB;
+        }
+        return nameB.localeCompare(nameA, 'fr', {numeric: true});
+    });
+}
+
+export function formatterDimensionStand(dimension: IPriceStandSalon | null): string {
+    return dimension?.dimension ?? '';
 }

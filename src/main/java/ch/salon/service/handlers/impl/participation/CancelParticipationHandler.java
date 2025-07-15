@@ -4,6 +4,7 @@ import ch.salon.domain.Conference;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Stand;
+import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
@@ -11,6 +12,7 @@ import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.StandRepository;
+import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
@@ -24,16 +26,18 @@ import java.util.Map;
 public class CancelParticipationHandler implements BusinessActionHandler<Participation> {
 
     private final ConferenceRepository conferenceRepository;
+    private final WorkshopRepository workshopRepository;
     private final StandRepository standRepository;
     private final InvoicingPlanRepository planRepository;
     private final EventLogService eventLogService;
 
     public CancelParticipationHandler(EventLogService eventLogService, StandRepository standRepository,
-                                      ConferenceRepository conferenceRepository,
-                                      InvoicingPlanRepository planRepository) {
+            WorkshopRepository workshopRepository, ConferenceRepository conferenceRepository,
+            InvoicingPlanRepository planRepository) {
         this.eventLogService = eventLogService;
         this.standRepository = standRepository;
         this.conferenceRepository = conferenceRepository;
+        this.workshopRepository = workshopRepository;
         this.planRepository = planRepository;
     }
 
@@ -57,35 +61,49 @@ public class CancelParticipationHandler implements BusinessActionHandler<Partici
 
         stands.forEach(stand -> {
             if (stand.getStatus() == Status.CLOSED || stand.getStatus() == Status.VALIDATED ||
-                stand.getStatus() == Status.ACCEPTED || stand.getStatus() == Status.IN_VERIFICATION) {
+                    stand.getStatus() == Status.ACCEPTED || stand.getStatus() == Status.IN_VERIFICATION) {
 
                 Status oldStandStatus = Status.valueOf(stand.getStatus().name());
                 stand.setStatus(Status.CANCELED);
                 eventLogService.eventFromSystem("Stand annulé", EventType.ACTION, EntityType.PARTICIPATION,
-                                                payload.getId(), Map.of("old_status", oldStandStatus.name(), "id",
-                                                                        stand.getId().toString()));
+                        payload.getId(), Map.of("old_status", oldStandStatus.name(), "id", stand.getId().toString()));
             }
         });
 
         List<Conference> conferences =
-            this.conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(payload.getId());
+                this.conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(payload.getId());
 
         conferences.forEach(conference -> {
             if (conference.getStatus() == Status.CLOSED || conference.getStatus() == Status.VALIDATED ||
-                conference.getStatus() == Status.ACCEPTED || conference.getStatus() == Status.IN_VERIFICATION) {
+                    conference.getStatus() == Status.ACCEPTED || conference.getStatus() == Status.IN_VERIFICATION) {
 
                 Status oldConferenceStatus = Status.valueOf(conference.getStatus().name());
                 conference.setStatus(Status.CANCELED);
                 eventLogService.eventFromSystem("Conference annulée", EventType.ACTION, EntityType.PARTICIPATION,
-                                                payload.getId(), Map.of("old_status", oldConferenceStatus.name(), "id",
-                                                                        conference.getId().toString()));
+                        payload.getId(),
+                        Map.of("old_status", oldConferenceStatus.name(), "id", conference.getId().toString()));
+            }
+        });
+
+        List<Workshop> workshops =
+                this.workshopRepository.findByParticipationIdOrderByRegistrationDateDesc(payload.getId());
+
+        workshops.forEach(workshop -> {
+            if (workshop.getStatus() == Status.CLOSED || workshop.getStatus() == Status.VALIDATED ||
+                    workshop.getStatus() == Status.ACCEPTED || workshop.getStatus() == Status.IN_VERIFICATION) {
+
+                Status oldWorkshopStatus = Status.valueOf(workshop.getStatus().name());
+                workshop.setStatus(Status.CANCELED);
+                eventLogService.eventFromSystem("Atelier annulé", EventType.ACTION, EntityType.PARTICIPATION,
+                        payload.getId(),
+                        Map.of("old_status", oldWorkshopStatus.name(), "id", workshop.getId().toString()));
             }
         });
 
         Status oldStatus = Status.valueOf(payload.getStatus().name());
         payload.setStatus(Status.CANCELED);
         eventLogService.eventFromSystem("Participation annulée", EventType.ACTION, EntityType.PARTICIPATION,
-                                        payload.getId(), Map.of("old_status", oldStatus.name()));
+                payload.getId(), Map.of("old_status", oldStatus.name()));
     }
 
     @Override

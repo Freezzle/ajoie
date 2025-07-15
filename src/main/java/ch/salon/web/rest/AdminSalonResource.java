@@ -3,15 +3,16 @@ package ch.salon.web.rest;
 import ch.salon.domain.Participation;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.security.AuthoritiesConstants;
-import ch.salon.service.ImportationService;
+import ch.salon.service.Importation2026Service;
 import ch.salon.service.ParticipationService;
 import ch.salon.service.SalonService;
 import ch.salon.service.TimeSlotService;
-import ch.salon.service.dto.DimensionStandDTO;
 import ch.salon.service.dto.FloorPlanSalonDTO;
+import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
 import ch.salon.service.dto.TimeSlotDTO;
 import ch.salon.web.rest.dto.SalonStatistiques;
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,17 +55,17 @@ public class AdminSalonResource {
 
     private static final Logger log = LoggerFactory.getLogger(AdminSalonResource.class);
     private final SalonService salonService;
-    private final ImportationService importationService;
+    private final Importation2026Service importation2026Service;
     private final ParticipationService participationService;
     private final TimeSlotService timeSlotService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    public AdminSalonResource(SalonService salonService, ImportationService importationService,
-                              ParticipationService participationService, TimeSlotService timeSlotService) {
+    public AdminSalonResource(SalonService salonService, Importation2026Service importation2026Service,
+            ParticipationService participationService, TimeSlotService timeSlotService) {
         this.salonService = salonService;
-        this.importationService = importationService;
+        this.importation2026Service = importation2026Service;
         this.participationService = participationService;
         this.timeSlotService = timeSlotService;
     }
@@ -77,14 +78,13 @@ public class AdminSalonResource {
         UUID id = salonService.create(salon);
 
         return created(new URI("/api/admin/salons/" + id)).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(salon);
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(salon);
     }
 
     @PutMapping("/{idSalon}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<SalonDTO> updateSalon(@PathVariable(value = "idSalon",
-                                                              required = false) final UUID idSalon,
-                                                @Valid @RequestBody SalonDTO salon) {
+    public ResponseEntity<SalonDTO> updateSalon(@PathVariable(value = "idSalon", required = false) final UUID idSalon,
+            @Valid @RequestBody SalonDTO salon) {
         log.debug("REST request to update Salon : {}, {}", idSalon, salon);
 
         salon = salonService.update(idSalon, salon);
@@ -121,8 +121,7 @@ public class AdminSalonResource {
 
     @GetMapping("{idSalon}/participations")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<Participation> getAllParticipations(@PathVariable(name = "idSalon",
-                                                                  required = false) UUID idSalon) {
+    public List<Participation> getAllParticipations(@PathVariable(name = "idSalon", required = false) UUID idSalon) {
         log.debug("REST request to get all Participations");
 
         return participationService.findAll(idSalon);
@@ -130,15 +129,18 @@ public class AdminSalonResource {
 
     @PostMapping("/{idSalon}/import-inscriptions")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<String> importation(@PathVariable(name = "idSalon",
-                                                            required = false) String idSalon,
-                                              @RequestParam("file") MultipartFile file) throws URISyntaxException {
+    public ResponseEntity<String> importation(@PathVariable(name = "idSalon", required = false) String idSalon,
+            @RequestParam("file") MultipartFile file) throws URISyntaxException {
         try {
-            if (file == null || file.isEmpty()) {
+            if (file == null || file.isEmpty() || StringUtils.isEmpty(file.getOriginalFilename())) {
                 throw new IllegalArgumentException("No file");
             }
 
-            importationService.importData(idSalon, file.getInputStream());
+            if (file.getOriginalFilename().contains("2026")) {
+                importation2026Service.importData(idSalon, file.getInputStream());
+            } else {
+                throw new IllegalStateException("Only 2026 file can be imported");
+            }
 
             return ResponseEntity.created(new URI("/idSalon/import")).build();
         } catch (Exception e) {
@@ -148,39 +150,36 @@ public class AdminSalonResource {
 
     @GetMapping("/{idSalon}/stats")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<SalonStatistiques> getStats(@PathVariable(value = "idSalon",
-                                                                    required = false) final UUID idSalon,
-                                                      @RequestParam List<Status> statuses) {
+    public ResponseEntity<SalonStatistiques> getStats(
+            @PathVariable(value = "idSalon", required = false) final UUID idSalon,
+            @RequestParam List<Status> statuses) {
         log.debug("REST request to get stats from Salon : {}", idSalon);
 
         SalonStatistiques stats = salonService.getStatistiques(idSalon,
-                                                               statuses == null || statuses.isEmpty() ? List.of(
-                                                                   Status.CLOSED, Status.VALIDATED,
-                                                                   Status.ACCEPTED) : statuses);
+                statuses == null || statuses.isEmpty() ? List.of(Status.CLOSED, Status.VALIDATED, Status.ACCEPTED) :
+                        statuses);
 
         return ok().body(stats);
     }
 
     @GetMapping("/{idSalon}/floor-plan")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<List<FloorPlanSalonDTO>> getFloorPlanSalon(@PathVariable(value = "idSalon",
-                                                                                   required = false)
-                                                                     final UUID idSalon) {
+    public ResponseEntity<List<FloorPlanSalonDTO>> getFloorPlanSalon(
+            @PathVariable(value = "idSalon", required = false) final UUID idSalon) {
         return ok(salonService.getFloorPlanSalon(idSalon));
     }
 
     @PostMapping("/{idSalon}/floor-plan")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<FloorPlanSalonDTO> createFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
-                                                                  @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
+            @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
         return ok(salonService.createFloorPlanSalon(idSalon, floorPlanSalonDTO));
     }
 
     @DeleteMapping("/{idSalon}/floor-plan/{idFloorPlan}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<FloorPlanSalonDTO> deleteFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
-                                                                  @PathVariable(value = "idFloorPlan")
-                                                                  final UUID idFloorPlan) {
+            @PathVariable(value = "idFloorPlan") final UUID idFloorPlan) {
         this.salonService.deleteFloorPlanSalon(idSalon, idFloorPlan);
         return noContent().build();
     }
@@ -188,23 +187,22 @@ public class AdminSalonResource {
     @PutMapping("/{idSalon}/floor-plan/{idFloorPlan}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<FloorPlanSalonDTO> updateFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
-                                                                  @PathVariable(value = "idFloorPlan")
-                                                                  final UUID idFloorPlan,
-                                                                  @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
+            @PathVariable(value = "idFloorPlan") final UUID idFloorPlan,
+            @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
         return ok(salonService.updateFloorPlanSalon(idSalon, idFloorPlan, floorPlanSalonDTO));
     }
 
     @GetMapping("/{idSalon}/dimension-stands")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<List<DimensionStandDTO>> getDimensionStandsFromSalon(
-        @PathVariable(value = "idSalon") final UUID idSalon) {
+    public ResponseEntity<List<PriceStandDTO>> getDimensionStandsFromSalon(
+            @PathVariable(value = "idSalon") final UUID idSalon) {
         return ResponseUtil.wrapOrNotFound(Optional.of(salonService.getDimensionStands(idSalon)));
     }
 
     @GetMapping("/{idSalon}/time-slots")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Map<LocalDate, List<TimeSlotDTO>>> getTimeSlots(
-        @PathVariable(value = "idSalon") final UUID idSalon) {
+            @PathVariable(value = "idSalon") final UUID idSalon) {
         return ResponseUtil.wrapOrNotFound(Optional.of(timeSlotService.getTimeSlotsBySalon(idSalon)));
     }
 }

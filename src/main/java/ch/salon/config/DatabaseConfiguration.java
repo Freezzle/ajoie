@@ -9,4 +9,5 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories({"ch.salon.repository"})
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @EnableTransactionManagement
-public class DatabaseConfiguration {}
+public class DatabaseConfiguration {
+}

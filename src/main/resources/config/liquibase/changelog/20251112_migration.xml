@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="2025-11-12-001-pss-add-dimension-columns" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="price_stand_salon"/>
+        </preConditions>
+
+        <addColumn tableName="price_stand_salon">
+            <column name="dimension" type="varchar(100)"/>
+            <column name="width_meter" type="double"/>
+            <column name="height_meter" type="double"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="price_stand_salon" columnName="dimension"/>
+            <dropColumn tableName="price_stand_salon" columnName="width_meter"/>
+            <dropColumn tableName="price_stand_salon" columnName="height_meter"/>
+        </rollback>
+    </changeSet>
+
+    <!-- =========================================================
+         2) MIGRATE DATA into price_stand_salon columns
+            en joignant via la FK pss.dimension_id -> dimension_stand.id
+       ========================================================= -->
+    <changeSet id="2025-11-12-002-pss-migrate-dimension-data" author="freezzle" runInTransaction="true">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="price_stand_salon"/>
+            <tableExists tableName="dimension_stand"/>
+            <columnExists tableName="price_stand_salon" columnName="dimension_id"/>
+        </preConditions>
+
+        <sql>
+            UPDATE price_stand_salon p
+            SET dimension    = d.dimension,
+                width_meter  = d.width_meter,
+                height_meter = d.height_meter FROM dimension_stand d
+            WHERE p.dimension_id = d.id;
+        </sql>
+
+        <addNotNullConstraint tableName="price_stand_salon" columnName="dimension" columnDataType="varchar(100)"/>
+        <addNotNullConstraint tableName="price_stand_salon" columnName="width_meter" columnDataType="double"/>
+        <addNotNullConstraint tableName="price_stand_salon" columnName="height_meter" columnDataType="double"/>
+
+        <rollback>
+            <dropNotNullConstraint tableName="price_stand_salon" columnName="dimension" columnDataType="varchar(255)"/>
+            <dropNotNullConstraint tableName="price_stand_salon" columnName="width_meter"
+                                   columnDataType="double precision"/>
+            <dropNotNullConstraint tableName="price_stand_salon" columnName="height_meter"
+                                   columnDataType="double precision"/>
+        </rollback>
+    </changeSet>
+
+
+    <changeSet id="2025-11-12-003-stand-add-pss-col" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="stand"/>
+            <tableExists tableName="price_stand_salon"/>
+        </preConditions>
+
+        <addColumn tableName="stand">
+            <column name="price_stand_salon_id" type="${uuidType}"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="stand" columnName="price_stand_salon_id"/>
+        </rollback>
+    </changeSet>
+
+    <!-- =========================================================
+         4) MIGRATE STAND REFERENCES:
+            stand.price_stand_salon_id = pss.id
+            via s.dimension_id = pss.dimension_id
+       ========================================================= -->
+    <changeSet id="2025-11-12-004-stand-fill-pss-col" author="freezzle" runInTransaction="true">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="stand"/>
+            <columnExists tableName="stand" columnName="price_stand_salon_id"/>
+            <columnExists tableName="stand" columnName="dimension_id"/>
+            <columnExists tableName="price_stand_salon" columnName="dimension_id"/>
+        </preConditions>
+
+        <sql>
+            UPDATE stand s
+            SET price_stand_salon_id = p.id FROM price_stand_salon p
+            WHERE s.dimension_id = p.dimension_id;
+        </sql>
+
+        <!-- FK (nullable car le champ JPA n'était pas @NotNull) -->
+        <addForeignKeyConstraint baseColumnNames="price_stand_salon_id"
+                                 baseTableName="stand"
+                                 constraintName="fk_stand__price_stand_salon_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="price_stand_salon"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="stand" constraintName="fk_stand__price_stand_salon_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2025-11-12-005-stand-drop-dimension-id" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="stand"/>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE stand DROP COLUMN IF EXISTS dimension_id CASCADE;
+        </sql>
+
+        <rollback>
+            <addColumn tableName="stand">
+                <column name="dimension_id" type="${uuidType}"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+
+    <changeSet id="2025-11-12-006-pss-drop-dimension-id" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="price_stand_salon"/>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE price_stand_salon DROP COLUMN IF EXISTS dimension_id CASCADE;
+        </sql>
+
+        <rollback>
+            <addColumn tableName="price_stand_salon">
+                <column name="dimension_id" type="uuid"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2025-11-12-007-drop-dimension-stand" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="dimension_stand"/>
+        </preConditions>
+
+        <dropTable tableName="dimension_stand" cascadeConstraints="true"/>
+
+        <rollback>
+            <!-- 7.R) Recréer dimension_stand -->
+            <createTable tableName="dimension_stand">
+                <column name="id" type="${uuidType}">
+                    <constraints primaryKey="true" nullable="false"/>
+                </column>
+                <column name="dimension" type="varchar(100)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="width_meter" type="double">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="height_meter" type="double">
+                    <constraints nullable="false"/>
+                </column>
+            </createTable>
+
+            <sql>
+                INSERT INTO dimension_stand (id, dimension, width_meter, height_meter)
+                SELECT DISTINCT uuid_generate_v4(), p.dimension, p.width_meter, p.height_meter
+                FROM price_stand_salon p
+                WHERE p.dimension IS NOT NULL;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2025-11-12-008-rollback-relink-fks" author="freezzle" runOnChange="false" runAlways="false"
+               context="rollback-helper">
+        <!-- Ce changeSet ne s'exécute pas en forward; il n'agit qu'en rollback, quand
+             7.R a recréé dimension_stand et rempli les enregistrements. -->
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="dimension_stand"/>
+            <tableExists tableName="price_stand_salon"/>
+            <tableExists tableName="stand"/>
+            <columnExists tableName="price_stand_salon" columnName="dimension_id"/>
+            <columnExists tableName="stand" columnName="dimension_id"/>
+        </preConditions>
+
+        <!-- Remettre pss.dimension_id par matching sur les attributs -->
+        <sql>
+            UPDATE price_stand_salon p
+            SET dimension_id = d.id FROM dimension_stand d
+            WHERE p.dimension = d.dimension
+              AND p.width_meter = d.width_meter
+              AND p.height_meter = d.height_meter;
+        </sql>
+
+        <!-- Remettre stand.dimension_id depuis stand.price_stand_salon_id -->
+        <sql>
+            UPDATE stand s
+            SET dimension_id = p.dimension_id FROM price_stand_salon p
+            WHERE s.price_stand_salon_id = p.id;
+        </sql>
+
+        <!-- Recréer FK stand.dimension_id -> dimension_stand.id -->
+        <addForeignKeyConstraint
+                baseTableName="stand"
+                baseColumnNames="dimension_id"
+                constraintName="fk_stand__dimension_id"
+                referencedTableName="dimension_stand"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"
+                onUpdate="RESTRICT"/>
+
+        <!-- Recréer FK pss.dimension_id -> dimension_stand.id -->
+        <addForeignKeyConstraint
+                baseTableName="price_stand_salon"
+                baseColumnNames="dimension_id"
+                constraintName="fk_dimension__price_stand_salon_id"
+                referencedTableName="dimension_stand"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"
+                onUpdate="RESTRICT"/>
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="stand" constraintName="fk_stand__dimension_id"/>
+            <dropForeignKeyConstraint baseTableName="price_stand_salon" constraintName="fk_dimension__price_stand_salon_id"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

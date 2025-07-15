@@ -1,244 +1,256 @@
 <div>
-  @if (salon()) {
-    <div>
-      <h2 id="page-heading">
-        <div class="d-flex justify-content-center">
-          <span jhiTranslate="salon.statistiques">Statistiques</span>
-        </div>
-        <hr/>
+    @if (salon()) {
+        <div>
+            <h2 id="page-heading">
+                <div class="d-flex justify-content-center">
+                    <span jhiTranslate="salon.statistiques">Statistiques</span>
+                </div>
+                <hr/>
 
-        <div class="d-flex justify-content-between mt-3">
+                <div class="d-flex justify-content-between mt-3">
           <span>
             <button-box (clickedEvent)="previousState()"
                         faIcon="arrow-left"
                         translateKey="common.back"/>
-          </span>
-
-          <span>
-            <span><input type="file" id="fileUpload" class="form-control form-control-sm me-2" (change)="onFileSelected($event)" #fileInput/></span>
-            <span>
-              <button type="submit" class="btn btn-primary btn-sm" (click)="importFile()">
-                <span jhiTranslate="common.import">Importer</span>
-              </button>
             </span>
-          </span>
+
+                    <span>
+              <span><input type="file" id="fileUpload" class="form-control form-control-sm me-2"
+                           (change)="onFileSelected($event)" #fileInput/></span>
+              <span>
+                <button type="submit" class="btn btn-primary btn-sm" (click)="importFile()">
+                  <span jhiTranslate="common.import">Importer</span>
+                </button>
+              </span>
+            </span>
+                </div>
+            </h2>
         </div>
-      </h2>
-    </div>
 
-    <div class="row" *ngIf="combinedStats$ | async; let combinedStats">
-      <div class="col-lg-6 table-responsive table-entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-          <thead class="thead-primary">
-            <tr>
-              <th class="width-80">
-                <span>Participations</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>En cours</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>Accepté/Payé</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Nombre de stands</td>
-              <td class="text-center">{{ combinedStats[0].nbStands }}</td>
-              <td class="text-center">{{ combinedStats[1].nbStands }}</td>
-            </tr>
-            <tr>
-              <td>Nombre de conférences</td>
-              <td class="text-center">{{ combinedStats[0].nbConference }}</td>
-              <td class="text-center">{{ combinedStats[1].nbConference }}</td>
-            </tr>
-            <tr>
-              <td>Nombre de coups de coeur</td>
-              <td class="text-center">{{ combinedStats[0].nbCrushOfHeart }}</td>
-              <td class="text-center">{{ combinedStats[1].nbCrushOfHeart }}</td>
-            </tr>
-            <tr>
-              <td>Nombre d'invités d'honneur</td>
-              <td class="text-center">{{ combinedStats[0].nbGuestOfHonor }}</td>
-              <td class="text-center">{{ combinedStats[1].nbGuestOfHonor }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="col-lg-6 table-responsive table-entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-          <thead class="thead-primary">
-            <tr>
-              <th class="width-80">
-                <span>Facturations</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>En cours</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>Accepté/Payé</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Totaux des prestations</td>
-              <td class="text-center">{{ combinedStats[0].facturation.total }}</td>
-              <td class="text-center">{{ combinedStats[1].facturation.total }}</td>
-            </tr>
-            <tr>
-              <td>Réductions appliquées</td>
-              <td class="text-center">{{ combinedStats[0].facturation.discount }}</td>
-              <td class="text-center">{{ combinedStats[1].facturation.discount }}</td>
-            </tr>
-            <tr>
-              <td>Totaux réels attendus</td>
-              <td class="text-center">{{ combinedStats[0].facturation.expected }}</td>
-              <td class="text-center">{{ combinedStats[1].facturation.expected }}</td>
-            </tr>
-            <tr>
-              <td>Paiements réels</td>
-              <td class="text-center">{{ combinedStats[0].facturation.paid }}</td>
-              <td class="text-center">{{ combinedStats[1].facturation.paid }}</td>
-            </tr>
-            <tr>
-              <td>Restant à payer</td>
-              <td class="text-center">{{ combinedStats[0].facturation.remaining }}</td>
-              <td class="text-center">{{ combinedStats[1].facturation.remaining }}</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td class="text-center" *ngIf="calculateFacturation(combinedStats[1].facturation); let factuGraph">
-                <ngb-progressbar-stacked *ngIf="factuGraph[0] || factuGraph[1] || factuGraph[2]">
-                  <ngb-progressbar type="success"
-                                   [title]="'réduction [' + factuGraph[2].toFixed(2) + '%]'"
-                                   [striped]="false"
-                                   [value]="factuGraph[2]"></ngb-progressbar>
-                  <ngb-progressbar type="primary"
-                                   [title]="'payé [' + factuGraph[1].toFixed(2) + '%]'"
-                                   [striped]="false"
-                                   [value]="factuGraph[1]"></ngb-progressbar>
-                  <ngb-progressbar class="custom-remaining"
-                                   [title]="'restant [' + factuGraph[0].toFixed(2) + '%]'"
-                                   [striped]="false"
-                                   [value]="factuGraph[0]"></ngb-progressbar>
-                </ngb-progressbar-stacked>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="col-lg-6 table-responsive table-entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-          <thead class="thead-primary">
-            <tr>
-              <th class="width-80">
-                <span>Organisation</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>En cours</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>Accepté/Payé</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Nombre de tables</td>
-              <td class="text-center">{{ combinedStats[0].standInfo.nbTable }}</td>
-              <td class="text-center">{{ combinedStats[1].standInfo.nbTable }}</td>
-            </tr>
-            <tr>
-              <td>Nombre de chaises</td>
-              <td class="text-center">{{ combinedStats[0].standInfo.nbChair }}</td>
-              <td class="text-center">{{ combinedStats[1].standInfo.nbChair }}</td>
-            </tr>
-            <tr>
-              <td>Nombre d'électricité</td>
-              <td class="text-center">{{ combinedStats[0].standInfo.nbElectricity }}</td>
-              <td class="text-center">{{ combinedStats[1].standInfo.nbElectricity }}</td>
-            </tr>
-            <tr>
-              <td>Nombre d'offres</td>
-              <td class="text-center">{{ combinedStats[0].standInfo.nbOffer }}</td>
-              <td class="text-center">{{ combinedStats[1].standInfo.nbOffer }}</td>
-            </tr>
-            <tr>
-              <td>Nombre de repas samedi midi</td>
-              <td class="text-center">{{ combinedStats[0].nbMeal1 }}</td>
-              <td class="text-center">{{ combinedStats[1].nbMeal1 }}</td>
-            </tr>
-            <tr>
-              <td>Nombre de repas samedi soir</td>
-              <td class="text-center">{{ combinedStats[0].nbMeal2 }}</td>
-              <td class="text-center">{{ combinedStats[1].nbMeal2 }}</td>
-            </tr>
-            <tr>
-              <td>Nombre de repas dimanche midi</td>
-              <td class="text-center">{{ combinedStats[0].nbMeal3 }}</td>
-              <td class="text-center">{{ combinedStats[1].nbMeal3 }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="col-lg-6 table-responsive table-entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-          <thead class="thead-primary">
-            <tr>
-              <th class="width-80">
-                <span>Catégories des stands</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>En cours</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>Accepté/Payé</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (category of packStatsByKey(combinedStats[0].categoriesStands, combinedStats[1].categoriesStands, combinedStats[2].categoriesStands); track $index) {
-              <tr>
-                <td>{{ 'stand.category.list.' + category[0] | translate }}</td>
-                <td class="text-center">{{ category[1][2] }}</td>
-                <td class="text-center">{{ category[1][0] }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <div class="col-lg-6 table-responsive table-entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-          <thead class="thead-primary">
-            <tr>
-              <th class="width-80">
-                <span>Dimensions des stands</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>En cours</span>
-              </th>
-              <th class="width-10 text-center">
-                <span>Accepté/Payé</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (dimension of packStatsByKey(combinedStats[0].dimensionStands, combinedStats[1].dimensionStands, combinedStats[2].dimensionStands); track $index) {
-              <tr>
-                <td>{{ dimension[0] }}</td>
-                <td class="text-center">{{ dimension[1][2] }}</td>
-                <td class="text-center">{{ dimension[1][0] }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  }
+        @if (combinedStats$ | async; as combinedStats) {
+            <div class="row">
+                <div class="col-lg-6 table-responsive table-entities">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                        <thead class="thead-primary">
+                        <tr>
+                            <th class="width-80">
+                                <span>Participations</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>En cours</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>Accepté/Payé</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Nombre de stands</td>
+                            <td class="text-center">{{ combinedStats[0].nbStands }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbStands }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de conférences</td>
+                            <td class="text-center">{{ combinedStats[0].nbConference }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbConference }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre d'ateliers</td>
+                            <td class="text-center">{{ combinedStats[0].nbWorkshop }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbWorkshop }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de coups de coeur</td>
+                            <td class="text-center">{{ combinedStats[0].nbCrushOfHeart }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbCrushOfHeart }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre d'invités d'honneur</td>
+                            <td class="text-center">{{ combinedStats[0].nbGuestOfHonor }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbGuestOfHonor }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6 table-responsive table-entities">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                        <thead class="thead-primary">
+                        <tr>
+                            <th class="width-80">
+                                <span>Facturations</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>En cours</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>Accepté/Payé</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Totaux des prestations</td>
+                            <td class="text-center">{{ (combinedStats[0].facturation.total > 0) ? (combinedStats[0].facturation.total | currency : 'CHF') : '-' }}</td>
+                            <td class="text-center">{{ (combinedStats[1].facturation.total > 0) ? (combinedStats[1].facturation.total | currency : 'CHF') : '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Réductions appliquées</td>
+                            <td class="text-center">{{ (combinedStats[0].facturation.discount > 0) ? (combinedStats[0].facturation.discount | currency : 'CHF') : '-' }}</td>
+                            <td class="text-center">{{ (combinedStats[1].facturation.discount > 0) ? (combinedStats[1].facturation.discount | currency : 'CHF') : '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Totaux réels attendus</td>
+                            <td class="text-center">{{ (combinedStats[0].facturation.expected > 0) ? (combinedStats[0].facturation.expected | currency : 'CHF') : '-' }}</td>
+                            <td class="text-center">{{ (combinedStats[1].facturation.expected > 0) ? (combinedStats[1].facturation.expected | currency : 'CHF') : '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Paiements réels</td>
+                            <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.paid | currency : 'CHF') : '-' }}</td>
+                            <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.paid | currency : 'CHF') : '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Restant à payer</td>
+                            <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.remaining | currency : 'CHF') : '-' }}</td>
+                            <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.remaining | currency : 'CHF') : '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            @if (calculateFacturation(combinedStats[1].facturation); as factuGraph) {
+                                <td class="text-center"
+                                >
+                                    @if (factuGraph[0] || factuGraph[1] || factuGraph[2]) {
+                                        <ngb-progressbar-stacked>
+                                            <ngb-progressbar type="success"
+                                                             [title]="'réduction [' + factuGraph[2].toFixed(2) + '%]'"
+                                                             [striped]="false"
+                                                             [value]="factuGraph[2]"></ngb-progressbar>
+                                            <ngb-progressbar type="primary"
+                                                             [title]="'payé [' + factuGraph[1].toFixed(2) + '%]'"
+                                                             [striped]="false"
+                                                             [value]="factuGraph[1]"></ngb-progressbar>
+                                            <ngb-progressbar class="custom-remaining"
+                                                             [title]="'restant [' + factuGraph[0].toFixed(2) + '%]'"
+                                                             [striped]="false"
+                                                             [value]="factuGraph[0]"></ngb-progressbar>
+                                        </ngb-progressbar-stacked>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6 table-responsive table-entities">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                        <thead class="thead-primary">
+                        <tr>
+                            <th class="width-80">
+                                <span>Organisation</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>En cours</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>Accepté/Payé</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Nombre de tables</td>
+                            <td class="text-center">{{ combinedStats[0].standInfo.nbTable }}</td>
+                            <td class="text-center">{{ combinedStats[1].standInfo.nbTable }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de chaises</td>
+                            <td class="text-center">{{ combinedStats[0].standInfo.nbChair }}</td>
+                            <td class="text-center">{{ combinedStats[1].standInfo.nbChair }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre d'électricité</td>
+                            <td class="text-center">{{ combinedStats[0].standInfo.nbElectricity }}</td>
+                            <td class="text-center">{{ combinedStats[1].standInfo.nbElectricity }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre d'offres</td>
+                            <td class="text-center">{{ combinedStats[0].standInfo.nbOffer }}</td>
+                            <td class="text-center">{{ combinedStats[1].standInfo.nbOffer }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de repas samedi midi</td>
+                            <td class="text-center">{{ combinedStats[0].nbMeal1 }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbMeal1 }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de repas samedi soir</td>
+                            <td class="text-center">{{ combinedStats[0].nbMeal2 }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbMeal2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nombre de repas dimanche midi</td>
+                            <td class="text-center">{{ combinedStats[0].nbMeal3 }}</td>
+                            <td class="text-center">{{ combinedStats[1].nbMeal3 }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6 table-responsive table-entities">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                        <thead class="thead-primary">
+                        <tr>
+                            <th class="width-80">
+                                <span>Catégories des stands</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>En cours</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>Accepté/Payé</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @for (
+                                    category of packStatsByKey(combinedStats[0].categoriesStands, combinedStats[1].categoriesStands, combinedStats[2].categoriesStands); track $index) {
+                                <tr>
+                                    <td>{{ 'stand.category.list.' + category[0] | translate }}</td>
+                                    <td class="text-center">{{ category[1][2] }}</td>
+                                    <td class="text-center">{{ category[1][0] }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6 table-responsive table-entities">
+                    <table aria-describedby="page-heading" class="table table-hover">
+                        <thead class="thead-primary">
+                        <tr>
+                            <th class="width-80">
+                                <span>Dimensions des stands</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>En cours</span>
+                            </th>
+                            <th class="width-10 text-center">
+                                <span>Accepté/Payé</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @for (
+                                    dimension of packStatsByKey(combinedStats[0].dimensionStands, combinedStats[1].dimensionStands, combinedStats[2].dimensionStands); track $index) {
+                                <tr>
+                                    <td>{{ dimension[0] }}</td>
+                                    <td class="text-center">{{ dimension[1][2] }}</td>
+                                    <td class="text-center">{{ dimension[1][0] }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
 </div>

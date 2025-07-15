@@ -2,10 +2,8 @@ package ch.salon.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
@@ -25,12 +23,20 @@ public class PriceStandSalon implements Serializable {
     private UUID id;
 
     @NotNull
-    @Column(name = "price",
-            nullable = false)
+    @Column(name = "price", nullable = false)
     private Double price;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private DimensionStand dimension;
+    @NotNull
+    @Column(name = "dimension", nullable = false)
+    private String dimension;
+
+    @NotNull
+    @Column(name = "width_meter", nullable = false)
+    private Double widthMeter;
+
+    @NotNull
+    @Column(name = "height_meter", nullable = false)
+    private Double heightMeter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -60,17 +66,28 @@ public class PriceStandSalon implements Serializable {
         return this;
     }
 
-    public DimensionStand getDimension() {
-        return this.dimension;
+    public String getDimension() {
+        return dimension;
     }
 
-    public void setDimension(DimensionStand dimensionStand) {
-        this.dimension = dimensionStand;
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
     }
 
-    public PriceStandSalon dimension(DimensionStand dimensionStand) {
-        this.setDimension(dimensionStand);
-        return this;
+    public Double getWidthMeter() {
+        return widthMeter;
+    }
+
+    public void setWidthMeter(Double widthMeter) {
+        this.widthMeter = widthMeter;
+    }
+
+    public Double getHeightMeter() {
+        return heightMeter;
+    }
+
+    public void setHeightMeter(Double heightMeter) {
+        this.heightMeter = heightMeter;
     }
 
     @Override

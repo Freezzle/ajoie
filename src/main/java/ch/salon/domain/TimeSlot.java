@@ -24,15 +24,13 @@ public class TimeSlot {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"priceStandSalons"},
-                          allowSetters = true)
+    @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
 
     @Column(name = "label")
     private String label;
 
-    @Column(name = "date",
-            nullable = false)
+    @Column(name = "date", nullable = false)
     private LocalDate date;
     @Column(name = "start")
     private LocalTime start;
@@ -100,8 +98,8 @@ public class TimeSlot {
         }
         TimeSlot timeSlot = (TimeSlot) o;
         return Objects.equals(id, timeSlot.id) && Objects.equals(label, timeSlot.label) &&
-               Objects.equals(date, timeSlot.date) && Objects.equals(start, timeSlot.start) &&
-               Objects.equals(end, timeSlot.end);
+                Objects.equals(date, timeSlot.date) && Objects.equals(start, timeSlot.start) &&
+                Objects.equals(end, timeSlot.end);
     }
 
     @Override
@@ -112,6 +110,6 @@ public class TimeSlot {
     @Override
     public String toString() {
         return "TimeSlot{" + "id=" + id + ", label='" + label + '\'' + ", date=" + date + ", start=" + start +
-               ", end=" + end + '}';
+                ", end=" + end + '}';
     }
 }

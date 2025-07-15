@@ -48,5 +48,12 @@
         <dropDefaultValue tableName="salon" columnName="ending_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
+    <changeSet id="202511031600-1" author="claudedy">
+        <addColumn tableName="salon">
+            <column name="price_workshop" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

@@ -21,5 +21,13 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="20251108-1" author="claudedy">
+        <addColumn tableName="floor_plan_salon">
+            <column name="position" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>

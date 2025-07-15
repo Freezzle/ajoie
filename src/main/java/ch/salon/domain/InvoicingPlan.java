@@ -1,6 +1,6 @@
 package ch.salon.domain;
 
-import ch.salon.domain.enumeration.Mode;
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
@@ -46,36 +46,32 @@ public class InvoicingPlan implements Serializable {
     @Column(name = "expiration_date")
     private Instant expirationDate;
 
-    @Column(name = "billing_number",
-            nullable = false)
+    @Column(name = "billing_number", nullable = false)
     private String billingNumber;
 
     @Column(name = "need_arrangement")
     private Boolean needArrangement = false;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "invoice_sending_method")
+    private InvoiceSendingMethod invoiceSendingMethod = InvoiceSendingMethod.EMAIL;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "state")
     private State state = State.DRAFT;
 
-    @OneToMany(fetch = FetchType.EAGER,
-               orphanRemoval = true,
-               cascade = CascadeType.ALL)
-    @JoinColumn(name = "invoicing_plan_id",
-                referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
     @OrderBy("position ASC")
     private Set<Invoice> invoices = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.EAGER,
-               orphanRemoval = true,
-               cascade = CascadeType.ALL)
-    @JoinColumn(name = "invoicing_plan_id",
-                referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = "invoicing_plan_id", referencedColumnName = "id")
     @OrderBy("billingDate ASC")
     private Set<Payment> payments = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = {"exhibitor", "salon"},
-                          allowSetters = true)
+    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
     private Participation participation;
 
     public UUID getId() {
@@ -166,6 +162,14 @@ public class InvoicingPlan implements Serializable {
         return this;
     }
 
+    public InvoiceSendingMethod getInvoiceSendingMethod() {
+        return invoiceSendingMethod;
+    }
+
+    public void setInvoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
+        this.invoiceSendingMethod = invoiceSendingMethod;
+    }
+
     public Instant getIssuedDate() {
         return issuedDate;
     }
@@ -195,19 +199,12 @@ public class InvoicingPlan implements Serializable {
     }
 
     public Double getInvoicesDefaultTotal() {
-        return getInvoices().stream()
-                            .filter(i -> !i.isReduction())
-                            .map(Invoice::getTotalDefaultAmount)
+        return getInvoices().stream().filter(i -> !i.isReduction()).map(Invoice::getTotalDefaultAmount)
                             .reduce(0.00, Double::sum);
     }
 
     public Double getPaymentTotal() {
-        return this.getPayments()
-                   .stream()
-                   .filter(payment -> payment.getPaymentMode() != Mode.DISCOUNT)
-                   .map(Payment::getAmount)
-                   .reduce(Double::sum)
-                   .orElse(0.00);
+        return this.getPayments().stream().map(Payment::getAmount).reduce(Double::sum).orElse(0.00);
     }
 
     public Double getPaymentsTotal() {
@@ -215,22 +212,14 @@ public class InvoicingPlan implements Serializable {
     }
 
     public Double getReductionsTotal() {
-        Double totalDiscount = getPayments().stream()
-                                            .filter(payment -> payment.getPaymentMode() == Mode.DISCOUNT)
-                                            .map(Payment::getAmount)
-                                            .map(Math::abs)
-                                            .reduce(0.00, Double::sum);
+        Double totalDiscount =
+                getInvoices().stream().filter(Invoice::isReduction).map(Invoice::getTotalAmount).map(Math::abs)
+                             .reduce(0.00, Double::sum);
 
-        totalDiscount += getInvoices().stream()
-                                      .filter(Invoice::isReduction)
-                                      .map(Invoice::getTotalAmount)
-                                      .map(Math::abs)
-                                      .reduce(0.00, Double::sum);
+        Double totalDiff = getInvoices().stream().filter(Invoice::hasDifference).filter(in -> !in.isReduction())
+                                        .map(Invoice::getTotalDifference).map(Math::abs).reduce(0.00, Double::sum);
 
-        return totalDiscount + getInvoices().stream().filter(Invoice::hasDifference).filter(in -> !in.isReduction())
-                                            .map(Invoice::getTotalDifference)
-                                            .map(Math::abs)
-                                            .reduce(0.00, Double::sum);
+        return totalDiscount + totalDiff;
     }
 
     public Double getTotal() {
@@ -242,11 +231,12 @@ public class InvoicingPlan implements Serializable {
             return invoicingPlan.getParticipation().getSalon().getEndingDate();
         }
 
-        LocalDateTime fixedExpirationDate = LocalDateTime.of(2025, 4, 30, 0, 0, 0);
-        LocalDateTime deadline = fixedExpirationDate.minusDays(30); // 31.03.2025
+        LocalDateTime fixedExpirationDate =
+                LocalDateTime.ofInstant(invoicingPlan.getParticipation().getSalon().getEndingDate(), ZoneOffset.UTC);
+        LocalDateTime deadline = fixedExpirationDate.minusDays(30);
 
-        if (!LocalDateTime.now().isAfter(deadline)) {
-            return fixedExpirationDate.toInstant(ZoneOffset.UTC);
+        if (LocalDateTime.now().isAfter(deadline)) {
+            return invoicingPlan.getParticipation().getSalon().getEndingDate();
         } else {
             return LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC);
         }

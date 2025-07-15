@@ -93,8 +93,7 @@ public class UserMapper {
 
     @Named("id")
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id",
-             source = "id")
+    @Mapping(target = "id", source = "id")
     public UserDTO toDtoId(User user) {
         if (user == null) {
             return null;
@@ -106,8 +105,7 @@ public class UserMapper {
 
     @Named("idSet")
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id",
-             source = "id")
+    @Mapping(target = "id", source = "id")
     public Set<UserDTO> toDtoIdSet(Set<User> users) {
         if (users == null) {
             return Collections.emptySet();
@@ -123,10 +121,8 @@ public class UserMapper {
 
     @Named("login")
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id",
-             source = "id")
-    @Mapping(target = "login",
-             source = "login")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "login", source = "login")
     public UserDTO toDtoLogin(User user) {
         if (user == null) {
             return null;
@@ -139,10 +135,8 @@ public class UserMapper {
 
     @Named("loginSet")
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id",
-             source = "id")
-    @Mapping(target = "login",
-             source = "login")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "login", source = "login")
     public Set<UserDTO> toDtoLoginSet(Set<User> users) {
         if (users == null) {
             return Collections.emptySet();

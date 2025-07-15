@@ -14,11 +14,13 @@
     "place": "Nom du salon",
     "planningVolunteers": "Planning des bénévoles",
     "priceConference": "Conférence",
+    "priceWorkshop": "Atelier",
     "priceMeal1": "Repas samedi midi",
     "priceMeal2": "Repas samedi soir",
     "priceMeal3": "Repas dimanche midi",
     "priceSharingStand": "Co-exposant",
     "prices": "Configuration des prix",
+    "dimensions-prices": "Configuration des dimensions de stands",
     "referenceNumber": "N° de référence",
     "stands": "Les stands",
     "startingDate": "Date de début",
@@ -39,6 +41,7 @@
       "stands": "Stands",
       "title": "Statistiques"
     },
-    "title": "Les salons"
+    "title": "Les salons",
+    "workshops": "Les ateliers"
   }
 }

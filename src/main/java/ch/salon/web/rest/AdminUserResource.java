@@ -46,8 +46,8 @@ import java.util.Optional;
 public class AdminUserResource {
 
     private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
-        Arrays.asList("id", "login", "firstName", "lastName", "email", "activated", "langKey", "createdBy",
-                      "createdDate", "lastModifiedBy", "lastModifiedDate"));
+            Arrays.asList("id", "login", "firstName", "lastName", "email", "activated", "langKey", "createdBy",
+                    "createdDate", "lastModifiedBy", "lastModifiedDate"));
 
     private static final Logger log = LoggerFactory.getLogger(AdminUserResource.class);
     private final UserService userService;
@@ -58,7 +58,7 @@ public class AdminUserResource {
     private String applicationName;
 
     public AdminUserResource(UserService userService, UserRepository userRepository,
-                             CreationAccountEmailCreator creationAccountEmailCreator) {
+            CreationAccountEmailCreator creationAccountEmailCreator) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.creationAccountEmailCreator = creationAccountEmailCreator;
@@ -80,19 +80,17 @@ public class AdminUserResource {
             User newUser = userService.createUser(userDTO);
             creationAccountEmailCreator.fillUser(newUser);
             creationAccountEmailCreator.sendEmailSync();
-            return ResponseEntity.created(new URI("/api/admin/users/" + newUser.getLogin()))
-                                 .headers(HeaderUtil.createAlert(applicationName, "userManagement.created",
-                                                                 newUser.getLogin()))
+            return ResponseEntity.created(new URI("/api/admin/users/" + newUser.getLogin())).headers(
+                                         HeaderUtil.createAlert(applicationName, "userManagement.created", newUser.getLogin()))
                                  .body(newUser);
         }
     }
 
     @PutMapping({"/users", "/users/{login}"})
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<AdminUserDTO> updateUser(@PathVariable(name = "login",
-                                                                 required = false)
-                                                   @Pattern(regexp = Constants.LOGIN_REGEX) String login,
-                                                   @Valid @RequestBody AdminUserDTO userDTO) {
+    public ResponseEntity<AdminUserDTO> updateUser(
+            @PathVariable(name = "login", required = false) @Pattern(regexp = Constants.LOGIN_REGEX) String login,
+            @Valid @RequestBody AdminUserDTO userDTO) {
         log.debug("REST request to update User : {}", userDTO);
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getId().equals(userDTO.getId()))) {
@@ -105,14 +103,13 @@ public class AdminUserResource {
         Optional<AdminUserDTO> updatedUser = userService.updateUser(userDTO);
 
         return ResponseUtil.wrapOrNotFound(updatedUser,
-                                           HeaderUtil.createAlert(applicationName, "userManagement.updated",
-                                                                  userDTO.getLogin()));
+                HeaderUtil.createAlert(applicationName, "userManagement.updated", userDTO.getLogin()));
     }
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<List<AdminUserDTO>> getAllUsers(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get all User for an admin");
         if (!onlyContainsAllowedProperties(pageable)) {
             return ResponseEntity.badRequest().build();
@@ -120,7 +117,7 @@ public class AdminUserResource {
 
         final Page<AdminUserDTO> page = userService.getAllManagedUsers(pageable);
         HttpHeaders headers =
-            PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+                PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
@@ -131,7 +128,7 @@ public class AdminUserResource {
     @GetMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<AdminUserDTO> getUser(
-        @PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+            @PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         log.debug("REST request to get User : {}", login);
         return ResponseUtil.wrapOrNotFound(userService.getUserWithAuthoritiesByLogin(login).map(AdminUserDTO::new));
     }
@@ -139,11 +136,10 @@ public class AdminUserResource {
     @DeleteMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteUser(
-        @PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+            @PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         log.debug("REST request to delete User: {}", login);
         userService.deleteUser(login);
         return ResponseEntity.noContent()
-                             .headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login))
-                             .build();
+                             .headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build();
     }
 }

@@ -1,17 +1,19 @@
 @if (formControlElement()?.invalid && (formControlElement()?.dirty || formControlElement()?.touched)) {
-  <div class="invalid-tooltip" *ngIf="formControlElement()?.errors as errors">
-    <div *ngFor="let error of errorKeys(errors)">
-      @if (error === 'minlength') {
-        <span class="error-message">{{ 'common.validation.minlength' | translate: { min: errors?.minlength?.requiredLength } }}</span>
-      } @else if (error === 'maxlength') {
-        <span class="error-message">{{ 'common.validation.maxlength' | translate: { max: errors?.maxlength?.requiredLength } }}</span>
-      } @else if (error === 'phonenumber') {
-        <span class="error-message">{{ 'common.validation.pattern' | translate: { pattern: errors?.phonenumber?.requiredPattern } }}</span>
-      } @else if (error === 'pattern') {
-        <span class="error-message">{{ 'common.validation.pattern' | translate: { pattern: errors?.pattern?.requiredPattern } }}</span>
-      } @else {
-        <span class="error-message">{{ 'common.validation.' + error | translate }}</span>
+  @if (formControlElement()?.errors; as errors) {
+      <p-message severity="error" size="small" variant="simple">
+      @for (error of errorKeys(errors); track error) {
+          @if (error === 'minlength') {
+            {{ 'common.validation.minlength' | translate: {min: errors?.minlength?.requiredLength} }}
+          } @else if (error === 'maxlength') {
+            {{ 'common.validation.maxlength' | translate: {max: errors?.maxlength?.requiredLength} }}
+          } @else if (error === 'phonenumber') {
+            {{ 'common.validation.pattern' | translate: {pattern: errors?.phonenumber?.requiredPattern} }}
+          } @else if (error === 'pattern') {
+            {{ 'common.validation.pattern' | translate: {pattern: errors?.pattern?.requiredPattern} }}
+          } @else {
+            {{ 'common.validation.' + error | translate }}
+          }
       }
-    </div>
-  </div>
+      </p-message>
+  }
 }

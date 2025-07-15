@@ -69,9 +69,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     private final UserRepository userRepository;
 
     public PersistentTokenRememberMeServices(JHipsterProperties jHipsterProperties,
-                                             org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
-                                             PersistentTokenRepository persistentTokenRepository,
-                                             UserRepository userRepository) {
+            org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
+            PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
         super(jHipsterProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
@@ -80,7 +79,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     @Override
     protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
-                                                 HttpServletResponse response) {
+            HttpServletResponse response) {
         synchronized (this) { // prevent 2 authentication requests from the same user in parallel
             String login = null;
             UpgradedRememberMeToken upgradedToken = upgradedTokenCache.get(cookieTokens[0]);
@@ -114,7 +113,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     @Override
     protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
-                                  Authentication successfulAuthentication) {
+            Authentication successfulAuthentication) {
         String login = successfulAuthentication.getName();
 
         log.debug("Creating new persistent login for user {}", login);
@@ -169,7 +168,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     private PersistentToken getPersistentToken(String[] cookieTokens) {
         if (cookieTokens.length != 2) {
             throw new InvalidCookieException(
-                "Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
+                    "Cookie token did not contain " + 2 + " tokens, but contained '" + Arrays.asList(cookieTokens) +
+                            "'");
         }
         String presentedSeries = cookieTokens[0];
         String presentedToken = cookieTokens[1];
@@ -185,7 +185,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             // Token doesn't match series value. Delete this session and throw an exception.
             persistentTokenRepository.deleteById(token.getSeries());
             throw new CookieTheftException(
-                "Invalid remember-me token (Series/token) mismatch. Implies previous " + "cookie theft attack.");
+                    "Invalid remember-me token (Series/token) mismatch. Implies previous " + "cookie theft attack.");
         }
         if (token.getTokenDate().plusDays(TOKEN_VALIDITY_DAYS).isBefore(LocalDate.now())) {
             persistentTokenRepository.deleteById(token.getSeries());
@@ -198,18 +198,9 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         setCookie(new String[]{token.getSeries(), token.getTokenValue()}, TOKEN_VALIDITY_SECONDS, request, response);
     }
 
-    private static class UpgradedRememberMeToken implements Serializable {
+    private record UpgradedRememberMeToken(String[] upgradedToken, String userLogin) implements Serializable {
 
         private static final long serialVersionUID = 1L;
-
-        private final String[] upgradedToken;
-
-        private final String userLogin;
-
-        UpgradedRememberMeToken(String[] upgradedToken, String userLogin) {
-            this.upgradedToken = upgradedToken;
-            this.userLogin = userLogin;
-        }
 
         String getUserLoginIfValid(String[] currentToken) {
             if (currentToken[0].equals(this.upgradedToken[0]) && currentToken[1].equals(this.upgradedToken[1])) {

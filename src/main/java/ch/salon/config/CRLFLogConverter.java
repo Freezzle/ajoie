@@ -26,7 +26,7 @@ public class CRLFLogConverter extends CompositeConverter<ILoggingEvent> {
     public static final Marker CRLF_SAFE_MARKER = MarkerFactory.getMarker("CRLF_SAFE");
 
     private static final String[] SAFE_LOGGERS =
-        {"org.hibernate", "org.springframework.boot.autoconfigure", "org.springframework.boot.diagnostics",};
+            {"org.hibernate", "org.springframework.boot.autoconfigure", "org.springframework.boot.diagnostics",};
     private static final Map<String, AnsiElement> ELEMENTS;
 
     static {
@@ -46,7 +46,7 @@ public class CRLFLogConverter extends CompositeConverter<ILoggingEvent> {
         AnsiElement element = ELEMENTS.get(getFirstOption());
         List<Marker> markers = event.getMarkerList();
         if ((markers != null && !markers.isEmpty() && markers.get(0).contains(CRLF_SAFE_MARKER)) ||
-            isLoggerSafe(event)) {
+                isLoggerSafe(event)) {
             return in;
         }
         String replacement = element == null ? "_" : toAnsiString("_", element);

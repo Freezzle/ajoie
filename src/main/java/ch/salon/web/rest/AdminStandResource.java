@@ -57,14 +57,13 @@ public class AdminStandResource {
         UUID id = standService.create(stand);
 
         return created(new URI("/api/admin/stands/" + id)).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stand);
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stand);
     }
 
     @PutMapping("/{idStand}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<StandDTO> updateStand(@PathVariable(value = "idStand",
-                                                              required = false) final UUID idStand,
-                                                @Valid @RequestBody StandDTO stand) {
+    public ResponseEntity<StandDTO> updateStand(@PathVariable(value = "idStand", required = false) final UUID idStand,
+            @Valid @RequestBody StandDTO stand) {
         log.debug("REST request to update Stand : {}, {}", idStand, stand);
 
         stand = standService.update(idStand, stand);
@@ -75,10 +74,8 @@ public class AdminStandResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<StandDTO> getAllStands(@RequestParam(name = "idSalon",
-                                                     required = false) UUID idSalon,
-                                       @RequestParam(name = "idParticipation",
-                                                     required = false) UUID idParticipation) {
+    public List<StandDTO> getAllStands(@RequestParam(name = "idSalon", required = false) UUID idSalon,
+            @RequestParam(name = "idParticipation", required = false) UUID idParticipation) {
         log.debug("REST request to get all Stands");
 
         return standService.findAll(idSalon, idParticipation);

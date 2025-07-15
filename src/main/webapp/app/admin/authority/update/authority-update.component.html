@@ -3,45 +3,51 @@
     <h2 id="page-heading">
 
       <div class="d-flex justify-content-center">
-        <span *ngIf="!authority?.name" jhiTranslate="authority.create">Création d'une nouvelle authorité</span>
+        @if (!authority?.name) {
+          <span jhiTranslate="authority.create">Création d'une nouvelle authorité</span>
+        }
       </div>
       <hr/>
 
       <div class="d-flex justify-content-between mt-3">
         <span>
           <button-box (clickedEvent)="previousState()"
-                      faIcon="arrow-left"
-                      [isDisabled]="isLoading"
-                      translateKey="common.back"/>
-        </span>
+            faIcon="arrow-left"
+            [isDisabled]="isLoading"
+            translateKey="common.back"/>
+          </span>
 
-        <span>
-          <button-box *ngIf="!isReadOnly"
-                      faIcon="floppy-disk"
-                      [isDisabled]="editForm.invalid || isLoading"
-                      [isSubmit]="true"
-                      translateKey="common.save"/>
-        </span>
-      </div>
-    </h2>
+          <span>
+            @if (!isReadOnly) {
+              <button-box
+                faIcon="floppy-disk"
+                [isDisabled]="editForm.invalid || isLoading"
+                [isSubmit]="true"
+                translateKey="common.save"/>
+            }
+          </span>
+        </div>
+      </h2>
 
-    <div>
-      <jhi-alert-error></jhi-alert-error>
+      <div>
+        <jhi-alert-error></jhi-alert-error>
 
-      <jhi-alert></jhi-alert>
+        <jhi-alert></jhi-alert>
 
-      <div class="card">
-        <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-sm-12 fw-bold align-content-center position-relative">
-              <label for="field_name" jhiTranslate="authority.name">Nom</label>
-              <input [readonly]="editForm.get('name')!.disabled" class="form-control" formControlName="name" id="field_name" name="name" type="text"/>
-              <field-error [formControlElement]="getName" [errors]="[ErrorModel.required(), ErrorModel.maxlength(50)]"></field-error>
+        <div class="card">
+          <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-12 fw-bold align-content-center position-relative">
+                <label for="field_name" jhiTranslate="authority.name">Nom</label>
+                <input [readonly]="editForm.get('name')!.disabled" class="form-control"
+                  formControlName="name" id="field_name" name="name" type="text"/>
+                  <field-error [formControlElement]="getName"
+                  [errors]="[ErrorModel.required(), ErrorModel.maxlength(50)]"></field-error>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
-  </form>
-</div>

@@ -1,66 +1,82 @@
-import { Component, Input, Self } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {Component, Input, OnInit, Self} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
-import { RouterLink } from '@angular/router';
-import { ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ErrorBoxComponent } from '../../error-box/error-box.component';
+import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ErrorBoxComponent} from '../../error-box/error-box.component';
+import {IftaLabel} from "primeng/iftalabel";
+import {Select} from "primeng/select";
+import {PrimeTemplate} from "primeng/api";
 
 @Component({
-  imports: [CommonModule, SharedModule, RouterLink, ReactiveFormsModule, ErrorBoxComponent],
-  selector: 'select-box',
-  standalone: true,
-  styleUrl: './select-box.component.scss',
-  templateUrl: './select-box.component.html',
+    imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, Select, PrimeTemplate],
+    selector: 'select-box',
+    templateUrl: './select-box.component.html'
 })
 export class SelectBoxComponent implements ControlValueAccessor {
-  @Input()
-  translateKey: string | undefined;
-  @Input()
-  fieldName: string = '';
-  @Input()
-  options: any[] = [];
-  @Input()
-  compareFunction: (a: any, b: any) => boolean = (a: any, b: any) => a === b;
-  @Input()
-  formatterFunction: (a: any) => string = (a: any) => JSON.parse(a);
-  @Input()
-  withEmptyOption: boolean = true;
-  @Input()
-  needTranslation: boolean = false;
+    @Input()
+    translateKey: string | undefined;
+    @Input()
+    fieldName: string = '';
+    @Input()
+    options: any[] = [];
 
-  protected readonly Validators = Validators;
+    @Input()
+    formatterFunction: (a: any) => string = (a: any) => {
+        if (!a) {
+            return '';
+        }
+        // Si c’est un string, on le renvoie tel quel
+        if (typeof a === 'string') {
+            return a;
+        }
+        // Sinon on essaie quelques propriétés standard
+        return a.label ?? a.name ?? a.id ?? JSON.stringify(a);
+    };
 
-  value: string = '';
+    @Input()
+    needTranslation: boolean = false;
 
-  // placeholder methods
-  onChange = (_: any) => {
-  };
-  onTouched = () => {
-  };
+    protected readonly Validators = Validators;
 
-  constructor(@Self() public controlDir: NgControl) {
-    this.controlDir.valueAccessor = this;
-  }
+    value: string = '';
 
-  writeValue(value: any): void {
-    this.value = value;
-  }
+    // placeholder methods
+    onChange = (_: any) => {
+    };
+    onTouched = () => {
+    };
 
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
+    constructor(@Self() public controlDir: NgControl) {
+        this.controlDir.valueAccessor = this;
+    }
 
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
+    writeValue(value: any): void {
+        this.value = value;
+    }
 
-  onInput(event: Event) {
-    this.value = (event.target as HTMLInputElement).value;
-    this.onChange(this.value);
-    this.onTouched();
-  }
+    registerOnChange(fn: any): void {
+        this.onChange = fn;
+    }
 
-  get control(): FormControl<any> {
-    return this.controlDir.control as FormControl<any>;
-  }
+    registerOnTouched(fn: any): void {
+        this.onTouched = fn;
+    }
+
+    get control(): FormControl<any> {
+        return this.controlDir.control as FormControl<any>;
+    }
+
+    getLabel(object: any): string {
+        return this.formatterFunction(object);
+    }
+
+    get stringOptions(): boolean {
+        return Array.isArray(this.options) &&
+            this.options.length > 0 &&
+            typeof this.options[0] === 'string';
+    }
+
+    get dataKeyToUse(): string | undefined {
+        return this.stringOptions ? undefined : 'id';
+    }
 }

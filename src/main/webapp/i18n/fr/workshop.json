@@ -1,0 +1,27 @@
+{
+  "workshop": {
+    "create": "Création d'un nouvel atelier",
+    "delete": {
+      "question": "Êtes-vous certain de vouloir supprimer l'atelier \"{{title}}\" ?"
+    },
+    "description": "Description",
+    "edit": "Détail d'un atelier",
+    "extraInformation": "Commentaire",
+    "notFound": "Aucun atelier",
+    "participation": "Participation",
+    "status": {
+      "label": "Statut",
+      "list": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "CLOSED": "Clôturé",
+        "IN_VERIFICATION": "En vérification",
+        "REFUSED": "Refusé",
+        "VALIDATED": "Validé",
+        "null": " "
+      }
+    },
+    "title": "Les ateliers",
+    "title-field": "Titre"
+  }
+}

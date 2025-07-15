@@ -31,13 +31,11 @@ public class Conference implements Serializable {
     private UUID id;
 
     @NotNull
-    @Column(name = "title",
-            nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
     @NotNull
-    @Column(name = "description",
-            nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -48,8 +46,7 @@ public class Conference implements Serializable {
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"exhibitor", "salon"},
-                          allowSetters = true)
+    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
     private Participation participation;
 
     @Column(name = "registration_date")

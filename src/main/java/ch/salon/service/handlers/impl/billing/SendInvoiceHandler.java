@@ -3,6 +3,7 @@ package ch.salon.service.handlers.impl.billing;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.EmailActionHandler;
@@ -28,7 +29,7 @@ public class SendInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
     private final EventLogService eventLogService;
 
     public SendInvoiceHandler(EmailCreator emailCreator, DownloadInvoiceHandler downloadInvoiceHandler,
-                              EventLogService eventLogService) {
+            EventLogService eventLogService) {
         this.emailCreator = emailCreator;
         this.downloadInvoiceHandler = downloadInvoiceHandler;
         this.eventLogService = eventLogService;
@@ -36,7 +37,8 @@ public class SendInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
 
     @Override
     public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState().isDraft() ? SupportType.ALLOWED : SupportType.REJECTED;
+        return payload != null && payload.getState().isDraft() && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL ?
+                SupportType.ALLOWED : SupportType.REJECTED;
     }
 
     @Override
@@ -44,15 +46,15 @@ public class SendInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
         Locale locale = (Locale) context.getOrDefault("locale", Locale.FRENCH);
 
         String subject = this.emailCreator.getTranslatedText("email.invoice.title", locale,
-                                                             payload.getParticipation().getSalon().getPlace());
+                payload.getParticipation().getSalon().getPlace());
 
         Context thymeleafCtxt = new Context(locale);
         thymeleafCtxt.setVariable("salon", payload.getParticipation().getSalon().getPlace());
         thymeleafCtxt.setVariable("arrangement", payload.getNeedArrangement());
         thymeleafCtxt.setVariable("startDate",
-                                  DateUtils.instantToIso(payload.getParticipation().getSalon().getStartingDate()));
+                DateUtils.instantToIso(payload.getParticipation().getSalon().getStartingDate()));
         thymeleafCtxt.setVariable("endDate",
-                                  DateUtils.instantToIso(payload.getParticipation().getSalon().getEndingDate()));
+                DateUtils.instantToIso(payload.getParticipation().getSalon().getEndingDate()));
 
         EmailMessage emailMessage = new EmailMessage();
         emailMessage.setFrom("dylan.claude.work@gmail.com");
@@ -78,9 +80,9 @@ public class SendInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
         InputStreamSource attachment = this.downloadInvoiceHandler.download(payload, context);
         emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(payload, context), attachment));
         eventLogService.eventFromSystem("Facture envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, payload.getId(),
-                                        null);
+                null);
         eventLogService.eventFromSystem("Facture envoyée " + payload.getBillingNumber(), EventType.EMAIL,
-                                        EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
+                EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
     }
 
     @Override

@@ -40,7 +40,8 @@
             "styles": [
               "node_modules/quill/dist/quill.snow.css",
               "src/main/webapp/content/scss/vendor.scss",
-              "src/main/webapp/content/scss/global.scss"
+              "src/main/webapp/content/scss/global.scss",
+              "node_modules/primeicons/primeicons.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
@@ -96,13 +97,6 @@
             }
           },
           "defaultConfiguration": "development"
-        },
-        "test": {
-          "builder": "@angular-builders/jest:run",
-          "options": {
-            "configPath": "jest.conf.js",
-            "tsConfig": "tsconfig.spec.json"
-          }
         }
       }
     }
@@ -115,5 +109,31 @@
     },
     "packageManager": "npm",
     "analytics": false
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
   }
 }

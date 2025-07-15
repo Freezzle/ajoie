@@ -33,11 +33,11 @@
     "sendByEmail": "Envoyer par email",
     "sent": "Facture envoyé",
     "state": {
-      "CANCELLED": "Annulé",
+      "CANCELLED": "Annulée",
       "DRAFT": "Brouillon",
-      "ISOLATED": "Brouillon isolé",
-      "ISSUED": "Soumit",
-      "PAID": "Payé"
+      "ISOLATED": "Brouillon isolée",
+      "ISSUED": "Envoyée",
+      "PAID": "Payée"
     },
     "title": "Facture n° {{billingNumber}}",
     "waitingPayments": "Facture envoyé"

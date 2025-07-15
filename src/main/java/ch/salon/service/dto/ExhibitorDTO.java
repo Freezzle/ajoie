@@ -25,6 +25,12 @@ public class ExhibitorDTO implements Serializable {
 
     private AddressDTO billingAddress;
 
+    private boolean newsletter;
+
+    private boolean redFlag = false;
+
+    private boolean duplicateDetected = false;
+
     public ExhibitorDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -107,5 +113,29 @@ public class ExhibitorDTO implements Serializable {
 
     public void setBillingAddress(AddressDTO billingAddress) {
         this.billingAddress = billingAddress;
+    }
+
+    public boolean isNewsletter() {
+        return newsletter;
+    }
+
+    public void setNewsletter(boolean newsletter) {
+        this.newsletter = newsletter;
+    }
+
+    public boolean isRedFlag() {
+        return redFlag;
+    }
+
+    public void setRedFlag(boolean redFlag) {
+        this.redFlag = redFlag;
+    }
+
+    public boolean isDuplicateDetected() {
+        return duplicateDetected;
+    }
+
+    public void setDuplicateDetected(boolean duplicateDetected) {
+        this.duplicateDetected = duplicateDetected;
     }
 }

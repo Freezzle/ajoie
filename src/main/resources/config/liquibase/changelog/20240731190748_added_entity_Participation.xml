@@ -63,10 +63,24 @@
             <column name="salon_id" type="${uuidType}">
                 <constraints nullable="true"/>
             </column>
+            <column name="therapist_nam" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
 
         </createTable>
         <dropDefaultValue tableName="participation" columnName="registration_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
-
+    <changeSet id="20251102-add-attributes-participation" author="freezzle">
+        <addColumn tableName="participation">
+            <column name="mode_payment_meals" type="varchar(50)" defaultValue="MIXED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="participation">
+            <column name="invoice_sending_method" type="varchar(50)" defaultValue="EMAIL">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

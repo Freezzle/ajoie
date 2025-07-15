@@ -29,9 +29,7 @@ public class Authority implements Serializable, Persistable<String> {
     @NotNull
     @Size(max = 50)
     @Id
-    @Column(name = "name",
-            length = 50,
-            nullable = false)
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
 
     @Transient

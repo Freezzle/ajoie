@@ -27,8 +27,7 @@ public class AdminEventResource {
 
     @DeleteMapping("/{idEvent}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public void getAllLogs(@PathVariable(value = "idEvent",
-                                         required = true) final UUID idEvent) {
+    public void getAllLogs(@PathVariable(value = "idEvent", required = true) final UUID idEvent) {
 
         this.eventLogRepository.deleteById(idEvent);
     }

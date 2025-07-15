@@ -23,8 +23,8 @@ public class CancelInvoiceHandler implements BusinessActionHandler<InvoicingPlan
 
     @Override
     public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && (payload.getState() == State.ISSUED ||
-                                   payload.getState() == State.PAID) ? SupportType.ALLOWED : SupportType.REJECTED;
+        return payload != null && (payload.getState() == State.ISSUED || payload.getState() == State.PAID) ?
+                SupportType.ALLOWED : SupportType.REJECTED;
     }
 
     @Override
@@ -32,9 +32,9 @@ public class CancelInvoiceHandler implements BusinessActionHandler<InvoicingPlan
         payload.setState(State.CANCELLED);
 
         eventLogService.eventFromSystem("Facture annulée", EventType.ACTION, EntityType.INVOICE_PLAN, payload.getId(),
-                                        null);
+                null);
         eventLogService.eventFromSystem("Facture annulée " + payload.getBillingNumber(), EventType.ACTION,
-                                        EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
+                EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
     }
 
     @Override

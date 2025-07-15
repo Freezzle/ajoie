@@ -1,11 +1,11 @@
 <div>
-  <h2 id="page-heading">
-    <div class="d-flex justify-content-center">
-      <span jhiTranslate="conference.title">Les conférences</span>
-    </div>
-    <hr/>
+    <h2 id="page-heading">
+        <div class="d-flex justify-content-center">
+            <span jhiTranslate="conference.title">Les conférences</span>
+        </div>
+        <hr/>
 
-    <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-between mt-3">
       <span>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
@@ -13,7 +13,7 @@
                     translateKey="common.back"/>
       </span>
 
-      <span [formGroup]="filters" class="row">
+            <span [formGroup]="filters" class="row">
         <div class="col-auto">
           <input (blur)="actionFilter()"
                  [placeholder]="'exhibitor.filter.fullName' | translate"
@@ -24,14 +24,14 @@
         <div class="col-auto">
           <select (change)="actionFilter()" class="form-control" formControlName="status">
             <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
-            @for (status of statusValues; track $index) {
-              <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
-            }
+              @for (status of statusValues; track $index) {
+                  <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
+              }
           </select>
         </div>
       </span>
 
-      <span>
+            <span>
         <button-box (clickedEvent)="refresh()"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
                     [isDisabled]="isLoading"
@@ -43,68 +43,70 @@
                   translateKey="common.create"
                   type="success"/>
       </span>
-    </div>
-  </h2>
+        </div>
+    </h2>
 
-  <jhi-alert-error></jhi-alert-error>
+    <jhi-alert-error></jhi-alert-error>
 
-  <div class="table-responsive table-entities" id="entities">
-    <table aria-describedby="page-heading" class="table table-hover">
-      <thead class="thead-primary">
-        <tr>
-          <th class="col-auto">
-            <span jhiTranslate="conference.participation">Participation</span>
-          </th>
-          <th class="col-8">
-            <span jhiTranslate="conference.titleField">Title</span>
-          </th>
-          <th class="col-auto text-center">
-            <span jhiTranslate="conference.status.label">Status</span>
-          </th>
-          <th class="col-auto">&nbsp;</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (conferences.length === 0) {
-          <tr>
-            <td colspan="4">
-              <span jhiTranslate="conference.notFound">Aucune Conference</span>
-            </td>
-          </tr>
-        } @else {
-          @for (conference of conferencesPaginated; track $index) {
+    <div class="table-responsive table-entities" id="entities">
+        <table aria-describedby="page-heading" class="table table-hover">
+            <thead class="thead-primary">
             <tr>
-              <td class="go-detail" [routerLink]="['./', conference.id, 'view']">
-                @if (conference.participation) {
-                  <a [routerLink]="[
+                <th class="col-auto">
+                    <span jhiTranslate="conference.participation">Participation</span>
+                </th>
+                <th class="col-8">
+                    <span jhiTranslate="conference.title-field">Title</span>
+                </th>
+                <th class="col-auto text-center">
+                    <span jhiTranslate="conference.status.label">Status</span>
+                </th>
+                <th class="col-auto">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (conferences.length === 0) {
+                <tr>
+                    <td colspan="4">
+                        <span jhiTranslate="conference.notFound">Aucune Conference</span>
+                    </td>
+                </tr>
+            } @else {
+                @for (conference of conferencesPaginated; track $index) {
+                    <tr>
+                        <td class="go-detail" [routerLink]="['./', conference.id, 'view']">
+                            @if (conference.participation) {
+                                <a [routerLink]="[
                       '/admin/salons',
                       params.get('idSalon'),
                       'participations',
                       conference.participation.id,
                       'view',
                     ]"
-                     (click)="$event.stopPropagation()">
-                    {{ getFormattedParticipationName(conference.participation) }} </a>
+                                   (click)="$event.stopPropagation()">
+                                    {{ getFormattedParticipationName(conference.participation) }} </a>
+                            }
+                        </td>
+                        <td class="go-detail truncate"
+                            [routerLink]="['./', conference.id, 'view']">{{ conference.title }}
+                        </td>
+                        <td class="go-detail text-center" [routerLink]="['./', conference.id, 'view']">
+                            <fa-icon [icon]="conference.status | status"
+                                     [class]="conference.status | colorStatus"
+                                     [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <button-box (clickedEvent)="delete(conference)" type="danger"
+                                            [showText]="false" translateKey="common.delete" faIcon="times"/>
+                            </div>
+                        </td>
+                    </tr>
                 }
-              </td>
-              <td class="go-detail truncate" [routerLink]="['./', conference.id, 'view']">{{ conference.title }}</td>
-              <td class="go-detail text-center" [routerLink]="['./', conference.id, 'view']">
-                <fa-icon [icon]="conference.status | status"
-                         [class]="conference.status | colorStatus"
-                         [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <button-box (clickedEvent)="delete(conference)" type="danger"
-                              [showText]="false" translateKey="common.delete" faIcon="times"/>
-                </div>
-              </td>
-            </tr>
-          }
-        }
-      </tbody>
-    </table>
-  </div>
+            }
+            </tbody>
+        </table>
+    </div>
 
-  <jhi-pagination (pageChanged)="refreshConferences($event)" [collectionSize]="this.conferences.length"/>
+    <jhi-pagination (pageChanged)="refreshConferences($event)" [collectionSize]="conferences.length"/>
 </div>

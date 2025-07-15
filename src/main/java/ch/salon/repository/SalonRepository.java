@@ -10,4 +10,5 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 @Repository
 @RepositoryAction("salon")
-public interface SalonRepository extends JpaRepository<Salon, UUID> {}
+public interface SalonRepository extends JpaRepository<Salon, UUID> {
+}

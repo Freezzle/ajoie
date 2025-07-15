@@ -31,8 +31,8 @@ public class SendValidationParticipationHandler implements EmailActionHandler<Pa
 
     @Override
     public SupportType supports(Participation payload, Map<String, Object> context) {
-        return payload != null && !payload.getNeedArrangement() &&
-               payload.getStatus() == Status.VALIDATED ? SupportType.ALLOWED : SupportType.REJECTED;
+        return payload != null && !payload.getNeedArrangement() && payload.getStatus() == Status.VALIDATED ?
+                SupportType.ALLOWED : SupportType.REJECTED;
     }
 
 
@@ -41,7 +41,7 @@ public class SendValidationParticipationHandler implements EmailActionHandler<Pa
         Locale locale = (Locale) context.getOrDefault("locale", Locale.FRENCH);
 
         String subject = this.emailCreator.getTranslatedText("email.participation-validated.title", locale,
-                                                             payload.getSalon().getPlace());
+                payload.getSalon().getPlace());
 
         Context thymeleafCtxt = new Context(locale);
         thymeleafCtxt.setVariable("salon", payload.getSalon().getPlace());
@@ -68,7 +68,7 @@ public class SendValidationParticipationHandler implements EmailActionHandler<Pa
         emailCreator.send(emailMessage, null);
 
         eventLogService.eventFromSystem("Email participation validée envoyé", EventType.EMAIL, EntityType.PARTICIPATION,
-                                        payload.getId(), null);
+                payload.getId(), null);
     }
 
     @Override

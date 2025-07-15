@@ -1,14 +1,7 @@
 package ch.salon.domain.enumeration;
 
 public enum Type {
-    STAND,
-    SHARED,
-    CONFERENCE,
-    MEAL1,
-    MEAL2,
-    MEAL3,
-    ELECTRICITY,
-    OTHERS;
+    STAND, SHARED, CONFERENCE, WORKSHOP, MEAL1, MEAL2, MEAL3, ELECTRICITY, POSTAL_FEE, OTHERS;
 
     public boolean isFromStand() {
         return STAND == this || SHARED == this || ELECTRICITY == this;
@@ -20,5 +13,9 @@ public enum Type {
 
     public boolean isFromConference() {
         return CONFERENCE == this;
+    }
+
+    public boolean isFromWorkshop() {
+        return WORKSHOP == this;
     }
 }

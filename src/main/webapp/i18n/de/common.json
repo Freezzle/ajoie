@@ -18,17 +18,18 @@
     "show": "Show {{otherEntity}}",
     "validate": "Valider",
     "validation": {
-      "datetimelocal": "Ce champ doit être une date et une heure.",
-      "max": "Ce champ doit être inférieur à {{max}}.",
-      "maxbytes": "Ce champ doit être inférieur à {{max}} bytes.",
-      "maxlength": "Ce champ doit faire moins de {{max}} caractères.",
-      "min": "Ce champ doit être supérieur à {{min}}.",
-      "minbytes": "Ce champ doit être supérieur à {{min}} bytes.",
-      "minlength": "Ce champ doit faire au minimum {{min}} caractères.",
-      "number": "Ce champ doit être un nombre.",
-      "pattern": "Ce champ doit suivre l'expression régulière {{pattern}}.",
+      "datetimelocal": "Format attendu : jj.mm.aaaa 00:00",
+      "email": "Format attendu : xxx@xx.xx",
+      "max": "Doit être inférieur à {{max}}",
+      "maxbytes": "Doit être inférieur à {{max}} bytes",
+      "maxlength": "Doit faire {{max}} caractères maximum",
+      "min": "Doit être supérieur à {{min}}",
+      "minbytes": "Doit être supérieur à {{min}} bytes",
+      "minlength": "Doit faire {{min}} caractères minimum",
+      "number": "Doit être un nombre",
+      "pattern": "Doit suivre ce pattern {{pattern}}",
       "patternLogin": "Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.",
-      "required": "Ce champ est obligatoire."
+      "required": "Ce champ est obligatoire"
     },
     "view": "Détail"
   }

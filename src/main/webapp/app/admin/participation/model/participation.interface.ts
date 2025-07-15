@@ -1,62 +1,63 @@
 import dayjs from 'dayjs/esm';
-import { ISalon } from '../../salon/model/salon.interface';
-import { Status } from '../../enumerations/status.model';
-import { Type } from '../../enumerations/type.model';
-import { IExhibitor } from '../../exhibitor/model/exhibitor.interface';
+import {ISalon} from '../../salon/model/salon.interface';
+import {Status} from '../../enumerations/status.model';
+import {Type} from '../../enumerations/type.model';
+import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
+import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
 
 export interface IParticipation {
-  id: string;
-  registrationDate?: dayjs.Dayjs | null;
-  therapistName?: string | null;
-  type?: keyof typeof Type | null;
-  clientNumber?: string | null;
-  nbMeal1?: number | null;
-  nbMeal2?: number | null;
-  nbMeal3?: number | null;
-  acceptedChart?: boolean | null;
-  acceptedContract?: boolean | null;
-  needArrangement?: boolean | null;
-  hasOffer?: boolean | null;
-  offer?: string | null;
-  guestOfHonor?: boolean | null;
-  crushOfHeart?: boolean | null;
-  additionnalInformation?: string | null;
-  status?: keyof typeof Status | null;
-  extraInformation?: string | null;
-  exhibitor?: IExhibitor | null;
-  salon?: ISalon | null;
+    id: string;
+    registrationDate: Date | null;
+    therapistName: string;
+    modePaymentMeals: keyof typeof ModePaymentMeals;
+    invoiceSendingMethod: keyof typeof InvoiceSendingMethod;
+    clientNumber: string | null;
+    nbMeal1: number;
+    nbMeal2: number;
+    nbMeal3: number;
+    acceptedChart: boolean;
+    acceptedContract: boolean;
+    needArrangement: boolean;
+    hasOffer: boolean;
+    offer: string | null;
+    guestOfHonor: boolean;
+    crushOfHeart: boolean;
+    additionnalInformation: string | null;
+    status: keyof typeof Status;
+    extraInformation: string | null;
+    exhibitor: IExhibitor;
+    salon: ISalon;
 }
-
-export type NewParticipation = Omit<IParticipation, 'id'> & { id: null };
 
 export interface IInfoInvoice {
-  hasDraftInvoices: false;
-  hasWaitingInvoices: false;
-  hasExpiredInvoices: false;
+    hasDraftInvoices: false;
+    hasWaitingInvoices: false;
+    hasExpiredInvoices: false;
 }
 
-export function containsParticipationName(participation: IParticipation | undefined | null,
+export function containsParticipationName(participation: IParticipation | null,
                                           filterText: string): boolean {
-  if (!participation || !filterText) {
-    return false;
-  }
+    if (!participation || !filterText) {
+        return false;
+    }
 
-  filterText = filterText.trim()?.toLocaleLowerCase();
+    filterText = filterText.trim()?.toLocaleLowerCase();
 
-  return (
-    (participation.exhibitor?.fullName?.toLocaleLowerCase().includes(filterText) ||
-     participation.therapistName?.toLocaleLowerCase().includes(filterText)) ??
-    false
-  );
+    return (
+        (participation.exhibitor?.fullName?.toLocaleLowerCase().includes(filterText) ||
+            participation.therapistName?.toLocaleLowerCase().includes(filterText)) ??
+        false
+    );
 }
 
 export function getFormattedParticipationName(participation: IParticipation | null | undefined): string {
-  if (!participation) {
-    return '-';
-  }
+    if (!participation) {
+        return '-';
+    }
 
-  if (participation?.therapistName) {
-    return `${participation?.therapistName} (${participation.exhibitor?.fullName})`;
-  }
-  return `- (${participation.exhibitor?.fullName})`;
+    if (participation?.therapistName) {
+        return `${participation?.therapistName} (${participation.exhibitor?.fullName})`;
+    }
+    return `- (${participation.exhibitor?.fullName})`;
 }

@@ -3,12 +3,12 @@
  They are written in English to avoid character encoding issues (not a perfect solution)
  */
 export const LANGUAGES: string[] = [
-  'fr',
-  'en',
-  'de',
+    'fr',
+    'en',
+    'de',
 ];
 
 
 export function formatterLanguage(language: string | null): string {
-  return 'exhibitor.language.list.' + language ?? '';
+    return 'exhibitor.language.list.' + language;
 }

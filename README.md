@@ -163,14 +163,6 @@ To launch your application's tests, run:
 ./mvnw verify
 ```
 
-### Client tests
-
-Unit tests are run by [Jest][]. They're located in [src/test/javascript/](src/test/javascript/) and can be run with:
-
-```
-./npmw test
-```
-
 ## Others
 
 ### Code quality using Sonar
@@ -264,7 +256,6 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [Doing API-First development]: https://www.jhipster.tech/documentation-archive/v8.6.0/doing-api-first-development/
 [Webpack]: https://webpack.github.io/
 [BrowserSync]: https://www.browsersync.io/
-[Jest]: https://facebook.github.io/jest/
 [Leaflet]: https://leafletjs.com/
 [DefinitelyTyped]: https://definitelytyped.org/
 [Angular CLI]: https://cli.angular.io/

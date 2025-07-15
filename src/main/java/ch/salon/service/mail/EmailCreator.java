@@ -30,7 +30,7 @@ public class EmailCreator {
     private final MessageSource messageSource;
 
     public EmailCreator(JavaMailSender javaMailSender, SpringTemplateEngine mailTemplateEngine,
-                        MessageSource messageSource) {
+            MessageSource messageSource) {
         this.javaMailSender = javaMailSender;
         this.mailTemplateEngine = mailTemplateEngine;
         this.messageSource = messageSource;
@@ -77,7 +77,7 @@ public class EmailCreator {
     }
 
     private MimeMessageHelper getMimeMessageHelper(MimeMessage mimeMessage, boolean withAttachments,
-                                                   EmailMessage emailMessage) throws MessagingException, IOException {
+            EmailMessage emailMessage) throws MessagingException, IOException {
         MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, UTF_8.name());
 
         // FIXME CHANGE THAT LATER

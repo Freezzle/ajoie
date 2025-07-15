@@ -15,10 +15,10 @@
         <tr>
           <td class="top-left">
             <span th:utext="#{document.invoice-receipt.reference}"></span>
-            <b>[[${reference}]]</b><br />
-            <span th:text="#{document.invoice.send-date}"></span>
+            [[${reference}]]<br />
+            <span th:utext="#{document.invoice.send-date}"></span>
             [[${sentDate}]]<br />
-            <span th:text="#{document.invoice.reference-date}"></span>
+            <span th:utext="#{document.invoice.reference-date}"></span>
             [[${invoiceDate}]]<br />
           </td>
           <td class="top-right">

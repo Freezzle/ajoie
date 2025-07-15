@@ -5,6 +5,7 @@
     "delete": {
       "question": "Êtes-vous certain de vouloir supprimer \"{{ id }}\" ?"
     },
+    "duplicateDetected": "Exposant double détecté",
     "edit": "Modification d'un exposant",
     "email": "Email",
     "extraInformation": "Commentaire",
@@ -22,9 +23,11 @@
         "label": "Langue"
       }
     },
+    "newsletter": "Newsletter",
     "notFound": "Aucun exposant",
     "npaLocalite": "Npa et localité",
     "phoneNumber": "N° de tél",
+    "redFlag": "Exposant bloqué",
     "therapistName": "Nom de thérapeute",
     "title": "Les exposants"
   }

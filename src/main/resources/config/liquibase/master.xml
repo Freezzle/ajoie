@@ -34,7 +34,6 @@
     <include file="config/liquibase/changelog/20250311_added_entity_Address.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250406_added_entity_Volunteers.xml" relativeToChangelogFile="false"/>
 
-
     <include file="config/liquibase/changelog/20240721083403_added_entity_constraints_Stand.xml"
              relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240721083405_added_entity_constraints_Invoice.xml"
@@ -56,4 +55,13 @@
     <include file="config/liquibase/changelog/20250406_added_entity_constraints_Volunteers.xml"
              relativeToChangelogFile="false"/>
 
+    <!-- New things -->
+
+    <include file="config/liquibase/changelog/20251102_added_entity_Workshop.xml"
+             relativeToChangelogFile="false"/>
+
+    <include file="config/liquibase/changelog/20251102_added_entity_constraints_Workshop.xml"
+             relativeToChangelogFile="false"/>
+
+    <include file="config/liquibase/changelog/20251112_migration.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

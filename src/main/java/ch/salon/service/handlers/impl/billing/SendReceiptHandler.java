@@ -27,7 +27,7 @@ public class SendReceiptHandler implements EmailActionHandler<InvoicingPlan> {
     private final EventLogService eventLogService;
 
     public SendReceiptHandler(EmailCreator emailCreator, DownloadReceiptHandler downloadReceiptHandler,
-                              EventLogService eventLogService) {
+            EventLogService eventLogService) {
         this.emailCreator = emailCreator;
         this.downloadReceiptHandler = downloadReceiptHandler;
         this.eventLogService = eventLogService;
@@ -43,7 +43,7 @@ public class SendReceiptHandler implements EmailActionHandler<InvoicingPlan> {
         Locale locale = (Locale) context.getOrDefault("locale", Locale.FRENCH);
 
         String subject = this.emailCreator.getTranslatedText("email.invoice-receipt.title", locale,
-                                                             payload.getParticipation().getSalon().getPlace());
+                payload.getParticipation().getSalon().getPlace());
 
         Context thymeleafCtxt = new Context(locale);
         thymeleafCtxt.setVariable("salon", payload.getParticipation().getSalon().getPlace());
@@ -69,9 +69,9 @@ public class SendReceiptHandler implements EmailActionHandler<InvoicingPlan> {
         emailCreator.send(emailMessage, Map.of(this.downloadReceiptHandler.getFilename(payload, context), attachment));
 
         eventLogService.eventFromSystem("Quittance envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, payload.getId(),
-                                        null);
+                null);
         eventLogService.eventFromSystem("Quittance envoyée " + payload.getBillingNumber(), EventType.EMAIL,
-                                        EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
+                EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
     }
 
     @Override

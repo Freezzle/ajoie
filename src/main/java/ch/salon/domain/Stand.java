@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -32,8 +33,7 @@ public class Stand implements Serializable {
     private UUID id;
 
     @NotNull
-    @Column(name = "description",
-            nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Column(name = "website")
@@ -72,12 +72,12 @@ public class Stand implements Serializable {
     private String extraInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"exhibitor", "salon"},
-                          allowSetters = true)
+    @JsonIgnoreProperties(value = {"exhibitor", "salon"}, allowSetters = true)
     private Participation participation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private DimensionStand dimension;
+    @JoinColumn(name = "price_stand_salon_id", nullable = true)
+    private PriceStandSalon dimension;
 
     @Column(name = "registration_date")
     private Instant registrationDate;
@@ -257,17 +257,12 @@ public class Stand implements Serializable {
         return this;
     }
 
-    public DimensionStand getDimension() {
-        return this.dimension;
+    public PriceStandSalon getDimension() {
+        return dimension;
     }
 
-    public void setDimension(DimensionStand dimensionStand) {
-        this.dimension = dimensionStand;
-    }
-
-    public Stand dimension(DimensionStand dimensionStand) {
-        this.setDimension(dimensionStand);
-        return this;
+    public void setDimension(PriceStandSalon dimension) {
+        this.dimension = dimension;
     }
 
     public static boolean diffDimension(Stand stand1, Stand stand2) {

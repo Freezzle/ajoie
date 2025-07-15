@@ -52,9 +52,8 @@ public class ParticipationService {
     private final InvoicingPlanRepository invoicingPlanRepository;
 
     public ParticipationService(ParticipationRepository participationRepository,
-                                ConferenceRepository conferenceRepository, StandRepository standRepository,
-                                EventLogService eventLogService, SalonRepository salonRepository,
-                                InvoicingPlanRepository invoicingPlanRepository) {
+            ConferenceRepository conferenceRepository, StandRepository standRepository, EventLogService eventLogService,
+            SalonRepository salonRepository, InvoicingPlanRepository invoicingPlanRepository) {
         this.participationRepository = participationRepository;
         this.conferenceRepository = conferenceRepository;
         this.standRepository = standRepository;
@@ -70,19 +69,18 @@ public class ParticipationService {
 
         if (participation.getId() != null) {
             throw new BadRequestAlertException("A new participation cannot already have an ID", ENTITY_NAME,
-                                               "id.exists");
+                    "id.exists");
         }
 
-        Salon salonFound = salonRepository.findById(participation.getSalon().getId())
-                                          .orElseThrow(() -> new BadRequestAlertException("No salon for the given Id",
-                                                                                          ENTITY_NAME, "idnotfound"));
+        Salon salonFound = salonRepository.findById(participation.getSalon().getId()).orElseThrow(
+                () -> new BadRequestAlertException("No salon for the given Id", ENTITY_NAME, "idnotfound"));
 
         String maxNumber = participationRepository.findMaxClientNumber(salonFound.getId());
         participation.setClientNumber(Participation.incrementClientNumber(maxNumber, salonFound.getReferenceNumber()));
         UUID idParticipation = participationRepository.save(participation).getId();
 
         this.eventLogService.eventFromSystem("Participation crée", EventType.EVENT, EntityType.PARTICIPATION,
-                                             idParticipation, null);
+                idParticipation, null);
 
         return idParticipation;
     }
@@ -96,19 +94,15 @@ public class ParticipationService {
 
         if (!invoicings.isEmpty()) {
             InfoInvoice infoInvoice = new InfoInvoice();
-            infoInvoice.setHasDraftInvoices(invoicings.stream()
-                                                      .anyMatch(
-                                                          invoicingPlan -> invoicingPlan.getState() == State.DRAFT ||
-                                                                           invoicingPlan.getState() == State.ISOLATED));
+            infoInvoice.setHasDraftInvoices(invoicings.stream().anyMatch(
+                    invoicingPlan -> invoicingPlan.getState() == State.DRAFT ||
+                            invoicingPlan.getState() == State.ISOLATED));
             infoInvoice.setHasWaitingInvoices(
-                invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.ISSUED));
-            infoInvoice.setHasExpiredInvoices(invoicings.stream()
-                                                        .anyMatch(
-                                                            invoicingPlan -> invoicingPlan.getState() == State.ISSUED &&
-                                                                             invoicingPlan.getExpirationDate() !=
-                                                                             null && Instant.now()
-                                                                                            .isAfter(
-                                                                                                invoicingPlan.getExpirationDate())));
+                    invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.ISSUED));
+            infoInvoice.setHasExpiredInvoices(invoicings.stream().anyMatch(
+                    invoicingPlan -> invoicingPlan.getState() == State.ISSUED &&
+                            invoicingPlan.getExpirationDate() != null &&
+                            Instant.now().isAfter(invoicingPlan.getExpirationDate())));
 
             return infoInvoice;
         }
@@ -125,47 +119,47 @@ public class ParticipationService {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        Participation existingParticipation = participationRepository.findById(id)
-                                                                     .orElseThrow(() -> new BadRequestAlertException(
-                                                                         "Entity not found", ENTITY_NAME,
-                                                                         "idnotfound"));
+        Participation existingParticipation = participationRepository.findById(id).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        participation.setClientNumber(existingParticipation.getClientNumber());
 
         if (Participation.diffArrangement(participation, existingParticipation)) {
             if (participation.getNeedArrangement()) {
                 this.eventLogService.eventFromSystem("Un arrangement est activé", EventType.EVENT,
-                                                     EntityType.PARTICIPATION, participation.getId(), null);
+                        EntityType.PARTICIPATION, participation.getId(), null);
             } else {
                 this.eventLogService.eventFromSystem("Un arrangement est désactivé", EventType.EVENT,
-                                                     EntityType.PARTICIPATION, participation.getId(), null);
+                        EntityType.PARTICIPATION, participation.getId(), null);
             }
         }
 
         if (Participation.diffMeal(1, participation, existingParticipation)) {
             this.eventLogService.eventFromSystem("Le nombre de repas du samedi midi a changé", EventType.EVENT,
-                                                 EntityType.PARTICIPATION, participation.getId(),
-                                                 Map.of("old_meal", existingParticipation.getNbMeal1().toString(),
-                                                        "new_meal", participation.getNbMeal1().toString()));
+                    EntityType.PARTICIPATION, participation.getId(),
+                    Map.of("old_meal", existingParticipation.getNbMeal1().toString(), "new_meal",
+                            participation.getNbMeal1().toString()));
         }
 
         if (Participation.diffMeal(2, participation, existingParticipation)) {
             this.eventLogService.eventFromSystem("Le nombre de repas du samedi soir a changé", EventType.EVENT,
-                                                 EntityType.PARTICIPATION, participation.getId(),
-                                                 Map.of("old_meal", existingParticipation.getNbMeal2().toString(),
-                                                        "new_meal", participation.getNbMeal2().toString()));
+                    EntityType.PARTICIPATION, participation.getId(),
+                    Map.of("old_meal", existingParticipation.getNbMeal2().toString(), "new_meal",
+                            participation.getNbMeal2().toString()));
         }
 
         if (Participation.diffMeal(3, participation, existingParticipation)) {
             this.eventLogService.eventFromSystem("Le nombre de repas du dimanche midi a changé", EventType.EVENT,
-                                                 EntityType.PARTICIPATION, participation.getId(),
-                                                 Map.of("old_meal", existingParticipation.getNbMeal3().toString(),
-                                                        "new_meal", participation.getNbMeal3().toString()));
+                    EntityType.PARTICIPATION, participation.getId(),
+                    Map.of("old_meal", existingParticipation.getNbMeal3().toString(), "new_meal",
+                            participation.getNbMeal3().toString()));
         }
 
         if (Participation.diffStatus(participation, existingParticipation)) {
             this.eventLogService.eventFromSystem(
-                "Le statut de la participation a changé en '" + participation.getStatus().name().toLowerCase() + "'",
-                EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
-                Map.of("old_status", existingParticipation.getStatus().name().toLowerCase()));
+                    "Le statut de la participation a changé en '" + participation.getStatus().name().toLowerCase() +
+                            "'", EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
+                    Map.of("old_status", existingParticipation.getStatus().name().toLowerCase()));
         }
 
         return participationRepository.save(participation);
@@ -176,10 +170,8 @@ public class ParticipationService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return this.participationRepository.findByExhibitorIdOrderByRegistrationDateDesc(idExhibitor)
-                                           .stream()
-                                           .map(ParticipationMapper.INSTANCE::toDto)
-                                           .toList();
+        return this.participationRepository.findByExhibitorIdOrderByRegistrationDateDesc(idExhibitor).stream()
+                                           .map(ParticipationMapper.INSTANCE::toDto).toList();
     }
 
     public List<Participation> findAll(UUID idSalon) {
@@ -195,17 +187,14 @@ public class ParticipationService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        Participation participation = participationRepository.findById(idParticipation)
-                                                             .orElseThrow(
-                                                                 () -> new BadRequestAlertException("Entity not found",
-                                                                                                    ENTITY_NAME,
-                                                                                                    "idnotfound"));
+        Participation participation = participationRepository.findById(idParticipation).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
         Status currentStatus = participation.getStatus();
 
         List<Stand> stands = this.standRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation);
         Set<Status> standsStatus = stands.stream().map(Stand::getStatus).collect(Collectors.toSet());
         List<Conference> conferences =
-            this.conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation);
+                this.conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation);
         Set<Status> conferencesStatus = conferences.stream().map(Conference::getStatus).collect(Collectors.toSet());
 
         Status statusToChange;
@@ -233,9 +222,9 @@ public class ParticipationService {
 
         if (currentStatus != statusToChange) {
             this.eventLogService.eventFromSystem(
-                "Le statut de la participation a changé en '" + statusToChange.name().toLowerCase() + "'",
-                EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
-                Map.of("old_status", currentStatus.name()));
+                    "Le statut de la participation a changé en '" + statusToChange.name().toLowerCase() + "'",
+                    EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
+                    Map.of("old_status", currentStatus.name()));
 
             participation.setStatus(statusToChange);
 
@@ -264,10 +253,8 @@ public class ParticipationService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation)
-                                   .stream()
-                                   .map(EventLogMapper.INSTANCE::toDto)
-                                   .toList();
+        return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation).stream()
+                                   .map(EventLogMapper.INSTANCE::toDto).toList();
     }
 
     private boolean isAllOf(Set<Status> stands, Set<Status> conferences, Status status) {

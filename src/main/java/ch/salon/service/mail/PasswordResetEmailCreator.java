@@ -21,8 +21,8 @@ public class PasswordResetEmailCreator extends AbstractEmailCreator {
     private User user;
 
     public PasswordResetEmailCreator(MessageSource messageSource, JavaMailSender javaMailSender,
-                                     @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine,
-                                     JHipsterProperties jHipsterProperties) {
+            @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine,
+            JHipsterProperties jHipsterProperties) {
         super(javaMailSender, mailTemplateEngine);
         this.messageSource = messageSource;
         this.jHipsterProperties = jHipsterProperties;

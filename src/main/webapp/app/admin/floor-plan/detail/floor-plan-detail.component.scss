@@ -20,6 +20,10 @@
   max-height: 40em;
 }
 
+.no-selection {
+  user-select: none;
+}
+
 .stand-item {
   border: 1px solid black;
   background-color: white;
@@ -89,6 +93,10 @@
   margin: 0.5em auto 0 auto;
   display: flex;
   justify-content: center;
+}
+
+.dragging {
+  opacity: 0.5 !important;
 }
 
 .title-side-column {

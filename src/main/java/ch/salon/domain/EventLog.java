@@ -48,8 +48,7 @@ public class EventLog implements Serializable {
     private UUID referenceId;
 
     @Lob
-    @Column(name = "data",
-            columnDefinition = "text")
+    @Column(name = "data", columnDefinition = "text")
     private String payloadJson;
 
     public UUID getId() {

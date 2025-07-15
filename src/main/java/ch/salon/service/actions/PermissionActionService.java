@@ -9,14 +9,7 @@ import org.springframework.stereotype.Service;
 public class PermissionActionService {
     public boolean isAllowed(String actionCode, Object entity, Authentication authentication) {
 
-        if (authentication.getAuthorities()
-                          .stream()
-                          .map(GrantedAuthority::getAuthority)
-                          .anyMatch(a -> a.equals(AuthoritiesConstants.ADMIN) ||
-                                         a.equals(AuthoritiesConstants.ADMIN_BUSINESS))) {
-            return true;
-        }
-
-        return false;
+        return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(
+                a -> a.equals(AuthoritiesConstants.ADMIN) || a.equals(AuthoritiesConstants.ADMIN_BUSINESS));
     }
 }

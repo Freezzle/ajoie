@@ -1,5 +1,5 @@
 export interface VolunteerAvailability {
-  idVolunteer: string;
-  idTimeSlot: string;
-  category: string;
+    idVolunteer: string;
+    idTimeSlot: string;
+    category: string;
 }

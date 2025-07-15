@@ -1,5 +1,7 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
+import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
@@ -32,8 +34,7 @@ public class Participation implements Serializable {
     @Column(name = "client_number")
     private String clientNumber;
 
-    @Column(name = "therapist_name",
-            nullable = false)
+    @Column(name = "therapist_name", nullable = false)
     private String therapistName;
 
     @Column(name = "registration_date")
@@ -82,9 +83,16 @@ public class Participation implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     private Exhibitor exhibitor;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mode_payment_meals")
+    private ModePaymentMeals modePaymentMeals = ModePaymentMeals.SEPARATE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "invoice_sending_method")
+    private InvoiceSendingMethod invoiceSendingMethod = InvoiceSendingMethod.EMAIL;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"priceStandSalons"},
-                          allowSetters = true)
+    @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
 
     public UUID getId() {
@@ -174,6 +182,32 @@ public class Participation implements Serializable {
 
     public Participation nbMeal3(Long nbMeal3) {
         this.setNbMeal3(nbMeal3);
+        return this;
+    }
+
+    public ModePaymentMeals getModePaymentMeals() {
+        return this.modePaymentMeals;
+    }
+
+    public void setModePaymentMeals(ModePaymentMeals modePaymentMeals) {
+        this.modePaymentMeals = modePaymentMeals;
+    }
+
+    public Participation modePaymentMeals(ModePaymentMeals modePaymentMeals) {
+        this.setModePaymentMeals(modePaymentMeals);
+        return this;
+    }
+
+    public InvoiceSendingMethod getInvoiceSendingMethod() {
+        return this.invoiceSendingMethod;
+    }
+
+    public void setInvoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
+        this.invoiceSendingMethod = invoiceSendingMethod;
+    }
+
+    public Participation invoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
+        this.setInvoiceSendingMethod(invoiceSendingMethod);
         return this;
     }
 

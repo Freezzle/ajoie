@@ -4,136 +4,189 @@
      [class.open]="!isCollapsed"
      class="sidebar">
 
-  <!-- Always-visible toggle button -->
-  <div class="sidebar-toggle">
-    <button (click)="toggleSidebar()" class="btn btn-outline-light btn-sm">
-      <fa-icon [icon]="isCollapsed ? 'bars' : 'arrow-left'"></fa-icon>
-    </button>
-  </div>
+    <!-- Always-visible toggle button -->
+    <div class="sidebar-toggle">
+        <button (click)="toggleSidebar()" class="btn btn-outline-light btn-sm">
+            <fa-icon [icon]="isCollapsed ? 'bars' : 'arrow-left'"></fa-icon>
+        </button>
+    </div>
 
-  <!-- Full content only shown when expanded -->
-  <div *ngIf="!isCollapsed" class="sidebar-content">
-    <ul class="nav flex-column">
-      <li class="nav-item mt-3">
-        <ul [class.show]="true" class="dropdown-list">
-          <li (click)="closeMobile()" [routerLinkActiveOptions]="{ exact: true }" routerLink="/" routerLinkActive="active">
-            <a>Accueil</a>
-          </li>
-        </ul>
-        <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="true" class="dropdown-list">
-          <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }"
-              routerLink="/admin/exhibitors" routerLinkActive="active">
-            <a>Les exposants</a>
-          </li>
-          <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }"
-              routerLink="/admin/salons" routerLinkActive="active">
-            <a>Les salons</a>
-          </li>
-        </ul>
-        <ng-container *ngIf="salonSelected$ | async; let salon">
-          <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="salon" class="dropdown-list">
-            <hr class="hr-navbar"/>
-            <div class="salon-title-navbar">{{ salon.place }}</div>
-            <hr class="hr-navbar"/>
-            <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }"
-                class="ms-3" routerLink="/admin/salons/{{salon.id}}/view"
-                routerLinkActive="active">
-              <a>{{ 'salon.edit' | translate }}</a>
-            </li>
-            <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }"
-                class="ms-3" routerLink="/admin/salons/{{salon.id}}/stats"
-                routerLinkActive="active">
-              <a>{{ 'salon.stats.title' | translate }}</a>
-            </li>
-            <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }"
-                class="ms-3" routerLink="/admin/salons/{{salon.id}}/floor-plan"
-                routerLinkActive="active">
-              <a>{{ 'salon.floorPlan' | translate }}</a>
-            </li>
-            <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }"
-                class="ms-3" routerLink="/admin/salons/{{salon.id}}/planning-volunteers"
-                routerLinkActive="active">
-              <a>{{ 'salon.planningVolunteers' | translate }}</a>
-            </li>
-            <li (click)="closeMobile()"
-                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
-                [routerLinkActiveOptions]="{ exact: true }" class="ms-3"
-                routerLink="/admin/salons/{{salon.id}}/participations"
-                routerLinkActive="active">
-              <a>{{ 'salon.participations' | translate }}</a>
-            </li>
-            <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [routerLinkActiveOptions]="{ exact: true }" class="ms-3"
-                routerLink="/admin/salons/{{salon.id}}/stands" routerLinkActive="active">
-              <a>{{ 'salon.stands' | translate }}</a>
-            </li>
-            <li (click)="closeMobile()"
-                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="ms-3"
-                routerLink="/admin/salons/{{salon.id}}/conferences" routerLinkActive="active">
-              <a>{{ 'salon.conferences' | translate }}</a>
-            </li>
-            <hr class="hr-navbar"/>
-          </ul>
-        </ng-container>
-        <ul (click)="toggleDropdown('admin')" *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="true" class="dropdown-list">
-          <li>
-            <a>Gestion technique</a>
-            &nbsp;<fa-icon icon="sort-down"></fa-icon>
-          </li>
-        </ul>
-        <ul *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="dropdowns.admin" class="dropdown-list ms-3">
-          <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN']" [routerLinkActiveOptions]="{ exact: true }"
-              routerLink="/admin/docs" routerLinkActive="active">
-            <a>API</a>
-          </li>
-          <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN']" [routerLinkActiveOptions]="{ exact: true }"
-              routerLink="/admin/authorities" routerLinkActive="active">
-            <a>Authority</a>
-          </li>
-          <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN']" [routerLinkActiveOptions]="{ exact: true }"
-              routerLink="/admin/user-management" routerLinkActive="active">
-            <a>Utilisateurs</a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-
-  <div *ngIf="!isCollapsed" class="sidebar-end-toggle">
-    @if (account() !== null) {
-      <div *ngIf="false" (click)="closeMobile()">
-        <a routerLink="/account/settings" routerLinkActive="active">
-          <fa-icon icon="wrench" class="white-icon" [fixedWidth]="true"></fa-icon>
-        </a>
-      </div>
-      <div *ngIf="false" (click)="closeMobile()">
-        <a routerLink="/account/password" routerLinkActive="active">
-          <fa-icon icon="lock" class="white-icon" [fixedWidth]="true"></fa-icon>
-        </a>
-      </div>
-      <div (click)="closeMobile()">
-        <a routerLink="/account/sessions" routerLinkActive="active">
-          <fa-icon icon="cloud" class="white-icon" [fixedWidth]="true"></fa-icon>
-        </a>
-      </div>
-      <div (click)="closeMobile()">
-        <a (click)="logout()" id="logout">
-          <fa-icon icon="sign-out-alt" class="white-icon" [fixedWidth]="true"></fa-icon>
-        </a>
-      </div>
-    } @else {
-      <div (click)="closeMobile()">
-        <a (click)="login()" id="login">
-          <fa-icon icon="sign-in-alt" class="white-icon" [fixedWidth]="true"></fa-icon>
-          <span>Login</span>
-        </a>
-      </div>
-      <div (click)="closeMobile()">
-        <a routerLink="/account/register" routerLinkActive="active">
-          <fa-icon icon="user-plus" class="white-icon" [fixedWidth]="true"></fa-icon>
-        </a>
-      </div>
+    <!-- Full content only shown when expanded -->
+    @if (!isCollapsed) {
+        <div class="sidebar-content">
+            <ul class="nav flex-column">
+                <li class="nav-item mt-3">
+                    <ul [class.show]="true" class="dropdown-list">
+                        <li (click)="closeMobile()"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            routerLink="/"
+                            routerLinkActive="active">
+                            <a>Accueil</a>
+                        </li>
+                    </ul>
+                    <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="true" class="dropdown-list">
+                        <li (click)="closeMobile()"
+                            *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            routerLink="/admin/exhibitors"
+                            routerLinkActive="active">
+                            <a>Les exposants</a>
+                        </li>
+                        <li (click)="closeMobile()"
+                            *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            routerLink="/admin/salons"
+                            routerLinkActive="active">
+                            <a>Les salons</a>
+                        </li>
+                    </ul>
+                    @if (salonSelected$ | async; as salon) {
+                        <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="salon" class="dropdown-list">
+                            <hr class="hr-navbar"/>
+                            <div class="salon-title-navbar"><h6>{{ salon.place }}</h6></div>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/view"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.edit' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/stats"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.stats.title' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/floor-plan"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.floorPlan' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/planning-volunteers"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.planningVolunteers' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/participations"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.participations' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/stands"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.stands' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/conferences"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.conferences' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/workshops"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.workshops' | translate }}</a>
+                            </li>
+                            <hr class="hr-navbar"/>
+                        </ul>
+                    }
+                    <ul (click)="toggleDropdown('admin')"
+                        *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                        [class.show]="true"
+                        class="dropdown-list">
+                        <li>
+                            <a>Gestion technique</a> &nbsp;<fa-icon icon="sort-down"></fa-icon>
+                        </li>
+                    </ul>
+                    <ul *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="dropdowns.admin" class="dropdown-list ms-3">
+                        <li (click)="closeMobile()"
+                            *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            routerLink="/admin/docs"
+                            routerLinkActive="active">
+                            <a>API</a>
+                        </li>
+                        <li (click)="closeMobile()"
+                            *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            routerLink="/admin/authorities"
+                            routerLinkActive="active">
+                            <a>Authority</a>
+                        </li>
+                        <li (click)="closeMobile()"
+                            *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            routerLink="/admin/user-management"
+                            routerLinkActive="active">
+                            <a>Utilisateurs</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     }
-  </div>
+
+    @if (!isCollapsed) {
+        <div class="sidebar-end-toggle">
+            @if (account() !== null) {
+                @if (false) {
+                    <div (click)="closeMobile()">
+                        <a routerLink="/account/settings" routerLinkActive="active">
+                            <fa-icon icon="wrench" class="white-icon" [fixedWidth]="true"></fa-icon>
+                        </a>
+                    </div>
+                }
+                @if (false) {
+                    <div (click)="closeMobile()">
+                        <a routerLink="/account/password" routerLinkActive="active">
+                            <fa-icon icon="lock" class="white-icon" [fixedWidth]="true"></fa-icon>
+                        </a>
+                    </div>
+                }
+                <div (click)="closeMobile()">
+                    <a routerLink="/account/sessions" routerLinkActive="active">
+                        <fa-icon icon="cloud" class="white-icon" [fixedWidth]="true"></fa-icon>
+                    </a>
+                </div>
+                <div (click)="closeMobile()">
+                    <a (click)="logout()" id="logout">
+                        <fa-icon icon="sign-out-alt" class="white-icon" [fixedWidth]="true"></fa-icon>
+                    </a>
+                </div>
+            } @else {
+                <div (click)="closeMobile()">
+                    <a (click)="login()" id="login">
+                        <fa-icon icon="sign-in-alt" class="white-icon" [fixedWidth]="true"></fa-icon>
+                        <span>Login</span>
+                    </a>
+                </div>
+                <div (click)="closeMobile()">
+                    <a routerLink="/account/register" routerLinkActive="active">
+                        <fa-icon icon="user-plus" class="white-icon" [fixedWidth]="true"></fa-icon>
+                    </a>
+                </div>
+            }
+        </div>
+    }
 </nav>

@@ -7,9 +7,7 @@ import ch.salon.service.handlers.EmailActionHandler;
 import java.util.Map;
 
 public enum ActionType {
-    EMAIL,
-    DOWNLOAD,
-    BUSINESS;
+    EMAIL, DOWNLOAD, BUSINESS;
 
     public static ActionType fromHandler(Object handler) {
         if (handler instanceof EmailActionHandler<?>) {

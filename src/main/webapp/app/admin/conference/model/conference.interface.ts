@@ -1,13 +1,11 @@
-import { Status } from '../../enumerations/status.model';
-import { IParticipation } from '../../participation/model/participation.interface';
+import {Status} from '../../enumerations/status.model';
+import {IParticipation} from '../../participation/model/participation.interface';
 
 export interface IConference {
-  id: string;
-  title?: string | null;
-  description?: string | null;
-  status?: keyof typeof Status | null;
-  extraInformation?: string | null;
-  participation?: IParticipation | null;
+    id: string;
+    title: string;
+    description: string;
+    status: keyof typeof Status;
+    extraInformation: string | null;
+    participation: IParticipation;
 }
-
-export type NewConference = Omit<IConference, 'id'> & { id: null };

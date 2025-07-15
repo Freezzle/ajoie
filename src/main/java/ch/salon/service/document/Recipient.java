@@ -30,8 +30,9 @@ public class Recipient implements Serializable {
             this.country = ""; // FIXME : COUNTRY ON EXHIBITOR
         }
 
-        this.language = StringUtils.isNotBlank(exhibitor.getLanguage()) ? Locale.forLanguageTag(
-            exhibitor.getLanguage()) : Locale.FRENCH;
+        this.language =
+                StringUtils.isNotBlank(exhibitor.getLanguage()) ? Locale.forLanguageTag(exhibitor.getLanguage()) :
+                        Locale.FRENCH;
     }
 
     public String getEnterpriseName() {

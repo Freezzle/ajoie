@@ -1,85 +1,71 @@
-import { Injectable } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IStand, NewStand } from '../model/stand.interface';
-import { Status } from '../../enumerations/status.model';
-import { IExhibitor } from '../../exhibitor/model/exhibitor.interface';
-import { CustomValidatorModel } from '../../../shared/field-error/custom-validator.model';
+import {Injectable} from '@angular/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {IStand} from '../model/stand.interface';
+import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {CustomValidatorModel} from '../../../shared/field-error/custom-validator.model';
 
 export type StandFormGroup = {
-  id: FormControl<IStand['id'] | NewStand['id']>;
-  description: FormControl<IStand['description']>;
-  website: FormControl<IStand['website']>;
-  instagram: FormControl<IStand['instagram']>;
-  facebook: FormControl<IStand['facebook']>;
-  urlPicture: FormControl<IStand['urlPicture']>;
-  shared: FormControl<IStand['shared']>;
-  nbTable: FormControl<IStand['nbTable']>;
-  nbChair: FormControl<IStand['nbChair']>;
-  needElectricity: FormControl<IStand['needElectricity']>;
-  status: FormControl<IStand['status']>;
-  category: FormControl<IStand['category']>;
-  extraInformation: FormControl<IStand['extraInformation']>;
-  participation: FormControl<IStand['participation']>;
-  dimension: FormControl<IStand['dimension']>;
+    id: FormControl<IStand['id'] | null>;
+    description: FormControl<IStand['description'] | null>;
+    website: FormControl<IStand['website'] | null>;
+    instagram: FormControl<IStand['instagram'] | null>;
+    facebook: FormControl<IStand['facebook'] | null>;
+    urlPicture: FormControl<IStand['urlPicture'] | null>;
+    shared: FormControl<IStand['shared'] | null>;
+    nbTable: FormControl<IStand['nbTable'] | null>;
+    nbChair: FormControl<IStand['nbChair'] | null>;
+    needElectricity: FormControl<IStand['needElectricity'] | null>;
+    status: FormControl<IStand['status'] | null>;
+    category: FormControl<IStand['category'] | null>;
+    extraInformation: FormControl<IStand['extraInformation'] | null>;
+    participation: FormControl<IStand['participation'] | null>;
+    dimension: FormControl<IStand['dimension'] | null>;
 };
 
 export type StandFilterFormGroup = {
-  fullName: FormControl<IExhibitor['fullName']>;
-  status: FormControl<IStand['status']>;
+    fullName: FormControl<IExhibitor['fullName'] | null>;
+    status: FormControl<IStand['status'] | null>;
 };
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class StandFormService {
-  createFilterFormGroup(): FormGroup<StandFilterFormGroup> {
-    return new FormGroup<StandFilterFormGroup>({
-      fullName: new FormControl(),
-      status: new FormControl(),
-    });
-  }
+    createFilterFormGroup(): FormGroup<StandFilterFormGroup> {
+        return new FormGroup<StandFilterFormGroup>({
+            fullName: new FormControl(null),
+            status: new FormControl(null),
+        });
+    }
 
-  createStandFormGroup(stand: IStand | NewStand): FormGroup<StandFormGroup> {
-    const standRawValue = {
-      ...this.getFormDefaults(),
-      ...stand,
-    };
-    return new FormGroup<StandFormGroup>({
-      id: new FormControl(standRawValue.id),
-      description: new FormControl(standRawValue.description, [
-        Validators.required,
-        Validators.maxLength(500),
-      ]),
-      website: new FormControl(standRawValue.website),
-      instagram: new FormControl(standRawValue.instagram),
-      facebook: new FormControl(standRawValue.facebook),
-      urlPicture: new FormControl(standRawValue.urlPicture),
-      shared: new FormControl(standRawValue.shared),
-      nbTable: new FormControl(standRawValue.nbTable, [
-        Validators.required,
-        CustomValidatorModel.onlyNumbers,
-      ]),
-      nbChair: new FormControl(standRawValue.nbChair, [
-        Validators.required,
-        CustomValidatorModel.onlyNumbers,
-      ]),
-      needElectricity: new FormControl(standRawValue.needElectricity),
-      status: new FormControl(standRawValue.status, Validators.required),
-      category: new FormControl(standRawValue.category),
-      extraInformation: new FormControl(standRawValue.extraInformation),
-      participation: new FormControl(standRawValue.participation, Validators.required),
-      dimension: new FormControl(standRawValue.dimension, Validators.required),
-    });
-  }
+    createStandFormGroup(stand: IStand | null): FormGroup<StandFormGroup> {
+        return new FormGroup<StandFormGroup>({
+            id: new FormControl(stand?.id ?? null),
+            description: new FormControl(stand?.description ?? null, [
+                Validators.required,
+                Validators.maxLength(500),
+            ]),
+            website: new FormControl(stand?.website ?? null),
+            instagram: new FormControl(stand?.instagram ?? null),
+            facebook: new FormControl(stand?.facebook ?? null),
+            urlPicture: new FormControl(stand?.urlPicture ?? null),
+            shared: new FormControl(stand?.shared ?? false, Validators.required),
+            nbTable: new FormControl(stand?.nbTable ?? null, [
+                Validators.required,
+                CustomValidatorModel.onlyNumbers,
+            ]),
+            nbChair: new FormControl(stand?.nbChair ?? null, [
+                Validators.required,
+                CustomValidatorModel.onlyNumbers,
+            ]),
+            needElectricity: new FormControl(stand?.needElectricity ?? true, Validators.required),
+            status: new FormControl(stand?.status ?? null, Validators.required),
+            category: new FormControl(stand?.category ?? null),
+            extraInformation: new FormControl(stand?.extraInformation ?? null),
+            participation: new FormControl(stand?.participation ?? null, Validators.required),
+            dimension: new FormControl(stand?.dimension ?? null, Validators.required),
+        });
+    }
 
-  getStand(form: FormGroup<StandFormGroup>): IStand | NewStand {
-    return form.getRawValue() as IStand | NewStand;
-  }
-
-  private getFormDefaults(): Pick<NewStand, 'id' | 'shared' | 'needElectricity' | 'status'> {
-    return {
-      id: null,
-      shared: false,
-      needElectricity: false,
-      status: Status.IN_VERIFICATION,
-    };
-  }
+    getStand(form: FormGroup<StandFormGroup>): IStand {
+        return form.getRawValue() as IStand;
+    }
 }

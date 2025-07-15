@@ -52,4 +52,26 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="20251102-add-newsletter" author="freezzle">
+        <addColumn tableName="exhibitor">
+            <column name="newsletter" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20251108-add-attributes" author="freezzle">
+        <addColumn tableName="exhibitor">
+            <column name="red_flag" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="exhibitor">
+            <column name="duplicate_detected" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+    </changeSet>
 </databaseChangeLog>

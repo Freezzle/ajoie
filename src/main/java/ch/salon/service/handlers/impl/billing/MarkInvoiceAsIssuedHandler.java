@@ -34,10 +34,9 @@ public class MarkInvoiceAsIssuedHandler implements BusinessActionHandler<Invoici
         payload.setState(State.ISSUED);
 
         eventLogService.eventFromSystem("Facture marquée comme facturée", EventType.ACTION, EntityType.INVOICE_PLAN,
-                                        payload.getId(), null);
+                payload.getId(), null);
         eventLogService.eventFromSystem("Facture marquée comme facturée " + payload.getBillingNumber(),
-                                        EventType.ACTION, EntityType.PARTICIPATION, payload.getParticipation().getId(),
-                                        null);
+                EventType.ACTION, EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
     }
 
     @Override

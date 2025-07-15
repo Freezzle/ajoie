@@ -40,9 +40,9 @@ public class MarkInvoiceAsClosedHandler implements BusinessActionHandler<Invoici
         payload.setState(State.PAID);
 
         eventLogService.eventFromSystem("Facture payée", EventType.ACTION, EntityType.INVOICE_PLAN, payload.getId(),
-                                        null);
+                null);
         eventLogService.eventFromSystem("Facture payée " + payload.getBillingNumber(), EventType.ACTION,
-                                        EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
+                EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
     }
 
     @Override

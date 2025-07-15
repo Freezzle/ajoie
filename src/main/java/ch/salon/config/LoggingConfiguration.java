@@ -22,8 +22,8 @@ import static tech.jhipster.config.logging.LoggingUtils.addLogstashTcpSocketAppe
 public class LoggingConfiguration {
 
     public LoggingConfiguration(@Value("${spring.application.name}") String appName,
-                                @Value("${server.port}") String serverPort, JHipsterProperties jHipsterProperties,
-                                ObjectMapper mapper) throws JsonProcessingException {
+            @Value("${server.port}") String serverPort, JHipsterProperties jHipsterProperties, ObjectMapper mapper)
+            throws JsonProcessingException {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
         Map<String, String> map = new HashMap<>();

@@ -9,16 +9,18 @@
     <div class="d-flex justify-content-between mt-3">
 
       <button-box (clickedEvent)="previousState()"
-                  [isDisabled]="isLoading"
-                  faIcon="arrow-left"
-                  translateKey="common.back"/>
-    </div>
-  </h2>
+        [isDisabled]="isLoading"
+        faIcon="arrow-left"
+        translateKey="common.back"/>
+      </div>
+    </h2>
 
-  @if (timeSlotsMap | async; as timeslotsPerDate) {
-    <daily-planning *ngFor="let timeslots of timeslotsPerDate | keyvalue"
-                    [timeslots]="timeslots.value"
-                    [categories]="['Buvette', 'Vaisselle', 'Cuisine', 'Pause', '-']"
-                    [lines]="lines()"></daily-planning>
-  }
-</div>
+    @if (timeSlotsMap | async; as timeslotsPerDate) {
+      @for (timeslots of timeslotsPerDate | keyvalue; track timeslots) {
+        <daily-planning
+          [timeslots]="timeslots.value"
+          [categories]="['Buvette', 'Vaisselle', 'Cuisine', 'Pause', '-']"
+        [lines]="lines()"></daily-planning>
+      }
+    }
+  </div>

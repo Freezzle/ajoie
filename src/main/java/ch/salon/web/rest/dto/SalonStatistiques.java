@@ -8,6 +8,7 @@ public class SalonStatistiques implements Serializable {
 
     private Map<String, Long> dimensionStands = new HashMap<>();
     private int nbConference = 0;
+    private int nbWorkshop = 0;
     private int nbStands = 0;
     private int nbMeal1 = 0;
     private int nbMeal2 = 0;
@@ -104,5 +105,13 @@ public class SalonStatistiques implements Serializable {
 
     public void setFacturation(FacturationStats facturation) {
         this.facturation = facturation;
+    }
+
+    public int getNbWorkshop() {
+        return nbWorkshop;
+    }
+
+    public void setNbWorkshop(int nbWorkshop) {
+        this.nbWorkshop = nbWorkshop;
     }
 }

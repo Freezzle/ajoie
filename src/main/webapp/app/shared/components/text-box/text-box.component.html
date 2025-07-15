@@ -1,12 +1,28 @@
-<label *ngIf="translateKey" [for]="'field_' + fieldName" class="fw-bold">{{ translateKey | translate }}
-  <span *ngIf="this.control?.hasValidator(Validators.required)" class="danger-icon">*</span>
-</label>
-<input (blur)="onTouched()"
-       (input)="onInput($event)"
-       [disabled]="disabled"
-       [id]="'field_' + fieldName"
-       [ngClass]="{'invalid': this.control.invalid && this.control.touched}"
-       [value]="value"
-       class="form-control"
-       type="text"/>
-<error-box *ngIf="this.control.errors" [formControlElement]="this.control"/>
+@if (translateKey) {
+    <p-iftalabel>
+        <input ptInputText
+               [id]="'field_' + fieldName"
+               pInputText
+               [invalid]="control.invalid && control.touched"
+               [formControl]="control"
+               fluid/>
+        <label [for]="'field_' + fieldName">
+            {{ translateKey | translate }}
+            @if (control.hasValidator(Validators.required)) {
+                <span class="danger-icon">*</span>
+            }
+        </label>
+    </p-iftalabel>
+} @else {
+    <p-float-label>
+        <input ptInputText
+               [id]="'field_' + fieldName"
+               pInputText
+               [invalid]="control.invalid && control.touched"
+               [formControl]="control"
+               fluid/>
+    </p-float-label>
+}
+@if (control.errors) {
+    <error-box [formControlElement]="control"/>
+}

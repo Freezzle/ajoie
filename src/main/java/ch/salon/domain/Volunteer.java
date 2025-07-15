@@ -80,8 +80,8 @@ public class Volunteer {
         }
         Volunteer volunteer = (Volunteer) o;
         return Objects.equals(id, volunteer.id) && Objects.equals(lastname, volunteer.lastname) &&
-               Objects.equals(firstname, volunteer.firstname) && Objects.equals(email, volunteer.email) &&
-               Objects.equals(phoneNumber, volunteer.phoneNumber);
+                Objects.equals(firstname, volunteer.firstname) && Objects.equals(email, volunteer.email) &&
+                Objects.equals(phoneNumber, volunteer.phoneNumber);
     }
 
     @Override
@@ -92,6 +92,6 @@ public class Volunteer {
     @Override
     public String toString() {
         return "Volunteer{" + "id=" + id + ", lastname='" + lastname + '\'' + ", firstname='" + firstname + '\'' +
-               ", email='" + email + '\'' + ", phoneNumber='" + phoneNumber + '\'' + '}';
+                ", email='" + email + '\'' + ", phoneNumber='" + phoneNumber + '\'' + '}';
     }
 }

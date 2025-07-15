@@ -1,5 +1,7 @@
 package ch.salon.service.dto;
 
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
+import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.Status;
 
 import java.io.Serializable;
@@ -15,6 +17,10 @@ public class ParticipationDTO implements Serializable {
     private String therapistName;
 
     private Instant registrationDate;
+
+    private ModePaymentMeals modePaymentMeals;
+
+    private InvoiceSendingMethod invoiceSendingMethod;
 
     private Long nbMeal1;
 
@@ -199,5 +205,21 @@ public class ParticipationDTO implements Serializable {
 
     public void setHasOffer(Boolean hasOffer) {
         this.hasOffer = hasOffer;
+    }
+
+    public ModePaymentMeals getModePaymentMeals() {
+        return modePaymentMeals;
+    }
+
+    public void setModePaymentMeals(ModePaymentMeals modePaymentMeals) {
+        this.modePaymentMeals = modePaymentMeals;
+    }
+
+    public InvoiceSendingMethod getInvoiceSendingMethod() {
+        return invoiceSendingMethod;
+    }
+
+    public void setInvoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
+        this.invoiceSendingMethod = invoiceSendingMethod;
     }
 }

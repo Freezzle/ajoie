@@ -1,79 +1,87 @@
-import { Routes } from '@angular/router';
-import { Authority } from '../config/authority.constants';
+import {Routes} from '@angular/router';
+import {Authority} from '../config/authority.constants';
 
 const routes: Routes = [
-  {
-    path: 'user-management',
-    data: {
-      authorities: [Authority.ADMIN],
+    {
+        path: 'user-management',
+        data: {
+            authorities: [Authority.ADMIN],
+        },
+        loadChildren: () => import('./user-management/user-management.route'),
+        title: 'userManagement.home.title',
     },
-    loadChildren: () => import('./user-management/user-management.route'),
-    title: 'userManagement.home.title',
-  },
-  {
-    path: 'docs',
-    data: {
-      authorities: [Authority.ADMIN],
+    {
+        path: 'docs',
+        data: {
+            authorities: [Authority.ADMIN],
+        },
+        loadComponent: () => import('./docs/docs.component'),
+        title: 'global.menu.admin.apidocs',
     },
-    loadComponent: () => import('./docs/docs.component'),
-    title: 'global.menu.admin.apidocs',
-  },
-  {
-    path: 'authorities',
-    data: {
-      pageTitle: 'authority.home.title',
-      authorities: [Authority.ADMIN],
+    {
+        path: 'authorities',
+        data: {
+            pageTitle: 'authority.home.title',
+            authorities: [Authority.ADMIN],
+        },
+        loadChildren: () => import('./authority/authority.routes'),
     },
-    loadChildren: () => import('./authority/authority.routes'),
-  },
-  {
-    path: 'salons',
-    data: {
-      pageTitle: 'salon.title',
-      authorities: [Authority.ADMIN_BUSINESS],
+    {
+        path: 'salons',
+        data: {
+            pageTitle: 'salon.title',
+            authorities: [Authority.ADMIN_BUSINESS],
+        },
+        loadChildren: () => import('./salon/salon.routes'),
     },
-    loadChildren: () => import('./salon/salon.routes'),
-  },
-  {
-    path: 'exhibitors',
-    data: {
-      pageTitle: 'exhibitor.title',
-      authorities: [Authority.ADMIN_BUSINESS],
+    {
+        path: 'exhibitors',
+        data: {
+            pageTitle: 'exhibitor.title',
+            authorities: [Authority.ADMIN_BUSINESS],
+        },
+        loadChildren: () => import('./exhibitor/exhibitor.routes'),
     },
-    loadChildren: () => import('./exhibitor/exhibitor.routes'),
-  },
-  {
-    path: 'stands',
-    data: {
-      pageTitle: 'salon.title',
-      authorities: [Authority.ADMIN_BUSINESS],
+    {
+        path: 'stands',
+        data: {
+            pageTitle: 'salon.title',
+            authorities: [Authority.ADMIN_BUSINESS],
+        },
+        loadChildren: () => import('./stand/stand.routes'),
     },
-    loadChildren: () => import('./stand/stand.routes'),
-  },
-  {
-    path: 'conferences',
-    data: {
-      pageTitle: 'conference.title',
-      authorities: [Authority.ADMIN_BUSINESS],
+    {
+        path: 'conferences',
+        data: {
+            pageTitle: 'conference.title',
+            authorities: [Authority.ADMIN_BUSINESS],
+        },
+        loadChildren: () => import('./conference/conference.routes'),
     },
-    loadChildren: () => import('./conference/conference.routes'),
-  },
-  {
-    path: 'participations',
-    data: {
-      pageTitle: 'participation.title',
-      authorities: [Authority.ADMIN_BUSINESS],
+    {
+        path: 'workshops',
+        data: {
+            pageTitle: 'workshop.title',
+            authorities: [Authority.ADMIN_BUSINESS],
+        },
+        loadChildren: () => import('./workshop/workshop.routes'),
     },
-    loadChildren: () => import('./participation/participation.routes'),
-  },
-  {
-    path: 'volunteers',
-    data: {
-      pageTitle: 'volunteer.title',
-      authorities: [Authority.ADMIN_BUSINESS],
+    {
+        path: 'participations',
+        data: {
+            pageTitle: 'participation.title',
+            authorities: [Authority.ADMIN_BUSINESS],
+        },
+        loadChildren: () => import('./participation/participation.routes'),
     },
-    loadChildren: () => import('./volunteer/volunteer.routes'),
-  },
+    {
+        path: 'volunteers',
+        data: {
+            pageTitle: 'volunteer.title',
+            authorities: [Authority.ADMIN_BUSINESS],
+        },
+        loadChildren: () => import('./volunteer/volunteer.routes'),
+    },
 ];
 
 export default routes;

@@ -62,13 +62,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleAnyException(Throwable ex, NativeWebRequest request) {
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
         return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex),
-                                       HttpStatusCode.valueOf(pdCause.getStatus()), request);
+                HttpStatusCode.valueOf(pdCause.getStatus()), request);
     }
 
     @Nullable
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, @Nullable Object body, HttpHeaders headers,
-                                                             HttpStatusCode statusCode, WebRequest request) {
+            HttpStatusCode statusCode, WebRequest request) {
         body = body == null ? wrapAndCustomizeProblem(ex, (NativeWebRequest) request) : body;
         return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
@@ -89,14 +89,14 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         }
 
         if (ex instanceof ErrorResponseException exp &&
-            exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause) {
+                exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause) {
             return problemDetailWithCause;
         }
         return ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
     }
 
     protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err,
-                                                      NativeWebRequest request) {
+            NativeWebRequest request) {
         if (problem.getStatus() <= 0) {
             problem.setStatus(toStatus(err));
         }
@@ -119,8 +119,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
         Map<String, Object> problemProperties = problem.getProperties();
         if (problemProperties == null || !problemProperties.containsKey(MESSAGE_KEY)) {
-            problem.setProperty(MESSAGE_KEY, getMappedMessageKey(err) != null ? getMappedMessageKey(err) :
-                "error.http." + problem.getStatus());
+            problem.setProperty(MESSAGE_KEY,
+                    getMappedMessageKey(err) != null ? getMappedMessageKey(err) : "error.http." + problem.getStatus());
         }
 
         if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) {
@@ -128,7 +128,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         }
 
         if ((err instanceof MethodArgumentNotValidException fieldException) &&
-            (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))) {
+                (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))) {
             problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
         }
 
@@ -138,18 +138,14 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private String extractTitle(Throwable err, int statusCode) {
-        return
-            getCustomizedTitle(err) != null ? getCustomizedTitle(err) : extractTitleForResponseStatus(err, statusCode);
+        return getCustomizedTitle(err) != null ? getCustomizedTitle(err) :
+                extractTitleForResponseStatus(err, statusCode);
     }
 
     private List<FieldErrorVM> getFieldErrors(MethodArgumentNotValidException ex) {
-        return ex.getBindingResult()
-                 .getFieldErrors()
-                 .stream()
+        return ex.getBindingResult().getFieldErrors().stream()
                  .map(f -> new FieldErrorVM(f.getObjectName().replaceFirst("DTO$", ""), f.getField(),
-                                            StringUtils.isNotBlank(
-                                                f.getDefaultMessage()) ? f.getDefaultMessage() : f.getCode()))
-                 .toList();
+                         StringUtils.isNotBlank(f.getDefaultMessage()) ? f.getDefaultMessage() : f.getCode())).toList();
     }
 
     private String extractTitleForResponseStatus(Throwable err, int statusCode) {
@@ -169,8 +165,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         }
 
         return Optional.ofNullable(getMappedStatus(throwable))
-                       .orElse(Optional.ofNullable(resolveResponseStatus(throwable))
-                                       .map(ResponseStatus::value)
+                       .orElse(Optional.ofNullable(resolveResponseStatus(throwable)).map(ResponseStatus::value)
                                        .orElse(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
@@ -194,7 +189,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         if (err instanceof MethodArgumentNotValidException) {
             return ErrorConstants.ERR_VALIDATION;
         } else if (err instanceof ConcurrencyFailureException ||
-                   err.getCause() instanceof ConcurrencyFailureException) {
+                err.getCause() instanceof ConcurrencyFailureException) {
             return ErrorConstants.ERR_CONCURRENCY_FAILURE;
         }
         return null;
@@ -245,9 +240,9 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private HttpHeaders buildHeaders(Throwable err) {
-        return err instanceof BadRequestAlertException badRequestAlertException ? HeaderUtil.createFailureAlert(
-            applicationName, true, badRequestAlertException.getEntityName(), badRequestAlertException.getErrorKey(),
-            badRequestAlertException.getMessage()) : null;
+        return err instanceof BadRequestAlertException badRequestAlertException ?
+                HeaderUtil.createFailureAlert(applicationName, true, badRequestAlertException.getEntityName(),
+                        badRequestAlertException.getErrorKey(), badRequestAlertException.getMessage()) : null;
     }
 
     public Optional<ProblemDetailWithCause> buildCause(final Throwable throwable, NativeWebRequest request) {
@@ -265,6 +260,6 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private boolean containsPackageName(String message) {
         // This list is for sure not complete
         return StringUtils.containsAny(message, "org.", "java.", "net.", "jakarta.", "javax.", "com.", "io.", "de.",
-                                       "ch.salon");
+                "ch.salon");
     }
 }

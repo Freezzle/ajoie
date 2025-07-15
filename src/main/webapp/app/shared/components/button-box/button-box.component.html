@@ -1,8 +1,12 @@
 <button (click)="onClick()"
-        [class.disabled]="isDisabled"
-        [title]="translateKey | translate"
-        class="btn {{colorButton}} btn-sm"
-        type="{{isSubmit ? 'submit' : 'button'}}">
-  <fa-icon *ngIf="faIcon" [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
-  <span *ngIf="showText" jhiTranslate="{{translateKey}}">Edit</span>
+  [class.disabled]="isDisabled"
+  [title]="translateKey | translate"
+  class="btn {{colorButton}} btn-sm"
+  type="{{isSubmit ? 'submit' : 'button'}}">
+  @if (faIcon) {
+    <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
+  }
+  @if (showText) {
+    <span jhiTranslate="{{translateKey}}">Edit</span>
+  }
 </button>

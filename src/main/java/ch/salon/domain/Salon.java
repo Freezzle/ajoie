@@ -1,6 +1,5 @@
 package ch.salon.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,18 +37,15 @@ public class Salon implements Serializable {
     private String referenceNumber;
 
     @NotNull
-    @Column(name = "place",
-            nullable = false)
+    @Column(name = "place", nullable = false)
     private String place;
 
     @NotNull
-    @Column(name = "starting_date",
-            nullable = false)
+    @Column(name = "starting_date", nullable = false)
     private Instant startingDate;
 
     @NotNull
-    @Column(name = "ending_date",
-            nullable = false)
+    @Column(name = "ending_date", nullable = false)
     private Instant endingDate;
 
     @Column(name = "price_meal_1")
@@ -64,20 +60,17 @@ public class Salon implements Serializable {
     @Column(name = "price_conference")
     private Double priceConference;
 
+    @Column(name = "price_workshop")
+    private Double priceWorkshop;
+
     @Column(name = "price_sharing_stand")
     private Double priceSharingStand;
 
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @OneToMany(fetch = FetchType.EAGER,
-               orphanRemoval = true,
-               cascade = CascadeType.ALL,
-               targetEntity = PriceStandSalon.class)
-    @JoinColumn(name = "salon_id",
-                referencedColumnName = "id")
-    @JsonIgnoreProperties(value = {"dimension"},
-                          allowSetters = true)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL, targetEntity = PriceStandSalon.class)
+    @JoinColumn(name = "salon_id", referencedColumnName = "id")
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
 
     public UUID getId() {
@@ -96,20 +89,21 @@ public class Salon implements Serializable {
     public static boolean hasDifference(Salon salon1, Salon salon2) {
         return ((salon1 == null && salon2 != null) || (salon1 != null && salon2 == null) ||
                 (salon1 != null && salon2 != null &&
-                 (!Objects.equals(salon1.getPriceConference(), salon2.getPriceConference()) ||
-                  !Objects.equals(salon1.getPriceSharingStand(), salon2.getPriceSharingStand()) ||
-                  !Objects.equals(salon1.getPriceMeal1(), salon2.getPriceMeal1()) ||
-                  !Objects.equals(salon1.getPriceMeal2(), salon2.getPriceMeal2()) ||
-                  !Objects.equals(salon1.getPriceMeal3(), salon2.getPriceMeal3()) ||
-                  hasPriceStandChanged(salon1.getPriceStandSalons(), salon2.getPriceStandSalons()))));
+                        (!Objects.equals(salon1.getPriceConference(), salon2.getPriceConference()) ||
+                                !Objects.equals(salon1.getPriceWorkshop(), salon2.getPriceWorkshop()) ||
+                                !Objects.equals(salon1.getPriceSharingStand(), salon2.getPriceSharingStand()) ||
+                                !Objects.equals(salon1.getPriceMeal1(), salon2.getPriceMeal1()) ||
+                                !Objects.equals(salon1.getPriceMeal2(), salon2.getPriceMeal2()) ||
+                                !Objects.equals(salon1.getPriceMeal3(), salon2.getPriceMeal3()) ||
+                                hasPriceStandChanged(salon1.getPriceStandSalons(), salon2.getPriceStandSalons()))));
     }
 
     public static boolean hasPriceStandChanged(Set<PriceStandSalon> oldPrices, Set<PriceStandSalon> newPrices) {
         Map<UUID, PriceStandSalon> oldPriceMap =
-            oldPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+                oldPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
 
         Map<UUID, PriceStandSalon> newPriceMap =
-            newPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
+                newPrices.stream().collect(Collectors.toMap(PriceStandSalon::getId, Function.identity()));
 
         // Vérification des éléments manquants et des changements de prix
         for (UUID id : oldPriceMap.keySet()) {
@@ -216,12 +210,25 @@ public class Salon implements Serializable {
         return this.priceConference;
     }
 
+    public Double getPriceWorkshop() {
+        return this.priceWorkshop;
+    }
+
     public void setPriceConference(Double priceConference) {
         this.priceConference = priceConference;
     }
 
+    public void setPriceWorkshop(Double priceWorkshop) {
+        this.priceWorkshop = priceWorkshop;
+    }
+
     public Salon priceConference(Double priceConference) {
         this.setPriceConference(priceConference);
+        return this;
+    }
+
+    public Salon priceWorkshop(Double priceWorkshop) {
+        this.setPriceWorkshop(priceWorkshop);
         return this;
     }
 
@@ -257,30 +264,6 @@ public class Salon implements Serializable {
 
     public void setPriceStandSalons(Set<PriceStandSalon> priceStandSalons) {
         this.priceStandSalons = priceStandSalons;
-    }
-
-    public Salon priceStandSalons(Set<PriceStandSalon> priceStandSalons) {
-        this.setPriceStandSalons(priceStandSalons);
-        return this;
-    }
-
-    public Salon addPriceStandSalon(PriceStandSalon priceStandSalon) {
-        this.priceStandSalons.add(priceStandSalon);
-        return this;
-    }
-
-    public Salon removePriceStandSalon(PriceStandSalon priceStandSalon) {
-        this.priceStandSalons.remove(priceStandSalon);
-        return this;
-    }
-
-    public Double getPriceStand(DimensionStand dimension) {
-        return this.getPriceStandSalons()
-                   .stream()
-                   .filter(priceStand -> priceStand.getDimension().getId().equals(dimension.getId()))
-                   .map(PriceStandSalon::getPrice)
-                   .findFirst()
-                   .orElse(null);
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

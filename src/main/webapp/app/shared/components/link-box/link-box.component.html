@@ -1,4 +1,21 @@
-<a [class.disabled]="isDisabled" [routerLink]="links" class="btn {{colorButton}} btn-sm">
-  <fa-icon *ngIf="faIcon" [icon]="faIcon" [animation]="faIconAnimation" [title]="translateKey | translate"></fa-icon>
-  <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>
-</a>
+@if (modeButton) {
+  <a [class.disabled]="isDisabled" [routerLink]="links" class="btn {{colorButton}} btn-sm">
+    @if (faIcon) {
+      <fa-icon [icon]="faIcon" [animation]="faIconAnimation" [title]="translateKey | translate"></fa-icon>
+    }
+    @if (showText) {
+      <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>
+    }
+  </a>
+}
+
+@if (!modeButton) {
+  <a [class.disabled]="isDisabled" [routerLink]="links">
+    @if (faIcon) {
+      <fa-icon [icon]="faIcon" [animation]="faIconAnimation" [title]="translateKey | translate"></fa-icon>
+    }
+    @if (showText) {
+      <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>
+    }
+  </a>
+}

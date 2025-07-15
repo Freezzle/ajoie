@@ -26,17 +26,18 @@ public class FloorPlanSalon implements Serializable {
     @Column(name = "id")
     private UUID id;
 
+    @Column(name = "position")
+    private Long position = 1L;
+
     @Column(name = "name")
     private String name;
 
     @Lob
-    @Column(name = "data",
-            columnDefinition = "text")
+    @Column(name = "data", columnDefinition = "text")
     private String data;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = {"priceStandSalons"},
-                          allowSetters = true)
+    @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
 
     public UUID getId() {
@@ -69,6 +70,14 @@ public class FloorPlanSalon implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
     }
 
     @Override

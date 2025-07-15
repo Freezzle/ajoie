@@ -52,17 +52,18 @@ public class ExhibitorService {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!exhibitorRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        Exhibitor exhibitorFound = exhibitorRepository.findById(id).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        return ExhibitorMapper.INSTANCE.toDto(exhibitorRepository.save(ExhibitorMapper.INSTANCE.toEntity(exhibitor)));
+        Exhibitor exhibitorToUpdate = ExhibitorMapper.INSTANCE.toEntity(exhibitor);
+
+        exhibitorToUpdate.setRegistrationDate(exhibitorFound.getRegistrationDate());
+
+        return ExhibitorMapper.INSTANCE.toDto(exhibitorRepository.save(exhibitorToUpdate));
     }
 
     public List<ExhibitorDTO> findAll() {
-        return exhibitorRepository.findByOrderByRegistrationDateDesc()
-                                  .stream()
-                                  .map(ExhibitorMapper.INSTANCE::toDto)
+        return exhibitorRepository.findByOrderByRegistrationDateDesc().stream().map(ExhibitorMapper.INSTANCE::toDto)
                                   .toList();
     }
 
@@ -87,9 +88,7 @@ public class ExhibitorService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return this.eventLogService.findAllEventLog(EntityType.EXHIBITOR, idExhibitor)
-                                   .stream()
-                                   .map(EventLogMapper.INSTANCE::toDto)
-                                   .toList();
+        return this.eventLogService.findAllEventLog(EntityType.EXHIBITOR, idExhibitor).stream()
+                                   .map(EventLogMapper.INSTANCE::toDto).toList();
     }
 }

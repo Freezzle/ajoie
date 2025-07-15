@@ -51,22 +51,21 @@ public class AdminConferenceResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<ConferenceDTO> createConference(
-        @Valid @RequestBody ConferenceDTO conference) throws URISyntaxException {
+    public ResponseEntity<ConferenceDTO> createConference(@Valid @RequestBody ConferenceDTO conference)
+            throws URISyntaxException {
         log.debug("REST request to save Conference : {}", conference);
 
         UUID id = conferenceService.create(conference);
 
         return created(new URI("/api/admin/conferences/" + id)).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(conference);
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(conference);
     }
 
     @PutMapping("/{idConference}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<ConferenceDTO> updateConference(@PathVariable(value = "idConference",
-                                                                        required = false) final UUID idConference,
-                                                          @Valid @RequestBody
-                                                          ConferenceDTO conference) throws URISyntaxException {
+    public ResponseEntity<ConferenceDTO> updateConference(
+            @PathVariable(value = "idConference", required = false) final UUID idConference,
+            @Valid @RequestBody ConferenceDTO conference) throws URISyntaxException {
         log.debug("REST request to update Conference : {}, {}", idConference, conference);
 
         conference = conferenceService.update(idConference, conference);
@@ -77,10 +76,8 @@ public class AdminConferenceResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<ConferenceDTO> getAllConferences(@RequestParam(name = "idSalon",
-                                                               required = false) UUID idSalon,
-                                                 @RequestParam(name = "idParticipation",
-                                                               required = false) UUID idParticipation) {
+    public List<ConferenceDTO> getAllConferences(@RequestParam(name = "idSalon", required = false) UUID idSalon,
+            @RequestParam(name = "idParticipation", required = false) UUID idParticipation) {
         log.debug("REST request to get all Conferences");
 
         return conferenceService.findAll(idSalon, idParticipation);
@@ -102,6 +99,6 @@ public class AdminConferenceResource {
         conferenceService.delete(idConference);
 
         return noContent().headers(
-            createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idConference.toString())).build();
+                createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idConference.toString())).build();
     }
 }

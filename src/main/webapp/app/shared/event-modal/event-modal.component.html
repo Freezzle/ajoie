@@ -6,23 +6,26 @@
   <div class="modal-body">
     @if (events.length > 0) {
       <ul class="list-group w-100 ul-list">
-        <li *ngFor="let event of events" class="list-group-item d-flex justify-content-between align-items-center">
-          <div class="d-flex flex-grow-1 align-items-center gap-3">
-            <small class="text-muted flex-shrink-0" style="width: 100px;">
-              {{ event.referenceDate | date: 'dd/MM/yy HH:mm' }}
-            </small>
-            <div class="flex-grow-1">
-              {{ event.label }}
+        @for (event of events; track event) {
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-grow-1 align-items-center gap-3">
+              <small class="text-muted flex-shrink-0" style="width: 100px;">
+                {{ event.referenceDate | date: 'dd/MM/yy HH:mm' }}
+              </small>
+              <div class="flex-grow-1">
+                {{ event.label }}
+              </div>
             </div>
-          </div>
-          <fa-icon [icon]="event.type | eventType" class="ms-2"></fa-icon>
-          <button-box *jhiHasAnyAuthority="['ROLE_ADMIN']"
-                      [showText]="false"
-                      faIcon="times"
-                      type="danger"
-                      translateKey="common.delete"
-                      (clickedEvent)="onDelete(event.id)"></button-box>
-        </li>
+            <fa-icon [icon]="event.type | eventType" class="ms-2"></fa-icon>
+            <button-box *jhiHasAnyAuthority="['ROLE_ADMIN']"
+              [showText]="false"
+              faIcon="times"
+              type="danger"
+              translateKey="common.delete"
+            (clickedEvent)="onDelete(event.id)"></button-box>
+          </li>
+        }
       </ul>
     } @else {
       <p class="text-muted">Aucun événement enregistré.</p>

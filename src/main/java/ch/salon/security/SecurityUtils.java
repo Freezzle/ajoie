@@ -47,14 +47,13 @@ public final class SecurityUtils {
     public static boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null &&
-               getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
+                getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
     }
 
     /**
      * Checks if the current user has any of the authorities.
      *
      * @param authorities the authorities to check.
-     *
      * @return true if the current user has any of the authorities, false otherwise.
      */
     public static boolean hasCurrentUserAnyOfAuthorities(String... authorities) {
@@ -67,7 +66,6 @@ public final class SecurityUtils {
      * Checks if the current user has none of the authorities.
      *
      * @param authorities the authorities to check.
-     *
      * @return true if the current user has none of the authorities, false otherwise.
      */
     public static boolean hasCurrentUserNoneOfAuthorities(String... authorities) {
@@ -78,7 +76,6 @@ public final class SecurityUtils {
      * Checks if the current user has a specific authority.
      *
      * @param authority the authority to check.
-     *
      * @return true if the current user has the authority, false otherwise.
      */
     public static boolean hasCurrentUserThisAuthority(String authority) {

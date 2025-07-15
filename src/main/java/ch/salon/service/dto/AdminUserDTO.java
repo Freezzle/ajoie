@@ -24,8 +24,7 @@ public class AdminUserDTO implements Serializable {
 
     @NotBlank
     @Pattern(regexp = Constants.LOGIN_REGEX)
-    @Size(min = 1,
-          max = 50)
+    @Size(min = 1, max = 50)
     private String login;
 
     @Size(max = 50)
@@ -35,8 +34,7 @@ public class AdminUserDTO implements Serializable {
     private String lastName;
 
     @Email
-    @Size(min = 5,
-          max = 254)
+    @Size(min = 5, max = 254)
     private String email;
 
     @Size(max = 256)
@@ -44,8 +42,7 @@ public class AdminUserDTO implements Serializable {
 
     private boolean activated = false;
 
-    @Size(min = 2,
-          max = 10)
+    @Size(min = 2, max = 10)
     private String langKey;
 
     private String createdBy;
@@ -186,9 +183,9 @@ public class AdminUserDTO implements Serializable {
     @Override
     public String toString() {
         return "AdminUserDTO{" + "login='" + login + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" +
-               lastName + '\'' + ", email='" + email + '\'' + ", imageUrl='" + imageUrl + '\'' + ", activated=" +
-               activated + ", langKey='" + langKey + '\'' + ", createdBy=" + createdBy + ", createdDate=" +
-               createdDate + ", lastModifiedBy='" + lastModifiedBy + '\'' + ", lastModifiedDate=" + lastModifiedDate +
-               ", authorities=" + authorities + "}";
+                lastName + '\'' + ", email='" + email + '\'' + ", imageUrl='" + imageUrl + '\'' + ", activated=" +
+                activated + ", langKey='" + langKey + '\'' + ", createdBy=" + createdBy + ", createdDate=" +
+                createdDate + ", lastModifiedBy='" + lastModifiedBy + '\'' + ", lastModifiedDate=" + lastModifiedDate +
+                ", authorities=" + authorities + "}";
     }
 }

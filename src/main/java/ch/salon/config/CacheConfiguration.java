@@ -29,11 +29,10 @@ public class CacheConfiguration {
         JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
 
         jcacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(
-            CacheConfigurationBuilder.newCacheConfigurationBuilder(Object.class, Object.class,
-                                                                   ResourcePoolsBuilder.heap(ehcache.getMaxEntries()))
-                                     .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(
-                                         Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
-                                     .build());
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(Object.class, Object.class,
+                                                 ResourcePoolsBuilder.heap(ehcache.getMaxEntries())).withExpiry(
+                                                 ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
+                                         .build());
     }
 
     @Bean

@@ -36,11 +36,9 @@ public class DocumentCreator {
                 .addFont("/templates/document/common/Code39.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
         // Fill styles & co in the XHTML
-        String baseUrl = FileSystems.getDefault()
-                                    .getPath("src", "main", "resources", "templates", "document", "common")
-                                    .toUri()
-                                    .toURL()
-                                    .toString();
+        String baseUrl =
+                FileSystems.getDefault().getPath("src", "main", "resources", "templates", "document", "common").toUri()
+                           .toURL().toString();
         renderer.setDocumentFromString(xHtml, baseUrl);
         renderer.layout();
 

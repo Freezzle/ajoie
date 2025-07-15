@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @SuppressWarnings("unused")
 @Repository
-public interface AuthorityRepository extends JpaRepository<Authority, String> {}
+public interface AuthorityRepository extends JpaRepository<Authority, String> {
+}

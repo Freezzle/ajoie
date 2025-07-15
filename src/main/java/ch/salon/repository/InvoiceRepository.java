@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @SuppressWarnings("unused")
 @Repository
-public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {}
+public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
+}

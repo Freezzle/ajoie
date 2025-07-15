@@ -26,17 +26,14 @@ public class PersistentToken implements Serializable {
 
     @JsonIgnore
     @NotNull
-    @Column(name = "token_value",
-            nullable = false)
+    @Column(name = "token_value", nullable = false)
     private String tokenValue;
 
     @Column(name = "token_date")
     private LocalDate tokenDate;
 
-    @Size(min = 0,
-          max = 39)
-    @Column(name = "ip_address",
-            length = 39)
+    @Size(min = 0, max = 39)
+    @Column(name = "ip_address", length = 39)
     private String ipAddress;
 
     @Column(name = "user_agent")

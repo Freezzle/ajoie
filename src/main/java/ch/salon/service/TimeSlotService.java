@@ -23,9 +23,7 @@ public class TimeSlotService {
     }
 
     public Map<LocalDate, List<TimeSlotDTO>> getTimeSlotsBySalon(UUID idSalon) {
-        return timeSlotRepository.findBySalon_Id_OrderByStart(idSalon)
-                                 .stream()
-                                 .map(TimeSlotMapper.INSTANCE::toDto)
+        return timeSlotRepository.findBySalon_Id_OrderByStart(idSalon).stream().map(TimeSlotMapper.INSTANCE::toDto)
                                  .collect(Collectors.groupingBy(TimeSlotDTO::getDate, Collectors.toList()));
     }
 }

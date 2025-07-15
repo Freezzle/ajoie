@@ -1,19 +1,23 @@
 <div class="overflow-auto">
   <div [style]="{'grid-template-columns': '9em repeat(' + timeslots.length + ', minmax(9em, 9em))'}" class="grid">
     <div></div>
-    <div *ngFor="let timeslot of timeslots" class="header border border-dark  bg-light text-dark">
-      <div class="content-slot">{{ timeslot.label }}</div>
-    </div>
-
-    <ng-container *ngFor="let line of _lines">
-      <div class="border border-dark p-1 font-semibold sticky-col bg-light text-dark">{{ line.label }}</div>
-      <div (click)="assignPosition(line.idLine, timeslot.id)" *ngFor="let timeslot of timeslots"
-           [ngClass]="computeClasses(line.idLine, timeslot.id)"
-           class="slot border border-dark text-center">
-        <div [ngStyle]="computeStyles(line.idLine, timeslot.id)" class="content-slot text-dark">
-          {{ getTimeSlot(line.idLine, timeslot.id)?.category === 'Unavailable' ? '' : getTimeSlot(line.idLine, timeslot.id)?.category }}
-        </div>
+    @for (timeslot of timeslots; track timeslot) {
+      <div class="header border border-dark  bg-light text-dark">
+        <div class="content-slot">{{ timeslot.label }}</div>
       </div>
-    </ng-container>
+    }
+
+    @for (line of _lines; track line) {
+      <div class="border border-dark p-1 font-semibold sticky-col bg-light text-dark">{{ line.label }}</div>
+      @for (timeslot of timeslots; track timeslot) {
+        <div (click)="assignPosition(line.idLine, timeslot.id)"
+          [ngClass]="computeClasses(line.idLine, timeslot.id)"
+          class="slot border border-dark text-center">
+          <div [ngStyle]="computeStyles(line.idLine, timeslot.id)" class="content-slot text-dark">
+            {{ getTimeSlot(line.idLine, timeslot.id)?.category === 'Unavailable' ? '' : getTimeSlot(line.idLine, timeslot.id)?.category }}
+          </div>
+        </div>
+      }
+    }
   </div>
 </div>

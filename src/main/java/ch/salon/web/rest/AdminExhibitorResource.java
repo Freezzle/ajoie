@@ -59,22 +59,21 @@ public class AdminExhibitorResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<ExhibitorDTO> createExhibitor(
-        @Valid @RequestBody ExhibitorDTO exhibitor) throws URISyntaxException {
+    public ResponseEntity<ExhibitorDTO> createExhibitor(@Valid @RequestBody ExhibitorDTO exhibitor)
+            throws URISyntaxException {
         log.debug("REST request to save Exhibitor : {}", exhibitor);
 
         UUID id = exhibitorService.create(exhibitor);
 
         return created(new URI("/api/admin/exhibitors/" + id)).headers(
-            createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(exhibitor);
+                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(exhibitor);
     }
 
     @PutMapping("/{idExhibitor}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<ExhibitorDTO> updateExhibitor(@PathVariable(value = "idExhibitor",
-                                                                      required = false) final UUID idExhibitor,
-                                                        @Valid @RequestBody
-                                                        ExhibitorDTO exhibitor) throws URISyntaxException {
+    public ResponseEntity<ExhibitorDTO> updateExhibitor(
+            @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor,
+            @Valid @RequestBody ExhibitorDTO exhibitor) throws URISyntaxException {
         log.debug("REST request to update Exhibitor : {}, {}", idExhibitor, exhibitor);
 
         exhibitor = exhibitorService.update(idExhibitor, exhibitor);
@@ -85,9 +84,8 @@ public class AdminExhibitorResource {
 
     @GetMapping("/{idExhibitor}/participations")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<List<ParticipationDTO>> getParticipationsFromExhibitor(@PathVariable(value = "idExhibitor",
-                                                                                               required = false)
-                                                                                 final UUID idExhibitor) throws URISyntaxException {
+    public ResponseEntity<List<ParticipationDTO>> getParticipationsFromExhibitor(
+            @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor) throws URISyntaxException {
         List<ParticipationDTO> participations = participationService.getParticipationsFromExhibitor(idExhibitor);
 
         return ResponseUtil.wrapOrNotFound(Optional.of(participations));
@@ -117,13 +115,12 @@ public class AdminExhibitorResource {
         exhibitorService.delete(idExhibitor);
 
         return noContent().headers(
-            createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idExhibitor.toString())).build();
+                createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idExhibitor.toString())).build();
     }
 
     @GetMapping("/{idExhibitor}/events")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<EventLogDTO> getAllLogs(@PathVariable(value = "idExhibitor",
-                                                      required = false) final UUID idExhibitor) {
+    public List<EventLogDTO> getAllLogs(@PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor) {
         log.debug("REST request to get all EventLogs");
 
         return exhibitorService.findAllEventLogs(idExhibitor);

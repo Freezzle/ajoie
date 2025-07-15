@@ -16,6 +16,9 @@ import java.util.UUID;
 public interface InvoicingPlanRepository extends JpaRepository<InvoicingPlan, UUID> {
 
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress", "invoices", "payments"})
+    List<InvoicingPlan> findByParticipationIdOrderByBillingNumberAsc(UUID participationId);
+
+    @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress", "invoices", "payments"})
     List<InvoicingPlan> findByParticipationIdOrderByBillingNumberDesc(UUID participationId);
 
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress", "invoices", "payments"})
@@ -26,5 +29,5 @@ public interface InvoicingPlanRepository extends JpaRepository<InvoicingPlan, UU
 
     @EntityGraph(attributePaths = {"participation", "participation.salon", "invoices", "payments"})
     List<InvoicingPlan> findByParticipation_IdInAndParticipation_Salon_IdOrderByBillingNumberDesc(
-        List<UUID> idParticipations, UUID salonId);
+            List<UUID> idParticipations, UUID salonId);
 }

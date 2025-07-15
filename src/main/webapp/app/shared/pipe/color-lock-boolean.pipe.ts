@@ -1,11 +1,11 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  standalone: true,
-  name: 'colorLockBoolean',
+    standalone: true,
+    name: 'colorLockBoolean',
 })
 export default class ColorLockBooleanPipe implements PipeTransform {
-  transform(value: boolean | null | undefined): string {
-    return value ? 'warning-icon' : 'grey-icon';
-  }
+    transform(value: boolean | null | undefined): string {
+        return value ? 'warning-icon' : 'grey-icon';
+    }
 }

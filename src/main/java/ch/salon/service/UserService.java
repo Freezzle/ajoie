@@ -54,8 +54,8 @@ public class UserService {
     private final CacheManager cacheManager;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       PersistentTokenRepository persistentTokenRepository, AuthorityRepository authorityRepository,
-                       CacheManager cacheManager) {
+            PersistentTokenRepository persistentTokenRepository, AuthorityRepository authorityRepository,
+            CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
@@ -165,12 +165,9 @@ public class UserService {
         user.setResetDate(Instant.now());
         user.setActivated(true);
         if (userDTO.getAuthorities() != null) {
-            Set<Authority> authorities = userDTO.getAuthorities()
-                                                .stream()
-                                                .map(authorityRepository::findById)
-                                                .filter(Optional::isPresent)
-                                                .map(Optional::get)
-                                                .collect(Collectors.toSet());
+            Set<Authority> authorities =
+                    userDTO.getAuthorities().stream().map(authorityRepository::findById).filter(Optional::isPresent)
+                           .map(Optional::get).collect(Collectors.toSet());
             user.setAuthorities(authorities);
         }
         userRepository.save(user);
@@ -183,7 +180,6 @@ public class UserService {
      * Update all information for a specific user, and return the modified user.
      *
      * @param userDTO user to update.
-     *
      * @return updated user.
      */
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
@@ -201,12 +197,8 @@ public class UserService {
                            user.setLangKey(userDTO.getLangKey());
                            Set<Authority> managedAuthorities = user.getAuthorities();
                            managedAuthorities.clear();
-                           userDTO.getAuthorities()
-                                  .stream()
-                                  .map(authorityRepository::findById)
-                                  .filter(Optional::isPresent)
-                                  .map(Optional::get)
-                                  .forEach(managedAuthorities::add);
+                           userDTO.getAuthorities().stream().map(authorityRepository::findById)
+                                  .filter(Optional::isPresent).map(Optional::get).forEach(managedAuthorities::add);
                            userRepository.save(user);
                            this.clearUserCaches(user);
                            log.debug("Changed Information for User: {}", user);
@@ -305,7 +297,7 @@ public class UserService {
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
-            Instant.now().minus(3, ChronoUnit.DAYS)).forEach(user -> {
+                Instant.now().minus(3, ChronoUnit.DAYS)).forEach(user -> {
             log.debug("Deleting not activated user {}", user.getLogin());
             userRepository.delete(user);
             this.clearUserCaches(user);

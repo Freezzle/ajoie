@@ -1,22 +1,21 @@
-import { Component, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import {Component, input} from '@angular/core';
+
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import SharedModule from '../shared.module';
+import {Message} from "primeng/message";
 
 @Component({
-  imports: [CommonModule, SharedModule, ReactiveFormsModule],
-  selector: 'error-box',
-  standalone: true,
-  templateUrl: './error-box.component.html',
-  styleUrl: './error-box.component.scss',
+    imports: [SharedModule, ReactiveFormsModule, Message],
+    selector: 'error-box',
+    templateUrl: './error-box.component.html',
 })
 export class ErrorBoxComponent {
-  formControlElement = input<FormControl | null | undefined>();
+    formControlElement = input<FormControl | null | undefined>();
 
-  constructor() {
-  }
+    constructor() {
+    }
 
-  errorKeys(errors: any): string[] {
-    return Object.keys(errors || {});
-  }
+    errorKeys(errors: any): string[] {
+        return Object.keys(errors || {});
+    }
 }

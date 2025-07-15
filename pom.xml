@@ -19,7 +19,7 @@
     <properties>
         <maven.version>3.2.5</maven.version>
         <java.version>17</java.version>
-        <node.version>v20.15.0</node.version>
+        <node.version>v22.17.0</node.version>
         <npm.version>10.8.1</npm.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -323,6 +323,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>1.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.codecrete.qrbill</groupId>
+            <artifactId>qrbill-generator</artifactId>
+            <version>3.3.1</version>
         </dependency>
     </dependencies>
 

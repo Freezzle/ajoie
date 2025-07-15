@@ -8,8 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {ParticipationMapper.class, InvoiceMapper.class},
-        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = {ParticipationMapper.class, InvoiceMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface InvoicingPlanMapper {
     InvoicingPlanMapper INSTANCE = Mappers.getMapper(InvoicingPlanMapper.class);
 
@@ -19,7 +18,6 @@ public interface InvoicingPlanMapper {
 
     InvoicingPlanLightDTO toLightDto(InvoicingPlan invoice);
 
-    @Mapping(target = "billingNumber",
-             ignore = true)
+    @Mapping(target = "billingNumber", ignore = true)
     InvoicingPlan toLightEntity(InvoicingPlanLightDTO invoice);
 }

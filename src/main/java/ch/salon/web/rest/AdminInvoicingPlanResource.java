@@ -1,5 +1,6 @@
 package ch.salon.web.rest;
 
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.dto.InvoiceDTO;
@@ -44,44 +45,50 @@ public class AdminInvoicingPlanResource {
 
     @PostMapping("{idInvoicingPlan}/split-invoices")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Void> splitInvoicingPlan(@PathVariable(value = "idInvoicingPlan",
-                                                                 required = false) final UUID idInvoicingPlan,
-                                                   @RequestBody SplitInvoicing splitInvoicing) throws Exception {
-        invoicingPlanService.splitInvoicingPlan(idInvoicingPlan, splitInvoicing.getInvoicesIds());
+    public ResponseEntity<Void> splitInvoicingPlan(
+            @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan,
+            @RequestBody SplitInvoicing splitInvoicing) throws Exception {
+        invoicingPlanService.splitInvoicingPlan(idInvoicingPlan, splitInvoicing.getInvoicesIds(), false, false);
         return noContent().build();
     }
 
     @PutMapping("{idInvoicingPlan}/switch-arrangement")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Void> switchArrangement(@PathVariable(value = "idInvoicingPlan",
-                                                                required = false)
-                                                  final UUID idInvoicingPlan) throws Exception {
+    public ResponseEntity<Void> switchArrangement(
+            @PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan) throws Exception {
         invoicingPlanService.switchArrangement(idInvoicingPlan);
+        return noContent().build();
+    }
+
+    @PutMapping("{idInvoicingPlan}/switch-invoice-method/{method}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<Void> switchInvoiceSendingMethod(
+            @PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan,
+            @PathVariable(value = "method")InvoiceSendingMethod method) throws Exception {
+        invoicingPlanService.switchInvoiceSendingMethod(idInvoicingPlan, method);
         return noContent().build();
     }
 
     @PostMapping("{idInvoicingPlan}/invoices")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<InvoiceDTO> updateInvoice(@PathVariable(value = "idInvoicingPlan",
-                                                                  required = false) final UUID idInvoicingPlan,
-                                                    @RequestBody InvoiceDTO invoiceDTO) {
+    public ResponseEntity<InvoiceDTO> updateInvoice(
+            @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan,
+            @RequestBody InvoiceDTO invoiceDTO) {
         return ResponseUtil.wrapOrNotFound(invoicingPlanService.createInvoice(idInvoicingPlan, invoiceDTO));
     }
 
     @PutMapping("{idInvoicingPlan}/invoices/{idInvoice}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<InvoiceDTO> updateInvoice(@PathVariable(value = "idInvoicingPlan",
-                                                                  required = false) final UUID idInvoicingPlan,
-                                                    @PathVariable(name = "idInvoice",
-                                                                  required = false) UUID idInvoice,
-                                                    @RequestBody InvoiceDTO invoiceDTO) {
+    public ResponseEntity<InvoiceDTO> updateInvoice(
+            @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan,
+            @PathVariable(name = "idInvoice", required = false) UUID idInvoice, @RequestBody InvoiceDTO invoiceDTO) {
         return ResponseUtil.wrapOrNotFound(invoicingPlanService.updateInvoice(idInvoicingPlan, idInvoice, invoiceDTO));
     }
 
     @PostMapping("/{idInvoicingPlan}/payments")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<PaymentDTO> createPayment(@PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
-                                                    @Valid @RequestBody PaymentDTO payment) throws URISyntaxException {
+            @Valid @RequestBody PaymentDTO payment) throws URISyntaxException {
         log.debug("REST request to save Payment : {}", payment);
 
         return ResponseUtil.wrapOrNotFound(this.invoicingPlanService.createPayment(idInvoicingPlan, payment));
@@ -90,18 +97,17 @@ public class AdminInvoicingPlanResource {
     @PutMapping("/{idInvoicingPlan}/payments/{idPayment}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<PaymentDTO> updatePayment(@PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
-                                                    @PathVariable("idPayment") UUID idPayment,
-                                                    @RequestBody PaymentDTO payment) {
+            @PathVariable("idPayment") UUID idPayment, @RequestBody PaymentDTO payment) {
         log.debug("REST request to update Payment : {}, {}, {}", idInvoicingPlan, idPayment, payment);
 
         return ResponseUtil.wrapOrNotFound(
-            this.invoicingPlanService.updatePayment(idInvoicingPlan, idPayment, payment));
+                this.invoicingPlanService.updatePayment(idInvoicingPlan, idPayment, payment));
     }
 
     @DeleteMapping("/{idInvoicingPlan}/payments/{idPayment}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Void> deletePayment(@PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
-                                              @PathVariable("idPayment") UUID idPayment) {
+            @PathVariable("idPayment") UUID idPayment) {
         log.debug("REST request to delete Payment : {}, {}", idInvoicingPlan, idPayment);
 
         this.invoicingPlanService.deletePayment(idInvoicingPlan, idPayment);

@@ -27,13 +27,11 @@ public class Payment implements Serializable {
     private UUID id;
 
     @NotNull
-    @Column(name = "amount",
-            nullable = false)
+    @Column(name = "amount", nullable = false)
     private Double amount;
 
     @NotNull
-    @Column(name = "billing_date",
-            nullable = false)
+    @Column(name = "billing_date", nullable = false)
     private Instant billingDate;
 
     @Enumerated(EnumType.STRING)

@@ -28,18 +28,15 @@ public class Exhibitor implements Serializable {
     private UUID id;
 
     @NotNull
-    @Column(name = "language",
-            nullable = false)
+    @Column(name = "language", nullable = false)
     private String language = Locale.FRENCH.getLanguage();
 
     @NotNull
-    @Column(name = "full_name",
-            nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @NotNull
-    @Column(name = "email",
-            nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "phone_number")
@@ -57,12 +54,20 @@ public class Exhibitor implements Serializable {
     @Column(name = "different_billing_address")
     private Boolean differentBillingAddress = false;
 
-    @ManyToOne(fetch = FetchType.EAGER,
-               cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Address billingAddress;
 
     @Column(name = "registration_date")
     private Instant registrationDate;
+
+    @Column(name = "newsletter")
+    private boolean newsletter = true;
+
+    @Column(name = "red_flag")
+    private boolean redFlag = false;
+
+    @Column(name = "duplicate_detected")
+    private boolean duplicateDetected = false;
 
     public UUID getId() {
         return this.id;
@@ -78,6 +83,45 @@ public class Exhibitor implements Serializable {
 
     public void setRegistrationDate(Instant registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public boolean isNewsletter() {
+        return newsletter;
+    }
+
+    public void setNewsletter(boolean newsletter) {
+        this.newsletter = newsletter;
+    }
+
+    public Exhibitor newsletter(boolean newsletter) {
+        this.setNewsletter(newsletter);
+        return this;
+    }
+
+    public boolean isRedFlag() {
+        return redFlag;
+    }
+
+    public void setRedFlag(boolean redFlag) {
+        this.redFlag = redFlag;
+    }
+
+    public Exhibitor redFlag(boolean redFlag) {
+        this.setRedFlag(redFlag);
+        return this;
+    }
+
+    public boolean isDuplicateDetected() {
+        return duplicateDetected;
+    }
+
+    public void setDuplicateDetected(boolean duplicateDetected) {
+        this.duplicateDetected = duplicateDetected;
+    }
+
+    public Exhibitor duplicateDetected(boolean duplicateDetected) {
+        this.setDuplicateDetected(duplicateDetected);
+        return this;
     }
 
     public Exhibitor id(UUID id) {

@@ -72,7 +72,7 @@ public class VolunteerAvailability {
         }
         VolunteerAvailability that = (VolunteerAvailability) o;
         return Objects.equals(id, that.id) && Objects.equals(volunteer, that.volunteer) &&
-               Objects.equals(timeSlot, that.timeSlot);
+                Objects.equals(timeSlot, that.timeSlot);
     }
 
     @Override

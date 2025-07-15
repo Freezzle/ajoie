@@ -26,24 +26,24 @@ public class EventLogService {
     }
 
     public void eventFromSystem(String label, EventType eventType, EntityType entityType, UUID referenceId,
-                                Map<String, String> extraAttributes) {
+            Map<String, String> extraAttributes) {
         this.eventLogRepository.save(
-            instance(label, eventType, entityType, referenceId, Instant.now(), extraAttributes, true));
+                instance(label, eventType, entityType, referenceId, Instant.now(), extraAttributes, true));
     }
 
     public void eventFromUser(String label, EventType eventType, EntityType entityType, UUID referenceId,
-                              Instant referenceDate, Map<String, String> extraAttributes) {
+            Instant referenceDate, Map<String, String> extraAttributes) {
         this.eventLogRepository.save(
-            instance(label, eventType, entityType, referenceId, referenceDate, extraAttributes, false));
+                instance(label, eventType, entityType, referenceId, referenceDate, extraAttributes, false));
     }
 
     public List<EventLog> findAllEventLog(EntityType entityType, UUID referenceId) {
         return this.eventLogRepository.findAllByEntityTypeAndReferenceIdOrderByReferenceDateAsc(entityType,
-                                                                                                referenceId);
+                referenceId);
     }
 
     private EventLog instance(String label, EventType eventType, EntityType entityType, UUID referenceId,
-                              Instant referenceDate, Map<String, String> extraAttributes, boolean fromSystem) {
+            Instant referenceDate, Map<String, String> extraAttributes, boolean fromSystem) {
         EventLog eventLog = new EventLog();
         eventLog.setLabel(label);
         eventLog.setType(eventType);

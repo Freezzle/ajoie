@@ -35,7 +35,7 @@ public class ConferenceService {
     private final EventLogService eventLogService;
 
     public ConferenceService(ConferenceRepository conferenceRepository, ParticipationService participationService,
-                             EventLogService eventLogService) {
+            EventLogService eventLogService) {
         this.conferenceRepository = conferenceRepository;
         this.participationService = participationService;
         this.eventLogService = eventLogService;
@@ -52,7 +52,7 @@ public class ConferenceService {
 
         if (conference.getParticipation() == null || conference.getParticipation().getId() == null) {
             throw new BadRequestAlertException("A new conference must be attached to a participation", ENTITY_NAME,
-                                               PARTICIPATION_LINK_NULL);
+                    PARTICIPATION_LINK_NULL);
         }
 
         if (participationService.get(conference.getParticipation().getId()).isEmpty()) {
@@ -64,7 +64,7 @@ public class ConferenceService {
         entity = conferenceRepository.save(entity);
 
         this.eventLogService.eventFromSystem("Une conférence a été ajoutée", EventType.EVENT, EntityType.PARTICIPATION,
-                                             entity.getParticipation().getId(), null);
+                entity.getParticipation().getId(), null);
 
         this.participationService.adaptStatusFromChildren(entity.getParticipation().getId());
 
@@ -84,19 +84,20 @@ public class ConferenceService {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, ID_INVALID);
         }
 
-        Conference conferenceExisting = this.conferenceRepository.findById(id)
-                                                                 .orElseThrow(() -> new BadRequestAlertException(
-                                                                     "Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
+        Conference conferenceExisting = this.conferenceRepository.findById(id).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
 
         Conference conferenceToUpdate = ConferenceMapper.INSTANCE.toEntity(conference);
 
         if (Conference.diffStatus(conferenceToUpdate, conferenceExisting)) {
             this.eventLogService.eventFromSystem(
-                "Le statut d'une conférence a changé en '" + conferenceToUpdate.getStatus().name().toLowerCase() + "'",
-                EventType.EVENT, EntityType.PARTICIPATION, conferenceExisting.getParticipation().getId(),
-                Map.of("old_status", conferenceExisting.getStatus().name()));
+                    "Le statut d'une conférence a changé en '" + conferenceToUpdate.getStatus().name().toLowerCase() +
+                            "'", EventType.EVENT, EntityType.PARTICIPATION,
+                    conferenceExisting.getParticipation().getId(),
+                    Map.of("old_status", conferenceExisting.getStatus().name()));
         }
 
+        conferenceToUpdate.setRegistrationDate(conferenceExisting.getRegistrationDate());
         conferenceToUpdate = conferenceRepository.save(conferenceToUpdate);
 
         this.participationService.adaptStatusFromChildren(conferenceToUpdate.getParticipation().getId());
@@ -106,15 +107,11 @@ public class ConferenceService {
 
     public List<ConferenceDTO> findAll(UUID idSalon, UUID idParticipation) {
         if (idParticipation != null) {
-            return conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation)
-                                       .stream()
-                                       .map(ConferenceMapper.INSTANCE::toDto)
-                                       .toList();
+            return conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation).stream()
+                                       .map(ConferenceMapper.INSTANCE::toDto).toList();
         } else if (idSalon != null) {
-            return conferenceRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon)
-                                       .stream()
-                                       .map(ConferenceMapper.INSTANCE::toDto)
-                                       .toList();
+            return conferenceRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
+                                       .map(ConferenceMapper.INSTANCE::toDto).toList();
         } else {
             throw new IllegalStateException("No filter given");
         }
@@ -134,11 +131,11 @@ public class ConferenceService {
         }
 
         UUID idParticipation =
-            get(id).map(ConferenceDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
+                get(id).map(ConferenceDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
 
         conferenceRepository.deleteById(id);
         this.eventLogService.eventFromSystem("Une conférence a été supprimée.", EventType.EVENT,
-                                             EntityType.PARTICIPATION, idParticipation, null);
+                EntityType.PARTICIPATION, idParticipation, null);
         this.participationService.adaptStatusFromChildren(idParticipation);
     }
 }

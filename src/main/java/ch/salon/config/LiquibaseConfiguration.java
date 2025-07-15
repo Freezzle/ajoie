@@ -35,19 +35,18 @@ public class LiquibaseConfiguration {
 
     @Bean
     public SpringLiquibase liquibase(@Qualifier("taskExecutor") Executor executor,
-                                     LiquibaseProperties liquibaseProperties,
-                                     @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
-                                     ObjectProvider<DataSource> dataSource, DataSourceProperties dataSourceProperties) {
+            LiquibaseProperties liquibaseProperties,
+            @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource, ObjectProvider<DataSource> dataSource,
+            DataSourceProperties dataSourceProperties) {
         SpringLiquibase liquibase;
         if (Boolean.TRUE.equals(asyncStart)) {
-            liquibase =
-                SpringLiquibaseUtil.createAsyncSpringLiquibase(this.env, executor, liquibaseDataSource.getIfAvailable(),
-                                                               liquibaseProperties, dataSource.getIfUnique(),
-                                                               dataSourceProperties);
+            liquibase = SpringLiquibaseUtil.createAsyncSpringLiquibase(this.env, executor,
+                    liquibaseDataSource.getIfAvailable(), liquibaseProperties, dataSource.getIfUnique(),
+                    dataSourceProperties);
         } else {
             liquibase =
-                SpringLiquibaseUtil.createSpringLiquibase(liquibaseDataSource.getIfAvailable(), liquibaseProperties,
-                                                          dataSource.getIfUnique(), dataSourceProperties);
+                    SpringLiquibaseUtil.createSpringLiquibase(liquibaseDataSource.getIfAvailable(), liquibaseProperties,
+                            dataSource.getIfUnique(), dataSourceProperties);
         }
         liquibase.setChangeLog("classpath:config/liquibase/master.xml");
         liquibase.setContexts(liquibaseProperties.getContexts());

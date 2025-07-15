@@ -27,7 +27,7 @@ import static org.springframework.http.ResponseEntity.badRequest;
 public class PublicUserResource {
 
     private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
-        Arrays.asList("id", "login", "firstName", "lastName", "email", "activated", "langKey"));
+            Arrays.asList("id", "login", "firstName", "lastName", "email", "activated", "langKey"));
     private static final Logger log = LoggerFactory.getLogger(PublicUserResource.class);
 
     private final UserService userService;
@@ -38,7 +38,7 @@ public class PublicUserResource {
 
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllPublicUsers(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get all public User names");
         if (!onlyContainsAllowedProperties(pageable)) {
             return badRequest().build();
@@ -46,7 +46,7 @@ public class PublicUserResource {
 
         final Page<UserDTO> page = userService.getAllPublicUsers(pageable);
         HttpHeaders headers =
-            PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+                PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 

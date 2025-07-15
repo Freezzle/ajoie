@@ -1,11 +1,11 @@
 <div>
-  <h2 id="page-heading">
-    <div class="d-flex justify-content-center">
-      <span jhiTranslate="salon.title">Les salons</span>
-    </div>
-    <hr/>
+    <h2 id="page-heading">
+        <div class="d-flex justify-content-center">
+            <span jhiTranslate="salon.title">Les salons</span>
+        </div>
+        <hr/>
 
-    <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-between mt-3">
       <span>
         <button-box (clickedEvent)="previousState()"
                     faIcon="arrow-left"
@@ -13,7 +13,7 @@
                     translateKey="common.back"/>
       </span>
 
-      <span>
+            <span>
         <button-box (clickedEvent)="load()"
                     faIcon="sync"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
@@ -25,64 +25,64 @@
                   faIcon="plus"
                   [isDisabled]="isLoading"/>
       </span>
-    </div>
-  </h2>
+        </div>
+    </h2>
 
-  <jhi-alert-error></jhi-alert-error>
+    <jhi-alert-error></jhi-alert-error>
 
-  <jhi-alert></jhi-alert>
+    <jhi-alert></jhi-alert>
 
-  <div class="table-responsive table-entities" id="entities">
-    <table aria-describedby="page-heading" class="table table-hover">
-      <thead class="thead-primary">
-        <tr>
-          <th class="text-white">
-            <span jhiTranslate="salon.referenceNumber">N° de référence</span>
-          </th>
-          <th class="text-white">
-            <span jhiTranslate="salon.place">Place</span>
-          </th>
-          <th class="text-center text-white">
-            <span jhiTranslate="salon.startingDate">Starting Date</span>
-          </th>
-          <th class="text-center text-white">
-            <span jhiTranslate="salon.endingDate">Ending Date</span>
-          </th>
-          <th>&nbsp;</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (salons.length === 0) {
-          <tr>
-            <td colspan="5">
-              <span jhiTranslate="salon.notFound">Aucun salon</span>
-            </td>
-          </tr>
-        } @else {
-          @for (salon of salons; track $index) {
+    <div class="table-responsive table-entities" id="entities">
+        <table aria-describedby="page-heading" class="table table-hover">
+            <thead class="thead-primary">
             <tr>
-              <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.referenceNumber }}</td>
-              <td class="go-detail" [routerLink]="['./', salon.id, 'view']">{{ salon.place }}</td>
-              <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{
-                  salon.startingDate | formatMediumDate
-                }}
-              </td>
-              <td class="go-detail text-center" [routerLink]="['./', salon.id, 'view']">{{
-                  salon.endingDate | formatMediumDate
-                }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <button-box (clickedEvent)="delete(salon)" type="danger"
-                              [showText]="false" translateKey="common.delete" faIcon="times"/>
-                </div>
-              </td>
+                <th class="text-white">
+                    <span jhiTranslate="salon.referenceNumber">N° de référence</span>
+                </th>
+                <th class="text-white">
+                    <span jhiTranslate="salon.place">Place</span>
+                </th>
+                <th class="text-center text-white">
+                    <span jhiTranslate="salon.startingDate">Starting Date</span>
+                </th>
+                <th class="text-center text-white">
+                    <span jhiTranslate="salon.endingDate">Ending Date</span>
+                </th>
+                <th>&nbsp;</th>
             </tr>
-          }
-        }
-      </tbody>
-    </table>
-  </div>
+            </thead>
+            <tbody>
+            @if (salons.length === 0) {
+                <tr>
+                    <td colspan="5">
+                        <span jhiTranslate="salon.notFound">Aucun salon</span>
+                    </td>
+                </tr>
+            } @else {
+                @for (salon of salons; track $index) {
+                    <tr>
+                        <td class="go-detail" [routerLink]="['./', salon.id, 'participations']">{{ salon.referenceNumber }}</td>
+                        <td class="go-detail" [routerLink]="['./', salon.id, 'participations']">{{ salon.place }}</td>
+                        <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
+                                salon.startingDate | formatMediumDate
+                            }}
+                        </td>
+                        <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
+                                salon.endingDate | formatMediumDate
+                            }}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <button-box (clickedEvent)="delete(salon)" type="danger"
+                                            [showText]="false" translateKey="common.delete" faIcon="times"/>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
 
-  <jhi-pagination (pageChanged)="refreshSalons($event)" [collectionSize]="salons.length"/>
+    <jhi-pagination (pageChanged)="refreshSalons($event)" [collectionSize]="salons.length"/>
 </div>

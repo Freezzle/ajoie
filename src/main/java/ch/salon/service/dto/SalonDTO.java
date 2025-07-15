@@ -26,6 +26,8 @@ public class SalonDTO implements Serializable {
 
     private Double priceConference;
 
+    private Double priceWorkshop;
+
     private Double priceSharingStand;
 
     private String extraInformation;
@@ -105,6 +107,14 @@ public class SalonDTO implements Serializable {
 
     public void setPriceConference(Double priceConference) {
         this.priceConference = priceConference;
+    }
+
+    public Double getPriceWorkshop() {
+        return priceWorkshop;
+    }
+
+    public void setPriceWorkshop(Double priceWorkshop) {
+        this.priceWorkshop = priceWorkshop;
     }
 
     public Double getPriceSharingStand() {

@@ -18,7 +18,6 @@ public interface PaymentMapper {
 
     PaymentLightDTO toLightDto(Payment payment);
 
-    @Mapping(target = "amount",
-             ignore = true)
+    @Mapping(target = "amount", ignore = true)
     Payment toLightEntity(PaymentLightDTO payment);
 }

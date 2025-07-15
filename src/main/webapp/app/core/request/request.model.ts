@@ -1,11 +1,11 @@
 export interface Pagination {
-  page: number;
-  size: number;
-  sort: string[];
+    page: number;
+    size: number;
+    sort: string[];
 }
 
 export interface Search {
-  query: string;
+    query: string;
 }
 
 export interface SearchWithPagination extends Search, Pagination {

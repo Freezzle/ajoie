@@ -4,9 +4,9 @@ import ch.salon.domain.Conference;
 import ch.salon.domain.FloorPlanSalon;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
-import ch.salon.domain.PriceStandSalon;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
+import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
@@ -17,10 +17,10 @@ import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
-import ch.salon.service.dto.DimensionStandDTO;
+import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.dto.FloorPlanSalonDTO;
+import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
-import ch.salon.service.mapper.DimensionStandMapper;
 import ch.salon.service.mapper.FloorPlanSalonMapper;
 import ch.salon.service.mapper.PriceStandMapper;
 import ch.salon.service.mapper.SalonMapper;
@@ -48,19 +48,21 @@ public class SalonService {
     private final StandRepository standRepository;
     private final EventLogService eventLogService;
     private final ConferenceRepository conferenceRepository;
+    private final WorkshopRepository workshopRepository;
     private final InvoicingPlanRepository invoicingPlanRepository;
     private final FloorPlanSalonRepository floorPlanSalonRepository;
 
     public SalonService(SalonRepository salonRepository, ParticipationRepository participationRepository,
-                        StandRepository standRepository, EventLogService eventLogService,
-                        ConferenceRepository conferenceRepository, InvoicingPlanRepository invoicingPlanRepository,
-                        FloorPlanSalonRepository floorPlanSalonRepository) {
+            StandRepository standRepository, EventLogService eventLogService, WorkshopRepository workshopRepository,
+            ConferenceRepository conferenceRepository, InvoicingPlanRepository invoicingPlanRepository,
+            FloorPlanSalonRepository floorPlanSalonRepository) {
         this.salonRepository = salonRepository;
         this.participationRepository = participationRepository;
         this.standRepository = standRepository;
         this.eventLogService = eventLogService;
         this.conferenceRepository = conferenceRepository;
         this.invoicingPlanRepository = invoicingPlanRepository;
+        this.workshopRepository = workshopRepository;
         this.floorPlanSalonRepository = floorPlanSalonRepository;
     }
 
@@ -83,24 +85,19 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        Salon salonFound = salonRepository.findById(id)
-                                          .orElseThrow(
-                                              () -> new BadRequestAlertException("Entity not found", ENTITY_NAME,
-                                                                                 "idnotfound"));
+        Salon salonFound = salonRepository.findById(id).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
-            salon.setPriceStandSalons(salonFound.getPriceStandSalons()
-                                                .stream()
-                                                .map(PriceStandMapper.INSTANCE::toDto)
+            salon.setPriceStandSalons(salonFound.getPriceStandSalons().stream().map(PriceStandMapper.INSTANCE::toDto)
                                                 .collect(Collectors.toSet()));
         }
 
         Salon salonToUpdate = SalonMapper.INSTANCE.toEntity(salon);
         if (Salon.hasDifference(salonFound, salonToUpdate)) {
-            participationRepository.findBySalonIdOrderByRegistrationDateDesc(salonFound.getId())
-                                   .forEach(participation -> eventLogService.eventFromSystem(
-                                       "Attention : Le salon a changé des prix.", EventType.EVENT,
-                                       EntityType.PARTICIPATION, participation.getId(), null));
+            participationRepository.findBySalonIdOrderByRegistrationDateDesc(salonFound.getId()).forEach(
+                    participation -> eventLogService.eventFromSystem("Attention : Le salon a changé des prix.",
+                            EventType.EVENT, EntityType.PARTICIPATION, participation.getId(), null));
         }
 
         return SalonMapper.INSTANCE.toDto(salonRepository.save(salonToUpdate));
@@ -126,21 +123,15 @@ public class SalonService {
         salonRepository.deleteById(id);
     }
 
-    public List<DimensionStandDTO> getDimensionStands(UUID idSalon) {
+    public List<PriceStandDTO> getDimensionStands(UUID idSalon) {
         if (idSalon == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        Salon salon = this.salonRepository.findById(idSalon)
-                                          .orElseThrow(
-                                              () -> new BadRequestAlertException("Entity not found", ENTITY_NAME,
-                                                                                 "idnotfound"));
+        Salon salon = this.salonRepository.findById(idSalon).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        return salon.getPriceStandSalons()
-                    .stream()
-                    .map(PriceStandSalon::getDimension)
-                    .map(DimensionStandMapper.INSTANCE::toDto)
-                    .toList();
+        return salon.getPriceStandSalons().stream().map(PriceStandMapper.INSTANCE::toDto).toList();
     }
 
     public FloorPlanSalonDTO createFloorPlanSalon(UUID idSalon, FloorPlanSalonDTO floorPlanDto) {
@@ -149,6 +140,7 @@ public class SalonService {
         }
 
         FloorPlanSalon floorPlanSalon = new FloorPlanSalon();
+        floorPlanSalon.setPosition(floorPlanDto.getPosition());
         floorPlanSalon.setName(floorPlanDto.getName());
         floorPlanSalon.setSalon(this.salonRepository.getReferenceById(idSalon));
         floorPlanSalon.setData(floorPlanDto.getData());
@@ -181,6 +173,7 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid idSalon", ENTITY_NAME, "doesntMatchs");
         }
 
+        floorPlan.setPosition(floorPlanSalonDTO.getPosition());
         floorPlan.setName(floorPlanSalonDTO.getName());
         floorPlan.setData(floorPlanSalonDTO.getData());
         return FloorPlanSalonMapper.INSTANCE.toDto(this.floorPlanSalonRepository.save(floorPlan));
@@ -191,10 +184,8 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return this.floorPlanSalonRepository.findBySalonId(idSalon)
-                                            .stream()
-                                            .map(FloorPlanSalonMapper.INSTANCE::toDto)
-                                            .toList();
+        return this.floorPlanSalonRepository.findBySalonIdOrderByPosition(idSalon).stream()
+                                            .map(FloorPlanSalonMapper.INSTANCE::toDto).toList();
     }
 
     public SalonStatistiques getStatistiques(UUID idSalon, List<Status> statuses) {
@@ -205,7 +196,7 @@ public class SalonService {
         SalonStatistiques stats = new SalonStatistiques();
 
         List<Stand> stands =
-            standRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
+                standRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
         stats.setNbStands(stands.size());
 
         // Dimensions Stand
@@ -227,18 +218,22 @@ public class SalonService {
         stats.setCategoriesStands(categories);
 
         List<Conference> conferences =
-            this.conferenceRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
+                this.conferenceRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
         stats.setNbConference(conferences.size());
 
+        List<Workshop> workshops =
+                this.workshopRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
+        stats.setNbWorkshop(workshops.size());
+
         List<Participation> participationsSalon =
-            this.participationRepository.findBySalonIdAndStatusIn(idSalon, statuses);
+                this.participationRepository.findBySalonIdAndStatusIn(idSalon, statuses);
 
         stats.setNbMeal1(
-            participationsSalon.stream().map(Participation::getNbMeal1).reduce(Long::sum).orElse(0L).intValue());
+                participationsSalon.stream().map(Participation::getNbMeal1).reduce(Long::sum).orElse(0L).intValue());
         stats.setNbMeal2(
-            participationsSalon.stream().map(Participation::getNbMeal2).reduce(Long::sum).orElse(0L).intValue());
+                participationsSalon.stream().map(Participation::getNbMeal2).reduce(Long::sum).orElse(0L).intValue());
         stats.setNbMeal3(
-            participationsSalon.stream().map(Participation::getNbMeal3).reduce(Long::sum).orElse(0L).intValue());
+                participationsSalon.stream().map(Participation::getNbMeal3).reduce(Long::sum).orElse(0L).intValue());
 
         StandInfoStats infoStats = new StandInfoStats();
         infoStats.setNbTable(stands.stream().map(Stand::getNbTable).reduce(Long::sum).orElse(0L));
@@ -252,11 +247,12 @@ public class SalonService {
 
         Double paid = 0.00;
         Double offered = 0.00;
+        Double totalReel = 0.00;
         Double total = 0.00;
 
         List<InvoicingPlan> invoicingPlans =
-            invoicingPlanRepository.findByParticipation_IdInAndParticipation_Salon_IdOrderByBillingNumberDesc(
-                participationsSalon.stream().map(Participation::getId).toList(), idSalon);
+                invoicingPlanRepository.findByParticipation_IdInAndParticipation_Salon_IdOrderByBillingNumberDesc(
+                        participationsSalon.stream().map(Participation::getId).toList(), idSalon);
 
         for (InvoicingPlan invoicingPlan : invoicingPlans) {
 
@@ -266,15 +262,16 @@ public class SalonService {
 
             total += invoicingPlan.getInvoicesDefaultTotal();
             offered += invoicingPlan.getReductionsTotal();
+            totalReel += invoicingPlan.getInvoicesTotal();
             paid += invoicingPlan.getPaymentTotal();
         }
 
         FacturationStats facturationStats = new FacturationStats();
         facturationStats.setTotal(total);
         facturationStats.setDiscount(offered);
-        facturationStats.setExpected(total - offered);
+        facturationStats.setExpected(totalReel);
         facturationStats.setPaid(paid);
-        facturationStats.setRemaining(total - offered - paid);
+        facturationStats.setRemaining(totalReel - paid);
         stats.setFacturation(facturationStats);
 
         return stats;

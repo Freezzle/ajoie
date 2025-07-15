@@ -1,136 +1,198 @@
 <div>
-  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <h2 id="page-heading">
+    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+        <h2 id="page-heading">
 
-      <div class="d-flex justify-content-center">
-        <span *ngIf="editForm.controls.id.value" jhiTranslate="salon.edit">Détail du salon</span>
-        <span *ngIf="!editForm.controls.id.value" jhiTranslate="salon.create">Création d'un nouveau salon</span>
-      </div>
-      <hr/>
+            <div class="d-flex justify-content-center">
+                @if (editForm.controls.id.value) {
+                    <span jhiTranslate="salon.edit">Détail du salon</span>
+                }
+                @if (!editForm.controls.id.value) {
+                    <span jhiTranslate="salon.create">Création d'un nouveau salon</span>
+                }
+            </div>
+            <hr/>
 
-      <div class="d-flex justify-content-between mt-3">
+            <div class="d-flex justify-content-between mt-3">
         <span>
           <button-box (clickedEvent)="previousState()"
                       [isDisabled]="isLoading"
                       faIcon="arrow-left"
                       translateKey="common.back"/>
-        </span>
+          </span>
 
-        <span>
-          <button-box (clickedEvent)="activateEditMode()"
-                      *ngIf="isReadOnly"
-                      [isDisabled]="isLoading"
-                      faIcon="pencil-alt"
-                      translateKey="common.edit"/>
+                <span>
+            @if (isReadOnly) {
+                <button-box (clickedEvent)="activateEditMode()"
+                            [isDisabled]="isLoading"
+                            faIcon="pencil-alt"
+                            translateKey="common.edit"/>
+            }
 
-          <button-box (clickedEvent)="activateReadOnlyMode()"
-                      *ngIf="this.editForm.controls.id.value && !isReadOnly"
-                      [isDisabled]="isLoading"
-                      faIcon="ban"
-                      translateKey="common.cancel"
-                      type="secondary"/>
+                    @if (editForm.controls.id.value && !isReadOnly) {
+                        <button-box (clickedEvent)="activateReadOnlyMode()"
+                                    [isDisabled]="isLoading"
+                                    faIcon="ban"
+                                    translateKey="common.cancel"
+                                    type="secondary"/>
+                    }
 
-          <button-box *ngIf="!isReadOnly"
-                      [isDisabled]="editForm.invalid || isLoading"
-                      [isSubmit]="true"
-                      faIcon="floppy-disk"
-                      translateKey="common.save"/>
-        </span>
-      </div>
-    </h2>
+                    @if (!isReadOnly) {
+                        <button-box [isDisabled]="editForm.invalid || isLoading"
+                                    [isSubmit]="true"
+                                    faIcon="floppy-disk"
+                                    translateKey="common.save"/>
+                    }
+          </span>
+            </div>
+        </h2>
 
-    <div>
-      <jhi-alert-error></jhi-alert-error>
+        <div>
+            <jhi-alert-error></jhi-alert-error>
 
-      <jhi-alert></jhi-alert>
+            <jhi-alert></jhi-alert>
 
-      <div class="card">
-        <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="mt-3 col-sm-12 col-lg-4">
-              <text-box [maxLength]="50" fieldName="place" formControlName="place" translateKey="salon.place"/>
+            <div class="card">
+                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mt-3 col-sm-12 col-lg-4">
+                            <text-box [maxLength]="50"
+                                      fieldName="place"
+                                      formControlName="place"
+                                      translateKey="salon.place"/>
+                        </div>
+
+                        <div class="mt-3 col-sm-4 col-lg-4">
+                            <text-box [maxLength]="10"
+                                      fieldName="referenceNumber"
+                                      formControlName="referenceNumber"
+                                      translateKey="salon.referenceNumber"/>
+                        </div>
+
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <date-box fieldName="startingDate"
+                                      formControlName="startingDate"
+                                      translateKey="salon.startingDate"/>
+                        </div>
+
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <date-box fieldName="endingDate"
+                                      formControlName="endingDate"
+                                      translateKey="salon.endingDate"/>
+                        </div>
+
+                        <div class="mt-3 col-12">
+                            <textarea-box fieldName="extraInformation"
+                                          formControlName="extraInformation"
+                                          translateKey="salon.extraInformation"/>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mt-3 col-sm-4 col-lg-4">
-              <text-box [maxLength]="10" fieldName="referenceNumber" formControlName="referenceNumber" translateKey="salon.referenceNumber"/>
+            <br/>
+
+            <div class="card">
+                <h5 class="card-header" jhiTranslate="salon.prices">Configuration des prix</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <currency-box fieldName="priceConference"
+                                          formControlName="priceConference"
+                                          translateKey="salon.priceConference"/>
+                        </div>
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <currency-box fieldName="priceWorkshop"
+                                          formControlName="priceWorkshop"
+                                          translateKey="salon.priceWorkshop"/>
+                        </div>
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <currency-box fieldName="priceSharingStand"
+                                          formControlName="priceSharingStand"
+                                          translateKey="salon.priceSharingStand"/>
+                        </div>
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <currency-box fieldName="priceMeal1"
+                                          formControlName="priceMeal1"
+                                          translateKey="salon.priceMeal1"/>
+                        </div>
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <currency-box fieldName="priceMeal2"
+                                          formControlName="priceMeal2"
+                                          translateKey="salon.priceMeal2"/>
+                        </div>
+                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
+                            <currency-box fieldName="priceMeal3"
+                                          formControlName="priceMeal3"
+                                          translateKey="salon.priceMeal3"/>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mt-3 col-sm-4 col-lg-2">
-              <date-box fieldName="startingDate" formControlName="startingDate" translateKey="salon.startingDate"/>
-            </div>
+            <br/>
 
-            <div class="mt-3 col-sm-4 col-lg-2">
-              <date-box fieldName="endingDate" formControlName="endingDate" translateKey="salon.endingDate"/>
-            </div>
+            <div class="card">
+                <h5 class="card-header" jhiTranslate="salon.dimensions-prices">Configuration des dimensions de
+                                                                               stands</h5>
+                <div class="card-body">
+                    <div class="mt-3 col-12">
+                        <div class="table-responsive table-entities"
+                             formArrayName="priceStandSalons"
+                             id="dimensions-prices">
+                            <p-table [value]="priceStandSalons.controls">
+                                <!-- HEADER -->
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>Libellé</th>
+                                        <th>Longueur (m)</th>
+                                        <th>Hauteur (m)</th>
+                                        <th>Prix</th>
+                                    </tr>
+                                </ng-template>
 
-            <div class="mt-3 col-12">
-              <textarea-box fieldName="extraInformation" formControlName="extraInformation" translateKey="salon.extraInformation"/>
+                                <!-- BODY -->
+                                <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                                    <!-- row = AbstractControl, we use the index to bind the form group -->
+                                    <tr [formGroupName]="rowIndex">
+                                        <td>
+                                            <text-box fieldName="dimension" formControlName="dimension"></text-box>
+                                        </td>
+                                        <td>
+                                            <number-box [modeDecimal]="true"
+                                                        fieldName="widthMeter"
+                                                        formControlName="widthMeter"></number-box>
+                                        </td>
+                                        <td>
+                                            <number-box [modeDecimal]="true"
+                                                        fieldName="heightMeter"
+                                                        formControlName="heightMeter"></number-box>
+                                        </td>
+                                        <td>
+                                            <currency-box fieldName="price" formControlName="price"></currency-box>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+
+                                <!-- FOOTER (add button) -->
+                                <ng-template pTemplate="footer" *ngIf="!isReadOnly">
+                                    <tr>
+                                        <td colspan="4">
+                                            <button (click)="addPriceStand()"
+                                                    class="btn btn-success btn-sm w-100"
+                                                    id="jh-create-invoice"
+                                                    type="button">
+                                                <fa-icon icon="plus"></fa-icon>
+                                                <span jhiTranslate="common.create">Create</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-
-      <br/>
-
-
-      <div class="card">
-        <h5 class="card-header" jhiTranslate="salon.prices">Configuration des prix</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="mt-3 col-sm-6 col-lg-2">
-              <number-box fieldName="priceConference" formControlName="priceConference" translateKey="salon.priceConference"/>
-            </div>
-            <div class="mt-3 col-sm-6 col-lg-2">
-              <number-box fieldName="priceSharingStand" formControlName="priceSharingStand" translateKey="salon.priceSharingStand"/>
-            </div>
-
-            <div class="mt-3 col-sm-4 col-lg-2">
-              <number-box fieldName="priceMeal1" formControlName="priceMeal1" translateKey="salon.priceMeal1"/>
-            </div>
-            <div class="mt-3 col-sm-4 col-lg-2">
-              <number-box fieldName="priceMeal2" formControlName="priceMeal2" translateKey="salon.priceMeal2"/>
-            </div>
-            <div class="mt-3 col-sm-4 col-lg-2">
-              <number-box fieldName="priceMeal3" formControlName="priceMeal3" translateKey="salon.priceMeal3"/>
-            </div>
-
-            <div class="mt-3 col-12">
-              <div class="table-responsive table-entities" formArrayName="priceStandSalons" id="prices">
-                <table aria-describedby="page-heading" class="table table-hover">
-                  <thead class="thead-primary">
-                    <tr>
-                      <th>
-                        <span>Libellé</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Longueur (m)</span>
-                      </th>
-                      <th class="text-center">
-                        <span>Hauteur (m)</span>
-                      </th>
-                      <th class="text-center" style="min-width:10em">
-                        <span>Prix</span>
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <tr *ngFor="let priceStand of editForm.controls['priceStandSalons'].controls; let i = index" [formGroupName]="i">
-                      <td>{{ priceStand.value.dimension?.dimension }}</td>
-                      <td class="text-center">{{ priceStand.value.dimension?.widthMeter }}</td>
-                      <td class="text-center">{{ priceStand.value.dimension?.heightMeter }}</td>
-                      <td class="text-center">
-                        <input [id]="'field_price' + i" class="form-control" formControlName="price" name="price" type="number"/>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
+    </form>
 </div>

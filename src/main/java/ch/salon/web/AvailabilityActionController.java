@@ -55,9 +55,9 @@ public class AvailabilityActionController {
     private final PermissionActionService permissionService;
 
     public AvailabilityActionController(EmailActionService emailService, DocumentActionService documentService,
-                                        BusinessActionService businessService, @Qualifier("actionRepositories")
-                                        Map<String, JpaRepository<?, UUID>> repositories,
-                                        PermissionActionService permissionService) {
+            BusinessActionService businessService,
+            @Qualifier("actionRepositories") Map<String, JpaRepository<?, UUID>> repositories,
+            PermissionActionService permissionService) {
         this.emailService = emailService;
         this.documentService = documentService;
         this.businessService = businessService;
@@ -68,12 +68,12 @@ public class AvailabilityActionController {
     @GetMapping("/{domain}/{id}/available")
     //@Cacheable(value = "availableActions", key = "#domain + '-' + #id + '-' + authentication.name")
     public ResponseEntity<List<ActionAvailable>> getAvailableActions(@PathVariable String domain, @PathVariable UUID id,
-                                                                     Authentication authentication) {
+            Authentication authentication) {
         Object payload = getEntity(domain, id);
 
         List<ActionAvailable> actions = new ArrayList<>();
         Stream.of(emailService.getHandlers().entrySet(), documentService.getHandlers().entrySet(),
-                  businessService.getHandlers().entrySet()).flatMap(Set::stream).forEach(entry -> {
+                businessService.getHandlers().entrySet()).flatMap(Set::stream).forEach(entry -> {
 
             ContextActionType.fromCode(entry.getKey()).ifPresent(context -> {
                 if (context.repositoryName().equals(domain)) {
@@ -83,9 +83,9 @@ public class AvailabilityActionController {
                     SupportType supportType = type.supports(handler, payload, new HashMap<>());
 
                     if (supportType != SupportType.REJECTED &&
-                        permissionService.isAllowed(context.code(), payload, authentication)) {
+                            permissionService.isAllowed(context.code(), payload, authentication)) {
                         actions.add(new ActionAvailable(context.code(), type, supportType == SupportType.DISABLED,
-                                                        "action." + context.code()));
+                                "action." + context.code()));
                     }
                 }
             });
@@ -97,14 +97,13 @@ public class AvailabilityActionController {
     @PostMapping("/email/{context}/{id}")
     @Transactional
     public ResponseEntity<Void> handleEmail(@PathVariable String context, @PathVariable UUID id,
-                                            @RequestBody Map<String, Object> payload,
-                                            Authentication authentication) throws Exception {
+            @RequestBody Map<String, Object> payload, Authentication authentication) throws Exception {
 
         var handler = (EmailActionHandler<Object>) emailService.getHandlers().get(context);
         Object entity = getEntityFromContext(context, id);
 
         if (handler.supports(entity, payload) == SupportType.ALLOWED &&
-            permissionService.isAllowed(context, entity, authentication)) {
+                permissionService.isAllowed(context, entity, authentication)) {
             handler.handle(entity, payload);
             return ResponseEntity.ok().build();
         } else {
@@ -115,7 +114,7 @@ public class AvailabilityActionController {
     @GetMapping("/email/{context}/{id}/template")
     @Transactional(readOnly = true)
     public ResponseEntity<EmailMessage> getEmailTemplate(@PathVariable String context, @PathVariable UUID id,
-                                                         Locale locale) {
+            Locale locale) {
 
         var handler = (EmailActionHandler<Object>) emailService.getHandlers().get(context);
         Object payload = getEntityFromContext(context, id);
@@ -126,13 +125,12 @@ public class AvailabilityActionController {
     @PostMapping("/business/{context}/{id}")
     @Transactional
     public ResponseEntity<Void> executeBusiness(@PathVariable String context, @PathVariable UUID id,
-                                                @RequestBody Map<String, Object> payload,
-                                                Authentication authentication) {
+            @RequestBody Map<String, Object> payload, Authentication authentication) {
         var handler = (BusinessActionHandler<Object>) businessService.getHandlers().get(context);
         Object entity = getEntityFromContext(context, id);
 
         if (handler.supports(entity, payload) == SupportType.ALLOWED &&
-            permissionService.isAllowed(context, entity, authentication)) {
+                permissionService.isAllowed(context, entity, authentication)) {
             handler.execute(entity, payload);
             return ResponseEntity.ok().build();
         } else {
@@ -143,13 +141,12 @@ public class AvailabilityActionController {
     @GetMapping("/download/{context}/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<InputStreamSource> download(@PathVariable String context, @PathVariable UUID id,
-                                                      @RequestParam Map<String, Object> payload,
-                                                      Authentication authentication) throws IOException {
+            @RequestParam Map<String, Object> payload, Authentication authentication) throws IOException {
         var handler = (DocumentActionHandler<Object>) documentService.getHandlers().get(context);
         Object entity = getEntityFromContext(context, id);
 
         if (handler.supports(entity, payload) == SupportType.ALLOWED &&
-            permissionService.isAllowed(context, entity, authentication)) {
+                permissionService.isAllowed(context, entity, authentication)) {
             InputStreamSource file = handler.download(entity, new HashMap<>(payload));
             String fileName = handler.getFilename(entity, new HashMap<>(payload));
 
@@ -174,8 +171,7 @@ public class AvailabilityActionController {
     }
 
     private Object getEntityFromContext(String contextCode, UUID id) {
-        return ContextActionType.fromCode(contextCode)
-                                .map(ctx -> getEntity(ctx.repositoryName(), id))
+        return ContextActionType.fromCode(contextCode).map(ctx -> getEntity(ctx.repositoryName(), id))
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
     }
 }

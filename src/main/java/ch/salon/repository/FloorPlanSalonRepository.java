@@ -10,5 +10,5 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 @Repository
 public interface FloorPlanSalonRepository extends JpaRepository<FloorPlanSalon, UUID> {
-    List<FloorPlanSalon> findBySalonId(UUID salonId);
+    List<FloorPlanSalon> findBySalonIdOrderByPosition(UUID salonId);
 }

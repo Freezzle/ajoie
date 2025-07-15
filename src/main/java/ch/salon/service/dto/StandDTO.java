@@ -36,7 +36,7 @@ public class StandDTO implements Serializable {
 
     private ParticipationLightDTO participation;
 
-    private DimensionStandLightDTO dimension;
+    private PriceStandLightDTO dimension;
 
     public StandDTO() {
     }
@@ -153,11 +153,11 @@ public class StandDTO implements Serializable {
         this.participation = participation;
     }
 
-    public DimensionStandLightDTO getDimension() {
+    public PriceStandLightDTO getDimension() {
         return dimension;
     }
 
-    public void setDimension(DimensionStandLightDTO dimension) {
+    public void setDimension(PriceStandLightDTO dimension) {
         this.dimension = dimension;
     }
 }

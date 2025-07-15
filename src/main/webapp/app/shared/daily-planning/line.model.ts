@@ -1,7 +1,7 @@
-import { Square } from './square.model';
+import {Square} from './square.model';
 
 export interface Line {
-  idLine: string;
-  label: string;
-  squares: Square[];
+    idLine: string;
+    label: string;
+    squares: Square[];
 }

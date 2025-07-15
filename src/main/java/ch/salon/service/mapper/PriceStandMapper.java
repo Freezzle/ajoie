@@ -5,11 +5,9 @@ import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.PriceStandLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {DimensionStandMapper.class},
-        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper
 public interface PriceStandMapper {
     PriceStandMapper INSTANCE = Mappers.getMapper(PriceStandMapper.class);
 
@@ -19,9 +17,9 @@ public interface PriceStandMapper {
 
     PriceStandLightDTO toLightDto(PriceStandSalon priceStandSalon);
 
-    @Mapping(target = "dimension",
-             ignore = true)
-    @Mapping(target = "price",
-             ignore = true)
+    @Mapping(target = "dimension", ignore = true)
+    @Mapping(target = "price", ignore = true)
+    @Mapping(target = "widthMeter", ignore = true)
+    @Mapping(target = "heightMeter", ignore = true)
     PriceStandSalon toLightEntity(PriceStandLightDTO priceStandSalon);
 }

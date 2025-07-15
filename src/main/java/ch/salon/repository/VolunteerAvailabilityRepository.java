@@ -11,5 +11,5 @@ import java.util.UUID;
 @Repository
 public interface VolunteerAvailabilityRepository extends JpaRepository<VolunteerAvailability, Long> {
     List<VolunteerAvailability> findByVolunteerIdAndTimeSlot_DateAndTimeSlot_Salon_Id(UUID volunteerId, LocalDate date,
-                                                                                      UUID salonId);
+            UUID salonId);
 }
