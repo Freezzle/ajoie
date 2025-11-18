@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "app_id": "app_82accd07-7176-4f96-8643-46ebbbf3fa54",
+      "org_id": "user_d6340bde-d1d1-43a0-b853-cd673f3d81cd",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_82accd07-7176-4f96-8643-46ebbbf3fa54.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_82accd07-7176-4f96-8643-46ebbbf3fa54.git",
+      "name": "ajoie",
+      "alias": "ajoie"
+    }
+  ]
+}

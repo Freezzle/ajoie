@@ -63,7 +63,7 @@
             <column name="salon_id" type="${uuidType}">
                 <constraints nullable="true"/>
             </column>
-            <column name="therapist_nam" type="varchar(250)">
+            <column name="therapist_name" type="varchar(250)">
                 <constraints nullable="false"/>
             </column>
 
@@ -83,4 +83,5 @@
             </column>
         </addColumn>
     </changeSet>
+
 </databaseChangeLog>
