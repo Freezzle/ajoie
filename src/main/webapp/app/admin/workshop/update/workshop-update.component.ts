@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, ParamMap} from '@angular/router';
 import {combineLatest, of} from 'rxjs';
 import {catchError, finalize, map} from 'rxjs/operators';
 
@@ -10,7 +10,11 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {WorkshopService} from '../service/workshop.service';
 import {IWorkshop} from '../model/workshop.interface';
 import {WorkshopFormGroup, WorkshopFormService} from '../service/workshop-form.service';
-import {getFormattedParticipationName, IParticipation} from '../../participation/model/participation.interface';
+import {
+    getFormattedParticipationName,
+    IParticipation,
+    selectFilterParticipation
+} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
 import {compareStatus, formatterStatus, Status} from '../../enumerations/status.model';
 import {ErrorModel} from '../../../shared/field-error/error.model';
@@ -21,6 +25,7 @@ import {SelectBoxComponent} from '../../../shared/components/select-box/select-b
 import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.component";
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
+import {selectFilterDimension} from "../../salon/model/price-stand-salon.interface";
 
 @Component({
     selector: 'jhi-workshop-update',
@@ -39,7 +44,7 @@ export class WorkshopUpdateComponent implements OnInit {
 
     initialWorkshop: IWorkshop | null = null;
     statusValues = Object.keys(Status);
-    params: any;
+    params!: ParamMap;
     participationsOptions: IParticipation[] = [];
     editForm: FormGroup<WorkshopFormGroup> = this.workshopFormService.createWorkshopFormGroup(null);
 
@@ -127,4 +132,6 @@ export class WorkshopUpdateComponent implements OnInit {
     protected readonly getFormattedParticipationName = getFormattedParticipationName;
     protected readonly formatterParticipation = formatterParticipation;
     protected readonly formatterStatus = formatterStatus;
+    protected readonly selectFilterDimension = selectFilterDimension;
+    protected readonly selectFilterParticipation = selectFilterParticipation;
 }

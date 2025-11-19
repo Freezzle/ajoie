@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, ParamMap} from '@angular/router';
 import {combineLatest, forkJoin, of} from 'rxjs';
 import {catchError, finalize, map} from 'rxjs/operators';
 
@@ -10,7 +10,11 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {StandService} from '../service/stand.service';
 import {IStand} from '../model/stand.interface';
 import {StandFormGroup, StandFormService} from '../service/stand-form.service';
-import {getFormattedParticipationName, IParticipation} from '../../participation/model/participation.interface';
+import {
+    getFormattedParticipationName,
+    IParticipation,
+    selectFilterParticipation
+} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
 import {formatterStatus, Status} from '../../enumerations/status.model';
 import {ErrorModel} from '../../../shared/field-error/error.model';
@@ -25,12 +29,13 @@ import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.com
 import {SalonService} from "../../salon/service/salon.service";
 import {
     formatterDimensionStand,
-    IPriceStandSalon,
+    IPriceStandSalon, selectFilterDimension,
     sortPriceStandSalon
 } from "../../salon/model/price-stand-salon.interface";
 import {AlertComponent} from "../../../shared/alert/alert.component";
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {formatterExhibitor} from "../../exhibitor/service/exhibitor.service";
+import {selectFilterExhibitor} from "../../exhibitor/model/exhibitor.interface";
 
 @Component({
     selector: 'jhi-stand-update',
@@ -63,7 +68,7 @@ export class StandUpdateComponent implements OnInit {
     initialStand: IStand | null = null;
     statusValues = Object.keys(Status);
     categoryValues = Object.keys(Category);
-    params: any;
+    params!: ParamMap;
     participationsOptions: IParticipation[] = [];
     dimensionsOptions: IPriceStandSalon[] = [];
     editForm: FormGroup<StandFormGroup> = this.standFormService.createStandFormGroup(null);
@@ -159,4 +164,7 @@ export class StandUpdateComponent implements OnInit {
     protected readonly formatterDimensionStand = formatterDimensionStand;
     protected readonly formatterStatus = formatterStatus;
     protected readonly formatterCategory = formatterCategory;
+    protected readonly selectFilterExhibitor = selectFilterExhibitor;
+    protected readonly selectFilterDimension = selectFilterDimension;
+    protected readonly selectFilterParticipation = selectFilterParticipation;
 }

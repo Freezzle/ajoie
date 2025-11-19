@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, RouterModule} from '@angular/router';
-import {combineLatest, filter, Observable, of, switchMap, tap} from 'rxjs';
+import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
+import {combineLatest, filter, switchMap, tap} from 'rxjs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
@@ -24,6 +24,7 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
 import {PaginationComponent} from '../../../shared/pagination/pagination.component';
 import {PaginationEvent} from '../../../shared/pagination/pagination-event.interface';
+import {ProgressSpinner} from "primeng/progressspinner";
 
 @Component({
     selector: 'jhi-participation',
@@ -39,22 +40,23 @@ import {PaginationEvent} from '../../../shared/pagination/pagination-event.inter
         ButtonBoxComponent,
         LinkBoxComponent,
         PaginationComponent,
+        ProgressSpinner,
     ]
 })
 export class ParticipationComponent implements OnInit {
-    protected participationFormService = inject(ParticipationFormService);
-    protected participationService = inject(ParticipationService);
-    protected activatedRoute = inject(ActivatedRoute);
-    protected modalService = inject(NgbModal);
+    private readonly participationFormService = inject(ParticipationFormService);
+    private readonly participationService = inject(ParticipationService);
+    private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly modalService = inject(NgbModal);
 
     participations: IParticipation[] = [];
     participationsPaginated: IParticipation[] = [];
     isLoading = false;
     statusValues = Object.keys(Status);
-    params: any;
+    params!: ParamMap;
     filters: FormGroup<ParticipationFilterFormGroup> =
         this.participationFormService.createFilterFormGroup();
-    private infoInvoices: { [key: string]: Observable<IInfoInvoice> } = {};
+    infoInvoicesMap: { [id: string]: IInfoInvoice } = {};
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -63,6 +65,9 @@ export class ParticipationComponent implements OnInit {
 
                 if (!this.participations || this.participations.length === 0) {
                     this.actionFilter();
+                    this.participationService.getInfosInvoiceForSalon(this.params.get('idSalon')!).subscribe(infoInvoicesMap => {
+                        this.infoInvoicesMap = infoInvoicesMap || {};
+                    });
                 }
             },
         );
@@ -93,48 +98,34 @@ export class ParticipationComponent implements OnInit {
 
     load(): void {
         this.isLoading = true;
+        const idSalon = this.params.get('idSalon')!;
 
         this.participationService
-            .query(this.params.get('idSalon'))
-            .pipe(finalize(() => (this.isLoading = false)))
-            .subscribe((result) => {
+            .query(idSalon)
+            .pipe(finalize(() => (this.isLoading = false)),)
+            .subscribe(result => {
                 this.participations = result.body ?? [];
 
-                this.loadInfoInvoice();
-
+                // filtres sur fullName/status AVANT l’appel bulk, si tu veux limiter
                 const fullNameFilter = this.filters.get('fullName')?.value;
                 if (fullNameFilter && fullNameFilter.length > 0) {
-                    this.participations = this.participations?.filter((participation) =>
+                    this.participations = this.participations?.filter(participation =>
                         containsParticipationName(participation, fullNameFilter),
                     );
                 }
 
                 const statusFilter = this.filters.get('status')?.value;
                 if (statusFilter && statusFilter.length > 0) {
-                    this.participations = this.participations?.filter((participation) =>
+                    this.participations = this.participations?.filter(participation =>
                         participation.status?.includes(statusFilter),
                     );
                 }
-
                 this.refreshParticipations({page: 1, pageSize: 10});
             });
     }
 
-    loadInfoInvoice(): void {
-        this.participations?.forEach((participation) => {
-            this.participationService
-                .getInfoInvoice(participation.id)
-                .pipe(
-                    tap((infoInvoice) => {
-                        this.infoInvoices[participation.id] = of(infoInvoice);
-                    }),
-                )
-                .subscribe();
-        });
-    }
-
-    getInfoInvoice(idParticipation: string): Observable<IInfoInvoice> {
-        return this.infoInvoices[idParticipation] ? this.infoInvoices[idParticipation] : of();
+    getInfoInvoice(idParticipation: string): IInfoInvoice {
+        return this.infoInvoicesMap[idParticipation];
     }
 
     refresh(): void {

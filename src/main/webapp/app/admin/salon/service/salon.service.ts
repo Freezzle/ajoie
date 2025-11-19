@@ -11,6 +11,7 @@ import {isPresent} from '../../../core/util/operators';
 import {Status} from '../../enumerations/status.model';
 import {ISalonStats} from '../model/salon-stats.interface';
 import {IPriceStandSalon} from "../model/price-stand-salon.interface";
+import {IParticipation} from "../../participation/model/participation.interface";
 
 @Injectable({providedIn: 'root'})
 export class SalonService {
@@ -53,10 +54,10 @@ export class SalonService {
             .pipe(map(res => this.convertResponseArrayFromServer(res)));
     }
 
-    generate(idSalon: string, selectedFile: File): Observable<any> {
+    generate(idSalon: string, selectedFile: File): Observable<IParticipation[]> {
         const formData = new FormData();
         formData.append('file', selectedFile);
-        return this.http.post<any>(`${this.resourceUrl}/${idSalon}/import-inscriptions`, formData, {observe: 'response'});
+        return this.http.post<IParticipation[]>(`${this.resourceUrl}/${idSalon}/import-inscriptions`, formData);
     }
 
     delete(idSalon: string): Observable<HttpResponse<{}>> {

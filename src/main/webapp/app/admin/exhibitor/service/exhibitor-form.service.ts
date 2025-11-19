@@ -36,38 +36,43 @@ export class ExhibitorFormService {
     }
 
     createExhibitorFormGroup(exhibitor: IExhibitor | null): ExhibitorFormGroup {
+        const raw: IExhibitor = {
+            ...this.getDefaultExhibitorFormValue() as IExhibitor,
+            ...(exhibitor ?? {}),
+        };
+
         return new FormGroup<ExhibitorFormGroupContent>({
             id: new FormControl(
-                {value: exhibitor?.id ?? null, disabled: true}
+                {value: raw.id, disabled: true}
             ),
-            fullName: new FormControl(exhibitor?.fullName ?? null, {
+            fullName: new FormControl(raw.fullName, {
                 validators: [Validators.required]
             }),
-            email: new FormControl(exhibitor?.email ?? null, {
+            email: new FormControl(raw.email, {
                 validators: [Validators.required, Validators.email]
             }),
-            phoneNumber: new FormControl(exhibitor?.phoneNumber ?? null, {
+            phoneNumber: new FormControl(raw.phoneNumber, {
                 validators: [this.phoneValidator()]
             }),
-            address: new FormControl(exhibitor?.address ?? null),
-            npaLocalite: new FormControl(exhibitor?.npaLocalite ?? null),
-            extraInformation: new FormControl(exhibitor?.extraInformation ?? null),
-            language: new FormControl(exhibitor?.language ?? 'fr', {
+            address: new FormControl(raw.address),
+            npaLocalite: new FormControl(raw.npaLocalite),
+            extraInformation: new FormControl(raw.extraInformation),
+            language: new FormControl(raw.language, {
                 validators: [Validators.required]
             }),
             differentBillingAddress: new FormControl(
-                exhibitor?.differentBillingAddress ?? false, {
+                raw.differentBillingAddress, {
                     validators: [Validators.required]
                 }
             ),
-            billingAddress: new FormControl(exhibitor?.billingAddress ?? null),
-            newsletter: new FormControl(exhibitor?.newsletter ?? true, {
+            billingAddress: new FormControl(raw.billingAddress),
+            newsletter: new FormControl(raw.newsletter, {
                 validators: [Validators.required]
             }),
-            redFlag: new FormControl(exhibitor?.redFlag ?? false, {
+            redFlag: new FormControl(raw.redFlag, {
                 validators: [Validators.required]
             }),
-            duplicateDetected: new FormControl(exhibitor?.duplicateDetected ?? false, {
+            duplicateDetected: new FormControl(raw.duplicateDetected, {
                 validators: [Validators.required]
             }),
         });
@@ -95,5 +100,17 @@ export class ExhibitorFormService {
 
     getExhibitor(form: ExhibitorFormGroup): IExhibitor {
         return form.getRawValue() as IExhibitor;
+    }
+
+    private getDefaultExhibitorFormValue(): Pick<IExhibitor,
+        'language' | 'differentBillingAddress' | 'newsletter'
+        | 'redFlag' | 'duplicateDetected'> {
+        return {
+            language: 'fr',
+            differentBillingAddress: false,
+            newsletter: true,
+            redFlag: false,
+            duplicateDetected: false
+        };
     }
 }

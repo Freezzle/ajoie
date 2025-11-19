@@ -10,12 +10,12 @@
             <hr/>
 
             <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button-box (clickedEvent)="previousState()"
-                      [isDisabled]="isLoading"
-                      faIcon="arrow-left"
-                      translateKey="common.back"/>
-          </span>
+                <span>
+                    <button-box (clickedEvent)="previousState()"
+                                [isDisabled]="isLoading"
+                                faIcon="arrow-left"
+                                translateKey="common.back"/>
+                </span>
             </div>
         </h2>
 
@@ -110,17 +110,23 @@
                                         <div class="col">
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-7 text-left">
-                                                    <div>
-                                                        <u><span jhiTranslate="invoicingPlan.title"
-                                                                 [translateValues]="{ billingNumber: invoicingPlan.billingNumber }"></span>
-                                                        </u>
-                                                        <span class="badge"
-                                                              [class.bg-light]="isInvoicingPlanPaid(invoicingPlan)"
-                                                              [class.bg-success]="isIssuedState(invoicingPlan)"
-                                                              [class.bg-danger]="isInvoicingPlanCancelled(invoicingPlan)"
-                                                              [class.bg-warning]="isDraftState(invoicingPlan)">{{ 'invoicingPlan.state.' + invoicingPlan.state | translate | uppercase }}</span>
+                                                    <div class="mb-1">
+                                                        <h5><span class="badge"
+                                                                  [title]="isDraftState(invoicingPlan) ? 'Généré le ' + (invoicingPlan.generationDate | formatMediumDate) :
+                                                            'Envoyé le ' + (invoicingPlan.issuedDate | formatMediumDate)"
+                                                                  [class.bg-light]="isInvoicingPlanPaid(invoicingPlan)"
+                                                                  [class.bg-success]="isIssuedState(invoicingPlan)"
+                                                                  [class.bg-danger]="isInvoicingPlanCancelled(invoicingPlan)"
+                                                                  [class.bg-warning]="isDraftState(invoicingPlan) || isIssuingState(invoicingPlan)">{{ 'invoicingPlan.state.' + invoicingPlan.state | translate | uppercase }}
+                                                        </span></h5>
                                                     </div>
-                                                    <div>
+                                                    <div class="ms-1">
+                                                        <u>
+                                                            <span jhiTranslate="invoicingPlan.title"
+                                                                  [translateValues]="{ billingNumber: invoicingPlan.billingNumber }"></span>
+                                                        </u>
+                                                    </div>
+                                                    <div class="ms-1">
                                                         <small>
                                                             Solde restant
                                                             : {{ remainingTotal(invoicingPlan) | currency: 'CHF' }}
@@ -133,7 +139,7 @@
                                                             </small>
                                                         }
                                                     </div>
-                                                    <div class="col-6 align-content-center">
+                                                    <div class="col-6 align-content-center ms-1">
                                                         @if (invoicingPlan.needArrangement) {
                                                             <fa-icon icon="handshake-simple"
                                                                      class="warning-icon"
@@ -168,17 +174,6 @@
                                                                      [title]="'Date d\'expiration ' + (invoicingPlan.expirationDate | formatMediumDate)"></fa-icon>
                                                         }
                                                     </div>
-                                                </div>
-                                                <div class="col-5 pe-5 text-end">
-                                                    @if (isDraftState(invoicingPlan)) {
-                                                        <div>Généré le
-                                                            <u>{{ invoicingPlan.generationDate | formatMediumDate }}</u>
-                                                        </div>
-                                                    } @else {
-                                                        <div>Envoyé le
-                                                            <u>{{ invoicingPlan.issuedDate | formatMediumDate }}</u>
-                                                        </div>
-                                                    }
                                                 </div>
                                             </div>
                                         </div>
@@ -282,22 +277,27 @@
                                                             <span>&nbsp;</span>
                                                         </th>
                                                         <th>
-                                                            <span jhiTranslate="invoicingPlan.header.label">Libellé</span>
+                                                            <span jhiTranslate="invoicingPlan.header.label">Libellé
+                                                            </span>
                                                         </th>
                                                         <th class="text-center">
                                                             <span>&nbsp;</span>
                                                         </th>
                                                         <th class="text-center">
-                                                            <span jhiTranslate="invoicingPlan.header.amount">Montant</span>
+                                                            <span jhiTranslate="invoicingPlan.header.amount">Montant
+                                                            </span>
                                                         </th>
                                                         <th class="text-center">
-                                                            <span jhiTranslate="invoicingPlan.header.qty">Quantité</span>
+                                                            <span jhiTranslate="invoicingPlan.header.qty">Quantité
+                                                            </span>
                                                         </th>
                                                         <th class="text-center">
                                                             <span jhiTranslate="invoicingPlan.header.sum">Total</span>
                                                         </th>
                                                         <th>
-                                                            <span jhiTranslate="invoicingPlan.header.comment">Commentaire</span>
+                                                            <span jhiTranslate="invoicingPlan.header.comment">
+                                                                Commentaire
+                                                            </span>
                                                         </th>
                                                         <th>
                                                             <span>&nbsp;</span>
@@ -318,7 +318,8 @@
                                                                                 class="btn btn-success btn-sm"
                                                                                 (click)="addInvoice(invoicingPlan)">
                                                                             <fa-icon icon="plus"></fa-icon>
-                                                                            <span jhiTranslate="common.create">Create</span>
+                                                                            <span jhiTranslate="common.create">Create
+                                                                            </span>
                                                                         </button>
                                                                     }
                                                                 </td>
@@ -327,7 +328,9 @@
                                                                 <tr>
                                                                     <td>&nbsp;</td>
                                                                     <td colspan="9">
-                                                                        <span jhiTranslate="invoicingPlan.invoices.notFound">Aucune facture</span>
+                                                                        <span jhiTranslate="invoicingPlan.invoices.notFound">
+                                                                            Aucune facture
+                                                                        </span>
                                                                     </td>
                                                                 </tr>
                                                             } @else if (invoices.length) {
@@ -426,7 +429,9 @@
                                                                                     class="btn btn-success btn-sm"
                                                                                     (click)="addPayment(invoicingPlan)">
                                                                                 <fa-icon icon="plus"></fa-icon>
-                                                                                <span jhiTranslate="common.create">Create</span>
+                                                                                <span jhiTranslate="common.create">
+                                                                                    Create
+                                                                                </span>
                                                                             </button>
                                                                         }
                                                                     </td>
@@ -435,7 +440,9 @@
                                                                     <tr>
                                                                         <td>&nbsp;</td>
                                                                         <td colspan="9">
-                                                                            <span jhiTranslate="invoicingPlan.payments.notFound">Aucun paiement</span>
+                                                                            <span jhiTranslate="invoicingPlan.payments.notFound">
+                                                                                Aucun paiement
+                                                                            </span>
                                                                         </td>
                                                                     </tr>
                                                                 }
@@ -486,12 +493,12 @@
                                                                             <td class="text-end">
                                                                                 @if (showPaymentActions(invoicingPlan)) {
                                                                                     <span>
-                                                                    @if (payment.readMode) {
-                                                                        <button-box (clickedEvent)="editPayment(payment)"
-                                                                                    [showText]="false"
-                                                                                    translateKey="common.edit"
-                                                                                    faIcon="pencil-alt"/>
-                                                                    }
+                                                                                        @if (payment.readMode) {
+                                                                                            <button-box (clickedEvent)="editPayment(payment)"
+                                                                                                        [showText]="false"
+                                                                                                        translateKey="common.edit"
+                                                                                                        faIcon="pencil-alt"/>
+                                                                                        }
                                                                                         @if (!payment.readMode) {
                                                                                             <button-box (clickedEvent)="updatePayment(invoicingPlan, payment)"
                                                                                                         [showText]="false"
@@ -505,7 +512,7 @@
                                                                                                         translateKey="common.delete"
                                                                                                         faIcon="times"/>
                                                                                         }
-                                                                  </span>
+                                                                                    </span>
                                                                                 }
                                                                             </td>
                                                                         </tr>

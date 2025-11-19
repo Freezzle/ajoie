@@ -17,6 +17,7 @@ import {PaginationComponent} from '../../../shared/pagination/pagination.compone
 import {PaginationEvent} from '../../../shared/pagination/pagination-event.interface';
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
+import {ProgressSpinner} from "primeng/progressspinner";
 
 @Component({
     selector: 'jhi-salon',
@@ -31,6 +32,7 @@ import {AlertComponent} from "../../../shared/alert/alert.component";
         PaginationComponent,
         AlertErrorComponent,
         AlertComponent,
+        ProgressSpinner,
     ]
 })
 export class SalonComponent implements OnInit {

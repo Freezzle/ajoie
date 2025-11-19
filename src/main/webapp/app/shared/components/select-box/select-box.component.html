@@ -1,10 +1,11 @@
 <p-iftalabel>
-    <p-select
-            [options]="options"
+    <p-select [options]="options"
               [formControl]="control"
               [inputId]="'field_' + fieldName"
               [invalid]="control.invalid && control.touched"
               [dataKey]="dataKeyToUse"
+              [filter]="enableFilter"
+              [filterBy]="filterByToUse"
               [showClear]="!control.hasValidator(Validators.required)"
               fluid>
         <!-- Affichage dans la liste -->

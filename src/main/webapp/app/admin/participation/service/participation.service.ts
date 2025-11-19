@@ -53,8 +53,9 @@ export class ParticipationService {
         return this.http.delete(`${this.resourceUrl}/${idParticipation}`, {observe: 'response'});
     }
 
-    getInfoInvoice(idParticipation: string): Observable<IInfoInvoice> {
-        return this.http.get<IInfoInvoice>(`${this.resourceUrl}/${idParticipation}/info-invoice`);
+    getInfosInvoiceForSalon(idSalon: string): Observable<{ [id: string]: IInfoInvoice }> {
+        return this.http.get<{ [id: string]: IInfoInvoice }>(`${this.salonResourceUrl}/${idSalon}/participations/info-invoices`
+        );
     }
 
     getInvoicingPlans(idParticipation: string): Observable<HttpResponse<IInvoicingPlan[]>> {

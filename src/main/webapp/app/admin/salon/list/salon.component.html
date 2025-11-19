@@ -20,7 +20,8 @@
                     [isDisabled]="isLoading"
                     translateKey="common.refresh"/>
 
-        <link-box [links]="['./new']" type="success"
+        <link-box [links]="['./new']"
+                  type="success"
                   translateKey="common.create"
                   faIcon="plus"
                   [isDisabled]="isLoading"/>
@@ -52,34 +53,52 @@
             </tr>
             </thead>
             <tbody>
-            @if (salons.length === 0) {
-                <tr>
-                    <td colspan="5">
-                        <span jhiTranslate="salon.notFound">Aucun salon</span>
-                    </td>
-                </tr>
-            } @else {
-                @for (salon of salons; track $index) {
+                @if (isLoading) {
                     <tr>
-                        <td class="go-detail" [routerLink]="['./', salon.id, 'participations']">{{ salon.referenceNumber }}</td>
-                        <td class="go-detail" [routerLink]="['./', salon.id, 'participations']">{{ salon.place }}</td>
-                        <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
-                                salon.startingDate | formatMediumDate
-                            }}
-                        </td>
-                        <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
-                                salon.endingDate | formatMediumDate
-                            }}
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group">
-                                <button-box (clickedEvent)="delete(salon)" type="danger"
-                                            [showText]="false" translateKey="common.delete" faIcon="times"/>
-                            </div>
+                        <td colspan="8" class="text-center">
+                            <p-progress-spinner strokeWidth="5"
+                                                fill="transparent"
+                                                animationDuration="1s"
+                                                [style]="{ width: '50px', height: '50px' }"/>
                         </td>
                     </tr>
+                } @else {
+                    @if (salons.length === 0) {
+                        <tr>
+                            <td colspan="5">
+                                <span jhiTranslate="salon.notFound">Aucun salon</span>
+                            </td>
+                        </tr>
+                    } @else {
+                        @for (salon of salons; track $index) {
+                            <tr>
+                                <td class="go-detail"
+                                    [routerLink]="['./', salon.id, 'participations']">{{ salon.referenceNumber }}
+                                </td>
+                                <td class="go-detail"
+                                    [routerLink]="['./', salon.id, 'participations']">{{ salon.place }}
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
+                                        salon.startingDate | formatMediumDate
+                                    }}
+                                </td>
+                                <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
+                                        salon.endingDate | formatMediumDate
+                                    }}
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button-box (clickedEvent)="delete(salon)"
+                                                    type="danger"
+                                                    [showText]="false"
+                                                    translateKey="common.delete"
+                                                    faIcon="times"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
                 }
-            }
             </tbody>
         </table>
     </div>

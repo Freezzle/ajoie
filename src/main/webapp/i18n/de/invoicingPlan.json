@@ -13,8 +13,9 @@
       "qty": "Quantité",
       "sum": "Total"
     },
+    "invoicings": "Les factures",
     "invoices": {
-      "label": "Factures",
+      "label": "Lignes de la facture",
       "notFound": "Aucune facture"
     },
     "needArrangement": {
@@ -36,6 +37,7 @@
       "CANCELLED": "Annulée",
       "DRAFT": "Brouillon",
       "ISOLATED": "Brouillon isolée",
+      "IS_ISSUING": "En cours d'envoi",
       "ISSUED": "Envoyée",
       "PAID": "Payée"
     },

@@ -20,6 +20,9 @@ public interface StandRepository extends JpaRepository<Stand, UUID> {
     List<Stand> findByParticipationIdOrderByRegistrationDateDesc(UUID participationId);
 
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress", "dimension"})
+    List<Stand> findByParticipationIdAndStatusInOrderByRegistrationDateDesc(UUID participationId, Status... statuses);
+
+    @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress", "dimension"})
     List<Stand> findByStatusInAndParticipation_SalonId(List<Status> statuses, UUID participationId);
 
     boolean existsStandByParticipationIdAndStatusIn(UUID participationId, Status... statuses);

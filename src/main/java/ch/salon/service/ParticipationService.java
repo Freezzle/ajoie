@@ -21,8 +21,10 @@ import ch.salon.service.mapper.ParticipationMapper;
 import ch.salon.web.rest.dto.InfoInvoice;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,29 +87,42 @@ public class ParticipationService {
         return idParticipation;
     }
 
-    public InfoInvoice getInfoInvoice(UUID id) {
-        if (id == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    @Transactional(readOnly = true)
+    public Map<UUID, InfoInvoice> getInfoInvoicesForSalon(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid salon id", ENTITY_NAME, "idnull");
         }
 
-        List<InvoicingPlan> invoicings = this.invoicingPlanRepository.findByParticipationIdOrderByBillingNumberDesc(id);
+        List<InvoicingPlan> invoicings = this.invoicingPlanRepository.findByParticipation_Salon_Id(idSalon);
 
-        if (!invoicings.isEmpty()) {
-            InfoInvoice infoInvoice = new InfoInvoice();
-            infoInvoice.setHasDraftInvoices(invoicings.stream().anyMatch(
-                    invoicingPlan -> invoicingPlan.getState() == State.DRAFT ||
-                            invoicingPlan.getState() == State.ISOLATED));
-            infoInvoice.setHasWaitingInvoices(
-                    invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.ISSUED));
-            infoInvoice.setHasExpiredInvoices(invoicings.stream().anyMatch(
-                    invoicingPlan -> invoicingPlan.getState() == State.ISSUED &&
-                            invoicingPlan.getExpirationDate() != null &&
-                            Instant.now().isAfter(invoicingPlan.getExpirationDate())));
+        Map<UUID, List<InvoicingPlan>> byParticipation =
+                invoicings.stream().collect(Collectors.groupingBy(ip -> ip.getParticipation().getId()));
 
-            return infoInvoice;
+        Map<UUID, InfoInvoice> result = new HashMap<>();
+
+        byParticipation.forEach((participationId, plans) -> result.put(participationId, buildInfoInvoice(plans)));
+
+        return result;
+    }
+
+    // --- PRIVATE helper pour éviter la duplication de logique ---
+    private InfoInvoice buildInfoInvoice(List<InvoicingPlan> invoicings) {
+        if (invoicings == null || invoicings.isEmpty()) {
+            return new InfoInvoice(); // tout false
         }
 
-        return new InfoInvoice();
+        InfoInvoice infoInvoice = new InfoInvoice();
+        infoInvoice.setHasDraftInvoices(invoicings.stream().anyMatch(
+                invoicingPlan -> invoicingPlan.getState() == State.DRAFT ||
+                        invoicingPlan.getState() == State.ISOLATED));
+        infoInvoice.setHasWaitingInvoices(
+                invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.ISSUED));
+        infoInvoice.setHasExpiredInvoices(invoicings.stream().anyMatch(
+                invoicingPlan -> invoicingPlan.getState() == State.ISSUED &&
+                        invoicingPlan.getExpirationDate() != null &&
+                        Instant.now().isAfter(invoicingPlan.getExpirationDate())));
+
+        return infoInvoice;
     }
 
     public Participation update(final UUID id, Participation participation) {

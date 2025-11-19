@@ -15,10 +15,18 @@ import {PrimeTemplate} from "primeng/api";
 export class SelectBoxComponent implements ControlValueAccessor {
     @Input()
     translateKey: string | undefined;
+
     @Input()
     fieldName: string = '';
+
     @Input()
     options: any[] = [];
+
+    @Input()
+    enableFilter: boolean = false;
+
+    @Input()
+    filterFields: string | undefined;
 
     @Input()
     formatterFunction: (a: any) => string = (a: any) => {
@@ -70,13 +78,34 @@ export class SelectBoxComponent implements ControlValueAccessor {
         return this.formatterFunction(object);
     }
 
+    /**
+     * dataKey pour p-select :
+     * - string[] => undefined
+     * - object[] => 'id' (par défaut)
+     */
+    get dataKeyToUse(): string | undefined {
+        return this.stringOptions ? undefined : 'id';
+    }
+
+
+    /**
+     * true si options est un tableau de string.
+     */
     get stringOptions(): boolean {
         return Array.isArray(this.options) &&
             this.options.length > 0 &&
             typeof this.options[0] === 'string';
     }
 
-    get dataKeyToUse(): string | undefined {
-        return this.stringOptions ? undefined : 'id';
+    /**
+     * Champs utilisés pour le filtre :
+     * - string[] => undefined (PrimeNG filtre sur la valeur elle-même)
+     * - object[] => filterFields ou 'label,name,id'
+     */
+    get filterByToUse(): string | undefined {
+        if (this.stringOptions) {
+            return undefined;
+        }
+        return this.filterFields ?? 'label,name,id';
     }
 }

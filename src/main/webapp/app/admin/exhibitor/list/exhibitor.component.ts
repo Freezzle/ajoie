@@ -17,6 +17,7 @@ import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.com
 import {PaginationComponent} from '../../../shared/pagination/pagination.component';
 import {PaginationEvent} from '../../../shared/pagination/pagination-event.interface';
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
+import {ProgressSpinner} from "primeng/progressspinner";
 
 @Component({
     selector: 'jhi-exhibitor',
@@ -32,6 +33,7 @@ import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
         LinkBoxComponent,
         PaginationComponent,
         AlertErrorComponent,
+        ProgressSpinner,
     ]
 })
 export class ExhibitorComponent implements OnInit {

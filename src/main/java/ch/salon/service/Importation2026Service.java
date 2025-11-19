@@ -18,6 +18,9 @@ import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
+import ch.salon.service.dto.ParticipationDTO;
+import ch.salon.service.dto.ParticipationLightDTO;
+import ch.salon.service.mapper.ParticipationMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -103,25 +106,27 @@ public class Importation2026Service {
     private final ConferenceRepository conferenceRepository;
     private final WorkshopRepository workshopRepository;
     private final ParticipationRepository participationRepository;
-    private final InvoicingPlanService invoiceService;
+    private final RefreshInvoicingPlansService refreshInvoicingPlansService;
     private final EventLogService eventLogService;
 
     public Importation2026Service(SalonRepository salonRepository, StandRepository standRepository,
             ExhibitorRepository exhibitorRepository, ConferenceRepository conferenceRepository,
             WorkshopRepository workshopRepository, ParticipationRepository participationRepository,
-            InvoicingPlanService invoicingPlanService, EventLogService eventLogService) {
+            RefreshInvoicingPlansService refreshInvoicingPlansService, EventLogService eventLogService) {
         this.salonRepository = salonRepository;
         this.standRepository = standRepository;
         this.exhibitorRepository = exhibitorRepository;
         this.conferenceRepository = conferenceRepository;
         this.workshopRepository = workshopRepository;
         this.participationRepository = participationRepository;
-        this.invoiceService = invoicingPlanService;
+        this.refreshInvoicingPlansService = refreshInvoicingPlansService;
         this.eventLogService = eventLogService;
     }
 
     @Transactional
-    public void importData(String idSalon, InputStream file) {
+    public List<ParticipationDTO> importData(String idSalon, InputStream file) {
+        List<Participation> participationsNew = new  ArrayList<>();
+
         Salon currentSalon = salonRepository.findById(UUID.fromString(idSalon)).orElseThrow(
                 () -> new IllegalArgumentException("Salon introuvable: " + idSalon));
 
@@ -139,7 +144,6 @@ public class Importation2026Service {
                     // on considère qu'il n'y a plus d'enregistrements utiles
                     break;
                 }
-
 
                 String email = sanitize(r, EXHIBITOR_EMAIL, true, false, false);
                 if (StringUtils.isBlank(email)) {
@@ -195,12 +199,16 @@ public class Importation2026Service {
                 eventLogService.eventFromSystem("Participation créée", EventType.EVENT, EntityType.PARTICIPATION,
                         participation.getId(), null);
 
-                invoiceService.refreshInvoicingPlans(participation.getId().toString());
+                refreshInvoicingPlansService.refreshInvoicingPlans(participation.getId().toString());
+
+                participationsNew.add(participation);
             }
         } catch (IOException e) {
             log.error("Erreur d'I/O pendant l'import", e);
             throw new IllegalStateException("Un problème est survenu pendant l'import CSV.", e);
         }
+
+        return participationsNew.stream().map(ParticipationMapper.INSTANCE::toDto).toList();
     }
 
     // -------------------- BUILDERS --------------------

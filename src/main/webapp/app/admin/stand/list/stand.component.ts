@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, RouterModule} from '@angular/router';
+import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
@@ -26,6 +26,7 @@ import {getFirstExhibitorName} from '../../exhibitor/model/exhibitor.interface';
 import {Category, formatterCategory} from '../../enumerations/category.model';
 import {AlertService} from '../../../core/util/alert.service';
 import {copyToClipboard} from '../../../core/util/utils';
+import {ProgressSpinner} from "primeng/progressspinner";
 
 @Component({
     selector: 'jhi-stand',
@@ -40,6 +41,7 @@ import {copyToClipboard} from '../../../core/util/utils';
         ButtonBoxComponent,
         LinkBoxComponent,
         PaginationComponent,
+        ProgressSpinner,
     ]
 })
 export class StandComponent implements OnInit {
@@ -53,7 +55,7 @@ export class StandComponent implements OnInit {
     stands: IStand[] = [];
     standsPaginated: IStand[] = [];
     isLoading = false;
-    params: any;
+    params!: ParamMap;
     filters: FormGroup<StandFilterFormGroup> = this.standFormService.createFilterFormGroup();
     standardView = true;
 

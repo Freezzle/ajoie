@@ -2,7 +2,7 @@ import dayjs from 'dayjs/esm';
 import {ISalon} from '../../salon/model/salon.interface';
 import {Status} from '../../enumerations/status.model';
 import {Type} from '../../enumerations/type.model';
-import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {IExhibitor, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
 import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
 
@@ -60,4 +60,8 @@ export function getFormattedParticipationName(participation: IParticipation | nu
         return `${participation?.therapistName} (${participation.exhibitor?.fullName})`;
     }
     return `- (${participation.exhibitor?.fullName})`;
+}
+
+export function selectFilterParticipation(): string {
+    return `therapistName,clientNumber,exhibitor.${selectFilterExhibitor().split(',').join(',exhibitor.')}`;
 }

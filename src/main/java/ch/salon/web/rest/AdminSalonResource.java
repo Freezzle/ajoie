@@ -8,9 +8,11 @@ import ch.salon.service.ParticipationService;
 import ch.salon.service.SalonService;
 import ch.salon.service.TimeSlotService;
 import ch.salon.service.dto.FloorPlanSalonDTO;
+import ch.salon.service.dto.ParticipationDTO;
 import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
 import ch.salon.service.dto.TimeSlotDTO;
+import ch.salon.web.rest.dto.InfoInvoice;
 import ch.salon.web.rest.dto.SalonStatistiques;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
@@ -93,6 +95,12 @@ public class AdminSalonResource {
                    .body(salon);
     }
 
+    @GetMapping("/{idSalon}/participations/info-invoices")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<Map<UUID, InfoInvoice>> getInfoInvoicesForSalon(@PathVariable("idSalon") UUID idSalon) {
+        return ResponseEntity.ok(participationService.getInfoInvoicesForSalon(idSalon));
+    }
+
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<SalonDTO> getAllSalons() {
@@ -129,7 +137,7 @@ public class AdminSalonResource {
 
     @PostMapping("/{idSalon}/import-inscriptions")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<String> importation(@PathVariable(name = "idSalon", required = false) String idSalon,
+    public ResponseEntity<List<ParticipationDTO>> importation(@PathVariable(name = "idSalon", required = false) String idSalon,
             @RequestParam("file") MultipartFile file) throws URISyntaxException {
         try {
             if (file == null || file.isEmpty() || StringUtils.isEmpty(file.getOriginalFilename())) {
@@ -137,14 +145,12 @@ public class AdminSalonResource {
             }
 
             if (file.getOriginalFilename().contains("2026")) {
-                importation2026Service.importData(idSalon, file.getInputStream());
+                return ResponseEntity.ok(importation2026Service.importData(idSalon, file.getInputStream()));
             } else {
                 throw new IllegalStateException("Only 2026 file can be imported");
             }
-
-            return ResponseEntity.created(new URI("/idSalon/import")).build();
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to upload the file");
+            return ResponseEntity.internalServerError().build();
         }
     }
 

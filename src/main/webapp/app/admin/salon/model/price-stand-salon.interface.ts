@@ -28,3 +28,7 @@ export function sortPriceStandSalon(priceStands: IPriceStandSalon[]): IPriceStan
 export function formatterDimensionStand(dimension: IPriceStandSalon | null): string {
     return dimension?.dimension ?? '';
 }
+
+export function selectFilterDimension() : string {
+    return 'dimension';
+}

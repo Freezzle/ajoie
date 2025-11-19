@@ -5,6 +5,7 @@ import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
+import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailMessage;
@@ -13,13 +14,20 @@ import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.service.mail.EmailCreator;
 import ch.salon.utils.DateUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamSource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class SendInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
@@ -27,12 +35,21 @@ public class SendInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
     private final EmailCreator emailCreator;
     private final DownloadInvoiceHandler downloadInvoiceHandler;
     private final EventLogService eventLogService;
+    private final InvoicingPlanRepository repository;
+
+    @Autowired
+    @Lazy
+    private SendInvoiceHandler self;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendInvoiceHandler.class);
 
     public SendInvoiceHandler(EmailCreator emailCreator, DownloadInvoiceHandler downloadInvoiceHandler,
+            InvoicingPlanRepository repository,
             EventLogService eventLogService) {
         this.emailCreator = emailCreator;
         this.downloadInvoiceHandler = downloadInvoiceHandler;
         this.eventLogService = eventLogService;
+        this.repository = repository;
     }
 
     @Override
@@ -67,22 +84,44 @@ public class SendInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
 
     @Override
     public void handle(InvoicingPlan payload, Map<String, Object> context) throws Exception {
+        State oldState = payload.getState();
         payload.setIssuedDate(Instant.now());
         payload.setExpirationDate(InvoicingPlan.calculateExpirationDate(payload));
-        payload.setState(State.ISSUED);
+        payload.setState(State.IS_ISSUING);
 
+        self.prepareAndSend(payload.getId(), oldState, context);
+    }
+
+    @Async
+    @Transactional
+    public void prepareAndSend(UUID idPlan, State oldState, Map<String, Object> context) {
+        InvoicingPlan plan = this.repository.getReferenceById(idPlan);
         Object raw = context.get("emailMessage");
         EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
         if (emailMessage == null) {
-            emailMessage = buildTemplate(payload, context);
+            emailMessage = buildTemplate(plan, context);
         }
 
-        InputStreamSource attachment = this.downloadInvoiceHandler.download(payload, context);
-        emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(payload, context), attachment));
-        eventLogService.eventFromSystem("Facture envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, payload.getId(),
-                null);
-        eventLogService.eventFromSystem("Facture envoyée " + payload.getBillingNumber(), EventType.EMAIL,
-                EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
+        try {
+            InputStreamSource attachment = this.downloadInvoiceHandler.download(plan, context);
+            emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(plan, context), attachment));
+            plan.setIssuedDate(Instant.now());
+            plan.setExpirationDate(InvoicingPlan.calculateExpirationDate(plan));
+            plan.setState(State.ISSUED);
+            eventLogService.eventFromSystem("Facture envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, plan.getId(),
+                    null);
+            eventLogService.eventFromSystem("Facture envoyée " + plan.getBillingNumber(), EventType.EMAIL,
+                    EntityType.PARTICIPATION, plan.getParticipation().getId(), null);
+        } catch (Exception e) {
+            LOGGER.error("Problem during sending email", e);
+            plan.setIssuedDate(null);
+            plan.setExpirationDate(null);
+            plan.setState(oldState);
+            eventLogService.eventFromSystem("Problème d'envoi facture", EventType.EMAIL, EntityType.INVOICE_PLAN, plan.getId(),
+                    null);
+            eventLogService.eventFromSystem("Problème d'envoi facture " + plan.getBillingNumber(), EventType.EMAIL,
+                    EntityType.PARTICIPATION, plan.getParticipation().getId(), null);
+        }
     }
 
     @Override

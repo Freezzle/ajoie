@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, RouterModule} from '@angular/router';
+import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
@@ -23,6 +23,7 @@ import {
     getFormattedParticipationName,
 } from '../../participation/model/participation.interface';
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
+import {ProgressSpinner} from "primeng/progressspinner";
 
 @Component({
     selector: 'jhi-conference',
@@ -38,6 +39,7 @@ import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
         LinkBoxComponent,
         PaginationComponent,
         AlertErrorComponent,
+        ProgressSpinner,
     ]
 })
 export class ConferenceComponent implements OnInit {
@@ -49,7 +51,7 @@ export class ConferenceComponent implements OnInit {
     conferences: IConference[] = [];
     conferencesPaginated: IConference[] = [];
     isLoading = false;
-    params: any;
+    params!: ParamMap;
     statusValues = Object.keys(Status);
     filters: FormGroup<ConferenceFilterFormGroup> =
         this.conferenceFormService.createFilterFormGroup();

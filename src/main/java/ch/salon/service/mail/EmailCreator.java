@@ -3,6 +3,7 @@ package ch.salon.service.mail;
 import ch.salon.service.handlers.EmailMessage;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamSource;
@@ -12,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
@@ -28,6 +30,9 @@ public class EmailCreator {
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine mailTemplateEngine;
     private final MessageSource messageSource;
+
+    @Value("${app.mail.redirection-all-to:}")
+    private String redirectionAllTo;
 
     public EmailCreator(JavaMailSender javaMailSender, SpringTemplateEngine mailTemplateEngine,
             MessageSource messageSource) {
@@ -80,14 +85,18 @@ public class EmailCreator {
             EmailMessage emailMessage) throws MessagingException, IOException {
         MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, UTF_8.name());
 
-        // FIXME CHANGE THAT LATER
+        // FIXME: To be able to change the mail sender (permission)
         message.setFrom(emailMessage.getFrom());
 
-        // FIXME CHANGE THAT LATER, AVOID SENDING PROD
-        message.setTo(emailMessage.getTo().contains("dylan") ? emailMessage.getTo() : "dylan.claude.work@gmail.com");
+        if (StringUtils.hasText(redirectionAllTo)) {
+            message.setTo(redirectionAllTo);
+        } else {
+            message.setTo(emailMessage.getTo());
+        }
+
         message.setSubject(emailMessage.getSubject());
         message.setText(emailMessage.getBody(), true);
-        message.addInline("logo_salon", new ClassPathResource("images/logo_salon.jpg").getFile());
+        message.addInline("logo_salon", new ClassPathResource("images/logo_salon.jpg"));
         return message;
     }
 }

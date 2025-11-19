@@ -8,24 +8,27 @@
                 <hr/>
 
                 <div class="d-flex justify-content-between mt-3">
-          <span>
-            <button-box (clickedEvent)="previousState()"
-                        faIcon="arrow-left"
-                        translateKey="common.back"/>
-            </span>
+                    <span>
+                        <button-box (clickedEvent)="previousState()" faIcon="arrow-left" translateKey="common.back"/>
+                    </span>
 
                     <span>
-              <span><input type="file" id="fileUpload" class="form-control form-control-sm me-2"
-                           (change)="onFileSelected($event)" #fileInput/></span>
-              <span>
-                <button type="submit" class="btn btn-primary btn-sm" (click)="importFile()">
-                  <span jhiTranslate="common.import">Importer</span>
-                </button>
-              </span>
-            </span>
+                        <span><input type="file"
+                                     id="fileUpload"
+                                     class="form-control form-control-sm me-2"
+                                     (change)="onFileSelected($event)"
+                                     #fileInput/></span>
+                        <span>
+                            <button type="submit" class="btn btn-primary btn-sm" (click)="importFile()">
+                                <span jhiTranslate="common.import">Importer</span>
+                            </button>
+                        </span>
+                    </span>
                 </div>
             </h2>
         </div>
+
+        <p-toast />
 
         @if (combinedStats$ | async; as combinedStats) {
             <div class="row">
@@ -118,8 +121,7 @@
                             <td></td>
                             <td></td>
                             @if (calculateFacturation(combinedStats[1].facturation); as factuGraph) {
-                                <td class="text-center"
-                                >
+                                <td class="text-center">
                                     @if (factuGraph[0] || factuGraph[1] || factuGraph[2]) {
                                         <ngb-progressbar-stacked>
                                             <ngb-progressbar type="success"

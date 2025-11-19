@@ -3,6 +3,8 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {IWorkshop} from '../model/workshop.interface';
 import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {IStand} from "../../stand/model/stand.interface";
+import {Status} from "../../enumerations/status.model";
 
 export type WorkshopFormGroup = {
     id: FormControl<IWorkshop['id'] | null>;
@@ -28,20 +30,31 @@ export class WorkshopFormService {
     }
 
     createWorkshopFormGroup(workshop: IWorkshop | null): FormGroup<WorkshopFormGroup> {
+        const raw: IWorkshop = {
+            ...this.getDefaultWorkshopFormValue() as IWorkshop,
+            ...(workshop ?? {}),
+        };
+
         return new FormGroup<WorkshopFormGroup>({
-            id: new FormControl(workshop?.id ?? null),
-            title: new FormControl(workshop?.title ?? null, [Validators.required]),
-            description: new FormControl(workshop?.description ?? null, [
+            id: new FormControl(raw.id),
+            title: new FormControl(raw.title, [Validators.required]),
+            description: new FormControl(raw.description, [
                 Validators.required,
                 Validators.maxLength(500),
             ]),
-            status: new FormControl(workshop?.status ?? null, Validators.required),
-            extraInformation: new FormControl(workshop?.extraInformation ?? null),
-            participation: new FormControl(workshop?.participation ?? null, Validators.required),
+            status: new FormControl(raw.status, Validators.required),
+            extraInformation: new FormControl(raw.extraInformation),
+            participation: new FormControl(raw.participation, Validators.required),
         });
     }
 
     getWorkshop(form: FormGroup<WorkshopFormGroup>): IWorkshop {
         return form.getRawValue() as IWorkshop;
+    }
+
+    private getDefaultWorkshopFormValue(): Pick<IWorkshop, 'status'> {
+        return {
+            status: Status.IN_VERIFICATION,
+        };
     }
 }

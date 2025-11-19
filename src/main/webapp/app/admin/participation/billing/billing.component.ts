@@ -49,6 +49,7 @@ import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.com
         SelectBoxComponent,
         TextareaBoxComponent,
         LinkBoxComponent,
+
     ]
 })
 export class BillingComponent implements OnInit {
@@ -276,9 +277,7 @@ export class BillingComponent implements OnInit {
     }
 
     mustPaymentBeDisabled(payment: IPayment, invoicingPlan: IInvoicingPlan): boolean {
-        return !!payment.readMode ||
-            (!this.isDraftState(invoicingPlan) && invoicingPlan.state !== State.ISSUED)
-            || this.participation()?.status === Status.CLOSED;
+        return !this.isPaymentEditable(payment) || this.isDraftState(invoicingPlan) || this.participation()?.status === Status.CLOSED;
     }
 
     isInvoiceEditable(invoice: IInvoice): boolean {
@@ -286,9 +285,7 @@ export class BillingComponent implements OnInit {
     }
 
     mustInvoiceBeDisabled(invoice: IInvoice, invoicingPlan: IInvoicingPlan): boolean {
-        return !!invoice.readMode ||
-            (!this.isDraftState(invoicingPlan) && invoicingPlan.state !== State.ISSUED)
-            || this.participation()?.status === Status.CLOSED;
+        return !this.isInvoiceEditable(invoice) || !this.isDraftState(invoicingPlan) || this.participation()?.status === Status.CLOSED;
     }
 
     disableActionButton(invoicingPlan: IInvoicingPlan): boolean {
@@ -459,6 +456,10 @@ export class BillingComponent implements OnInit {
 
     isDraftState(invoicingPlan: IInvoicingPlan): boolean {
         return invoicingPlan.state === State.DRAFT || invoicingPlan.state === State.ISOLATED;
+    }
+
+    isIssuingState(invoicingPlan: IInvoicingPlan): boolean {
+        return invoicingPlan.state === State.IS_ISSUING;
     }
 
     isIssuedState(invoicingPlan: IInvoicingPlan): boolean {

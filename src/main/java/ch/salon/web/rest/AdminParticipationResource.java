@@ -5,9 +5,9 @@ import ch.salon.repository.EventLogRepository;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.ParticipationService;
+import ch.salon.service.RefreshInvoicingPlansService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
-import ch.salon.web.rest.dto.InfoInvoice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,6 @@ import tech.jhipster.web.util.ResponseUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static ch.salon.service.ParticipationService.ENTITY_NAME;
@@ -47,16 +46,16 @@ public class AdminParticipationResource {
     private static final Logger log = LoggerFactory.getLogger(AdminParticipationResource.class);
     private final ParticipationService participationService;
     private final InvoicingPlanService invoicingPlanService;
-    private final EventLogRepository eventLogRepository;
+    private final RefreshInvoicingPlansService refreshInvoicingPlansService;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     public AdminParticipationResource(ParticipationService participationService,
-            InvoicingPlanService invoicingPlanService, EventLogRepository eventLogRepository) {
+            InvoicingPlanService invoicingPlanService, RefreshInvoicingPlansService refreshInvoicingPlansService) {
         this.participationService = participationService;
         this.invoicingPlanService = invoicingPlanService;
-        this.eventLogRepository = eventLogRepository;
+        this.refreshInvoicingPlansService = refreshInvoicingPlansService;
     }
 
     @PostMapping("")
@@ -69,14 +68,6 @@ public class AdminParticipationResource {
 
         return created(new URI("/api/admin/participations/" + id)).headers(
                 createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(participation);
-    }
-
-    @GetMapping("/{idParticipation}/info-invoice")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<InfoInvoice> getInfoFromInvoicing(
-            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation) {
-
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(participationService.getInfoInvoice(idParticipation)));
     }
 
     @PutMapping("/{idParticipation}")
@@ -126,7 +117,7 @@ public class AdminParticipationResource {
             @PathVariable(name = "idParticipation", required = false) String idParticipation) {
         log.debug("REST request to get all Participations");
 
-        invoicingPlanService.refreshInvoicingPlans(idParticipation);
+        refreshInvoicingPlansService.refreshInvoicingPlans(idParticipation);
     }
 
     @GetMapping("/{idParticipation}/events")

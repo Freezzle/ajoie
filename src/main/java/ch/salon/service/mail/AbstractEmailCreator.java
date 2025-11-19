@@ -77,7 +77,7 @@ public abstract class AbstractEmailCreator {
         message.setTo(getRecipientEmail().contains("dylan") ? getRecipientEmail() : "dylan.claude.work@gmail.com");
         message.setSubject(getTranslatedSubject());
         message.setText(content, true);
-        message.addInline("logo_salon", new ClassPathResource("images/logo_salon.jpg").getFile());
+        message.addInline("logo_salon", new ClassPathResource("images/logo_salon.jpg"));
         return message;
     }
 }

@@ -21,6 +21,9 @@ logging:
     ch.salon: DEBUG
 
 spring:
+  config:
+    activate:
+      on-profile: dev
   devtools:
     restart:
       enabled: true
@@ -45,7 +48,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: dylan.claude.work@gmail.com
-    password: bivw bsop dxdj habs
+    password: ruxq ocqf hhpe bgf
     properties:
       mail:
         smtp:
@@ -106,3 +109,8 @@ jhipster:
 # ===================================================================
 
 # application:
+app:
+  thymeleaf:
+    cache: false
+  mail:
+    redirect-all-to: "dylan.claude.work@gmail.com"

@@ -20,6 +20,9 @@ public interface WorkshopRepository extends JpaRepository<Workshop, UUID> {
     List<Workshop> findByParticipationIdOrderByRegistrationDateDesc(UUID participationId);
 
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress"})
+    List<Workshop> findByParticipationIdAndStatusInOrderByRegistrationDateDesc(UUID participationId, Status... statuses);
+
+    @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress"})
     List<Workshop> findByStatusInAndParticipation_SalonId(List<Status> statuses, UUID participationId);
 
     boolean existsWorkshopByParticipationIdAndStatusIn(UUID participationId, Status... statuses);

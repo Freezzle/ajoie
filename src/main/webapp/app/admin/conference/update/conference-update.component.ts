@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, ParamMap} from '@angular/router';
 import {combineLatest, of} from 'rxjs';
 import {catchError, finalize, map} from 'rxjs/operators';
 
@@ -10,7 +10,11 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ConferenceService} from '../service/conference.service';
 import {IConference} from '../model/conference.interface';
 import {ConferenceFormGroup, ConferenceFormService} from '../service/conference-form.service';
-import {getFormattedParticipationName, IParticipation} from '../../participation/model/participation.interface';
+import {
+    getFormattedParticipationName,
+    IParticipation,
+    selectFilterParticipation
+} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
 import {compareStatus, formatterStatus, Status} from '../../enumerations/status.model';
 import {ErrorModel} from '../../../shared/field-error/error.model';
@@ -39,7 +43,7 @@ export class ConferenceUpdateComponent implements OnInit {
 
     initialConference: IConference | null = null;
     statusValues = Object.keys(Status);
-    params: any;
+    params!: ParamMap;
     participationsOptions: IParticipation[] = [];
     editForm: FormGroup<ConferenceFormGroup> = this.conferenceFormService.createConferenceFormGroup(null);
 
@@ -128,4 +132,5 @@ export class ConferenceUpdateComponent implements OnInit {
     protected readonly formatterParticipation = formatterParticipation;
     protected readonly formatterStatus = formatterStatus;
     protected readonly compareStatus = compareStatus;
+    protected readonly selectFilterParticipation = selectFilterParticipation;
 }

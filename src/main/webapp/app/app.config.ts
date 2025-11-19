@@ -24,6 +24,7 @@ import {AppPageTitleStrategy} from './app-page-title-strategy';
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 import {providePrimeNG} from "primeng/config";
 import Material from '@primeuix/themes/material';
+import {MessageService} from "primeng/api";
 
 const routerFeatures: Array<RouterFeatures> = [
     withComponentInputBinding(),
@@ -57,6 +58,7 @@ export const appConfig: ApplicationConfig = {
                 preset: Material
             }
         }),
+        MessageService,
         Title,
         {provide: LOCALE_ID, useValue: 'fr'},
         {provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter},

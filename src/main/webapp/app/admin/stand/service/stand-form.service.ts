@@ -3,6 +3,10 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {IStand} from '../model/stand.interface';
 import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {CustomValidatorModel} from '../../../shared/field-error/custom-validator.model';
+import {IParticipation} from "../../participation/model/participation.interface";
+import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
+import {ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
+import {Status} from "../../enumerations/status.model";
 
 export type StandFormGroup = {
     id: FormControl<IStand['id'] | null>;
@@ -37,35 +41,52 @@ export class StandFormService {
     }
 
     createStandFormGroup(stand: IStand | null): FormGroup<StandFormGroup> {
+        const raw: IStand = {
+            ...this.getDefaultStandFormValue() as IStand,
+            ...(stand ?? {}),
+        };
+
         return new FormGroup<StandFormGroup>({
-            id: new FormControl(stand?.id ?? null),
-            description: new FormControl(stand?.description ?? null, [
+            id: new FormControl(raw.id),
+            description: new FormControl(raw.description, [
                 Validators.required,
                 Validators.maxLength(500),
             ]),
-            website: new FormControl(stand?.website ?? null),
-            instagram: new FormControl(stand?.instagram ?? null),
-            facebook: new FormControl(stand?.facebook ?? null),
-            urlPicture: new FormControl(stand?.urlPicture ?? null),
-            shared: new FormControl(stand?.shared ?? false, Validators.required),
-            nbTable: new FormControl(stand?.nbTable ?? null, [
+            website: new FormControl(raw.website),
+            instagram: new FormControl(raw.instagram),
+            facebook: new FormControl(raw.facebook),
+            urlPicture: new FormControl(raw.urlPicture),
+            shared: new FormControl(raw.shared, Validators.required),
+            nbTable: new FormControl(raw.nbTable, [
                 Validators.required,
                 CustomValidatorModel.onlyNumbers,
             ]),
-            nbChair: new FormControl(stand?.nbChair ?? null, [
+            nbChair: new FormControl(raw.nbChair, [
                 Validators.required,
                 CustomValidatorModel.onlyNumbers,
             ]),
-            needElectricity: new FormControl(stand?.needElectricity ?? true, Validators.required),
-            status: new FormControl(stand?.status ?? null, Validators.required),
-            category: new FormControl(stand?.category ?? null),
-            extraInformation: new FormControl(stand?.extraInformation ?? null),
-            participation: new FormControl(stand?.participation ?? null, Validators.required),
-            dimension: new FormControl(stand?.dimension ?? null, Validators.required),
+            needElectricity: new FormControl(raw.needElectricity, Validators.required),
+            status: new FormControl(raw.status, Validators.required),
+            category: new FormControl(raw.category),
+            extraInformation: new FormControl(raw.extraInformation),
+            participation: new FormControl(raw.participation, Validators.required),
+            dimension: new FormControl(raw.dimension, Validators.required),
         });
     }
 
     getStand(form: FormGroup<StandFormGroup>): IStand {
         return form.getRawValue() as IStand;
+    }
+
+    private getDefaultStandFormValue(): Pick<IStand,
+        'status' | 'nbTable' | 'nbChair' | 'needElectricity'
+        | 'shared'> {
+        return {
+            status: Status.IN_VERIFICATION,
+            nbTable: 0,
+            nbChair: 0,
+            needElectricity: true,
+            shared: false
+        };
     }
 }

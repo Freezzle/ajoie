@@ -26,4 +26,12 @@ public class InvoiceKey {
     public int hashCode() {
         return Objects.hash(type, referenceId);
     }
+
+    public Type getType() {
+        return type;
+    }
+
+    public UUID getReferenceId() {
+        return referenceId;
+    }
 }

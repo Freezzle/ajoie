@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, input, LOCALE_ID, OnInit, ViewChild} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
@@ -12,6 +12,9 @@ import {Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {ISalonStats} from '../model/salon-stats.interface';
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
+import {Toast, ToastModule} from "primeng/toast";
+import {MessageService} from "primeng/api";
+import {formatDate} from "@angular/common";
 
 @Component({
     selector: 'jhi-salon-stats',
@@ -22,9 +25,9 @@ import {getFormattedParticipationName} from '../../participation/model/participa
         RouterModule,
         FormsModule,
         ReactiveFormsModule,
+        ToastModule,
         ButtonBoxComponent,
-
-
+        Toast,
     ]
 })
 export class SalonStatsComponent implements OnInit {
@@ -34,6 +37,8 @@ export class SalonStatsComponent implements OnInit {
     combinedStats$: Observable<ISalonStats[]> | undefined;
     selectedFile: File | null = null;
     protected salonService = inject(SalonService);
+    private readonly messageService = inject(MessageService);
+    private readonly locale = inject(LOCALE_ID);
 
     ngOnInit(): void {
         this.loadStats();
@@ -107,7 +112,22 @@ export class SalonStatsComponent implements OnInit {
             return;
         }
 
-        this.salonService.generate(this.salon()!.id, this.selectedFile!).subscribe(() => {
+        this.salonService.generate(this.salon()!.id, this.selectedFile!).subscribe((participationsNew) => {
+            const detailMessage = participationsNew.map(part => {
+                const therapistName = part.therapistName?.length > 10 ? part.therapistName.slice(0, 10) + '...' : part.therapistName;
+                return '<' + therapistName + '> inscrit le ' + (!!part.registrationDate
+                    ? formatDate(part.registrationDate, 'dd.MM.yyyy HH:mm', this.locale)
+                    : '-');
+            });
+
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Résultat',
+                detail: 'Nombre d\'inscriptions importées : ' + participationsNew.length + '\n\n' + detailMessage.join('\n'),
+                closable: true,
+                sticky: true
+            });
+
             if (this.fileInput) {
                 this.fileInput.nativeElement.value = ''; // Reset the file input field
             }

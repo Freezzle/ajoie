@@ -31,3 +31,7 @@ export function containsExhibitorName(exhibitor: IExhibitor | undefined | null, 
 export function getFirstExhibitorName(exhibitor: IExhibitor | null | undefined): string {
     return exhibitor?.fullName ?? '';
 }
+
+export function selectFilterExhibitor(): string {
+    return 'fullName,email';
+}

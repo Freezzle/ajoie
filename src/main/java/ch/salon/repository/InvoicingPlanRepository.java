@@ -30,4 +30,6 @@ public interface InvoicingPlanRepository extends JpaRepository<InvoicingPlan, UU
     @EntityGraph(attributePaths = {"participation", "participation.salon", "invoices", "payments"})
     List<InvoicingPlan> findByParticipation_IdInAndParticipation_Salon_IdOrderByBillingNumberDesc(
             List<UUID> idParticipations, UUID salonId);
+
+    List<InvoicingPlan> findByParticipation_Salon_Id(UUID salonId);
 }

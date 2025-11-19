@@ -1,8 +1,8 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
-import {ActivatedRoute, RouterModule} from '@angular/router';
+import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
 import {combineLatest, filter, Observable, of, switchMap} from 'rxjs';
-import {catchError, finalize, map} from 'rxjs/operators';
+import {catchError, finalize, map, shareReplay} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -19,7 +19,7 @@ import {IStand} from '../../stand/model/stand.interface';
 import {StandService} from '../../stand/service/stand.service';
 import {ISalon} from '../../salon/model/salon.interface';
 import {SalonService} from '../../salon/service/salon.service';
-import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {IExhibitor, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {ExhibitorService, formatterExhibitor} from '../../exhibitor/service/exhibitor.service';
 import {formatterStatus, Status} from '../../enumerations/status.model';
 import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
@@ -44,13 +44,14 @@ import {formatterModePaymentMeals, ModePaymentMeals} from "../../enumerations/mo
 import {formatterInvoiceMethod, InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
+import {ProgressSpinner} from "primeng/progressspinner";
 
 @Component({
     selector: 'jhi-participation-update',
     templateUrl: './participation-update.component.html',
     imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
         ButtonBoxComponent, LinkBoxComponent, SelectBoxComponent, DateBoxComponent,
-        NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent, AlertComponent]
+        NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent, AlertComponent, ProgressSpinner]
 })
 export class ParticipationUpdateComponent implements OnInit {
     protected participationService = inject(ParticipationService);
@@ -74,15 +75,12 @@ export class ParticipationUpdateComponent implements OnInit {
     conferences$: Observable<IConference[]> | undefined;
     workshops$: Observable<IWorkshop[]> | undefined;
     stands$: Observable<IStand[]> | undefined;
-    params: any;
+    params!: ParamMap;
     exhibitorsOptions: IExhibitor[] = [];
-    salonsSharedCollection: ISalon[] = [];
     editForm: FormGroup<ParticipationFormGroup> = this.participationFormService.createParticipationFormGroup(null);
     availableActions: Observable<AvailableAction[]> = of([]);
 
     ngOnInit(): void {
-        this.activateReadOnlyMode();
-
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data])
             .pipe(
                 map(([params, data]) => ({
@@ -98,18 +96,62 @@ export class ParticipationUpdateComponent implements OnInit {
 
     private workReload(isReadOnly: boolean, params: any, participation: IParticipation) {
         this.isReadOnly = isReadOnly;
-        this.initialParticipation = {...participation};
+        this.initialParticipation = participation ? { ...participation } : null;
         this.params = params;
 
         this.editForm = this.participationFormService.createParticipationFormGroup(participation);
         this.loadRelationshipsOptions(participation);
 
         if (participation) {
-            this.loadRelationships(participation!.id);
             this.availableActions = this.actionsService.getAvailableActions('participation', participation.id);
         }
 
         isReadOnly ? this.activateReadOnlyMode(false) : this.activateEditMode();
+    }
+
+    loadStandsOnce(): Observable<IStand[]> {
+        if (!this.initialParticipation?.id) {
+            return of([]);
+        }
+        if (!this.stands$) {
+            const queryObject = { idParticipation: this.initialParticipation.id };
+            this.stands$ = this.standService.query(queryObject).pipe(
+                map(res => res ?? []),
+                catchError(() => of([])),
+                shareReplay(1),
+            );
+        }
+        return this.stands$;
+    }
+
+    loadConferencesOnce(): Observable<IConference[]> {
+        if (!this.initialParticipation?.id) {
+            return of([]);
+        }
+        if (!this.conferences$) {
+            const queryObject = { idParticipation: this.initialParticipation.id };
+            this.conferences$ = this.conferenceService.query(queryObject).pipe(
+                map(res => res ?? []),
+                catchError(() => of([])),
+                shareReplay(1),
+            );
+        }
+        return this.conferences$;
+    }
+
+    loadWorkshopsOnce(): Observable<IWorkshop[]> {
+        if (!this.initialParticipation?.id) {
+            return of([]);
+        }
+        if (!this.workshops$) {
+            const queryObject = { idParticipation: this.initialParticipation.id };
+            this.workshops$ = this.workshopService.query(queryObject).pipe(
+                map(res => res ?? []),
+                catchError(() => of([])),
+                shareReplay(1),
+            );
+        }
+        return this.workshops$;
     }
 
     private reload(idParticipation: string): void {
@@ -120,8 +162,8 @@ export class ParticipationUpdateComponent implements OnInit {
 
     activateReadOnlyMode(reset: boolean = true): void {
         this.isReadOnly = true;
-        if (reset) {
-            this.editForm = this.participationFormService.createParticipationFormGroup(this.initialParticipation!);
+        if (reset && this.initialParticipation) {
+            this.editForm = this.participationFormService.createParticipationFormGroup(this.initialParticipation);
         }
         this.editForm.disable();
     }
@@ -176,29 +218,6 @@ export class ParticipationUpdateComponent implements OnInit {
             .subscribe(() => this.reload(this.initialParticipation!.id!));
     }
 
-    private loadRelationships(idParticipation: string): void {
-        if (!idParticipation) {
-            return;
-        }
-
-        const queryObject = {idParticipation: idParticipation};
-
-        this.conferences$ = this.conferenceService.query(queryObject).pipe(
-            map((result) => result ?? []),
-            catchError(() => of([])),
-        );
-
-        this.workshops$ = this.workshopService.query(queryObject).pipe(
-            map((result) => result ?? []),
-            catchError(() => of([])),
-        );
-
-        this.stands$ = this.standService.query(queryObject).pipe(
-            map((res) => res ?? []),
-            catchError(() => of([])),
-        );
-    }
-
     protected loadRelationshipsOptions(participation: IParticipation): void {
         this.exhibitorService
             .query()
@@ -212,15 +231,12 @@ export class ParticipationUpdateComponent implements OnInit {
             .subscribe((exhibitors: IExhibitor[]) => (this.exhibitorsOptions = exhibitors));
 
         this.salonService
-            .query()
-            .pipe(map((res: HttpResponse<ISalon[]>) => res.body ?? []))
-            .pipe(
-                map((salons: ISalon[]) => {
-                    this.editForm.controls.salon.setValue(salons.find(salon => salon.id === this.params.get('idSalon')) ?? null);
-                    return this.salonService.addSalonOptionsIfMissing<ISalon>(salons, participation?.salon);
-                }),
-            )
-            .subscribe((salons: ISalon[]) => (this.salonsSharedCollection = salons));
+            .find(this.params.get('idSalon')!)
+            .pipe(map((res: HttpResponse<ISalon>) => {
+                    const salon = res.body ?? null;
+                    this.editForm.controls.salon.setValue(salon ?? null);
+                })
+            ).subscribe();
     }
 
     clickAction(action: AvailableAction): void {
@@ -281,5 +297,5 @@ export class ParticipationUpdateComponent implements OnInit {
     protected readonly formatterExhibitor = formatterExhibitor;
     protected readonly formatterModePaymentMeals = formatterModePaymentMeals;
     protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
-    protected readonly formatterParticipation = formatterParticipation;
+    protected readonly selectFilterExhibitor = selectFilterExhibitor;
 }
