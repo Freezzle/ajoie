@@ -5,19 +5,19 @@
 
     <groupId>ch.salon</groupId>
     <artifactId>salon</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Salon</name>
     <description>Description for Salon</description>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.1</version>
+        <version>4.0.0</version>
         <relativePath/>
     </parent>
 
     <properties>
-        <maven.version>3.2.5</maven.version>
+        <maven.version>3.9.8</maven.version>
         <java.version>21</java.version>
         <node.version>v22.17.0</node.version>
         <npm.version>10.8.1</npm.version>
@@ -36,17 +36,15 @@
         <checksum-maven-plugin.version>1.11</checksum-maven-plugin.version>
         <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
         <git-commit-id-maven-plugin.version>9.0.0</git-commit-id-maven-plugin.version>
-        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <jhipster-framework.version>8.6.0</jhipster-framework.version>
         <jib-maven-plugin.architecture>amd64</jib-maven-plugin.architecture>
-        <jib-maven-plugin.image>eclipse-temurin:17-jre-focal</jib-maven-plugin.image>
+        <jib-maven-plugin.image>eclipse-temurin:21-jre</jib-maven-plugin.image>
         <jib-maven-plugin.version>3.4.3</jib-maven-plugin.version>
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
         <liquibase-plugin.password/>
         <liquibase-plugin.url/>
         <liquibase-plugin.username/>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
         <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
@@ -61,16 +59,13 @@
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
         <modernizer-maven-plugin.version>2.9.0</modernizer-maven-plugin.version>
         <nohttp-checkstyle.version>0.0.11</nohttp-checkstyle.version>
-        <openapi-generator-maven-plugin.version>7.6.0</openapi-generator-maven-plugin.version>
-        <profile.api-docs/>
         <profile.e2e/>
         <profile.no-liquibase/>
         <profile.test/>
         <profile.tls/>
         <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
-        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
-        <springdoc-openapi-starter-webmvc-api.version>2.5.0</springdoc-openapi-starter-webmvc-api.version>
+        <springdoc-openapi-starter-webmvc-api.version>3.0.1</springdoc-openapi-starter-webmvc-api.version>
     </properties>
 
     <dependencies>
@@ -107,33 +102,25 @@
         <!-- END TO GENERATE HTML TO PDF -->
 
         <dependency>
-            <groupId>tech.jhipster</groupId>
-            <artifactId>jhipster-framework</artifactId>
-            <version>${jhipster-framework.version}</version>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>9.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-loader-tools</artifactId>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>1.18.42</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -142,10 +129,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -166,34 +149,19 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-data</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -202,20 +170,12 @@
             <version>${springdoc-openapi-starter-webmvc-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate6</artifactId>
+            <groupId>tools.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate7</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <groupId>tools.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hppc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
@@ -231,18 +191,7 @@
             <version>${archunit-junit5.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus-simpleclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
@@ -263,21 +212,12 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
+            <artifactId>hibernate-processor</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-liquibase</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -291,27 +231,22 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>${jackson-databind-nullable.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>jdbc</artifactId>
+            <artifactId>testcontainers-jdbc</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -385,18 +320,6 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <!--
-                    Plugin that provides API-first development using openapi-generator-cli to
-                    generate Spring-MVC endpoint stubs at compile time from an OpenAPI definition file
-                -->
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -578,14 +501,27 @@
                                 <version>${mapstruct.version}</version>
                             </path>
                             <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>0.2.0</version>
+                            </path>
+                            <path>
                                 <groupId>org.hibernate.orm</groupId>
-                                <artifactId>hibernate-jpamodelgen</artifactId>
+                                <artifactId>hibernate-processor</artifactId>
                             </path>
                             <path>
                                 <groupId>org.glassfish.jaxb</groupId>
                                 <artifactId>jaxb-runtime</artifactId>
                             </path>
                         </annotationProcessorPaths>
+                        <compilerArgs>
+                            <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -615,11 +551,11 @@
                     <configuration>
                         <rules>
                             <requireMavenVersion>
-                                <message>You are running an older version of Maven. JHipster requires at least Maven ${maven.version}</message>
+                                <message>You are running an older version of Maven.</message>
                                 <version>[${maven.version},)</version>
                             </requireMavenVersion>
                             <requireJavaVersion>
-                                <message>You are running an incompatible version of Java. JHipster supports JDK 17 to 22.</message>
+                                <message>You are running an incompatible version of Java.</message>
                                 <version>[17,18),[18,19),[19,20),[20,21),[21,22),[22,23)</version>
                             </requireJavaVersion>
                         </rules>
@@ -727,11 +663,6 @@
                             <goals>
                                 <goal>read-project-properties</goal>
                             </goals>
-                            <configuration>
-                                <files>
-                                    <file>sonar-project.properties</file>
-                                </files>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -799,7 +730,7 @@
                         <defaultSchemaName/>
                         <username>${liquibase-plugin.username}</username>
                         <password>${liquibase-plugin.password}</password>
-                        <referenceUrl>hibernate:spring:ch.salon.domain?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
+                        <referenceUrl>hibernate:spring:ch.salon.domain?dialect=org.hibernate.dialect.PostgreSQLDialect&amp;hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.hibernate.SpringImplicitNamingStrategy</referenceUrl>
                         <verbose>true</verbose>
                         <logging>debug</logging>
                         <contexts>!test</contexts>
@@ -808,11 +739,6 @@
                         <dependency>
                             <groupId>org.liquibase</groupId>
                             <artifactId>liquibase-core</artifactId>
-                            <version>${liquibase.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.liquibase.ext</groupId>
-                            <artifactId>liquibase-hibernate6</artifactId>
                             <version>${liquibase.version}</version>
                         </dependency>
                         <dependency>
@@ -827,51 +753,11 @@
                         </dependency>
                     </dependencies>
                 </plugin>
-                <plugin>
-                    <!--
-                        Plugin that provides API-first development using openapi-generator-cli to
-                        generate Spring-MVC endpoint stubs at compile time from an OpenAPI definition file
-                    -->
-                    <groupId>org.openapitools</groupId>
-                    <artifactId>openapi-generator-maven-plugin</artifactId>
-                    <version>${openapi-generator-maven-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>generate</goal>
-                            </goals>
-                            <configuration>
-                                <inputSpec>${project.basedir}/src/main/resources/swagger/api.yml</inputSpec>
-                                <generatorName>spring</generatorName>
-                                <apiPackage>ch.salon.web.api</apiPackage>
-                                <modelPackage>ch.salon.service.api.dto</modelPackage>
-                                <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
-                                <skipValidateSpec>false</skipValidateSpec>
-                                <configOptions>
-                                    <delegatePattern>true</delegatePattern>
-                                    <title>salon</title>
-                                    <useSpringBoot3>true</useSpringBoot3>
-                                </configOptions>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonarsource.scanner.maven</groupId>
-                    <artifactId>sonar-maven-plugin</artifactId>
-                    <version>${sonar-maven-plugin.version}</version>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <profiles>
-        <profile>
-            <id>api-docs</id>
-            <properties>
-                <profile.api-docs>,api-docs</profile.api-docs>
-            </properties>
-        </profile>
         <profile>
             <id>dev</id>
             <activation>
@@ -894,84 +780,6 @@
             </dependencies>
         </profile>
         <profile>
-            <!-- This is automatically activated when working in Eclipse -->
-            <id>eclipse</id>
-            <activation>
-                <property>
-                    <name>m2e.version</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <!-- The following dependency is added due to issue #9175-->
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-undertow</artifactId>
-                </dependency>
-            </dependencies>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <!--
-                            This plugin's configuration is used to store Eclipse m2e settings only.
-                            It has no influence on the Maven build itself.
-                            Remove when the m2e plugin can correctly bind to Maven lifecycle
-                        -->
-                        <plugin>
-                            <groupId>org.eclipse.m2e</groupId>
-                            <artifactId>lifecycle-mapping</artifactId>
-                            <version>${lifecycle-mapping.version}</version>
-                            <configuration>
-                                <lifecycleMappingMetadata>
-                                    <pluginExecutions>
-                                        <pluginExecution>
-                                            <pluginExecutionFilter>
-                                                <groupId>org.jacoco</groupId>
-                                                <artifactId>jacoco-maven-plugin</artifactId>
-                                                <versionRange>${jacoco-maven-plugin.version}</versionRange>
-                                                <goals>
-                                                    <goal>prepare-agent</goal>
-                                                </goals>
-                                            </pluginExecutionFilter>
-                                            <action>
-                                                <ignore/>
-                                            </action>
-                                        </pluginExecution>
-                                        <pluginExecution>
-                                            <pluginExecutionFilter>
-                                                <groupId>com.github.eirslett</groupId>
-                                                <artifactId>frontend-maven-plugin</artifactId>
-                                                <versionRange>${frontend-maven-plugin.version}</versionRange>
-                                                <goals>
-                                                    <goal>install-node-and-npm</goal>
-                                                    <goal>npm</goal>
-                                                </goals>
-                                            </pluginExecutionFilter>
-                                            <action>
-                                                <ignore/>
-                                            </action>
-                                        </pluginExecution>
-                                        <pluginExecution>
-                                            <pluginExecutionFilter>
-                                                <groupId>org.openapitools</groupId>
-                                                <artifactId>openapi-generator-maven-plugin</artifactId>
-                                                <versionRange>${openapi-generator-maven-plugin.version}</versionRange>
-                                                <goals>
-                                                    <goal>generate</goal>
-                                                </goals>
-                                            </pluginExecutionFilter>
-                                            <action>
-                                                <ignore/>
-                                            </action>
-                                        </pluginExecution>
-                                    </pluginExecutions>
-                                </lifecycleMappingMetadata>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <!--
                 Profile for applying IDE-specific configuration.
                 At the moment it configures MapStruct and Hibernate JPA Metamodel Generator, which you need when working
@@ -986,7 +794,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate.orm</groupId>
-                    <artifactId>hibernate-jpamodelgen</artifactId>
+                    <artifactId>hibernate-processor</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -1000,7 +808,7 @@
             <id>prod</id>
             <properties>
                 <!-- default Spring profiles -->
-                <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>
+                <spring.profiles.active>prod${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>
                 <profile.test>testprod</profile.test>
                 <liquibase-plugin.url>jdbc:postgresql://localhost:5432/salon</liquibase-plugin.url>
                 <liquibase-plugin.username>salon</liquibase-plugin.username>
@@ -1049,17 +857,6 @@
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
-                            </execution>
-                            <execution>
-                                <id>webapp build test</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <configuration>
-                                    <arguments>run webapp:test</arguments>
-                                    <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
-                                </configuration>
                             </execution>
                             <execution>
                                 <id>webapp build prod</id>

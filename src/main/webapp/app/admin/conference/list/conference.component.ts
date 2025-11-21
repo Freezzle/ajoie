@@ -1,32 +1,32 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ITEM_DELETED_EVENT} from 'app/config/navigation.constants';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {IConference} from '../model/conference.interface';
 import {ConferenceService} from '../service/conference.service';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import {Status} from '../../enumerations/status.model';
-import {ConferenceFilterFormGroup, ConferenceFormService} from '../service/conference-form.service';
-import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
-import {finalize} from 'rxjs/operators';
+import {ConferenceFormService} from '../service/conference-form.service';
+import {finalize, map} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
-import {PaginationComponent} from '../../../shared/pagination/pagination.component';
-import {PaginationEvent} from '../../../shared/pagination/pagination-event.interface';
-import {
-    containsParticipationName,
-    getFormattedParticipationName,
-} from '../../participation/model/participation.interface';
+import {getFormattedParticipationName,} from '../../participation/model/participation.interface';
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ProgressSpinner} from "primeng/progressspinner";
+import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
+import {Toast} from "primeng/toast";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {AlertComponent} from "../../../shared/alert/alert.component";
+import {TableModule} from "primeng/table";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {IconField} from "primeng/iconfield";
+import {InputIcon} from "primeng/inputicon";
+import {InputText} from "primeng/inputtext";
 
 @Component({
-    selector: 'jhi-conference',
+    selector: 'app-conference',
     templateUrl: './conference.component.html',
     imports: [
         RouterModule,
@@ -36,25 +36,28 @@ import {ProgressSpinner} from "primeng/progressspinner";
         ColorStatusPipe,
         ReactiveFormsModule,
         ButtonBoxComponent,
-        LinkBoxComponent,
-        PaginationComponent,
         AlertErrorComponent,
-        ProgressSpinner,
+        Toast,
+        ConfirmPopup,
+        AlertComponent,
+        TableModule,
+        ContentPageComponent,
+        CardComponent,
+        IconField,
+        InputIcon,
+        InputText,
     ]
 })
 export class ConferenceComponent implements OnInit {
     protected activatedRoute = inject(ActivatedRoute);
-    protected modalService = inject(NgbModal);
     protected conferenceService = inject(ConferenceService);
     protected conferenceFormService = inject(ConferenceFormService);
+    protected confirmDialogService = inject(ConfirmDialogService);
 
     conferences: IConference[] = [];
-    conferencesPaginated: IConference[] = [];
     isLoading = false;
     params!: ParamMap;
     statusValues = Object.keys(Status);
-    filters: FormGroup<ConferenceFilterFormGroup> =
-        this.conferenceFormService.createFilterFormGroup();
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -62,31 +65,20 @@ export class ConferenceComponent implements OnInit {
                 this.params = params;
 
                 if (!this.conferences || this.conferences.length === 0) {
-                    this.actionFilter();
+                    this.load();
                 }
             },
         );
     }
 
-    delete(conference: IConference): void {
-        const modalRef = this.modalService.open(DeleteDialogComponent, {
-            size: 'lg',
-            backdrop: 'static',
-        });
-        modalRef.componentInstance.translateKey = 'conference.delete.question';
-        modalRef.componentInstance.translateValues = {title: conference.title};
-
-        modalRef.closed
+    delete(htmlElement: HTMLElement, conference: IConference): void {
+        this.confirmDialogService.delete(htmlElement, 'conference.delete.question', {title: conference.title})
             .pipe(
-                filter((reason) => reason === ITEM_DELETED_EVENT),
+                filter(confirmed => confirmed),
                 switchMap(() => this.conferenceService.delete(conference.id)),
-                tap(() => this.actionFilter()),
+                tap(() => this.load()),
             )
-            .subscribe();
-    }
-
-    actionFilter(): void {
-        this.load();
+            .subscribe()
     }
 
     load(): void {
@@ -99,40 +91,23 @@ export class ConferenceComponent implements OnInit {
 
         this.conferenceService
             .query(queryObject)
-            .pipe(finalize(() => (this.isLoading = false)))
+            .pipe(map(conferences => conferences.map(conference => ({
+                        ...conference,
+                        fullNameFilter: getFormattedParticipationName(conference.participation)
+                    }))
+                ),
+                finalize(() => (this.isLoading = false)))
             .subscribe((result) => {
                 this.conferences = result ?? [];
-
-                const fullNameFilter = this.filters.get('fullName')?.value;
-                if (fullNameFilter && fullNameFilter.length > 0) {
-                    this.conferences = this.conferences?.filter((conference) =>
-                        containsParticipationName(conference.participation, fullNameFilter),
-                    );
-                }
-
-                const statusFilter = this.filters.get('status')?.value;
-                if (statusFilter && statusFilter.length > 0) {
-                    this.conferences = this.conferences?.filter((conference) =>
-                        conference.status?.includes(statusFilter),
-                    );
-                }
-
-                this.refreshConferences({page: 1, pageSize: 10});
             });
     }
 
     refresh(): void {
-        this.filters.reset();
-        this.actionFilter();
+        this.load();
     }
 
     previousState(): void {
         window.history.back();
-    }
-
-    refreshConferences(event: PaginationEvent): void {
-        this.conferencesPaginated = this.conferences.slice((event.page - 1) * event.pageSize,
-            (event.page - 1) * event.pageSize + event.pageSize);
     }
 
     protected readonly getFormattedParticipationName = getFormattedParticipationName;

@@ -10,6 +10,7 @@ type ExhibitorFormGroupContent = {
     phoneNumber: FormControl<IExhibitor['phoneNumber'] | null>;
     address: FormControl<IExhibitor['address'] | null>;
     npaLocalite: FormControl<IExhibitor['npaLocalite'] | null>;
+    isoCountry: FormControl<IExhibitor['isoCountry'] | null>;
     extraInformation: FormControl<IExhibitor['extraInformation'] | null>;
     language: FormControl<IExhibitor['language'] | null>;
     differentBillingAddress: FormControl<IExhibitor['differentBillingAddress'] | null>;
@@ -21,20 +22,8 @@ type ExhibitorFormGroupContent = {
 
 export type ExhibitorFormGroup = FormGroup<ExhibitorFormGroupContent>;
 
-export type ExhibitorFilterFormGroup = {
-    fullName: FormControl<IExhibitor['fullName'] | null>;
-    email: FormControl<IExhibitor['email'] | null>;
-};
-
 @Injectable({providedIn: 'root'})
 export class ExhibitorFormService {
-    createFilterFormGroup(): FormGroup<ExhibitorFilterFormGroup> {
-        return new FormGroup<ExhibitorFilterFormGroup>({
-            fullName: new FormControl(null),
-            email: new FormControl(null)
-        });
-    }
-
     createExhibitorFormGroup(exhibitor: IExhibitor | null): ExhibitorFormGroup {
         const raw: IExhibitor = {
             ...this.getDefaultExhibitorFormValue() as IExhibitor,
@@ -42,39 +31,20 @@ export class ExhibitorFormService {
         };
 
         return new FormGroup<ExhibitorFormGroupContent>({
-            id: new FormControl(
-                {value: raw.id, disabled: true}
-            ),
-            fullName: new FormControl(raw.fullName, {
-                validators: [Validators.required]
-            }),
-            email: new FormControl(raw.email, {
-                validators: [Validators.required, Validators.email]
-            }),
-            phoneNumber: new FormControl(raw.phoneNumber, {
-                validators: [this.phoneValidator()]
-            }),
-            address: new FormControl(raw.address),
-            npaLocalite: new FormControl(raw.npaLocalite),
+            id: new FormControl({value: raw.id, disabled: true}),
+            fullName: new FormControl(raw.fullName, Validators.required),
+            email: new FormControl(raw.email, {validators: [Validators.required, Validators.email]}),
+            phoneNumber: new FormControl(raw.phoneNumber, {validators: [this.phoneValidator()]}),
+            address: new FormControl(raw.address, Validators.required),
+            npaLocalite: new FormControl(raw.npaLocalite, Validators.required),
+            isoCountry: new FormControl(raw.isoCountry, Validators.required),
             extraInformation: new FormControl(raw.extraInformation),
-            language: new FormControl(raw.language, {
-                validators: [Validators.required]
-            }),
-            differentBillingAddress: new FormControl(
-                raw.differentBillingAddress, {
-                    validators: [Validators.required]
-                }
-            ),
+            language: new FormControl(raw.language, Validators.required),
+            differentBillingAddress: new FormControl(raw.differentBillingAddress, Validators.required),
             billingAddress: new FormControl(raw.billingAddress),
-            newsletter: new FormControl(raw.newsletter, {
-                validators: [Validators.required]
-            }),
-            redFlag: new FormControl(raw.redFlag, {
-                validators: [Validators.required]
-            }),
-            duplicateDetected: new FormControl(raw.duplicateDetected, {
-                validators: [Validators.required]
-            }),
+            newsletter: new FormControl(raw.newsletter, Validators.required),
+            redFlag: new FormControl(raw.redFlag, Validators.required),
+            duplicateDetected: new FormControl(raw.duplicateDetected, Validators.required),
         });
     }
 
@@ -103,10 +73,11 @@ export class ExhibitorFormService {
     }
 
     private getDefaultExhibitorFormValue(): Pick<IExhibitor,
-        'language' | 'differentBillingAddress' | 'newsletter'
+        'language' | 'differentBillingAddress' | 'isoCountry' | 'newsletter'
         | 'redFlag' | 'duplicateDetected'> {
         return {
             language: 'fr',
+            isoCountry: 'CH',
             differentBillingAddress: false,
             newsletter: true,
             redFlag: false,

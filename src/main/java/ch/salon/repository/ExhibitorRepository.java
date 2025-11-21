@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 @Repository
 public interface ExhibitorRepository extends JpaRepository<Exhibitor, UUID> {
 
@@ -21,4 +20,6 @@ public interface ExhibitorRepository extends JpaRepository<Exhibitor, UUID> {
             String lastName);
 
     Exhibitor findByEmail(String email);
+
+    List<Exhibitor> findAllByNewsletterIsTrue();
 }

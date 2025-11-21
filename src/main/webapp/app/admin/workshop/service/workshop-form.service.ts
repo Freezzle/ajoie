@@ -2,8 +2,6 @@ import {Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {IWorkshop} from '../model/workshop.interface';
-import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
-import {IStand} from "../../stand/model/stand.interface";
 import {Status} from "../../enumerations/status.model";
 
 export type WorkshopFormGroup = {
@@ -15,20 +13,8 @@ export type WorkshopFormGroup = {
     participation: FormControl<IWorkshop['participation'] | null>;
 };
 
-export type WorkshopFilterFormGroup = {
-    fullName: FormControl<IExhibitor['fullName'] | null>;
-    status: FormControl<IWorkshop['status'] | null>;
-};
-
 @Injectable({providedIn: 'root'})
 export class WorkshopFormService {
-    createFilterFormGroup(): FormGroup<WorkshopFilterFormGroup> {
-        return new FormGroup<WorkshopFilterFormGroup>({
-            fullName: new FormControl(null),
-            status: new FormControl(null),
-        });
-    }
-
     createWorkshopFormGroup(workshop: IWorkshop | null): FormGroup<WorkshopFormGroup> {
         const raw: IWorkshop = {
             ...this.getDefaultWorkshopFormValue() as IWorkshop,

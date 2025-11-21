@@ -6,11 +6,9 @@ import ch.salon.service.dto.ParticipationLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {ExhibitorMapper.class, SalonMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {ExhibitorMapper.class, SalonMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ParticipationMapper {
-    ParticipationMapper INSTANCE = Mappers.getMapper(ParticipationMapper.class);
 
     ParticipationDTO toDto(Participation participation);
 
@@ -22,5 +20,7 @@ public interface ParticipationMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "therapistName", ignore = true)
     @Mapping(target = "extraInformation", ignore = true)
+    @Mapping(target = "crushOfHeart", ignore = true)
+    @Mapping(target = "guestOfHonor", ignore = true)
     Participation toLightEntity(ParticipationLightDTO participation);
 }

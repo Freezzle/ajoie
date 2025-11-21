@@ -2,8 +2,8 @@ package ch.salon.web.rest.errors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponseException;
-import tech.jhipster.web.rest.errors.ProblemDetailWithCause;
-import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
+import ch.salon.utils.ProblemDetailWithCause;
+import ch.salon.utils.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
 
 import java.net.URI;
 

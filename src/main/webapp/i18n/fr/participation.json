@@ -4,17 +4,17 @@
     "acceptedContract": "Contrat accepté ?",
     "additionnalInformation": "Complément d'information",
     "billing": {
-      "details": "Détails de la participation",
+      "details": "Détail de la participation",
       "events": "Evénements",
       "title": "Facturations"
     },
     "cannot-show": "No data can be shown during editing a participation",
-    "create": "Création d'une nouvelle participation",
+    "create": "Nouvel participation",
     "crushOfHeart": "Coup de coeur ?",
     "delete": {
       "question": "Voulez-vous supprimer la participation \"{{fullName}}\""
     },
-    "edit": "Détail d'une participation",
+    "edit": "Détail de la participation",
     "exhibitor": "Exposant",
     "extraInformation": "Commentaire",
     "guestOfHonor": "Invité d'honneur ?",
@@ -39,9 +39,13 @@
     "nbMeal2": "Repas samedi soir",
     "nbMeal3": "Repas dimanche midi",
     "needArrangement": "Arrangement ?",
+    "newConference": "Nouvelle conférence",
+    "newStand": "Nouveau stand",
+    "newWorkshop": "Nouvel atelier",
     "notFound": "Aucune participation",
     "offer": "Description de l'offre",
     "registrationDate": "Date d'inscription",
+    "linkedServices": "Les prestations souscrites",
     "status": {
       "label": "Statut",
       "list": {

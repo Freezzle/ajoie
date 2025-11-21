@@ -1,35 +1,36 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ITEM_DELETED_EVENT} from 'app/config/navigation.constants';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {IStand} from '../model/stand.interface';
 import {StandService} from '../service/stand.service';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
-import {StandFilterFormGroup, StandFormService} from '../service/stand-form.service';
 import {formatterStatus, Status} from '../../enumerations/status.model';
-import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
-import {finalize} from 'rxjs/operators';
+import {finalize, map} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
-import {PaginationComponent} from '../../../shared/pagination/pagination.component';
-import {PaginationEvent} from '../../../shared/pagination/pagination-event.interface';
-import {
-    containsParticipationName,
-    getFormattedParticipationName,
-} from '../../participation/model/participation.interface';
+import {getFormattedParticipationName,} from '../../participation/model/participation.interface';
 import {getFirstExhibitorName} from '../../exhibitor/model/exhibitor.interface';
 import {Category, formatterCategory} from '../../enumerations/category.model';
-import {AlertService} from '../../../core/util/alert.service';
 import {copyToClipboard} from '../../../core/util/utils';
 import {ProgressSpinner} from "primeng/progressspinner";
+import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
+import {Toast} from "primeng/toast";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {AlertComponent} from "../../../shared/alert/alert.component";
+import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
+import {TableModule} from "primeng/table";
+import {Tag} from "primeng/tag";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {IconField} from "primeng/iconfield";
+import {InputIcon} from "primeng/inputicon";
+import {InputText} from "primeng/inputtext";
 
 @Component({
-    selector: 'jhi-stand',
+    selector: 'app-stand',
     templateUrl: './stand.component.html',
     imports: [
         RouterModule,
@@ -39,25 +40,30 @@ import {ProgressSpinner} from "primeng/progressspinner";
         ColorStatusPipe,
         ReactiveFormsModule,
         ButtonBoxComponent,
-        LinkBoxComponent,
-        PaginationComponent,
         ProgressSpinner,
+        Toast,
+        ConfirmPopup,
+        AlertComponent,
+        AlertErrorComponent,
+        TableModule,
+        Tag,
+        ContentPageComponent,
+        CardComponent,
+        IconField,
+        InputIcon,
+        InputText,
     ]
 })
 export class StandComponent implements OnInit {
     protected standService = inject(StandService);
     protected activatedRoute = inject(ActivatedRoute);
-    protected modalService = inject(NgbModal);
-    protected standFormService = inject(StandFormService);
-    protected alertService = inject(AlertService);
+    protected confirmDialogService = inject(ConfirmDialogService);
 
     statusValues = Object.keys(Status);
     stands: IStand[] = [];
-    standsPaginated: IStand[] = [];
     isLoading = false;
-    params!: ParamMap;
-    filters: FormGroup<StandFilterFormGroup> = this.standFormService.createFilterFormGroup();
     standardView = true;
+    params!: ParamMap;
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -65,33 +71,20 @@ export class StandComponent implements OnInit {
                 this.params = params;
 
                 if (!this.stands || this.stands.length === 0) {
-                    this.actionFilter();
+                    this.load();
                 }
             },
         );
     }
 
-    delete(stand: IStand): void {
-        const modalRef = this.modalService.open(DeleteDialogComponent, {
-            size: 'lg',
-            backdrop: 'static',
-        });
-        modalRef.componentInstance.translateKey = 'stand.delete.question';
-        modalRef.componentInstance.translateValues = {
+    delete(htmlElement: HTMLElement, stand: IStand): void {
+        this.confirmDialogService.delete(htmlElement, 'stand.delete.question', {
             description: getFormattedParticipationName(stand.participation),
-        };
-
-        modalRef.closed
-            .pipe(
-                filter((reason) => reason === ITEM_DELETED_EVENT),
-                switchMap(() => this.standService.delete(stand.id)),
-                tap(() => this.actionFilter()), // Recharge les données
-            )
-            .subscribe();
-    }
-
-    actionFilter(): void {
-        this.load();
+        }).pipe(
+            filter(confirmed => confirmed),
+            switchMap(() => this.standService.delete(stand.id)),
+            tap(() => this.load()), // Recharge les données
+        ).subscribe()
     }
 
     load(): void {
@@ -103,38 +96,23 @@ export class StandComponent implements OnInit {
         };
         this.standService
             .query(queryObject)
-            .pipe(finalize(() => (this.isLoading = false)))
+            .pipe(map(stands => stands.map(stand => ({
+                        ...stand,
+                        fullNameFilter: getFormattedParticipationName(stand.participation)
+                    }))
+                ),
+                finalize(() => (this.isLoading = false)))
             .subscribe((result) => {
                 this.stands = result ?? [];
-
-                const fullNameFilter = this.filters.get('fullName')?.value;
-                if (fullNameFilter && fullNameFilter.length > 0) {
-                    this.stands = this.stands.filter((stand) =>
-                        containsParticipationName(stand.participation, fullNameFilter),
-                    );
-                }
-
-                const statusFilter = this.filters.get('status')?.value;
-                if (statusFilter && statusFilter.length > 0) {
-                    this.stands = this.stands.filter((stand) => stand.status?.includes(statusFilter));
-                }
-
-                this.refreshStands({page: 1, pageSize: 10});
             });
     }
 
     refresh(): void {
-        this.filters.reset();
-        this.actionFilter();
+        this.load();
     }
 
     previousState(): void {
         window.history.back();
-    }
-
-    refreshStands(event: PaginationEvent): void {
-        this.standsPaginated = this.stands.slice((event.page - 1) * event.pageSize,
-            (event.page - 1) * event.pageSize + event.pageSize);
     }
 
     clipboard(value: string | null | undefined): void {
@@ -143,8 +121,8 @@ export class StandComponent implements OnInit {
 
     changeTechnicalView(): void {
         this.stands.sort((a, b) => {
-            const nameA = a.category || '';
-            const nameB = b.category || '';
+            const nameA = a.category ?? '';
+            const nameB = b.category ?? '';
 
             if (nameA < nameB) {
                 return -1;
@@ -153,8 +131,8 @@ export class StandComponent implements OnInit {
                 return 1;
             }
 
-            const nameAName = a.participation?.therapistName?.toLocaleLowerCase() || '';
-            const nameBName = b.participation?.therapistName?.toLocaleLowerCase() || '';
+            const nameAName = a.participation?.therapistName?.toLocaleLowerCase() ?? '';
+            const nameBName = b.participation?.therapistName?.toLocaleLowerCase() ?? '';
 
             if (nameAName < nameBName) {
                 return -1;

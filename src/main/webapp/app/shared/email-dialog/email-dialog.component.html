@@ -5,22 +5,32 @@
 
     <div class="modal-body">
         <div class="row">
-            <div class="mt-3 col-12 col-sm-6">
+            <div class="mt-4 col-12 col-sm-6">
                 <text-box fieldName="from" formControlName="from" translateKey="email.from"/>
             </div>
-            <div class="mt-3 col-12 col-sm-6">
+            <div class="mt-4 col-12 col-sm-6">
                 <text-box fieldName="to" formControlName="to" translateKey="email.to"/>
             </div>
-            <div class="mt-3 col-12">
+            <div class="mt-4 col-12">
                 <text-box fieldName="subject" formControlName="subject" translateKey="email.subject"/>
             </div>
-            <div class="mt-3 col-12">
-                <quill-editor
-                        [modules]="quillModules"
-                        style="width: 100%"
-                        formControlName="body"
-                        theme="snow">
-                </quill-editor>
+            <div class="mt-4 col-12">
+                <div class="fw-bold">
+                    Attachements
+                </div>
+                <div class="d-flex w-100">
+                @for (attachment of form.get('attachments')?.value; track attachment.id) {
+                    <a class="underline text-primary" (click)="downloadAttachment(attachment)"><small>{{attachment.filename}}</small></a>
+                } @empty {
+                    <small>Aucun</small>
+                }
+                </div>
+            </div>
+            <div class="mt-4 col-12">
+                <p-editor formControlName="body"
+                          [style]="{ height: '240px' }"
+                          (onInit)="onEditorInit($event)"
+                />
             </div>
         </div>
     </div>

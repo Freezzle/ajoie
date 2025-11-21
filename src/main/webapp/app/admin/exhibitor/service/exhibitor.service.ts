@@ -36,29 +36,12 @@ export class ExhibitorService {
         return this.http.get<IExhibitor[]>(this.resourceUrl, {params: options, observe: 'response'});
     }
 
-    delete(idExhibitor: string): Observable<{}> {
+    delete(idExhibitor: string): Observable<unknown> {
         return this.http.delete(`${this.resourceUrl}/${idExhibitor}`);
     }
 
-    addExhibitorOptionsIfMissing<Type extends Pick<IExhibitor, 'id'>>(
-        exhibitorCollection: Type[],
-        ...exhibitorsToCheck: (Type | null | undefined)[]
-    ): Type[] {
-        const exhibitors: Type[] = exhibitorsToCheck.filter(isPresent);
-        if (exhibitors.length > 0) {
-            const exhibitorCollectionIdentifiers = exhibitorCollection.map(
-                exhibitorItem => getExhibitorIdentifier(exhibitorItem));
-            const exhibitorsToAdd = exhibitors.filter(exhibitorItem => {
-                const exhibitorIdentifier = getExhibitorIdentifier(exhibitorItem);
-                if (exhibitorCollectionIdentifiers.includes(exhibitorIdentifier)) {
-                    return false;
-                }
-                exhibitorCollectionIdentifiers.push(exhibitorIdentifier);
-                return true;
-            });
-            return [...exhibitorsToAdd, ...exhibitorCollection];
-        }
-        return exhibitorCollection;
+    getExhibitorsWithActiveNewsletter(): Observable<IExhibitor[]> {
+        return this.http.get<IExhibitor[]>(`${this.resourceUrl}/newsletter`);
     }
 }
 

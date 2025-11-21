@@ -107,9 +107,7 @@
     <p th:utext="#{document.invoice.important.title}"></p>
     <div class="padding-left-5">
         <p th:utext="#{document.invoice.important.text1}"></p>
-        <br/>
-        <p th:if="${arrangement}"
-              th:utext="#{document.invoice.important.text2.arrangement(${expirationDate})}"></p>
+        <p th:if="${arrangement}" th:utext="#{document.invoice.important.text2.arrangement(${expirationDate})}"></p>
     </div>
     <br/>
     <br/>

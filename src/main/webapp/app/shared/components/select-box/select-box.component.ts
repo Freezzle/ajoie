@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Self} from '@angular/core';
+import {Component, Input, Self} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -23,6 +23,9 @@ export class SelectBoxComponent implements ControlValueAccessor {
     options: any[] = [];
 
     @Input()
+    dataKey: string = 'id';
+
+    @Input()
     enableFilter: boolean = false;
 
     @Input()
@@ -30,15 +33,51 @@ export class SelectBoxComponent implements ControlValueAccessor {
 
     @Input()
     formatterFunction: (a: any) => string = (a: any) => {
-        if (!a) {
+        if (a == null) {
             return '';
         }
-        // Si c’est un string, on le renvoie tel quel
         if (typeof a === 'string') {
             return a;
         }
-        // Sinon on essaie quelques propriétés standard
-        return a.label ?? a.name ?? a.id ?? JSON.stringify(a);
+        if (typeof a === 'number' || typeof a === 'boolean' || typeof a === 'bigint') {
+            return String(a);
+        }
+        if (typeof a === 'symbol') {
+            return a.toString();
+        }
+        if (typeof a === 'function') {
+            return `[Function ${a.name ?? 'anonymous'}]`;
+        }
+
+        if (typeof a === 'object') {
+            const obj = a as Record<string, unknown>;
+            const candidate = obj['label'] ?? obj['name'] ?? obj['id'];
+
+            if (typeof candidate === 'string') {
+                return candidate;
+            }
+            if (typeof candidate === 'number' || typeof candidate === 'boolean' || typeof candidate === 'bigint') {
+                return String(candidate);
+            }
+
+            if (a instanceof Date) {
+                return a.toISOString();
+            }
+            if (a instanceof Error) {
+                return a.message;
+            }
+
+            const json = this.safeStringify(a);
+            if (json) {
+                return json;
+            }
+
+            // final fallback for objects (no base String(a))
+            return Object.prototype.toString.call(a);
+        }
+
+        // should be unreachable, but keep total safety
+        return '';
     };
 
     @Input()
@@ -84,7 +123,7 @@ export class SelectBoxComponent implements ControlValueAccessor {
      * - object[] => 'id' (par défaut)
      */
     get dataKeyToUse(): string | undefined {
-        return this.stringOptions ? undefined : 'id';
+        return this.stringOptions ? undefined : this.dataKey;
     }
 
 
@@ -107,5 +146,34 @@ export class SelectBoxComponent implements ControlValueAccessor {
             return undefined;
         }
         return this.filterFields ?? 'label,name,id';
+    }
+
+    private safeStringify(value: unknown): string | null {
+        try {
+            const seen = new WeakSet<object>();
+
+            const json = JSON.stringify(value, (_key, val: unknown) => {
+                if (typeof val === 'object' && val !== null) {
+                    if (seen.has(val)) {
+                        return '[Circular]';
+                    }
+                    seen.add(val);
+                }
+                if (typeof val === 'bigint') {
+                    return val.toString();
+                }
+                if (typeof val === 'function') {
+                    return `[Function ${val.name || 'anonymous'}]`;
+                }
+                if (typeof val === 'symbol') {
+                    return val.toString();
+                }
+                return val;
+            });
+
+            return typeof json === 'string' ? json : null;
+        } catch {
+            return null;
+        }
     }
 }

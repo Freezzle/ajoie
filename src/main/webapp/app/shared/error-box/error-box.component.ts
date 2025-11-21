@@ -16,6 +16,6 @@ export class ErrorBoxComponent {
     }
 
     errorKeys(errors: any): string[] {
-        return Object.keys(errors || {});
+        return Object.keys(errors ?? {});
     }
 }

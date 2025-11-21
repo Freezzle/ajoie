@@ -5,11 +5,9 @@ import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.PriceStandLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PriceStandMapper {
-    PriceStandMapper INSTANCE = Mappers.getMapper(PriceStandMapper.class);
 
     PriceStandDTO toDto(PriceStandSalon priceStandSalon);
 

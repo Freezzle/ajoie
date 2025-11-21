@@ -8,7 +8,6 @@ import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule} fro
 import {ISalon} from '../model/salon.interface';
 import {SalonService} from '../service/salon.service';
 import {PriceStandGroup, SalonFormGroup, SalonFormService} from '../service/salon-form.service';
-import {ErrorModel} from '../../../shared/field-error/error.model';
 import {State} from '../../enumerations/state.model';
 import {Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
@@ -21,9 +20,13 @@ import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {CurrencyBoxComponent} from "../../../shared/components/currency-box/currency-box.component";
 import {NumberBoxComponent} from "../../../shared/components/number-box/number-box.component";
 import {TableModule} from "primeng/table";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
 
 @Component({
-    selector: 'jhi-salon-update',
+    selector: 'app-salon-update',
     templateUrl: './salon-update.component.html',
     imports: [
         SharedModule,
@@ -38,6 +41,10 @@ import {TableModule} from "primeng/table";
         CurrencyBoxComponent,
         NumberBoxComponent,
         TableModule,
+        ConfirmPopup,
+        Toast,
+        CardComponent,
+        ContentPageComponent,
     ]
 })
 export class SalonUpdateComponent implements OnInit {
@@ -60,9 +67,13 @@ export class SalonUpdateComponent implements OnInit {
 
                 this.processSalonData();
 
-                this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon!);
+                this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
 
-                this.isReadOnly ? this.activateReadOnlyMode() : this.activateEditMode();
+                if (this.isReadOnly) {
+                    this.activateReadOnlyMode()
+                } else {
+                    this.activateEditMode();
+                }
             });
     }
 
@@ -78,7 +89,7 @@ export class SalonUpdateComponent implements OnInit {
     activateReadOnlyMode(reset: boolean = true): void {
         this.isReadOnly = true;
         if (reset) {
-            this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon!);
+            this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
         }
         this.editForm.disable();
     }
@@ -124,7 +135,6 @@ export class SalonUpdateComponent implements OnInit {
         return this.editForm.controls.priceStandSalons;
     }
 
-    protected readonly ErrorModel = ErrorModel;
     protected readonly State = State;
     protected readonly Status = Status;
 }

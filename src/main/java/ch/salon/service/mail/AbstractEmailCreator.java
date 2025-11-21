@@ -2,7 +2,6 @@ package ch.salon.service.mail;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
@@ -74,10 +73,9 @@ public abstract class AbstractEmailCreator {
         message.setFrom(getSenderEmail());
 
         // FIXME CHANGE THAT LATER, AVOID SENDING PROD
-        message.setTo(getRecipientEmail().contains("dylan") ? getRecipientEmail() : "dylan.claude.work@gmail.com");
+        message.setTo(getRecipientEmail().contains("dylan") ? getRecipientEmail() : "");
         message.setSubject(getTranslatedSubject());
         message.setText(content, true);
-        message.addInline("logo_salon", new ClassPathResource("images/logo_salon.jpg"));
         return message;
     }
 }

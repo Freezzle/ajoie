@@ -1,14 +1,12 @@
-@import 'content/scss/bootstrap-variables';
-
 ::ng-deep .ql-container p {
   padding-bottom: 0.5em;
 }
 
 ::ng-deep .ql-container .ql-editor {
-  background-color: #fffddc;
+  background-color: var(--app-surface-muted);
   font-size: 15px;
 
   &:focus {
-    background-color: #ffffff;
+    background-color: var(--app-surface);
   }
 }

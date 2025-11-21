@@ -1,0 +1,15 @@
+<p-menu #menu
+        [popup]="true"
+        [model]="items"
+        [appendTo]="appendTo"/>
+
+<p-button (onClick)="menu.toggle($event)"
+          [disabled]="buttonDisabled"
+          [attr.title]="buttonTranslateKey | translate"
+          size="small"
+          severity="primary">
+    @if (buttonIcon) {
+        <fa-icon [icon]="buttonIcon"></fa-icon>
+    }
+    <span class="text-uppercase">{{ buttonTranslateKey | translate }}</span>
+</p-button>

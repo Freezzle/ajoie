@@ -1,9 +1,8 @@
 import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {getFirstExhibitorName} from '../../exhibitor/model/exhibitor.interface';
-import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, CdkDropList} from '@angular/cdk/drag-drop';
 import {
     AddPlanInfo,
-    ContextMenu,
+    convertAvailableDimensionCell,
     convertAvailableDimensionCells,
     DimensionCell,
     getColorStand,
@@ -26,26 +25,38 @@ import {finalize, map} from 'rxjs/operators';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ITEM_ADDED_EVENT, ITEM_DELETED_EVENT, ITEM_UPDATED_EVENT} from '../../../config/navigation.constants';
 import {RenamePlanDialogComponent} from '../rename-plan/rename-plan-dialog.component';
-import {NgbModal, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AddPlanDialogComponent} from '../add-plan/add-plan-dialog.component';
 import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
 import {CommonModule} from '@angular/common';
-import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
-import StatusPipe from '../../../shared/pipe/status.pipe';
 import {Status} from '../../enumerations/status.model';
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
 import {AlertComponent} from "../../../shared/alert/alert.component";
+import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {ContextMenu} from "primeng/contextmenu";
+import {MenuItem, PrimeIcons, PrimeTemplate} from "primeng/api";
+import {Dialog} from "primeng/dialog";
+import {Tag} from "primeng/tag";
+import {Category, formatterCategory} from "../../enumerations/category.model";
+import {FloorPlanDimensionTileComponent} from "./floor-plan-dimension-tile/floor-plan-dimension-tile.component";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import ColorStatusPipe from "../../../shared/pipe/color-status.pipe";
+import StatusPipe from "../../../shared/pipe/status.pipe";
 
 @Component({
-    selector: 'jhi-floor-plan',
+    selector: 'floor-plan',
     templateUrl: './floor-plan-detail.component.html',
     styleUrl: './floor-plan-detail.component.scss',
-    imports: [SharedModule, CommonModule, RouterModule, CdkDragHandle, CdkDrag, CdkDropList, FormsModule,
-        ReactiveFormsModule, ButtonBoxComponent, LinkBoxComponent, ColorStatusPipe, StatusPipe, AlertComponent]
+    imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule,
+        ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Dialog, Tag, PrimeTemplate, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe]
 })
 export class FloorPlanDetailComponent implements OnInit, OnDestroy {
+    @ViewChild('cm', {static: true}) cm!: ContextMenu;
+
     protected modalService = inject(NgbModal);
     private salonService = inject(SalonService);
     private standService = inject(StandService);
@@ -54,6 +65,10 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     PIXELS = 20;
     DEFAULT_HIGHLIGHT = '#FFFFFF';
+
+    contextMenuItems: MenuItem[] = [];
+    currentCell: GridCell | null = null;
+    standDialogVisible = false;
 
     @ViewChild('gridDropList')
     gridContainer!: ElementRef;
@@ -67,9 +82,8 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     sizeRealCell = 2;
     isLoading = false;
 
-    contextMenu: ContextMenu = {printable: 'CLOSED', x: 0, y: 0, cell: {} as GridCell} as ContextMenu;
     stands: IStand[] = [];
-    availableStands: IStand[] = [];
+    availableStandDimensions: DimensionCell[] = [];
     availableDimensions: DimensionCell[] = [];
     salon?: ISalon;
     gridCellPopOver: GridCell | null = null;
@@ -126,18 +140,22 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
                     .subscribe(([stands, floorPlans, dimensionStands]) => {
                         this.availableDimensions = convertAvailableDimensionCells(dimensionStands);
                         this.stands = stands;
-                        this.availableStands = stands.filter(
+                        let availableStands = stands.filter(
                             stand => stand.status !== Status.CANCELED && stand.status !== Status.REFUSED);
 
                         if (floorPlans.length > 0) {
                             floorPlans.forEach(floorPlan => {
                                 this.floorPlans.push(mapFloorPlanLight(floorPlan, this.availableDimensions, this.stands));
 
-                                this.availableStands = this.availableStands.filter(
+                                availableStands = availableStands.filter(
                                     stand => !floorPlan.data.cells.flatMap(row => row.flatMap(column => column.dimension?.stand?.id))
                                         .includes(stand.id));
+
+                                this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
                             });
                         } else {
+                            this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
+
                             this.floorPlans.push({
                                 id: null,
                                 position: 1,
@@ -187,10 +205,10 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     }
 
     private initializeState(): void {
-        this.contextMenu = {printable: 'CLOSED', x: 0, y: 0, cell: {} as GridCell} as ContextMenu;
+        this.currentCell = null;
         this.stands = [];
         this.availableDimensions = [];
-        this.availableStands = [];
+        this.availableStandDimensions = [];
         this.gridCellPopOver = null;
         this.floorPlans = [];
         this.indexActiveFloorPlan = 0;
@@ -252,101 +270,12 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         }
     }
 
-    removeShapeById(shapeId: string | null) {
-        if (!shapeId) {
-            return;
-        }
-
-        this.forEachCell(cell => {
-            if (cell.id === shapeId) {
-                this.unassignCell(cell);
-                this.resetCell(cell);
-            }
-        });
-
-        this.contextMenu.printable = 'CLOSED';
-    }
-
-    unassign(shapeId: string | null) {
-        if (!shapeId) {
-            return;
-        }
-
-        this.forEachCell(cell => {
-            if (cell.id === shapeId) {
-                this.unassignCell(cell);
-            }
-        });
-
-        this.contextMenu.printable = 'CLOSED';
-    }
-
-    private unassignCell(cell: GridCell) {
-        if (cell.dimension?.stand) {
-            this.availableStands.push(JSON.parse(JSON.stringify(cell.dimension.stand)) as IStand);
-            cell.dimension.stand = null;
-            cell.dimension.color = getColorStand(cell.dimension.stand);
-        }
-    }
-
-    assign(givenStand: IStand, givenCell: GridCell | null) {
-        if (!givenCell) {
-            return;
-        }
-
-        this.forEachCell(cell => {
-            if (cell.dimension && cell.id === givenCell.id) {
-                cell.dimension.stand = JSON.parse(JSON.stringify(givenStand)) as IStand;
-                cell.dimension.color = getColorStand(cell.dimension.stand);
-            }
-        });
-
-        this.availableStands = this.availableStands.filter(stand => stand.id !== givenStand.id);
-        this.contextMenu.printable = 'CLOSED';
-    }
-
-    openContextMenu(event: MouseEvent, row: number, col: number) {
-        event.preventDefault();
-        if (this.isReadOnly) {
-            return;
-        }
-
-        const cell = this.getCell(row, col);
-        if (cell?.id) {
-            // Calculer la position relative au conteneur
-            const x = event.clientX + (this.gridContainer ? this.gridContainer.nativeElement.scrollLeft : 0);
-            const y = event.clientY + (this.gridContainer ? this.gridContainer.nativeElement.scrollTop : 0);
-
-            const xPos = Math.floor(x);
-            const yPos = Math.floor(y);
-
-            this.contextMenu = {
-                printable: 'MAIN',
-                x: xPos, // ou xPos
-                y: yPos, // ou yPos
-                cell: cell,
-            };
-        } else {
-            this.contextMenu.printable = 'CLOSED';
-        }
-    }
-
-    togglePopover(popover: NgbPopover, cell: GridCell) {
-        if (popover.isOpen()) {
-            this.gridCellPopOver = null;
-            popover.close();
-        } else {
-            this.gridCellPopOver = cell;
-            popover.open();
-        }
-    }
-
     drop(event: CdkDragDrop<any[]>) {
         this.clearHighlights();
-        const dimensionCell = JSON.parse(JSON.stringify(event.item.data)) as DimensionCell;
-        if (!this.gridContainer) {
-            return;
-        }
+
+        const dimensionCell = structuredClone(event.item.data) as DimensionCell;
+
+        if (!this.gridContainer) {return;}
 
         const gridRect = this.gridContainer.nativeElement.getBoundingClientRect();
         const x = event.dropPoint.x - gridRect.left;
@@ -355,8 +284,13 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         const row = Math.floor(y / this.PIXELS);
         const col = Math.floor(x / this.PIXELS);
 
-        if (this.canPlaceShape(row, col, dimensionCell)) {
-            this.placeShape(row, col, dimensionCell);
+        if (!this.canPlaceShape(row, col, dimensionCell)) {return;}
+
+        this.placeShape(row, col, dimensionCell);
+
+        const standId = dimensionCell?.stand?.id;
+        if (standId) {
+            this.availableStandDimensions = this.availableStandDimensions.filter(d => d.stand!.id !== standId);
         }
     }
 
@@ -418,7 +352,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
                         continue;
                     }
 
-                    this.getCell(row + i, col + j).colorHighlight = 'rgb(255, 0, 0, 0.5)';
+                    this.getCell(row + i, col + j).colorHighlight = 'var(--app-danger)';
                 }
             }
             return;
@@ -426,7 +360,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
         for (let i = 0; i < shape.rows; i++) {
             for (let j = 0; j < shape.cols; j++) {
-                this.getCell(row + i, col + j).colorHighlight = 'rgb(255,255,0,0.5)';
+                this.getCell(row + i, col + j).colorHighlight = 'var(--app-surface-muted)';
             }
         }
     }
@@ -481,14 +415,14 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     movePositionFloorPlan(mode: 'right' | 'left') {
         const floorPlan = this.getActiveFloorPlan();
-        if (!floorPlan || !this.canMoveFloorPlan(mode)) return;
+        if (!floorPlan || !this.canMoveFloorPlan(mode)) {return;}
 
         const delta = mode === 'right' ? 1 : -1;
         const neighborPos = floorPlan.position + delta;
 
         // Trouver le voisin par sa position
         const neighbor = this.floorPlans.find(fp => fp.position === neighborPos);
-        if (!neighbor) return;
+        if (!neighbor) {return;}
 
         // Swap des positions
         const tmp = floorPlan.position;
@@ -638,6 +572,13 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         });
     }
 
+    changeRotationAvailableStands(): void {
+        this.availableStandDimensions = this.availableStandDimensions.map(dimension => {
+            this.changeRotation(dimension);
+            return dimension;
+        });
+    }
+
     private changeRotation(dimension: DimensionCell) {
         const rows = dimension.rows;
         const cols = dimension.cols;
@@ -673,7 +614,135 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         this.displayHeader = !this.displayHeader;
     }
 
+    removeShapeById(shapeId: string | null | undefined) {
+        if (!shapeId) {
+            return;
+        }
+
+        this.forEachCell(cell => {
+            if (cell.id === shapeId) {
+                this.unassignCell(cell);
+                this.resetCell(cell);
+            }
+        });
+
+        this.cm?.hide();
+    }
+
+    unassign(shapeId: string | null | undefined) {
+        if (!shapeId) {
+            return;
+        }
+
+        this.forEachCell(cell => {
+            if (cell.id === shapeId) {
+                this.unassignCell(cell);
+            }
+        });
+
+        this.cm?.hide();
+    }
+
+    private unassignCell(cell: GridCell) {
+        if (cell.dimension?.stand) {
+            this.availableStandDimensions.push(convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand));
+            cell.dimension.stand = null;
+            cell.dimension.color = getColorStand(cell.dimension.stand);
+        }
+    }
+
+    assign(givenStand: IStand, givenCell: GridCell | null) {
+        if (!givenCell) {
+            return;
+        }
+
+        this.forEachCell(cell => {
+            if (cell.dimension && cell.id === givenCell.id) {
+                cell.dimension.stand = structuredClone(givenStand);
+                cell.dimension.color = getColorStand(cell.dimension.stand);
+            }
+        });
+
+        this.availableStandDimensions = this.availableStandDimensions.filter(
+            dim => dim.stand!.id !== givenStand.id
+        );
+        this.cm?.hide();
+    }
+
+    openContextMenu(event: MouseEvent, cell: GridCell): void {
+        event.preventDefault();
+        if (this.isReadOnly) {
+            return;
+        }
+
+        if (!cell?.id) {
+            this.cm?.hide();
+            return;
+        }
+
+        this.currentCell = cell;
+        this.contextMenuItems = this.buildContextMenuItems(cell);
+        this.cm?.show(event);
+    }
+
+    private buildContextMenuItems(cell: GridCell): MenuItem[] {
+        const items: MenuItem[] = [];
+
+        // CAS 1 : pas de stand -> on propose "Attribuer à..." (avec sous-menu)
+        if (!cell.dimension?.stand) {
+            if (this.availableStandDimensions.length) {
+                items.push({
+                    label: 'Attribuer à...',
+                    icon: PrimeIcons.USER_PLUS + ' text-success',
+                    items: this.availableStandDimensions.map(dim => ({
+                        label: this.getFormattedParticipationName(dim.stand!.participation),
+                        // petit indicateur si la dimension colle
+                        icon:
+                            dim.stand!.dimension?.id === cell.dimension?.idDimension
+                                ? PrimeIcons.VERIFIED + ' text-success'
+                                : PrimeIcons.EXCLAMATION_CIRCLE + ' text-warning',
+                        command: () => this.assign(dim.stand!, cell),
+                    })),
+                });
+            } else {
+                items.push({
+                    label: 'Aucun stand disponible',
+                    icon: PrimeIcons.USER,
+                    disabled: true,
+                });
+            }
+        }
+
+        // CAS 2 : stand présent -> "Désattribuer"
+        if (cell.dimension?.stand) {
+            items.push({
+                label: 'Désattribuer',
+                icon: PrimeIcons.USER_MINUS + ' text-warning',
+                command: () => this.unassign(cell.id),
+            });
+        }
+
+        // commun : supprimer le stand
+        items.push({
+            label: 'Supprimer l\'emplacement',
+            icon: PrimeIcons.TRASH + ' text-danger',
+            command: () => this.removeShapeById(cell.id),
+        });
+
+        return items;
+    }
+
+    openStandDialog(cell: GridCell | null): void {
+        if (!cell) {
+            return;
+        }
+
+        this.gridCellPopOver = cell;
+        this.standDialogVisible = true;
+    }
+
     protected readonly getFormattedParticipationName = getFormattedParticipationName;
-    protected readonly getFirstExhibitorName = getFirstExhibitorName;
+    protected readonly formatterCategory = formatterCategory;
+    protected readonly Category = Category;
     protected readonly getColorStand = getColorStand;
 }

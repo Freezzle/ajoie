@@ -8,6 +8,7 @@ import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.dto.StandDTO;
 import ch.salon.service.mapper.StandMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,7 +18,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static ch.salon.web.rest.errors.ErrorBusinessKey.ID_EXISTS;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.PARTICIPATION_NOTFOUND;
+
 @Service
+@AllArgsConstructor
 public class StandService {
 
     public static final String ENTITY_NAME = "stand";
@@ -25,26 +30,26 @@ public class StandService {
     private final StandRepository standRepository;
     private final ParticipationService participationService;
     private final EventLogService eventLogService;
-
-    public StandService(StandRepository standRepository, ParticipationService participationService,
-            EventLogService eventLogService) {
-        this.standRepository = standRepository;
-        this.participationService = participationService;
-        this.eventLogService = eventLogService;
-    }
+    private final StandMapper standMapper;
 
     public UUID create(StandDTO stand) {
-        if (stand == null || stand.getId() != null) {
+        if (stand == null) {
             throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "id.exists");
         }
 
-        Stand entity = StandMapper.INSTANCE.toEntity(stand);
+        if (stand.getId() != null) {
+            throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, ID_EXISTS);
+        }
+        if (participationService.get(stand.getParticipation().getId()).isEmpty()) {
+            throw new BadRequestAlertException("Participation does not exist", ENTITY_NAME, PARTICIPATION_NOTFOUND);
+        }
+
+        Stand entity = standMapper.toEntity(stand);
         entity.setRegistrationDate(Instant.now());
         entity = standRepository.save(entity);
 
-        this.eventLogService.eventFromSystem("Un stand a été ajouté", EventType.EVENT, EntityType.PARTICIPATION,
+        this.eventLogService.eventFromSystem("Stand ajouté", EventType.EVENT, EntityType.PARTICIPATION,
                 entity.getParticipation().getId(), null);
-        this.participationService.adaptStatusFromChildren(entity.getParticipation().getId());
 
         return entity.getId();
     }
@@ -61,7 +66,7 @@ public class StandService {
         Stand standExisting = standRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Stand standToUpdate = StandMapper.INSTANCE.toEntity(stand);
+        Stand standToUpdate = standMapper.toEntity(stand);
 
         if (Stand.diffDimension(standToUpdate, standExisting)) {
             this.eventLogService.eventFromSystem("Un stand a changé de dimension", EventType.EVENT,
@@ -72,10 +77,10 @@ public class StandService {
 
         if (Stand.diffShared(standToUpdate, standExisting)) {
             if (standToUpdate.getShared()) {
-                this.eventLogService.eventFromSystem("Un stand a un co-exposant", EventType.EVENT,
+                this.eventLogService.eventFromSystem("Stand avec co-exposant", EventType.EVENT,
                         EntityType.PARTICIPATION, standExisting.getParticipation().getId(), null);
             } else {
-                this.eventLogService.eventFromSystem("Un stand n'a plus de co-exposant", EventType.EVENT,
+                this.eventLogService.eventFromSystem("Stand sans co-exposant", EventType.EVENT,
                         EntityType.PARTICIPATION, standExisting.getParticipation().getId(), null);
             }
         }
@@ -89,18 +94,17 @@ public class StandService {
 
         standToUpdate.setRegistrationDate(standExisting.getRegistrationDate());
         standToUpdate = standRepository.save(standToUpdate);
-        this.participationService.adaptStatusFromChildren(standToUpdate.getParticipation().getId());
 
-        return StandMapper.INSTANCE.toDto(standToUpdate);
+        return standMapper.toDto(standToUpdate);
     }
 
     public List<StandDTO> findAll(UUID idSalon, UUID idParticipation) {
         if (idParticipation != null) {
             return standRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation).stream()
-                                  .map(StandMapper.INSTANCE::toDto).toList();
+                                  .map(standMapper::toDto).toList();
         } else if (idSalon != null) {
             return standRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
-                                  .map(StandMapper.INSTANCE::toDto).toList();
+                                  .map(standMapper::toDto).toList();
         }
 
         throw new IllegalStateException("No filter given");
@@ -111,7 +115,7 @@ public class StandService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return standRepository.findById(id).map(StandMapper.INSTANCE::toDto);
+        return standRepository.findById(id).map(standMapper::toDto);
     }
 
     public void delete(UUID id) {
@@ -121,8 +125,7 @@ public class StandService {
 
         UUID idParticipation = get(id).map(StandDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
         standRepository.deleteById(id);
-        this.eventLogService.eventFromSystem("Un stand a été supprimé", EventType.EVENT, EntityType.PARTICIPATION,
+        this.eventLogService.eventFromSystem("Stand supprimé", EventType.EVENT, EntityType.PARTICIPATION,
                 idParticipation, null);
-        this.participationService.adaptStatusFromChildren(idParticipation);
     }
 }

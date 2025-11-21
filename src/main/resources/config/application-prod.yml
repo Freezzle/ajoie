@@ -1,13 +1,4 @@
 # ===================================================================
-# Spring Boot configuration for the "prod" profile.
-#
-# This configuration overrides the application.yml file.
-#
-# More information on profiles: https://www.jhipster.tech/profiles/
-# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
-# ===================================================================
-
-# ===================================================================
 # Standard Spring Boot properties.
 # Full reference is available at:
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
@@ -16,14 +7,7 @@
 logging:
   level:
     ROOT: INFO
-    tech.jhipster: INFO
     ch.salon: INFO
-
-management:
-  prometheus:
-    metrics:
-      export:
-        enabled: false
 
 spring:
   devtools:
@@ -45,8 +29,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: dylan.claude.work@gmail.com
-    password: ruxq ocqf hhpe bgf
+    username: lajoiedemieuxvivre@gmail.com
+    password: TO BE OVERRIDE BY CI
     properties:
       mail:
         smtp:
@@ -84,13 +68,7 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json,image/svg+xml
     min-response-size: 1024
 
-# ===================================================================
-# JHipster specific properties
-#
-# Full reference is available at: https://www.jhipster.tech/common-application-properties/
-# ===================================================================
-
-jhipster:
+salon:
   http:
     cache: # Used by the CachingHttpHeadersFilter
       timeToLiveInDays: 1461
@@ -102,8 +80,8 @@ jhipster:
     remember-me:
       # security key (this key should be unique for your application, and kept secret)
       key: 3725f3520cd45993d988a5545c7556d093a6de6eba61b6ad352f6635727fc57f669f7fc6578edca5698089d6dd0baa21e224
-  mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: http://my-server-url-to-change # Modify according to your server's URL
+  mail:
+    base-url: http://my-server-url-to-change
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
@@ -111,13 +89,8 @@ jhipster:
       host: localhost
       port: 5000
       ring-buffer-size: 512
-# ===================================================================
-# Application specific properties
-# Add your own application properties here, see the ApplicationProperties class
-# to have type-safe configuration, like in the JHipsterProperties above
-#
-# More documentation is available at:
-# https://www.jhipster.tech/common-application-properties/
-# ===================================================================
 
 # application:
+app:
+  mail:
+    redirect-all-to: ""

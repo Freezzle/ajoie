@@ -1,163 +1,187 @@
-<div>
-    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-        <h2 id="page-heading">
+<app-content-page [formGroup]="editForm">
+    <div appMenuBarStart>
+        @if (editForm.controls.id.value) {
+            <h3>{{ 'exhibitor.edit' | translate }}</h3>
+        } @else {
+            <h3>{{ 'exhibitor.create' | translate }}</h3>
+        }
+    </div>
+    <div appMenuBarEnd>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    faIcon="arrow-left"
+                    translateKey="common.back"
+                    [showText]="false"/>
+        @if (isReadOnly) {
+            <button-box (clickedEvent)="edit()"
+                        [isDisabled]="isLoading"
+                        faIcon="pencil-alt"
+                        translateKey="common.edit"
+                        [showText]="false"/>
+        }
 
-            <div class="d-flex justify-content-center">
-                @if (editForm.controls.id.value) {
-                    <span jhiTranslate="exhibitor.edit">Modification d'un exposant</span>
-                }
-                @if (!editForm.controls.id.value) {
-                    <span jhiTranslate="exhibitor.create">Création d'un nouvel exposant</span>
-                }
-            </div>
+        @if (editForm.controls.id.value && !isReadOnly) {
+            <button-box (clickedEvent)="cancel()"
+                        [isDisabled]="isLoading"
+                        faIcon="ban"
+                        translateKey="common.cancel"
+                        [showText]="false"
+                        type="secondary"/>
+        }
 
-            <hr/>
-
-            <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button-box (clickedEvent)="previousState()"
-                      [isDisabled]="isLoading"
-                      faIcon="arrow-left"
-                      translateKey="common.back"/>
-          </span>
-
-                <span>
-            @if (isReadOnly) {
-                <button-box (clickedEvent)="activateEditMode()"
-                            [isDisabled]="isLoading"
-                            faIcon="pencil-alt"
-                            translateKey="common.edit"/>
-            }
-
-                    @if (editForm.controls.id.value && !isReadOnly) {
-                        <button-box (clickedEvent)="activateReadOnlyMode()"
-                                    [isDisabled]="isLoading"
-                                    faIcon="ban"
-                                    translateKey="common.cancel"
-                                    type="secondary"/>
-                    }
-
-                    @if (!isReadOnly) {
-                        <button-box [isDisabled]="editForm.invalid || isLoading"
-                                    [isSubmit]="true"
-                                    faIcon="floppy-disk"
-                                    translateKey="common.save"/>
-                    }
-          </span>
-            </div>
-        </h2>
-
-        <div>
-            <jhi-alert-error></jhi-alert-error>
-            <jhi-alert></jhi-alert>
-
-            <div class="card">
-                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="mt-3 col-sm-12 col-lg-3">
-                            <text-box fieldName="fullName"
-                                      formControlName="fullName"
-                                      translateKey="exhibitor.fullName"/>
-                        </div>
-                        <div class="mt-3 col-sm-6 col-lg-3">
-                            <text-box fieldName="email" formControlName="email" translateKey="exhibitor.email"/>
-                        </div>
-                        <div class="mt-3 col-sm-6 col-lg-3">
-                            <text-box fieldName="phoneNumber"
-                                      formControlName="phoneNumber"
-                                      translateKey="exhibitor.phoneNumber"/>
-                        </div>
-                        <div class="mt-3 col-sm-6 col-lg-3">
-                            <select-box [formatterFunction]="formatterLanguage"
-                                        [needTranslation]="true"
-                                        [options]="languageValues"
-                                        fieldName="language"
-                                        formControlName="language"
-                                        translateKey="exhibitor.language.list.label"/>
-                        </div>
-                        <div class="mt-3 col-sm-6 col-lg-4">
-                            <checkbox-box fieldName="newsletter"
-                                          formControlName="newsletter"
-                                          translateKey="exhibitor.newsletter"/>
-                        </div>
-                        <div class="mt-3 col-sm-6 col-lg-4">
-                            <checkbox-box fieldName="redFlag"
-                                          formControlName="redFlag"
-                                          translateKey="exhibitor.redFlag"/>
-                        </div>
-                        <div class="mt-3 col-sm-6 col-lg-4">
-                            <checkbox-box fieldName="duplicateDetected"
-                                          formControlName="duplicateDetected"
-                                          translateKey="exhibitor.duplicateDetected"/>
-                        </div>
-                        <div class="mt-3 col-sm-6">
-                            <text-box fieldName="address" formControlName="address" translateKey="exhibitor.address"/>
-                        </div>
-                        <div class="mt-3 col-sm-6">
-                            <text-box fieldName="npaLocalite"
-                                      formControlName="npaLocalite"
-                                      translateKey="exhibitor.npaLocalite"/>
-                        </div>
-
-                        <div class="mt-3 col-12">
-                            <textarea-box fieldName="extraInformation"
-                                          formControlName="extraInformation"
-                                          translateKey="exhibitor.extraInformation"/>
-                        </div>
-                    </div>
+        @if (!isReadOnly) {
+            <button-box (clickedEvent)="save()"
+                        [isDisabled]="editForm.invalid || isLoading"
+                        [isSubmit]="true"
+                        faIcon="floppy-disk"
+                        translateKey="common.save"
+                        [showText]="false"/>
+        }
+    </div>
+    <app-alert-error></app-alert-error>
+    <app-alert></app-alert>
+    <p-toast/>
+    <p-confirmpopup/>
+    <app-card>
+        <div appCardHeader>
+            <h4>{{ 'common.info-basic' | translate }}</h4>
+        </div>
+        <div appCardBody>
+            <div class="row">
+                <div class="mt-4 col-lg-6">
+                    <text-box fieldName="fullName" formControlName="fullName" translateKey="exhibitor.fullName"/>
                 </div>
-            </div>
-
-            <div class="col-sm-12 mt-3">
-                <div class="card h-100">
-                    <h5 class="card-header" jhiTranslate="participation.title">Les participations</h5>
-                    <div class="card-body">
-                        <div class="row">
-                            @if (!isReadOnly) {
-                                <div class="col-12 align-content-center">
-                                    <label jhiTranslate="participation.cannot-show">No data can be shown during editing
-                                                                                    a participation
-                                    </label>
-                                </div>
-                            } @else {
-                                @if (participations$ | async; as participations) {
-                                    <div class="table-responsive table-entities" id="entities-participations">
-                                        <table aria-describedby="page-heading" class="table table-hover">
-                                            <thead class="thead-primary">
-                                            <tr>
-                                                <th class="width-75">{{ 'salon.place' | translate }}</th>
-                                                <th class="width-25 text-center">{{ 'participation.status.label' | translate }}</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                @if (participations.length === 0) {
-                                                    <tr>
-                                                        <td colspan="2">{{ 'participation.notFound' | translate }}</td>
-                                                    </tr>
-                                                } @else {
-                                                    @for (participation of participations; track $index) {
-                                                        <tr>
-                                                            <td class="go-detail"
-                                                                [routerLink]="['/admin',  'salons',  participation.salon.id,  'participations',  participation.id,  'view']">{{ participation.salon.place }}
-                                                            </td>
-                                                            <td class="go-detail text-center">
-                                                                <fa-icon [icon]="participation.status | status"
-                                                                         [class]="participation.status | colorStatus"
-                                                                         [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
-                                                            </td>
-                                                        </tr>
-                                                    }
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    </div>
+                <div class="mt-4 col-lg-6">
+                    <text-box fieldName="email" formControlName="email" translateKey="exhibitor.email"/>
+                </div>
+                <div class="mt-4 col-lg-6">
+                    <text-box fieldName="phoneNumber"
+                              formControlName="phoneNumber"
+                              translateKey="exhibitor.phoneNumber"/>
+                </div>
+                <div class="mt-4 col-lg-6">
+                    <select-box [formatterFunction]="formatterLanguage"
+                                [needTranslation]="true"
+                                [options]="languageValues"
+                                fieldName="language"
+                                formControlName="language"
+                                translateKey="exhibitor.language.list.label"/>
                 </div>
             </div>
         </div>
-    </form>
-</div>
+    </app-card>
+    <app-card>
+        <div appCardHeader>
+            <h4>{{ 'exhibitor.homeAddress' | translate }}</h4>
+        </div>
+        <div appCardBody>
+            <div class="row">
+                <div class="mt-4 col-sm-12">
+                    <text-box fieldName="address" formControlName="address" translateKey="exhibitor.address"/>
+                </div>
+                <div class="mt-4 col-sm-6">
+                    <text-box fieldName="npaLocalite"
+                              formControlName="npaLocalite"
+                              translateKey="exhibitor.npaLocalite"/>
+                </div>
+                <div class="mt-4 col-sm-6">
+                    <select-box [formatterFunction]="formatterCountry"
+                                [options]="countryService.getAll()"
+                                [needTranslation]="true"
+                                fieldName="name"
+                                formControlName="isoCountry"
+                                translateKey="exhibitor.country"/>
+                </div>
+            </div>
+        </div>
+    </app-card>
+    <app-card>
+        <div appCardHeader>
+            <h4>{{ 'exhibitor.preferences' | translate }}</h4>
+        </div>
+        <div appCardBody>
+            <div class="row">
+                <div class="mt-4 col-12">
+                    <checkbox-box fieldName="newsletter"
+                                  formControlName="newsletter"
+                                  translateKey="exhibitor.newsletter"/>
+                </div>
+            </div>
+        </div>
+    </app-card>
+    <app-card>
+        <div appCardHeader>
+            <h4>{{ 'common.info-intern' | translate }}</h4>
+        </div>
+        <div appCardBody>
+            <div class="row">
+                <div class="mt-4 col-sm-6">
+                    <checkbox-box fieldName="redFlag" formControlName="redFlag" translateKey="exhibitor.redFlag"/>
+                </div>
+                <div class="mt-4 col-sm-6">
+                    <checkbox-box fieldName="duplicateDetected"
+                                  formControlName="duplicateDetected"
+                                  translateKey="exhibitor.duplicateDetected"/>
+                </div>
+                <div class="mt-4 col-12">
+                    <textarea-box fieldName="extraInformation"
+                                  formControlName="extraInformation"
+                                  translateKey="exhibitor.extraInformation"/>
+                </div>
+            </div>
+        </div>
+    </app-card>
+
+    @if (isReadOnly) {
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'participation.title' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <div class="row">
+                    <p-table #dt2
+                             class="mt-2"
+                             [value]="(participations$ | async)!"
+                             dataKey="id"
+                             [rows]="10"
+                             [rowsPerPageOptions]="[10, 25, 50]"
+                             [loading]="isLoading"
+                             [paginator]="true"
+                             sortField="registrationDate"
+                             [sortOrder]="-1">
+                        <ng-template #header>
+                            <tr>
+                                <th pSortableColumn="place">{{ 'salon.place' | translate }}
+                                    <p-sortIcon field="place"/>
+                                    <p-columnFilter type="text"
+                                                    field="place"
+                                                    matchMode="contains"
+                                                    display="menu"></p-columnFilter>
+                                </th>
+                                <th>{{ 'participation.status.label' | translate }}</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-participation>
+                            <tr>
+                                <td class="clickable truncate-medium"
+                                    [routerLink]="['/admin',  'salons',  participation.salon.id,  'participations',  participation.id,  'view']">{{ participation.salon.place }}
+                                </td>
+                                <td class="clickable">
+                                    <fa-icon [icon]="participation.status | status"
+                                             [class]="participation.status | colorStatus"
+                                             [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template #emptymessage>
+                            <tr>
+                                <td colspan="5">{{ 'participation.notFound' | translate }}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </app-card>
+    }
+
+</app-content-page>

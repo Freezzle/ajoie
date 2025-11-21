@@ -5,9 +5,11 @@ import ch.salon.domain.enumeration.EntityType;
 import ch.salon.repository.ExhibitorRepository;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.ExhibitorDTO;
+import ch.salon.service.dto.ExhibitorLightDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.ExhibitorMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,17 +19,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class ExhibitorService {
 
     public static final String ENTITY_NAME = "exhibitor";
 
     private final ExhibitorRepository exhibitorRepository;
     private final EventLogService eventLogService;
-
-    public ExhibitorService(ExhibitorRepository exhibitorRepository, EventLogService eventLogService) {
-        this.exhibitorRepository = exhibitorRepository;
-        this.eventLogService = eventLogService;
-    }
+    private final ExhibitorMapper exhibitorMapper;
+    private final EventLogMapper eventLogMapper;
 
     public UUID create(ExhibitorDTO exhibitor) {
         if (exhibitor == null) {
@@ -37,7 +37,7 @@ public class ExhibitorService {
         if (exhibitor.getId() != null) {
             throw new BadRequestAlertException("A new exhibitor cannot already have an ID", ENTITY_NAME, "id.exists");
         }
-        Exhibitor entity = ExhibitorMapper.INSTANCE.toEntity(exhibitor);
+        Exhibitor entity = exhibitorMapper.toEntity(exhibitor);
         entity.setRegistrationDate(Instant.now());
 
         return exhibitorRepository.save(entity).getId();
@@ -55,15 +55,15 @@ public class ExhibitorService {
         Exhibitor exhibitorFound = exhibitorRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Exhibitor exhibitorToUpdate = ExhibitorMapper.INSTANCE.toEntity(exhibitor);
+        Exhibitor exhibitorToUpdate = exhibitorMapper.toEntity(exhibitor);
 
         exhibitorToUpdate.setRegistrationDate(exhibitorFound.getRegistrationDate());
 
-        return ExhibitorMapper.INSTANCE.toDto(exhibitorRepository.save(exhibitorToUpdate));
+        return exhibitorMapper.toDto(exhibitorRepository.save(exhibitorToUpdate));
     }
 
     public List<ExhibitorDTO> findAll() {
-        return exhibitorRepository.findByOrderByRegistrationDateDesc().stream().map(ExhibitorMapper.INSTANCE::toDto)
+        return exhibitorRepository.findByOrderByRegistrationDateDesc().stream().map(exhibitorMapper::toDto)
                                   .toList();
     }
 
@@ -72,7 +72,7 @@ public class ExhibitorService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return exhibitorRepository.findById(id).map(ExhibitorMapper.INSTANCE::toDto);
+        return exhibitorRepository.findById(id).map(exhibitorMapper::toDto);
     }
 
     public void delete(UUID id) {
@@ -89,6 +89,11 @@ public class ExhibitorService {
         }
 
         return this.eventLogService.findAllEventLog(EntityType.EXHIBITOR, idExhibitor).stream()
-                                   .map(EventLogMapper.INSTANCE::toDto).toList();
+                                   .map(eventLogMapper::toDto).toList();
+    }
+
+    public List<ExhibitorLightDTO> getExhibitorsWithActiveNewsletter() {
+        return exhibitorRepository.findAllByNewsletterIsTrue().stream().map(exhibitorMapper::toLightDto)
+                .toList();
     }
 }

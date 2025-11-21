@@ -1,7 +1,6 @@
 package ch.salon.web.rest;
 
 import ch.salon.domain.Participation;
-import ch.salon.repository.EventLogRepository;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.ParticipationService;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.jhipster.web.util.ResponseUtil;
+import ch.salon.utils.ResponseUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,9 +33,9 @@ import static ch.salon.service.ParticipationService.ENTITY_NAME;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
-import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityUpdateAlert;
+import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
+import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
+import static ch.salon.utils.HeaderUtil.createEntityUpdateAlert;
 
 @RestController
 @RequestMapping("/api/admin/participations")
@@ -48,7 +47,7 @@ public class AdminParticipationResource {
     private final InvoicingPlanService invoicingPlanService;
     private final RefreshInvoicingPlansService refreshInvoicingPlansService;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AdminParticipationResource(ParticipationService participationService,

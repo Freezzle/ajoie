@@ -1,33 +1,34 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormatMediumDatePipe} from 'app/shared/date';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ITEM_DELETED_EVENT} from 'app/config/navigation.constants';
-import {
-    containsParticipationName,
-    getFormattedParticipationName,
-    IInfoInvoice,
-    IParticipation,
-} from '../model/participation.interface';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {getFormattedParticipationName, IInfoInvoice, IParticipation,} from '../model/participation.interface';
 import {ParticipationService} from '../service/participation.service';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import {Status} from '../../enumerations/status.model';
-import {ParticipationFilterFormGroup, ParticipationFormService} from '../service/participation-form.service';
-import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
 import {finalize} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
-import {PaginationComponent} from '../../../shared/pagination/pagination.component';
-import {PaginationEvent} from '../../../shared/pagination/pagination-event.interface';
-import {ProgressSpinner} from "primeng/progressspinner";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
+import {AlertComponent} from "../../../shared/alert/alert.component";
+import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
+import {TableModule} from "primeng/table";
+import {DateTimelinePoint, TimelineDotComponent} from "../../../shared/components/timeline-dot/timeline-dot.component";
+import {NavigationStateService} from "../../../layouts/navbar/navigation-state.service";
+import {OverlayBadge} from "primeng/overlaybadge";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {IconField} from "primeng/iconfield";
+import {InputIcon} from "primeng/inputicon";
+import {InputText} from "primeng/inputtext";
 
 @Component({
-    selector: 'jhi-participation',
+    selector: 'app-participation',
     templateUrl: './participation.component.html',
     imports: [
         RouterModule,
@@ -38,25 +39,35 @@ import {ProgressSpinner} from "primeng/progressspinner";
         StatusPipe,
         ReactiveFormsModule,
         ButtonBoxComponent,
-        LinkBoxComponent,
-        PaginationComponent,
-        ProgressSpinner,
+        ConfirmPopup,
+        Toast,
+        AlertComponent,
+        AlertErrorComponent,
+        TableModule,
+        TimelineDotComponent,
+        OverlayBadge,
+        ContentPageComponent,
+        CardComponent,
+        IconField,
+        InputIcon,
+        InputText,
     ]
 })
 export class ParticipationComponent implements OnInit {
-    private readonly participationFormService = inject(ParticipationFormService);
     private readonly participationService = inject(ParticipationService);
     private readonly activatedRoute = inject(ActivatedRoute);
-    private readonly modalService = inject(NgbModal);
+    protected confirmDialogService = inject(ConfirmDialogService);
+    protected readonly navigationStateService = inject(NavigationStateService);
 
     participations: IParticipation[] = [];
-    participationsPaginated: IParticipation[] = [];
     isLoading = false;
     statusValues = Object.keys(Status);
     params!: ParamMap;
-    filters: FormGroup<ParticipationFilterFormGroup> =
-        this.participationFormService.createFilterFormGroup();
     infoInvoicesMap: { [id: string]: IInfoInvoice } = {};
+
+    points: DateTimelinePoint[] = [];
+    start: Date | undefined;
+    end: Date | undefined;
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -64,36 +75,22 @@ export class ParticipationComponent implements OnInit {
                 this.params = params;
 
                 if (!this.participations || this.participations.length === 0) {
-                    this.actionFilter();
+                    this.load();
                     this.participationService.getInfosInvoiceForSalon(this.params.get('idSalon')!).subscribe(infoInvoicesMap => {
                         this.infoInvoicesMap = infoInvoicesMap || {};
                     });
                 }
-            },
-        );
+            });
     }
 
-    delete(participation: IParticipation): void {
-        const modalRef = this.modalService.open(DeleteDialogComponent, {
-            size: 'lg',
-            backdrop: 'static',
-        });
-        modalRef.componentInstance.translateKey = 'participation.delete.question';
-        modalRef.componentInstance.translateValues = {
+    delete(htmlElement: HTMLElement, participation: IParticipation): void {
+        this.confirmDialogService.delete(htmlElement, 'participation.delete.question', {
             fullName: getFormattedParticipationName(participation),
-        };
-
-        modalRef.closed
-            .pipe(
-                filter((reason) => reason === ITEM_DELETED_EVENT),
-                switchMap(() => this.participationService.delete(participation.id)),
-                tap(() => this.actionFilter()), // Recharge les données
-            )
-            .subscribe();
-    }
-
-    actionFilter(): void {
-        this.load();
+        }).pipe(
+            filter(confirmed => confirmed),
+            switchMap(() => this.participationService.delete(participation.id)),
+            tap(() => this.load()), // Recharge les données
+        ).subscribe();
     }
 
     load(): void {
@@ -105,22 +102,53 @@ export class ParticipationComponent implements OnInit {
             .pipe(finalize(() => (this.isLoading = false)),)
             .subscribe(result => {
                 this.participations = result.body ?? [];
+                this.points = this.participations.map(part => ({
+                    date: part.registrationDate!,
+                    label: null,
+                    isMilestone: false
+                } as DateTimelinePoint));
 
-                // filtres sur fullName/status AVANT l’appel bulk, si tu veux limiter
-                const fullNameFilter = this.filters.get('fullName')?.value;
-                if (fullNameFilter && fullNameFilter.length > 0) {
-                    this.participations = this.participations?.filter(participation =>
-                        containsParticipationName(participation, fullNameFilter),
-                    );
+                this.start = this.navigationStateService.salon()?.startingDate;
+                if (this.start) {
+                    const startMinus6Months = new Date(this.start);
+                    startMinus6Months.setMonth(startMinus6Months.getMonth() - 7);
+                    this.start = startMinus6Months;
                 }
 
-                const statusFilter = this.filters.get('status')?.value;
-                if (statusFilter && statusFilter.length > 0) {
-                    this.participations = this.participations?.filter(participation =>
-                        participation.status?.includes(statusFilter),
-                    );
+                this.end = this.navigationStateService.salon()?.endingDate;
+
+                if (this.start && this.end) {
+                    const milestones: DateTimelinePoint[] = [];
+
+                    // on part du 1er du mois de start, à minuit
+                    const cursor = new Date(this.start);
+                    cursor.setDate(1);
+                    cursor.setHours(0, 0, 0, 0);
+                    cursor.setMonth(cursor.getMonth() + 1);
+
+                    // on normalise end pour comparaison
+                    const end = new Date(this.end);
+                    end.setHours(23, 59, 59, 999);
+
+                    while (cursor <= end) {
+                        milestones.push({
+                            date: new Date(cursor),
+                            label: cursor.toLocaleDateString('fr-CH', {month: '2-digit', year: 'numeric'}),
+                            isMilestone: true
+                        });
+
+                        cursor.setMonth(cursor.getMonth() + 1);
+                    }
+
+                    // Jalons + "Aujourd'hui"
+                    this.points.push(...milestones);
                 }
-                this.refreshParticipations({page: 1, pageSize: 10});
+
+                if (new Date() <= this.end!) {
+                    this.points.push({date: new Date(), label: "Aujourd'hui", isMilestone: true});
+                }
+
+                this.points.sort((a, b) => a.date.getTime() - b.date.getTime());
             });
     }
 
@@ -129,16 +157,10 @@ export class ParticipationComponent implements OnInit {
     }
 
     refresh(): void {
-        this.filters.reset();
-        this.actionFilter();
+        this.load();
     }
 
     previousState(): void {
         window.history.back();
-    }
-
-    refreshParticipations(event: PaginationEvent): void {
-        this.participationsPaginated = this.participations.slice((event.page - 1) * event.pageSize,
-            (event.page - 1) * event.pageSize + event.pageSize);
     }
 }

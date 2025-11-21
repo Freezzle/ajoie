@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 @Repository
 @RepositoryAction("salon")
 public interface SalonRepository extends JpaRepository<Salon, UUID> {

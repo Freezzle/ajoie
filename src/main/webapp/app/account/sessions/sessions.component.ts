@@ -10,7 +10,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {finalize} from 'rxjs/operators';
 
 @Component({
-    selector: 'jhi-sessions',
+    selector: 'app-sessions',
     imports: [SharedModule, ButtonBoxComponent, FormsModule, ReactiveFormsModule],
     templateUrl: './sessions.component.html'
 })

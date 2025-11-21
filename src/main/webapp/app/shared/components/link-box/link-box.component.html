@@ -1,21 +1,8 @@
-@if (modeButton) {
-  <a [class.disabled]="isDisabled" [routerLink]="links" class="btn {{colorButton}} btn-sm">
+<a [class.disabled]="isDisabled" class="text-{{colorLink}}" [routerLink]="links">
     @if (faIcon) {
-      <fa-icon [icon]="faIcon" [animation]="faIconAnimation" [title]="translateKey | translate"></fa-icon>
+        <fa-icon [icon]="faIcon" [animation]="faIconAnimation" [title]="translateKey | translate"></fa-icon>
     }
     @if (showText) {
-      <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>
+        <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>
     }
-  </a>
-}
-
-@if (!modeButton) {
-  <a [class.disabled]="isDisabled" [routerLink]="links">
-    @if (faIcon) {
-      <fa-icon [icon]="faIcon" [animation]="faIconAnimation" [title]="translateKey | translate"></fa-icon>
-    }
-    @if (showText) {
-      <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>
-    }
-  </a>
-}
+</a>

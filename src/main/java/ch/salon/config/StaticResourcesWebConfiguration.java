@@ -6,13 +6,13 @@ import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import tech.jhipster.config.JHipsterConstants;
-import tech.jhipster.config.JHipsterProperties;
+import ch.salon.utils.ConfigConstants;
+import ch.salon.utils.SalonProperties;
 
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@Profile({JHipsterConstants.SPRING_PROFILE_PRODUCTION})
+@Profile({ConfigConstants.SPRING_PROFILE_PRODUCTION})
 public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
     protected static final String[] RESOURCE_LOCATIONS =
@@ -20,10 +20,10 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
     protected static final String[] RESOURCE_PATHS =
             {"/*.js", "/*.css", "/*.svg", "/*.png", "*.ico", "/content/**", "/i18n/*"};
 
-    private final JHipsterProperties jhipsterProperties;
+    private final SalonProperties jhipsterProperties;
 
-    public StaticResourcesWebConfiguration(JHipsterProperties jHipsterProperties) {
-        this.jhipsterProperties = jHipsterProperties;
+    public StaticResourcesWebConfiguration(SalonProperties salonProperties) {
+        this.jhipsterProperties = salonProperties;
     }
 
     @Override

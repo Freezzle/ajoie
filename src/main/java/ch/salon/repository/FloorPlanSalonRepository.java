@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 @Repository
 public interface FloorPlanSalonRepository extends JpaRepository<FloorPlanSalon, UUID> {
     List<FloorPlanSalon> findBySalonIdOrderByPosition(UUID salonId);

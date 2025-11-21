@@ -15,9 +15,14 @@ import {getFormattedParticipationName} from '../../participation/model/participa
 import {Toast, ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {formatDate} from "@angular/common";
+import {AlertComponent} from "../../../shared/alert/alert.component";
+import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
 
 @Component({
-    selector: 'jhi-salon-stats',
+    selector: 'app-salon-stats',
     templateUrl: './salon-stats.component.html',
     styleUrl: './salon-stats.component.scss',
     imports: [
@@ -28,6 +33,11 @@ import {formatDate} from "@angular/common";
         ToastModule,
         ButtonBoxComponent,
         Toast,
+        AlertComponent,
+        AlertErrorComponent,
+        ConfirmPopup,
+        CardComponent,
+        ContentPageComponent,
     ]
 })
 export class SalonStatsComponent implements OnInit {
@@ -101,9 +111,9 @@ export class SalonStatsComponent implements OnInit {
     }
 
     onFileSelected(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        if (input.files && input.files.length > 0) {
-            this.selectedFile = input.files[0];
+        const element = event.target as HTMLInputElement;
+        if (element.files && element.files.length > 0) {
+            this.selectedFile = element.files[0];
         }
     }
 
@@ -112,10 +122,10 @@ export class SalonStatsComponent implements OnInit {
             return;
         }
 
-        this.salonService.generate(this.salon()!.id, this.selectedFile!).subscribe((participationsNew) => {
+        this.salonService.generate(this.salon()!.id, this.selectedFile).subscribe((participationsNew) => {
             const detailMessage = participationsNew.map(part => {
                 const therapistName = part.therapistName?.length > 10 ? part.therapistName.slice(0, 10) + '...' : part.therapistName;
-                return '<' + therapistName + '> inscrit le ' + (!!part.registrationDate
+                return '<' + therapistName + '> inscrit le ' + (part.registrationDate
                     ? formatDate(part.registrationDate, 'dd.MM.yyyy HH:mm', this.locale)
                     : '-');
             });

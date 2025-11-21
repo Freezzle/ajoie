@@ -1,23 +1,11 @@
 package ch.salon.service;
 
-import ch.salon.domain.Conference;
-import ch.salon.domain.FloorPlanSalon;
-import ch.salon.domain.InvoicingPlan;
-import ch.salon.domain.Participation;
-import ch.salon.domain.Salon;
-import ch.salon.domain.Stand;
-import ch.salon.domain.Workshop;
+import ch.salon.domain.*;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.repository.ConferenceRepository;
-import ch.salon.repository.FloorPlanSalonRepository;
-import ch.salon.repository.InvoicingPlanRepository;
-import ch.salon.repository.ParticipationRepository;
-import ch.salon.repository.SalonRepository;
-import ch.salon.repository.StandRepository;
-import ch.salon.repository.WorkshopRepository;
+import ch.salon.repository.*;
 import ch.salon.service.dto.FloorPlanSalonDTO;
 import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
@@ -28,6 +16,7 @@ import ch.salon.web.rest.dto.FacturationStats;
 import ch.salon.web.rest.dto.SalonStatistiques;
 import ch.salon.web.rest.dto.StandInfoStats;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -39,6 +28,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class SalonService {
 
     public static final String ENTITY_NAME = "salon";
@@ -51,20 +41,10 @@ public class SalonService {
     private final WorkshopRepository workshopRepository;
     private final InvoicingPlanRepository invoicingPlanRepository;
     private final FloorPlanSalonRepository floorPlanSalonRepository;
-
-    public SalonService(SalonRepository salonRepository, ParticipationRepository participationRepository,
-            StandRepository standRepository, EventLogService eventLogService, WorkshopRepository workshopRepository,
-            ConferenceRepository conferenceRepository, InvoicingPlanRepository invoicingPlanRepository,
-            FloorPlanSalonRepository floorPlanSalonRepository) {
-        this.salonRepository = salonRepository;
-        this.participationRepository = participationRepository;
-        this.standRepository = standRepository;
-        this.eventLogService = eventLogService;
-        this.conferenceRepository = conferenceRepository;
-        this.invoicingPlanRepository = invoicingPlanRepository;
-        this.workshopRepository = workshopRepository;
-        this.floorPlanSalonRepository = floorPlanSalonRepository;
-    }
+    private final SalonMapper salonMapper;
+    private final FloorPlanSalonMapper  floorPlanSalonMapper;
+    private final PriceStandMapper priceStandMapper;
+    private final PlanningTalksSalonRepository planningTalksSalonRepository;
 
     public UUID create(SalonDTO salon) {
         if (salon == null) {
@@ -74,7 +54,7 @@ public class SalonService {
             throw new BadRequestAlertException("A new salon cannot already have an ID", ENTITY_NAME, "id.exists");
         }
 
-        return salonRepository.save(SalonMapper.INSTANCE.toEntity(salon)).getId();
+        return salonRepository.save(salonMapper.toEntity(salon)).getId();
     }
 
     public SalonDTO update(final UUID id, SalonDTO salon) {
@@ -89,22 +69,22 @@ public class SalonService {
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
-            salon.setPriceStandSalons(salonFound.getPriceStandSalons().stream().map(PriceStandMapper.INSTANCE::toDto)
+            salon.setPriceStandSalons(salonFound.getPriceStandSalons().stream().map(priceStandMapper::toDto)
                                                 .collect(Collectors.toSet()));
         }
 
-        Salon salonToUpdate = SalonMapper.INSTANCE.toEntity(salon);
+        Salon salonToUpdate = salonMapper.toEntity(salon);
         if (Salon.hasDifference(salonFound, salonToUpdate)) {
             participationRepository.findBySalonIdOrderByRegistrationDateDesc(salonFound.getId()).forEach(
                     participation -> eventLogService.eventFromSystem("Attention : Le salon a changé des prix.",
                             EventType.EVENT, EntityType.PARTICIPATION, participation.getId(), null));
         }
 
-        return SalonMapper.INSTANCE.toDto(salonRepository.save(salonToUpdate));
+        return salonMapper.toDto(salonRepository.save(salonToUpdate));
     }
 
     public List<SalonDTO> findAll() {
-        return salonRepository.findAll().stream().map(SalonMapper.INSTANCE::toDto).toList();
+        return salonRepository.findAll().stream().map(salonMapper::toDto).toList();
     }
 
     public Optional<SalonDTO> get(UUID id) {
@@ -112,7 +92,7 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return salonRepository.findById(id).map(SalonMapper.INSTANCE::toDto);
+        return salonRepository.findById(id).map(salonMapper::toDto);
     }
 
     public void delete(UUID id) {
@@ -131,7 +111,7 @@ public class SalonService {
         Salon salon = this.salonRepository.findById(idSalon).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        return salon.getPriceStandSalons().stream().map(PriceStandMapper.INSTANCE::toDto).toList();
+        return salon.getPriceStandSalons().stream().map(priceStandMapper::toDto).toList();
     }
 
     public FloorPlanSalonDTO createFloorPlanSalon(UUID idSalon, FloorPlanSalonDTO floorPlanDto) {
@@ -145,7 +125,7 @@ public class SalonService {
         floorPlanSalon.setSalon(this.salonRepository.getReferenceById(idSalon));
         floorPlanSalon.setData(floorPlanDto.getData());
 
-        return FloorPlanSalonMapper.INSTANCE.toDto(this.floorPlanSalonRepository.save(floorPlanSalon));
+        return floorPlanSalonMapper.toDto(this.floorPlanSalonRepository.save(floorPlanSalon));
     }
 
     public void deleteFloorPlanSalon(UUID idSalon, UUID idFloorPlan) {
@@ -176,7 +156,7 @@ public class SalonService {
         floorPlan.setPosition(floorPlanSalonDTO.getPosition());
         floorPlan.setName(floorPlanSalonDTO.getName());
         floorPlan.setData(floorPlanSalonDTO.getData());
-        return FloorPlanSalonMapper.INSTANCE.toDto(this.floorPlanSalonRepository.save(floorPlan));
+        return floorPlanSalonMapper.toDto(this.floorPlanSalonRepository.save(floorPlan));
     }
 
     public List<FloorPlanSalonDTO> getFloorPlanSalon(UUID idSalon) {
@@ -185,7 +165,33 @@ public class SalonService {
         }
 
         return this.floorPlanSalonRepository.findBySalonIdOrderByPosition(idSalon).stream()
-                                            .map(FloorPlanSalonMapper.INSTANCE::toDto).toList();
+                                            .map(floorPlanSalonMapper::toDto).toList();
+    }
+
+    public PlanningTalksSalon getPlanningTalks(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        return this.planningTalksSalonRepository.findBySalonId(idSalon);
+    }
+
+    public PlanningTalksSalon updatePlanningTalks(UUID idSalon, PlanningTalksSalon dto) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        var planning = this.getPlanningTalks(idSalon);
+
+        if (planning != null) {
+            planning.setConfiguration(dto.getConfiguration());
+            planning.setTalks(dto.getTalks());
+        } else {
+            planning = dto;
+            planning.setSalon(this.salonRepository.findById(idSalon).orElseThrow());
+        }
+
+        return this.planningTalksSalonRepository.save(planning);
     }
 
     public SalonStatistiques getStatistiques(UUID idSalon, List<Status> statuses) {
@@ -198,6 +204,7 @@ public class SalonService {
         List<Stand> stands =
                 standRepository.findByStatusInAndParticipation_SalonId(statuses, idSalon).stream().toList();
         stats.setNbStands(stands.size());
+        stats.setNbCoExhibitors(stands.stream().filter(Stand::getShared).toList().size());
 
         // Dimensions Stand
         Map<String, Long> dimensions = new HashMap<>();

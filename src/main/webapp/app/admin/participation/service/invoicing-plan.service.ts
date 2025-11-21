@@ -31,12 +31,17 @@ export class InvoicingPlanService {
             {observe: 'response'});
     }
 
-    switchArrangement(idInvoicingPlan: string): Observable<{}> {
-        return this.http.put<{}>(`${this.resourceUrl}/${idInvoicingPlan}/switch-arrangement`, {});
+    switchArrangement(idInvoicingPlan: string): Observable<unknown> {
+        return this.http.put<unknown>(`${this.resourceUrl}/${idInvoicingPlan}/switch-arrangement`, {});
     }
 
-    switchInvoiceSendingMethod(idInvoicingPlan: string, method: InvoiceSendingMethod): Observable<{}> {
-        return this.http.put<{}>(`${this.resourceUrl}/${idInvoicingPlan}/switch-invoice-method/${method}`, {});
+    switchInvoiceSendingMethod(idInvoicingPlan: string, method: InvoiceSendingMethod): Observable<unknown> {
+        return this.http.put<unknown>(`${this.resourceUrl}/${idInvoicingPlan}/switch-invoice-method/${method}`, {});
+    }
+
+    deleteInvoice(idInvoicingPlan: string, idInvoice: string): Observable<HttpResponse<void>> {
+        return this.http.delete<void>(`${this.resourceUrl}/${idInvoicingPlan}/invoices/${idInvoice}`,
+            {observe: 'response'});
     }
 
     deletePayment(idInvoicingPlan: string, idPayment: string): Observable<HttpResponse<void>> {
@@ -44,9 +49,13 @@ export class InvoicingPlanService {
             {observe: 'response'});
     }
 
-    splitInvoicingPlan(idInvoicingPlan: string, invoicesIdsToMove: (string | null)[]): Observable<HttpResponse<{}>> {
+    getEventLogs(idInvoicingPlan: string): Observable<HttpResponse<unknown[]>> {
+        return this.http.get<unknown[]>(`${this.resourceUrl}/${idInvoicingPlan}/events`, {observe: 'response'});
+    }
 
-        return this.http.post<{}>(`${this.resourceUrl}/${idInvoicingPlan}/split-invoices`,
+    splitInvoicingPlan(idInvoicingPlan: string, invoicesIdsToMove: (string | null)[]): Observable<HttpResponse<unknown>> {
+
+        return this.http.post<unknown>(`${this.resourceUrl}/${idInvoicingPlan}/split-invoices`,
             {invoicesIds: invoicesIdsToMove},
             {observe: 'response'});
     }

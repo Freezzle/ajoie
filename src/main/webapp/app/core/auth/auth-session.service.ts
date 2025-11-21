@@ -11,7 +11,7 @@ export class AuthServerProvider {
     private http = inject(HttpClient);
     private applicationConfigService = inject(ApplicationConfigService);
 
-    login(credentials: Login): Observable<{}> {
+    login(credentials: Login): Observable<unknown> {
         const data =
             `username=${encodeURIComponent(credentials.username)}` +
             `&password=${encodeURIComponent(credentials.password)}` +

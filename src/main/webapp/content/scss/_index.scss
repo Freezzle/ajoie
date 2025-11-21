@@ -1,0 +1,6 @@
+@use "content/scss/variables";
+@use "content/scss/global";
+
+:root {
+  @include variables.tokens();
+}

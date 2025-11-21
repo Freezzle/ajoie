@@ -6,11 +6,9 @@ import ch.salon.service.dto.PaymentLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PaymentMapper {
-    PaymentMapper INSTANCE = Mappers.getMapper(PaymentMapper.class);
 
     PaymentDTO toDto(Payment payment);
 

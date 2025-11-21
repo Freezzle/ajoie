@@ -14,8 +14,9 @@ export interface IStand {
     nbTable: number;
     nbChair: number;
     needElectricity: boolean;
-    status: keyof typeof Status;
-    category: keyof typeof Category | null;
+    status: Status;
+    category: Category | null;
+    subCategories: string[] | [];
     extraInformation: string | null;
     participation: IParticipation;
     dimension: IPriceStandSalon;

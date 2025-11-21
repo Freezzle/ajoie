@@ -12,7 +12,7 @@ import {ErrorModel} from '../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../shared/field-error/field-error.component';
 
 @Component({
-    selector: 'jhi-register',
+    selector: 'app-register',
     imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
         FieldErrorComponent],
     templateUrl: './register.component.html'

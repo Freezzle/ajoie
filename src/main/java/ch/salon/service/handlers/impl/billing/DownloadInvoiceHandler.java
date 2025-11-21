@@ -9,7 +9,10 @@ import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.utils.DateUtils;
+import lombok.RequiredArgsConstructor;
 import net.codecrete.qrbill.generator.Bill;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
@@ -20,18 +23,13 @@ import java.time.Instant;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPlan> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadInvoiceHandler.class.getName());
 
     private final MessageSource messageSource;
     private final DocumentCreator documentCreator;
     private final GenerateQRCode generateQRCode;
-
-    public DownloadInvoiceHandler(MessageSource messageSource, DocumentCreator documentCreator,
-            GenerateQRCode generateQRCode) {
-        this.messageSource = messageSource;
-        this.documentCreator = documentCreator;
-        this.generateQRCode = generateQRCode;
-    }
 
     @Override
     public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
@@ -82,11 +80,12 @@ public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPl
                     "Facture " + payload.getBillingNumber(), sender.getEnterpriseName(), "Sous les chênes", "109A",
                     sender.getCity().split(" ")[0], sender.getCity().split(" ")[1], "CH", recipient.getFullName(),
                     recipient.getStreet(), null, recipient.getCity().split(" ")[0],
-                    recipient.getCity().split(" ", 2)[1], "CH");
+                    recipient.getCity().split(" ", 2)[1], recipient.getCountry());
 
             String dataUri = generateQRCode.toDataUri(bill);
             thymeleafCtxt.setVariable("qrBillDataUri", dataUri);
         } catch (Exception e) {
+            LOGGER.warn(e.getMessage(), e);
             // en cas d’erreur, on masque l’image côté template
             thymeleafCtxt.setVariable("qrBillDataUri", null);
         }
@@ -101,6 +100,6 @@ public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPl
 
     @Override
     public String getFilename(InvoicingPlan payload, Map<String, Object> context) {
-        return "invoice-" + payload.getBillingNumber() + ".pdf";
+        return "Invoice_" + payload.getBillingNumber() + ".pdf";
     }
 }

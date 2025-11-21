@@ -3,7 +3,6 @@ import {HttpClient} from '@angular/common/http';
 import {MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 import {missingTranslationHandler, translatePartialLoader} from 'app/config/translation.config';
 import {StateStorageService} from 'app/core/auth/state-storage.service';
-import {QuillModule} from 'ngx-quill';
 
 @NgModule({
     imports: [
@@ -17,8 +16,7 @@ import {QuillModule} from 'ngx-quill';
                 provide: MissingTranslationHandler,
                 useFactory: missingTranslationHandler,
             },
-        }),
-        QuillModule.forRoot(),
+        })
     ],
 })
 export class TranslationModule {

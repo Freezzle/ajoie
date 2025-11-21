@@ -10,7 +10,7 @@ import {EventManager, EventWithContent} from 'app/core/util/event-manager.servic
 import {AlertError} from './alert-error.model';
 
 @Component({
-    selector: 'jhi-alert-error',
+    selector: 'app-alert-error',
     templateUrl: './alert-error.component.html',
     imports: [CommonModule, NgbModule],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

@@ -1,48 +1,15 @@
 package ch.salon.service.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.UUID;
 
+@Data
 public class FloorPlanSalonDTO implements Serializable {
 
     private UUID id;
     private Long position;
     private String name;
     private String data;
-
-    public FloorPlanSalonDTO() {
-        // Empty constructor needed for Jackson.
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getPosition() {
-        return position;
-    }
-
-    public void setPosition(Long position) {
-        this.position = position;
-    }
 }

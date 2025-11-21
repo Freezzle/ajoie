@@ -1,0 +1,24 @@
+<p-iftalabel>
+    <p-auto-complete [id]="'field_' + fieldName"
+                     multiple
+                     [inputSize]="maxChips"
+                     [typeahead]="false"
+                     [addOnTab]="true"
+                     [addOnBlur]="true"
+                     [formControl]="control"
+                     [showClear]="!control.disabled"
+                     fluid="true"/>
+
+    <label [for]="'field_' + fieldName">
+        @if (translateKey) {
+            {{ translateKey | translate }}
+        }
+        @if (control.hasValidator(Validators.required)) {
+            <span class="text-danger">*</span>
+        }
+        <small>{{ 'autocomplete.chips.suffix' | translate }}</small>
+    </label>
+</p-iftalabel>
+@if (control.errors) {
+    <error-box [formControlElement]="control"/>
+}

@@ -1,184 +1,216 @@
-<div>
-    <h2 id="page-heading">
-        <div class="d-flex justify-content-center">
-            <span jhiTranslate="participation.title">Les participations</span>
-        </div>
-        <hr/>
-
-        <div class="d-flex justify-content-between mt-3">
-      <span>
+<app-content-page>
+    <div appMenuBarStart>
+        <h3 jhiTranslate="participation.title">Les participations</h3>
+    </div>
+    <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     faIcon="arrow-left"
-                    translateKey="common.back"/>
-        </span>
-
-            <span [formGroup]="filters" class="row">
-          <div class="col-auto">
-            <input (blur)="actionFilter()"
-                   [placeholder]="'exhibitor.filter.fullName' | translate"
-                   class="form-control"
-                   formControlName="fullName"
-                   type="text"/>
-            </div>
-            <div class="col-auto">
-              <select (change)="actionFilter()" class="form-control" formControlName="status">
-                <option [ngValue]="null">{{ 'participation.status.list.null' | translate }}</option>
-                  @for (status of statusValues; track $index) {
-                      <option [value]="status">{{ 'participation.status.list.' + status | translate }}</option>
-                  }
-              </select>
-            </div>
-          </span>
-
-            <span>
-            <button-box (clickedEvent)="refresh()"
-                        [faIconAnimation]="isLoading ? 'spin' : undefined"
-                        [isDisabled]="isLoading"
-                        faIcon="sync"
-                        translateKey="common.refresh"/>
-
-              <link-box [isDisabled]="isLoading"
-                        [links]="['./new']"
-                        faIcon="plus"
-                        translateKey="common.create"
-                        type="success"/>
-              </span>
-        </div>
-    </h2>
-
-    <div class="table-responsive table-entities" id="entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-            <thead class="thead-primary">
-            <tr>
-                <th class="col-auto">
-                    <span jhiTranslate="exhibitor.fullName">Nom complet</span>
-                </th>
-                <th class="col-auto">
-                    <span jhiTranslate="exhibitor.therapistName">Nom de thérapeute</span>
-                </th>
-                <th class="col-auto">
-                    <span>&nbsp;</span>
-                </th>
-                <th class="col-1 text-center">
-                    <span jhiTranslate="participation.registrationDate">Date d'inscription</span>
-                </th>
-                <th class="col-auto text-center">
-                    <span jhiTranslate="participation.status.label">Statut</span>
-                </th>
-                <th class="col-auto text-center">
-                    <span>Info Facture</span>
-                </th>
-                <th class="col-auto">&nbsp;</th>
-            </tr>
-            </thead>
-            <tbody>
-                @if (isLoading) {
-                    <tr>
-                        <td colspan="8" class="text-center">
-                            <p-progress-spinner strokeWidth="5"
-                                                fill="transparent"
-                                                animationDuration="1s"
-                                                [style]="{ width: '50px', height: '50px' }"/>
-                        </td>
-                    </tr>
-                } @else {
-                    @if (participations.length === 0) {
+                    translateKey="common.back"
+                    [showText]="false"/>
+        <button-box (clickedEvent)="refresh()"
+                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [isDisabled]="isLoading"
+                    faIcon="sync"
+                    [showText]="false"
+                    translateKey="common.refresh"/>
+        <button-box [modeLink]="true"
+                    [links]="['./new']"
+                    [isDisabled]="isLoading"
+                    [showText]="false"
+                    type="success"
+                    faIcon="plus"
+                    translateKey="common.create"/>
+    </div>
+    <app-alert-error></app-alert-error>
+    <app-alert></app-alert>
+    <p-toast/>
+    <p-confirmpopup/>
+    <app-card [showHeader]="false">
+        <div appCardBody>
+            <div class="row">
+                <p-table #dt2
+                         [value]="participations"
+                         dataKey="id"
+                         [rows]="10"
+                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [loading]="isLoading"
+                         [paginator]="true"
+                         [globalFilterFields]="['exhibitor.fullName', 'therapistName']"
+                         sortField="registrationDate"
+                         [sortOrder]="-1"
+                         [tableStyle]="{ 'min-width': '75rem' }">
+                    <ng-template #caption>
+                        <div class="flex">
+                            <p-iconfield iconPosition="left" class="ml-auto">
+                                <p-inputicon>
+                                    <i class="pi pi-search"></i>
+                                </p-inputicon>
+                                <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Recherche" />
+                            </p-iconfield>
+                        </div>
+                    </ng-template>
+                    <ng-template #header>
                         <tr>
-                            <td colspan="8">
-                                <span jhiTranslate="participation.notFound">Aucune participation</span>
-                            </td>
+                            <th pSortableColumn="exhibitor.fullName">{{ 'exhibitor.fullName' | translate }}
+                                <p-sortIcon field="exhibitor.fullName"/>
+                            </th>
+                            <th pSortableColumn="therapistName">{{ 'exhibitor.therapistName' | translate }}
+                                <p-sortIcon field="therapistName"/>
+                            </th>
+                            <th pSortableColumn="registrationDate">{{ 'participation.registrationDate' | translate }}
+                                <p-sortIcon field="registrationDate"/>
+                                <p-columnFilter type="date"
+                                                field="registrationDate"
+                                                matchMode="dateAfter"
+                                                display="menu"></p-columnFilter>
+                            </th>
+                            <th pSortableColumn="status">{{ 'participation.status.label' | translate }}
+                                <p-sortIcon field="status"/>
+                            </th>
+                            <th>Info</th>
+                            <th>Info Facture</th>
+                            <th>&nbsp;</th>
                         </tr>
-                    } @else {
-                        @for (participation of participationsPaginated; track $index) {
-                            <tr>
-                                <td class="go-detail truncate" [routerLink]="['./', participation.id, 'view']">
-                                    @if (participation.exhibitor) {
-                                        <div class="d-flex gap-1">
-                                            <a [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']"
-                                               (click)="$event.stopPropagation()">
-                                                {{ participation.exhibitor.fullName }}
-                                            </a>
-                                            @if (participation.exhibitor.redFlag) {
-                                                <fa-icon icon="flag"
-                                                         [title]="'exhibitor.redFlag' | translate"
-                                                         class="danger-icon"></fa-icon>
-                                            }
-                                            @if (participation.exhibitor.duplicateDetected) {
-                                                <fa-icon icon="triangle-exclamation"
-                                                         [title]="'exhibitor.duplicateDetected' | translate"
-                                                         class="warning-icon"></fa-icon>
-                                            }
-                                        </div>
-                                    }
-                                </td>
-                                <td class="go-detail truncate" [routerLink]="['./', participation.id, 'view']">
-                                    {{ participation.therapistName }}
-                                </td>
-                                <td class="go-detail" [routerLink]="['./', participation.id, 'view']">
-                                    @if (participation.crushOfHeart) {
-                                        <fa-icon icon="heart" class="danger-icon"></fa-icon>
-                                    }
-                                    @if (participation.guestOfHonor) {
-                                        <fa-icon icon="star" class="warning-icon"></fa-icon>
-                                    }
-                                    @if (participation.extraInformation) {
-                                        <fa-icon icon="note-sticky"
-                                                 class="warning-icon"
-                                                 [title]="participation.extraInformation"/>
-                                    }
-                                    @if (participation.needArrangement) {
-                                        <fa-icon icon="handshake-simple" class="danger-icon"></fa-icon>
-                                    }
-                                </td>
-                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                                    {{ participation.registrationDate | formatMediumDate }}
-                                </td>
-
-                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                                    <fa-icon [icon]="participation.status | status"
-                                             [class]="participation.status | colorStatus"
-                                             [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
-                                </td>
-                                <td class="go-detail text-center" [routerLink]="['./', participation.id, 'view']">
-                                    @let infoInvoice = getInfoInvoice(participation.id);
-                                    @if (infoInvoice) {
-                                        <span>
-                                        @if (infoInvoice.hasDraftInvoices) {
+                    </ng-template>
+                    <ng-template #body let-participation>
+                        <tr>
+                            <td class="clickable truncate-medium" [routerLink]="['./', participation.id, 'view']">
+                                @if (participation.exhibitor) {
+                                    <div class="d-flex gap-1">
+                                        <a [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']"
+                                           (click)="$event.stopPropagation()">
+                                            {{ participation.exhibitor.fullName }}
+                                        </a>
+                                        @if (participation.exhibitor.redFlag) {
+                                            <fa-icon icon="flag"
+                                                     [title]="'exhibitor.redFlag' | translate"
+                                                     class="text-danger"></fa-icon>
+                                        }
+                                        @if (participation.exhibitor.duplicateDetected) {
+                                            <fa-icon icon="triangle-exclamation"
+                                                     [title]="'exhibitor.duplicateDetected' | translate"
+                                                     class="text-warning"></fa-icon>
+                                        }
+                                    </div>
+                                }
+                            </td>
+                            <td class="clickable truncate" [routerLink]="['./', participation.id, 'view']">
+                                {{ participation.therapistName }}
+                            </td>
+                            <td class="clickable truncate-small" [routerLink]="['./', participation.id, 'view']">
+                                {{ participation.registrationDate | formatMediumDate }}
+                            </td>
+                            <td class="clickable" [routerLink]="['./', participation.id, 'view']">
+                                <fa-icon [icon]="participation.status | status"
+                                         [class]="participation.status | colorStatus"
+                                         [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
+                            </td>
+                            <td class="clickable" [routerLink]="['./', participation.id, 'view']">
+                                @if (participation.crushOfHeart) {
+                                    <fa-icon icon="heart" class="text-danger"></fa-icon>
+                                }
+                                @if (participation.guestOfHonor) {
+                                    <fa-icon icon="star" class="golden-icon"></fa-icon>
+                                }
+                                @if (participation.extraInformation) {
+                                    <fa-icon icon="note-sticky" class="text-warning" [title]="participation.extraInformation"/>
+                                }
+                                @if (participation.needArrangement) {
+                                    <fa-icon icon="handshake-simple" class="text-primary"></fa-icon>
+                                }
+                                @if (participation.offer) {
+                                    <fa-icon icon="gift" class="text-primary"></fa-icon>
+                                }
+                            </td>
+                            <td class="clickable" [routerLink]="['./', participation.id, 'view']">
+                                @let infoInvoice = getInfoInvoice(participation.id);
+                                @if (infoInvoice) {
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @if (infoInvoice.nbDraft > 1) {
+                                            <p-overlay-badge [value]="infoInvoice.nbDraft"
+                                                             class="p-badge-xs"
+                                                             severity="success">
+                                                <fa-icon icon="sheet-plastic"
+                                                         [title]="'invoicingPlan.drafts' | translate"
+                                                         class="text-success"></fa-icon>
+                                            </p-overlay-badge>
+                                        } @else if (infoInvoice.nbDraft == 1) {
                                             <fa-icon icon="sheet-plastic"
                                                      [title]="'invoicingPlan.drafts' | translate"
-                                                     class="primary-icon"></fa-icon>
+                                                     class="text-success"></fa-icon>
                                         }
-                                            @if (infoInvoice.hasWaitingInvoices) {
+
+                                        @if (infoInvoice.nbIssued > 1) {
+                                            <p-overlay-badge [value]="infoInvoice.nbIssued" class="p-badge-xs" severity="info">
                                                 <fa-icon icon="file-import"
                                                          [title]="'invoicingPlan.waitingPayments' | translate"
-                                                         class="success-icon"></fa-icon>
-                                            }
-                                            @if (infoInvoice.hasExpiredInvoices) {
+                                                         class="text-info"></fa-icon>
+                                            </p-overlay-badge>
+                                        } @else if (infoInvoice.nbIssued == 1) {
+                                            <fa-icon icon="file-import"
+                                                     [title]="'invoicingPlan.waitingPayments' | translate"
+                                                     class="text-info"></fa-icon>
+                                        }
+
+                                        @if (infoInvoice.nbPaid > 1) {
+                                            <p-overlay-badge [value]="infoInvoice.nbPaid"
+                                                             class="p-badge-xs"
+                                                             severity="contrast">
+                                                <fa-icon icon="file-circle-check"
+                                                         [title]="'invoicingPlan.paids' | translate"
+                                                         class="text-primary"></fa-icon>
+                                            </p-overlay-badge>
+                                        } @else if (infoInvoice.nbPaid == 1) {
+                                            <fa-icon icon="file-circle-check"
+                                                     [title]="'invoicingPlan.paids' | translate"
+                                                     class="text-primary"></fa-icon>
+                                        }
+
+                                        @if (infoInvoice.nbExpired > 1) {
+                                            <p-overlay-badge [value]="infoInvoice.nbExpired"
+                                                             class="p-badge-xs"
+                                                             severity="danger">
                                                 <fa-icon icon="clock"
                                                          [title]="'invoicingPlan.expirations' | translate"
-                                                         class="danger-icon"></fa-icon>
-                                            }
-                                    </span>
-                                    }
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <button-box (clickedEvent)="delete(participation)"
-                                                    type="danger"
-                                                    [showText]="false"
-                                                    translateKey="common.delete"
-                                                    faIcon="times"/>
+                                                         class="text-danger"></fa-icon>
+                                            </p-overlay-badge>
+                                        } @else if (infoInvoice.nbExpired == 1) {
+                                            <fa-icon icon="clock"
+                                                     [title]="'invoicingPlan.expirations' | translate"
+                                                     class="text-danger"></fa-icon>
+                                        }
                                     </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <jhi-pagination (pageChanged)="refreshParticipations($event)" [collectionSize]="participations.length"/>
-
-</div>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button-box (clickedEvent)="delete($event, participation)"
+                                                type="danger"
+                                                [showText]="false"
+                                                translateKey="common.delete"
+                                                faIcon="times"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template #emptymessage>
+                        <tr>
+                            <td colspan="5">{{ 'participation.notFound' | translate }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </app-card>
+    <app-card>
+        <div appCardHeader>
+            <h4>Ligne de temps des inscriptions</h4>
+        </div>
+        <div appCardBody>
+            @if (start && end) {
+                <timeline-dot [points]="points" [startDate]="start" [endDate]="end"/>
+            }
+        </div>
+    </app-card>
+</app-content-page>

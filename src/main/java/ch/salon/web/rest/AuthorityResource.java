@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.jhipster.web.util.ResponseUtil;
+import ch.salon.utils.ResponseUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,8 +26,8 @@ import java.util.List;
 
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
-import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
+import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
+import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
 
 @RestController
 @RequestMapping("/api/authorities")
@@ -39,7 +39,7 @@ public class AuthorityResource {
     private static final String ENTITY_NAME = "authority";
     private final AuthorityRepository authorityRepository;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AuthorityResource(AuthorityRepository authorityRepository) {

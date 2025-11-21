@@ -1,7 +1,5 @@
-import dayjs from 'dayjs/esm';
 import {ISalon} from '../../salon/model/salon.interface';
 import {Status} from '../../enumerations/status.model';
-import {Type} from '../../enumerations/type.model';
 import {IExhibitor, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
 import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
@@ -10,8 +8,8 @@ export interface IParticipation {
     id: string;
     registrationDate: Date | null;
     therapistName: string;
-    modePaymentMeals: keyof typeof ModePaymentMeals;
-    invoiceSendingMethod: keyof typeof InvoiceSendingMethod;
+    modePaymentMeals: ModePaymentMeals;
+    invoiceSendingMethod: InvoiceSendingMethod;
     clientNumber: string | null;
     nbMeal1: number;
     nbMeal2: number;
@@ -24,16 +22,17 @@ export interface IParticipation {
     guestOfHonor: boolean;
     crushOfHeart: boolean;
     additionnalInformation: string | null;
-    status: keyof typeof Status;
+    status: Status;
     extraInformation: string | null;
     exhibitor: IExhibitor;
     salon: ISalon;
 }
 
 export interface IInfoInvoice {
-    hasDraftInvoices: false;
-    hasWaitingInvoices: false;
-    hasExpiredInvoices: false;
+    nbDraft: number;
+    nbIssued: number;
+    nbPaid: number;
+    nbExpired: number;
 }
 
 export function containsParticipationName(participation: IParticipation | null,

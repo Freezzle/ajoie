@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, Renderer2, RendererFactory2} from '@angular/core';
+import {Component, inject, OnInit, Renderer2, RendererFactory2, signal} from '@angular/core';
 import {Router, RouterOutlet} from '@angular/router';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import dayjs from 'dayjs/esm';
@@ -7,7 +7,7 @@ import {AccountService} from 'app/core/auth/account.service';
 import {AppPageTitleStrategy} from 'app/app-page-title-strategy';
 
 @Component({
-    selector: 'jhi-main',
+    selector: 'app-main',
     templateUrl: './main.component.html',
     styleUrl: './main.component.scss',
     providers: [AppPageTitleStrategy],
@@ -22,13 +22,15 @@ export default class MainComponent implements OnInit {
     private translateService = inject(TranslateService);
     private rootRenderer = inject(RendererFactory2);
 
+    readonly inDevelopementMode = signal<boolean>(false);
+
     constructor() {
         this.renderer = this.rootRenderer.createRenderer(document.querySelector('html'), null);
     }
 
     ngOnInit(): void {
-        // try to log in automatically
         this.accountService.identity().subscribe();
+        this.inDevelopementMode.set(false);
 
         this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
             this.appPageTitleStrategy.updateTitle(this.router.routerState.snapshot);

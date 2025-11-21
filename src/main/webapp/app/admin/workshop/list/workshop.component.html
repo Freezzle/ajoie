@@ -1,127 +1,125 @@
-<div>
-    <h2 id="page-heading">
-        <div class="d-flex justify-content-center">
-            <span jhiTranslate="workshop.title">Les ateliers</span>
-        </div>
-        <hr/>
-
-        <div class="d-flex justify-content-between mt-3">
-      <span>
+<app-content-page>
+    <div appMenuBarStart>
+        <h3>{{ 'workshop.title' | translate }}</h3>
+    </div>
+    <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     faIcon="arrow-left"
-                    translateKey="common.back"/>
-      </span>
-
-            <span [formGroup]="filters" class="row">
-        <div class="col-auto">
-          <input (blur)="actionFilter()"
-                 [placeholder]="'exhibitor.filter.fullName' | translate"
-                 class="form-control"
-                 formControlName="fullName"
-                 type="text"/>
-        </div>
-        <div class="col-auto">
-          <select (change)="actionFilter()" class="form-control" formControlName="status">
-            <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
-              @for (status of statusValues; track $index) {
-                  <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
-              }
-          </select>
-        </div>
-      </span>
-
-            <span>
+                    translateKey="common.back"
+                    [showText]="false"/>
         <button-box (clickedEvent)="refresh()"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
                     [isDisabled]="isLoading"
                     faIcon="sync"
+                    [showText]="false"
                     translateKey="common.refresh"/>
-
-        <link-box [isDisabled]="isLoading"
-                  [links]="['./new']"
-                  faIcon="plus"
-                  translateKey="common.create"
-                  type="success"/>
-      </span>
-        </div>
-    </h2>
-
-    <jhi-alert-error></jhi-alert-error>
-
-    <div class="table-responsive table-entities" id="entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-            <thead class="thead-primary">
-            <tr>
-                <th class="col-auto">
-                    <span jhiTranslate="workshop.participation">Participation</span>
-                </th>
-                <th class="col-8">
-                    <span jhiTranslate="workshop.title-field">Title</span>
-                </th>
-                <th class="col-auto text-center">
-                    <span jhiTranslate="workshop.status.label">Status</span>
-                </th>
-                <th class="col-auto">&nbsp;</th>
-            </tr>
-            </thead>
-            <tbody>
-                @if (isLoading) {
-                    <tr>
-                        <td colspan="8" class="text-center">
-                            <p-progress-spinner strokeWidth="5"
-                                                fill="transparent"
-                                                animationDuration="1s"
-                                                [style]="{ width: '50px', height: '50px' }"/>
-                        </td>
-                    </tr>
-                } @else {
-                    @if (workshops.length === 0) {
+        <button-box [modeLink]="true"
+                    [links]="['./new']"
+                    [isDisabled]="isLoading"
+                    [showText]="false"
+                    type="success"
+                    faIcon="plus"
+                    translateKey="common.create"/>
+    </div>
+    <app-alert-error></app-alert-error>
+    <app-alert></app-alert>
+    <p-toast/>
+    <p-confirmpopup/>
+    <app-card [showHeader]="false">
+        <div appCardBody>
+            <div class="row">
+                <p-table #dt2
+                         [value]="workshops"
+                         dataKey="id"
+                         [rows]="10"
+                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [loading]="isLoading"
+                         [paginator]="true"
+                         [globalFilterFields]="['participation.exhibitor.fullName', 'participation.therapistName']"
+                         sortField="registrationDate"
+                         [sortOrder]="-1"
+                         [tableStyle]="{ 'min-width': '75rem' }">
+                    <ng-template #caption>
+                        <div class="flex">
+                            <p-iconfield iconPosition="left" class="ml-auto">
+                                <p-inputicon>
+                                    <i class="pi pi-search"></i>
+                                </p-inputicon>
+                                <input pInputText type="text"
+                                       (input)="dt2.filterGlobal($event.target.value, 'contains')"
+                                       placeholder="Recherche"/>
+                            </p-iconfield>
+                        </div>
+                    </ng-template>
+                    <ng-template #header>
                         <tr>
-                            <td colspan="4">
-                                <span jhiTranslate="workshop.notFound">Aucune Workshop</span>
+                            <th pSortableColumn="fullNameFilter">{{ 'workshop.participation' | translate }}
+                                <p-sortIcon field="fullNameFilter"/>
+                            </th>
+                            <th pSortableColumn="title">{{ 'workshop.titleField' | translate }}
+                                <p-sortIcon field="title"/>
+                                <p-columnFilter type="text"
+                                                field="title"
+                                                matchMode="contains"
+                                                display="menu"></p-columnFilter>
+                            </th>
+                            <th>Info</th>
+                            <th pSortableColumn="status">{{ 'workshop.status.label' | translate }}
+                                <p-sortIcon field="status"/>
+                            </th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-workshop>
+                        <tr>
+                            <td class="clickable truncate-medium" [routerLink]="['./', workshop.id, 'view']">
+                                @if (workshop.participation) {
+                                    <a [routerLink]="['/admin/salons',params.get('idSalon'),'participations',workshop.participation.id,'view']"
+                                       (click)="$event.stopPropagation()">
+                                        {{ workshop.fullNameFilter }}
+                                    </a>
+                                }
+                            </td>
+                            <td class="clickable truncate"
+                                [routerLink]="['./', workshop.id, 'view']">{{ workshop.title }}
+                            </td>
+                            <td class="clickable truncate-medium" [routerLink]="['./', workshop.id, 'view']">
+                                @if (workshop.participation.crushOfHeart) {
+                                    <fa-icon icon="heart" class="text-danger"></fa-icon>
+                                }
+                                @if (workshop.participation.guestOfHonor) {
+                                    <fa-icon icon="star" class="golden-icon"></fa-icon>
+                                }
+                                @if (workshop.extraInformation) {
+                                    <fa-icon icon="note-sticky"
+                                             class="text-warning"
+                                             [title]="workshop.extraInformation"/>
+                                }
+                            </td>
+                            <td class="clickable" [routerLink]="['./', workshop.id, 'view']">
+                                <fa-icon [icon]="workshop.status | status"
+                                         [class]="workshop.status | colorStatus"
+                                         [title]="'workshop.status.list.' + workshop.status | translate"></fa-icon>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button-box (clickedEvent)="delete($event, workshop)"
+                                                type="danger"
+                                                [showText]="false"
+                                                translateKey="common.delete"
+                                                faIcon="times"/>
+                                </div>
                             </td>
                         </tr>
-                    } @else {
-                        @for (workshop of workshopsPaginated; track $index) {
-                            <tr>
-                                <td class="go-detail truncate" [routerLink]="['./', workshop.id, 'view']">
-                                    @if (workshop.participation) {
-                                        <a [routerLink]="[
-                      '/admin/salons',
-                      params.get('idSalon'),
-                      'participations',
-                      workshop.participation.id,
-                      'view',
-                    ]" (click)="$event.stopPropagation()">
-                                            {{ getFormattedParticipationName(workshop.participation) }}
-                                        </a>
-                                    }
-                                </td>
-                                <td class="go-detail truncate"
-                                    [routerLink]="['./', workshop.id, 'view']">{{ workshop.title }}
-                                </td>
-                                <td class="go-detail text-center" [routerLink]="['./', workshop.id, 'view']">
-                                    <fa-icon [icon]="workshop.status | status"
-                                             [class]="workshop.status | colorStatus"
-                                             [title]="'workshop.status.list.' + workshop.status | translate"></fa-icon>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <button-box (clickedEvent)="delete(workshop)"
-                                                    type="danger"
-                                                    [showText]="false"
-                                                    translateKey="common.delete"
-                                                    faIcon="times"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <jhi-pagination (pageChanged)="refreshWorkshops($event)" [collectionSize]="workshops.length"/>
-</div>
+                    </ng-template>
+                    <ng-template #emptymessage>
+                        <tr>
+                            <td colspan="5">{{ 'workshop.notFound' | translate }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </app-card>
+</app-content-page>

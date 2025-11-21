@@ -9,18 +9,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "floor_plan_salon")
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Data
 public class FloorPlanSalon implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -39,61 +36,4 @@ public class FloorPlanSalon implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public Salon getSalon() {
-        return salon;
-    }
-
-    public void setSalon(Salon salon) {
-        this.salon = salon;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getPosition() {
-        return position;
-    }
-
-    public void setPosition(Long position) {
-        this.position = position;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        FloorPlanSalon that = (FloorPlanSalon) o;
-        return Objects.equals(id, that.id) && Objects.equals(salon, that.salon);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, data, salon);
-    }
 }

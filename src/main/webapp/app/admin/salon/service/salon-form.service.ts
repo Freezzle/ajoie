@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ISalon} from '../model/salon.interface';
 import {IPriceStandSalon} from '../model/price-stand-salon.interface';
-import {IStand} from "../../stand/model/stand.interface";
 
 export type PriceStandGroup = {
     id: FormControl<IPriceStandSalon['id'] | null>;

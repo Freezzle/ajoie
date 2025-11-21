@@ -168,17 +168,22 @@ export function convertAvailableDimensionCells(dimensionStands: IPriceStandSalon
     const dimensions = [] as DimensionCell[];
 
     sortPriceStandSalon(dimensionStands).forEach((dimension) => {
-        dimensions.push({
-            idDimension: dimension.id,
-            dimension: dimension.dimension,
-            stand: null,
-            color: getColorStand(null),
-            cols: (dimension.heightMeter ?? 1) * 2,
-            rows: (dimension.widthMeter ?? 1) * 2,
-        } as DimensionCell);
+        dimensions.push(convertAvailableDimensionCell(dimension));
     });
 
     return dimensions;
+}
+
+export function convertAvailableDimensionCell(dimensionStand: IPriceStandSalon, stand?: IStand): DimensionCell {
+    return {
+        idDimension: dimensionStand.id,
+        dimension: dimensionStand.dimension,
+        stand: stand ?? null,
+        color: getColorStand(stand ?? null),
+        cols: (dimensionStand.heightMeter ?? 1) * 2,
+        rows: (dimensionStand.widthMeter ?? 1) * 2,
+        position: null
+    };
 }
 
 export function mapFloorPlanDataLight(
@@ -205,13 +210,6 @@ export function mapFloorPlanLight(floorPlan: IFloorPlanLight, dimensionCells: Di
         name: floorPlan.name,
         data: mapFloorPlanDataLight(floorPlan.data, dimensionCells, stands)
     };
-}
-
-export interface ContextMenu {
-    printable: 'CLOSED' | 'MAIN' | 'ASSIGNATION';
-    x: number;
-    y: number;
-    cell?: GridCell | null;
 }
 
 export interface AddPlanInfo {

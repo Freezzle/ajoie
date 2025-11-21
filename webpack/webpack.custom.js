@@ -88,26 +88,6 @@ module.exports = async (config, options, targetOptions) => {
     );
   }
 
-  const patterns = [
-    {
-      // https://github.com/swagger-api/swagger-ui/blob/v4.6.1/swagger-ui-dist-package/README.md
-      context: require('swagger-ui-dist').getAbsoluteFSPath(),
-      from: '*.{js,css,html,png}',
-      to: 'swagger-ui/',
-      globOptions: { ignore: ['**/index.html'] },
-    },
-    {
-      from: path.join(path.dirname(require.resolve('axios/package.json')), 'dist/axios.min.js'),
-      to: 'swagger-ui/',
-    },
-    { from: './src/main/webapp/swagger-ui/', to: 'swagger-ui/' },
-    // jhipster-needle-add-assets-to-webpack - JHipster will add/remove third-party resources in this array
-  ];
-
-  if (patterns.length > 0) {
-    config.plugins.push(new CopyWebpackPlugin({ patterns }));
-  }
-
   config.plugins.push(
     new webpack.DefinePlugin({
       I18N_HASH: JSON.stringify(languagesHash.hash),
@@ -123,10 +103,7 @@ module.exports = async (config, options, targetOptions) => {
     new MergeJsonWebpackPlugin({
       output: {
         groupBy: [
-          { pattern: './src/main/webapp/i18n/fr/*.json', fileName: './i18n/fr.json' },
-          { pattern: './src/main/webapp/i18n/en/*.json', fileName: './i18n/en.json' },
-          { pattern: './src/main/webapp/i18n/de/*.json', fileName: './i18n/de.json' },
-          // jhipster-needle-i18n-language-webpack - JHipster will add/remove languages in this array
+          { pattern: './src/main/webapp/i18n/fr/*.json', fileName: './i18n/fr.json' }
         ],
       },
     }),

@@ -1,12 +1,35 @@
-<button (click)="onClick()"
-  [class.disabled]="isDisabled"
-  [title]="translateKey | translate"
-  class="btn {{colorButton}} btn-sm"
-  type="{{isSubmit ? 'submit' : 'button'}}">
-  @if (faIcon) {
-    <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
-  }
-  @if (showText) {
-    <span jhiTranslate="{{translateKey}}">Edit</span>
-  }
-</button>
+@if (modeLink) {
+    <!-- Version "lien" (visuel lien, mais garde exactement tes features) -->
+    <p-button
+            #btn
+            (onClick)="onClick()"
+            [disabled]="isDisabled"
+            [attr.title]="translateKey | translate"
+            size="small"
+            [severity]="colorButton"
+            [routerLink]="links">
+        @if (faIcon) {
+            <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
+        }
+        @if (showText) {
+            <span class="text-uppercase" jhiTranslate="{{ translateKey }}">Edit</span>
+        }
+    </p-button>
+} @else {
+    <!-- Version bouton normale -->
+    <p-button
+            #btn
+            (onClick)="onClick()"
+            [disabled]="isDisabled"
+            [attr.title]="translateKey | translate"
+            [attr.type]="isSubmit ? 'submit' : 'button'"
+            size="small"
+            [severity]="colorButton">
+        @if (faIcon) {
+            <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
+        }
+        @if (showText) {
+            <span class="text-uppercase" jhiTranslate="{{ translateKey }}">Edit</span>
+        }
+    </p-button>
+}

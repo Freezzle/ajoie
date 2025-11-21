@@ -14,8 +14,6 @@ export class LinkBoxComponent {
     @Input()
     showText: boolean = true;
     @Input()
-    modeButton: boolean = true;
-    @Input()
     faIcon: string | null = null;
     @Input()
     faIconAnimation: 'spin' | undefined = undefined;
@@ -26,7 +24,7 @@ export class LinkBoxComponent {
     @Input()
     translateKey: string = 'common.edit';
 
-    get colorButton() {
+    get colorLink() {
         if (this.type === 'primary') {
             return 'btn-primary';
         } else if (this.type === 'secondary') {

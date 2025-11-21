@@ -1,10 +1,11 @@
 {
   "salon": {
     "conferences": "Les conférences",
-    "create": "Création d'un nouveau salon",
+    "create": "Nouveau salon",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer le salon \"{{id}}\" ?"
+      "question": "Voulez-vous supprimer le salon \"{{id}}\" ?"
     },
+    "dimensions-prices": "Configuration des dimensions de stands",
     "edit": "Détail du salon",
     "endingDate": "Date de fin",
     "extraInformation": "Commentaire",
@@ -12,15 +13,14 @@
     "notFound": "Aucun salon",
     "participations": "Les participations",
     "place": "Nom du salon",
-    "planningVolunteers": "Planning des bénévoles",
+    "planningConferences": "Planning des animations",
     "priceConference": "Conférence",
-    "priceWorkshop": "Atelier",
     "priceMeal1": "Repas samedi midi",
     "priceMeal2": "Repas samedi soir",
     "priceMeal3": "Repas dimanche midi",
     "priceSharingStand": "Co-exposant",
+    "priceWorkshop": "Atelier",
     "prices": "Configuration des prix",
-    "dimensions-prices": "Configuration des dimensions de stands",
     "referenceNumber": "N° de référence",
     "stands": "Les stands",
     "startingDate": "Date de début",

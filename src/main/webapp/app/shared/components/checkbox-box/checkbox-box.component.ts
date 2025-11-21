@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import SharedModule from '../../shared.module';
 import {ToggleButton} from "primeng/togglebutton";
+import {PrimeIcons} from "primeng/api";
 
 @Component({
     imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule, ToggleButton],
@@ -21,7 +22,6 @@ export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
     @Input() fieldName: string = '';
     @Input() value: boolean = false;
     @Input() forceDisabled: boolean = false;
-    @Output() onValueChange = new EventEmitter<void>;
 
     isFormControlUsed: boolean = false; // Détecter l'utilisation du formControl
     disabled: boolean = false;
@@ -61,17 +61,10 @@ export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
         this.disabled = this.forceDisabled || isDisabled;
     }
 
-    onInput(event: Event) {
-        const newValue = (event.target as HTMLInputElement).checked;
-        this.value = newValue;
-        this.onChange(newValue);
-        this.onTouched();
-        this.onValueChange.emit();
-    }
-
     get control(): FormControl<any> {
         return this.controlDir.control as FormControl<any>;
     }
 
     protected readonly Validators = Validators;
+    protected readonly PrimeIcons = PrimeIcons;
 }

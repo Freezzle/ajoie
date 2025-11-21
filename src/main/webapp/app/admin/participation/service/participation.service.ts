@@ -6,14 +6,9 @@ import dayjs from 'dayjs/esm';
 
 import {isPresent} from 'app/core/util/operators';
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
-import {
-    getFormattedParticipationName,
-    IInfoInvoice,
-    IParticipation
-} from '../model/participation.interface';
+import {getFormattedParticipationName, IInfoInvoice, IParticipation} from '../model/participation.interface';
 import {removeAccents} from '../../../shared/utils/string.util';
 import {IInvoicingPlan} from '../model/invoicing-plan.interface';
-import {ISalon, NewSalon} from "../../salon/model/salon.interface";
 
 @Injectable({providedIn: 'root'})
 export class ParticipationService {
@@ -49,7 +44,7 @@ export class ParticipationService {
             .pipe(map(res => this.convertResponseArrayFromServer(res)));
     }
 
-    delete(idParticipation: string): Observable<HttpResponse<{}>> {
+    delete(idParticipation: string): Observable<HttpResponse<unknown>> {
         return this.http.delete(`${this.resourceUrl}/${idParticipation}`, {observe: 'response'});
     }
 
@@ -64,35 +59,13 @@ export class ParticipationService {
         });
     }
 
-    generateInvoices(idParticipation: string): Observable<HttpResponse<{}>> {
+    generateInvoices(idParticipation: string): Observable<HttpResponse<unknown>> {
         return this.http.patch(`${this.resourceUrl}/${idParticipation}/refresh-invoicing-plans`, {},
             {observe: 'response'});
     }
 
     getEventLogs(idParticipation: string): Observable<HttpResponse<any>> {
         return this.http.get<any[]>(`${this.resourceUrl}/${idParticipation}/events`, {observe: 'response'});
-    }
-
-    addParticipationsOptionsIfMissing<Type extends Pick<IParticipation, 'id'>>(
-        participationCollection: Type[],
-        ...participationsToCheck: (Type | null | undefined)[]
-    ): Type[] {
-        const participations: Type[] = participationsToCheck.filter(isPresent);
-        if (participations.length > 0) {
-            const participationCollectionIdentifiers = participationCollection.map(participationItem =>
-                getParticipationIdentifier(participationItem),
-            );
-            const participationsToAdd = participations.filter(participationItem => {
-                const participationIdentifier = getParticipationIdentifier(participationItem);
-                if (participationCollectionIdentifiers.includes(participationIdentifier)) {
-                    return false;
-                }
-                participationCollectionIdentifiers.push(participationIdentifier);
-                return true;
-            });
-            return [...participationsToAdd, ...participationCollection];
-        }
-        return participationCollection;
     }
 
     protected convertDateFromClient<T extends IParticipation>(participation: T): T {

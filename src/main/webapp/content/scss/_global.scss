@@ -1,0 +1,432 @@
+/* ==============================================================
+Bootstrap tweaks
+===============================================================*/
+
+html {
+  font-size: 14px !important;
+}
+body {
+  font-weight: 300;
+  font-family: 'Lato', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  margin-bottom: 0;
+  font-family: inherit;
+}
+
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+Browser Upgrade Prompt
+========================================================================== */
+.browserupgrade {
+  margin: 0.2em 0;
+  background: var(--app-border);
+  color: #000;
+  padding: 0.2em 0;
+}
+
+/* ==========================================================================
+Generic styles
+========================================================================== */
+
+/* TODO: TO REMOVE LATER */
+[jhisortby] {
+  cursor: pointer;
+}
+
+/* ==========================================================================
+Custom alerts for notification
+========================================================================== */
+.alerts {
+  .alert {
+    text-overflow: ellipsis;
+
+    pre {
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      padding: 0;
+      margin: 0;
+    }
+
+    .popover pre {
+      font-size: 10px;
+    }
+  }
+
+  .jhi-toast {
+    position: fixed;
+    width: 100%;
+
+    &.left {
+      left: 5px;
+    }
+
+    &.right {
+      right: 5px;
+    }
+
+    &.top {
+      top: 55px;
+    }
+
+    &.bottom {
+      bottom: 55px;
+    }
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .alerts .jhi-toast {
+    width: 50%;
+  }
+}
+
+/* ==========================================================================
+ui bootstrap tweaks
+========================================================================== */
+
+a {
+  color: var(--app-primary) !important;
+  &:hover {
+    cursor: pointer;
+    color: var(--app-secondary) !important;
+  }
+}
+
+/******************** SALON STYLES *************************/
+
+/* TODO: TO REMOVE LATER */
+.golden-icon {
+  color: #efbf00;
+}
+
+/* ACCORDION */
+
+/* TODO: TO REMOVE LATER */
+.accordion-button:not(.collapsed) {
+  background-color: var(--app-primary);
+  color: white;
+}
+
+/* TODO: TO REMOVE LATER */
+.accordion-button.collapsed {
+  background-color: var(--app-primary);
+  color: white;
+}
+
+/* TABLE */
+/* TODO: TO REMOVE LATER */
+.table .thead-primary th {
+  background-color: var(--app-primary);
+  color: white;
+}
+
+/* TODO: TO REMOVE LATER */
+.table {
+  border: 1px solid var(--app-secondary);
+}
+
+/* TODO: TO REMOVE LATER */
+.table td {
+  vertical-align: middle;
+}
+
+/* TODO: TO REMOVE LATER */
+.table td.clipboard:hover {
+  cursor: pointer;
+  background-color: var(--app-secondary);
+}
+
+/* TODO: TO REMOVE LATER */
+.clickable {
+  cursor: pointer;
+}
+
+/* TODO: TO REMOVE LATER */
+.truncate {
+  white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
+  overflow: hidden; /* Cache le texte qui déborde du conteneur */
+  text-overflow: ellipsis; /* Remplace le texte tronqué par "..." */
+  max-width: 20rem; /* Fixe une largeur maximale pour la cellule */
+}
+
+.truncate-medium {
+  white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
+  overflow: hidden; /* Cache le texte qui déborde du conteneur */
+  text-overflow: ellipsis; /* Remplace le texte tronqué par "..." */
+  max-width: 10rem; /* Fixe une largeur maximale pour la cellule */
+}
+
+/* TODO: TO REMOVE LATER */
+.truncate-small {
+  white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
+  overflow: hidden; /* Cache le texte qui déborde du conteneur */
+  text-overflow: ellipsis; /* Remplace le texte tronqué par "..." */
+  max-width: 5rem; /* Fixe une largeur maximale pour la cellule */
+}
+
+/* CARD */
+
+.card-header {
+  background-color: var(--app-primary);
+  color: white;
+}
+
+.card-body {
+  border: 1px solid var(--app-primary);
+}
+
+/* FORM CONTROL */
+/* TODO: TO REMOVE LATER */
+.form-control {
+  background-color: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+
+  &:focus {
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-border);
+    outline: 0;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    background-color: var(--app-border) !important;
+    border: 1px dashed var(--app-contrast) !important;
+  }
+}
+
+/* TABLE SECTION FOR INVOICES */
+/* TODO: TO REMOVE LATER */
+.table-section-ending {
+  background-color: var(--app-secondary) !important;
+  color: var(--app-surface) !important;
+}
+
+/* TODO: TO REMOVE LATER, USE PRIMENG TABS */
+.nav-tabs .nav-link {
+  border-radius: 0 !important;
+}
+
+/* TODO: TO REMOVE LATER, USE PRIMENG TABS */
+.nav-tabs .nav-link.active {
+  border-radius: 0 !important;
+  background-color: var(--app-primary) !important;
+  color: var(--app-surface) !important;
+  border: 1px solid var(--app-primary) !important;
+  margin-bottom: calc(-1 * var(--bs-nav-tabs-border-width)) !important;
+}
+
+/* TODO: TO REMOVE LATER, USE PRIMENG DROPDOWN */
+.btn-group.active .dropdown-toggle {
+  border-radius: 0;
+  background-color: var(--app-primary);
+  color: var(--app-surface);
+  border: 1px solid var(--app-primary);
+  margin-bottom: calc(-1 * var(--bs-nav-tabs-border-width));
+}
+
+/* TODO: TO REMOVE LATER, USE PRIMENG DROPDOWN */
+.btn-group.active .dropdown-item:hover {
+  background-color: var(--app-primary);
+  color: var(--app-surface);
+}
+
+/* TODO: TO REMOVE LATER, USE PRIMENG DROPDOWN */
+.dropdown-items {
+  .dropdown-item.active {
+    background-color: var(--app-warning);
+    color: var(--app-surface);
+  }
+
+  .dropdown-item {
+    color: #555555;
+  }
+
+  .dropdown-item:disabled {
+    color: #bbbbbb;
+  }
+
+  .dropdown-item:focus,
+  .dropdown-item:hover {
+    background-color: var(--app-primary);
+    color: var(--app-surface);
+  }
+
+  .dropdown-item.dropdown-item-danger:focus,
+  .dropdown-item.dropdown-item-danger:hover {
+    background-color: var(--app-danger);
+    color: var(--app-surface);
+  }
+}
+
+
+/************************************* PRIMENG ****************************************************/
+
+.p-togglebutton {
+  background-color: var(--app-surface) !important;
+  opacity: 1 !important;
+
+  &.p-disabled {
+    border-style: dashed;
+  }
+}
+
+.p-textarea:disabled {
+  background-color: var(--app-surface) !important;
+  border-style: dashed;
+}
+
+.p-autocomplete-input-multiple.p-disabled {
+  background-color: var(--app-surface) !important;
+  border-style: dashed;
+}
+
+.p-autocomplete-chip.p-chip {
+  opacity: 1 !important;
+  background-color: var(--app-surface) !important;
+  color: var(--app-primary) !important;
+  border: 1px solid var(--app-primary) !important;
+
+  &.p-disabled {
+    border: 1px dashed var(--app-primary) !important;
+    & .p-chip-remove-icon {
+      display: none; /* cache la petite croix */
+    }
+  }
+}
+
+.p-togglebutton-content {
+  justify-content: space-between !important;
+}
+
+.p-inputtext:disabled {
+  background-color: var(--app-surface) !important;
+  border-style: dashed;
+}
+
+.p-select.p-disabled {
+  background-color: var(--app-surface) !important;
+  border-style: dashed;
+}
+
+p-iftalabel label {
+  font-weight: bold !important;
+}
+
+.p-datatable-thead > tr > th p-columnfilter {
+  color: var(--app-primary) !important;
+}
+
+.p-tabpanels {
+  padding: 0 !important;
+}
+
+.p-tabpanel .table {
+  margin: 0 !important;
+}
+
+.p-datatable-header-cell, .p-datatable-tbody > tr:hover {
+  background-color: var(--p-datatable-header-cell-selected-background);
+}
+
+.p-accordionpanel:not(.p-disabled).p-accordionpanel-active > .p-accordionheader {
+  background-color: var(--app-primary) !important;
+  color: white !important;
+}
+
+.p-accordionheader {
+  border: 1px solid var(--app-primary) !important;
+}
+
+.p-dialog-content {
+  padding-top: 1.5rem !important;
+}
+
+.p-badge-xs .p-badge {
+  font-size: 0.75rem;
+  min-width: 1rem;
+  height: 1rem;
+  border: 0;
+  outline-width: 0;
+}
+
+.p-badge {
+  font-size: 1rem;
+  border: 0;
+  outline-width: 0;
+}
+
+.p-card {
+  border: 1px solid var(--p-menubar-border-color) !important;
+  box-shadow: none !important;
+}
+
+.p-card-header {
+  padding-top: var(--p-card-body-padding) !important;
+  padding-left: var(--p-card-body-padding) !important;
+  padding-right: var(--p-card-body-padding) !important;
+  padding-bottom: 0 !important;
+}
+
+.p-card-body {
+  padding-top: 0 !important;
+}
+
+.p-contextmenu-root-list, .p-contextmenu-submenu {
+  padding-left: 0 !important;
+}
+
+.p-contextmenu-item-content a {
+  text-decoration: none !important;
+}
+
+@media screen and (min-width: 1200px) {
+  .p-panel-header {
+    padding-top: 0.75rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  .p-panel-header {
+    padding-top: 0.75rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}

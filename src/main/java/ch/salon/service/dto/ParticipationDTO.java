@@ -3,223 +3,34 @@ package ch.salon.service.dto;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.Status;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Data
 public class ParticipationDTO implements Serializable {
 
     private UUID id;
-
     private String clientNumber;
-
     private String therapistName;
-
     private Instant registrationDate;
-
     private ModePaymentMeals modePaymentMeals;
-
     private InvoiceSendingMethod invoiceSendingMethod;
-
     private Long nbMeal1;
-
     private Long nbMeal2;
-
     private Long nbMeal3;
-
     private Boolean acceptedChart;
-
     private Boolean acceptedContract;
-
     private Boolean needArrangement;
-
     private Boolean hasOffer;
-
     private String offer;
-
     private String additionnalInformation;
-
     private Boolean guestOfHonor;
-
     private Boolean crushOfHeart;
-
     private Status status;
-
     private String extraInformation;
-
     private ExhibitorLightDTO exhibitor;
-
     private SalonLightDTO salon;
-
-    public ParticipationDTO() {
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getTherapistName() {
-        return therapistName;
-    }
-
-    public void setTherapistName(String therapistName) {
-        this.therapistName = therapistName;
-    }
-
-    public String getClientNumber() {
-        return clientNumber;
-    }
-
-    public void setClientNumber(String clientNumber) {
-        this.clientNumber = clientNumber;
-    }
-
-    public Instant getRegistrationDate() {
-        return registrationDate;
-    }
-
-    public void setRegistrationDate(Instant registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public Long getNbMeal1() {
-        return nbMeal1;
-    }
-
-    public void setNbMeal1(Long nbMeal1) {
-        this.nbMeal1 = nbMeal1;
-    }
-
-    public Long getNbMeal2() {
-        return nbMeal2;
-    }
-
-    public void setNbMeal2(Long nbMeal2) {
-        this.nbMeal2 = nbMeal2;
-    }
-
-    public Long getNbMeal3() {
-        return nbMeal3;
-    }
-
-    public void setNbMeal3(Long nbMeal3) {
-        this.nbMeal3 = nbMeal3;
-    }
-
-    public Boolean getAcceptedChart() {
-        return acceptedChart;
-    }
-
-    public void setAcceptedChart(Boolean acceptedChart) {
-        this.acceptedChart = acceptedChart;
-    }
-
-    public Boolean getAcceptedContract() {
-        return acceptedContract;
-    }
-
-    public void setAcceptedContract(Boolean acceptedContract) {
-        this.acceptedContract = acceptedContract;
-    }
-
-    public Boolean getNeedArrangement() {
-        return needArrangement;
-    }
-
-    public void setNeedArrangement(Boolean needArrangement) {
-        this.needArrangement = needArrangement;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public String getOffer() {
-        return offer;
-    }
-
-    public void setOffer(String offer) {
-        this.offer = offer;
-    }
-
-    public String getAdditionnalInformation() {
-        return additionnalInformation;
-    }
-
-    public void setAdditionnalInformation(String additionnalInformation) {
-        this.additionnalInformation = additionnalInformation;
-    }
-
-    public Boolean getGuestOfHonor() {
-        return guestOfHonor;
-    }
-
-    public void setGuestOfHonor(Boolean guestOfHonor) {
-        this.guestOfHonor = guestOfHonor;
-    }
-
-    public Boolean getCrushOfHeart() {
-        return crushOfHeart;
-    }
-
-    public void setCrushOfHeart(Boolean crushOfHeart) {
-        this.crushOfHeart = crushOfHeart;
-    }
-
-    public String getExtraInformation() {
-        return extraInformation;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
-    }
-
-    public ExhibitorLightDTO getExhibitor() {
-        return exhibitor;
-    }
-
-    public void setExhibitor(ExhibitorLightDTO exhibitor) {
-        this.exhibitor = exhibitor;
-    }
-
-    public SalonLightDTO getSalon() {
-        return salon;
-    }
-
-    public void setSalon(SalonLightDTO salon) {
-        this.salon = salon;
-    }
-
-    public Boolean getHasOffer() {
-        return hasOffer;
-    }
-
-    public void setHasOffer(Boolean hasOffer) {
-        this.hasOffer = hasOffer;
-    }
-
-    public ModePaymentMeals getModePaymentMeals() {
-        return modePaymentMeals;
-    }
-
-    public void setModePaymentMeals(ModePaymentMeals modePaymentMeals) {
-        this.modePaymentMeals = modePaymentMeals;
-    }
-
-    public InvoiceSendingMethod getInvoiceSendingMethod() {
-        return invoiceSendingMethod;
-    }
-
-    public void setInvoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
-        this.invoiceSendingMethod = invoiceSendingMethod;
-    }
 }

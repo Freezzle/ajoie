@@ -11,7 +11,7 @@ import {ErrorModel} from '../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../shared/field-error/field-error.component';
 
 @Component({
-    selector: 'jhi-password',
+    selector: 'app-password',
     imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, FieldErrorComponent],
     templateUrl: './password.component.html'
 })

@@ -31,9 +31,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import ch.salon.utils.HeaderUtil;
+import ch.salon.utils.PaginationUtil;
+import ch.salon.utils.ResponseUtil;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ public class AdminUserResource {
     private final UserRepository userRepository;
     private final CreationAccountEmailCreator creationAccountEmailCreator;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AdminUserResource(UserService userService, UserRepository userRepository,

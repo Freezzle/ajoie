@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0.0.2_202511-1" author="claudedy">
+        <addColumn tableName="stand">
+            <column name="sub_categories" type="JSON">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="0.0.2_202511-2" author="claudedy">
+        <addColumn tableName="exhibitor">
+            <column name="iso_country" type="VARCHAR(5)" defaultValue="CH">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="0.0.2_202511-3" author="claudedy">
+        <addColumn tableName="address">
+            <column name="iso_country" type="VARCHAR(5)" defaultValue="CH">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

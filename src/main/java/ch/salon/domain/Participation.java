@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -21,11 +22,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "participation")
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Data
 public class Participation implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -95,245 +93,6 @@ public class Participation implements Serializable {
     @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
 
-    public UUID getId() {
-        return this.id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Participation id(UUID id) {
-        this.setId(id);
-        return this;
-    }
-
-    public String getTherapistName() {
-        return therapistName;
-    }
-
-    public void setTherapistName(String therapistName) {
-        this.therapistName = therapistName;
-    }
-
-
-    public Instant getRegistrationDate() {
-        return this.registrationDate;
-    }
-
-    public void setRegistrationDate(Instant registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public Participation registrationDate(Instant registrationDate) {
-        this.setRegistrationDate(registrationDate);
-        return this;
-    }
-
-    public Long getNbMeal1() {
-        return this.nbMeal1;
-    }
-
-    public void setNbMeal1(Long nbMeal1) {
-        this.nbMeal1 = nbMeal1;
-    }
-
-    public Participation nbMeal1(Long nbMeal1) {
-        this.setNbMeal1(nbMeal1);
-        return this;
-    }
-
-    public String getOffer() {
-        return offer;
-    }
-
-    public void setOffer(String offer) {
-        this.offer = offer;
-    }
-
-    public String getAdditionnalInformation() {
-        return additionnalInformation;
-    }
-
-    public void setAdditionnalInformation(String additionnalInformation) {
-        this.additionnalInformation = additionnalInformation;
-    }
-
-    public Long getNbMeal2() {
-        return this.nbMeal2;
-    }
-
-    public void setNbMeal2(Long nbMeal2) {
-        this.nbMeal2 = nbMeal2;
-    }
-
-    public Participation nbMeal2(Long nbMeal2) {
-        this.setNbMeal2(nbMeal2);
-        return this;
-    }
-
-    public Long getNbMeal3() {
-        return this.nbMeal3;
-    }
-
-    public void setNbMeal3(Long nbMeal3) {
-        this.nbMeal3 = nbMeal3;
-    }
-
-    public Participation nbMeal3(Long nbMeal3) {
-        this.setNbMeal3(nbMeal3);
-        return this;
-    }
-
-    public ModePaymentMeals getModePaymentMeals() {
-        return this.modePaymentMeals;
-    }
-
-    public void setModePaymentMeals(ModePaymentMeals modePaymentMeals) {
-        this.modePaymentMeals = modePaymentMeals;
-    }
-
-    public Participation modePaymentMeals(ModePaymentMeals modePaymentMeals) {
-        this.setModePaymentMeals(modePaymentMeals);
-        return this;
-    }
-
-    public InvoiceSendingMethod getInvoiceSendingMethod() {
-        return this.invoiceSendingMethod;
-    }
-
-    public void setInvoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
-        this.invoiceSendingMethod = invoiceSendingMethod;
-    }
-
-    public Participation invoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
-        this.setInvoiceSendingMethod(invoiceSendingMethod);
-        return this;
-    }
-
-    public Boolean getAcceptedChart() {
-        return this.acceptedChart;
-    }
-
-    public void setAcceptedChart(Boolean acceptedChart) {
-        this.acceptedChart = acceptedChart;
-    }
-
-    public Participation acceptedChart(Boolean acceptedChart) {
-        this.setAcceptedChart(acceptedChart);
-        return this;
-    }
-
-    public Boolean getAcceptedContract() {
-        return this.acceptedContract;
-    }
-
-    public void setAcceptedContract(Boolean acceptedContract) {
-        this.acceptedContract = acceptedContract;
-    }
-
-    public Participation acceptedContract(Boolean acceptedContract) {
-        this.setAcceptedContract(acceptedContract);
-        return this;
-    }
-
-    public Boolean getNeedArrangement() {
-        return this.needArrangement;
-    }
-
-    public void setNeedArrangement(Boolean needArrangement) {
-        this.needArrangement = needArrangement;
-    }
-
-    public Participation needArrangement(Boolean needArrangement) {
-        this.setNeedArrangement(needArrangement);
-        return this;
-    }
-
-    public Status getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public Participation status(Status status) {
-        this.setStatus(status);
-        return this;
-    }
-
-    public String getExtraInformation() {
-        return this.extraInformation;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
-    }
-
-    public Participation extraInformation(String extraInformation) {
-        this.setExtraInformation(extraInformation);
-        return this;
-    }
-
-    public Exhibitor getExhibitor() {
-        return this.exhibitor;
-    }
-
-    public void setExhibitor(Exhibitor exhibitor) {
-        this.exhibitor = exhibitor;
-    }
-
-    public Participation exhibitor(Exhibitor exhibitor) {
-        this.setExhibitor(exhibitor);
-        return this;
-    }
-
-    public Salon getSalon() {
-        return this.salon;
-    }
-
-    public void setSalon(Salon salon) {
-        this.salon = salon;
-    }
-
-    public Participation salon(Salon salon) {
-        this.setSalon(salon);
-        return this;
-    }
-
-    public Boolean getGuestOfHonor() {
-        return guestOfHonor;
-    }
-
-    public void setGuestOfHonor(Boolean guestOfHonor) {
-        this.guestOfHonor = guestOfHonor;
-    }
-
-    public Boolean getCrushOfHeart() {
-        return crushOfHeart;
-    }
-
-    public void setCrushOfHeart(Boolean crushOfHeart) {
-        this.crushOfHeart = crushOfHeart;
-    }
-
-    public String getClientNumber() {
-        return clientNumber;
-    }
-
-    public void setClientNumber(String clientNumber) {
-        this.clientNumber = clientNumber;
-    }
-
-    public Boolean getHasOffer() {
-        return hasOffer;
-    }
-
-    public void setHasOffer(Boolean hasOffer) {
-        this.hasOffer = hasOffer;
-    }
-
     public static boolean diffMeal(int indexMeal, Participation part1, Participation part2) {
         if (part1 == null && part2 != null) {
             return true;
@@ -392,31 +151,5 @@ public class Participation implements Serializable {
 
         // Reformater le numéro incrémenté avec le même nombre de chiffres
         return referenceSalon + "-" + String.format("%03d", number);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Participation)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((Participation) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return ("Participation{" + "id=" + getId() + ", registrationDate='" + getRegistrationDate() + "'" +
-                ", clientNumber='" + getClientNumber() + "'" + ", nbMeal1=" + getNbMeal1() + ", nbMeal2=" +
-                getNbMeal2() + ", nbMeal3=" + getNbMeal3() + ", acceptedChart='" + getAcceptedChart() + "'" +
-                ", acceptedContract='" + getAcceptedContract() + "'" + ", needArrangement='" + getNeedArrangement() +
-                "'" + ", status='" + getStatus() + "'" + ", extraInformation='" + getExtraInformation() + "'" + "}");
     }
 }

@@ -1,0 +1,23 @@
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {MenuItem, MenuItemCommandEvent} from "primeng/api";
+import {MenuModule} from "primeng/menu";
+import {CommonModule} from "@angular/common";
+import {ButtonModule} from "primeng/button";
+import {FaIconComponent} from "@fortawesome/angular-fontawesome";
+import {TranslateModule} from "@ngx-translate/core";
+
+@Component({
+    selector: 'menu-box',
+    imports: [CommonModule, MenuModule, ButtonModule, FaIconComponent, TranslateModule],
+    templateUrl: './menu-box.component.html',
+    styleUrl: './menu-box.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class MenuBoxComponent {
+    @Input({required: true}) items: MenuItem[] = [];
+
+    @Input() buttonTranslateKey = 'common.actions';
+    @Input() buttonIcon?: string;
+    @Input() buttonDisabled = false;
+    @Input() appendTo: any = 'body';
+}

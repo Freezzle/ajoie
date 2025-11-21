@@ -10,7 +10,7 @@ export class EventService {
     protected applicationConfigService = inject(ApplicationConfigService);
     protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/events');
 
-    deleteEvent(idEvent: string): Observable<{}> {
-        return this.http.delete(`${this.resourceUrl}/${idEvent}`);
+    deleteEvent(idEvent: string): Observable<void> {
+        return this.http.delete<void>(`${this.resourceUrl}/${idEvent}`);
     }
 }

@@ -5,12 +5,12 @@
         </div>
         <hr/>
 
-        <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-between mt-4">
       <span>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     faIcon="arrow-left"
-                    translateKey="common.back"/>
+                    translateKey="common.back" [showText]="false"/>
       </span>
         </div>
     </h2>

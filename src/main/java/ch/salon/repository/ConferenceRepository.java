@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 @Repository
 public interface ConferenceRepository extends JpaRepository<Conference, UUID> {
 

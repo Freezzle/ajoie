@@ -6,11 +6,9 @@ import ch.salon.service.dto.SalonLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SalonMapper {
-    SalonMapper INSTANCE = Mappers.getMapper(SalonMapper.class);
 
     SalonDTO toDto(Salon salon);
 

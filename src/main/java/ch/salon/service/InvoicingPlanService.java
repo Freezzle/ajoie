@@ -1,35 +1,28 @@
 package ch.salon.service;
 
-import ch.salon.domain.Conference;
 import ch.salon.domain.Invoice;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Payment;
-import ch.salon.domain.PriceStandSalon;
-import ch.salon.domain.Salon;
-import ch.salon.domain.Stand;
-import ch.salon.domain.Workshop;
+import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
-import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.domain.enumeration.Type;
-import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.InvoiceRepository;
 import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.PaymentRepository;
-import ch.salon.repository.SalonRepository;
-import ch.salon.repository.StandRepository;
-import ch.salon.repository.WorkshopRepository;
+import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.PaymentDTO;
+import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.InvoiceMapper;
 import ch.salon.service.mapper.InvoicingPlanMapper;
 import ch.salon.service.mapper.PaymentMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -45,17 +38,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ch.salon.domain.enumeration.EntityType.INVOICE_PLAN;
-import static ch.salon.domain.enumeration.EntityType.PARTICIPATION;
-import static ch.salon.domain.enumeration.Type.CONFERENCE;
-import static ch.salon.domain.enumeration.Type.MEAL1;
-import static ch.salon.domain.enumeration.Type.MEAL2;
-import static ch.salon.domain.enumeration.Type.MEAL3;
 import static ch.salon.domain.enumeration.Type.POSTAL_FEE;
-import static ch.salon.domain.enumeration.Type.SHARED;
-import static ch.salon.domain.enumeration.Type.STAND;
-import static ch.salon.domain.enumeration.Type.WORKSHOP;
 
 @Service
+@AllArgsConstructor
 public class InvoicingPlanService {
 
     public static final String ENTITY_NAME = "invoicingPlan";
@@ -63,33 +49,16 @@ public class InvoicingPlanService {
 
     private final InvoicingPlanRepository repository;
 
-    private final SalonRepository salonRepository;
     private final ParticipationRepository participationRepository;
-
-    private final StandRepository standRepository;
-    private final ConferenceRepository conferenceRepository;
-    private final WorkshopRepository workshopRepository;
-
     private final PaymentRepository paymentRepository;
     private final InvoiceRepository invoiceRepository;
 
-    private final MessageSource messageSource;
+    private final PaymentMapper paymentMapper;
+    private final InvoiceMapper invoiceMapper;
+    private final InvoicingPlanMapper invoicingPlanMapper;
+    private final EventLogMapper eventLogMapper;
 
-    public InvoicingPlanService(SalonRepository salonRepository, ParticipationRepository participationRepository,
-            InvoicingPlanRepository repository, StandRepository standRepository, WorkshopRepository workshopRepository,
-            ConferenceRepository conferenceRepository, MessageSource messageSource, EventLogService eventLogService,
-            PaymentRepository paymentRepository, InvoiceRepository invoiceRepository) {
-        this.participationRepository = participationRepository;
-        this.salonRepository = salonRepository;
-        this.repository = repository;
-        this.standRepository = standRepository;
-        this.conferenceRepository = conferenceRepository;
-        this.workshopRepository = workshopRepository;
-        this.messageSource = messageSource;
-        this.eventLogService = eventLogService;
-        this.paymentRepository = paymentRepository;
-        this.invoiceRepository = invoiceRepository;
-    }
+    private final MessageSource messageSource;
 
     public Optional<InvoiceDTO> createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {
         if (idInvoicingPlan == null || invoiceDTO == null) {
@@ -99,20 +68,16 @@ public class InvoicingPlanService {
         InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Invoice invoiceToCreate = InvoiceMapper.INSTANCE.toEntity(invoiceDTO);
+        Invoice invoiceToCreate = invoiceMapper.toEntity(invoiceDTO);
         invoiceToCreate.setDefaultAmount(invoiceDTO.getCustomAmount());
         invoiceToCreate.setReduction(invoiceToCreate.getTotalAmount() < 0.00);
         invoiceToCreate = this.invoiceRepository.save(invoiceToCreate);
 
-        invoicingPlan.addInvoice(invoiceToCreate);
+        invoicingPlan.getInvoices().add(invoiceToCreate);
         invoicingPlan = repository.save(invoicingPlan);
-
-        this.eventLogService.eventFromSystem("Une ligne de facture a été ajoutée " + invoicingPlan.getBillingNumber(),
-                EventType.ACTION, PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
-        this.eventLogService.eventFromSystem("Une ligne de facture a été ajoutée", EventType.ACTION, INVOICE_PLAN,
+        this.eventLogService.eventFromSystem("Ligne de facture ajoutée", EventType.ACTION, INVOICE_PLAN,
                 invoicingPlan.getId(), null);
-
-        return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceToCreate));
+        return Optional.of(invoiceMapper.toDto(invoiceToCreate));
     }
 
     public Optional<InvoiceDTO> updateInvoice(UUID idInvoicingPlan, UUID idInvoice, InvoiceDTO invoiceDTO) {
@@ -128,10 +93,7 @@ public class InvoicingPlanService {
                              .orElseThrow();
 
         if (!Objects.equals(invoiceFound.getCustomAmount(), invoiceDTO.getCustomAmount())) {
-            this.eventLogService.eventFromSystem(
-                    "Une ligne de facture a été modifiée #" + invoicingPlan.getBillingNumber(), EventType.ACTION,
-                    PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
-            this.eventLogService.eventFromSystem("Une ligne de facture a été modifiée", EventType.ACTION, INVOICE_PLAN,
+            this.eventLogService.eventFromSystem("Ligne de facture modifiée", EventType.ACTION, INVOICE_PLAN,
                     invoicingPlan.getId(), null);
         }
 
@@ -145,7 +107,22 @@ public class InvoicingPlanService {
 
         repository.save(invoicingPlan);
 
-        return Optional.of(InvoiceMapper.INSTANCE.toDto(invoiceFound));
+        return Optional.of(invoiceMapper.toDto(invoiceFound));
+    }
+
+    public void deleteInvoice(UUID idInvoicingPlan, UUID idInvoice) {
+        InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
+
+        Invoice invoiceFound =
+                invoicingPlan.getInvoices().stream().filter(invoice -> invoice.getId().equals(idInvoice)).findFirst()
+                             .orElseThrow();
+
+        invoicingPlan.getInvoices().remove(invoiceFound);
+
+        this.repository.save(invoicingPlan);
+
+        this.eventLogService.eventFromSystem("Ligne de facture supprimé", EventType.PAYMENT, INVOICE_PLAN,
+                invoicingPlan.getId(), null);
     }
 
     public Optional<PaymentDTO> createPayment(UUID idInvoicingPlan, PaymentDTO paymentDTO) {
@@ -154,18 +131,15 @@ public class InvoicingPlanService {
         }
 
         InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
-        Payment payment = PaymentMapper.INSTANCE.toEntity(paymentDTO);
+        Payment payment = paymentMapper.toEntity(paymentDTO);
         payment = this.paymentRepository.save(payment);
 
-        invoicingPlan.addPayment(payment);
+        invoicingPlan.getPayments().add(payment);
         invoicingPlan = this.repository.save(invoicingPlan);
 
-        this.eventLogService.eventFromSystem("Un paiement a été ajouté " + invoicingPlan.getBillingNumber(),
-                EventType.PAYMENT, PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
-        this.eventLogService.eventFromSystem("Un paiement a été ajouté", EventType.PAYMENT, INVOICE_PLAN,
+        this.eventLogService.eventFromSystem("Paiement ajouté", EventType.PAYMENT, INVOICE_PLAN,
                 invoicingPlan.getId(), null);
-
-        return Optional.of(PaymentMapper.INSTANCE.toDto(payment));
+        return Optional.of(paymentMapper.toDto(payment));
     }
 
     public Optional<PaymentDTO> updatePayment(final UUID idInvoicingPlan, final UUID idPayment, PaymentDTO paymentDTO) {
@@ -181,9 +155,7 @@ public class InvoicingPlanService {
                              .orElseThrow();
 
         if (!Objects.equals(paymentDTO.getAmount(), paymentFound.getAmount())) {
-            this.eventLogService.eventFromSystem("Un paiement a été modifié " + invoicingPlan.getBillingNumber(),
-                    EventType.PAYMENT, PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
-            this.eventLogService.eventFromSystem("Un paiement a été modifié", EventType.PAYMENT, INVOICE_PLAN,
+            this.eventLogService.eventFromSystem("Paiement modifié", EventType.PAYMENT, INVOICE_PLAN,
                     invoicingPlan.getId(), null);
         }
 
@@ -194,7 +166,7 @@ public class InvoicingPlanService {
 
         repository.save(invoicingPlan);
 
-        return Optional.of(PaymentMapper.INSTANCE.toDto(paymentFound));
+        return Optional.of(paymentMapper.toDto(paymentFound));
     }
 
     public void deletePayment(UUID idInvoicingPlan, UUID idPayment) {
@@ -204,20 +176,27 @@ public class InvoicingPlanService {
                 invoicingPlan.getPayments().stream().filter(payment -> payment.getId().equals(idPayment)).findFirst()
                              .orElseThrow();
 
-        invoicingPlan.removePayment(paymentFound);
-
+        invoicingPlan.getPayments().remove(paymentFound);
         this.repository.save(invoicingPlan);
-        this.eventLogService.eventFromSystem("Un paiement a été supprimé " + invoicingPlan.getBillingNumber(),
-                EventType.PAYMENT, PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
-        this.eventLogService.eventFromSystem("Un paiement a été supprimé", EventType.PAYMENT, INVOICE_PLAN,
+
+        this.eventLogService.eventFromSystem("Paiement supprimé", EventType.PAYMENT, INVOICE_PLAN,
                 invoicingPlan.getId(), null);
+    }
+
+    public List<EventLogDTO> findAllEventLogs(UUID idInvoicingPlan) {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        return this.eventLogService.findAllEventLog(INVOICE_PLAN, idInvoicingPlan).stream()
+                                   .map(eventLogMapper::toDto).toList();
     }
 
     public List<InvoicingPlanDTO> findAll(String idParticipation) {
         if (StringUtils.isNotBlank(idParticipation)) {
             List<InvoicingPlan> invoicingPlans =
                     repository.findByParticipationIdOrderByBillingNumberAsc(UUID.fromString(idParticipation));
-            return invoicingPlans.stream().map(InvoicingPlanMapper.INSTANCE::toDto).toList();
+            return invoicingPlans.stream().map(invoicingPlanMapper::toDto).toList();
         }
 
         throw new IllegalStateException("No filter given");
@@ -232,10 +211,13 @@ public class InvoicingPlanService {
 
         invoicingPlan.setNeedArrangement(!invoicingPlan.getNeedArrangement());
 
-        this.eventLogService.eventFromSystem("Changement d'arrangement " + invoicingPlan.getBillingNumber(),
-                EventType.ACTION, PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
-        this.eventLogService.eventFromSystem("Changement d'arrangement", EventType.ACTION, INVOICE_PLAN,
-                invoicingPlan.getId(), null);
+        if (invoicingPlan.getNeedArrangement()) {
+            this.eventLogService.eventFromSystem("Facture avec arrangement", EventType.ACTION, INVOICE_PLAN,
+                    invoicingPlan.getId(), null);
+        } else {
+            this.eventLogService.eventFromSystem("Facture sans arrangement", EventType.ACTION, INVOICE_PLAN,
+                    invoicingPlan.getId(), null);
+        }
 
         repository.save(invoicingPlan);
     }
@@ -251,17 +233,12 @@ public class InvoicingPlanService {
                 invoiceSendingMethod == InvoiceSendingMethod.POSTAL) {
             invoicingPlan.setInvoiceSendingMethod(invoiceSendingMethod);
             manageInvoiceSendingMethod(invoicingPlan);
-            this.eventLogService.eventFromSystem(
-                    "Facture à envoyer par la poste pour " + invoicingPlan.getBillingNumber(), EventType.ACTION,
-                    PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
             this.eventLogService.eventFromSystem("Facture à envoyer par la poste", EventType.ACTION, INVOICE_PLAN,
                     invoicingPlan.getId(), null);
         } else if (invoicingPlan.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL &&
                 invoiceSendingMethod == InvoiceSendingMethod.EMAIL) {
             invoicingPlan.setInvoiceSendingMethod(invoiceSendingMethod);
             manageInvoiceSendingMethod(invoicingPlan);
-            this.eventLogService.eventFromSystem("Facture à envoyer par émail pour " + invoicingPlan.getBillingNumber(),
-                    EventType.ACTION, PARTICIPATION, invoicingPlan.getParticipation().getId(), null);
             this.eventLogService.eventFromSystem("Facture à envoyer par émail", EventType.ACTION, INVOICE_PLAN,
                     invoicingPlan.getId(), null);
         }
@@ -284,7 +261,7 @@ public class InvoicingPlanService {
             postalFee.setDefaultAmount(3.00);
             postalFee.setCustomAmount(3.00);
 
-            plan.addInvoice(postalFee);
+            plan.getInvoices().add(postalFee);
         } else if (plan.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
             plan.getInvoices().removeIf((invoice -> invoice.getType() == POSTAL_FEE));
         }
@@ -340,6 +317,9 @@ public class InvoicingPlanService {
             repository.save(invoicingPlan);
         }
         repository.save(currentInvoicingPlan);
+
+        this.eventLogService.eventFromSystem("Facture crée par splitting", EventType.EVENT, EntityType.INVOICE_PLAN,
+                currentInvoicingPlan.getId(), null);
     }
 
     private String incrementBillingNumber(String billingNumber) {

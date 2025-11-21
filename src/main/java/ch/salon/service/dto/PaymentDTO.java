@@ -1,11 +1,13 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Mode;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Data
 public class PaymentDTO implements Serializable {
 
     private UUID id;
@@ -13,48 +15,4 @@ public class PaymentDTO implements Serializable {
     private Instant billingDate;
     private Mode paymentMode;
     private String extraInformation;
-
-    public PaymentDTO() {
-        // Empty constructor needed for Jackson.
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public Instant getBillingDate() {
-        return billingDate;
-    }
-
-    public void setBillingDate(Instant billingDate) {
-        this.billingDate = billingDate;
-    }
-
-    public Mode getPaymentMode() {
-        return paymentMode;
-    }
-
-    public void setPaymentMode(Mode paymentMode) {
-        this.paymentMode = paymentMode;
-    }
-
-    public String getExtraInformation() {
-        return extraInformation;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
-    }
 }

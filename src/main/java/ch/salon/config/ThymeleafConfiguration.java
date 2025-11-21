@@ -1,13 +1,12 @@
 package ch.salon.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.beans.factory.annotation.Value;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.nio.charset.StandardCharsets;
 

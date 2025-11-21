@@ -1,14 +1,22 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import SharedModule from '../../shared.module';
+import {Button} from "primeng/button";
+import {RouterLink} from "@angular/router";
 
 @Component({
-    imports: [FaIconComponent, SharedModule],
+    imports: [FaIconComponent, SharedModule, Button, RouterLink],
     selector: 'button-box',
     templateUrl: './button-box.component.html'
 })
 export class ButtonBoxComponent {
+    @ViewChild('btn') btn!: ElementRef<HTMLButtonElement>;
+
+    @Input()
+    modeLink: boolean = false;
+    @Input()
+    links: string[] = [];
     @Input()
     isDisabled: boolean = false;
     @Input()
@@ -25,25 +33,25 @@ export class ButtonBoxComponent {
     showText: boolean = true;
 
     @Output()
-    clickedEvent = new EventEmitter<void>();
+    clickedEvent = new EventEmitter<HTMLElement>();
 
     onClick(): void {
-        this.clickedEvent.emit();
+        this.clickedEvent.emit(this.btn.nativeElement);
     }
 
     get colorButton() {
         if (this.type === 'primary') {
-            return 'btn-primary';
+            return 'primary';
         } else if (this.type === 'secondary') {
-            return 'btn-secondary';
+            return 'secondary';
         } else if (this.type === 'warning') {
-            return 'btn-warning';
+            return 'warn';
         } else if (this.type === 'danger') {
-            return 'btn-danger';
+            return 'danger';
         } else if (this.type === 'success') {
-            return 'btn-success';
+            return 'success';
         } else {
-            return 'btn-primary';
+            return 'primary';
         }
     }
 }

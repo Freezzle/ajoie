@@ -1,0 +1,14 @@
+@mixin tokens() {
+  --app-surface: #fff;
+  --app-surface-25: #ffffff40;
+  --app-surface-muted: #ffeecc;
+  --app-border: #ddd;
+  --app-text: #575757;
+
+  --app-primary: #325d88;
+  --app-secondary: #acacac;
+  --app-warning: #e89d0e;
+  --app-sucess: #83ca1a;
+  --app-danger: #fd7658;
+  --app-contrast: #575757;
+}

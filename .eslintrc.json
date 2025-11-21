@@ -17,38 +17,32 @@
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
-    "project": ["./tsconfig.app.json"]
+    "project": ["tsconfig.eslint.json"]
   },
   "rules": {
-    "@angular-eslint/component-selector": [
+   /* "@angular-eslint/component-selector": [
       "error",
       {
         "type": "element",
-        "prefix": "jhi",
+        "prefix": "app",
         "style": "kebab-case"
       }
-    ],
-    "@angular-eslint/directive-selector": [
+    ],*/
+    /*"@angular-eslint/directive-selector": [
       "error",
       {
         "type": "attribute",
-        "prefix": "jhi",
+        "prefix": "app",
         "style": "camelCase"
       }
-    ],
+    ],*/
+    "@angular-eslint/directive-selector": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/member-ordering": "off",
     "@angular-eslint/relative-url-prefix": "error",
-    "@typescript-eslint/ban-types": [
-      "error",
-      {
-        "extendDefaults": true,
-        "types": {
-          "{}": false
-        }
-      }
-    ],
-    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
+    /*"@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],*/
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/member-ordering": [
+    /*"@typescript-eslint/member-ordering": [
       "error",
       {
         "default": [
@@ -67,12 +61,12 @@
           "private-instance-method"
         ]
       }
-    ],
+    ],*/
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-shadow": ["error"],
-    "@typescript-eslint/no-unnecessary-condition": "error",
+    "@typescript-eslint/no-unnecessary-condition": "off",
     "@typescript-eslint/no-unsafe-argument": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",

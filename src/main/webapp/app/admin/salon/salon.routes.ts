@@ -8,9 +8,9 @@ import SalonResolve from './service/salon-routing-resolve.service';
 import conferenceRoutes from '../conference/conference.routes';
 import standRoutes from '../stand/stand.routes';
 import participationRoutes from '../participation/participation.routes';
-import volunteerRoutes from '../volunteer/volunteer.routes';
 import floorPlanRoutes from '../floor-plan/floor-plan.routes';
 import workshopRoutes from "../workshop/workshop.routes";
+import planningTalksRoute from "../conference/planning-talks.routes";
 
 const salonRoute: Routes = [
     {
@@ -84,9 +84,9 @@ const salonRoute: Routes = [
         children: floorPlanRoutes,
     },
     {
-        path: ':idSalon/planning-volunteers',
-        children: volunteerRoutes,
-    },
+        path: ':idSalon/planning-conferences',
+        children: planningTalksRoute,
+    }
 ];
 
 export default salonRoute;

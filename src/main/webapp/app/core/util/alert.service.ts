@@ -54,11 +54,12 @@ export class AlertService {
 
         if (alert.translationKey) {
             const translatedMessage = this.translateService.instant(alert.translationKey, alert.translationParams);
+
             // if translation key exists
             if (translatedMessage !== `${translationNotFoundMessage}[${alert.translationKey}]`) {
                 alert.message = translatedMessage;
-            } else if (!alert.message) {
-                alert.message = alert.translationKey;
+            } else {
+                alert.message ??= alert.translationKey;
             }
         }
 

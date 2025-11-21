@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {IParticipation} from '../model/participation.interface';
-import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {CustomValidatorModel} from '../../../shared/field-error/custom-validator.model';
 import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
 import {ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
@@ -30,20 +29,8 @@ export type ParticipationFormGroup = {
     salon: FormControl<IParticipation['salon'] | null>;
 };
 
-export type ParticipationFilterFormGroup = {
-    fullName: FormControl<IExhibitor['fullName'] | null>;
-    status: FormControl<IParticipation['status'] | null>;
-};
-
 @Injectable({providedIn: 'root'})
 export class ParticipationFormService {
-    createFilterFormGroup(): FormGroup<ParticipationFilterFormGroup> {
-        return new FormGroup<ParticipationFilterFormGroup>({
-            fullName: new FormControl(null),
-            status: new FormControl(null),
-        });
-    }
-
     createParticipationFormGroup(participation: IParticipation | null): FormGroup<ParticipationFormGroup> {
         const raw: IParticipation = {
             ...this.getDefaultParticipationFormValue() as IParticipation,

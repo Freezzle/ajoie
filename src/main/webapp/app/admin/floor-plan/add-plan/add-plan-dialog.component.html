@@ -4,7 +4,7 @@
     </div>
 
     <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
+        <app-alert-error></app-alert-error>
         <div class="row">
             <div class="col-sm-12 fw-bold align-content-center position-relative">
                 <label for="field_name">Nom du plan</label> <input class="form-control" [(ngModel)]="info.name"
@@ -36,7 +36,6 @@
 
         <button class="btn btn-primary" id="jhi-confirm-add" type="submit">
             <fa-icon [title]="'common.create' | translate" icon="add"></fa-icon>
-            <span jhiTranslate="common.create">Créer</span>
         </button>
     </div>
 </form>

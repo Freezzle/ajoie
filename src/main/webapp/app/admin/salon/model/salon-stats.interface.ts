@@ -3,6 +3,7 @@ export interface ISalonStats {
     nbConference: number;
     nbWorkshop: number;
     nbStands: number;
+    nbCoExhibitors: number;
     nbMeal1: number;
     nbMeal2: number;
     nbMeal3: number;

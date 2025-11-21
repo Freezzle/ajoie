@@ -1,11 +1,11 @@
 {
   "conference": {
-    "create": "Création d'une nouvelle conférence",
+    "create": "Nouvelle conférence",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer la conférence \"{{title}}\" ?"
+      "question": "Voulez-vous supprimer la conférence \"{{title}}\" ?"
     },
     "description": "Description",
-    "edit": "Détail d'une conférence",
+    "edit": "Détail de la conférence",
     "extraInformation": "Commentaire",
     "notFound": "Aucune conférence",
     "participation": "Participation",
@@ -22,6 +22,6 @@
       }
     },
     "title": "Les conférences",
-    "title-field": "Titre"
+    "titleField": "Titre"
   }
 }

@@ -3,34 +3,33 @@
         <div class="d-flex justify-content-center">
             <span jhiTranslate="authority.title">Les authorités</span>
         </div>
-
         <hr/>
-
-        <div class="d-flex justify-content-between mt-3">
-      <span>
-        <button-box (clickedEvent)="previousState()"
-                    faIcon="arrow-left"
-                    [isDisabled]="isLoading"
-                    translateKey="common.back"/>
-      </span>
+        <div class="d-flex justify-content-between mt-4">
+            <span>
+                <button-box (clickedEvent)="previousState()"
+                            faIcon="arrow-left"
+                            [isDisabled]="isLoading"
+                            translateKey="common.back" [showText]="false"/>
+            </span>
 
             <span>
-        <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-          <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-          <span jhiTranslate="common.refresh"></span>
-        </button>
+                <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
+                    <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
+                    <span jhiTranslate="common.refresh"></span>
+                </button>
 
-        <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="jh-create-entity">
-          <fa-icon icon="plus"></fa-icon>
-          <span jhiTranslate="common.create">Créer</span>
-        </button>
-      </span>
+                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="create-entity">
+                    <fa-icon icon="plus"></fa-icon>
+                    <span jhiTranslate="common.create">Créer</span>
+                </button>
+            </span>
         </div>
     </h2>
+    <p-toast/>
+    <p-confirm-dialog/>
+    <app-alert-error></app-alert-error>
 
-    <jhi-alert-error></jhi-alert-error>
-
-    <jhi-alert></jhi-alert>
+    <app-alert></app-alert>
 
     @if (authorities) {
         <div class="table-responsive table-entities" id="entities">
@@ -48,29 +47,31 @@
                 </tr>
                 </thead>
                 <tbody>
-                @if (authorities.length === 0) {
-                    <tr>
-                        <td colspan="2">
-                            <span jhiTranslate="authority.home.notFound">Aucun Authority</span>
-                        </td>
-                    </tr>
-                } @else {
-                    @for (authority of authorities; track trackName($index, authority)) {
+                    @if (authorities.length === 0) {
                         <tr>
-                            <td class="go-detail" [routerLink]="['./', authority.name, 'view']">
-                                {{ authority.name }}
-                            </td>
-                            <td class="text-end">
-                                <div class="btn-group">
-                                    <button type="submit" (click)="delete(authority)" class="btn btn-danger btn-sm">
-                                        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                        <span jhiTranslate="common.delete"></span>
-                                    </button>
-                                </div>
+                            <td colspan="2">
+                                <span jhiTranslate="authority.home.notFound">Aucun Authority</span>
                             </td>
                         </tr>
+                    } @else {
+                        @for (authority of authorities; track trackName($index, authority)) {
+                            <tr>
+                                <td class="clickable" [routerLink]="['./', authority.name, 'view']">
+                                    {{ authority.name }}
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button type="submit"
+                                                (click)="delete($event, authority)"
+                                                class="btn btn-danger btn-sm">
+                                            <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                            <span jhiTranslate="common.delete"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
-                }
                 </tbody>
             </table>
         </div>

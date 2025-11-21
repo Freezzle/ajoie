@@ -1,21 +1,23 @@
-<nav [class.collapsed]="isCollapsed"
+<nav [class.collapsed]="isCollapsed()"
      [class.desktop]="!isMobile()"
      [class.mobile]="isMobile()"
-     [class.open]="!isCollapsed"
+     [class.open]="!isCollapsed()"
+     (click)="$event.stopPropagation()"
+     #sidebar
      class="sidebar">
 
     <!-- Always-visible toggle button -->
     <div class="sidebar-toggle">
         <button (click)="toggleSidebar()" class="btn btn-outline-light btn-sm">
-            <fa-icon [icon]="isCollapsed ? 'bars' : 'arrow-left'"></fa-icon>
+            <fa-icon [icon]="isCollapsed() ? 'bars' : 'arrow-left'"></fa-icon>
         </button>
     </div>
 
     <!-- Full content only shown when expanded -->
-    @if (!isCollapsed) {
+    @if (!isCollapsed()) {
         <div class="sidebar-content">
             <ul class="nav flex-column">
-                <li class="nav-item mt-3">
+                <li class="nav-item mt-4">
                     <ul [class.show]="true" class="dropdown-list">
                         <li (click)="closeMobile()"
                             [routerLinkActiveOptions]="{ exact: true }"
@@ -30,7 +32,7 @@
                             [routerLinkActiveOptions]="{ exact: true }"
                             routerLink="/admin/exhibitors"
                             routerLinkActive="active">
-                            <a>Les exposants</a>
+                            <a>L'annuaire client</a>
                         </li>
                         <li (click)="closeMobile()"
                             *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
@@ -40,7 +42,7 @@
                             <a>Les salons</a>
                         </li>
                     </ul>
-                    @if (salonSelected$ | async; as salon) {
+                    @if (navigationService.salon(); as salon) {
                         <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="salon" class="dropdown-list">
                             <hr class="hr-navbar"/>
                             <div class="salon-title-navbar"><h6>{{ salon.place }}</h6></div>
@@ -72,9 +74,9 @@
                                 *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                                 [routerLinkActiveOptions]="{ exact: true }"
                                 class="ms-3"
-                                routerLink="/admin/salons/{{salon.id}}/planning-volunteers"
+                                routerLink="/admin/salons/{{salon.id}}/planning-conferences"
                                 routerLinkActive="active">
-                                <a>{{ 'salon.planningVolunteers' | translate }}</a>
+                                <a>{{ 'salon.planningConferences' | translate }}</a>
                             </li>
                             <li (click)="closeMobile()"
                                 *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
@@ -119,14 +121,7 @@
                             <a>Gestion technique</a> &nbsp;<fa-icon icon="sort-down"></fa-icon>
                         </li>
                     </ul>
-                    <ul *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="dropdowns.admin" class="dropdown-list ms-3">
-                        <li (click)="closeMobile()"
-                            *jhiHasAnyAuthority="['ROLE_ADMIN']"
-                            [routerLinkActiveOptions]="{ exact: true }"
-                            routerLink="/admin/docs"
-                            routerLinkActive="active">
-                            <a>API</a>
-                        </li>
+                    <ul *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="dropdowns().admin" class="dropdown-list ms-3">
                         <li (click)="closeMobile()"
                             *jhiHasAnyAuthority="['ROLE_ADMIN']"
                             [routerLinkActiveOptions]="{ exact: true }"
@@ -147,43 +142,43 @@
         </div>
     }
 
-    @if (!isCollapsed) {
+    @if (!isCollapsed()) {
         <div class="sidebar-end-toggle">
             @if (account() !== null) {
                 @if (false) {
                     <div (click)="closeMobile()">
                         <a routerLink="/account/settings" routerLinkActive="active">
-                            <fa-icon icon="wrench" class="white-icon" [fixedWidth]="true"></fa-icon>
+                            <fa-icon icon="wrench" class="text-white" [fixedWidth]="true"></fa-icon>
                         </a>
                     </div>
                 }
                 @if (false) {
                     <div (click)="closeMobile()">
                         <a routerLink="/account/password" routerLinkActive="active">
-                            <fa-icon icon="lock" class="white-icon" [fixedWidth]="true"></fa-icon>
+                            <fa-icon icon="lock" class="text-white" [fixedWidth]="true"></fa-icon>
                         </a>
                     </div>
                 }
                 <div (click)="closeMobile()">
                     <a routerLink="/account/sessions" routerLinkActive="active">
-                        <fa-icon icon="cloud" class="white-icon" [fixedWidth]="true"></fa-icon>
+                        <fa-icon icon="cloud" class="text-white" [fixedWidth]="true"></fa-icon>
                     </a>
                 </div>
                 <div (click)="closeMobile()">
                     <a (click)="logout()" id="logout">
-                        <fa-icon icon="sign-out-alt" class="white-icon" [fixedWidth]="true"></fa-icon>
+                        <fa-icon icon="sign-out-alt" class="text-white" [fixedWidth]="true"></fa-icon>
                     </a>
                 </div>
             } @else {
                 <div (click)="closeMobile()">
                     <a (click)="login()" id="login">
-                        <fa-icon icon="sign-in-alt" class="white-icon" [fixedWidth]="true"></fa-icon>
+                        <fa-icon icon="sign-in-alt" class="text-white" [fixedWidth]="true"></fa-icon>
                         <span>Login</span>
                     </a>
                 </div>
                 <div (click)="closeMobile()">
                     <a routerLink="/account/register" routerLinkActive="active">
-                        <fa-icon icon="user-plus" class="white-icon" [fixedWidth]="true"></fa-icon>
+                        <fa-icon icon="user-plus" class="text-white" [fixedWidth]="true"></fa-icon>
                     </a>
                 </div>
             }

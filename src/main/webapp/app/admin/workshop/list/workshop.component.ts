@@ -1,32 +1,31 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ITEM_DELETED_EVENT} from 'app/config/navigation.constants';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {IWorkshop} from '../model/workshop.interface';
 import {WorkshopService} from '../service/workshop.service';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import {Status} from '../../enumerations/status.model';
-import {WorkshopFilterFormGroup, WorkshopFormService} from '../service/workshop-form.service';
-import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
-import {finalize} from 'rxjs/operators';
+import {finalize, map} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
-import {PaginationComponent} from '../../../shared/pagination/pagination.component';
-import {PaginationEvent} from '../../../shared/pagination/pagination-event.interface';
-import {
-    containsParticipationName,
-    getFormattedParticipationName,
-} from '../../participation/model/participation.interface';
+import {getFormattedParticipationName,} from '../../participation/model/participation.interface';
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ProgressSpinner} from "primeng/progressspinner";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
+import {AlertComponent} from "../../../shared/alert/alert.component";
+import {TableModule} from "primeng/table";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {IconField} from "primeng/iconfield";
+import {InputIcon} from "primeng/inputicon";
+import {InputText} from "primeng/inputtext";
 
 @Component({
-    selector: 'jhi-workshop',
+    selector: 'app-workshop',
     templateUrl: './workshop.component.html',
     imports: [
         RouterModule,
@@ -36,25 +35,27 @@ import {ProgressSpinner} from "primeng/progressspinner";
         ColorStatusPipe,
         ReactiveFormsModule,
         ButtonBoxComponent,
-        LinkBoxComponent,
-        PaginationComponent,
         AlertErrorComponent,
-        ProgressSpinner,
+        ConfirmPopup,
+        Toast,
+        AlertComponent,
+        TableModule,
+        ContentPageComponent,
+        CardComponent,
+        IconField,
+        InputIcon,
+        InputText,
     ]
 })
 export class WorkshopComponent implements OnInit {
     protected activatedRoute = inject(ActivatedRoute);
-    protected modalService = inject(NgbModal);
+    protected confirmDialogService = inject(ConfirmDialogService);
     protected workshopService = inject(WorkshopService);
-    protected workshopFormService = inject(WorkshopFormService);
 
     workshops: IWorkshop[] = [];
-    workshopsPaginated: IWorkshop[] = [];
     isLoading = false;
     params!: ParamMap;
     statusValues = Object.keys(Status);
-    filters: FormGroup<WorkshopFilterFormGroup> =
-        this.workshopFormService.createFilterFormGroup();
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -62,31 +63,20 @@ export class WorkshopComponent implements OnInit {
                 this.params = params;
 
                 if (!this.workshops || this.workshops.length === 0) {
-                    this.actionFilter();
+                    this.load();
                 }
             },
         );
     }
 
-    delete(workshop: IWorkshop): void {
-        const modalRef = this.modalService.open(DeleteDialogComponent, {
-            size: 'lg',
-            backdrop: 'static',
-        });
-        modalRef.componentInstance.translateKey = 'workshop.delete.question';
-        modalRef.componentInstance.translateValues = {title: workshop.title};
-
-        modalRef.closed
+    delete(htmlElement: HTMLElement, workshop: IWorkshop): void {
+        this.confirmDialogService.delete(htmlElement, 'workshop.delete.question', {title: workshop.title})
             .pipe(
-                filter((reason) => reason === ITEM_DELETED_EVENT),
+                filter(confirmed => confirmed),
                 switchMap(() => this.workshopService.delete(workshop.id)),
-                tap(() => this.actionFilter()),
+                tap(() => this.load()),
             )
-            .subscribe();
-    }
-
-    actionFilter(): void {
-        this.load();
+            .subscribe()
     }
 
     load(): void {
@@ -99,40 +89,23 @@ export class WorkshopComponent implements OnInit {
 
         this.workshopService
             .query(queryObject)
-            .pipe(finalize(() => (this.isLoading = false)))
+            .pipe(map(workshops => workshops.map(workshop => ({
+                        ...workshop,
+                        fullNameFilter: getFormattedParticipationName(workshop.participation)
+                    }))
+                ),
+                finalize(() => (this.isLoading = false)))
             .subscribe((result) => {
                 this.workshops = result ?? [];
-
-                const fullNameFilter = this.filters.get('fullName')?.value;
-                if (fullNameFilter && fullNameFilter.length > 0) {
-                    this.workshops = this.workshops?.filter((workshop) =>
-                        containsParticipationName(workshop.participation, fullNameFilter),
-                    );
-                }
-
-                const statusFilter = this.filters.get('status')?.value;
-                if (statusFilter && statusFilter.length > 0) {
-                    this.workshops = this.workshops?.filter((workshop) =>
-                        workshop.status?.includes(statusFilter),
-                    );
-                }
-
-                this.refreshWorkshops({page: 1, pageSize: 10});
             });
     }
 
     refresh(): void {
-        this.filters.reset();
-        this.actionFilter();
+        this.load();
     }
 
     previousState(): void {
         window.history.back();
-    }
-
-    refreshWorkshops(event: PaginationEvent): void {
-        this.workshopsPaginated = this.workshops.slice((event.page - 1) * event.pageSize,
-            (event.page - 1) * event.pageSize + event.pageSize);
     }
 
     protected readonly getFormattedParticipationName = getFormattedParticipationName;

@@ -1,5 +1,8 @@
 {
   "stand": {
+    "card": {
+      "socialNetwork": "Réseau sociaux"
+    },
     "category": {
       "label": "Catégorie",
       "list": {
@@ -9,16 +12,16 @@
         "MISCELLANEOUS": "Autres",
         "NONE": "Aucun",
         "THERAPIST": "Thérapeute",
-        "null": ""
+        "null": "Aucun"
       }
     },
-    "create": "Création d'un nouveau stand",
+    "create": "Nouveau stand",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer le stand \"{{description}}\" ?"
+      "question": "Voulez-vous supprimer le stand \"{{description}}\" ?"
     },
     "description": "Description",
     "dimension": "Dimension",
-    "edit": "Détail d'un stand",
+    "edit": "Détail du stand",
     "extraInformation": "Commentaire",
     "facebook": "Facebook",
     "instagram": "Instagram",
@@ -41,6 +44,7 @@
         "null": " "
       }
     },
+    "subCategories": "Tags",
     "title": "Les stands",
     "urlPicture": "Url de l'image",
     "viewClipboard": "Liste technique",

@@ -18,7 +18,7 @@ import java.util.UUID;
 public class AdminEventResource {
     private final EventLogRepository eventLogRepository;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AdminEventResource(EventLogRepository eventLogRepository) {

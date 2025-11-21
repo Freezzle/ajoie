@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -17,11 +18,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "event_log")
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Data
 public class EventLog implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -50,91 +48,4 @@ public class EventLog implements Serializable {
     @Lob
     @Column(name = "data", columnDefinition = "text")
     private String payloadJson;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Instant getReferenceDate() {
-        return referenceDate;
-    }
-
-    public void setReferenceDate(Instant referenceDate) {
-        this.referenceDate = referenceDate;
-    }
-
-    public EventType getType() {
-        return type;
-    }
-
-    public void setType(EventType type) {
-        this.type = type;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public boolean isFromSystem() {
-        return fromSystem;
-    }
-
-    public void setFromSystem(boolean fromSystem) {
-        this.fromSystem = fromSystem;
-    }
-
-    public EntityType getEntityType() {
-        return entityType;
-    }
-
-    public void setEntityType(EntityType entityType) {
-        this.entityType = entityType;
-    }
-
-    public UUID getReferenceId() {
-        return referenceId;
-    }
-
-    public void setReferenceId(UUID referenceId) {
-        this.referenceId = referenceId;
-    }
-
-    public String getPayloadJson() {
-        return payloadJson;
-    }
-
-    public void setPayloadJson(String payloadJson) {
-        this.payloadJson = payloadJson;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof EventLog)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((EventLog) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return ("EventLog{" + "fromSystem=" + fromSystem + ", label='" + label + '\'' + ", type=" + type +
-                ", referenceDate=" + referenceDate + ", id=" + id + '}');
-    }
 }

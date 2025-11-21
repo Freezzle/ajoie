@@ -1,0 +1,35 @@
+<div class="timeline-wrapper">
+    <!-- Labels start / end -->
+    <div class="timeline-header">
+        <div class="timeline-date timeline-date--start">
+            {{ startDate | date: 'shortDate' }}
+        </div>
+        <div class="timeline-date timeline-date--end">
+            {{ endDate | date: 'shortDate' }}
+        </div>
+    </div>
+
+    <!-- Ligne principale -->
+    <div class="timeline-line-container">
+        <div class="timeline-line">
+            <!-- Point de début -->
+            <div class="timeline-endpoint timeline-point-startend timeline-endpoint--start"></div>
+
+            <!-- Point de fin -->
+            <div class="timeline-endpoint timeline-point-startend timeline-endpoint--end"></div>
+
+            <!-- Points intermédiaires -->
+            @for(point of computedPoints; track point) {
+                <div class="timeline-point" [style.left.%]="point.position">
+                    <div [class.timeline-point-dot]="!point.isMilestone"
+                    [class.timeline-point-milestone]="point.isMilestone"></div>
+                    <div class="timeline-point-label">
+                        <div class="timeline-point-label-text">
+                            {{ point.label ?? '' }}
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

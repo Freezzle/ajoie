@@ -1,198 +1,185 @@
-<div>
-    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-        <h2 id="page-heading">
-
-            <div class="d-flex justify-content-center">
-                @if (editForm.controls.id.value) {
-                    <span jhiTranslate="salon.edit">Détail du salon</span>
-                }
-                @if (!editForm.controls.id.value) {
-                    <span jhiTranslate="salon.create">Création d'un nouveau salon</span>
-                }
-            </div>
-            <hr/>
-
-            <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button-box (clickedEvent)="previousState()"
-                      [isDisabled]="isLoading"
-                      faIcon="arrow-left"
-                      translateKey="common.back"/>
-          </span>
-
-                <span>
+<form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+    <app-content-page>
+        <div appMenuBarStart>
+            @if (editForm.controls.id.value) {
+                <h3 jhiTranslate="salon.edit">Détail du salon</h3>
+            }
+            @if (!editForm.controls.id.value) {
+                <h3 jhiTranslate="salon.create">Nouveau salon</h3>
+            }
+        </div>
+        <div appMenuBarEnd>
+            <button-box (clickedEvent)="previousState()"
+                        [isDisabled]="isLoading"
+                        faIcon="arrow-left"
+                        translateKey="common.back"
+                        [showText]="false"/>
             @if (isReadOnly) {
                 <button-box (clickedEvent)="activateEditMode()"
                             [isDisabled]="isLoading"
                             faIcon="pencil-alt"
-                            translateKey="common.edit"/>
+                            translateKey="common.edit"
+                            [showText]="false"/>
             }
 
-                    @if (editForm.controls.id.value && !isReadOnly) {
-                        <button-box (clickedEvent)="activateReadOnlyMode()"
-                                    [isDisabled]="isLoading"
-                                    faIcon="ban"
-                                    translateKey="common.cancel"
-                                    type="secondary"/>
-                    }
+            @if (editForm.controls.id.value && !isReadOnly) {
+                <button-box (clickedEvent)="activateReadOnlyMode()"
+                            [isDisabled]="isLoading"
+                            faIcon="ban"
+                            translateKey="common.cancel"
+                            [showText]="false"
+                            type="secondary"/>
+            }
 
-                    @if (!isReadOnly) {
-                        <button-box [isDisabled]="editForm.invalid || isLoading"
-                                    [isSubmit]="true"
-                                    faIcon="floppy-disk"
-                                    translateKey="common.save"/>
-                    }
-          </span>
-            </div>
-        </h2>
-
-        <div>
-            <jhi-alert-error></jhi-alert-error>
-
-            <jhi-alert></jhi-alert>
-
-            <div class="card">
-                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="mt-3 col-sm-12 col-lg-4">
-                            <text-box [maxLength]="50"
-                                      fieldName="place"
-                                      formControlName="place"
-                                      translateKey="salon.place"/>
-                        </div>
-
-                        <div class="mt-3 col-sm-4 col-lg-4">
-                            <text-box [maxLength]="10"
-                                      fieldName="referenceNumber"
-                                      formControlName="referenceNumber"
-                                      translateKey="salon.referenceNumber"/>
-                        </div>
-
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <date-box fieldName="startingDate"
-                                      formControlName="startingDate"
-                                      translateKey="salon.startingDate"/>
-                        </div>
-
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <date-box fieldName="endingDate"
-                                      formControlName="endingDate"
-                                      translateKey="salon.endingDate"/>
-                        </div>
-
-                        <div class="mt-3 col-12">
-                            <textarea-box fieldName="extraInformation"
-                                          formControlName="extraInformation"
-                                          translateKey="salon.extraInformation"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <br/>
-
-            <div class="card">
-                <h5 class="card-header" jhiTranslate="salon.prices">Configuration des prix</h5>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <currency-box fieldName="priceConference"
-                                          formControlName="priceConference"
-                                          translateKey="salon.priceConference"/>
-                        </div>
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <currency-box fieldName="priceWorkshop"
-                                          formControlName="priceWorkshop"
-                                          translateKey="salon.priceWorkshop"/>
-                        </div>
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <currency-box fieldName="priceSharingStand"
-                                          formControlName="priceSharingStand"
-                                          translateKey="salon.priceSharingStand"/>
-                        </div>
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <currency-box fieldName="priceMeal1"
-                                          formControlName="priceMeal1"
-                                          translateKey="salon.priceMeal1"/>
-                        </div>
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <currency-box fieldName="priceMeal2"
-                                          formControlName="priceMeal2"
-                                          translateKey="salon.priceMeal2"/>
-                        </div>
-                        <div class="mt-3 col-6 col-sm-4 col-lg-2">
-                            <currency-box fieldName="priceMeal3"
-                                          formControlName="priceMeal3"
-                                          translateKey="salon.priceMeal3"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <br/>
-
-            <div class="card">
-                <h5 class="card-header" jhiTranslate="salon.dimensions-prices">Configuration des dimensions de
-                                                                               stands</h5>
-                <div class="card-body">
-                    <div class="mt-3 col-12">
-                        <div class="table-responsive table-entities"
-                             formArrayName="priceStandSalons"
-                             id="dimensions-prices">
-                            <p-table [value]="priceStandSalons.controls">
-                                <!-- HEADER -->
-                                <ng-template pTemplate="header">
-                                    <tr>
-                                        <th>Libellé</th>
-                                        <th>Longueur (m)</th>
-                                        <th>Hauteur (m)</th>
-                                        <th>Prix</th>
-                                    </tr>
-                                </ng-template>
-
-                                <!-- BODY -->
-                                <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
-                                    <!-- row = AbstractControl, we use the index to bind the form group -->
-                                    <tr [formGroupName]="rowIndex">
-                                        <td>
-                                            <text-box fieldName="dimension" formControlName="dimension"></text-box>
-                                        </td>
-                                        <td>
-                                            <number-box [modeDecimal]="true"
-                                                        fieldName="widthMeter"
-                                                        formControlName="widthMeter"></number-box>
-                                        </td>
-                                        <td>
-                                            <number-box [modeDecimal]="true"
-                                                        fieldName="heightMeter"
-                                                        formControlName="heightMeter"></number-box>
-                                        </td>
-                                        <td>
-                                            <currency-box fieldName="price" formControlName="price"></currency-box>
-                                        </td>
-                                    </tr>
-                                </ng-template>
-
-                                <!-- FOOTER (add button) -->
-                                <ng-template pTemplate="footer" *ngIf="!isReadOnly">
-                                    <tr>
-                                        <td colspan="4">
-                                            <button (click)="addPriceStand()"
-                                                    class="btn btn-success btn-sm w-100"
-                                                    id="jh-create-invoice"
-                                                    type="button">
-                                                <fa-icon icon="plus"></fa-icon>
-                                                <span jhiTranslate="common.create">Create</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </ng-template>
-                            </p-table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @if (!isReadOnly) {
+                <button-box (clickedEvent)="save()"
+                            [isDisabled]="editForm.invalid || isLoading"
+                            [isSubmit]="true"
+                            faIcon="floppy-disk"
+                            translateKey="common.save"
+                            [showText]="false"/>
+            }
         </div>
-    </form>
-</div>
+        <app-alert-error></app-alert-error>
+        <app-alert></app-alert>
+        <p-toast/>
+        <p-confirmpopup/>
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'common.info-basic' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <div class="row">
+                    <div class="mt-4 col-12">
+                        <text-box [maxLength]="50"
+                                  fieldName="place"
+                                  formControlName="place"
+                                  translateKey="salon.place"/>
+                    </div>
+
+                    <div class="mt-4 col-12 col-lg-6">
+                        <text-box [maxLength]="10"
+                                  fieldName="referenceNumber"
+                                  formControlName="referenceNumber"
+                                  translateKey="salon.referenceNumber"/>
+                    </div>
+
+                    <div class="mt-4 col-6 col-lg-3">
+                        <date-box fieldName="startingDate"
+                                  formControlName="startingDate"
+                                  translateKey="salon.startingDate"/>
+                    </div>
+
+                    <div class="mt-4 col-6 col-lg-3">
+                        <date-box fieldName="endingDate" formControlName="endingDate" translateKey="salon.endingDate"/>
+                    </div>
+
+                    <div class="mt-4 col-12">
+                        <textarea-box fieldName="extraInformation"
+                                      formControlName="extraInformation"
+                                      translateKey="salon.extraInformation"/>
+                    </div>
+                </div>
+            </div>
+        </app-card>
+
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'salon.prices' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <div class="row">
+                    <div class="mt-4 col-6 col-lg-4">
+                        <currency-box fieldName="priceConference"
+                                      formControlName="priceConference"
+                                      translateKey="salon.priceConference"/>
+                    </div>
+                    <div class="mt-4 col-6 col-lg-4">
+                        <currency-box fieldName="priceWorkshop"
+                                      formControlName="priceWorkshop"
+                                      translateKey="salon.priceWorkshop"/>
+                    </div>
+                    <div class="mt-4 col-6 col-lg-4">
+                        <currency-box fieldName="priceSharingStand"
+                                      formControlName="priceSharingStand"
+                                      translateKey="salon.priceSharingStand"/>
+                    </div>
+                    <div class="mt-4 col-6 col-lg-4">
+                        <currency-box fieldName="priceMeal1"
+                                      formControlName="priceMeal1"
+                                      translateKey="salon.priceMeal1"/>
+                    </div>
+                    <div class="mt-4 col-6 col-lg-4">
+                        <currency-box fieldName="priceMeal2"
+                                      formControlName="priceMeal2"
+                                      translateKey="salon.priceMeal2"/>
+                    </div>
+                    <div class="mt-4 col-6 col-lg-4">
+                        <currency-box fieldName="priceMeal3"
+                                      formControlName="priceMeal3"
+                                      translateKey="salon.priceMeal3"/>
+                    </div>
+                </div>
+            </div>
+        </app-card>
+
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'salon.dimensions-prices' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <div class="row">
+                    <p-table #dt2
+                             [value]="priceStandSalons.controls"
+                             [tableStyle]="{ 'min-width': '50rem' }"
+                             class="mt-4">
+                        <!-- HEADER -->
+                        <ng-template #header>
+                            <tr>
+                                <th>Libellé</th>
+                                <th>Longueur (m)</th>
+                                <th>Hauteur (m)</th>
+                                <th>Prix</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-dimensionStand>
+                            <tr [formGroup]="dimensionStand">
+                                <td>
+                                    <text-box fieldName="dimension" formControlName="dimension"></text-box>
+                                </td>
+                                <td>
+                                    <number-box [modeDecimal]="true"
+                                                fieldName="widthMeter"
+                                                formControlName="widthMeter"></number-box>
+                                </td>
+                                <td>
+                                    <number-box [modeDecimal]="true"
+                                                fieldName="heightMeter"
+                                                formControlName="heightMeter"></number-box>
+                                </td>
+                                <td>
+                                    <currency-box fieldName="price" formControlName="price"></currency-box>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        @if (!isReadOnly) {
+                            <ng-template #footer>
+                                <tr>
+                                    <td colspan="4">
+                                        <button (click)="addPriceStand()"
+                                                class="btn btn-success btn-sm w-100"
+                                                id="create-invoice"
+                                                type="button">
+                                            <fa-icon icon="plus"></fa-icon>
+                                            <span jhiTranslate="common.create">Create</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        }
+                    </p-table>
+                </div>
+            </div>
+        </app-card>
+    </app-content-page>
+</form>

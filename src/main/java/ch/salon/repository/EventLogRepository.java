@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 @Repository
 public interface EventLogRepository extends JpaRepository<EventLog, UUID> {
     List<EventLog> findAllByEntityTypeAndReferenceIdOrderByReferenceDateAsc(EntityType entityType, UUID id);

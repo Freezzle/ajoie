@@ -1,39 +1,15 @@
 package ch.salon.service.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.UUID;
 
+@Data
 public class ExhibitorLightDTO implements Serializable {
 
     private UUID id;
+    private String email;
     private String fullName;
     private boolean redFlag;
-
-    public ExhibitorLightDTO() {
-        // Empty constructor needed for Jackson.
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public boolean isRedFlag() {
-        return redFlag;
-    }
-
-    public void setRedFlag(boolean redFlag) {
-        this.redFlag = redFlag;
-    }
 }

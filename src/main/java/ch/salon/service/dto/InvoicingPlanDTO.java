@@ -2,6 +2,7 @@ package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Data
 public class InvoicingPlanDTO implements Serializable {
 
     private UUID id;
@@ -22,96 +24,4 @@ public class InvoicingPlanDTO implements Serializable {
     private Set<InvoiceDTO> invoices = new HashSet<>();
     private Set<PaymentDTO> payments = new HashSet<>();
     private ParticipationLightDTO participation;
-
-    public InvoicingPlanDTO() {
-        // Empty constructor needed for Jackson.
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public Instant getGenerationDate() {
-        return generationDate;
-    }
-
-    public void setGenerationDate(Instant generationDate) {
-        this.generationDate = generationDate;
-    }
-
-    public String getBillingNumber() {
-        return billingNumber;
-    }
-
-    public void setBillingNumber(String billingNumber) {
-        this.billingNumber = billingNumber;
-    }
-
-    public Set<InvoiceDTO> getInvoices() {
-        return invoices;
-    }
-
-    public void setInvoices(Set<InvoiceDTO> invoices) {
-        this.invoices = invoices;
-    }
-
-    public ParticipationLightDTO getParticipation() {
-        return participation;
-    }
-
-    public void setParticipation(ParticipationLightDTO participation) {
-        this.participation = participation;
-    }
-
-    public Set<PaymentDTO> getPayments() {
-        return payments;
-    }
-
-    public void setPayments(Set<PaymentDTO> payments) {
-        this.payments = payments;
-    }
-
-    public Instant getIssuedDate() {
-        return issuedDate;
-    }
-
-    public void setIssuedDate(Instant issuedDate) {
-        this.issuedDate = issuedDate;
-    }
-
-    public Instant getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(Instant expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public Boolean getNeedArrangement() {
-        return needArrangement;
-    }
-
-    public void setNeedArrangement(Boolean needArrangement) {
-        this.needArrangement = needArrangement;
-    }
-
-    public InvoiceSendingMethod getInvoiceSendingMethod() {
-        return invoiceSendingMethod;
-    }
-
-    public void setInvoiceSendingMethod(InvoiceSendingMethod invoiceSendingMethod) {
-        this.invoiceSendingMethod = invoiceSendingMethod;
-    }
 }

@@ -2,7 +2,7 @@ package ch.salon.web.rest.errors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponseException;
-import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
+import ch.salon.utils.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
 
 @SuppressWarnings("java:S110") // Inheritance tree of classes should not be too deep
 public class InvalidPasswordException extends ErrorResponseException {

@@ -23,7 +23,7 @@
         <label [for]="'field_' + fieldName">
             {{ translateKey | translate }}
             @if (control.hasValidator(Validators.required)) {
-                <span class="danger-icon">*</span>
+                <span class="text-danger">*</span>
             }
         </label>
     }

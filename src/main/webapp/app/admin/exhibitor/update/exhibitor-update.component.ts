@@ -1,13 +1,12 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {combineLatest, Observable, of} from 'rxjs';
-import {finalize, map} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ExhibitorService} from '../service/exhibitor.service';
 import {ExhibitorFormGroup, ExhibitorFormService} from '../service/exhibitor-form.service';
-import {ErrorModel} from '../../../shared/field-error/error.model';
 import {formatterLanguage, LANGUAGES} from '../../../config/language.constants';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
@@ -20,9 +19,15 @@ import {IExhibitor} from '../model/exhibitor.interface';
 import {CheckboxBoxComponent} from "../../../shared/components/checkbox-box/checkbox-box.component";
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
+import {TableModule} from "primeng/table";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {CountryService, formatterCountry} from "../../../shared/country.service";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
 
 @Component({
-    selector: 'jhi-exhibitor-update',
+    selector: 'app-exhibitor-update',
     templateUrl: './exhibitor-update.component.html',
     imports: [
         SharedModule,
@@ -38,10 +43,16 @@ import {AlertComponent} from "../../../shared/alert/alert.component";
         CheckboxBoxComponent,
         AlertErrorComponent,
         AlertComponent,
+        TableModule,
+        ConfirmPopup,
+        Toast,
+        CardComponent,
+        ContentPageComponent,
     ]
 })
 export class ExhibitorUpdateComponent implements OnInit {
     protected exhibitorService = inject(ExhibitorService);
+    protected countryService = inject(CountryService);
     protected exhibitorFormService = inject(ExhibitorFormService);
     protected activatedRoute = inject(ActivatedRoute);
 
@@ -55,36 +66,22 @@ export class ExhibitorUpdateComponent implements OnInit {
     participations$: Observable<IParticipation[]> = of([]);
 
     ngOnInit(): void {
-        this.activateReadOnlyMode();
+        const data = this.activatedRoute.snapshot.data;
 
-        combineLatest([this.activatedRoute.data])
-            .pipe(
-                map(([data]) => ({
-                    isReadOnly: data['readonly'],
-                    initialExhibitor: data['exhibitor'] as IExhibitor,
-                })),
-            )
-            .subscribe(({isReadOnly, initialExhibitor}) => {
-                    this.isReadOnly = isReadOnly;
-                    this.initialExhibitor = {...initialExhibitor};
+        this.initialExhibitor = {...data['exhibitor']};
+        this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.initialExhibitor);
 
-                    this.editForm = this.exhibitorFormService.createExhibitorFormGroup(initialExhibitor);
-                    this.loadRelationships(this.editForm.controls.id.value);
-
-                    isReadOnly ? this.activateReadOnlyMode(false) : this.activateEditMode();
-                },
-            );
-    }
-
-    activateReadOnlyMode(reset: boolean = true): void {
-        this.isReadOnly = true;
-        if (reset) {
-            this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.initialExhibitor!);
+        if (data['readonly']) {
+            this.isReadOnly = true;
+            this.editForm.disable();
+        } else {
+            this.edit();
         }
-        this.editForm.disable();
+
+        this.loadRelationships(this.editForm.controls.id.value);
     }
 
-    activateEditMode(): void {
+    edit(): void {
         this.isReadOnly = false;
         this.editForm.enable();
     }
@@ -93,11 +90,10 @@ export class ExhibitorUpdateComponent implements OnInit {
         window.history.back();
     }
 
-    loadRelationships(idExhibitor: string | null): void {
-        if (!idExhibitor) {
-            return;
-        }
-        this.participations$ = this.exhibitorService.findParticipations(idExhibitor);
+    cancel(): void {
+        this.isReadOnly = true;
+        this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.initialExhibitor);
+        this.editForm.disable();
     }
 
     save(): void {
@@ -115,6 +111,13 @@ export class ExhibitorUpdateComponent implements OnInit {
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
 
-    protected readonly ErrorModel = ErrorModel;
+    loadRelationships(idExhibitor: string | null): void {
+        if (!idExhibitor) {
+            return;
+        }
+        this.participations$ = this.exhibitorService.findParticipations(idExhibitor);
+    }
+
     protected readonly formatterLanguage = formatterLanguage;
+    protected readonly formatterCountry = formatterCountry;
 }

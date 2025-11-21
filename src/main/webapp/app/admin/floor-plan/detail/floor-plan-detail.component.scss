@@ -1,10 +1,3 @@
-@import 'content/scss/bootstrap-variables';
-
-.container {
-  display: flex;
-  justify-content: center;
-}
-
 .upper-grid-area {
   width: 100%;
 }
@@ -25,8 +18,8 @@
 }
 
 .stand-item {
-  border: 1px solid black;
-  background-color: white;
+  border: 1px solid var(--app-text);
+  background-color: var(--app-surface);
   margin: 0.2em;
   width: 100%;
 }
@@ -45,9 +38,9 @@
   padding: 0 4em 0 1em;
   display: grid;
   place-items: center;
-  height: 40em;
-  border: 1px solid #777777;
-  background-color: white;
+  min-height:40em;
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface);
 }
 
 .palette {
@@ -55,8 +48,8 @@
   padding-top: 1em;
   right: 0;
   top: 0;
-  background-color: rgba(#ffebd2, 0.85);
-  border: 1px solid $dark;
+  background-color: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
   height: 100%;
   width: 3em;
   min-width: 3em;
@@ -70,7 +63,7 @@
 }
 
 .grid {
-  border: 1px solid $dark;
+  border: 1px solid var(--app-border);
 }
 
 .cell {
@@ -79,20 +72,16 @@
   min-width: 20px;
   min-height: 20px;
   height: 20px;
-  border: 0.5px dashed lightgrey;
+  border: 0.5px solid var(--app-border);
 }
 
 .shapes-container {
   align-items: center;
-  text-align: center;
   max-height: 40em;
-  display: inline-flex;
 }
 
 .shape-container {
   margin: 0.5em auto 0 auto;
-  display: flex;
-  justify-content: center;
 }
 
 .dragging {
@@ -100,19 +89,19 @@
 }
 
 .title-side-column {
-  background-color: $primary;
-  color: $light;
+  background-color: var(--app-primary);
+  color: var(--app-surface);
   margin: 0;
   text-align: center;
 }
 
 .draggable {
   font-size: 0.75em;
-  color: black;
+  color: var(--app-text);
   text-align: center;
   cursor: move;
-  border: 1px solid $dark;
-  background-color: rgb(white, 0.3);
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface-25);
   margin-right: 5px;
 }
 
@@ -125,11 +114,10 @@
   transform: translate(-50%, -25%);
   min-width: 150px;
   max-height: 300px;
-  background: white;
+  background: var(--app-surface);
   overflow-y: auto;
-  border: 1px solid darkcyan;
+  border: 1px solid var(--app-border);
   padding: 5px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   z-index: 9999;
 }
@@ -139,13 +127,7 @@
   text-align: center;
 }
 
-.row {
-  display: flex;
-  align-items: flex-start;
-}
-
 .main-column {
-  flex-grow: 1;
   max-height: 100%;
 }
 
@@ -167,7 +149,7 @@
   position: absolute;
   border: 1px solid #777777;
   z-index: 1;
-  display: flex;
+  display: contents;
   justify-content: center;
   align-items: center;
   margin-top: -10px;
@@ -188,7 +170,7 @@
 }
 
 .technical-header {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: var(--app-surface-25);
   display: grid;
   position: absolute;
   grid-template-columns: repeat(3, 1fr);
@@ -200,7 +182,7 @@
 }
 
 .technical-info {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--app-surface-25);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 20px;
@@ -227,17 +209,21 @@
   text-align: center;
 }
 
-.icon-inactive {
-  font-size: 1.25em;
-  color: $dark;
-}
-
 .icon-active {
   font-size: 1.25em;
-  color: $success;
+  color: var(--app-primary);
+}
+
+.icon-inactive {
+  font-size: 1.25em;
+  color: var(--app-secondary);
 }
 
 .icon-inactive.disabled {
   font-size: 1.25em;
-  color: lightgrey;
+  color: var(--app-secondary);
+}
+
+::ng-deep #draw-area-panel .p-panel-content {
+  padding-right: 0 !important;
 }

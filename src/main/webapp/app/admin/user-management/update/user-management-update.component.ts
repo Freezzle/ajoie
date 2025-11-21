@@ -21,7 +21,7 @@ const newUser: IUser = {
 } as IUser;
 
 @Component({
-    selector: 'jhi-user-mgmt-update',
+    selector: 'app-user-mgmt-update',
     templateUrl: './user-management-update.component.html',
     imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent,
         CheckboxBoxComponent, AlertErrorComponent, AlertComponent]

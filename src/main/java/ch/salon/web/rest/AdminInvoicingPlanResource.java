@@ -3,6 +3,7 @@ package ch.salon.web.rest;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
+import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.PaymentDTO;
 import ch.salon.web.rest.dto.SplitInvoicing;
@@ -14,19 +15,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.jhipster.web.util.ResponseUtil;
+import ch.salon.utils.ResponseUtil;
 
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.ResponseEntity.noContent;
-import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
+import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
 
 @RestController
 @RequestMapping("/api/admin/invoicing-plans")
@@ -36,7 +39,7 @@ public class AdminInvoicingPlanResource {
     private static final Logger log = LoggerFactory.getLogger(AdminInvoicingPlanResource.class);
     private final InvoicingPlanService invoicingPlanService;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AdminInvoicingPlanResource(InvoicingPlanService invoicingPlanService) {
@@ -85,6 +88,18 @@ public class AdminInvoicingPlanResource {
         return ResponseUtil.wrapOrNotFound(invoicingPlanService.updateInvoice(idInvoicingPlan, idInvoice, invoiceDTO));
     }
 
+    @DeleteMapping("/{idInvoicingPlan}/invoices/{idInvoice}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<Void> deleteInvoice(@PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
+            @PathVariable("idInvoice") UUID idInvoice) {
+        log.debug("REST request to delete Invoice : {}, {}", idInvoicingPlan, idInvoice);
+
+        this.invoicingPlanService.deleteInvoice(idInvoicingPlan, idInvoice);
+
+        return noContent().headers(createEntityDeletionAlert(applicationName, true, "payment", idInvoice.toString()))
+                          .build();
+    }
+
     @PostMapping("/{idInvoicingPlan}/payments")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<PaymentDTO> createPayment(@PathVariable("idInvoicingPlan") UUID idInvoicingPlan,
@@ -114,5 +129,13 @@ public class AdminInvoicingPlanResource {
 
         return noContent().headers(createEntityDeletionAlert(applicationName, true, "payment", idPayment.toString()))
                           .build();
+    }
+
+    @GetMapping("/{idInvoicingPlan}/events")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public List<EventLogDTO> getAllLogs(@PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan) {
+        log.debug("REST request to get all EventLogs for InvoicingPlan : {}", idInvoicingPlan);
+
+        return invoicingPlanService.findAllEventLogs(idInvoicingPlan);
     }
 }

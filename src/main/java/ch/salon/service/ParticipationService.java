@@ -1,10 +1,8 @@
 package ch.salon.service;
 
-import ch.salon.domain.Conference;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Salon;
-import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
@@ -20,6 +18,7 @@ import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.ParticipationMapper;
 import ch.salon.web.rest.dto.InfoInvoice;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +32,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ch.salon.domain.enumeration.Status.ACCEPTED;
-import static ch.salon.domain.enumeration.Status.CANCELED;
-import static ch.salon.domain.enumeration.Status.CLOSED;
-import static ch.salon.domain.enumeration.Status.IN_VERIFICATION;
-import static ch.salon.domain.enumeration.Status.REFUSED;
-import static ch.salon.domain.enumeration.Status.VALIDATED;
-
 @Service
+@AllArgsConstructor
 public class ParticipationService {
 
     public static final String ENTITY_NAME = "participation";
@@ -52,17 +45,8 @@ public class ParticipationService {
     private final EventLogService eventLogService;
     private final SalonRepository salonRepository;
     private final InvoicingPlanRepository invoicingPlanRepository;
-
-    public ParticipationService(ParticipationRepository participationRepository,
-            ConferenceRepository conferenceRepository, StandRepository standRepository, EventLogService eventLogService,
-            SalonRepository salonRepository, InvoicingPlanRepository invoicingPlanRepository) {
-        this.participationRepository = participationRepository;
-        this.conferenceRepository = conferenceRepository;
-        this.standRepository = standRepository;
-        this.eventLogService = eventLogService;
-        this.salonRepository = salonRepository;
-        this.invoicingPlanRepository = invoicingPlanRepository;
-    }
+    private final ParticipationMapper participationMapper;
+    private final EventLogMapper eventLogMapper;
 
     public UUID create(Participation participation) {
         if (participation == null) {
@@ -108,19 +92,17 @@ public class ParticipationService {
     // --- PRIVATE helper pour éviter la duplication de logique ---
     private InfoInvoice buildInfoInvoice(List<InvoicingPlan> invoicings) {
         if (invoicings == null || invoicings.isEmpty()) {
-            return new InfoInvoice(); // tout false
+            return new InfoInvoice();
         }
 
         InfoInvoice infoInvoice = new InfoInvoice();
-        infoInvoice.setHasDraftInvoices(invoicings.stream().anyMatch(
-                invoicingPlan -> invoicingPlan.getState() == State.DRAFT ||
-                        invoicingPlan.getState() == State.ISOLATED));
-        infoInvoice.setHasWaitingInvoices(
-                invoicings.stream().anyMatch(invoicingPlan -> invoicingPlan.getState() == State.ISSUED));
-        infoInvoice.setHasExpiredInvoices(invoicings.stream().anyMatch(
+        infoInvoice.setNbDraft(invoicings.stream().filter(invoicingPlan -> invoicingPlan.getState().isDraft()).count());
+        infoInvoice.setNbIssued(invoicings.stream().filter(invoicingPlan -> invoicingPlan.getState() == State.ISSUED || invoicingPlan.getState() == State.IS_ISSUING).count());
+        infoInvoice.setNbPaid(invoicings.stream().filter(invoicingPlan -> invoicingPlan.getState() == State.PAID).count());
+        infoInvoice.setNbExpired(invoicings.stream().filter(
                 invoicingPlan -> invoicingPlan.getState() == State.ISSUED &&
                         invoicingPlan.getExpirationDate() != null &&
-                        Instant.now().isAfter(invoicingPlan.getExpirationDate())));
+                        Instant.now().isAfter(invoicingPlan.getExpirationDate())).count());
 
         return infoInvoice;
     }
@@ -141,30 +123,30 @@ public class ParticipationService {
 
         if (Participation.diffArrangement(participation, existingParticipation)) {
             if (participation.getNeedArrangement()) {
-                this.eventLogService.eventFromSystem("Un arrangement est activé", EventType.EVENT,
+                this.eventLogService.eventFromSystem("Arrangement activé", EventType.EVENT,
                         EntityType.PARTICIPATION, participation.getId(), null);
             } else {
-                this.eventLogService.eventFromSystem("Un arrangement est désactivé", EventType.EVENT,
+                this.eventLogService.eventFromSystem("Arrangement désactivé", EventType.EVENT,
                         EntityType.PARTICIPATION, participation.getId(), null);
             }
         }
 
         if (Participation.diffMeal(1, participation, existingParticipation)) {
-            this.eventLogService.eventFromSystem("Le nombre de repas du samedi midi a changé", EventType.EVENT,
+            this.eventLogService.eventFromSystem("Nombre de repas (samedi midi) changé", EventType.EVENT,
                     EntityType.PARTICIPATION, participation.getId(),
                     Map.of("old_meal", existingParticipation.getNbMeal1().toString(), "new_meal",
                             participation.getNbMeal1().toString()));
         }
 
         if (Participation.diffMeal(2, participation, existingParticipation)) {
-            this.eventLogService.eventFromSystem("Le nombre de repas du samedi soir a changé", EventType.EVENT,
+            this.eventLogService.eventFromSystem("Nombre de repas (samedi soir) changé", EventType.EVENT,
                     EntityType.PARTICIPATION, participation.getId(),
                     Map.of("old_meal", existingParticipation.getNbMeal2().toString(), "new_meal",
                             participation.getNbMeal2().toString()));
         }
 
         if (Participation.diffMeal(3, participation, existingParticipation)) {
-            this.eventLogService.eventFromSystem("Le nombre de repas du dimanche midi a changé", EventType.EVENT,
+            this.eventLogService.eventFromSystem("Nombre de repas (dimanche midi) changé", EventType.EVENT,
                     EntityType.PARTICIPATION, participation.getId(),
                     Map.of("old_meal", existingParticipation.getNbMeal3().toString(), "new_meal",
                             participation.getNbMeal3().toString()));
@@ -186,7 +168,7 @@ public class ParticipationService {
         }
 
         return this.participationRepository.findByExhibitorIdOrderByRegistrationDateDesc(idExhibitor).stream()
-                                           .map(ParticipationMapper.INSTANCE::toDto).toList();
+                                           .map(participationMapper::toDto).toList();
     }
 
     public List<Participation> findAll(UUID idSalon) {
@@ -195,56 +177,6 @@ public class ParticipationService {
         }
 
         throw new IllegalStateException("No filter given");
-    }
-
-    public void adaptStatusFromChildren(UUID idParticipation) {
-        if (idParticipation == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-
-        Participation participation = participationRepository.findById(idParticipation).orElseThrow(
-                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-        Status currentStatus = participation.getStatus();
-
-        List<Stand> stands = this.standRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation);
-        Set<Status> standsStatus = stands.stream().map(Stand::getStatus).collect(Collectors.toSet());
-        List<Conference> conferences =
-                this.conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation);
-        Set<Status> conferencesStatus = conferences.stream().map(Conference::getStatus).collect(Collectors.toSet());
-
-        Status statusToChange;
-        if (isAnyOf(standsStatus, conferencesStatus, IN_VERIFICATION)) {
-            // If one in verification mode, so participation is still in verification
-            statusToChange = IN_VERIFICATION;
-        } else if (isAnyOf(standsStatus, conferencesStatus, ACCEPTED)) {
-            // If one in accepted mode (and none in verification mode due to the previous condition), so participation is accepted
-            statusToChange = ACCEPTED;
-        } else if (isAnyOf(standsStatus, conferencesStatus, VALIDATED)) {
-            // If one in validated mode (and none in verification/accepted mode due to the previous condition), so participation is validated
-            statusToChange = VALIDATED;
-        } else if (isAnyOf(standsStatus, conferencesStatus, CLOSED)) {
-            // If one in closed mode (and none in verification/accepted/validated mode due to the previous condition), so participation is closed
-            statusToChange = CLOSED;
-        } else if (isAnyOf(standsStatus, conferencesStatus, REFUSED)) {
-            // If one in refused mode (and none in verification/accepted/validated/closed mode due to the previous conditions), so participation is refused
-            statusToChange = REFUSED;
-        } else if (isAllOf(standsStatus, conferencesStatus, CANCELED)) {
-            // if none in verification/accepted/refused mode, so participation is canceled
-            statusToChange = CANCELED;
-        } else {
-            statusToChange = currentStatus;
-        }
-
-        if (currentStatus != statusToChange) {
-            this.eventLogService.eventFromSystem(
-                    "Le statut de la participation a changé en '" + statusToChange.name().toLowerCase() + "'",
-                    EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
-                    Map.of("old_status", currentStatus.name()));
-
-            participation.setStatus(statusToChange);
-
-            participationRepository.save(participation);
-        }
     }
 
     public Optional<Participation> get(UUID id) {
@@ -269,7 +201,7 @@ public class ParticipationService {
         }
 
         return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation).stream()
-                                   .map(EventLogMapper.INSTANCE::toDto).toList();
+                                   .map(eventLogMapper::toDto).toList();
     }
 
     private boolean isAllOf(Set<Status> stands, Set<Status> conferences, Status status) {

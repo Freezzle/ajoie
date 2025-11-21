@@ -5,10 +5,16 @@ import {Router, RouterModule} from '@angular/router';
 import SharedModule from 'app/shared/shared.module';
 import {LoginService} from 'app/login/login.service';
 import {AccountService} from 'app/core/auth/account.service';
+import {ContentPageComponent} from "../shared/components/content-page/content-page.component";
+import {AlertComponent} from "../shared/alert/alert.component";
+import {AlertErrorComponent} from "../shared/alert/alert-error.component";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {CardComponent} from "../shared/components/card/card.component";
 
 @Component({
-    selector: 'jhi-login',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule],
+    selector: 'app-login',
+    imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, ContentPageComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, CardComponent],
     templateUrl: './login.component.html'
 })
 export default class LoginComponent implements OnInit, AfterViewInit {

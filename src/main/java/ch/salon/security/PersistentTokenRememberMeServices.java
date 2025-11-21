@@ -16,9 +16,9 @@ import org.springframework.security.web.authentication.rememberme.CookieTheftExc
 import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.stereotype.Service;
-import tech.jhipster.config.JHipsterProperties;
-import tech.jhipster.security.PersistentTokenCache;
-import tech.jhipster.security.RandomUtil;
+import ch.salon.utils.SalonProperties;
+import ch.salon.utils.PersistentTokenCache;
+import ch.salon.utils.RandomUtil;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -68,10 +68,10 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     private final UserRepository userRepository;
 
-    public PersistentTokenRememberMeServices(JHipsterProperties jHipsterProperties,
+    public PersistentTokenRememberMeServices(SalonProperties salonProperties,
             org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
             PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
-        super(jHipsterProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
+        super(salonProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
         upgradedTokenCache = new PersistentTokenCache<>(UPGRADED_TOKEN_VALIDITY_MILLIS);

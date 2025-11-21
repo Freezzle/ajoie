@@ -1,4 +1,6 @@
 spring:
+  mail:
+    password: ${EMAIL_SENDER_APP_CODE}
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://${POSTGRESQL_ADDON_HOST}:${POSTGRESQL_ADDON_PORT}/${POSTGRESQL_ADDON_DB}?sslmode=require

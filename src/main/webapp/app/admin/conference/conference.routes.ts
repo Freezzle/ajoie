@@ -7,12 +7,6 @@ import ConferenceResolve from './service/conference-routing-resolve.service';
 
 const conferenceRoute: Routes = [
     {
-        path: '',
-        component: ConferenceComponent,
-        data: {},
-        canActivate: [UserRouteAccessService],
-    },
-    {
         path: ':idConference/view',
         component: ConferenceUpdateComponent,
         resolve: {
@@ -43,6 +37,12 @@ const conferenceRoute: Routes = [
         data: {
             readonly: false,
         },
+        canActivate: [UserRouteAccessService],
+    },
+    {
+        path: '',
+        component: ConferenceComponent,
+        data: {},
         canActivate: [UserRouteAccessService],
     },
 ];

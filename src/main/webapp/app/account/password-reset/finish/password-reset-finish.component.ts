@@ -9,7 +9,7 @@ import {ErrorModel} from '../../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../../shared/field-error/field-error.component';
 
 @Component({
-    selector: 'jhi-password-reset-finish',
+    selector: 'app-password-reset-finish',
     imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
         FieldErrorComponent],
     templateUrl: './password-reset-finish.component.html'

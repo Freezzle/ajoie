@@ -30,7 +30,7 @@ export class WorkshopService {
         return this.http.get<IWorkshop[]>(this.resourceUrl, {params: options});
     }
 
-    delete(idWorkshop: string): Observable<{}> {
+    delete(idWorkshop: string): Observable<unknown> {
         return this.http.delete(`${this.resourceUrl}/${idWorkshop}`);
     }
 

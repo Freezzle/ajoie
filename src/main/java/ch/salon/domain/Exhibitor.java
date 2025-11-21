@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -17,11 +18,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "exhibitor")
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Data
 public class Exhibitor implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -48,6 +46,9 @@ public class Exhibitor implements Serializable {
     @Column(name = "npa_localite")
     private String npaLocalite;
 
+    @Column(name = "iso_country")
+    private String isoCountry = "CH";
+
     @Column(name = "extra_information")
     private String extraInformation;
 
@@ -68,190 +69,4 @@ public class Exhibitor implements Serializable {
 
     @Column(name = "duplicate_detected")
     private boolean duplicateDetected = false;
-
-    public UUID getId() {
-        return this.id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Instant getRegistrationDate() {
-        return registrationDate;
-    }
-
-    public void setRegistrationDate(Instant registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public boolean isNewsletter() {
-        return newsletter;
-    }
-
-    public void setNewsletter(boolean newsletter) {
-        this.newsletter = newsletter;
-    }
-
-    public Exhibitor newsletter(boolean newsletter) {
-        this.setNewsletter(newsletter);
-        return this;
-    }
-
-    public boolean isRedFlag() {
-        return redFlag;
-    }
-
-    public void setRedFlag(boolean redFlag) {
-        this.redFlag = redFlag;
-    }
-
-    public Exhibitor redFlag(boolean redFlag) {
-        this.setRedFlag(redFlag);
-        return this;
-    }
-
-    public boolean isDuplicateDetected() {
-        return duplicateDetected;
-    }
-
-    public void setDuplicateDetected(boolean duplicateDetected) {
-        this.duplicateDetected = duplicateDetected;
-    }
-
-    public Exhibitor duplicateDetected(boolean duplicateDetected) {
-        this.setDuplicateDetected(duplicateDetected);
-        return this;
-    }
-
-    public Exhibitor id(UUID id) {
-        this.setId(id);
-        return this;
-    }
-
-    public String getFullName() {
-        return this.fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public Exhibitor fullName(String fullName) {
-        this.setFullName(fullName);
-        return this;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Exhibitor email(String email) {
-        this.setEmail(email);
-        return this;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(@NotNull String language) {
-        this.language = language;
-    }
-
-    public String getPhoneNumber() {
-        return this.phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Exhibitor phoneNumber(String phoneNumber) {
-        this.setPhoneNumber(phoneNumber);
-        return this;
-    }
-
-    public String getAddress() {
-        return this.address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Exhibitor address(String address) {
-        this.setAddress(address);
-        return this;
-    }
-
-    public String getNpaLocalite() {
-        return this.npaLocalite;
-    }
-
-    public void setNpaLocalite(String npaLocalite) {
-        this.npaLocalite = npaLocalite;
-    }
-
-    public Exhibitor npaLocalite(String npaLocalite) {
-        this.setNpaLocalite(npaLocalite);
-        return this;
-    }
-
-    public String getExtraInformation() {
-        return this.extraInformation;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
-    }
-
-    public Exhibitor extraInformation(String extraInformation) {
-        this.setExtraInformation(extraInformation);
-        return this;
-    }
-
-    public Boolean getDifferentBillingAddress() {
-        return differentBillingAddress;
-    }
-
-    public void setDifferentBillingAddress(Boolean differentBillingAddress) {
-        this.differentBillingAddress = differentBillingAddress;
-    }
-
-    public Address getBillingAddress() {
-        return billingAddress;
-    }
-
-    public void setBillingAddress(Address billingAddress) {
-        this.billingAddress = billingAddress;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Exhibitor)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((Exhibitor) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return ("Exhibitor{" + "id=" + id + ", fullName='" + fullName + '\'' + ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address + '\'' + ", npaLocalite='" +
-                npaLocalite + '\'' + ", extraInformation='" + extraInformation + '\'' + '}');
-    }
 }

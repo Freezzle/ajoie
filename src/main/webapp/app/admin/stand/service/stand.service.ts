@@ -29,7 +29,7 @@ export class StandService {
         return this.http.get<IStand[]>(this.resourceUrl, {params: options});
     }
 
-    delete(idStand: string): Observable<{}> {
+    delete(idStand: string): Observable<unknown> {
         return this.http.delete(`${this.resourceUrl}/${idStand}`);
     }
 

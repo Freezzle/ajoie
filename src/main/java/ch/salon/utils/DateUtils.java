@@ -12,6 +12,6 @@ public class DateUtils {
         }
 
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        return instant.atZone(ZoneId.systemDefault()).toLocalDate().format(outputFormatter);
+        return instant.atZone(ZoneId.of("Europe/Zurich")).toLocalDate().format(outputFormatter);
     }
 }

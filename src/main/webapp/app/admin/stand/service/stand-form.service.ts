@@ -1,11 +1,7 @@
 import {Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {IStand} from '../model/stand.interface';
-import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {CustomValidatorModel} from '../../../shared/field-error/custom-validator.model';
-import {IParticipation} from "../../participation/model/participation.interface";
-import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
-import {ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
 import {Status} from "../../enumerations/status.model";
 
 export type StandFormGroup = {
@@ -21,25 +17,14 @@ export type StandFormGroup = {
     needElectricity: FormControl<IStand['needElectricity'] | null>;
     status: FormControl<IStand['status'] | null>;
     category: FormControl<IStand['category'] | null>;
+    subCategories: FormControl<IStand['subCategories'] | null>;
     extraInformation: FormControl<IStand['extraInformation'] | null>;
     participation: FormControl<IStand['participation'] | null>;
     dimension: FormControl<IStand['dimension'] | null>;
 };
 
-export type StandFilterFormGroup = {
-    fullName: FormControl<IExhibitor['fullName'] | null>;
-    status: FormControl<IStand['status'] | null>;
-};
-
 @Injectable({providedIn: 'root'})
 export class StandFormService {
-    createFilterFormGroup(): FormGroup<StandFilterFormGroup> {
-        return new FormGroup<StandFilterFormGroup>({
-            fullName: new FormControl(null),
-            status: new FormControl(null),
-        });
-    }
-
     createStandFormGroup(stand: IStand | null): FormGroup<StandFormGroup> {
         const raw: IStand = {
             ...this.getDefaultStandFormValue() as IStand,
@@ -68,6 +53,7 @@ export class StandFormService {
             needElectricity: new FormControl(raw.needElectricity, Validators.required),
             status: new FormControl(raw.status, Validators.required),
             category: new FormControl(raw.category),
+            subCategories: new FormControl(raw.subCategories),
             extraInformation: new FormControl(raw.extraInformation),
             participation: new FormControl(raw.participation, Validators.required),
             dimension: new FormControl(raw.dimension, Validators.required),
@@ -79,13 +65,14 @@ export class StandFormService {
     }
 
     private getDefaultStandFormValue(): Pick<IStand,
-        'status' | 'nbTable' | 'nbChair' | 'needElectricity'
+        'status' | 'nbTable' | 'nbChair' | 'subCategories' | 'needElectricity'
         | 'shared'> {
         return {
             status: Status.IN_VERIFICATION,
             nbTable: 0,
             nbChair: 0,
             needElectricity: true,
+            subCategories: [],
             shared: false
         };
     }

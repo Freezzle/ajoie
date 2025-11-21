@@ -13,7 +13,7 @@ import {AlertErrorComponent} from "../../shared/alert/alert-error.component";
 const initialAccount: Account = {} as Account;
 
 @Component({
-    selector: 'jhi-settings',
+    selector: 'app-settings',
     imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, AlertErrorComponent],
     templateUrl: './settings.component.html'
 })

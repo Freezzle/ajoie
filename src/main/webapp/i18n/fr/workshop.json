@@ -1,11 +1,11 @@
 {
   "workshop": {
-    "create": "Création d'un nouvel atelier",
+    "create": "Nouvel atelier",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer l'atelier \"{{title}}\" ?"
+      "question": "Voulez-vous supprimer l'atelier \"{{title}}\" ?"
     },
     "description": "Description",
-    "edit": "Détail d'un atelier",
+    "edit": "Détail de l'atelier",
     "extraInformation": "Commentaire",
     "notFound": "Aucun atelier",
     "participation": "Participation",
@@ -22,6 +22,6 @@
       }
     },
     "title": "Les ateliers",
-    "title-field": "Titre"
+    "titleField": "Titre"
   }
 }

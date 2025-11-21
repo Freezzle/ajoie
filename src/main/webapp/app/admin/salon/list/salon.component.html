@@ -1,107 +1,118 @@
-<div>
-    <h2 id="page-heading">
-        <div class="d-flex justify-content-center">
-            <span jhiTranslate="salon.title">Les salons</span>
-        </div>
-        <hr/>
-
-        <div class="d-flex justify-content-between mt-3">
-      <span>
+<app-content-page>
+    <div appMenuBarStart>
+        <h3 jhiTranslate="salon.title">Les salons</h3>
+    </div>
+    <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     faIcon="arrow-left"
                     [isDisabled]="isLoading"
-                    translateKey="common.back"/>
-      </span>
-
-            <span>
+                    translateKey="common.back"
+                    [showText]="false"/>
         <button-box (clickedEvent)="load()"
                     faIcon="sync"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
                     [isDisabled]="isLoading"
+                    [showText]="false"
                     translateKey="common.refresh"/>
-
-        <link-box [links]="['./new']"
-                  type="success"
-                  translateKey="common.create"
-                  faIcon="plus"
-                  [isDisabled]="isLoading"/>
-      </span>
-        </div>
-    </h2>
-
-    <jhi-alert-error></jhi-alert-error>
-
-    <jhi-alert></jhi-alert>
-
-    <div class="table-responsive table-entities" id="entities">
-        <table aria-describedby="page-heading" class="table table-hover">
-            <thead class="thead-primary">
-            <tr>
-                <th class="text-white">
-                    <span jhiTranslate="salon.referenceNumber">N° de référence</span>
-                </th>
-                <th class="text-white">
-                    <span jhiTranslate="salon.place">Place</span>
-                </th>
-                <th class="text-center text-white">
-                    <span jhiTranslate="salon.startingDate">Starting Date</span>
-                </th>
-                <th class="text-center text-white">
-                    <span jhiTranslate="salon.endingDate">Ending Date</span>
-                </th>
-                <th>&nbsp;</th>
-            </tr>
-            </thead>
-            <tbody>
-                @if (isLoading) {
-                    <tr>
-                        <td colspan="8" class="text-center">
-                            <p-progress-spinner strokeWidth="5"
-                                                fill="transparent"
-                                                animationDuration="1s"
-                                                [style]="{ width: '50px', height: '50px' }"/>
-                        </td>
-                    </tr>
-                } @else {
-                    @if (salons.length === 0) {
+        <button-box [modeLink]="true"
+                    [links]="['./new']"
+                    [isDisabled]="isLoading"
+                    [showText]="false"
+                    type="success"
+                    faIcon="plus"
+                    translateKey="common.create"/>
+    </div>
+    <app-alert-error></app-alert-error>
+    <app-alert></app-alert>
+    <p-toast/>
+    <p-confirmpopup/>
+    <app-card [showHeader]="false">
+        <div appCardBody>
+            <div class="row">
+                <p-table #dt2
+                         [value]="salons"
+                         dataKey="id"
+                         [rows]="10"
+                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [loading]="isLoading"
+                         [paginator]="true"
+                         [globalFilterFields]="['place', 'referenceNumber']"
+                         sortField="startingDate"
+                         [sortOrder]="-1"
+                         [tableStyle]="{ 'min-width': '60rem' }">
+                    <ng-template #caption>
+                        <div class="flex">
+                            <p-iconfield iconPosition="left" class="ml-auto">
+                                <p-inputicon>
+                                    <i class="pi pi-search"></i>
+                                </p-inputicon>
+                                <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Recherche" />
+                            </p-iconfield>
+                        </div>
+                    </ng-template>
+                    <ng-template #header>
                         <tr>
-                            <td colspan="5">
-                                <span jhiTranslate="salon.notFound">Aucun salon</span>
+                            <th pSortableColumn="place">{{ 'salon.place' | translate }}
+                                <p-sortIcon field="place"/>
+                            </th>
+                            <th pSortableColumn="referenceNumber">{{ 'salon.referenceNumber' | translate }}
+                                <p-sortIcon field="referenceNumber"/>
+                            </th>
+                            <th pSortableColumn="startingDate">
+                                {{ 'salon.startingDate' | translate }}
+                                <p-sortIcon field="startingDate"/>
+                                <p-columnFilter type="date"
+                                                field="startingDate"
+                                                size="small"
+                                                matchMode="dateAfter"
+                                                display="menu"></p-columnFilter>
+                            </th>
+                            <th pSortableColumn="endingDate">
+                                {{ 'salon.endingDate' | translate }}
+                                <p-sortIcon field="endingDate"/>
+                                <p-columnFilter type="date"
+                                                field="endingDate"
+                                                size="small"
+                                                matchMode="dateBefore"
+                                                display="menu"></p-columnFilter>
+                            </th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-salon>
+                        <tr>
+                            <td class="clickable truncate-medium"
+                                [routerLink]="['./', salon.id, 'participations']">{{ salon.place }}
+                            </td>
+                            <td class="clickable truncate-small"
+                                [routerLink]="['./', salon.id, 'participations']">{{ salon.referenceNumber }}
+                            </td>
+                            <td class="clickable truncate-small" [routerLink]="['./', salon.id, 'participations']">{{
+                                    salon.startingDate | formatMediumDate
+                                }}
+                            </td>
+                            <td class="clickable truncate-small" [routerLink]="['./', salon.id, 'participations']">{{
+                                    salon.endingDate | formatMediumDate
+                                }}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button-box (clickedEvent)="delete($event, salon)"
+                                                type="danger"
+                                                [showText]="false"
+                                                translateKey="common.delete"
+                                                faIcon="times"/>
+                                </div>
                             </td>
                         </tr>
-                    } @else {
-                        @for (salon of salons; track $index) {
-                            <tr>
-                                <td class="go-detail"
-                                    [routerLink]="['./', salon.id, 'participations']">{{ salon.referenceNumber }}
-                                </td>
-                                <td class="go-detail"
-                                    [routerLink]="['./', salon.id, 'participations']">{{ salon.place }}
-                                </td>
-                                <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
-                                        salon.startingDate | formatMediumDate
-                                    }}
-                                </td>
-                                <td class="go-detail text-center" [routerLink]="['./', salon.id, 'participations']">{{
-                                        salon.endingDate | formatMediumDate
-                                    }}
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <button-box (clickedEvent)="delete(salon)"
-                                                    type="danger"
-                                                    [showText]="false"
-                                                    translateKey="common.delete"
-                                                    faIcon="times"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <jhi-pagination (pageChanged)="refreshSalons($event)" [collectionSize]="salons.length"/>
-</div>
+                    </ng-template>
+                    <ng-template #emptymessage>
+                        <tr>
+                            <td colspan="5">{{ 'salon.notFound' | translate }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </app-card>
+</app-content-page>

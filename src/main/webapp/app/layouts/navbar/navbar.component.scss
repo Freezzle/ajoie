@@ -1,15 +1,13 @@
-@import "content/scss/bootstrap-variables";
-
 .sidebar {
-  background-color: $primary;
-  color: white;
+  background-color: var(--app-primary);
+  color: var(--app-surface);
   transition: all 0.3s ease;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 
   .sidebar-toggle {
-    padding: 1rem;
+    padding: 0.5rem;
     display: flex;
     justify-content: end;
   }
@@ -29,7 +27,7 @@
     border-top-style: solid;
 
     .nav-link {
-      color: white;
+      color: var(--app-surface) !important;
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -45,12 +43,21 @@
 
       li {
         list-style: none !important;
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
+        padding: 0.25rem 0;
 
         a {
-          color: white;
+          padding: 0 0.5rem;
           text-decoration: none;
+          color: var(--app-surface) !important;
+        }
+
+        &:hover {
+          background: var(--app-surface-25) !important;
+          cursor: pointer;
+        }
+
+        &.active {
+          background: var(--app-surface-25) !important;
         }
       }
 
@@ -69,25 +76,24 @@
     height: auto;
 
     &.collapsed {
-      border-radius: 0 0 8px 0;
+      border-radius: 0;
     }
 
     &.open {
-      width: 300px;
-      height: 100%;
+      min-width: 300px;
+      height: 100dvh;
     }
   }
 
   /* ---- Desktop Style ---- */
   &.desktop {
-    position: relative;         // ⬅️ la sidebar suit le flux, n'est plus flottante
+    position: relative; // ⬅️ la sidebar suit le flux, n'est plus flottante
     top: 0;
-    height: 100vh;              // ⬅️ garantit 100% de la hauteur de l'écran
+    height: 100dvh; // ⬅️ garantit 100% de la hauteur de l'écran
     z-index: 1050;
 
     &.collapsed {
-      width: 60px;
-      height: 100vh;            // ⬅️ Garder la hauteur en collapsed aussi
+      height: 100dvh; // ⬅️ Garder la hauteur en collapsed aussi
 
       .sidebar-content {
         display: none;
@@ -95,33 +101,12 @@
     }
 
     &.open {
-      width: 300px;
-      height: 100vh;            // ⬅️ Toujours 100vh
-    }
-  }
-}
-
-.sidebar {
-  .nav-link,
-  .dropdown-list li:hover {
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.25);
+      min-width: 300px;
+      height: 100dvh; // ⬅️ Toujours 100vh
     }
   }
 }
 
 .hr-navbar {
   border: 3px solid white;
-}
-
-.salon-title-navbar {
-}
-
-li .active {
-  background-color: rgba(255, 255, 255, 0.25);
-  color: $primary;
 }

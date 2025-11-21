@@ -14,6 +14,7 @@ export interface IExhibitor {
     phoneNumber: string | null;
     address: string | null;
     npaLocalite: string | null;
+    isoCountry: string | null;
     extraInformation: string | null;
     billingAddress: IAddress | null;
 }

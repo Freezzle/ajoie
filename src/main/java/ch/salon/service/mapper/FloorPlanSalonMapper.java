@@ -4,11 +4,9 @@ import ch.salon.domain.FloorPlanSalon;
 import ch.salon.service.dto.FloorPlanSalonDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface FloorPlanSalonMapper {
-    FloorPlanSalonMapper INSTANCE = Mappers.getMapper(FloorPlanSalonMapper.class);
 
     FloorPlanSalonDTO toDto(FloorPlanSalon stand);
 

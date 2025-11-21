@@ -6,6 +6,6 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export default class ColorBoolPipe implements PipeTransform {
     transform(value: boolean | null | undefined): string {
-        return value ? 'success-icon' : 'danger-icon';
+        return value ? 'text-primary' : 'text-danger';
     }
 }

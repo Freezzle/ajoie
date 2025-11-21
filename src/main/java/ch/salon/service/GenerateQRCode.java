@@ -22,9 +22,6 @@ public class GenerateQRCode {
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(QRBill.generate(bill));
     }
 
-    /**
-     * aide: crée l’objet Bill à partir de tes objets métier
-     */
     public Bill buildBill(String iban, double amount, String reference, String message, String creditorName,
             String creditorStreet, String creditorHouseNo, String creditorZip, String creditorCity,
             String creditorCountry, String debtorName, String debtorStreet, String debtorHouseNo, String debtorZip,

@@ -16,7 +16,7 @@ export class SessionsService {
         return this.http.get<Session[]>(this.resourceUrl);
     }
 
-    delete(series: string): Observable<{}> {
+    delete(series: string): Observable<unknown> {
         return this.http.delete(`${this.resourceUrl}/${series}`);
     }
 }

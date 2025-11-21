@@ -6,6 +6,6 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export default class ColorLockBooleanPipe implements PipeTransform {
     transform(value: boolean | null | undefined): string {
-        return value ? 'warning-icon' : 'grey-icon';
+        return value ? 'text-warning' : 'text-secondary';
     }
 }

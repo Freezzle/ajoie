@@ -5,11 +5,9 @@ import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoiceLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface InvoiceMapper {
-    InvoiceMapper INSTANCE = Mappers.getMapper(InvoiceMapper.class);
 
     InvoiceDTO toDto(Invoice invoice);
 

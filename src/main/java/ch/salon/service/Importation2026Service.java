@@ -19,8 +19,8 @@ import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.dto.ParticipationDTO;
-import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.mapper.ParticipationMapper;
+import lombok.AllArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -52,6 +52,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class Importation2026Service {
 
     private static final Logger log = LoggerFactory.getLogger(Importation2026Service.class);
@@ -108,20 +109,7 @@ public class Importation2026Service {
     private final ParticipationRepository participationRepository;
     private final RefreshInvoicingPlansService refreshInvoicingPlansService;
     private final EventLogService eventLogService;
-
-    public Importation2026Service(SalonRepository salonRepository, StandRepository standRepository,
-            ExhibitorRepository exhibitorRepository, ConferenceRepository conferenceRepository,
-            WorkshopRepository workshopRepository, ParticipationRepository participationRepository,
-            RefreshInvoicingPlansService refreshInvoicingPlansService, EventLogService eventLogService) {
-        this.salonRepository = salonRepository;
-        this.standRepository = standRepository;
-        this.exhibitorRepository = exhibitorRepository;
-        this.conferenceRepository = conferenceRepository;
-        this.workshopRepository = workshopRepository;
-        this.participationRepository = participationRepository;
-        this.refreshInvoicingPlansService = refreshInvoicingPlansService;
-        this.eventLogService = eventLogService;
-    }
+    private final ParticipationMapper participationMapper;
 
     @Transactional
     public List<ParticipationDTO> importData(String idSalon, InputStream file) {
@@ -208,7 +196,7 @@ public class Importation2026Service {
             throw new IllegalStateException("Un problème est survenu pendant l'import CSV.", e);
         }
 
-        return participationsNew.stream().map(ParticipationMapper.INSTANCE::toDto).toList();
+        return participationsNew.stream().map(participationMapper::toDto).toList();
     }
 
     // -------------------- BUILDERS --------------------
@@ -303,6 +291,7 @@ public class Importation2026Service {
             current.setEmail(sub100(email));
             current.setLanguage(LANG_FR);
             current.setRegistrationDate(now);
+            current.setIsoCountry("CH");
         }
 
         current.setFullName(sub100(String.format("%s %s", StringUtils.defaultString(firstName).trim(),

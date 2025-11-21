@@ -8,6 +8,7 @@ import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.dto.WorkshopDTO;
 import ch.salon.service.mapper.WorkshopMapper;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,6 +27,7 @@ import static ch.salon.web.rest.errors.ErrorBusinessKey.PARTICIPATION_LINK_NULL;
 import static ch.salon.web.rest.errors.ErrorBusinessKey.PARTICIPATION_NOTFOUND;
 
 @Service
+@AllArgsConstructor
 public class WorkshopService {
 
     public static final String ENTITY_NAME = "workshop";
@@ -33,13 +35,7 @@ public class WorkshopService {
     private final WorkshopRepository workshopRepository;
     private final ParticipationService participationService;
     private final EventLogService eventLogService;
-
-    public WorkshopService(WorkshopRepository workshopRepository, ParticipationService participationService,
-            EventLogService eventLogService) {
-        this.workshopRepository = workshopRepository;
-        this.participationService = participationService;
-        this.eventLogService = eventLogService;
-    }
+    private final WorkshopMapper workshopMapper;
 
     public UUID create(WorkshopDTO workshop) {
         if (workshop == null) {
@@ -59,14 +55,12 @@ public class WorkshopService {
             throw new BadRequestAlertException("Participation does not exist", ENTITY_NAME, PARTICIPATION_NOTFOUND);
         }
 
-        Workshop entity = WorkshopMapper.INSTANCE.toEntity(workshop);
+        Workshop entity = workshopMapper.toEntity(workshop);
         entity.setRegistrationDate(Instant.now());
         entity = workshopRepository.save(entity);
 
-        this.eventLogService.eventFromSystem("Une conférence a été ajoutée", EventType.EVENT, EntityType.PARTICIPATION,
+        this.eventLogService.eventFromSystem("Un atelier a été ajouté", EventType.EVENT, EntityType.PARTICIPATION,
                 entity.getParticipation().getId(), null);
-
-        this.participationService.adaptStatusFromChildren(entity.getParticipation().getId());
 
         return entity.getId();
     }
@@ -87,11 +81,11 @@ public class WorkshopService {
         Workshop workshopExisting = this.workshopRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
 
-        Workshop workshopToUpdate = WorkshopMapper.INSTANCE.toEntity(workshop);
+        Workshop workshopToUpdate = workshopMapper.toEntity(workshop);
 
         if (Workshop.diffStatus(workshopToUpdate, workshopExisting)) {
             this.eventLogService.eventFromSystem(
-                    "Le statut d'une conférence a changé en '" + workshopToUpdate.getStatus().name().toLowerCase() +
+                    "Le statut d'un atelier a changé en '" + workshopToUpdate.getStatus().name().toLowerCase() +
                             "'", EventType.EVENT, EntityType.PARTICIPATION, workshopExisting.getParticipation().getId(),
                     Map.of("old_status", workshopExisting.getStatus().name()));
         }
@@ -99,18 +93,16 @@ public class WorkshopService {
         workshopToUpdate.setRegistrationDate(workshopExisting.getRegistrationDate());
         workshopToUpdate = workshopRepository.save(workshopToUpdate);
 
-        this.participationService.adaptStatusFromChildren(workshopToUpdate.getParticipation().getId());
-
-        return WorkshopMapper.INSTANCE.toDto(workshopToUpdate);
+        return workshopMapper.toDto(workshopToUpdate);
     }
 
     public List<WorkshopDTO> findAll(UUID idSalon, UUID idParticipation) {
         if (idParticipation != null) {
             return workshopRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation).stream()
-                                     .map(WorkshopMapper.INSTANCE::toDto).toList();
+                                     .map(workshopMapper::toDto).toList();
         } else if (idSalon != null) {
             return workshopRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
-                                     .map(WorkshopMapper.INSTANCE::toDto).toList();
+                                     .map(workshopMapper::toDto).toList();
         } else {
             throw new IllegalStateException("No filter given");
         }
@@ -121,7 +113,7 @@ public class WorkshopService {
             throw new BadRequestAlertException("Id null", ENTITY_NAME, ID_NULL);
         }
 
-        return workshopRepository.findById(id).map(WorkshopMapper.INSTANCE::toDto);
+        return workshopRepository.findById(id).map(workshopMapper::toDto);
     }
 
     public void delete(UUID id) {
@@ -133,8 +125,7 @@ public class WorkshopService {
                 get(id).map(WorkshopDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
 
         workshopRepository.deleteById(id);
-        this.eventLogService.eventFromSystem("Une conférence a été supprimée.", EventType.EVENT,
+        this.eventLogService.eventFromSystem("Atelier supprimé.", EventType.EVENT,
                 EntityType.PARTICIPATION, idParticipation, null);
-        this.participationService.adaptStatusFromChildren(idParticipation);
     }
 }

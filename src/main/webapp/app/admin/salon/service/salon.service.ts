@@ -6,12 +6,12 @@ import dayjs from 'dayjs/esm';
 
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
 import {createRequestOption} from 'app/core/request/request-util';
-import {ISalon, NewSalon, TimeSlotMap} from '../model/salon.interface';
-import {isPresent} from '../../../core/util/operators';
+import {ISalon, NewSalon} from '../model/salon.interface';
 import {Status} from '../../enumerations/status.model';
 import {ISalonStats} from '../model/salon-stats.interface';
 import {IPriceStandSalon} from "../model/price-stand-salon.interface";
 import {IParticipation} from "../../participation/model/participation.interface";
+import {PlanningTalksDto} from "../../conference/planning/planning-talks.component";
 
 @Injectable({providedIn: 'root'})
 export class SalonService {
@@ -47,6 +47,14 @@ export class SalonService {
         return this.http.get<ISalonStats>(`${this.resourceUrl}/${idSalon}/stats`, {params, observe: 'response'});
     }
 
+    getPlanningTalks(idSalon: string): Observable<PlanningTalksDto> {
+        return this.http.get<PlanningTalksDto>(`${this.resourceUrl}/${idSalon}/planning-talks`);
+    }
+
+    savePlanningTalks(idSalon: string, payload: PlanningTalksDto): Observable<void> {
+        return this.http.put<void>(`${this.resourceUrl}/${idSalon}/planning-talks`, payload);
+    }
+
     query(req?: any): Observable<HttpResponse<ISalon[]>> {
         const options = createRequestOption(req);
         return this.http
@@ -60,7 +68,7 @@ export class SalonService {
         return this.http.post<IParticipation[]>(`${this.resourceUrl}/${idSalon}/import-inscriptions`, formData);
     }
 
-    delete(idSalon: string): Observable<HttpResponse<{}>> {
+    delete(idSalon: string): Observable<HttpResponse<unknown>> {
         return this.http.delete(`${this.resourceUrl}/${idSalon}`, {observe: 'response'});
     }
 
@@ -68,35 +76,11 @@ export class SalonService {
         return salon.id;
     }
 
-    addSalonOptionsIfMissing<Type extends Pick<ISalon, 'id'>>(
-        salonCollection: Type[],
-        ...salonsToCheck: (Type | null | undefined)[]
-    ): Type[] {
-        const salons: Type[] = salonsToCheck.filter(isPresent);
-        if (salons.length > 0) {
-            const salonCollectionIdentifiers = salonCollection.map(salonItem => this.getSalonIdentifier(salonItem));
-            const salonsToAdd = salons.filter(salonItem => {
-                const salonIdentifier = this.getSalonIdentifier(salonItem);
-                if (salonCollectionIdentifiers.includes(salonIdentifier)) {
-                    return false;
-                }
-                salonCollectionIdentifiers.push(salonIdentifier);
-                return true;
-            });
-            return [...salonsToAdd, ...salonCollection];
-        }
-        return salonCollection;
-    }
-
     getDimensionStands(idSalon: string | null): Observable<IPriceStandSalon[]> {
         if (!idSalon) {
             return of([]);
         }
         return this.http.get<IPriceStandSalon[]>(`${this.resourceUrl}/${idSalon}/dimension-stands`);
-    }
-
-    getTimeSlots(idSalon: string | null): Observable<TimeSlotMap> {
-        return this.http.get<TimeSlotMap>(`${this.resourceUrl}/${idSalon}/time-slots`);
     }
 
     protected convertResponseFromServer(res: HttpResponse<ISalon>): HttpResponse<ISalon> {

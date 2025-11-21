@@ -1,0 +1,124 @@
+@import '../../../../../../../node_modules/bootstrap/scss/functions';
+@import '../../../../../../../node_modules/bootswatch/dist/sandstone/variables';
+@import '../../../../../../../node_modules/bootstrap/scss/variables';
+
+.unassigned-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hint {
+  margin-top: 8px;
+  color: var(--app-text);
+  font-size: 11px;
+}
+
+/* Planning */
+.schedule {
+  --cell-width: 80px;
+  --cell-height: 80px;
+  --slot-count: 12;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+/* Lignes de base */
+.header-row,
+.room-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+}
+
+/* En-tête */
+.header-row {
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+}
+
+/* Colonne salles */
+.room-label {
+  display: flex;
+  padding-left: 0.5em;
+  font-weight: 600;
+  align-items: center;
+  background: var(--app-surface);
+  border-right: 1px solid #f0f0f0;
+}
+
+/* Pistes de temps */
+.time-track,
+.room-track {
+  position: relative;
+  display: grid;
+  align-items: center;
+}
+
+/* Cases (grille) */
+.time-cell,
+.slot-cell {
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  height: var(--cell-height);
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.time-cell {
+  font-weight: 600;
+  background: var(--app-surface);
+  padding-left: 0.5em;
+}
+
+.slot-cell {
+  background: var(--app-surface);
+  &.slot-highlight {
+    background: var(--app-surface-muted);
+  }
+}
+
+.slot-disabled {
+  background: var(--app-contrast);
+}
+
+.talk-unassigned {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  z-index: 1;
+}
+
+.talk-assigned {
+  position: absolute;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  z-index: 1;
+}
+
+.room-timeline-title {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Contenu de la carte */
+.talk-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.talk-card-time {
+  font-weight: 600;
+}
+
+.talk-card-description {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}
+
+:host ::ng-deep .p-timeline-event-opposite {
+  display: none !important;
+}

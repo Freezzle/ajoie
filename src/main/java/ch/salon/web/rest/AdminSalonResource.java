@@ -1,17 +1,16 @@
 package ch.salon.web.rest;
 
 import ch.salon.domain.Participation;
+import ch.salon.domain.PlanningTalksSalon;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.Importation2026Service;
 import ch.salon.service.ParticipationService;
 import ch.salon.service.SalonService;
-import ch.salon.service.TimeSlotService;
 import ch.salon.service.dto.FloorPlanSalonDTO;
 import ch.salon.service.dto.ParticipationDTO;
 import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
-import ch.salon.service.dto.TimeSlotDTO;
 import ch.salon.web.rest.dto.InfoInvoice;
 import ch.salon.web.rest.dto.SalonStatistiques;
 import io.micrometer.common.util.StringUtils;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import tech.jhipster.web.util.ResponseUtil;
+import ch.salon.utils.ResponseUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,9 +45,9 @@ import static ch.salon.service.SalonService.ENTITY_NAME;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
-import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityUpdateAlert;
+import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
+import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
+import static ch.salon.utils.HeaderUtil.createEntityUpdateAlert;
 
 @RestController
 @RequestMapping("/api/admin/salons")
@@ -59,17 +58,15 @@ public class AdminSalonResource {
     private final SalonService salonService;
     private final Importation2026Service importation2026Service;
     private final ParticipationService participationService;
-    private final TimeSlotService timeSlotService;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AdminSalonResource(SalonService salonService, Importation2026Service importation2026Service,
-            ParticipationService participationService, TimeSlotService timeSlotService) {
+            ParticipationService participationService) {
         this.salonService = salonService;
         this.importation2026Service = importation2026Service;
         this.participationService = participationService;
-        this.timeSlotService = timeSlotService;
     }
 
     @PostMapping("")
@@ -198,17 +195,25 @@ public class AdminSalonResource {
         return ok(salonService.updateFloorPlanSalon(idSalon, idFloorPlan, floorPlanSalonDTO));
     }
 
+    @PutMapping("/{idSalon}/planning-talks")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<PlanningTalksSalon> updatePlanningTalks(
+            @PathVariable(value = "idSalon", required = false) final UUID idSalon,
+            @RequestBody PlanningTalksSalon planningTalksSalon) {
+        return ok(salonService.updatePlanningTalks(idSalon, planningTalksSalon));
+    }
+
+    @GetMapping("/{idSalon}/planning-talks")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<PlanningTalksSalon> getPlanningTalks(
+            @PathVariable(value = "idSalon", required = false) final UUID idSalon) {
+        return ok(salonService.getPlanningTalks(idSalon));
+    }
+
     @GetMapping("/{idSalon}/dimension-stands")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<List<PriceStandDTO>> getDimensionStandsFromSalon(
             @PathVariable(value = "idSalon") final UUID idSalon) {
         return ResponseUtil.wrapOrNotFound(Optional.of(salonService.getDimensionStands(idSalon)));
-    }
-
-    @GetMapping("/{idSalon}/time-slots")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Map<LocalDate, List<TimeSlotDTO>>> getTimeSlots(
-            @PathVariable(value = "idSalon") final UUID idSalon) {
-        return ResponseUtil.wrapOrNotFound(Optional.of(timeSlotService.getTimeSlotsBySalon(idSalon)));
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 @Repository
 @RepositoryAction("participation")
 public interface ParticipationRepository extends JpaRepository<Participation, UUID> {

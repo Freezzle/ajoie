@@ -5,7 +5,7 @@ export interface IWorkshop {
     id: string;
     title: string;
     description: string;
-    status: keyof typeof Status;
+    status: Status;
     extraInformation: string | null;
     participation: IParticipation;
 }

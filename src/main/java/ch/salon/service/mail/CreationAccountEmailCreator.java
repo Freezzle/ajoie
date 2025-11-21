@@ -8,7 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-import tech.jhipster.config.JHipsterProperties;
+import ch.salon.utils.SalonProperties;
 
 import java.util.Locale;
 import java.util.Map;
@@ -17,15 +17,15 @@ import java.util.Map;
 public class CreationAccountEmailCreator extends AbstractEmailCreator {
 
     private final MessageSource messageSource;
-    private final JHipsterProperties jHipsterProperties;
+    private final SalonProperties salonProperties;
     private User user;
 
     public CreationAccountEmailCreator(MessageSource messageSource, JavaMailSender javaMailSender,
             @Qualifier("mailTemplateEngine") SpringTemplateEngine mailTemplateEngine,
-            JHipsterProperties jHipsterProperties) {
+            SalonProperties salonProperties) {
         super(javaMailSender, mailTemplateEngine);
         this.messageSource = messageSource;
-        this.jHipsterProperties = jHipsterProperties;
+        this.salonProperties = salonProperties;
     }
 
     public void fillUser(User user) {
@@ -44,7 +44,7 @@ public class CreationAccountEmailCreator extends AbstractEmailCreator {
 
     @Override
     protected String getSenderEmail() {
-        return "dylan.claude.work@gmail.com";
+        return "";
     }
 
     @Override
@@ -56,7 +56,7 @@ public class CreationAccountEmailCreator extends AbstractEmailCreator {
     protected Context getContext() {
         Context context = new Context(Locale.forLanguageTag(user.getLangKey()));
         context.setVariable("user", user);
-        context.setVariable("baseUrl", jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable("baseUrl", salonProperties.getMail().getBaseUrl());
 
         return context;
     }

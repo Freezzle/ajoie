@@ -5,8 +5,9 @@ import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.repository.EventLogRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -16,14 +17,11 @@ import java.util.UUID;
 
 @Service
 @Transactional(value = Transactional.TxType.REQUIRED)
+@AllArgsConstructor
 public class EventLogService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final EventLogRepository eventLogRepository;
-
-    public EventLogService(EventLogRepository eventLogRepository) {
-        this.eventLogRepository = eventLogRepository;
-    }
 
     public void eventFromSystem(String label, EventType eventType, EntityType entityType, UUID referenceId,
             Map<String, String> extraAttributes) {
@@ -53,11 +51,7 @@ public class EventLogService {
         eventLog.setFromSystem(fromSystem);
 
         if (extraAttributes != null && !extraAttributes.isEmpty()) {
-            try {
-                eventLog.setPayloadJson(objectMapper.writeValueAsString(extraAttributes));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Erreur JSON", e);
-            }
+            eventLog.setPayloadJson(objectMapper.writeValueAsString(extraAttributes));
         }
 
         return eventLog;

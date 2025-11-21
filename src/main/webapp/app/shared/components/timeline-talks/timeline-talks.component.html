@@ -1,0 +1,170 @@
+<p-dialog header="Configuration du planning"
+          [visible]="showConfiguration()"
+          [modal]="true"
+          [style]="{width: '80vw'}"
+          [breakpoints]="{'800px': '80vw','650px': '95vw'}"
+          closable="false">
+
+    <app-timeline-config-panel [data]="configuration()" (dataChange)="configuration.set($event)"/>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" severity="primary" (click)="showConfiguration.set(false)">Fermer</button>
+    </ng-template>
+</p-dialog>
+
+<div class="d-flex justify-content-between align-items-center">
+    @if (days().length && selectedDay()) {
+        <h4>Animations disponibles</h4>
+    } @else {
+        <h4>&nbsp;</h4>
+    }
+
+    @if (editionMode()) {
+        <button pButton type="button"
+                size="small"
+                severity="primary"
+                (click)="showConfiguration.set(true)">Configurer
+        </button>
+    }
+</div>
+@if (days().length && selectedDay()) {
+    <div class="mt-4">
+        @if (unassignedTalks().length > 0) {
+            <div class="unassigned-list">
+                @for (unassignedTalk of unassignedTalks(); track unassignedTalk.id) {
+                    <talk-slot class="talk-unassigned"
+                               [style.cursor]="editionMode() ? 'move': 'default'"
+                               [talk]="unassignedTalk"
+                               cdkDrag
+                               [widthInPx]="getTalkNbPeriods(unassignedTalk) * slotWidthPx()"
+                               [cdkDragDisabled]="!editionMode()"
+                               (cdkDragMoved)="onTalkDragMoved($event, unassignedTalk)"
+                               (cdkDragEnded)="onTalkDragEnded($event, unassignedTalk, selectedDay())"/>
+                }
+            </div>
+        }
+        <div>
+            @if (unassignedTalks().length === 0) {
+                <p class="hint">Aucun élément non assignée pour le moment.</p>
+            } @else {
+                <p class="hint">Glisse et lâche sur la grille. </p>
+            }
+        </div>
+    </div>
+
+    <h4>Planning</h4>
+    <p-tabs [value]="selectedDay()!.id">
+        <p-tablist>
+            @for (day of days(); track day.id) {
+                <p-tab [value]="day.id" (click)="selectedDayId.set(day.id)">{{ day.label }}</p-tab>
+            }
+        </p-tablist>
+        <p-tabpanels>
+            <div class="mt-4 mb-2">
+                <span>Prévisualiser ? <p-toggleswitch [ngModel]="!showGrid()"
+                                                      (onChange)="showGrid.set(!showGrid())"/></span>
+            </div>
+            @if (showGrid()) {
+                @for (day of days(); track day.id) {
+                    <p-tabpanel [value]="day.id">
+                        <div class="mt-4 schedule"
+                             [style.--slot-count]="timeSlots().length"
+                             [style.--cell-height.px]="60"
+                             [style.--cell-width.px]="slotWidthPx()">
+                            <!-- En-tête heures -->
+                            <div class="header-row">
+                                <div class="time-cell">Salle / Heure</div>
+                                <div class="time-track"
+                                     [style.grid-template-columns]="'repeat('+timeSlots().length+', '+slotWidthPx()+'px)'">
+                                    @for (t of timeSlots(); track t) {
+                                        <div class="time-cell">
+                                            {{ t }}
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Une ligne par salle -->
+                            @for (roomData of roomsFromSelectedDay(); track roomData.roomId) {
+                                <div class="room-row">
+                                    <div class="room-label">{{ roomsById().get(roomData.roomId)?.label }}</div>
+
+                                    <div class="room-track"
+                                         #roomTrack
+                                         [attr.data-room-id]="roomData.roomId"
+                                         [style.grid-template-columns]="'repeat('+timeSlots().length+', '+slotWidthPx()+'px)'">
+                                        @for (t of timeSlots(); track t; let i = $index) {
+                                            <div class="slot-cell"
+                                                 [class.slot-disabled]="isSlotDisabled(roomData.roomId, i)"
+                                                 [class.slot-highlight]="
+                                                !isSlotDisabled(roomData.roomId, i) &&
+                                                 hoveredRoomId() === roomData.roomId &&
+                                                 hoveredStartSlot() !== null &&
+                                                 i >= (hoveredStartSlot() ?? 0) &&
+                                                 i < (hoveredStartSlot() ?? 0) + getTalkNbPeriods(hoveredTalk())"></div>
+                                        }
+
+                                        @for (talk of (talksForSelectedDayByRoom().get(roomData.roomId) ?? []); track talk.id) {
+                                            <talk-slot class="talk-assigned"
+                                                       [style.cursor]="editionMode() ? 'move': 'default'"
+                                                       [widthInPx]="getTalkNbPeriods(talk) * slotWidthPx()"
+                                                       [talk]="talk"
+                                                       cdkDrag
+                                                       [style.left.px]="(talk.startSlot * slotWidthPx())"
+                                                       [cdkDragDisabled]="!editionMode()"
+                                                       (cdkDragMoved)="onTalkDragMoved($event, talk)"
+                                                       (cdkDragEnded)="onTalkDragEnded($event, talk, day)"/>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </p-tabpanel>
+                }
+            } @else {
+                <div class="row">
+                    @for (room of roomsFromSelectedDay(); track room.roomId) {
+                        <div class="d-flex mt-4 col-lg-6">
+                            <div>
+                                <h4 class="room-timeline-title">{{ roomsById().get(room.roomId)?.label }}</h4>
+                                @let talksForDayAndRoom = talksForSelectedDayByRoom().get(room.roomId);
+
+                                @if (talksForDayAndRoom && talksForDayAndRoom.length > 0) {
+                                    <p-timeline [value]="talksForDayAndRoom" align="left">
+
+                                        <ng-template #marker let-talk>
+                                            <p-badge [severity]="talk.type === 'CONFERENCE' ? undefined : 'warn'"
+                                                     size="large"
+                                                     [value]="getTalkStartTimeLabel(talk)"/>
+                                        </ng-template>
+
+                                        <ng-template #content let-talk>
+                                            <app-card>
+                                                <div appCardHeader>
+                                                    <h4>{{ talk.title }}</h4>
+                                                </div>
+                                                <div appCardBody>
+                                                    <div class="talk-card-meta">
+                                                        <span>{{ talk.client }}</span>
+                                                        <span class="text-black-50">
+                                                        {{ talk.durationTalkMinutes + ' minutes' }}
+                                                    </span>
+                                                    </div>
+                                                    @if (talk.description) {
+                                                        <p class="talk-card-description">{{ talk.description }} </p>
+                                                    }
+                                                </div>
+                                            </app-card>
+                                        </ng-template>
+                                    </p-timeline>
+                                } @else {
+                                    <p>Aucun élément défini dans la salle</p>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </p-tabpanels>
+    </p-tabs>
+}

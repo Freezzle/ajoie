@@ -9,6 +9,7 @@ import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.utils.DateUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
@@ -20,15 +21,11 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPlan> {
 
     private final MessageSource messageSource;
     private final DocumentCreator documentCreator;
-
-    public DownloadReceiptHandler(MessageSource messageSource, DocumentCreator documentCreator) {
-        this.messageSource = messageSource;
-        this.documentCreator = documentCreator;
-    }
 
     @Override
     public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
@@ -74,6 +71,6 @@ public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPl
 
     @Override
     public String getFilename(InvoicingPlan payload, Map<String, Object> context) {
-        return "receipt-" + payload.getBillingNumber() + ".pdf";
+        return "Receipt_" + payload.getBillingNumber() + ".pdf";
     }
 }

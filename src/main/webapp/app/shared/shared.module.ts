@@ -6,15 +6,12 @@ import {TranslateModule} from '@ngx-translate/core';
 
 import FindLanguageFromKeyPipe from './language/find-language-from-key.pipe';
 import TranslateDirective from './language/translate.directive';
-import {QuillModule} from 'ngx-quill';
-import {ToastModule} from "primeng/toast";
 
 /**
  * Application wide Module
  */
 @NgModule({
-    imports: [FindLanguageFromKeyPipe, TranslateDirective,
-        QuillModule.forRoot()],
+    imports: [FindLanguageFromKeyPipe, TranslateDirective],
     exports: [
         CommonModule,
         NgbModule,
@@ -22,7 +19,7 @@ import {ToastModule} from "primeng/toast";
         TranslateModule,
         FindLanguageFromKeyPipe,
         TranslateDirective
-    ],
+    ]
 })
 export default class SharedModule {
 }

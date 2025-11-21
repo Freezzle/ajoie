@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tech.jhipster.web.util.ResponseUtil;
+import ch.salon.utils.ResponseUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,9 +30,9 @@ import static ch.salon.service.StandService.ENTITY_NAME;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
-import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityUpdateAlert;
+import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
+import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
+import static ch.salon.utils.HeaderUtil.createEntityUpdateAlert;
 
 @RestController
 @RequestMapping("/api/admin/stands")
@@ -42,7 +42,7 @@ public class AdminStandResource {
     private static final Logger log = LoggerFactory.getLogger(AdminStandResource.class);
     private final StandService standService;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AdminStandResource(StandService standService) {

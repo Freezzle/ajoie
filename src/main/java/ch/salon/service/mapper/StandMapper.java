@@ -6,11 +6,9 @@ import ch.salon.service.dto.StandLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {ParticipationMapper.class, PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {ParticipationMapper.class, PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface StandMapper {
-    StandMapper INSTANCE = Mappers.getMapper(StandMapper.class);
 
     StandDTO toDto(Stand stand);
 

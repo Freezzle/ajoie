@@ -1,12 +1,14 @@
 {
   "exhibitor": {
     "address": "Rue et n°",
-    "create": "Création d'un nouvel exposant",
+    "copyNewsletter": "Emails (newsletter)",
+    "country": "Pays",
+    "create": "Nouveau client",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer \"{{ id }}\" ?"
+      "question": "Voulez-vous supprimer \"{{ id }}\" ?"
     },
     "duplicateDetected": "Exposant double détecté",
-    "edit": "Modification d'un exposant",
+    "edit": "Détail client",
     "email": "Email",
     "extraInformation": "Commentaire",
     "filter": {
@@ -15,6 +17,7 @@
       "therapistName": "Nom de thérapeute"
     },
     "fullName": "Nom complet",
+    "homeAddress": "Address de domicile",
     "language": {
       "list": {
         "de": "Allemand",
@@ -26,9 +29,10 @@
     "newsletter": "Newsletter",
     "notFound": "Aucun exposant",
     "npaLocalite": "Npa et localité",
-    "phoneNumber": "N° de tél",
+    "phoneNumber": "Téléphone",
+    "preferences": "Préférences",
     "redFlag": "Exposant bloqué",
     "therapistName": "Nom de thérapeute",
-    "title": "Les exposants"
+    "title": "L'annuaire client"
   }
 }

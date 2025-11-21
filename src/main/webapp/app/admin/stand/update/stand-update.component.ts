@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
-import {ActivatedRoute, ParamMap} from '@angular/router';
-import {combineLatest, forkJoin, of} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
+import {forkJoin, of} from 'rxjs';
 import {catchError, finalize, map} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -10,14 +10,9 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {StandService} from '../service/stand.service';
 import {IStand} from '../model/stand.interface';
 import {StandFormGroup, StandFormService} from '../service/stand-form.service';
-import {
-    getFormattedParticipationName,
-    IParticipation,
-    selectFilterParticipation
-} from '../../participation/model/participation.interface';
+import {IParticipation, selectFilterParticipation} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
 import {formatterStatus, Status} from '../../enumerations/status.model';
-import {ErrorModel} from '../../../shared/field-error/error.model';
 import {Category, formatterCategory} from '../../enumerations/category.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
@@ -29,16 +24,20 @@ import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.com
 import {SalonService} from "../../salon/service/salon.service";
 import {
     formatterDimensionStand,
-    IPriceStandSalon, selectFilterDimension,
+    IPriceStandSalon,
+    selectFilterDimension,
     sortPriceStandSalon
 } from "../../salon/model/price-stand-salon.interface";
 import {AlertComponent} from "../../../shared/alert/alert.component";
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {formatterExhibitor} from "../../exhibitor/service/exhibitor.service";
-import {selectFilterExhibitor} from "../../exhibitor/model/exhibitor.interface";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {ChipsBoxComponent} from "../../../shared/components/chips-box/chips-box.component";
+import {CardComponent} from "../../../shared/components/card/card.component";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
 
 @Component({
-    selector: 'jhi-stand-update',
+    selector: 'app-stand-update',
     templateUrl: './stand-update.component.html',
     imports: [
         SharedModule,
@@ -53,6 +52,11 @@ import {selectFilterExhibitor} from "../../exhibitor/model/exhibitor.interface";
         LinkBoxComponent,
         AlertComponent,
         AlertErrorComponent,
+        ConfirmPopup,
+        Toast,
+        ChipsBoxComponent,
+        CardComponent,
+        ContentPageComponent,
     ]
 })
 export class StandUpdateComponent implements OnInit {
@@ -64,47 +68,34 @@ export class StandUpdateComponent implements OnInit {
 
     isLoading = false;
     isReadOnly = false;
+    eventId!: string;
 
     initialStand: IStand | null = null;
     statusValues = Object.keys(Status);
     categoryValues = Object.keys(Category);
-    params!: ParamMap;
     participationsOptions: IParticipation[] = [];
     dimensionsOptions: IPriceStandSalon[] = [];
     editForm: FormGroup<StandFormGroup> = this.standFormService.createStandFormGroup(null);
 
     ngOnInit(): void {
-        this.activateReadOnlyMode(false);
+        const data = this.activatedRoute.snapshot.data;
 
-        combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data])
-            .pipe(
-                map(([params, data]) => ({
-                    params,
-                    isReadOnly: data['readonly'],
-                    initialStand: data['stand'] as IStand,
-                })),
-            )
-            .subscribe(({params, isReadOnly, initialStand}) => {
-                this.params = params;
-                this.isReadOnly = isReadOnly;
-                this.initialStand = {...initialStand};
+        this.eventId = this.activatedRoute.snapshot.paramMap.get('idSalon')!;
+        const participationId = this.activatedRoute.snapshot.paramMap.get('idParticipation')!;
+        this.initialStand = {...data['stand']};
+        this.editForm = this.standFormService.createStandFormGroup(this.initialStand);
 
-                this.editForm = this.standFormService.createStandFormGroup(initialStand);
-                this.loadRelationshipsOptions(initialStand);
-
-                isReadOnly ? this.activateReadOnlyMode(false) : this.activateEditMode();
-            });
-    }
-
-    activateReadOnlyMode(reset: boolean = true): void {
-        this.isReadOnly = true;
-        if (reset) {
-            this.editForm = this.standFormService.createStandFormGroup(this.initialStand!);
+        if (data['readonly']) {
+            this.isReadOnly = true;
+            this.editForm.disable();
+        } else {
+            this.edit();
         }
-        this.editForm.disable();
+
+        this.loadRelationshipsOptions(this.eventId, participationId);
     }
 
-    activateEditMode(): void {
+    edit(): void {
         this.isReadOnly = false;
         this.editForm.enable();
     }
@@ -113,15 +104,21 @@ export class StandUpdateComponent implements OnInit {
         window.history.back();
     }
 
+    cancel(): void {
+        this.isReadOnly = true;
+        this.editForm = this.standFormService.createStandFormGroup(this.initialStand);
+        this.editForm.disable();
+    }
+
     save(): void {
         if (this.editForm.invalid) {
             this.editForm.markAllAsTouched();
             return;
         }
+
         this.isLoading = true;
+
         const stand = this.standFormService.getStand(this.editForm);
-
-
         const saveOperation = stand.id != null
             ? this.standService.update(stand)
             : this.standService.create(stand);
@@ -129,27 +126,28 @@ export class StandUpdateComponent implements OnInit {
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
 
-    protected loadRelationshipsOptions(stand: IStand): void {
-        const idSalon = this.params.get('idSalon');
-        const idParticipation = this.params.get('idParticipation');
+    protected loadRelationshipsOptions(eventId: string, participationId: string | null): void {
+        const participations$ =
+            this.participationService
+                .query(eventId)
+                .pipe(
+                    map((res: HttpResponse<IParticipation[]>) => res.body ?? []),
+                    map((participations) => {
+                        if (participationId) {
+                            this.editForm.get('participation')?.setValue(
+                                participations.find((p) => p.id === participationId) ?? null,
+                            );
+                        }
+                        return participations;
+                    }),
+                    catchError(() => of([])));
 
-        const participations$ = idSalon ? this.participationService.query(idSalon).pipe(
-            map((res: HttpResponse<IParticipation[]>) => res.body ?? []),
-            map((participations) => {
-                if (idParticipation) {
-                    this.editForm.get('participation')?.setValue(
-                        participations.find((p) => p.id === idParticipation) || null,
-                    );
-                }
-                return this.participationService.addParticipationsOptionsIfMissing(participations, stand?.participation);
-            }),
-            catchError(() => of([])),
-        ) : of([]);
-
-        const dimensions$ = this.salonService.getDimensionStands(idSalon).pipe(
-            map((dimensionStands) => sortPriceStandSalon(dimensionStands)),
-            catchError(() => of([])),
-        );
+        const dimensions$ =
+            this.salonService
+                .getDimensionStands(eventId)
+                .pipe(
+                    map((dimensionStands) => sortPriceStandSalon(dimensionStands)),
+                    catchError(() => of([])));
 
         forkJoin({participations: participations$, dimensions: dimensions$})
             .subscribe(({participations, dimensions}) => {
@@ -158,13 +156,10 @@ export class StandUpdateComponent implements OnInit {
             });
     }
 
-    protected readonly ErrorModel = ErrorModel;
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
     protected readonly formatterParticipation = formatterParticipation;
     protected readonly formatterDimensionStand = formatterDimensionStand;
     protected readonly formatterStatus = formatterStatus;
     protected readonly formatterCategory = formatterCategory;
-    protected readonly selectFilterExhibitor = selectFilterExhibitor;
     protected readonly selectFilterDimension = selectFilterDimension;
     protected readonly selectFilterParticipation = selectFilterParticipation;
 }

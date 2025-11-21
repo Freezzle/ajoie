@@ -11,14 +11,6 @@ const routes: Routes = [
         title: 'userManagement.home.title',
     },
     {
-        path: 'docs',
-        data: {
-            authorities: [Authority.ADMIN],
-        },
-        loadComponent: () => import('./docs/docs.component'),
-        title: 'global.menu.admin.apidocs',
-    },
-    {
         path: 'authorities',
         data: {
             pageTitle: 'authority.home.title',
@@ -73,15 +65,7 @@ const routes: Routes = [
             authorities: [Authority.ADMIN_BUSINESS],
         },
         loadChildren: () => import('./participation/participation.routes'),
-    },
-    {
-        path: 'volunteers',
-        data: {
-            pageTitle: 'volunteer.title',
-            authorities: [Authority.ADMIN_BUSINESS],
-        },
-        loadChildren: () => import('./volunteer/volunteer.routes'),
-    },
+    }
 ];
 
 export default routes;

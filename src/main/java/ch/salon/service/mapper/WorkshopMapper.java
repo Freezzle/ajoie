@@ -6,11 +6,9 @@ import ch.salon.service.dto.WorkshopLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {ParticipationMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {ParticipationMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface WorkshopMapper {
-    WorkshopMapper INSTANCE = Mappers.getMapper(WorkshopMapper.class);
 
     WorkshopDTO toDto(Workshop workshop);
 

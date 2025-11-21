@@ -1,213 +1,217 @@
-<div>
-    <h2 id="page-heading">
-        <div class="d-flex justify-content-center">
-            <span jhiTranslate="stand.title">Les stands</span>
-        </div>
-        <hr/>
-
-        <div class="d-flex justify-content-between mt-3">
-      <span>
+<app-content-page>
+    <div appMenuBarStart>
+        <h3>{{ 'stand.title' | translate }}</h3>
+    </div>
+    <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     faIcon="arrow-left"
-                    translateKey="common.back"/>
-        </span>
-
-            @if (standardView) {
-                <span [formGroup]="filters" class="row">
-            <div class="col-auto">
-              <input (blur)="actionFilter()"
-                     [placeholder]="'exhibitor.filter.fullName' | translate"
-                     class="form-control"
-                     formControlName="fullName"
-                     type="text"/>
-              </div>
-              <div class="col-auto">
-                <select (change)="actionFilter()" class="form-control" formControlName="status">
-                  <option [ngValue]="null">{{ 'stand.status.list.null' | translate }}</option>
-                    @for (status of statusValues; track $index) {
-                        <option [value]="status">{{ 'stand.status.list.' + status | translate }}</option>
-                    }
-                </select>
-              </div>
-            </span>
-            }
-
-            @if (!standardView) {
-                <span>
-              <button-box (clickedEvent)="standardView = true"
-                          [faIconAnimation]="isLoading ? 'spin' : undefined"
-                          [isDisabled]="isLoading"
-                          faIcon="sync"
-                          translateKey="stand.viewStandard"/>
-              </span>
-            }
-
-            @if (standardView) {
-                <span>
-                <button-box (clickedEvent)="changeTechnicalView()"
-                            [faIconAnimation]="isLoading ? 'spin' : undefined"
-                            [isDisabled]="isLoading"
-                            faIcon="sync"
-                            translateKey="stand.viewClipboard"/>
-                  <button-box (clickedEvent)="refresh()"
-                              [faIconAnimation]="isLoading ? 'spin' : undefined"
-                              [isDisabled]="isLoading"
-                              faIcon="sync"
-                              translateKey="common.refresh"/>
-                    <link-box [isDisabled]="isLoading"
-                              [links]="['./new']"
-                              faIcon="plus"
-                              translateKey="common.create"
-                              type="success"/>
-                    </span>
-            }
-        </div>
-    </h2>
-
-    @if (standardView) {
-        <div class="table-responsive table-entities" id="entities">
-            <table aria-describedby="page-heading" class="table table-hover">
-                <thead class="thead-primary">
-                <tr>
-                    <th class="col-auto">
-                        <span jhiTranslate="stand.participation">Participation</span>
-                    </th>
-                    <th class="col-5">
-                        <span jhiTranslate="stand.description">Description</span>
-                    </th>
-                    <th class="col-1">
-                        <span jhiTranslate="stand.category.label">Catégorie</span>
-                    </th>
-                    <th class="col-auto">
-                        <span jhiTranslate="stand.dimension">Dimension</span>
-                    </th>
-                    <th class="col-auto text-center">
-                        <span jhiTranslate="stand.status.label">Statut</span>
-                    </th>
-                    <th class="col-auto">&nbsp;</th>
-                </tr>
-                </thead>
-                <tbody>
-                    @if (isLoading) {
-                        <tr>
-                            <td colspan="8" class="text-center">
-                                <p-progress-spinner strokeWidth="5"
-                                                    fill="transparent"
-                                                    animationDuration="1s"
-                                                    [style]="{ width: '50px', height: '50px' }"/>
-                            </td>
-                        </tr>
-                    } @else {
-                        @if (stands.length === 0) {
+                    translateKey="common.back"
+                    [showText]="false"/>
+        @if (standardView) {
+            <button-box (clickedEvent)="changeTechnicalView()"
+                        [isDisabled]="isLoading"
+                        translateKey="stand.viewClipboard"/>
+            <button-box (clickedEvent)="refresh()"
+                        [faIconAnimation]="isLoading ? 'spin' : undefined"
+                        [isDisabled]="isLoading"
+                        faIcon="sync"
+                        [showText]="false"
+                        translateKey="common.refresh"/>
+            <button-box [modeLink]="true"
+                        [links]="['./new']"
+                        [isDisabled]="isLoading"
+                        [showText]="false"
+                        type="success"
+                        faIcon="plus"
+                        translateKey="common.create"/>
+        } @else {
+            <button-box (clickedEvent)="standardView = true"
+                        [faIconAnimation]="isLoading ? 'spin' : undefined"
+                        [isDisabled]="isLoading"
+                        faIcon="sync"
+                        translateKey="stand.viewStandard"/>
+        }
+    </div>
+    <app-alert-error></app-alert-error>
+    <app-alert></app-alert>
+    <p-toast/>
+    <p-confirmpopup/>
+    <app-card [showHeader]="false">
+        <div appCardBody>
+            <div class="row">
+                @if (standardView) {
+                    <p-table #dt2
+                             [value]="stands"
+                             dataKey="id"
+                             [rows]="10"
+                             [rowsPerPageOptions]="[10, 25, 50]"
+                             [loading]="isLoading"
+                             [paginator]="true"
+                             [globalFilterFields]="['participation.exhibitor.fullName', 'participation.therapistName']"
+                             sortField="registrationDate"
+                             [sortOrder]="-1"
+                             [tableStyle]="{ 'min-width': '75rem' }">
+                        <ng-template #caption>
+                            <div class="flex">
+                                <p-iconfield iconPosition="left" class="ml-auto">
+                                    <p-inputicon>
+                                        <i class="pi pi-search"></i>
+                                    </p-inputicon>
+                                    <input pInputText type="text"
+                                           (input)="dt2.filterGlobal($event.target.value, 'contains')"
+                                           placeholder="Recherche"/>
+                                </p-iconfield>
+                            </div>
+                        </ng-template>
+                        <ng-template #header>
                             <tr>
-                                <td colspan="5">
-                                    <span jhiTranslate="stand.notFound">Aucun Stand</span>
-                                </td>
+                                <th pSortableColumn="fullNameFilter">{{ 'stand.participation' | translate }}
+                                    <p-sortIcon field="fullNameFilter"/>
+                                </th>
+                                <th pSortableColumn="description">{{ 'stand.description' | translate }}
+                                    <p-sortIcon field="description"/>
+                                    <p-columnFilter type="text"
+                                                    field="description"
+                                                    matchMode="contains"
+                                                    display="menu"></p-columnFilter>
+                                </th>
+                                <th pSortableColumn="category">{{ 'stand.category.label' | translate }}
+                                    <p-sortIcon field="category"/>
+                                </th>
+                                <th pSortableColumn="dimension">{{ 'stand.dimension' | translate }}
+                                    <p-sortIcon field="dimension"/>
+                                </th>
+                                <th>Info</th>
+                                <th pSortableColumn="status">{{ 'stand.status.label' | translate }}
+                                    <p-sortIcon field="status"/>
+                                </th>
+                                <th>&nbsp;</th>
                             </tr>
-                        } @else {
-                            @for (stand of standsPaginated; track $index) {
-                                <tr>
-                                    <td class="go-detail truncate" [routerLink]="['./', stand.id, 'view']">
-                                        @if (stand.participation) {
-                                            <a [routerLink]="['/admin','salons',params.get('idSalon'),'participations',stand.participation.id,'view']"
-                                               (click)="$event.stopPropagation()">{{ getFormattedParticipationName(stand.participation) }}
-                                            </a>
-                                        }
-                                    </td>
-                                    <td class="go-detail truncate"
-                                        [routerLink]="['./', stand.id, 'view']">{{ stand.description }}
-                                    </td>
-                                    <td class="go-detail text-center truncate" [routerLink]="['./', stand.id, 'view']">
-                                        {{ 'stand.category.list.' + stand.category | translate }}
-                                    </td>
-                                    <td class="go-detail truncate"
-                                        [routerLink]="['./', stand.id, 'view']">{{ stand.dimension.dimension }}
-                                    </td>
-                                    <td class="go-detail text-center truncate" [routerLink]="['./', stand.id, 'view']">
-                                        <fa-icon [icon]="stand.status | status"
-                                                 [class]="stand.status | colorStatus"
-                                                 [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
-                                    </td>
-                                    <td class="text-end">
-                                        <div class="btn-group">
-                                            <button-box (clickedEvent)="delete(stand)"
-                                                        type="danger"
-                                                        [showText]="false"
-                                                        translateKey="common.delete"
-                                                        faIcon="times"/>
+                        </ng-template>
+                        <ng-template #body let-stand>
+                            <tr>
+                                <td class="clickable truncate-medium" [routerLink]="['./', stand.id, 'view']">
+                                    @if (stand.participation) {
+                                        <a [routerLink]="['/admin','salons',params.get('idSalon'),'participations',stand.participation.id,'view']"
+                                           (click)="$event.stopPropagation()">{{ stand.fullNameFilter }}
+                                        </a>
+                                    }
+                                </td>
+                                <td class="clickable truncate" [routerLink]="['./', stand.id, 'view']">
+                                    {{ stand.description }}
+                                    @if (stand.subCategories.length > 0) {
+                                        <div>
+                                            @for (subCategory of stand.subCategories; track subCategory) {
+                                                <p-tag [value]="subCategory"/>
+                                            }
                                         </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-
-    @if (!standardView) {
-        <div class="table-responsive table-entities">
-            <table class="table table-hover">
-                <thead class="thead-primary">
-                <tr>
-                    <th>Nom de thérapeute</th>
-                    <th>Nom complet</th>
-                    <th>Description</th>
-                    <th>Site internet</th>
-                    <th>Facebook</th>
-                    <th>Instagram</th>
-                    <th>Url Image</th>
-                    <th>Catégorie</th>
-                    <th>Statut</th>
-                </tr>
-                </thead>
-                <tbody>
-                    @if (isLoading) {
-                        <tr>
-                            <td colspan="8" class="text-center">
-                                <p-progress-spinner strokeWidth="5"
-                                                    fill="transparent"
-                                                    animationDuration="1s"
-                                                    [style]="{ width: '50px', height: '50px' }"/>
-                            </td>
-                        </tr>
-                    } @else {
-                        @for (stand of stands; track stand) {
-                            <tr>
-                                <td class="{{stand.participation.therapistName ? 'clipboard' : ''}} truncate-small"
-                                    (click)="clipboard(stand.participation.therapistName)">{{ stand.participation.therapistName }}
+                                    }
                                 </td>
-                                <td class="{{stand.participation.exhibitor ? 'clipboard' : ''}} truncate-small"
-                                    (click)="clipboard(getFirstExhibitorName(stand.participation.exhibitor))">{{ getFirstExhibitorName(stand.participation.exhibitor) }}
+                                <td class="clickable truncate-small" [routerLink]="['./', stand.id, 'view']">
+                                    {{ 'stand.category.list.' + stand.category | translate }}
                                 </td>
-                                <td class="{{stand.description ? 'clipboard' : ''}} truncate-small"
-                                    (click)="clipboard(stand.description)">{{ stand.description }}
+                                <td class="clickable truncate-medium"
+                                    [routerLink]="['./', stand.id, 'view']">{{ stand.dimension.dimension }}
                                 </td>
-                                <td class="{{stand.website ? 'clipboard' : ''}} truncate-small"
-                                    (click)="clipboard(stand.website)">{{ stand.website ?? '' }}
+                                <td class="clickable truncate-medium" [routerLink]="['./', stand.id, 'view']">
+                                    @if (stand.participation.crushOfHeart) {
+                                        <fa-icon icon="heart" class="text-danger"></fa-icon>
+                                    }
+                                    @if (stand.participation.guestOfHonor) {
+                                        <fa-icon icon="star" class="golden-icon"></fa-icon>
+                                    }
+                                    @if (stand.shared) {
+                                        <fa-icon icon="people-arrows" class="text-primary"></fa-icon>
+                                    }
+                                    @if (stand.extraInformation) {
+                                        <fa-icon icon="note-sticky"
+                                                 class="text-warning"
+                                                 [title]="stand.extraInformation"/>
+                                    }
                                 </td>
-                                <td class="{{stand.facebook ? 'clipboard' : ''}} truncate-small"
-                                    (click)="clipboard(stand.facebook)">{{ stand.facebook ?? '' }}
+                                <td class="clickable" [routerLink]="['./', stand.id, 'view']">
+                                    <fa-icon [icon]="stand.status | status"
+                                             [class]="stand.status | colorStatus"
+                                             [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
                                 </td>
-                                <td class="{{stand.instagram ? 'clipboard' : ''}} truncate-small"
-                                    (click)="clipboard(stand.instagram)">{{ stand.instagram ?? '' }}
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button-box (clickedEvent)="delete($event, stand)"
+                                                    type="danger"
+                                                    [showText]="false"
+                                                    translateKey="common.delete"
+                                                    faIcon="times"/>
+                                    </div>
                                 </td>
-                                <td class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small"
-                                    (click)="clipboard(stand.urlPicture)">{{ stand.urlPicture ?? '' }}
-                                </td>
-                                <td class="truncate-small">{{ stand.category ? (formatterCategory(Category[stand.category]) | translate) : '' }}</td>
-                                <td class="truncate-small">{{ stand.status ? (formatterStatus(Status[stand.status]) | translate) : '' }}</td>
                             </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+                        </ng-template>
+                        <ng-template #emptymessage>
+                            <tr>
+                                <td colspan="5">{{ 'stand.notFound' | translate }}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                } @else {
+                    <div class="table-responsive table-entities">
+                        <table class="table table-hover">
+                            <thead class="thead-primary">
+                            <tr>
+                                <th>Nom de thérapeute</th>
+                                <th>Nom complet</th>
+                                <th>Description</th>
+                                <th>Site internet</th>
+                                <th>Facebook</th>
+                                <th>Instagram</th>
+                                <th>Url Image</th>
+                                <th>Catégorie</th>
+                                <th>Statut</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @if (isLoading) {
+                                    <tr>
+                                        <td colspan="8" class="text-center">
+                                            <p-progress-spinner strokeWidth="5"
+                                                                fill="transparent"
+                                                                animationDuration="1s"
+                                                                [style]="{ width: '50px', height: '50px' }"/>
+                                        </td>
+                                    </tr>
+                                } @else {
+                                    @for (stand of stands; track stand) {
+                                        <tr>
+                                            <td class="{{stand.participation.therapistName ? 'clipboard' : ''}} truncate-small"
+                                                (click)="clipboard(stand.participation.therapistName)">{{ stand.participation.therapistName }}
+                                            </td>
+                                            <td class="{{stand.participation.exhibitor ? 'clipboard' : ''}} truncate-small"
+                                                (click)="clipboard(getFirstExhibitorName(stand.participation.exhibitor))">{{ getFirstExhibitorName(stand.participation.exhibitor) }}
+                                            </td>
+                                            <td class="{{stand.description ? 'clipboard' : ''}} truncate-small"
+                                                (click)="clipboard(stand.description)">{{ stand.description }}
+                                            </td>
+                                            <td class="{{stand.website ? 'clipboard' : ''}} truncate-small"
+                                                (click)="clipboard(stand.website)">{{ stand.website ?? '' }}
+                                            </td>
+                                            <td class="{{stand.facebook ? 'clipboard' : ''}} truncate-small"
+                                                (click)="clipboard(stand.facebook)">{{ stand.facebook ?? '' }}
+                                            </td>
+                                            <td class="{{stand.instagram ? 'clipboard' : ''}} truncate-small"
+                                                (click)="clipboard(stand.instagram)">{{ stand.instagram ?? '' }}
+                                            </td>
+                                            <td class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small"
+                                                (click)="clipboard(stand.urlPicture)">{{ stand.urlPicture ?? '' }}
+                                            </td>
+                                            <td class="truncate-small">{{ stand.category ? (formatterCategory(Category[stand.category]) | translate) : '' }}</td>
+                                            <td class="truncate-small">{{ stand.status ? (formatterStatus(Status[stand.status]) | translate) : '' }}</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
         </div>
-    }
-
-    @if (standardView) {
-        <jhi-pagination (pageChanged)="refreshStands($event)" [collectionSize]="stands.length"/>
-    }
-</div>
+    </app-card>
+</app-content-page>

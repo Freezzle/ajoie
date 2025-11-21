@@ -2,18 +2,18 @@ package ch.salon.config;
 
 import ch.qos.logback.classic.LoggerContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import tech.jhipster.config.JHipsterProperties;
+import ch.salon.utils.SalonProperties;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static tech.jhipster.config.logging.LoggingUtils.addContextListener;
-import static tech.jhipster.config.logging.LoggingUtils.addJsonConsoleAppender;
-import static tech.jhipster.config.logging.LoggingUtils.addLogstashTcpSocketAppender;
+import static ch.salon.utils.LoggingUtils.addContextListener;
+import static ch.salon.utils.LoggingUtils.addJsonConsoleAppender;
+import static ch.salon.utils.LoggingUtils.addLogstashTcpSocketAppender;
 
 /*
  * Configures the console and Logstash log appenders from the app properties
@@ -22,7 +22,9 @@ import static tech.jhipster.config.logging.LoggingUtils.addLogstashTcpSocketAppe
 public class LoggingConfiguration {
 
     public LoggingConfiguration(@Value("${spring.application.name}") String appName,
-            @Value("${server.port}") String serverPort, JHipsterProperties jHipsterProperties, ObjectMapper mapper)
+                                @Value("${server.port}") String serverPort,
+                                SalonProperties salonProperties,
+                                ObjectMapper mapper)
             throws JsonProcessingException {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
@@ -31,8 +33,8 @@ public class LoggingConfiguration {
         map.put("app_port", serverPort);
         String customFields = mapper.writeValueAsString(map);
 
-        JHipsterProperties.Logging loggingProperties = jHipsterProperties.getLogging();
-        JHipsterProperties.Logging.Logstash logstashProperties = loggingProperties.getLogstash();
+        SalonProperties.Logging loggingProperties = salonProperties.getLogging();
+        SalonProperties.Logging.Logstash logstashProperties = loggingProperties.getLogstash();
 
         if (loggingProperties.isUseJsonFormat()) {
             addJsonConsoleAppender(context, customFields);

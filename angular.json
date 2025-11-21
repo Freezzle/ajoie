@@ -15,7 +15,7 @@
       },
       "root": "",
       "sourceRoot": "src/main/webapp",
-      "prefix": "jhi",
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
@@ -38,9 +38,7 @@
               "src/main/webapp/robots.txt"
             ],
             "styles": [
-              "node_modules/quill/dist/quill.snow.css",
-              "src/main/webapp/content/scss/vendor.scss",
-              "src/main/webapp/content/scss/global.scss",
+              "src/main/webapp/content/scss/style.scss",
               "node_modules/primeicons/primeicons.css"
             ],
             "scripts": [

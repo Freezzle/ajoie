@@ -2,7 +2,7 @@ import {Observable} from 'rxjs';
 import {AvailableAction} from '../../shared/model/available-action';
 import {EmailMessage} from '../../shared/email-dialog/email-message';
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {ApplicationConfigService} from '../../core/config/application-config.service';
 
 @Injectable({providedIn: 'root'})
@@ -20,19 +20,19 @@ export class ActionsService {
         return this.http.get<EmailMessage>(`${this.resourceActionsUrl}/email/${context}/${idEntity}/template`);
     }
 
-    businessAction(context: string, idEntity: string): Observable<{}> {
-        return this.http.post<{}>(`${this.resourceActionsUrl}/business/${context}/${idEntity}`, {});
+    businessAction(context: string, idEntity: string, payload?: [string, unknown]): Observable<unknown> {
+        return this.http.post<unknown>(`${this.resourceActionsUrl}/business/${context}/${idEntity}`, {payload});
     }
 
-    emailAction(context: string, idEntity: string, emailMessage: EmailMessage) {
+    emailAction(context: string, idEntity: string, emailMessage: EmailMessage): Observable<unknown> {
         const payload: { [key: string]: any } = {
-            'emailMessage': emailMessage,
+            emailMessage,
         };
 
-        return this.http.post<{}>(`${this.resourceActionsUrl}/email/${context}/${idEntity}`, payload);
+        return this.http.post<unknown>(`${this.resourceActionsUrl}/email/${context}/${idEntity}`, payload);
     }
 
-    downloadAction(context: string, idEntity: string): Observable<Blob> {
-        return this.http.get(`${this.resourceActionsUrl}/download/${context}/${idEntity}`, {responseType: 'blob'});
+    downloadAction(context: string, idEntity: string): Observable<HttpResponse<Blob>> {
+        return this.http.get(`${this.resourceActionsUrl}/download/${context}/${idEntity}`, {responseType: 'blob', observe: 'response'});
     }
 }

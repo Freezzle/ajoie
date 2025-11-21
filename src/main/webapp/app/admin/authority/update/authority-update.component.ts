@@ -17,7 +17,7 @@ import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
 
 @Component({
-    selector: 'jhi-authority-update',
+    selector: 'app-authority-update',
     templateUrl: './authority-update.component.html',
     imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent, AlertErrorComponent, AlertComponent]
 })

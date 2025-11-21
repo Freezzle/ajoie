@@ -12,7 +12,12 @@ public class BusinessActionService {
     private final Map<String, BusinessActionHandler<?>> handlers;
 
     public BusinessActionService(List<BusinessActionHandler<?>> handlers) {
-        this.handlers = handlers.stream().collect(Collectors.toMap(h -> h.getActionType().code(), h -> h));
+        this.handlers = handlers.stream().collect(Collectors.toMap(
+                h -> h.getActionType().code(),
+                h -> h,
+                (a, b) -> { throw new IllegalStateException(
+                        "Two handlers with the exact same actionType: " + a.getActionType().code()); }
+        ));
     }
 
     public Map<String, BusinessActionHandler<?>> getHandlers() {

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 @Repository
 @RepositoryAction("billing")
 public interface InvoicingPlanRepository extends JpaRepository<InvoicingPlan, UUID> {
@@ -31,5 +30,6 @@ public interface InvoicingPlanRepository extends JpaRepository<InvoicingPlan, UU
     List<InvoicingPlan> findByParticipation_IdInAndParticipation_Salon_IdOrderByBillingNumberDesc(
             List<UUID> idParticipations, UUID salonId);
 
+    @EntityGraph(attributePaths = {"participation", "participation.salon", "invoices", "payments"})
     List<InvoicingPlan> findByParticipation_Salon_Id(UUID salonId);
 }

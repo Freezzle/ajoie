@@ -1,4 +1,9 @@
 {
+  "autocomplete": {
+    "chips": {
+      "suffix": "(Pressez TAB pour ajouter)"
+    }
+  },
   "entity": {
     "filters": {
       "clear": "Clear filter",

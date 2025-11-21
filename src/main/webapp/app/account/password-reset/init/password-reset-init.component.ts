@@ -8,7 +8,7 @@ import {FieldErrorComponent} from '../../../shared/field-error/field-error.compo
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 
 @Component({
-    selector: 'jhi-password-reset-init',
+    selector: 'app-password-reset-init',
     imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, AlertErrorComponent],
     templateUrl: './password-reset-init.component.html'
 })

@@ -13,6 +13,8 @@ import ch.salon.service.dto.UserDTO;
 import ch.salon.service.exception.EmailAlreadyUsedException;
 import ch.salon.service.exception.InvalidPasswordException;
 import ch.salon.service.exception.UsernameAlreadyUsedException;
+import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -22,13 +24,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tech.jhipster.security.RandomUtil;
+import ch.salon.utils.RandomUtil;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -39,29 +42,15 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@AllArgsConstructor
 public class UserService {
-
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final PersistentTokenRepository persistentTokenRepository;
-
     private final AuthorityRepository authorityRepository;
-
     private final CacheManager cacheManager;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            PersistentTokenRepository persistentTokenRepository, AuthorityRepository authorityRepository,
-            CacheManager cacheManager) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.persistentTokenRepository = persistentTokenRepository;
-        this.authorityRepository = authorityRepository;
-        this.cacheManager = cacheManager;
-    }
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -112,7 +101,7 @@ public class UserService {
         });
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setLogin(userDTO.getLogin().toLowerCase());
+        newUser.setLogin(StringUtils.lowerCase(userDTO.getLogin(), Locale.ENGLISH));
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
         newUser.setFirstName(userDTO.getFirstName());
@@ -147,7 +136,7 @@ public class UserService {
 
     public User createUser(AdminUserDTO userDTO) {
         User user = new User();
-        user.setLogin(userDTO.getLogin().toLowerCase());
+        user.setLogin(StringUtils.lowerCase(userDTO.getLogin(), Locale.ENGLISH));
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         if (userDTO.getEmail() != null) {
@@ -186,7 +175,7 @@ public class UserService {
         return Optional.of(userRepository.findById(userDTO.getId())).filter(Optional::isPresent).map(Optional::get)
                        .map(user -> {
                            this.clearUserCaches(user);
-                           user.setLogin(userDTO.getLogin().toLowerCase());
+                           user.setLogin(StringUtils.lowerCase(userDTO.getLogin(), Locale.ENGLISH));
                            user.setFirstName(userDTO.getFirstName());
                            user.setLastName(userDTO.getLastName());
                            if (userDTO.getEmail() != null) {

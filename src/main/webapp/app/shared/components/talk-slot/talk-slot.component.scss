@@ -1,0 +1,11 @@
+.talk-container {
+  height: calc(var(--cell-height) - 8px);
+  align-items: center;
+  padding: 0.25em;
+}
+
+.text-overflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

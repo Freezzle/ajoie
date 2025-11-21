@@ -1,0 +1,105 @@
+/* date-timeline.component.scss */
+
+.timeline-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  sans-serif;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--app-text);
+}
+
+.timeline-date {
+  &--start {
+    text-align: left;
+  }
+
+  &--end {
+    text-align: right;
+  }
+}
+
+.timeline-line-container {
+  position: relative;
+  padding: 1.5rem 0 0.5rem 0;
+}
+
+.timeline-line {
+  position: relative;
+  height: 4px;
+  background: var(--app-border);
+  border-radius: 999px;
+}
+
+/* Points de début et fin */
+.timeline-endpoint {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--app-warning);
+  border: 2px solid var(--app-warning);
+  font-size: 0.7rem;
+
+  &--start {
+    left: 0%;
+  }
+
+  &--end {
+    left: 100%;
+  }
+}
+
+/* Points intermédiaires */
+.timeline-point {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.timeline-point-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--app-primary);
+  border: 2px solid var(--app-primary);
+  opacity: 0.75;
+}
+
+/* Labels sous les points */
+.timeline-point-label {
+  position: absolute;
+  top: 150%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--app-text);
+}
+
+.timeline-point-label-text {
+  font-weight: 500;
+}
+
+.timeline-point-label-date {
+  font-size: 0.7rem;
+  color: var(--app-text);
+}
+
+.timeline-point-milestone {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--app-contrast);
+  border: 2px solid var(--app-contrast);
+  font-size: 0.7rem;
+}

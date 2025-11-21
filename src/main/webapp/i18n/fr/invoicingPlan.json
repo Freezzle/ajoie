@@ -13,15 +13,17 @@
       "qty": "Quantité",
       "sum": "Total"
     },
-    "invoicings": "Les factures",
     "invoices": {
       "label": "Lignes de la facture",
       "notFound": "Aucune facture"
     },
+    "invoicings": "Les lignes de facture",
+    "invoicingPlans": "Les factures",
     "needArrangement": {
       "checked": "Plan avec arrangement",
       "unchecked": "Plan sans arrangement"
     },
+    "paids": "Facture payé",
     "payments": {
       "label": "Paiements",
       "notFound": "Aucun paiement"
@@ -33,15 +35,16 @@
     "result": "Résultat",
     "sendByEmail": "Envoyer par email",
     "sent": "Facture envoyé",
+    "split": "Déplacer dans une nouvelle facture",
     "state": {
       "CANCELLED": "Annulée",
       "DRAFT": "Brouillon",
       "ISOLATED": "Brouillon isolée",
-      "IS_ISSUING": "En cours d'envoi",
       "ISSUED": "Envoyée",
+      "IS_ISSUING": "En cours d'envoi",
       "PAID": "Payée"
     },
-    "title": "Facture n° {{billingNumber}}",
+    "title": "{{billingNumber}}",
     "waitingPayments": "Facture envoyé"
   }
 }

@@ -5,15 +5,15 @@ import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.jsr107.Eh107Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
+import org.springframework.boot.cache.autoconfigure.JCacheManagerCustomizer;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import tech.jhipster.config.JHipsterProperties;
-import tech.jhipster.config.cache.PrefixedKeyGenerator;
+import ch.salon.utils.SalonProperties;
+import ch.salon.utils.PrefixedKeyGenerator;
 
 import java.time.Duration;
 
@@ -25,8 +25,8 @@ public class CacheConfiguration {
     private GitProperties gitProperties;
     private BuildProperties buildProperties;
 
-    public CacheConfiguration(JHipsterProperties jHipsterProperties) {
-        JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
+    public CacheConfiguration(SalonProperties salonProperties) {
+        SalonProperties.Cache.Ehcache ehcache = salonProperties.getCache().getEhcache();
 
         jcacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(
                 CacheConfigurationBuilder.newCacheConfigurationBuilder(Object.class, Object.class,

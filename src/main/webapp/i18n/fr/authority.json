@@ -1,9 +1,9 @@
 {
   "authority": {
-    "create": "Création d'une nouvelle authorité",
+    "create": "Nouvel authorité",
     "created": "Une nouvelle authorité a été créé avec l'identifiant {{ param }}",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer l'authorité {{ id }} ?"
+      "question": "Voulez-vous supprimer l'authorité {{ id }} ?"
     },
     "deleted": "L'authorité avec l'identifiant {{ param }} a été supprimé",
     "detail": {

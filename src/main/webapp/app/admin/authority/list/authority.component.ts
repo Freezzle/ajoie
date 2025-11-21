@@ -1,21 +1,22 @@
 import {Component, inject, NgZone, OnInit} from '@angular/core';
 import {ActivatedRoute, Data, ParamMap, Router, RouterModule} from '@angular/router';
 import {combineLatest, filter, Observable, Subscription, switchMap, tap} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import {SortByDirective, SortDirective, SortService, type SortState, sortStateSignal} from 'app/shared/sort';
 import {FormsModule} from '@angular/forms';
-import {DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT} from 'app/config/navigation.constants';
+import {DEFAULT_SORT_DATA, SORT} from 'app/config/navigation.constants';
 import {IAuthority} from '../authority.model';
 import {AuthorityService, EntityArrayResponseType} from '../service/authority.service';
-import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
+import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
+import {ConfirmDialog} from "primeng/confirmdialog";
+import {Toast} from "primeng/toast";
 
 @Component({
-    selector: 'jhi-authority',
+    selector: 'app-authority',
     templateUrl: './authority.component.html',
     imports: [
         RouterModule,
@@ -26,6 +27,8 @@ import {AlertComponent} from "../../../shared/alert/alert.component";
         ButtonBoxComponent,
         AlertErrorComponent,
         AlertComponent,
+        ConfirmDialog,
+        Toast,
     ]
 })
 export class AuthorityComponent implements OnInit {
@@ -39,7 +42,7 @@ export class AuthorityComponent implements OnInit {
     protected authorityService = inject(AuthorityService);
     protected activatedRoute = inject(ActivatedRoute);
     protected sortService = inject(SortService);
-    protected modalService = inject(NgbModal);
+    protected confirmDialogService = inject(ConfirmDialogService);
     protected ngZone = inject(NgZone);
 
     trackName = (_index: number, item: IAuthority): string => this.authorityService.getAuthorityIdentifier(item);
@@ -61,18 +64,14 @@ export class AuthorityComponent implements OnInit {
         window.history.back();
     }
 
-    delete(authority: IAuthority): void {
-        const modalRef = this.modalService.open(DeleteDialogComponent, {size: 'lg', backdrop: 'static'});
-        modalRef.componentInstance.translateKey = 'authority.delete.question';
-        modalRef.componentInstance.translateValues = {id: authority.name};
-
-        modalRef.closed
+    delete(event: Event, authority: IAuthority): void {
+        this.confirmDialogService.delete(event.target as HTMLElement, 'authority.delete.question', {id: authority.name})
             .pipe(
-                filter(reason => reason === ITEM_DELETED_EVENT),
+                filter(confirmed => confirmed),
                 switchMap(() => this.authorityService.delete(authority.name)),
                 tap(() => this.load()), // Recharge les données
             )
-            .subscribe();
+            .subscribe()
     }
 
     load(): void {

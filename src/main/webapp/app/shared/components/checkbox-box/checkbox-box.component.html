@@ -1,10 +1,10 @@
 <p-toggle-button [inputId]="'field_' + fieldName"
-        [style.height]="'100%'"
-                [formControl]="control"
-                [onLabel]="(translateKey ?? '') | translate"
-                [offLabel]="(translateKey ?? '') | translate"
-                [invalid]="control!.invalid && control!.touched"
-                onIcon="pi pi-check"
-                offIcon="pi pi-times"
+                 [style.height]="'100%'"
+                 [formControl]="control"
                  iconPos="right"
-                fluid></p-toggle-button>
+                 [onLabel]="(translateKey ?? '') | translate"
+                 [offIcon]="PrimeIcons.TIMES_CIRCLE + ' text-warning'"
+                 [onIcon]="PrimeIcons.VERIFIED + ' text-success'"
+                 [offLabel]="(translateKey ?? '') | translate"
+                 [invalid]="control!.invalid && control!.touched"
+                 fluid></p-toggle-button>

@@ -8,6 +8,8 @@ import ch.salon.domain.PriceStandSalon;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
 import ch.salon.domain.Workshop;
+import ch.salon.domain.enumeration.EntityType;
+import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
@@ -19,6 +21,7 @@ import ch.salon.repository.SalonRepository;
 import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import io.micrometer.common.util.StringUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +42,7 @@ import static ch.salon.domain.enumeration.Type.STAND;
 import static ch.salon.domain.enumeration.Type.WORKSHOP;
 
 @Service
+@AllArgsConstructor
 public class RefreshInvoicingPlansService {
     public static final String ENTITY_NAME = "invoicingPlan";
     private static final double EPSILON_TOTAL = 0.01;
@@ -47,29 +51,12 @@ public class RefreshInvoicingPlansService {
 
     private final SalonRepository salonRepository;
     private final ParticipationRepository participationRepository;
-
     private final InvoicingPlanService invoicingPlanService;
-
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
     private final WorkshopRepository workshopRepository;
-
     private final MessageSource messageSource;
-
-    public RefreshInvoicingPlansService(SalonRepository salonRepository,
-            ParticipationRepository participationRepository, InvoicingPlanRepository repository,
-            StandRepository standRepository, WorkshopRepository workshopRepository,
-            ConferenceRepository conferenceRepository, MessageSource messageSource,
-            InvoicingPlanService invoicingPlanService) {
-        this.participationRepository = participationRepository;
-        this.salonRepository = salonRepository;
-        this.repository = repository;
-        this.standRepository = standRepository;
-        this.conferenceRepository = conferenceRepository;
-        this.workshopRepository = workshopRepository;
-        this.messageSource = messageSource;
-        this.invoicingPlanService = invoicingPlanService;
-    }
+    private final EventLogService eventLogService;
 
     /**
      * Recalcule les plans de facturation pour une participation.
@@ -131,7 +118,17 @@ public class RefreshInvoicingPlansService {
         // Application des différences dans le brouillon courant
         applyDifferencesToDraft(currentDraft, coverage.getDifferences(), position);
 
+        var isNew = currentDraft.getId() == null;
+
         currentDraft = repository.save(currentDraft);
+
+        if (isNew){
+            this.eventLogService.eventFromSystem("Facture crée", EventType.EVENT, EntityType.INVOICE_PLAN,
+                    currentDraft.getId(), null);
+        } else {
+            this.eventLogService.eventFromSystem("Facture rafraîchie", EventType.EVENT, EntityType.INVOICE_PLAN,
+                    currentDraft.getId(), null);
+        }
 
         // Séparation des repas si nécessaire (MEAL1/2/3 dans un plan ISOLATED)
         if (participation.getModePaymentMeals() == ModePaymentMeals.SEPARATE) {
@@ -215,14 +212,14 @@ public class RefreshInvoicingPlansService {
         long position = lastPosition;
 
         for (InvoiceDiff diff : differences) {
-            InvoiceExpected expected = diff.getExpected();
+            InvoiceExpected expected = diff.expected();
 
             double expectedTotal = expected.getExpectedTotal();
-            double existingTotal = diff.getExistingTotal();
-            long expectedQty = expected.getQuantity();
-            long existingQty = diff.getExistingQuantity();
+            double existingTotal = diff.existingTotal();
+            long expectedQty = expected.quantity();
+            long existingQty = diff.existingQuantity();
 
-            boolean quantityRelevant = isQuantityRelevant(expected.getType());
+            boolean quantityRelevant = isQuantityRelevant(expected.type());
 
             double deltaTotal = expectedTotal - existingTotal;
             long deltaQuantity = quantityRelevant ? (expectedQty - existingQty) : 0L;
@@ -232,42 +229,42 @@ public class RefreshInvoicingPlansService {
             }
 
             // Cas spécial STAND : seul le prix change (quantité identique)
-            if (expected.getType() == STAND && deltaQuantity == 0L && Math.abs(existingTotal) > EPSILON_TOTAL &&
+            if (expected.type() == STAND && deltaQuantity == 0L && Math.abs(existingTotal) > EPSILON_TOTAL &&
                     Math.abs(deltaTotal) > EPSILON_TOTAL) {
 
                 // 1) Annulation de l'ancien montant du stand
                 position += 1;
                 Invoice cancel = new Invoice();
                 cancel.setPosition(position);
-                cancel.setReferenceId(expected.getReferenceId());
+                cancel.setReferenceId(expected.referenceId());
                 cancel.setLock(false);
                 cancel.setGenerationDate(Instant.now());
                 cancel.setReduction(false);
                 cancel.setType(STAND);
 
-                String baseLabel = diff.getExistingLabel() != null ? diff.getExistingLabel() : expected.getLabel();
+                String baseLabel = diff.existingLabel() != null ? diff.existingLabel() : expected.label();
                 cancel.setLabel(sub("Rectif. : " + baseLabel));
                 cancel.setQuantity(1L);
                 cancel.setDefaultAmount(-existingTotal);
                 cancel.setCustomAmount(-existingTotal);
 
-                draft.addInvoice(cancel);
+                draft.getInvoices().add(cancel);
 
                 // 2) Nouvelle ligne du stand avec le nouveau prix
                 position += 1;
                 Invoice newStand = new Invoice();
                 newStand.setPosition(position);
-                newStand.setReferenceId(expected.getReferenceId());
+                newStand.setReferenceId(expected.referenceId());
                 newStand.setLock(false);
                 newStand.setGenerationDate(Instant.now());
                 newStand.setType(STAND);
                 newStand.setReduction(false);
-                newStand.setLabel(sub(expected.getLabel()));
+                newStand.setLabel(sub(expected.label()));
                 newStand.setQuantity(expectedQty);
-                newStand.setDefaultAmount(expected.getUnitPrice());
-                newStand.setCustomAmount(expected.getUnitPrice());
+                newStand.setDefaultAmount(expected.unitPrice());
+                newStand.setCustomAmount(expected.unitPrice());
 
-                draft.addInvoice(newStand);
+                draft.getInvoices().add(newStand);
                 continue;
             }
 
@@ -275,16 +272,16 @@ public class RefreshInvoicingPlansService {
             position += 1;
             Invoice invoice = new Invoice();
             invoice.setPosition(position);
-            invoice.setReferenceId(expected.getReferenceId());
+            invoice.setReferenceId(expected.referenceId());
             invoice.setLock(false);
             invoice.setReduction(false);
             invoice.setGenerationDate(Instant.now());
-            invoice.setType(expected.getType());
-            invoice.setLabel(sub(expected.getLabel()));
+            invoice.setType(expected.type());
+            invoice.setLabel(sub(expected.label()));
 
             if (deltaQuantity != 0L) {
                 long qty = Math.abs(deltaQuantity);
-                double unitAmount = expected.getUnitPrice();
+                double unitAmount = expected.unitPrice();
                 if (deltaQuantity < 0) {
                     unitAmount = -unitAmount;
                 }
@@ -297,7 +294,7 @@ public class RefreshInvoicingPlansService {
                 invoice.setCustomAmount(deltaTotal);
             }
 
-            draft.addInvoice(invoice);
+            draft.getInvoices().add(invoice);
         }
     }
 
@@ -424,16 +421,16 @@ public class RefreshInvoicingPlansService {
         final double EPS = EPSILON_TOTAL;
 
         for (InvoiceExpected expected : expectedMap.values()) {
-            InvoiceKey key = new InvoiceKey(expected.getType(), expected.getReferenceId());
+            InvoiceKey key = new InvoiceKey(expected.type(), expected.referenceId());
 
             double existingTotal = existingTotals.getOrDefault(key, 0.0);
             long existingQty = existingQuantities.getOrDefault(key, 0L);
             String existingLabel = existingLabels.get(key);
 
-            long expectedQty = expected.getQuantity();
+            long expectedQty = expected.quantity();
             double expectedTotal = expected.getExpectedTotal();
 
-            boolean quantityRelevant = isQuantityRelevant(expected.getType());
+            boolean quantityRelevant = isQuantityRelevant(expected.type());
 
             if (Math.abs(existingTotal) < EPS && expectedTotal != 0.0) {
                 // Exemple : stand attendu 300.-, pas encore facturé -> élément manquant
@@ -453,7 +450,7 @@ public class RefreshInvoicingPlansService {
         for (var entry : existingTotals.entrySet()) {
             InvoiceKey key = entry.getKey();
 
-            if (!isManagedInvoiceType(key.getType())) {
+            if (!isManagedInvoiceType(key.type())) {
                 continue;
             }
 
@@ -468,12 +465,12 @@ public class RefreshInvoicingPlansService {
 
             long existingQty = existingQuantities.getOrDefault(key, 0L);
             String existingLabel = existingLabels.get(key);
-            Type type = key.getType();
+            Type type = key.type();
             boolean quantityRelevant = isQuantityRelevant(type);
 
             // expected "virtuel" à 0 (on annule tout ce qui existe)
             InvoiceExpected expected =
-                    new InvoiceExpected(type, key.getReferenceId(), existingLabel != null ? existingLabel : "", 0L,
+                    new InvoiceExpected(type, key.referenceId(), existingLabel != null ? existingLabel : "", 0L,
                             0.0);
 
             double deltaTotal = -existingTotal;              // ex: 50 => -50

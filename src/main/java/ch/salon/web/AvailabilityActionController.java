@@ -67,6 +67,7 @@ public class AvailabilityActionController {
 
     @GetMapping("/{domain}/{id}/available")
     //@Cacheable(value = "availableActions", key = "#domain + '-' + #id + '-' + authentication.name")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<ActionAvailable>> getAvailableActions(@PathVariable String domain, @PathVariable UUID id,
             Authentication authentication) {
         Object payload = getEntity(domain, id);
@@ -152,7 +153,7 @@ public class AvailabilityActionController {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDisposition(ContentDisposition.inline().filename(fileName).build());
+            headers.setContentDisposition(ContentDisposition.attachment().filename(fileName).build());
 
             return ResponseEntity.ok().headers(headers).body(file);
         } else {

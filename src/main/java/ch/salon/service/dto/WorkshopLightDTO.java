@@ -1,29 +1,13 @@
 package ch.salon.service.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.UUID;
 
+@Data
 public class WorkshopLightDTO implements Serializable {
 
     private UUID id;
     private String title;
-
-    public WorkshopLightDTO() {
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 }

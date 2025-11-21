@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
 import {ActivatedRoute, ParamMap} from '@angular/router';
-import {combineLatest, of} from 'rxjs';
+import {of} from 'rxjs';
 import {catchError, finalize, map} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -10,14 +10,9 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ConferenceService} from '../service/conference.service';
 import {IConference} from '../model/conference.interface';
 import {ConferenceFormGroup, ConferenceFormService} from '../service/conference-form.service';
-import {
-    getFormattedParticipationName,
-    IParticipation,
-    selectFilterParticipation
-} from '../../participation/model/participation.interface';
+import {IParticipation, selectFilterParticipation} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
-import {compareStatus, formatterStatus, Status} from '../../enumerations/status.model';
-import {ErrorModel} from '../../../shared/field-error/error.model';
+import {formatterStatus, Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
@@ -25,12 +20,16 @@ import {SelectBoxComponent} from '../../../shared/components/select-box/select-b
 import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
+import {ConfirmPopup} from "primeng/confirmpopup";
+import {Toast} from "primeng/toast";
+import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import {CardComponent} from "../../../shared/components/card/card.component";
 
 @Component({
-    selector: 'jhi-conference-update',
+    selector: 'app-conference-update',
     templateUrl: './conference-update.component.html',
     imports: [SharedModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
-        TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertComponent, AlertErrorComponent]
+        TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContentPageComponent, CardComponent]
 })
 export class ConferenceUpdateComponent implements OnInit {
     protected conferenceService = inject(ConferenceService);
@@ -40,6 +39,7 @@ export class ConferenceUpdateComponent implements OnInit {
 
     isLoading = false;
     isReadOnly = false;
+    eventId!: string;
 
     initialConference: IConference | null = null;
     statusValues = Object.keys(Status);
@@ -48,37 +48,24 @@ export class ConferenceUpdateComponent implements OnInit {
     editForm: FormGroup<ConferenceFormGroup> = this.conferenceFormService.createConferenceFormGroup(null);
 
     ngOnInit(): void {
-        this.activateReadOnlyMode(false);
+        const data = this.activatedRoute.snapshot.data;
 
-        combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data])
-            .pipe(
-                map(([params, data]) => ({
-                    params,
-                    isReadOnly: data['readonly'],
-                    initialConference: data['conference'] as IConference,
-                })),
-            )
-            .subscribe(({params, isReadOnly, initialConference}) => {
-                this.params = params;
-                this.isReadOnly = isReadOnly;
-                this.initialConference = {...initialConference};
+        this.eventId = this.activatedRoute.snapshot.paramMap.get('idSalon')!;
+        const participationId = this.activatedRoute.snapshot.paramMap.get('idParticipation')!;
+        this.initialConference = {...data['conference']};
 
-                this.editForm = this.conferenceFormService.createConferenceFormGroup(initialConference);
-                this.loadRelationshipsOptions(initialConference);
-
-                isReadOnly ? this.activateReadOnlyMode(false) : this.activateEditMode();
-            });
-    }
-
-    activateReadOnlyMode(reset: boolean = true): void {
-        this.isReadOnly = true;
-        if (reset) {
-            this.editForm = this.conferenceFormService.createConferenceFormGroup(this.initialConference!);
+        this.editForm = this.conferenceFormService.createConferenceFormGroup(this.initialConference);
+        if (data['readonly']) {
+            this.isReadOnly = true;
+            this.editForm.disable();
+        } else {
+            this.edit();
         }
-        this.editForm.disable();
+
+        this.loadRelationshipsOptions(this.eventId, participationId);
     }
 
-    activateEditMode(): void {
+    edit(): void {
         this.isReadOnly = false;
         this.editForm.enable();
     }
@@ -87,15 +74,21 @@ export class ConferenceUpdateComponent implements OnInit {
         window.history.back();
     }
 
+    cancel(): void {
+        this.isReadOnly = true;
+        this.editForm = this.conferenceFormService.createConferenceFormGroup(this.initialConference);
+        this.editForm.disable();
+    }
+
     save(): void {
         if (this.editForm.invalid) {
             this.editForm.markAllAsTouched();
             return;
         }
+
         this.isLoading = true;
 
         const conference = this.conferenceFormService.getConference(this.editForm);
-
         const saveOperation = conference.id != null
             ? this.conferenceService.update(conference)
             : this.conferenceService.create(conference);
@@ -103,34 +96,23 @@ export class ConferenceUpdateComponent implements OnInit {
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
 
-    private loadRelationshipsOptions(conference: IConference): void {
-        const idSalon = this.params.get('idSalon');
-        const idParticipation = this.params.get('idParticipation');
-
-        if (!idSalon) {
-            return;
-        }
-
-        this.participationService.query(idSalon)
+    private loadRelationshipsOptions(eventId: string, participationId: string | null): void {
+        this.participationService.query(eventId)
             .pipe(
                 map((res: HttpResponse<IParticipation[]>) => res.body ?? []),
                 map((participations) => {
-                    if (idParticipation) {
+                    if (participationId) {
                         this.editForm.get('participation')?.setValue(
-                            participations.find(p => p.id === idParticipation) || null,
+                            participations.find(p => p.id === participationId) ?? null,
                         );
                     }
-                    return this.participationService.addParticipationsOptionsIfMissing(participations, conference?.participation);
+                    return participations;
                 }),
-                catchError(() => of([])),
-            )
+                catchError(() => of([])))
             .subscribe((participations) => (this.participationsOptions = participations));
     }
 
-    protected readonly ErrorModel = ErrorModel;
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
     protected readonly formatterParticipation = formatterParticipation;
     protected readonly formatterStatus = formatterStatus;
-    protected readonly compareStatus = compareStatus;
     protected readonly selectFilterParticipation = selectFilterParticipation;
 }

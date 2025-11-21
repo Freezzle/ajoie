@@ -1,6 +1,7 @@
 package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.EventType;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Data
 public class EventLogDTO implements Serializable {
 
     private UUID id;
@@ -16,56 +18,4 @@ public class EventLogDTO implements Serializable {
     private String label;
     private Map<String, String> extraAttributes = new HashMap<>();
     private boolean fromSystem = true;
-
-    public EventLogDTO() {
-        // Empty constructor needed for Jackson.
-    }
-
-    public Map<String, String> getExtraAttributes() {
-        return extraAttributes;
-    }
-
-    public void setExtraAttributes(Map<String, String> extraAttributes) {
-        this.extraAttributes = extraAttributes;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Instant getReferenceDate() {
-        return referenceDate;
-    }
-
-    public void setReferenceDate(Instant referenceDate) {
-        this.referenceDate = referenceDate;
-    }
-
-    public EventType getType() {
-        return type;
-    }
-
-    public void setType(EventType type) {
-        this.type = type;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public boolean isFromSystem() {
-        return fromSystem;
-    }
-
-    public void setFromSystem(boolean fromSystem) {
-        this.fromSystem = fromSystem;
-    }
 }

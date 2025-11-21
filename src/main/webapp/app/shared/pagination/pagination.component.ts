@@ -4,7 +4,7 @@ import ItemCountComponent from './item-count.component';
 import {PaginationEvent} from './pagination-event.interface';
 
 @Component({
-    selector: 'jhi-pagination',
+    selector: 'app-pagination',
     templateUrl: './pagination.component.html',
     imports: [
         NgbPagination,
@@ -26,7 +26,7 @@ export class PaginationComponent implements OnInit {
     }
 
     onPageChanged(event: number): void {
-        this.page = event as number;
+        this.page = event;
         this.pageChanged.emit({page: this.page, pageSize: this.pageSize});
     }
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -23,11 +24,8 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "salon")
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Data
 public class Salon implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -73,19 +71,6 @@ public class Salon implements Serializable {
     @JoinColumn(name = "salon_id", referencedColumnName = "id")
     private Set<PriceStandSalon> priceStandSalons = new HashSet<>();
 
-    public UUID getId() {
-        return this.id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Salon id(UUID id) {
-        this.setId(id);
-        return this;
-    }
-
     public static boolean hasDifference(Salon salon1, Salon salon2) {
         return ((salon1 == null && salon2 != null) || (salon1 != null && salon2 == null) ||
                 (salon1 != null && salon2 != null &&
@@ -118,179 +103,5 @@ public class Salon implements Serializable {
         }
 
         return false;
-    }
-
-    public String getReferenceNumber() {
-        return referenceNumber;
-    }
-
-    public void setReferenceNumber(String referenceNumber) {
-        this.referenceNumber = referenceNumber;
-    }
-
-    public String getPlace() {
-        return this.place;
-    }
-
-    public void setPlace(String place) {
-        this.place = place;
-    }
-
-    public Salon place(String place) {
-        this.setPlace(place);
-        return this;
-    }
-
-    public Instant getStartingDate() {
-        return this.startingDate;
-    }
-
-    public void setStartingDate(Instant startingDate) {
-        this.startingDate = startingDate;
-    }
-
-    public Salon startingDate(Instant startingDate) {
-        this.setStartingDate(startingDate);
-        return this;
-    }
-
-    public Instant getEndingDate() {
-        return this.endingDate;
-    }
-
-    public void setEndingDate(Instant endingDate) {
-        this.endingDate = endingDate;
-    }
-
-    public Salon endingDate(Instant endingDate) {
-        this.setEndingDate(endingDate);
-        return this;
-    }
-
-    public Double getPriceMeal1() {
-        return this.priceMeal1;
-    }
-
-    public void setPriceMeal1(Double priceMeal1) {
-        this.priceMeal1 = priceMeal1;
-    }
-
-    public Salon priceMeal1(Double priceMeal1) {
-        this.setPriceMeal1(priceMeal1);
-        return this;
-    }
-
-    public Double getPriceMeal2() {
-        return this.priceMeal2;
-    }
-
-    public void setPriceMeal2(Double priceMeal2) {
-        this.priceMeal2 = priceMeal2;
-    }
-
-    public Salon priceMeal2(Double priceMeal2) {
-        this.setPriceMeal2(priceMeal2);
-        return this;
-    }
-
-    public Double getPriceMeal3() {
-        return this.priceMeal3;
-    }
-
-    public void setPriceMeal3(Double priceMeal3) {
-        this.priceMeal3 = priceMeal3;
-    }
-
-    public Salon priceMeal3(Double priceMeal3) {
-        this.setPriceMeal3(priceMeal3);
-        return this;
-    }
-
-    public Double getPriceConference() {
-        return this.priceConference;
-    }
-
-    public Double getPriceWorkshop() {
-        return this.priceWorkshop;
-    }
-
-    public void setPriceConference(Double priceConference) {
-        this.priceConference = priceConference;
-    }
-
-    public void setPriceWorkshop(Double priceWorkshop) {
-        this.priceWorkshop = priceWorkshop;
-    }
-
-    public Salon priceConference(Double priceConference) {
-        this.setPriceConference(priceConference);
-        return this;
-    }
-
-    public Salon priceWorkshop(Double priceWorkshop) {
-        this.setPriceWorkshop(priceWorkshop);
-        return this;
-    }
-
-    public Double getPriceSharingStand() {
-        return this.priceSharingStand;
-    }
-
-    public void setPriceSharingStand(Double priceSharingStand) {
-        this.priceSharingStand = priceSharingStand;
-    }
-
-    public Salon priceSharingStand(Double priceSharingStand) {
-        this.setPriceSharingStand(priceSharingStand);
-        return this;
-    }
-
-    public String getExtraInformation() {
-        return this.extraInformation;
-    }
-
-    public void setExtraInformation(String extraInformation) {
-        this.extraInformation = extraInformation;
-    }
-
-    public Salon extraInformation(String extraInformation) {
-        this.setExtraInformation(extraInformation);
-        return this;
-    }
-
-    public Set<PriceStandSalon> getPriceStandSalons() {
-        return this.priceStandSalons;
-    }
-
-    public void setPriceStandSalons(Set<PriceStandSalon> priceStandSalons) {
-        this.priceStandSalons = priceStandSalons;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Salon)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((Salon) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return ("Salon{" + "id=" + getId() + ", referenceNumber='" + getReferenceNumber() + "'" + ", place='" +
-                getPlace() + "'" + ", startingDate='" + getStartingDate() + "'" + ", endingDate='" + getEndingDate() +
-                "'" + ", priceMeal1=" + getPriceMeal1() + ", priceMeal2=" + getPriceMeal2() + ", priceMeal3=" +
-                getPriceMeal3() + ", priceConference=" + getPriceConference() + ", priceSharingStand=" +
-                getPriceSharingStand() + ", extraInformation='" + getExtraInformation() + "'" + "}");
     }
 }

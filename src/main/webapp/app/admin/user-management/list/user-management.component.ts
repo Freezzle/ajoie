@@ -2,17 +2,15 @@ import {Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {HttpHeaders, HttpResponse} from '@angular/common/http';
 import {combineLatest, switchMap} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import {SortByDirective, SortDirective, SortService, SortState, sortStateSignal} from 'app/shared/sort';
 import {ITEMS_PER_PAGE} from 'app/config/pagination.constants';
-import {ITEM_DELETED_EVENT, SORT} from 'app/config/navigation.constants';
+import {SORT} from 'app/config/navigation.constants';
 import {ItemCountComponent} from 'app/shared/pagination';
 import {AccountService} from 'app/core/auth/account.service';
 import {UserManagementService} from '../service/user-management.service';
 import {User} from '../user-management.model';
-import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
 import {filter, tap} from 'rxjs/operators';
 import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
@@ -20,9 +18,10 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
 import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {AlertComponent} from "../../../shared/alert/alert.component";
+import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
 
 @Component({
-    selector: 'jhi-user-mgmt',
+    selector: 'app-user-mgmt',
     templateUrl: './user-management.component.html',
     imports: [
         RouterModule,
@@ -51,7 +50,7 @@ export default class UserManagementComponent implements OnInit {
     private activatedRoute = inject(ActivatedRoute);
     private router = inject(Router);
     private sortService = inject(SortService);
-    private modalService = inject(NgbModal);
+    private confirmDialogService = inject(ConfirmDialogService);
 
     ngOnInit(): void {
         this.handleNavigation();
@@ -69,18 +68,12 @@ export default class UserManagementComponent implements OnInit {
         return item.id!;
     }
 
-    deleteUser(user: User): void {
-        const modalRef = this.modalService.open(DeleteDialogComponent, {size: 'lg', backdrop: 'static'});
-        modalRef.componentInstance.translateKey = 'userManagement.delete.question';
-        modalRef.componentInstance.translateValues = {login: user.login};
-
-        modalRef.closed
-            .pipe(
-                filter(reason => reason === ITEM_DELETED_EVENT),
-                switchMap(() => this.userService.delete(user.login)),
-                tap(() => this.load()), // Recharge les données
-            )
-            .subscribe();
+    deleteUser(event: Event, user: User): void {
+        this.confirmDialogService.delete(event.target as HTMLElement, 'userManagement.delete.question', {login: user.login}).pipe(
+            filter(confirmed => confirmed),
+            switchMap(() => this.userService.delete(user.login)),
+            tap(() => this.load()), // Recharge les données
+        ).subscribe();
     }
 
     load(): void {

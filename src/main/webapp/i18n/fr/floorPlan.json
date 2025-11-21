@@ -4,7 +4,7 @@
     "automaticallyIncrementNumber": "Incrémenter position automatiquement",
     "changeRotation": "Changer de rotation",
     "delete": {
-      "question": "Êtes-vous certain de vouloir supprimer le plan \"{{floorName}}\" ?"
+      "question": "Voulez-vous supprimer le plan \"{{floorName}}\" ?"
     },
     "differentDimension": "Les dimensions diffèrent",
     "displayName": "Voir nom / nom de thérapeute",

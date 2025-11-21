@@ -1,105 +1,105 @@
-<div>
-    <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-        <h2 id="page-heading">
-            <div class="d-flex justify-content-center">
-                @if (editForm.controls.id.value) {
-                    <span jhiTranslate="workshop.edit">Modification d'une conférence</span>
-                }
-                @if (!editForm.controls.id.value) {
-                    <span jhiTranslate="workshop.create">Création d'une nouvelle conférence</span>
-                }
-            </div>
+<app-content-page [formGroup]="editForm">
+    <div appMenuBarStart>
+        @if (editForm.controls.id.value) {
+            <h3>{{ 'workshop.edit' | translate }}</h3>
+        } @else {
+            <h3>{{ 'workshop.create' | translate }}</h3>
+        }
+    </div>
+    <div appMenuBarEnd>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    faIcon="arrow-left"
+                    translateKey="common.back"
+                    [showText]="false"/>
+        @if (isReadOnly) {
+            <button-box (clickedEvent)="edit()"
+                        [isDisabled]="isLoading"
+                        faIcon="pencil-alt"
+                        translateKey="common.edit"
+                        [showText]="false"/>
+        }
 
-            <hr/>
+        @if (editForm.controls.id.value && !isReadOnly) {
+            <button-box (clickedEvent)="cancel()"
+                        [isDisabled]="isLoading"
+                        faIcon="ban"
+                        translateKey="common.cancel"
+                        [showText]="false"
+                        type="secondary"/>
+        }
 
-            <div class="d-flex justify-content-between mt-3">
-        <span>
-          <button-box (clickedEvent)="previousState()"
-                      [isDisabled]="isLoading"
-                      faIcon="arrow-left"
-                      translateKey="common.back"/>
-          </span>
-
-                <span>
-            @if (isReadOnly) {
-                <button-box (clickedEvent)="activateEditMode()"
-                            [isDisabled]="isLoading"
-                            faIcon="pencil-alt"
-                            translateKey="common.edit"/>
-            }
-
-                    @if (editForm.controls.id.value && !isReadOnly) {
-                        <button-box (clickedEvent)="activateReadOnlyMode()"
-                                    [isDisabled]="isLoading"
-                                    faIcon="ban"
-                                    translateKey="common.cancel"
-                                    type="secondary"/>
-                    }
-
-                    @if (!isReadOnly) {
-                        <button-box [isDisabled]="editForm.invalid || isLoading"
-                                    [isSubmit]="true"
-                                    faIcon="floppy-disk"
-                                    translateKey="common.save"/>
-                    }
-          </span>
-            </div>
-        </h2>
-
-        <div>
-            <jhi-alert-error></jhi-alert-error>
-            <jhi-alert></jhi-alert>
-
-            <div class="card">
-                <h5 class="card-header" jhiTranslate="common.info-basic">Information de base</h5>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="mt-3 col-12">
-                            <text-box fieldName="title" formControlName="title" translateKey="workshop.title-field"/>
-                        </div>
-                        <div class="mt-3 col-12">
-                            <textarea-box [rows]="6"
-                                          [showCounter]="true"
-                                          [maxLength]="500"
-                                          fieldName="description"
-                                          formControlName="description"
-                                          translateKey="workshop.description"/>
-                        </div>
-                        <div class="mt-3 col-sm-6 d-flex">
-                            <select-box [formatterFunction]="formatterParticipation"
-                                        [options]="participationsOptions"
-                                        [enableFilter]="true"
-                                        [filterFields]="selectFilterParticipation()"
-                                        fieldName="participation"
-                                        formControlName="participation"
-                                        translateKey="stand.participation"
-                                        class="w-100"/>
-                            @if (isReadOnly && !!editForm.controls.participation.value?.id) {
-                                <link-box class="align-content-center"
-                                          [modeButton]="false"
-                                          style="background-color: #e6e6e6;border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"
-                                          [links]="['/admin', 'salons', params.get('idSalon') ?? '', 'participations', editForm.controls.participation.value?.id ?? '' ,'view']"
-                                          [showText]="false"
-                                          faIcon="link"/>
-                            }
-                        </div>
-                        <div class="mt-3 col-sm-6">
-                            <select-box [formatterFunction]="formatterStatus"
-                                        [options]="statusValues"
-                                        [needTranslation]="true"
-                                        fieldName="status"
-                                        formControlName="status"
-                                        translateKey="workshop.status.label"/>
-                        </div>
-                        <div class="mt-3 col-12">
-                            <textarea-box [rows]="3"
-                                          fieldName="extraInformation"
-                                          formControlName="extraInformation"
-                                          translateKey="workshop.extraInformation"/>
-                        </div>
-                    </div>
+        @if (!isReadOnly) {
+            <button-box (clickedEvent)="save()"
+                        [isDisabled]="editForm.invalid || isLoading"
+                        [isSubmit]="true"
+                        faIcon="floppy-disk"
+                        translateKey="common.save"
+                        [showText]="false"/>
+        }
+    </div>
+    <app-alert-error></app-alert-error>
+    <app-alert></app-alert>
+    <p-toast/>
+    <p-confirmpopup/>
+    <app-card>
+        <div appCardHeader>
+            <h4>{{ 'common.info-basic' | translate }}</h4>
+        </div>
+        <div appCardBody>
+            <div class="row">
+                <div class="mt-4 col-12">
+                    <text-box fieldName="title" formControlName="title" translateKey="workshop.titleField"/>
+                </div>
+                <div class="mt-4 col-12">
+                    <textarea-box [rows]="6"
+                                  [showCounter]="true"
+                                  [maxLength]="500"
+                                  fieldName="description"
+                                  formControlName="description"
+                                  translateKey="workshop.description"/>
                 </div>
             </div>
         </div>
-    </form>
-</div>
+    </app-card>
+    <app-card>
+        <div appCardHeader>
+            <h4>{{ 'common.info-intern' | translate }}</h4>
+        </div>
+        <div appCardBody>
+            <div class="row">
+                <div class="mt-4 col-sm-6 d-flex">
+                    <select-box [formatterFunction]="formatterParticipation"
+                                [options]="participationsOptions"
+                                [enableFilter]="true"
+                                [filterFields]="selectFilterParticipation()"
+                                fieldName="participation"
+                                formControlName="participation"
+                                translateKey="workshop.participation"
+                                class="w-100"/>
+                    @if (isReadOnly) {
+                        <link-box class="align-content-center"
+                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"
+                                  [links]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '','view']"
+                                  [showText]="false"
+                                  faIcon="link"/>
+                    }
+                </div>
+                <div class="mt-4 col-sm-6">
+                    <select-box [formatterFunction]="formatterStatus"
+                                [options]="statusValues"
+                                [needTranslation]="true"
+                                fieldName="status"
+                                formControlName="status"
+                                translateKey="workshop.status.label"/>
+                </div>
+                <div class="mt-4 col-12">
+                    <textarea-box [rows]="3"
+                                  fieldName="extraInformation"
+                                  formControlName="extraInformation"
+                                  translateKey="workshop.extraInformation"/>
+                </div>
+            </div>
+        </div>
+    </app-card>
+</app-content-page>

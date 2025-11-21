@@ -2,8 +2,6 @@ import {Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {IConference} from '../model/conference.interface';
-import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
-import {IWorkshop} from "../../workshop/model/workshop.interface";
 import {Status} from "../../enumerations/status.model";
 
 export type ConferenceFormGroup = {
@@ -15,20 +13,8 @@ export type ConferenceFormGroup = {
     participation: FormControl<IConference['participation'] | null>;
 };
 
-export type ConferenceFilterFormGroup = {
-    fullName: FormControl<IExhibitor['fullName'] | null>;
-    status: FormControl<IConference['status'] | null>;
-};
-
 @Injectable({providedIn: 'root'})
 export class ConferenceFormService {
-    createFilterFormGroup(): FormGroup<ConferenceFilterFormGroup> {
-        return new FormGroup<ConferenceFilterFormGroup>({
-            fullName: new FormControl(null),
-            status: new FormControl(null),
-        });
-    }
-
     createConferenceFormGroup(conference: IConference | null): FormGroup<ConferenceFormGroup> {
         const raw: IConference = {
             ...this.getDefaultConferenceFormValue() as IConference,

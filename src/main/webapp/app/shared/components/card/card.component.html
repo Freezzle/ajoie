@@ -1,0 +1,10 @@
+<p-card class="mt-4" [class.pt-4]="!showHeader()">
+    @if (showHeader()) {
+        <ng-template #header pTemplate="header">
+            <ng-content select="[appCardHeader]"></ng-content>
+        </ng-template>
+    }
+
+    <!-- Contenu -->
+    <ng-content select="[appCardBody]"></ng-content>
+</p-card>

@@ -5,7 +5,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
@@ -31,7 +30,7 @@ public class EmailCreator {
     private final SpringTemplateEngine mailTemplateEngine;
     private final MessageSource messageSource;
 
-    @Value("${app.mail.redirection-all-to:}")
+    @Value("${app.mail.redirect-all-to:}")
     private String redirectionAllTo;
 
     public EmailCreator(JavaMailSender javaMailSender, SpringTemplateEngine mailTemplateEngine,
@@ -95,8 +94,16 @@ public class EmailCreator {
         }
 
         message.setSubject(emailMessage.getSubject());
-        message.setText(emailMessage.getBody(), true);
-        message.addInline("logo_salon", new ClassPathResource("images/logo_salon.jpg"));
+
+        emailMessage.setBody(emailMessage.getBody().replace("\u00A0", " ")
+                .replace("&nbsp;", " "));
+
+        Context context = new Context();
+        context.setVariable("bodyHtml", emailMessage.getBody());
+        context.setVariable("contactAddress", "L'Ajoie de mieux vivre, Sous les chênes 109A, 2944 Bonfol");
+
+        message.setText(getContentHtml("layout", context), true);
+        // message.addInline("logo", new ClassPathResource("templates/mail/common/logo.png"), "image/png");
         return message;
     }
 }

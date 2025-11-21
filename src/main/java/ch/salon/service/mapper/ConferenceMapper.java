@@ -6,11 +6,9 @@ import ch.salon.service.dto.ConferenceLightDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {ParticipationMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {ParticipationMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ConferenceMapper {
-    ConferenceMapper INSTANCE = Mappers.getMapper(ConferenceMapper.class);
 
     ConferenceDTO toDto(Conference conference);
 

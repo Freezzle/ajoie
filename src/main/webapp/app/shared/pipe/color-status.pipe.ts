@@ -8,11 +8,11 @@ import {Status} from '../../admin/enumerations/status.model';
 export default class ColorStatusPipe implements PipeTransform {
     transform(value: string | Status | null | undefined): string {
         if (value === Status.ACCEPTED || value === Status.VALIDATED) {
-            return 'success-icon';
+            return 'text-primary';
         } else if (value === Status.REFUSED || value === Status.CANCELED) {
-            return 'danger-icon';
+            return 'text-danger';
         } else if (value === Status.IN_VERIFICATION) {
-            return 'grey-icon';
+            return 'text-secondary';
         } else if (value === Status.CLOSED) {
             return 'golden-icon';
         } else {

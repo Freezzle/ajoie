@@ -5,6 +5,7 @@ import ch.salon.service.ExhibitorService;
 import ch.salon.service.ParticipationService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.ExhibitorDTO;
+import ch.salon.service.dto.ExhibitorLightDTO;
 import ch.salon.service.dto.ParticipationDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.jhipster.web.util.ResponseUtil;
+import ch.salon.utils.ResponseUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,9 +34,9 @@ import static ch.salon.service.ExhibitorService.ENTITY_NAME;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
-import static tech.jhipster.web.util.HeaderUtil.createEntityCreationAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityDeletionAlert;
-import static tech.jhipster.web.util.HeaderUtil.createEntityUpdateAlert;
+import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
+import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
+import static ch.salon.utils.HeaderUtil.createEntityUpdateAlert;
 
 /**
  * REST controller for managing {@link ch.salon.domain.Exhibitor}.
@@ -49,7 +50,7 @@ public class AdminExhibitorResource {
     private final ExhibitorService exhibitorService;
     private final ParticipationService participationService;
 
-    @Value("${jhipster.clientApp.name}")
+    @Value("${salon.clientApp.name}")
     private String applicationName;
 
     public AdminExhibitorResource(ExhibitorService exhibitorService, ParticipationService participationService) {
@@ -125,4 +126,11 @@ public class AdminExhibitorResource {
 
         return exhibitorService.findAllEventLogs(idExhibitor);
     }
+
+    @GetMapping("/newsletter")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public List<ExhibitorLightDTO> getExhibitorsWithActiveNewsletter() {
+        return exhibitorService.getExhibitorsWithActiveNewsletter();
+    }
+
 }

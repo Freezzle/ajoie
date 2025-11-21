@@ -30,7 +30,7 @@ export class ConferenceService {
         return this.http.get<IConference[]>(this.resourceUrl, {params: options});
     }
 
-    delete(idConference: string): Observable<{}> {
+    delete(idConference: string): Observable<unknown> {
         return this.http.delete(`${this.resourceUrl}/${idConference}`);
     }
 

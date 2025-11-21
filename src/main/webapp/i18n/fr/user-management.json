@@ -1,7 +1,7 @@
 {
   "userManagement": {
     "activated": "Activé",
-    "create": "Création d'un nouvel utilisateur",
+    "create": "Nouvel utilisateur",
     "created": "L'utilisateur {{ param }} a été créé.",
     "createdBy": "Créé par",
     "createdDate": "Créé le",
@@ -13,7 +13,7 @@
     "detail": {
       "title": "Utilisateur"
     },
-    "edit": "Modification d'un nouvel utilisateur",
+    "edit": "Nouvel utilisateur",
     "email": "Email",
     "firstName": "Prénom",
     "home": {

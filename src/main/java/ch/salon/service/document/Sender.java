@@ -1,9 +1,11 @@
 package ch.salon.service.document;
 
 import ch.salon.domain.Salon;
+import lombok.Data;
 
 import java.io.Serializable;
 
+@Data
 public class Sender implements Serializable {
 
     private String enterpriseName;
@@ -16,37 +18,5 @@ public class Sender implements Serializable {
         this.street = "Sous les chênes 109A";
         this.city = "2944 Bonfol";
         this.website = "www.lajoiedemieuxvivre-alle.com";
-    }
-
-    public String getEnterpriseName() {
-        return enterpriseName;
-    }
-
-    public void setEnterpriseName(String enterpriseName) {
-        this.enterpriseName = enterpriseName;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
     }
 }

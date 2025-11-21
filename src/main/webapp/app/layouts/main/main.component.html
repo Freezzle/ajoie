@@ -3,8 +3,8 @@
     <router-outlet name="navbar"></router-outlet>
 
     <!-- Main content card -->
-    <div class="main-content">
-        <div class="card jh-card">
+    <div class="main-content" [class.inDevelopement]="inDevelopementMode()">
+        <div>
             <router-outlet></router-outlet>
         </div>
     </div>

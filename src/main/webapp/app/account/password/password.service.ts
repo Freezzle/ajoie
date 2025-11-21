@@ -9,7 +9,7 @@ export class PasswordService {
     private http = inject(HttpClient);
     private applicationConfigService = inject(ApplicationConfigService);
 
-    save(newPassword: string, currentPassword: string): Observable<{}> {
+    save(newPassword: string, currentPassword: string): Observable<unknown> {
         return this.http.post(this.applicationConfigService.getEndpointFor('api/account/change-password'),
             {currentPassword, newPassword});
     }

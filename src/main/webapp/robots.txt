@@ -7,4 +7,3 @@ Disallow: /api/account/sessions
 Disallow: /api/logs/
 Disallow: /api/users/
 Disallow: /management/
-Disallow: /v3/api-docs/
