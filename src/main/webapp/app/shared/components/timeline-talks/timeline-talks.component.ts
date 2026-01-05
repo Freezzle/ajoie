@@ -184,14 +184,50 @@ export class TimelineTalksComponent {
                         }
                     }
 
-                    return {
-                        ...talk,
-                        dayId: null,
-                        roomId: null,
-                    };
+                    return this.unassignTalk(talk)
                 })
             );
         });
+
+        effect(() => {
+            // 🔥 nouveau nettoyage : talks en dehors des bounds après recalcul
+            const day = this.selectedDay();
+            const bounds = this.roomBoundariesById(); // dépend des ranges + interval + roomsFromSelectedDay
+            this.cleanupTalksOutsideBounds(day, bounds);
+        });
+    }
+
+    private unassignTalk(t: Talk): Talk {
+        return { ...t, roomId: null, dayId: null, startSlot: 0 };
+    }
+
+    private cleanupTalksOutsideBounds(day: TimelineDay | null, boundsByRoomId: Map<string, RoomBounds>): void {
+        if (!day) { return; }
+
+        this.talks.update(ts =>
+            ts.map(t => {
+                // ne touche que les talks du jour courant et assignés à une room
+                if (t.dayId !== day.id) { return t; }
+                if (!t.roomId) { return t; }
+
+                const b = boundsByRoomId.get(t.roomId);
+                if (!b) {
+                    // room plus présente dans la config du jour sélectionné
+                    return this.unassignTalk(t);
+                }
+
+                const periods = this.getTalkNbPeriods(t);
+                const start = t.startSlot ?? b.start;
+                const end = start + periods;
+
+                const outside = start < b.start || end > b.end;
+                if (outside) {
+                    return this.unassignTalk(t);
+                }
+
+                return t;
+            })
+        );
     }
 
     getTalkStartTimeLabel(talk: Talk): string {
@@ -245,7 +281,7 @@ export class TimelineTalksComponent {
             event.source.reset();
 
             this.talks.update(ts =>
-                ts.map(t => (t.id === talk.id ? {...t, roomId: null, dayId: null, startSlot: 0} : t))
+                ts.map(t => (t.id === talk.id ? this.unassignTalk(t) : t))
             );
 
             this.clearHover();

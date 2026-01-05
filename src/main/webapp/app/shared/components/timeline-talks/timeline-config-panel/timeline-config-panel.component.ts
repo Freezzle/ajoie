@@ -32,7 +32,7 @@ type IdLabel = { id: string; label: string };
     templateUrl: './timeline-config-panel.component.html',
 })
 export class TimelineConfigPanelComponent {
-    private readonly TIME_REF = new Date();
+    private readonly TIME_REF = new Date(2000, 0, 1, 0, 0, 0, 0);
 
     private fb = inject(NonNullableFormBuilder);
 
@@ -42,13 +42,22 @@ export class TimelineConfigPanelComponent {
 
     @Input({required: true})
     set data(value: TimelineData) {
-        this._data.set(value);
+        // Normalize toutes les heures entrantes sur TIME_REF
+        const normalized = structuredClone(value);
+        normalized.days.forEach(day => {
+            day.rooms.forEach(r => {
+                r.startingHour = this.normalizeTime(new Date(r.startingHour));
+                r.endingHour = this.normalizeTime(new Date(r.endingHour));
+            });
+        });
+
+        this._data.set(normalized);
 
         const sel = this.selectedDayId();
-        if (sel && !value.days.some(d => d.id === sel)) {
+        if (sel && !normalized.days.some(d => d.id === sel)) {
             this.selectedDayId.set(null);
         } else if (!sel) {
-            this.selectedDayId.set(value.days[0]?.id ?? null);
+            this.selectedDayId.set(normalized.days[0]?.id ?? null);
         }
     }
 
@@ -352,13 +361,14 @@ export class TimelineConfigPanelComponent {
     }
 
     private timeAt(h: number, m: number): Date {
-        const d = new Date(this.TIME_REF);
+        const d = new Date(this.TIME_REF.getTime()); // clone propre
         d.setHours(h, m, 0, 0);
         return d;
     }
 
     private normalizeTime(d: Date): Date {
-        const x = new Date(this.TIME_REF);
+        // Reprend uniquement heures/minutes et force la date TIME_REF
+        const x = new Date(this.TIME_REF.getTime());
         x.setHours(d.getHours(), d.getMinutes(), 0, 0);
         return x;
     }
