@@ -1,5 +1,5 @@
 <div>
-  <form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
+  <form [formGroup]="editForm" name="editForm">
     <h2 id="page-heading">
       <div class="d-flex justify-content-center">
         @if (user?.id) {
@@ -37,9 +37,8 @@
             }
 
             @if (!isReadOnly) {
-              <button-box
+              <button-box (clickedEvent)="save()"
                 [isDisabled]="editForm.invalid || isLoading()"
-                [isSubmit]="true"
                 faIcon="floppy-disk"
                 translateKey="common.save" [showText]="false"/>
             }

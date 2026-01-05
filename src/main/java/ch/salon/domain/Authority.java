@@ -11,10 +11,14 @@ import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.data.domain.Persistable;
 
 import java.io.Serializable;
 
+@ToString(exclude = {"isPersisted"})
+@EqualsAndHashCode(exclude = {"isPersisted"})
 @Entity
 @Table(name = "jhi_authority")
 @JsonIgnoreProperties(value = {"new", "id"})

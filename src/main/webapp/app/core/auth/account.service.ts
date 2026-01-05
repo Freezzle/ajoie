@@ -8,6 +8,7 @@ import {catchError, shareReplay, tap} from 'rxjs/operators';
 import {StateStorageService} from 'app/core/auth/state-storage.service';
 import {Account} from 'app/core/auth/account.model';
 import {ApplicationConfigService} from '../config/application-config.service';
+import {PresenceService} from "../../admin/presence/service/presence.service";
 
 @Injectable({providedIn: 'root'})
 export class AccountService {

@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {registerLocaleData} from '@angular/common';
 import {FaIconLibrary} from '@fortawesome/angular-fontawesome';
 import locale from '@angular/common/locales/fr';

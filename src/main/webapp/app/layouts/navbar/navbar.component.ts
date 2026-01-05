@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, inject, OnInit, signal, ViewChild} from '@angular/core';
+import {Component, effect, ElementRef, HostListener, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
 import {NavigationEnd, Router, RouterModule} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -13,6 +13,7 @@ import {SalonService} from '../../admin/salon/service/salon.service';
 import {map} from 'rxjs/operators';
 import {NavigationStateService} from "./navigation-state.service";
 import {PresenceComponent} from "../../admin/presence/component/presence.component";
+import {PresenceService} from "../../admin/presence/service/presence.service";
 
 @Component({
     selector: 'app-navbar',
@@ -36,7 +37,6 @@ export default class NavbarComponent implements OnInit {
     private salonService = inject(SalonService);
 
     ngOnInit(): void {
-
         this.manageSalonUrl();
         this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
             this.manageSalonUrl();
@@ -98,7 +98,9 @@ export default class NavbarComponent implements OnInit {
         }
 
         const target = event.target as Node | null;
-        if (!target || !this.sidebar) {return;}
+        if (!target || !this.sidebar) {
+            return;
+        }
 
         const clickedInside = this.sidebar.nativeElement.contains(target);
 

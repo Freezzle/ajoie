@@ -15,7 +15,7 @@ import {TimeSincePipe} from "../../../shared/pipe/time-since.pipe";
     templateUrl: './presence.component.html',
     styleUrl: './presence.component.scss',
 })
-export class PresenceComponent implements OnInit, OnDestroy {
+export class PresenceComponent {
     private presenceService = inject(PresenceService);
     account = inject(AccountService).trackCurrentAccount();
 
@@ -23,14 +23,6 @@ export class PresenceComponent implements OnInit, OnDestroy {
     onlineCount$ = this.presenceService.onlineCount$;
 
     @ViewChild('pop') pop!: Popover;
-
-    ngOnInit() {
-        this.presenceService.connect();
-    }
-
-    ngOnDestroy(): void {
-        this.presenceService.disconnect();
-    }
 
     toggle(event: Event) {
         this.pop.toggle(event);

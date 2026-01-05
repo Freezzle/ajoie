@@ -4,14 +4,17 @@ import {map} from 'rxjs/operators';
 
 import {AccountService} from 'app/core/auth/account.service';
 import {StateStorageService} from './state-storage.service';
+import {PresenceService} from "../../admin/presence/service/presence.service";
 
 export const UserRouteAccessService: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const accountService = inject(AccountService);
+    const presenceService = inject(PresenceService);
     const router = inject(Router);
     const stateStorageService = inject(StateStorageService);
     return accountService.identity().pipe(
         map(account => {
             if (account) {
+                presenceService.connect();
                 const authorities = next.data['authorities'];
 
                 if (!authorities || authorities.length === 0 || accountService.hasAnyAuthority(authorities)) {
@@ -23,6 +26,8 @@ export const UserRouteAccessService: CanActivateFn = (next: ActivatedRouteSnapsh
                 }
                 router.navigate(['accessdenied']);
                 return false;
+            } else {
+                presenceService.disconnect();
             }
 
             stateStorageService.storeUrl(state.url);

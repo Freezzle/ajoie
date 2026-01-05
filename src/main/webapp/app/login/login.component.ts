@@ -11,6 +11,7 @@ import {AlertErrorComponent} from "../shared/alert/alert-error.component";
 import {ConfirmPopup} from "primeng/confirmpopup";
 import {Toast} from "primeng/toast";
 import {CardComponent} from "../shared/components/card/card.component";
+import {PresenceService} from "../admin/presence/service/presence.service";
 
 @Component({
     selector: 'app-login',
