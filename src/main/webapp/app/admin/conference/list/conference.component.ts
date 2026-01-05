@@ -24,6 +24,7 @@ import {CardComponent} from "../../../shared/components/card/card.component";
 import {IconField} from "primeng/iconfield";
 import {InputIcon} from "primeng/inputicon";
 import {InputText} from "primeng/inputtext";
+import {MultiSelect} from "primeng/multiselect";
 
 @Component({
     selector: 'app-conference',
@@ -46,6 +47,7 @@ import {InputText} from "primeng/inputtext";
         IconField,
         InputIcon,
         InputText,
+        MultiSelect,
     ]
 })
 export class ConferenceComponent implements OnInit {

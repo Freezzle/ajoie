@@ -66,6 +66,20 @@
                             <th>Info</th>
                             <th pSortableColumn="status">{{ 'conference.status.label' | translate }}
                                 <p-sortIcon field="status"/>
+                                <p-columnFilter field="status" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                                    <ng-template #filter let-value let-filter="filterCallback">
+                                        <p-multiselect [ngModel]="value" [options]="statusValues" (ngModelChange)="filter($event)" style="min-width: 14rem" [panelStyle]="{ minWidth: '16rem' }">
+                                            <ng-template let-option #item>
+                                                <div class="flex items-center gap-2">
+                                                    <fa-icon [icon]="option | status"
+                                                             [class]="option | colorStatus"
+                                                             [title]="'conference.status.list.' + option | translate"></fa-icon>
+                                                    <span>{{ 'conference.status.list.' + option | translate }}</span>
+                                                </div>
+                                            </ng-template>
+                                        </p-multiselect>
+                                    </ng-template>
+                                </p-columnFilter>
                             </th>
                             <th>&nbsp;</th>
                         </tr>
