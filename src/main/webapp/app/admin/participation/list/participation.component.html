@@ -133,8 +133,8 @@
                                 @if (participation.needArrangement) {
                                     <fa-icon icon="handshake-simple" class="text-primary"></fa-icon>
                                 }
-                                @if (participation.offer) {
-                                    <fa-icon icon="gift" class="text-primary"></fa-icon>
+                                @if (participation.hasOffer) {
+                                    <fa-icon icon="gift" [title]="participation.offer" class="text-primary"></fa-icon>
                                 }
                             </td>
                             <td class="clickable" [routerLink]="['./', participation.id, 'view']">
