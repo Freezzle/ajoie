@@ -1,0 +1,54 @@
+<p-button
+        type="button"
+        icon="pi pi-user"
+        [badge]="'' + ((onlineCount$ | async) ?? 0)"
+        (click)="toggle($event)"
+></p-button>
+
+<p-popover #pop [style]="{ minWidth: '300px' }" [baseZIndex]="9999">
+    <div class="flex align-items-center justify-content-between mb-2">
+        <span class="font-bold">Utilisateurs en ligne</span>
+    </div>
+
+    <p-table [value]="(presence$ | async) ?? []">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Nom</th>
+                <th>Status</th>
+                <th>Dernière connexion</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row>
+            <tr>
+                <td>
+                    <div class="flex flex-column">
+                        <span class="font-medium" [class.fw-bold]="account()?.login === row.login">{{ row.displayName }}</span>
+                    </div>
+                </td>
+
+                <td>
+                    <p-tag [severity]="row.online ? undefined : 'danger'"
+                           [value]="row.online ? 'En ligne' : 'Hors ligne'"/>
+                </td>
+
+                <td>
+                    @if (row.online) {
+                        -
+                    } @else {
+                        <div class="flex flex-column">
+                            @if (row.lastSeen) {
+                                <small>{{ row.lastSeen | timeSince }}</small>
+                            }
+                            @if (!row.lastSeen && row.lastLoginAt) {
+                                <small class="text-500">
+                                    login: {{ row.lastLoginAt | timeSince }}
+                                </small>
+                            }
+                        </div>
+                    }
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-popover>

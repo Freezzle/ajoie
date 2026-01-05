@@ -159,8 +159,9 @@
                         </a>
                     </div>
                 }
-                <div (click)="closeMobile()">
-                    <a routerLink="/account/sessions" routerLinkActive="active">
+                <div class="d-flex gap-2 align-items-center">
+                    <app-presence *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"></app-presence>
+                    <a  (click)="closeMobile()" routerLink="/account/sessions" routerLinkActive="active">
                         <fa-icon icon="cloud" class="text-white" [fixedWidth]="true"></fa-icon>
                     </a>
                 </div>

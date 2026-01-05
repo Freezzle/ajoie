@@ -89,6 +89,12 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "reset_date")
     private Instant resetDate = null;
 
+    @Column(name = "last_login_at")
+    private Instant lastLoginAt;
+
+    @Column(name = "last_seen_at")
+    private Instant lastSeenAt;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "jhi_user_authority", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})

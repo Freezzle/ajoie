@@ -47,14 +47,16 @@ export class TimelineConfigPanelComponent {
         const sel = this.selectedDayId();
         if (sel && !value.days.some(d => d.id === sel)) {
             this.selectedDayId.set(null);
-        } else if(!sel){
+        } else if (!sel) {
             this.selectedDayId.set(value.days[0]?.id ?? null);
         }
     }
 
     get data(): TimelineData {
         const d = this._data();
-        if (!d) {throw new Error('data required');}
+        if (!d) {
+            throw new Error('data required');
+        }
         return d;
     }
 
@@ -106,7 +108,9 @@ export class TimelineConfigPanelComponent {
 
     selectedDayRoomRows = computed(() => {
         const day = this.selectedDay();
-        if (!day) {return [];}
+        if (!day) {
+            return [];
+        }
 
         const roomsById = new Map(this.rooms().map(r => [r.id, r]));
         return day.rooms
@@ -121,7 +125,9 @@ export class TimelineConfigPanelComponent {
 
     availableRoomsForSelectedDay = computed<IdLabel[]>(() => {
         const day = this.selectedDay();
-        if (!day) {return this.roomOptions();}
+        if (!day) {
+            return this.roomOptions();
+        }
         const used = new Set(day.rooms.map(x => x.roomId));
         return this.roomOptions().filter(r => !used.has(r.id));
     });
@@ -144,10 +150,14 @@ export class TimelineConfigPanelComponent {
 
     updateRoomLabel(roomId: string, label: string) {
         const v = label.trim();
-        if (!v) {return;}
+        if (!v) {
+            return;
+        }
         this.commit(next => {
             const r = next.rooms.find(x => x.id === roomId);
-            if (r) {r.label = v;}
+            if (r) {
+                r.label = v;
+            }
         });
     }
 
@@ -168,7 +178,9 @@ export class TimelineConfigPanelComponent {
 
     commitRoomLabel(roomId: string) {
         const value = this.roomLabelDraft()[roomId];
-        if (value === undefined) {return;}
+        if (value === undefined) {
+            return;
+        }
 
         this.updateRoomLabel(roomId, value); // ton commit existant (trim etc.)
         this.roomLabelDraft.update(m => {
@@ -188,7 +200,9 @@ export class TimelineConfigPanelComponent {
 
     commitDayLabel(dayId: string) {
         const value = this.dayLabelDraft()[dayId];
-        if (value === undefined) {return;}
+        if (value === undefined) {
+            return;
+        }
 
         this.updateDayLabel(dayId, value);
         this.dayLabelDraft.update(m => {
@@ -212,10 +226,14 @@ export class TimelineConfigPanelComponent {
 
     updateDayLabel(dayId: string, label: string) {
         const v = label.trim();
-        if (!v) {return;}
+        if (!v) {
+            return;
+        }
         this.commit(next => {
             const d = next.days.find(x => x.id === dayId);
-            if (d) {d.label = v;}
+            if (d) {
+                d.label = v;
+            }
         });
     }
 
@@ -223,7 +241,9 @@ export class TimelineConfigPanelComponent {
         this.commit(next => {
             next.days = next.days.filter(d => d.id !== dayId);
         });
-        if (this.selectedDayId() === dayId) {this.selectedDayId.set(null);}
+        if (this.selectedDayId() === dayId) {
+            this.selectedDayId.set(null);
+        }
     }
 
     // Assignations
@@ -238,7 +258,9 @@ export class TimelineConfigPanelComponent {
 
     addRoomToSelectedDay() {
         const day = this.selectedDay();
-        if (!day) {return;}
+        if (!day) {
+            return;
+        }
 
         if (this.addRoomToDayForm.invalid) {
             this.addRoomToDayForm.markAllAsTouched();
@@ -248,12 +270,18 @@ export class TimelineConfigPanelComponent {
         const roomId = this.addRoomToDayForm.controls.roomId.value!;
         const start = this.normalizeTime(this.addRoomToDayForm.controls.startingHour.value);
         const end = this.normalizeTime(this.addRoomToDayForm.controls.endingHour.value);
-        if (end.getTime() <= start.getTime()) {return;}
+        if (end.getTime() <= start.getTime()) {
+            return;
+        }
 
         this.commit(next => {
             const d = next.days.find(x => x.id === day.id);
-            if (!d) {return;}
-            if (d.rooms.some(r => r.roomId === roomId)) {return;}
+            if (!d) {
+                return;
+            }
+            if (d.rooms.some(r => r.roomId === roomId)) {
+                return;
+            }
             d.rooms.push({roomId, startingHour: start, endingHour: end});
         });
 
@@ -266,17 +294,25 @@ export class TimelineConfigPanelComponent {
 
     updateSelectedDayRoomTime(roomId: string, startingHour: Date, endingHour: Date) {
         const day = this.selectedDay();
-        if (!day) {return;}
+        if (!day) {
+            return;
+        }
 
         const start = this.normalizeTime(startingHour);
         const end = this.normalizeTime(endingHour);
-        if (end.getTime() <= start.getTime()) {return;}
+        if (end.getTime() <= start.getTime()) {
+            return;
+        }
 
         this.commit(next => {
             const d = next.days.find(x => x.id === day.id);
-            if (!d) {return;}
+            if (!d) {
+                return;
+            }
             const rd = d.rooms.find(x => x.roomId === roomId);
-            if (!rd) {return;}
+            if (!rd) {
+                return;
+            }
             rd.startingHour = start;
             rd.endingHour = end;
         });
@@ -284,10 +320,14 @@ export class TimelineConfigPanelComponent {
 
     askRemoveRoomFromSelectedDay(roomId: string) {
         const day = this.selectedDay();
-        if (!day) {return;}
+        if (!day) {
+            return;
+        }
         this.commit(next => {
             const d = next.days.find(x => x.id === day.id);
-            if (!d) {return;}
+            if (!d) {
+                return;
+            }
             d.rooms = d.rooms.filter(x => x.roomId !== roomId);
         });
     }
@@ -295,7 +335,9 @@ export class TimelineConfigPanelComponent {
     // infra
     private commit(mutator: (next: TimelineData) => void) {
         const current = this._data();
-        if (!current) {return;}
+        if (!current) {
+            return;
+        }
         const next = structuredClone(current);
         mutator(next);
         this._data.set(next);
@@ -303,7 +345,9 @@ export class TimelineConfigPanelComponent {
     }
 
     private newId(): string {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {return crypto.randomUUID();}
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
         return 'id_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
     }
 

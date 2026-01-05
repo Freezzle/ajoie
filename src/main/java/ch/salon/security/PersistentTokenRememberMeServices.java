@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import ch.salon.utils.SalonProperties;
 import ch.salon.utils.PersistentTokenCache;
 import ch.salon.utils.RandomUtil;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
@@ -69,8 +71,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     private final UserRepository userRepository;
 
     public PersistentTokenRememberMeServices(SalonProperties salonProperties,
-            org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
-            PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+                                             org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
+                                             PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
         super(salonProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
@@ -78,20 +80,24 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     }
 
     @Override
+    @Transactional
     protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
-            HttpServletResponse response) {
+                                                 HttpServletResponse response) {
         synchronized (this) { // prevent 2 authentication requests from the same user in parallel
             String login = null;
             UpgradedRememberMeToken upgradedToken = upgradedTokenCache.get(cookieTokens[0]);
             if (upgradedToken != null) {
                 login = upgradedToken.getUserLoginIfValid(cookieTokens);
+                userRepository.updateLastLoginAt(login, Instant.now());
                 log.debug("Detected previously upgraded login token for user '{}'", login);
             }
 
             if (login == null) {
                 PersistentToken token = getPersistentToken(cookieTokens);
                 login = token.getUser().getLogin();
-
+                if (login != null) {
+                    userRepository.updateLastLoginAt(login, Instant.now());
+                }
                 // Token also matches, so login is valid. Update the token value, keeping the *same* series number.
                 log.debug("Refreshing persistent login token for user '{}', series '{}'", login, token.getSeries());
                 token.setTokenDate(LocalDate.now());
@@ -112,8 +118,9 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     }
 
     @Override
+    @Transactional
     protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication successfulAuthentication) {
+                                  Authentication successfulAuthentication) {
         String login = successfulAuthentication.getName();
 
         log.debug("Creating new persistent login for user {}", login);
@@ -146,6 +153,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
      * @param authentication the authentication.
      */
     @Override
+    @Transactional
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String rememberMeCookie = extractRememberMeCookie(request);
         if (rememberMeCookie != null && rememberMeCookie.length() != 0) {

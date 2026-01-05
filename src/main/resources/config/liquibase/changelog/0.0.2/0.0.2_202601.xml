@@ -8,4 +8,13 @@
         <dropTable tableName="time_slot"/>
         <dropTable tableName="volunteer"/>
     </changeSet>
+
+    <changeSet id="0.0.2_202601-2" author="claudedy">
+        <addColumn tableName="jhi_user">
+            <column name="last_login_at" type="timestamp"/>
+        </addColumn>
+        <addColumn tableName="jhi_user">
+            <column name="last_seen_at" type="timestamp"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

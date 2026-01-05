@@ -1,5 +1,6 @@
 package ch.salon.config;
 
+import ch.salon.repository.UserRepository;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.web.filter.SpaWebFilter;
 import ch.salon.utils.CookieCsrfFilter;
@@ -27,8 +28,10 @@ import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.util.function.Supplier;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -39,10 +42,12 @@ public class SecurityConfiguration {
 
     private final SalonProperties salonProperties;
     private final RememberMeServices rememberMeServices;
+    private final UserRepository userRepository;
 
-    public SecurityConfiguration(RememberMeServices rememberMeServices, SalonProperties salonProperties) {
+    public SecurityConfiguration(RememberMeServices rememberMeServices, SalonProperties salonProperties, UserRepository userRepository) {
         this.rememberMeServices = rememberMeServices;
         this.salonProperties = salonProperties;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -51,10 +56,12 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Transactional
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(withDefaults())
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/ws/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 )
@@ -80,6 +87,7 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/*.ico", "/*.png", "/*.svg", "/*.woff2", "/*.woff", "/*.ttf", "/*.webapp"
                         ).permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/app/**").permitAll()
                         .requestMatchers("/i18n/**").permitAll()
                         .requestMatchers("/content/**").permitAll()
@@ -104,7 +112,10 @@ public class SecurityConfiguration {
                 .formLogin(formLogin -> formLogin
                         .loginPage("/")
                         .loginProcessingUrl("/api/authentication")
-                        .successHandler((request, response, authentication) -> response.setStatus(HttpStatus.OK.value()))
+                        .successHandler((request, response, authentication) -> {
+                            userRepository.updateLastLoginAt(authentication.getName(), Instant.now());
+                            response.setStatus(HttpStatus.OK.value());
+                        })
                         .failureHandler((request, response, exception) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()))
                         .permitAll()
                 )

@@ -12,12 +12,13 @@ import {filter} from 'rxjs';
 import {SalonService} from '../../admin/salon/service/salon.service';
 import {map} from 'rxjs/operators';
 import {NavigationStateService} from "./navigation-state.service";
+import {PresenceComponent} from "../../admin/presence/component/presence.component";
 
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
-    imports: [RouterModule, SharedModule, HasAnyAuthorityDirective]
+    imports: [RouterModule, SharedModule, HasAnyAuthorityDirective, PresenceComponent]
 })
 export default class NavbarComponent implements OnInit {
     @ViewChild('sidebar', {static: true}) sidebar!: ElementRef<HTMLElement>;
