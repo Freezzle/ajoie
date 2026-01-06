@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, model, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CdkDrag, CdkDragEnd, CdkDragHandle, CdkDragMove, CdkDragStart} from '@angular/cdk/drag-drop';
 import ColorStatusPipe from "../../../../shared/pipe/color-status.pipe";
@@ -23,6 +23,7 @@ export class FloorPlanDimensionTileComponent {
   @Input() displayHeader = true;
   @Input() displayTechnical = false;
   @Input() displayFullname = false;
+  displaySensibleInformation = model<boolean>(true);
 
   // comportement
   @Input() dragDisabled = false;
@@ -33,7 +34,6 @@ export class FloorPlanDimensionTileComponent {
   @Output() dragStarted = new EventEmitter<CdkDragStart>();
   @Output() dragMoved = new EventEmitter<CdkDragMove>();
   @Output() dragEnded = new EventEmitter<CdkDragEnd>();
-  @Output() clicked = new EventEmitter<MouseEvent>();
 
   protected readonly getFirstExhibitorName = getFirstExhibitorName;
 }

@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, computed, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
 import {CdkDragDrop, CdkDropList} from '@angular/cdk/drag-drop';
 import {
     AddPlanInfo,
@@ -65,6 +65,9 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     private floorPlanService = inject(FloorPlanService);
     private activatedRoute = inject(ActivatedRoute);
 
+    private clickTimer: any;
+    private readonly clickDelay = 220;
+
     PIXELS = 20;
     DEFAULT_HIGHLIGHT = '#FFFFFF';
 
@@ -90,6 +93,8 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     salon?: ISalon;
     gridCellPopOver: GridCell | null = null;
     floorPlansToRemove: string[] = [];
+
+    idOnlydisplaySensibleInformation = signal<string | null>(null)
 
     isNumberAttribution: FormControl<boolean | null> = new FormControl<boolean>(false);
     automaticallyIncrementNumber: FormControl<boolean | null> = new FormControl<boolean>(true);
@@ -548,6 +553,28 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
                     this.indexActiveFloorPlan = this.indexActiveFloorPlan - 1;
                 }
             });
+    }
+
+    onClick(event: MouseEvent, cell: GridCell) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        clearTimeout(this.clickTimer);
+        this.clickTimer = setTimeout(() => {
+            (!this.isReadOnly && this.isNumberAttribution.value) ? this.onClickNumberAttribution(cell) : this.openStandDialog(cell)
+        }, this.clickDelay);
+    }
+
+    onDoubleClick(event: MouseEvent, cell: GridCell) {
+        clearTimeout(this.clickTimer);
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (this.idOnlydisplaySensibleInformation()) {
+            this.idOnlydisplaySensibleInformation.set(null);
+        } else {
+            this.idOnlydisplaySensibleInformation.set(cell.id ?? null);
+        }
     }
 
     onClickNumberAttribution(cell: GridCell): void {

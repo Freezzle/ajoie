@@ -6,11 +6,11 @@
      (cdkDragStarted)="dragStarted.emit($event)"
      (cdkDragMoved)="dragMoved.emit($event)"
      (cdkDragEnded)="dragEnded.emit($event)"
+     [cdkDragStartDelay]="150"
      [style.background-color]="dimension.color"
      [style.height.px]="dimension.rows * pixels"
      [style.width.px]="dimension.cols * pixels"
-     [style.cursor]="cursor"
-     (click)="clicked.emit($event)">
+     [style.cursor]="cursor">
     <!-- handle pleine surface -->
     <div class="handle" cdkDragHandle>
         <div class="shape-inside">
@@ -19,7 +19,7 @@
                     @if (!dimension.stand) {
                         <span>{{ dimension.dimension }}</span>
                     }
-                    @if (dimension.stand?.participation; as participation) {
+                    @if (displaySensibleInformation() && dimension.stand?.participation; as participation) {
                         <div>
                             @if (displayFullname) {
                                 {{ getFirstExhibitorName(participation.exhibitor) }}
@@ -34,12 +34,12 @@
             @if (displayHeader) {
                 <div class="technical-header">
                     <div class="technical-info-item">
-                        @if (dimension.stand && dimension.stand.dimension.id !== dimension.idDimension) {
+                        @if (displaySensibleInformation() && dimension.stand && dimension.stand.dimension.id !== dimension.idDimension) {
                             <fa-icon [title]="'floorPlan.differentDimension' | translate"
                                      class="text-danger"
                                      icon="warning"></fa-icon>
                         }
-                        @if (dimension.prereserved) {
+                        @if (displaySensibleInformation() && dimension.prereserved) {
                             <fa-icon [title]="dimension.prereserved.note"
                                      class="text-primary"
                                      icon="tag"></fa-icon>
@@ -47,7 +47,7 @@
                     </div>
 
                     <div class="technical-info-item">
-                        @if (dimension.stand?.participation; as participation) {
+                        @if (displaySensibleInformation() && dimension.stand?.participation; as participation) {
                             <fa-icon [title]="'participation.status.list.' + participation.status | translate"
                                      [icon]="participation.status | status"
                                      [class]="participation.status | colorStatus"></fa-icon>
@@ -62,7 +62,7 @@
                 </div>
             }
 
-            @if (displayTechnical) {
+            @if (displaySensibleInformation() && displayTechnical) {
                 <div class="technical-info">
                     <div class="technical-info-item">&nbsp;</div>
                     <div class="technical-info-item">&nbsp;</div>

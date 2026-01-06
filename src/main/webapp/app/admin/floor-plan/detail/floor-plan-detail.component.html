@@ -302,7 +302,9 @@
                                                                                                [displayHeader]="displayHeader"
                                                                                                [displayTechnical]="displayTechnical"
                                                                                                [displayFullname]="displayFullname"
-                                                                                               (click)="(!isReadOnly && isNumberAttribution.value) ? onClickNumberAttribution(cell) : openStandDialog(cell)"
+                                                                                               [displaySensibleInformation]="idOnlydisplaySensibleInformation() === null || this.idOnlydisplaySensibleInformation() === cell.id"
+                                                                                               (dblclick)="onDoubleClick($event, cell)"
+                                                                                               (click)="onClick($event, cell)"
                                                                                                (dragStarted)="startDragging(cell)"
                                                                                                (dragEnded)="finishDragging(cell)"
                                                                                                (dragMoved)="highlightCells($event)"/>
