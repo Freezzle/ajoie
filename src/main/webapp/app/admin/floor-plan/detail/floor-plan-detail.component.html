@@ -415,6 +415,33 @@
 
                 <p-contextMenu #cm [model]="contextMenuItems" appendTo="body"></p-contextMenu>
             </div>
+
+            <p-dialog
+                    header="Réserver la place"
+                    [(visible)]="prereservedDialogVisible"
+                    [closable]="false"
+                    [draggable]="false"
+                    [resizable]="false"
+                    [style]="{ width: '32rem' }"
+                    (onHide)="onPrereservedDialogHide()">
+
+                <p-iftalabel>
+                    <textarea pTextarea
+                              [(ngModel)]="prereservedNote" rows="2" fluid></textarea>
+                    <label [for]="'field_prereservedNote'">Note</label>
+                </p-iftalabel>
+
+                <ng-template pTemplate="footer">
+                    <button-box (clickedEvent)="prereservedDialogVisible = false"
+                                translateKey="common.cancel"
+                                type="secondary"/>
+
+                    <button-box (clickedEvent)="confirmPrereserved()"
+                                [isDisabled]="!canConfirmPrereserved()"
+                                translateKey="common.save"
+                                type="primary"/>
+                </ng-template>
+            </p-dialog>
         </div>
     </app-card>
 </app-content-page>

@@ -31,7 +31,12 @@ export interface DimensionCell {
     rows: number;
     color: string;
     stand?: IStand | null;
+    prereserved: Prereserved | null;
     position: number | null;
+}
+
+export interface Prereserved {
+    note: string;
 }
 
 export interface IFloorPlanLight {
@@ -60,6 +65,7 @@ export interface DimensionCellLight {
     cols: number;
     rows: number;
     stand?: Pick<IStand, 'id'> | null;
+    prereserved: Prereserved | null;
     position: number | null;
 }
 
@@ -72,6 +78,7 @@ export function mapDimensionCell(dimension?: DimensionCell | null): DimensionCel
         cols: dimension.cols,
         rows: dimension.rows,
         stand: dimension.stand ? {id: dimension.stand.id} : null,
+        prereserved: dimension.prereserved,
         position: dimension.position,
     };
 }
@@ -126,6 +133,7 @@ export function mapDimensionCellLight(
         dimension: dimensionFound.dimension,
         color: getColorStand(standFound ?? null),
         stand: standFound,
+        prereserved: dimension.prereserved,
         position: dimension.position,
     };
 }
@@ -182,6 +190,7 @@ export function convertAvailableDimensionCell(dimensionStand: IPriceStandSalon, 
         color: getColorStand(stand ?? null),
         cols: (dimensionStand.heightMeter ?? 1) * 2,
         rows: (dimensionStand.widthMeter ?? 1) * 2,
+        prereserved: null,
         position: null
     };
 }

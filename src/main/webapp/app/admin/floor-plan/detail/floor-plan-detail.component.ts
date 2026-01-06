@@ -22,7 +22,7 @@ import {combineLatest, filter, forkJoin, Observable} from 'rxjs';
 import {ISalon} from '../../salon/model/salon.interface';
 import {SalonService} from '../../salon/service/salon.service';
 import {finalize, map} from 'rxjs/operators';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ITEM_ADDED_EVENT, ITEM_DELETED_EVENT, ITEM_UPDATED_EVENT} from '../../../config/navigation.constants';
 import {RenamePlanDialogComponent} from '../rename-plan/rename-plan-dialog.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -46,13 +46,15 @@ import {CardComponent} from "../../../shared/components/card/card.component";
 import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
 import ColorStatusPipe from "../../../shared/pipe/color-status.pipe";
 import StatusPipe from "../../../shared/pipe/status.pipe";
+import {Textarea} from "primeng/textarea";
+import {IftaLabel} from "primeng/iftalabel";
 
 @Component({
     selector: 'floor-plan',
     templateUrl: './floor-plan-detail.component.html',
     styleUrl: './floor-plan-detail.component.scss',
     imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule,
-        ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Dialog, Tag, PrimeTemplate, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe]
+        ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Dialog, Tag, PrimeTemplate, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe, Textarea, IftaLabel]
 })
 export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     @ViewChild('cm', {static: true}) cm!: ContextMenu;
@@ -103,6 +105,10 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     isDragging = false;
     draggingCell: GridCell | null = null;
+
+    prereservedDialogVisible = false;
+    prereservedNote: string | null = null;
+    private prereservedTargetDimension: DimensionCell | null = null;
 
     resetPalette(): void {
         this.showDimensions = false;
@@ -275,7 +281,9 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
         const dimensionCell = structuredClone(event.item.data) as DimensionCell;
 
-        if (!this.gridContainer) {return;}
+        if (!this.gridContainer) {
+            return;
+        }
 
         const gridRect = this.gridContainer.nativeElement.getBoundingClientRect();
         const x = event.dropPoint.x - gridRect.left;
@@ -284,7 +292,9 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         const row = Math.floor(y / this.PIXELS);
         const col = Math.floor(x / this.PIXELS);
 
-        if (!this.canPlaceShape(row, col, dimensionCell)) {return;}
+        if (!this.canPlaceShape(row, col, dimensionCell)) {
+            return;
+        }
 
         this.placeShape(row, col, dimensionCell);
 
@@ -415,14 +425,18 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     movePositionFloorPlan(mode: 'right' | 'left') {
         const floorPlan = this.getActiveFloorPlan();
-        if (!floorPlan || !this.canMoveFloorPlan(mode)) {return;}
+        if (!floorPlan || !this.canMoveFloorPlan(mode)) {
+            return;
+        }
 
         const delta = mode === 'right' ? 1 : -1;
         const neighborPos = floorPlan.position + delta;
 
         // Trouver le voisin par sa position
         const neighbor = this.floorPlans.find(fp => fp.position === neighborPos);
-        if (!neighbor) {return;}
+        if (!neighbor) {
+            return;
+        }
 
         // Swap des positions
         const tmp = floorPlan.position;
@@ -643,6 +657,16 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         this.cm?.hide();
     }
 
+    cancelPrereserved(cell: DimensionCell) {
+        if (!cell) {
+            return;
+        }
+
+        cell.prereserved = null;
+
+        this.cm?.hide();
+    }
+
     private unassignCell(cell: GridCell) {
         if (cell.dimension?.stand) {
             this.availableStandDimensions.push(convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand));
@@ -722,6 +746,21 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
             });
         }
 
+        if (cell.dimension?.prereserved) {
+            items.push({
+                label: 'Annuler la réservation',
+                icon: PrimeIcons.TAG + ' text-warning',
+                command: () => this.cancelPrereserved(cell.dimension!),
+            });
+        }
+        if (!cell.dimension?.stand && !cell.dimension?.prereserved) {
+            items.push({
+                label: 'Réserver la place...',
+                icon: PrimeIcons.TAG + ' text-success',
+                command: () => this.prereserved(cell.dimension!),
+            });
+        }
+
         // commun : supprimer le stand
         items.push({
             label: 'Supprimer l\'emplacement',
@@ -741,8 +780,33 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         this.standDialogVisible = true;
     }
 
+    prereserved(dimension: DimensionCell) {
+        this.prereservedTargetDimension = dimension;
+        this.prereservedNote = null;
+        this.prereservedDialogVisible = true;
+        this.cm?.hide();
+    }
+
+    onPrereservedDialogHide() {
+        // optionnel : reset quand on ferme
+        this.prereservedNote = null;
+        this.prereservedTargetDimension = null;
+    }
+
+    canConfirmPrereserved(): boolean {
+        return this.prereservedNote != null && this.prereservedNote.trim().length > 0;
+    }
+
+    confirmPrereserved() {
+        if (!this.prereservedTargetDimension || !this.prereservedNote) return;
+
+        this.prereservedTargetDimension.prereserved = ({note: this.prereservedNote.trim()});
+
+        this.prereservedDialogVisible = false;
+    }
+
     protected readonly getFormattedParticipationName = getFormattedParticipationName;
     protected readonly formatterCategory = formatterCategory;
     protected readonly Category = Category;
-    protected readonly getColorStand = getColorStand;
+    protected readonly Validators = Validators;
 }

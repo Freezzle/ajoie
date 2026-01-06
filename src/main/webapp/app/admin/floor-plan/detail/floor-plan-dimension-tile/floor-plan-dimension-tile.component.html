@@ -39,6 +39,11 @@
                                      class="text-danger"
                                      icon="warning"></fa-icon>
                         }
+                        @if (dimension.prereserved) {
+                            <fa-icon [title]="dimension.prereserved.note"
+                                     class="text-primary"
+                                     icon="tag"></fa-icon>
+                        }
                     </div>
 
                     <div class="technical-info-item">
