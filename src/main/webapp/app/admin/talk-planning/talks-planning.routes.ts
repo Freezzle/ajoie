@@ -1,12 +1,12 @@
 import {Routes} from '@angular/router';
 
 import {UserRouteAccessService} from 'app/core/auth/user-route-access.service';
-import {PlanningTalksComponent} from "./planning/planning-talks.component";
+import {TalksPlanningComponent} from "./components/talks-planning.component";
 
 const planningTalksRoute: Routes = [
     {
         path: '',
-        component: PlanningTalksComponent,
+        component: TalksPlanningComponent,
         canActivate: [UserRouteAccessService],
     },
 ];

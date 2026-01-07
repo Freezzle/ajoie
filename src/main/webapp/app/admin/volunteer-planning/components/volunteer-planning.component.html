@@ -1,0 +1,21 @@
+<app-content-page>
+    <div appMenuBarStart>
+        <h3>{{ 'salon.volunteersPlanning' | translate }}</h3>
+    </div>
+    <div appMenuBarEnd>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading()"
+                    faIcon="arrow-left"
+                    translateKey="common.back"
+                    [showText]="false"/>
+    </div>
+    <app-alert-error></app-alert-error>
+    <app-alert></app-alert>
+    <p-toast/>
+    <p-confirmpopup/>
+    <app-card [showHeader]="false">
+        <div appCardBody>
+            <fa-icon icon="warning" class="text-warning"/> En chantier
+        </div>
+    </app-card>
+</app-content-page>

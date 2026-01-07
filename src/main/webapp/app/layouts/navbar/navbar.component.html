@@ -74,9 +74,17 @@
                                 *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                                 [routerLinkActiveOptions]="{ exact: true }"
                                 class="ms-3"
-                                routerLink="/admin/salons/{{salon.id}}/planning-conferences"
+                                routerLink="/admin/salons/{{salon.id}}/talks-planning"
                                 routerLinkActive="active">
-                                <a>{{ 'salon.planningConferences' | translate }}</a>
+                                <a>{{ 'salon.talksPlanning' | translate }}</a>
+                            </li>
+                            <li (click)="closeMobile()"
+                                *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="ms-3"
+                                routerLink="/admin/salons/{{salon.id}}/volunteers-planning"
+                                routerLinkActive="active">
+                                <a>{{ 'salon.volunteersPlanning' | translate }}</a>
                             </li>
                             <li (click)="closeMobile()"
                                 *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"

@@ -10,7 +10,9 @@ import standRoutes from '../stand/stand.routes';
 import participationRoutes from '../participation/participation.routes';
 import floorPlanRoutes from '../floor-plan/floor-plan.routes';
 import workshopRoutes from "../workshop/workshop.routes";
-import planningTalksRoute from "../conference/planning-talks.routes";
+import talksPlanningRoute from "../talk-planning/talks-planning.routes";
+import {Authority} from "../../config/authority.constants";
+import volunteersPlanningRoute from "../volunteer-planning/volunteer-planning.routes";
 
 const salonRoute: Routes = [
     {
@@ -77,15 +79,19 @@ const salonRoute: Routes = [
         children: participationRoutes,
     },
     {
+        path: ':idSalon/talks-planning',
+        children: talksPlanningRoute
+    },
+    {
+        path: ':idSalon/volunteers-planning',
+        children: volunteersPlanningRoute
+    },
+    {
         path: ':idSalon/floor-plan',
         resolve: {
             salon: SalonResolve,
         },
         children: floorPlanRoutes,
-    },
-    {
-        path: ':idSalon/planning-conferences',
-        children: planningTalksRoute,
     }
 ];
 

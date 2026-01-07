@@ -9,7 +9,7 @@ import {AlertComponent} from '../../../shared/alert/alert.component';
 import {Toast} from 'primeng/toast';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 
-import {ConferenceService} from '../service/conference.service';
+import {ConferenceService} from '../../conference/service/conference.service';
 import {filter, forkJoin, map, of, switchMap, tap, throwError} from 'rxjs';
 import {Talk} from "../../../shared/components/talk-slot/talk-slot.component";
 import {
@@ -19,7 +19,7 @@ import {CardComponent} from "../../../shared/components/card/card.component";
 import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
 import {WorkshopService} from "../../workshop/service/workshop.service";
 import {IWorkshop} from "../../workshop/model/workshop.interface";
-import {IConference} from "../model/conference.interface";
+import {IConference} from "../../conference/model/conference.interface";
 import {Status} from "../../enumerations/status.model";
 import {catchError, finalize} from "rxjs/operators";
 import {SalonService} from "../../salon/service/salon.service";
@@ -30,7 +30,7 @@ import {IntervalMinutes} from "../../../shared/components/timeline-talks/model/i
 
 @Component({
     selector: 'planning-talks',
-    templateUrl: './planning-talks.component.html',
+    templateUrl: './talks-planning.component.html',
     imports: [
         RouterModule,
         FormsModule,
@@ -45,7 +45,7 @@ import {IntervalMinutes} from "../../../shared/components/timeline-talks/model/i
         ContentPageComponent,
     ]
 })
-export class PlanningTalksComponent implements OnInit {
+export class TalksPlanningComponent implements OnInit {
     private readonly salonService = inject(SalonService);
     private readonly conferenceService = inject(ConferenceService);
     private readonly workshopService = inject(WorkshopService);

@@ -13,7 +13,6 @@
     "notFound": "Aucun salon",
     "participations": "Les participations",
     "place": "Nom du salon",
-    "planningConferences": "Planning des animations",
     "priceConference": "Conférence",
     "priceMeal1": "Repas samedi midi",
     "priceMeal2": "Repas samedi soir",
@@ -41,7 +40,9 @@
       "stands": "Stands",
       "title": "Statistiques"
     },
+    "talksPlanning": "Planning des animations",
     "title": "Les salons",
+    "volunteersPlanning": "Planning des bénévoles",
     "workshops": "Les ateliers"
   }
 }

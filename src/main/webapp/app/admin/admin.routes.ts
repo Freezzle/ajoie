@@ -33,38 +33,6 @@ const routes: Routes = [
             authorities: [Authority.ADMIN_BUSINESS],
         },
         loadChildren: () => import('./exhibitor/exhibitor.routes'),
-    },
-    {
-        path: 'stands',
-        data: {
-            pageTitle: 'salon.title',
-            authorities: [Authority.ADMIN_BUSINESS],
-        },
-        loadChildren: () => import('./stand/stand.routes'),
-    },
-    {
-        path: 'conferences',
-        data: {
-            pageTitle: 'conference.title',
-            authorities: [Authority.ADMIN_BUSINESS],
-        },
-        loadChildren: () => import('./conference/conference.routes'),
-    },
-    {
-        path: 'workshops',
-        data: {
-            pageTitle: 'workshop.title',
-            authorities: [Authority.ADMIN_BUSINESS],
-        },
-        loadChildren: () => import('./workshop/workshop.routes'),
-    },
-    {
-        path: 'participations',
-        data: {
-            pageTitle: 'participation.title',
-            authorities: [Authority.ADMIN_BUSINESS],
-        },
-        loadChildren: () => import('./participation/participation.routes'),
     }
 ];
 
