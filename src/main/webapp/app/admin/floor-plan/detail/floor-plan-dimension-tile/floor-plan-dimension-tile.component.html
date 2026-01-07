@@ -33,7 +33,12 @@
 
             @if (displayHeader) {
                 <div class="technical-header">
-                    <div class="technical-info-item">
+                    <div class="technical-info-item gap-1 justify-content-start ps-1">
+                        @if (displaySensibleInformation() && dimension.stand?.participation; as participation) {
+                            <fa-icon [title]="'participation.status.list.' + participation.status | translate"
+                                     [icon]="participation.status | status"
+                                     [class]="participation.status | colorStatus"></fa-icon>
+                        }
                         @if (displaySensibleInformation() && dimension.stand && dimension.stand.dimension.id !== dimension.idDimension) {
                             <fa-icon [title]="'floorPlan.differentDimension' | translate"
                                      class="text-danger"
@@ -46,15 +51,7 @@
                         }
                     </div>
 
-                    <div class="technical-info-item">
-                        @if (displaySensibleInformation() && dimension.stand?.participation; as participation) {
-                            <fa-icon [title]="'participation.status.list.' + participation.status | translate"
-                                     [icon]="participation.status | status"
-                                     [class]="participation.status | colorStatus"></fa-icon>
-                        }
-                    </div>
-
-                    <div class="technical-info-item">
+                    <div class="technical-info-item justify-content-end pe-1">
                         @if (dimension.position; as position) {
                             <span [title]="'stand.position' | translate">{{ position }}</span>
                         }
