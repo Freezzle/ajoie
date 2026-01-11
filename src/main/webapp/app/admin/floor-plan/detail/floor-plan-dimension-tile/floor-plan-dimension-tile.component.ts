@@ -8,32 +8,32 @@ import {DimensionCell} from "../../floor-plan.model";
 import {getFirstExhibitorName} from "../../../exhibitor/model/exhibitor.interface";
 
 @Component({
-  selector: 'floor-plan-dimension-tile',
-  imports: [CommonModule, SharedModule, CdkDrag, CdkDragHandle, ColorStatusPipe, StatusPipe],
-  templateUrl: './floor-plan-dimension-tile.component.html',
-  styleUrl: './floor-plan-dimension-tile.component.scss'
+    selector: 'floor-plan-dimension-tile',
+    imports: [CommonModule, SharedModule, CdkDrag, CdkDragHandle, ColorStatusPipe, StatusPipe],
+    templateUrl: './floor-plan-dimension-tile.component.html',
+    styleUrl: './floor-plan-dimension-tile.component.scss'
 })
 export class FloorPlanDimensionTileComponent {
-  @Input({ required: true }) dimension!: DimensionCell;
+    @Input({required: true}) dimension!: DimensionCell;
 
-  @Input() pixels = 20;
-  @Input() variant: 'grid' | 'palette' = 'palette';
+    @Input() pixels = 20;
+    @Input() variant: 'grid' | 'palette' = 'palette';
 
-  // affichage
-  @Input() displayHeader = true;
-  @Input() displayTechnical = false;
-  @Input() displayFullname = false;
-  displaySensibleInformation = model<boolean>(true);
+    // affichage
+    @Input() displayHeader = true;
+    @Input() displayTechnical = false;
+    @Input() displayFullname = false;
+    displaySensibleInformation = model<boolean>(true);
 
-  // comportement
-  @Input() dragDisabled = false;
-  @Input() dragData: any = null;
-  @Input() cursor: 'move' | 'pointer' = 'pointer';
-  @Input() dragging = false;
+    // comportement
+    @Input() dragDisabled = false;
+    @Input() dragData: any = null;
+    @Input() cursor: 'move' | 'pointer' | 'default' = 'default';
+    @Input() dragging = false;
 
-  @Output() dragStarted = new EventEmitter<CdkDragStart>();
-  @Output() dragMoved = new EventEmitter<CdkDragMove>();
-  @Output() dragEnded = new EventEmitter<CdkDragEnd>();
+    @Output() dragStarted = new EventEmitter<CdkDragStart>();
+    @Output() dragMoved = new EventEmitter<CdkDragMove>();
+    @Output() dragEnded = new EventEmitter<CdkDragEnd>();
 
-  protected readonly getFirstExhibitorName = getFirstExhibitorName;
+    protected readonly getFirstExhibitorName = getFirstExhibitorName;
 }

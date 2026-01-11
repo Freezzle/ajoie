@@ -2,7 +2,6 @@ import {Component, input, model, output, TemplateRef} from '@angular/core';
 import {Dialog} from "primeng/dialog";
 import {ButtonDirective} from "primeng/button";
 import {PrimeTemplate} from "primeng/api";
-import {NgTemplateOutlet} from "@angular/common";
 
 export type AppDialogMode = 'view' | 'edit';
 
@@ -11,8 +10,7 @@ export type AppDialogMode = 'view' | 'edit';
     imports: [
         Dialog,
         ButtonDirective,
-        PrimeTemplate,
-        NgTemplateOutlet
+        PrimeTemplate
     ],
     templateUrl: './dialog-box.component.html',
     styleUrl: './dialog-box.component.scss',
@@ -36,9 +34,6 @@ export class DialogBoxComponent {
     confirmDisabled = input(false);
     confirmLoading = input(false);
 
-    // Templating
-    headerTpl = input<TemplateRef<any> | null>(null);
-    footerTpl = input<TemplateRef<any> | null>(null);
 
     // Outputs modernes
     cancel = output<void>();

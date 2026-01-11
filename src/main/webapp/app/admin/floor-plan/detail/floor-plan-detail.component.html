@@ -298,7 +298,7 @@
                                                                                                [dragDisabled]="isReadOnly || (!showDimensions && !showAvailableStands)"
                                                                                                [dragData]="dimension"
                                                                                                [dragging]="isDragging"
-                                                                                               [cursor]="showDimensions ||showAvailableStands ? 'move' : 'pointer'"
+                                                                                               [cursor]="adaptCursor(cell)"
                                                                                                [displayHeader]="displayHeader"
                                                                                                [displayTechnical]="displayTechnical"
                                                                                                [displayFullname]="displayFullname"
@@ -332,43 +332,37 @@
 
                 <!-- ############ POPINS ############ -->
 
-                <p-dialog [(visible)]="standDialogVisible"
-                          [modal]="true"
-                          [dismissableMask]="true"
-                          [closeOnEscape]="true"
-                          [draggable]="false"
-                          [resizable]="false"
-                          [style]="{ width: '500px' }"
-                          [showHeader]="false"
-                          [blockScroll]="true">
+                <dialog-box [header]="'Détail de l\'emplacement'"
+                            [(visible)]="standDialogVisible"
+                            [dismissableMask]="true"
+                            (closed)="standDialogVisible.set(false)">
+
                     <!-- CONTENU -->
                     @if (gridCellPopOver) {
-                        <app-card [showHeader]="false">
-                            <div appCardBody>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; row-gap: 0.5em">
-                                    @if (gridCellPopOver.dimension?.stand; as stand) {
-                                        <b>Thérapeute</b>
-                                        <span>{{ stand.participation.therapistName }}</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; row-gap: 0.5em">
+                            @if (gridCellPopOver.dimension?.stand; as stand) {
+                                <b>Thérapeute</b>
+                                <span>{{ stand.participation.therapistName }}</span>
 
-                                        <b>Nom</b>
-                                        <span>{{ stand.participation.exhibitor.fullName }}</span>
+                                <b>Nom</b>
+                                <span>{{ stand.participation.exhibitor.fullName }}</span>
 
-                                        <b>Status</b>
-                                        <span>
+                                <b>Status</b>
+                                <span>
                                             <fa-icon
                                                     [title]="'participation.status.list.' + stand.participation.status | translate"
                                                     [icon]="stand.participation.status | status"
                                                     [class]="stand.participation.status | colorStatus"></fa-icon>
                                         </span>
 
-                                        <b>Catégorie</b>
-                                        <span>
+                                <b>Catégorie</b>
+                                <span>
                                             <p-tag severity="warn"
                                                    [value]="formatterCategory(stand.category ? Category[stand.category] : null) | translate"></p-tag>
                                         </span>
 
-                                        <b>Tags</b>
-                                        <span>
+                                <b>Tags</b>
+                                <span>
                                             @for (subCategorie of stand.subCategories; track subCategorie) {
                                                 <p-tag [value]="subCategorie"></p-tag>
                                             } @empty {
@@ -376,74 +370,60 @@
                                             }
                                         </span>
 
-                                        <b>Dimension sur plan</b>
-                                        <span>{{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</span>
+                                <b>Dimension sur plan</b>
+                                <span>{{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</span>
 
-                                        <b>Dimension participation</b>
-                                        <span>{{ stand.dimension.dimension }}</span>
+                                <b>Dimension participation</b>
+                                <span>{{ stand.dimension.dimension }}</span>
 
-                                        <b>Commentaire</b>
-                                        <span>{{ stand.participation.extraInformation ?? '-' }}</span>
-                                    } @else {
-                                        <b>Dimension :</b>
-                                        <span>{{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</span>
-                                    }
-                                </div>
-                            </div>
-                        </app-card>
-                    }
-
-                    <!-- FOOTER -->
-                    <ng-template pTemplate="footer">
-                        @if (gridCellPopOver?.dimension?.stand; as stand) {
-                            @if (stand.participation && isReadOnly) {
-                                <div class="d-flex w-100 justify-content-center gap-2">
-                                    <button-box [modeLink]="true"
-                                                [links]="['../', 'participations', stand.participation.id, 'view']"
-                                                type="warning"
-                                                faIcon="link"
-                                                translateKey="common.view"/>
-
-                                    <button-box [modeLink]="true"
-                                                [links]="['../', 'participations', stand.participation.id, 'billing']"
-                                                type="warning"
-                                                faIcon="link"
-                                                translateKey="participation.billing.title"/>
-                                </div>
+                                <b>Commentaire</b>
+                                <span>{{ stand.participation.extraInformation ?? '-' }}</span>
+                            } @else {
+                                <b>Dimension :</b>
+                                <span>{{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</span>
                             }
-                        }
-                    </ng-template>
-                </p-dialog>
+                        </div>
+                        <p-divider class="mt-4"></p-divider>
+                        <div class="mt-4">
+                            @if (gridCellPopOver.dimension?.stand; as stand) {
+                                @if (stand.participation && isReadOnly) {
+                                    <div class="d-flex w-100 justify-content-center gap-2">
+                                        <button-box [modeLink]="true"
+                                                    [links]="['../', 'participations', stand.participation.id, 'view']"
+                                                    type="warning"
+                                                    faIcon="link"
+                                                    translateKey="common.view"/>
+
+                                        <button-box [modeLink]="true"
+                                                    [links]="['../', 'participations', stand.participation.id, 'billing']"
+                                                    type="warning"
+                                                    faIcon="link"
+                                                    translateKey="participation.billing.title"/>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                </dialog-box>
 
                 <p-contextMenu #cm [model]="contextMenuItems" appendTo="body"></p-contextMenu>
             </div>
 
-            <p-dialog
-                    header="Réserver la place"
+            <dialog-box
+                    [header]="'Réserver la place'"
+                    [mode]="'edit'"
                     [(visible)]="prereservedDialogVisible"
-                    [closable]="false"
-                    [draggable]="false"
-                    [resizable]="false"
-                    [style]="{ width: '32rem' }"
-                    (onHide)="onPrereservedDialogHide()">
+                    [dismissableMask]="true"
+                    [confirmDisabled]="!canConfirmPrereserved()"
+                    (cancel)="onPrereservedDialogHide()"
+                    (confirm)="confirmPrereserved()">
 
                 <p-iftalabel>
-                    <textarea pTextarea
-                              [(ngModel)]="prereservedNote" rows="2" fluid></textarea>
+                        <textarea pTextarea
+                                  [(ngModel)]="prereservedNote" rows="2" fluid></textarea>
                     <label [for]="'field_prereservedNote'">Note</label>
                 </p-iftalabel>
-
-                <ng-template pTemplate="footer">
-                    <button-box (clickedEvent)="prereservedDialogVisible = false"
-                                translateKey="common.cancel"
-                                type="secondary"/>
-
-                    <button-box (clickedEvent)="confirmPrereserved()"
-                                [isDisabled]="!canConfirmPrereserved()"
-                                translateKey="common.save"
-                                type="primary"/>
-                </ng-template>
-            </p-dialog>
+            </dialog-box>
         </div>
     </app-card>
 </app-content-page>

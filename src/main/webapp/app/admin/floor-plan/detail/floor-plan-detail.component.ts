@@ -1,4 +1,4 @@
-import {Component, computed, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, model, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
 import {CdkDragDrop, CdkDropList} from '@angular/cdk/drag-drop';
 import {
     AddPlanInfo,
@@ -37,8 +37,7 @@ import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
 import {ConfirmPopup} from "primeng/confirmpopup";
 import {Toast} from "primeng/toast";
 import {ContextMenu} from "primeng/contextmenu";
-import {MenuItem, PrimeIcons, PrimeTemplate} from "primeng/api";
-import {Dialog} from "primeng/dialog";
+import {MenuItem, PrimeIcons} from "primeng/api";
 import {Tag} from "primeng/tag";
 import {Category, formatterCategory} from "../../enumerations/category.model";
 import {FloorPlanDimensionTileComponent} from "./floor-plan-dimension-tile/floor-plan-dimension-tile.component";
@@ -48,13 +47,14 @@ import ColorStatusPipe from "../../../shared/pipe/color-status.pipe";
 import StatusPipe from "../../../shared/pipe/status.pipe";
 import {Textarea} from "primeng/textarea";
 import {IftaLabel} from "primeng/iftalabel";
+import {DialogBoxComponent} from "../../../shared/components/dialog-box/dialog-box.component";
+import {Divider} from "primeng/divider";
 
 @Component({
     selector: 'floor-plan',
     templateUrl: './floor-plan-detail.component.html',
     styleUrl: './floor-plan-detail.component.scss',
-    imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule,
-        ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Dialog, Tag, PrimeTemplate, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe, Textarea, IftaLabel]
+    imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule, ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Tag, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe, Textarea, IftaLabel, DialogBoxComponent, Divider]
 })
 export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     @ViewChild('cm', {static: true}) cm!: ContextMenu;
@@ -73,7 +73,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     contextMenuItems: MenuItem[] = [];
     currentCell: GridCell | null = null;
-    standDialogVisible = false;
+    standDialogVisible = model<boolean>(false);
 
     @ViewChild('gridDropList')
     gridContainer!: ElementRef;
@@ -111,7 +111,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     isDragging = false;
     draggingCell: GridCell | null = null;
 
-    prereservedDialogVisible = false;
+    prereservedDialogVisible = model<boolean>(false);
     prereservedNote: string | null = null;
     private prereservedTargetDimension: DimensionCell | null = null;
 
@@ -247,6 +247,18 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     outOfBound(col: number, row: number, shape: any) {
         return row < 0 || col + shape.rows > this.nbHeightTiles || row + shape.cols > this.nbWidthTiles || col < 0;
+    }
+
+    adaptCursor(cell: GridCell): 'move' | 'pointer' | 'default' {
+        if (this.showDimensions || this.showAvailableStands) {
+            return 'move';
+        }
+
+        if (!cell || !cell.dimension?.stand) {
+            return 'default';
+        }
+
+        return 'pointer';
     }
 
     canPlaceShape(row: number, col: number, shape: any): boolean {
@@ -799,18 +811,18 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     }
 
     openStandDialog(cell: GridCell | null): void {
-        if (!cell) {
+        if (!cell || !cell.dimension?.stand) {
             return;
         }
 
         this.gridCellPopOver = cell;
-        this.standDialogVisible = true;
+        this.standDialogVisible.set(true);
     }
 
     prereserved(dimension: DimensionCell) {
         this.prereservedTargetDimension = dimension;
         this.prereservedNote = null;
-        this.prereservedDialogVisible = true;
+        this.prereservedDialogVisible.set(true)
         this.cm?.hide();
     }
 
@@ -818,6 +830,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         // optionnel : reset quand on ferme
         this.prereservedNote = null;
         this.prereservedTargetDimension = null;
+        this.prereservedDialogVisible.set(false)
     }
 
     canConfirmPrereserved(): boolean {
@@ -826,10 +839,9 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     confirmPrereserved() {
         if (!this.prereservedTargetDimension || !this.prereservedNote) return;
-
         this.prereservedTargetDimension.prereserved = ({note: this.prereservedNote.trim()});
 
-        this.prereservedDialogVisible = false;
+        this.onPrereservedDialogHide();
     }
 
     protected readonly getFormattedParticipationName = getFormattedParticipationName;

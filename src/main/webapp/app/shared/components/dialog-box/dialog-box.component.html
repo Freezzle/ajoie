@@ -12,46 +12,33 @@
           [draggable]="false"
           [resizable]="false">
     <ng-template pTemplate="header">
-        @if (headerTpl()) {
-            <ng-container [ngTemplateOutlet]="headerTpl()!"></ng-container>
-        } @else {
-            <div class="dialog-header">
-                <span class="dialog-title"><h3>{{ header() }}</h3></span>
-            </div>
-        }
+        <div class="dialog-header">
+            <span class="dialog-title"><h4>{{ header() }}</h4></span>
+        </div>
     </ng-template>
     <div class="dialog-body">
         <ng-content></ng-content>
     </div>
-    <ng-template pTemplate="footer">
-        @if (footerTpl()) {
-            <ng-container [ngTemplateOutlet]="footerTpl()!"></ng-container>
-        } @else {
-            <div class="dialog-footer">
-                @switch (mode()) {
-                    @case ('view') {
-                        <button pButton type="button" (click)="requestClose()">
-                            {{ closeLabel() }}
-                        </button>
-                    }
-                    @case ('edit') {
-                        <button pButton
-                                type="button"
-                                class="p-button-text"
-                                (click)="onCancelClick()">
-                            {{ cancelLabel() }}
-                        </button>
+    @switch (mode()) {
+        @case ('edit') {
+            <ng-template pTemplate="footer">
+                <div class="dialog-footer">
+                    <button pButton
+                            type="button"
+                            class="p-button-text"
+                            (click)="onCancelClick()">
+                        {{ cancelLabel() }}
+                    </button>
 
-                        <button pButton
-                                type="button"
-                                [disabled]="confirmDisabled() || confirmLoading()"
-                                [loading]="confirmLoading()"
-                                (click)="onConfirmClick()">
-                            {{ confirmLabel() }}
-                        </button>
-                    }
-                }
-            </div>
+                    <button pButton
+                            type="button"
+                            [disabled]="confirmDisabled() || confirmLoading()"
+                            [loading]="confirmLoading()"
+                            (click)="onConfirmClick()">
+                        {{ confirmLabel() }}
+                    </button>
+                </div>
+            </ng-template>
         }
-    </ng-template>
+    }
 </p-dialog>
