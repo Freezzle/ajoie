@@ -1,6 +1,16 @@
 {
   "planningTalks": {
+    "availableTalks": "Animations disponibles",
+    "grid": {
+      "headerRoomHour": "Salles / Heures",
+      "noAssignedTalks": "Aucune animation assignée",
+      "noRoom": "Aucune salle définie"
+    },
     "modeGrid": "Mode grille",
-    "modeTimeline": "Prévisualiser"
+    "modeTimeline": "Prévisualiser",
+    "manageRooms": "Gestion des salles",
+    "noSelectedDay": "Aucun jour sélectionné",
+    "noUnassignedTalks": "Toutes les animations sont déjà assignées",
+    "removeDay": "Voulez-vous supprimer le jour <strong>{{day}}</strong> ?"
   }
 }

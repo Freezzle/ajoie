@@ -10,23 +10,21 @@ import {Toast} from 'primeng/toast';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import {ConferenceService} from '../../conference/service/conference.service';
-import {filter, forkJoin, map, of, switchMap, tap, throwError} from 'rxjs';
+import {forkJoin, map, switchMap, tap} from 'rxjs';
 import {Talk} from "../../../shared/components/talk-slot/talk-slot.component";
-import {
-    TimelineTalksComponent
-} from "../../../shared/components/timeline-talks/timeline-talks.component";
 import {CardComponent} from "../../../shared/components/card/card.component";
 import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
 import {WorkshopService} from "../../workshop/service/workshop.service";
 import {IWorkshop} from "../../workshop/model/workshop.interface";
 import {IConference} from "../../conference/model/conference.interface";
 import {Status} from "../../enumerations/status.model";
-import {catchError, finalize} from "rxjs/operators";
+import {finalize} from "rxjs/operators";
 import {SalonService} from "../../salon/service/salon.service";
-import {TimelineDay} from "../../../shared/components/timeline-talks/model/timeline-day";
-import {TimelineRoom} from "../../../shared/components/timeline-talks/model/timeline-room";
-import {TimelineData} from "../../../shared/components/timeline-talks/model/timeline-data";
-import {IntervalMinutes} from "../../../shared/components/timeline-talks/model/interval-minutes";
+import {TimelineDay} from "../../../shared/components/talks-planning/model/timeline-day";
+import {TimelineRoom} from "../../../shared/components/talks-planning/model/timeline-room";
+import {TimelineData} from "../../../shared/components/talks-planning/model/timeline-data";
+import {IntervalMinutes} from "../../../shared/components/talks-planning/model/interval-minutes";
+import {TpComponent} from "../../../shared/components/talks-planning/tp.component";
 
 @Component({
     selector: 'planning-talks',
@@ -40,9 +38,10 @@ import {IntervalMinutes} from "../../../shared/components/timeline-talks/model/i
         AlertComponent,
         Toast,
         ConfirmPopup,
-        TimelineTalksComponent,
+        TpComponent,
         CardComponent,
         ContentPageComponent,
+        TpComponent,
     ]
 })
 export class TalksPlanningComponent implements OnInit {

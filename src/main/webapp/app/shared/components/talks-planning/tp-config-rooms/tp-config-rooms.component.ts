@@ -10,12 +10,12 @@ import { TimelineData } from '../model/timeline-data';
 import { TimelineRoom } from '../model/timeline-room';
 
 @Component({
-  selector: 'app-timeline-config-rooms-dialog',
+  selector: 'tp-config-rooms',
   standalone: true,
   imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule],
-  templateUrl: './timeline-config-rooms-dialog.component.html',
+  templateUrl: './tp-config-rooms.component.html',
 })
-export class TimelineConfigRoomsDialogComponent {
+export class TpConfigRoomsComponent {
   _draft = signal<TimelineData | null>(null);
 
   @Input({ required: true })

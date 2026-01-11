@@ -1,7 +1,7 @@
 import {Routes} from '@angular/router';
 
 import {UserRouteAccessService} from 'app/core/auth/user-route-access.service';
-import {TalksPlanningComponent} from "./components/talks-planning.component";
+import {TalksPlanningComponent} from "./update/talks-planning.component";
 
 const planningTalksRoute: Routes = [
     {

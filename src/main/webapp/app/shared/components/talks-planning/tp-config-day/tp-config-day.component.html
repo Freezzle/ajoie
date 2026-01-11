@@ -1,5 +1,18 @@
 <div class="row">
     <div class="col-12" *ngIf="day() as day; else missing">
+        <div class="mt-3">
+            <label>Libellé</label>
+            <input
+                    pInputText
+                    fluid="true"
+                    [ngModel]="dayLabel(day)"
+                    (ngModelChange)="setDayLabelDraft(day.id, $event)"
+                    (blur)="commitDayLabel(day.id)"
+            />
+        </div>
+
+        <p-divider></p-divider>
+
         <h4>Affectations</h4>
         <div class="mt-4">
             <p-table [value]="selectedDayRoomRows()" [rowTrackBy]="trackByRoomId" [rowHover]="true">
