@@ -1,0 +1,19 @@
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dialog-title {
+}
+
+.dialog-body {
+  padding: 1rem 1rem 0.75rem 1rem;
+}
+
+.dialog-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 0.75rem 1rem 1rem 1rem;
+}

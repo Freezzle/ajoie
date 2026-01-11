@@ -2,20 +2,120 @@
     <div appMenuBarStart>
         <h3>{{ 'salon.volunteersPlanning' | translate }}</h3>
     </div>
+
     <div appMenuBarEnd>
-        <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading()"
-                    faIcon="arrow-left"
-                    translateKey="common.back"
-                    [showText]="false"/>
+        <button-box faIcon="arrow-left" translateKey="common.back" [showText]="false"/>
+
+        <button pButton
+                type="button"
+                icon="pi pi-cog"
+                class="p-button-text"
+                (click)="openPanel()"
+                title="Configurer"
+        ></button>
     </div>
+
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
     <p-toast/>
     <p-confirmpopup/>
+
+    <dialog-box
+            [header]="'Configuration'"
+            [mode]="'edit'"
+            [(visible)]="panelVisible"
+            (cancel)="panelVisible.set(false)"
+            (confirm)="panelVisible.set(false)">
+
+        <volunteer-planning-panel
+                [planning]="planning()"
+                (planningChange)="onPlanningChange($event)"/>
+    </dialog-box>
+
     <app-card [showHeader]="false">
         <div appCardBody>
-            <fa-icon icon="warning" class="text-warning"/> En chantier
+            @if (selectedDay(); as sd) {
+                <p-tabs [value]="sd.id" scrollable>
+                    <p-tablist class="justify-content-center">
+                        @for (day of dayOptions(); track day.id) {
+                            <p-tab [value]="day.id" (click)="selectedDayId.set(day.id)">{{ day.label }}</p-tab>
+                        }
+                    </p-tablist>
+
+                    <p-tabpanels>
+                        <div class="main mt-4">
+                            <div class="table-wrap" (pointermove)="onPaintMove($event)" (pointerleave)="stopPaint()">
+                                <p-table [value]="visibleVolunteers()" class="planning-table">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th class="col-volunteer p-0 sticky-col sticky-header"></th>
+                                            @for (slot of timeSlots(); track slot.index) {
+                                                <th class="slot-col sticky-header">{{ slot.label }}</th>
+                                            }
+                                        </tr>
+                                    </ng-template>
+
+                                    <ng-template pTemplate="body" let-v>
+                                        <tr>
+                                            <td class="col-volunteer sticky-col row-label">{{ v.label }}</td>
+
+                                            @for (slot of timeSlots(); track slot.index) {
+                                                @let categoryId = getCategoryId(v.id, slot.index);
+                                                @let cat = uiFor(categoryId);
+
+                                                <td class="slot-cell">
+                                                    <div
+                                                            class="paint-cell"
+                                                            [attr.data-volunteer-id]="v.id"
+                                                            [attr.data-slot-index]="slot.index"
+                                                            (pointerdown)="startPaint(v.id, slot.index, $event)"
+                                                            (click)="!painting() ? applyTool(v.id, slot.index) : undefined">
+                                                        @if (cat) {
+                                                            <span class="cat-badge"
+                                                                  [style.background-color]="cat.color"
+                                                                  [title]="cat.label">
+                                                                <i [class]="cat.icon"></i>
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            }
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+
+                            <!-- palette fixe à droite -->
+                            <aside class="palette">
+                                <div class="palette-grid">
+                                    <button pButton
+                                            type="button"
+                                            class="p-button-secondary"
+                                            icon="pi pi-eraser"
+                                            [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
+                                            (click)="selectEraser()"
+                                    ></button>
+
+                                    <p-divider></p-divider>
+
+                                    @for (c of planning().categories; track c.id) {
+                                        <button
+                                                pButton
+                                                type="button"
+                                                [icon]="c.icon"
+                                                [style.color]="'black'"
+                                                [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
+                                                [style.background-color]="c.color"
+                                                (click)="selectCategory(c.id)"
+                                                [title]="c.label"
+                                        ></button>
+                                    }
+                                </div>
+                            </aside>
+                        </div>
+                    </p-tabpanels>
+                </p-tabs>
+            }
         </div>
     </app-card>
 </app-content-page>

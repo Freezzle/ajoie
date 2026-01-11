@@ -1,16 +1,12 @@
-<p-dialog header="Configuration du planning"
-          [visible]="showConfiguration()"
-          [modal]="true"
-          [style]="{width: '80vw'}"
-          [breakpoints]="{'800px': '80vw','650px': '95vw'}"
-          closable="false">
+<dialog-box
+        [header]="'Configuration du planning'"
+        [mode]="'edit'"
+        [(visible)]="showConfiguration"
+        (cancel)="showConfiguration.set(false)"
+        (confirm)="showConfiguration.set(false)">
 
     <app-timeline-config-panel [data]="configuration()" (dataChange)="configuration.set($event)"/>
-
-    <ng-template pTemplate="footer">
-        <button pButton type="button" severity="primary" (click)="showConfiguration.set(false)">Fermer</button>
-    </ng-template>
-</p-dialog>
+</dialog-box>
 
 <div class="d-flex justify-content-between align-items-center">
     @if (days().length && selectedDay()) {

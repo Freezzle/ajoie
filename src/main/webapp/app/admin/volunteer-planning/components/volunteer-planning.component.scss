@@ -1,0 +1,97 @@
+.main {
+  display: flex;
+  justify-content: center;
+}
+
+.table-wrap {
+  overflow: hidden;
+}
+
+:host ::ng-deep .planning-table .p-datatable-wrapper {
+  background: var(--app-surface);
+}
+
+.col-volunteer {
+  width: 120px;
+  min-width: 120px;
+}
+
+.row-label {
+  justify-content: flex-start;
+  font-weight: 600;
+}
+
+.slot-col {
+  font-weight: 600;
+  padding: 0 0 0 0.5em;
+}
+
+.slot-cell {
+  padding: 0;
+}
+
+.paint-cell {
+  width: 65px;
+  min-width: 65px;
+  max-width: 65px;
+  height: 50px;
+  min-height: 50px;
+  max-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  user-select: none;
+  cursor: pointer;
+  border: 0.5px solid var(--app-border);
+  background: var(--app-surface);
+
+  touch-action: none;
+}
+
+.cat-badge {
+  width: 55px;
+  height: 40px;
+  border-radius: 10%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cat-badge i {
+  font-size: 14px;
+  line-height: 1;
+  color: #000; /* ou white si tes couleurs sont foncées */
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--app-surface);
+}
+
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--app-surface);
+}
+
+.sticky-col.sticky-header {
+  z-index: 4;
+}
+
+.palette {
+  position: sticky;
+  top: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-muted);
+}
+
+.palette-grid {
+  display: grid;
+  gap: 0.25rem;
+}

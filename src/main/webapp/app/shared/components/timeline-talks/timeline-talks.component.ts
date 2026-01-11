@@ -1,26 +1,14 @@
-import {
-    Component,
-    computed,
-    effect,
-    ElementRef,
-    input,
-    model,
-    OnInit,
-    QueryList,
-    signal,
-    ViewChildren,
-} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, model, QueryList, signal, ViewChildren,} from '@angular/core';
 import {Talk, TalkSlotComponent} from '../talk-slot/talk-slot.component';
-import {CdkDrag, CdkDragEnd, CdkDragMove, DragDropModule} from '@angular/cdk/drag-drop';
+import {CdkDragEnd, CdkDragMove, DragDropModule} from '@angular/cdk/drag-drop';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TabsModule} from 'primeng/tabs';
-import {Timeline, TimelineModule} from 'primeng/timeline';
-import {Card, CardModule} from 'primeng/card';
-import {Badge, BadgeModule} from 'primeng/badge';
-import {ToggleSwitch, ToggleSwitchModule} from "primeng/toggleswitch";
-import {Dialog, DialogModule} from "primeng/dialog";
+import {TimelineModule} from 'primeng/timeline';
+import {CardModule} from 'primeng/card';
+import {BadgeModule} from 'primeng/badge';
+import {ToggleSwitchModule} from "primeng/toggleswitch";
+import {DialogModule} from "primeng/dialog";
 import {TimelineConfigPanelComponent} from "./timeline-config-panel/timeline-config-panel.component";
-import {PrimeTemplate} from "primeng/api";
 import {ButtonDirective} from "primeng/button";
 import {TimelineDay} from "./model/timeline-day";
 import {TimelineRoom} from "./model/timeline-room";
@@ -28,6 +16,7 @@ import {TimelineData} from "./model/timeline-data";
 import {IntervalMinutes} from "./model/interval-minutes";
 import {CardComponent} from "../card/card.component";
 import {TranslateModule} from "@ngx-translate/core";
+import {DialogBoxComponent} from "../dialog-box/dialog-box.component";
 
 @Component({
     selector: 'timeline-talks',
@@ -41,12 +30,13 @@ import {TranslateModule} from "@ngx-translate/core";
         ReactiveFormsModule,
         ToggleSwitchModule,
         DialogModule,
-        PrimeTemplate,
         ButtonDirective,
         TalkSlotComponent,
         TimelineConfigPanelComponent,
         CardComponent,
         TranslateModule,
+        DialogBoxComponent,
+
     ],
     templateUrl: './timeline-talks.component.html',
     styleUrl: './timeline-talks.component.scss',
@@ -67,7 +57,9 @@ export class TimelineTalksComponent {
         const interval = this.configuration().intervalMinutes;
 
         const map = new Map<string, RoomBounds>();
-        if (!range) {return map;}
+        if (!range) {
+            return map;
+        }
 
         const nbDaySlots = this.countIntervals(range.minStart, range.maxEnd, interval);
 
@@ -88,7 +80,9 @@ export class TimelineTalksComponent {
 
     readonly selectedDay = computed(() => {
         const days = this.days();
-        if (!days.length) {return null;}
+        if (!days.length) {
+            return null;
+        }
 
         const id = this.selectedDayId();
         return days.find(d => d.id === id) ?? days[0];
@@ -106,14 +100,20 @@ export class TimelineTalksComponent {
 
     readonly rangeSelectedDay = computed(() => {
         const rooms = this.roomsFromSelectedDay();
-        if (!rooms.length) {return null;}
+        if (!rooms.length) {
+            return null;
+        }
 
         let minStart = rooms[0].startingHour;
         let maxEnd = rooms[0].endingHour;
 
         for (const r of rooms) {
-            if (r.startingHour < minStart) {minStart = r.startingHour;}
-            if (r.endingHour > maxEnd) {maxEnd = r.endingHour;}
+            if (r.startingHour < minStart) {
+                minStart = r.startingHour;
+            }
+            if (r.endingHour > maxEnd) {
+                maxEnd = r.endingHour;
+            }
         }
 
         return {minStart, maxEnd};
@@ -125,7 +125,9 @@ export class TimelineTalksComponent {
 
     readonly timeSlots = computed(() => {
         const range = this.rangeSelectedDay();
-        if (!range) {return [];}
+        if (!range) {
+            return [];
+        }
 
         return this.buildTimeSlots(range.minStart, range.maxEnd, this.configuration().intervalMinutes);
     });
@@ -133,11 +135,17 @@ export class TimelineTalksComponent {
     readonly talksForSelectedDayByRoom = computed(() => {
         const dayId = this.selectedDay()?.id;
         const map = new Map<string, Talk[]>();
-        if (!dayId) {return map;}
+        if (!dayId) {
+            return map;
+        }
 
         for (const t of this.talks()) {
-            if (t.dayId !== dayId) {continue;}
-            if (!t.roomId) {continue;}
+            if (t.dayId !== dayId) {
+                continue;
+            }
+            if (!t.roomId) {
+                continue;
+            }
 
             const list = map.get(t.roomId) ?? [];
             list.push(t);
@@ -198,17 +206,23 @@ export class TimelineTalksComponent {
     }
 
     private unassignTalk(t: Talk): Talk {
-        return { ...t, roomId: null, dayId: null, startSlot: 0 };
+        return {...t, roomId: null, dayId: null, startSlot: 0};
     }
 
     private cleanupTalksOutsideBounds(day: TimelineDay | null, boundsByRoomId: Map<string, RoomBounds>): void {
-        if (!day) { return; }
+        if (!day) {
+            return;
+        }
 
         this.talks.update(ts =>
             ts.map(t => {
                 // ne touche que les talks du jour courant et assignés à une room
-                if (t.dayId !== day.id) { return t; }
-                if (!t.roomId) { return t; }
+                if (t.dayId !== day.id) {
+                    return t;
+                }
+                if (!t.roomId) {
+                    return t;
+                }
 
                 const b = boundsByRoomId.get(t.roomId);
                 if (!b) {
@@ -232,7 +246,9 @@ export class TimelineTalksComponent {
 
     getTalkStartTimeLabel(talk: Talk): string {
         const range = this.rangeSelectedDay();
-        if (!range) {return '';}
+        if (!range) {
+            return '';
+        }
 
         const base = new Date(range.minStart);
         base.setMinutes(base.getMinutes() + (talk.startSlot ?? 0) * this.configuration().intervalMinutes);
@@ -243,7 +259,9 @@ export class TimelineTalksComponent {
     }
 
     getTalkNbPeriods(talk: Talk | null): number {
-        if (!talk) {return 1;}
+        if (!talk) {
+            return 1;
+        }
 
         return Math.max(1, Math.ceil(talk.durationTotalMinutes / this.configuration().intervalMinutes));
     }
@@ -271,7 +289,9 @@ export class TimelineTalksComponent {
     }
 
     onTalkDragEnded(event: CdkDragEnd, talk: Talk, day: TimelineDay | null): void {
-        if (!day) {return;}
+        if (!day) {
+            return;
+        }
 
         const dragEl = event.source.element.nativeElement;
         const dragRect = dragEl.getBoundingClientRect();
@@ -332,10 +352,14 @@ export class TimelineTalksComponent {
         for (const t of tracksArray) {
             const el = t.nativeElement;
             const rect = el.getBoundingClientRect();
-            if (midY < rect.top || midY > rect.bottom) {continue;}
+            if (midY < rect.top || midY > rect.bottom) {
+                continue;
+            }
 
             const roomId = el.dataset['roomId'];
-            if (!roomId) {continue;}
+            if (!roomId) {
+                continue;
+            }
 
             return {room: this.roomsById().get(roomId) ?? null, rect};
         }
@@ -398,7 +422,9 @@ export class TimelineTalksComponent {
             updated.set(talk.id, {...talk, startSlot: newStart});
         }
 
-        if (overflow) {return {talks: allTalks, overflow: true};}
+        if (overflow) {
+            return {talks: allTalks, overflow: true};
+        }
 
         return {
             talks: allTalks.map(t => updated.get(t.id) ?? t),
@@ -424,7 +450,9 @@ export class TimelineTalksComponent {
     private countIntervals(startingHour: Date, endingHour: Date, intervalMinutes: IntervalMinutes): number {
         const startMs = startingHour.getTime();
         const endMs = endingHour.getTime();
-        if (endMs <= startMs) {return 0;}
+        if (endMs <= startMs) {
+            return 0;
+        }
 
         const intervalMs = intervalMinutes * 60 * 1000;
         const diffMs = endMs - startMs;
@@ -465,7 +493,9 @@ export class TimelineTalksComponent {
         const minStart = boundary.start;
         const maxStart = boundary.end - periods;
 
-        if (maxStart < minStart) {return minStart;} // talk trop long pour la room
+        if (maxStart < minStart) {
+            return minStart;
+        } // talk trop long pour la room
         return Math.min(Math.max(slot, minStart), maxStart);
     }
 

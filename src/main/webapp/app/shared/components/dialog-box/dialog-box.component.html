@@ -1,0 +1,57 @@
+<p-dialog [visible]="visible()"
+          (visibleChange)="visible.set($event)"
+          (onHide)="onHide()"
+          [modal]="true"
+          appendTo="body"
+          [closable]="closable()"
+          [closeOnEscape]="closeOnEscape()"
+          [dismissableMask]="dismissableMask()"
+          [blockScroll]="blockScroll()"
+          [style]="{ width: '1080px', maxWidth: '1080px' }"
+          [breakpoints]="{ '1024px': '90vw', '640px': '95vw' }"
+          [draggable]="false"
+          [resizable]="false">
+    <ng-template pTemplate="header">
+        @if (headerTpl()) {
+            <ng-container [ngTemplateOutlet]="headerTpl()!"></ng-container>
+        } @else {
+            <div class="dialog-header">
+                <span class="dialog-title"><h3>{{ header() }}</h3></span>
+            </div>
+        }
+    </ng-template>
+    <div class="dialog-body">
+        <ng-content></ng-content>
+    </div>
+    <ng-template pTemplate="footer">
+        @if (footerTpl()) {
+            <ng-container [ngTemplateOutlet]="footerTpl()!"></ng-container>
+        } @else {
+            <div class="dialog-footer">
+                @switch (mode()) {
+                    @case ('view') {
+                        <button pButton type="button" (click)="requestClose()">
+                            {{ closeLabel() }}
+                        </button>
+                    }
+                    @case ('edit') {
+                        <button pButton
+                                type="button"
+                                class="p-button-text"
+                                (click)="onCancelClick()">
+                            {{ cancelLabel() }}
+                        </button>
+
+                        <button pButton
+                                type="button"
+                                [disabled]="confirmDisabled() || confirmLoading()"
+                                [loading]="confirmLoading()"
+                                (click)="onConfirmClick()">
+                            {{ confirmLabel() }}
+                        </button>
+                    }
+                }
+            </div>
+        }
+    </ng-template>
+</p-dialog>
