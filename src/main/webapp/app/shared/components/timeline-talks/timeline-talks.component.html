@@ -1,64 +1,46 @@
-<dialog-box
-        [header]="'Configuration du planning'"
-        [mode]="'edit'"
-        [(visible)]="showConfiguration"
-        (cancel)="showConfiguration.set(false)"
-        (confirm)="showConfiguration.set(false)">
-
-    <app-timeline-config-panel [data]="configuration()" (dataChange)="configuration.set($event)"/>
-</dialog-box>
-
-<div class="d-flex justify-content-between align-items-center">
-    @if (days().length && selectedDay()) {
-        <h4>Animations disponibles</h4>
-    } @else {
-        <h4>&nbsp;</h4>
-    }
-
-    @if (editionMode()) {
+@if (editionMode() && days().length) {
+    <div class="d-flex justify-content-end align-items-center">
         <button pButton type="button"
                 size="small"
                 severity="primary"
-                (click)="showConfiguration.set(true)">Configurer
+                (click)="showManageRooms.set(true)">Gestion des salles
         </button>
-    }
-</div>
-@if (days().length && selectedDay()) {
-    <div class="mt-4">
-        @if (unassignedTalks().length > 0) {
-            <div class="unassigned-list">
-                @for (unassignedTalk of unassignedTalks(); track unassignedTalk.id) {
-                    <talk-slot class="talk-unassigned"
-                               [style.cursor]="editionMode() ? 'move': 'default'"
-                               [talk]="unassignedTalk"
-                               cdkDrag
-                               [widthInPx]="getTalkNbPeriods(unassignedTalk) * slotWidthPx()"
-                               [cdkDragDisabled]="!editionMode()"
-                               (cdkDragMoved)="onTalkDragMoved($event, unassignedTalk)"
-                               (cdkDragEnded)="onTalkDragEnded($event, unassignedTalk, selectedDay())"/>
-                }
-            </div>
-        }
-        <div>
-            @if (unassignedTalks().length === 0) {
-                <p class="hint">Aucun élément non assignée pour le moment.</p>
-            } @else {
-                <p class="hint">Glisse et lâche sur la grille. </p>
-            }
-        </div>
     </div>
+}
+@if (editionMode() || days().length) {
+    <p-tabs [value]="selectedDay()?.id">
+    <p-tablist>
+        @for (day of days(); track day.id) {
+            <p-tab [value]="day.id" (click)="selectedDayId.set(day.id)">
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                    <span>{{ day.label }}</span>
 
-    <h4>Planning</h4>
-    <p-tabs [value]="selectedDay()!.id">
-        <p-tablist>
-            @for (day of days(); track day.id) {
-                <p-tab [value]="day.id" (click)="selectedDayId.set(day.id)">{{ day.label }}</p-tab>
-            }
-        </p-tablist>
-        <p-tabpanels>
-            <div class="mt-4 mb-2">
-                <span>Prévisualiser ? <p-toggleswitch [ngModel]="!showGrid()"
-                                                      (onChange)="showGrid.set(!showGrid())"/></span>
+                    @if (editionMode() && selectedDayId() === day.id) {
+                        <menu-box [items]="daysMenuCache.get(day.id)!"
+                                  buttonIcon="gear"
+                                  type="secondary"
+                                  [appendTo]="'body'">
+                        </menu-box>
+                    }
+                </div>
+            </p-tab>
+        }
+        @if (editionMode()) {
+            <p-tab [value]="'__ADD__'">
+                <button-box type="secondary"
+                            faIcon="plus"
+                            [showText]="!days()?.length"
+                            translateKey="common.create" (clickedEvent)="addNewDay()"/>
+            </p-tab>
+        }
+    </p-tablist>
+    <p-tabpanels>
+        @if (selectedDay()) {
+            <div class="mt-4 me-2 d-flex justify-content-end">
+                <div>Prévisualiser ?
+                    <p-toggleswitch [ngModel]="!showGrid()"
+                                    (onChange)="showGrid.set(!showGrid())"/>
+                </div>
             </div>
             @if (showGrid()) {
                 @for (day of days(); track day.id) {
@@ -113,6 +95,10 @@
                                         }
                                     </div>
                                 </div>
+                            } @empty {
+                                <div class="p-2">
+                                    Encore aucune salle attaché à ce jour.
+                                </div>
                             }
                         </div>
                     </p-tabpanel>
@@ -161,6 +147,94 @@
                     }
                 </div>
             }
-        </p-tabpanels>
-    </p-tabs>
+            @if (days().length && selectedDay() && showGrid()) {
+                <div class="mt-4">
+                    <h4>Animations disponibles</h4>
+                    @if (unassignedTalks().length > 0) {
+                        <div class="unassigned-list">
+                            @for (unassignedTalk of unassignedTalks(); track unassignedTalk.id) {
+                                <talk-slot class="talk-unassigned"
+                                           [style.cursor]="editionMode() ? 'move': 'default'"
+                                           [talk]="unassignedTalk"
+                                           cdkDrag
+                                           [widthInPx]="getTalkNbPeriods(unassignedTalk) * slotWidthPx()"
+                                           [cdkDragDisabled]="!editionMode()"
+                                           (cdkDragMoved)="onTalkDragMoved($event, unassignedTalk)"
+                                           (cdkDragEnded)="onTalkDragEnded($event, unassignedTalk, selectedDay())"/>
+                            }
+                        </div>
+                    }
+                    <div>
+                        @if (unassignedTalks().length === 0) {
+                            <p class="hint">Aucun élément non assignée pour le moment.</p>
+                        } @else {
+                            <p class="hint">Glisse et lâche sur la grille. </p>
+                        }
+                    </div>
+                </div>
+            }
+        } @else if (!selectedDay() && editionMode()) {
+            <div class="mt-4">Aucun jour de sélectionné.</div>
+        }
+    </p-tabpanels>
+</p-tabs>
 }
+
+<!-- Dialog 1 : Gérer un jour -->
+<dialog-box [header]="manageDayCreateMode() ? 'Création d\'un jour' : 'Gestion du jour'"
+            [mode]="'edit'"
+            [(visible)]="showManageDay"
+            (cancel)="onManageDayCancel()"
+            (confirm)="dayPanelConfirm()">
+
+    @if (manageDaySelectedDayId()) {
+        <app-timeline-config-day-dialog
+                #dayDialog
+                [data]="configuration()"
+                [selectedDayId]="manageDaySelectedDayId()!"
+                [createIfMissing]="manageDayCreateMode()"
+                (confirmDraft)="onManageDayConfirm($event)"
+                (cancelDraft)="onManageDayCancel()"/>
+    }
+</dialog-box>
+
+<!-- Dialog 2 : Gérer les salles -->
+<dialog-box
+        [header]="'Gestion des salles'"
+        [mode]="'edit'"
+        [(visible)]="showManageRooms"
+        (cancel)="showManageRooms.set(false)"
+        (confirm)="roomsPanelConfirm()">
+    <app-timeline-config-rooms-dialog
+            [data]="configuration()"
+            (confirmDraft)="configuration.set($event); showManageRooms.set(false)"
+            (cancelDraft)="showManageRooms.set(false)"/>
+</dialog-box>
+
+<!-- Dialog 3 : Affecter / désaffecter -->
+<dialog-box
+        [header]="'Gestion des affectations de salles'"
+        [mode]="'edit'"
+        [(visible)]="showAssignRooms"
+        (cancel)="showAssignRooms.set(false)"
+        (confirm)="assignPanelConfirm()">
+    <app-timeline-config-assign-dialog
+            [data]="configuration()"
+            [selectedDayId]="selectedDayId()"
+            (confirmDraft)="configuration.set($event); showAssignRooms.set(false)"
+            (cancelDraft)="showAssignRooms.set(false)"/>
+</dialog-box>
+
+<dialog-box [header]="'Supprimer le jour'"
+            [mode]="'edit'"
+            [(visible)]="showConfirmDeleteDay"
+            (cancel)="showConfirmDeleteDay.set(false)"
+            (confirm)="confirmDeleteSelectedDay()">
+
+    <div class="p-text-secondary">
+        Supprimer le jour <b>{{ selectedDay()?.label }}</b> ?
+        <br/>
+        Cette action retirera aussi ses affectations de salles (et tout contenu associé si tu le gères).
+    </div>
+
+</dialog-box>

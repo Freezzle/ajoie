@@ -15,9 +15,25 @@ import {TranslateModule} from "@ngx-translate/core";
 })
 export class MenuBoxComponent {
     @Input({required: true}) items: MenuItem[] = [];
-
-    @Input() buttonTranslateKey = 'common.actions';
+    @Input() type: 'primary' | 'secondary' | 'warning' | 'danger' | 'success' = 'primary';
+    @Input() buttonTranslateKey: string | null = null;
     @Input() buttonIcon?: string;
     @Input() buttonDisabled = false;
     @Input() appendTo: any = 'body';
+
+    get colorButton() {
+        if (this.type === 'primary') {
+            return 'primary';
+        } else if (this.type === 'secondary') {
+            return 'secondary';
+        } else if (this.type === 'warning') {
+            return 'warn';
+        } else if (this.type === 'danger') {
+            return 'danger';
+        } else if (this.type === 'success') {
+            return 'success';
+        } else {
+            return 'primary';
+        }
+    }
 }

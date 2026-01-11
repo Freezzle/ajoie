@@ -1,4 +1,15 @@
-import {Component, computed, effect, ElementRef, input, model, QueryList, signal, ViewChildren,} from '@angular/core';
+import {
+    Component,
+    computed,
+    effect,
+    ElementRef,
+    input,
+    model,
+    QueryList,
+    signal,
+    ViewChild,
+    ViewChildren,
+} from '@angular/core';
 import {Talk, TalkSlotComponent} from '../talk-slot/talk-slot.component';
 import {CdkDragEnd, CdkDragMove, DragDropModule} from '@angular/cdk/drag-drop';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -8,7 +19,6 @@ import {CardModule} from 'primeng/card';
 import {BadgeModule} from 'primeng/badge';
 import {ToggleSwitchModule} from "primeng/toggleswitch";
 import {DialogModule} from "primeng/dialog";
-import {TimelineConfigPanelComponent} from "./timeline-config-panel/timeline-config-panel.component";
 import {ButtonDirective} from "primeng/button";
 import {TimelineDay} from "./model/timeline-day";
 import {TimelineRoom} from "./model/timeline-room";
@@ -17,6 +27,16 @@ import {IntervalMinutes} from "./model/interval-minutes";
 import {CardComponent} from "../card/card.component";
 import {TranslateModule} from "@ngx-translate/core";
 import {DialogBoxComponent} from "../dialog-box/dialog-box.component";
+import {TimelineConfigDayDialogComponent} from "./timeline-config-day-dialog/timeline-config-day-dialog.component";
+import {
+    TimelineConfigRoomsDialogComponent
+} from "./timeline-config-rooms-dialog/timeline-config-rooms-dialog.component";
+import {
+    TimelineConfigAssignDialogComponent
+} from "./timeline-config-assign-dialog/timeline-config-assign-dialog.component";
+import {MenuBoxComponent} from "../menu-box/menu-box.component";
+import {MenuItem} from "primeng/api";
+import {ButtonBoxComponent} from "../button-box/button-box.component";
 
 @Component({
     selector: 'timeline-talks',
@@ -32,10 +52,14 @@ import {DialogBoxComponent} from "../dialog-box/dialog-box.component";
         DialogModule,
         ButtonDirective,
         TalkSlotComponent,
-        TimelineConfigPanelComponent,
         CardComponent,
         TranslateModule,
         DialogBoxComponent,
+        TimelineConfigRoomsDialogComponent,
+        TimelineConfigAssignDialogComponent,
+        TimelineConfigDayDialogComponent,
+        MenuBoxComponent,
+        ButtonBoxComponent,
 
     ],
     templateUrl: './timeline-talks.component.html',
@@ -44,13 +68,27 @@ import {DialogBoxComponent} from "../dialog-box/dialog-box.component";
 export class TimelineTalksComponent {
     @ViewChildren('roomTrack') roomTracks!: QueryList<ElementRef<HTMLDivElement>>;
 
+    daysMenuCache = new Map<string, MenuItem[]>();
+
     configuration = model.required<TimelineData>();
     talks = model.required<Talk[]>();
     editionMode = input<boolean>(false);
 
     // State management
     showGrid = signal<boolean>(true);
-    showConfiguration = signal<boolean>(false);
+
+    showConfirmDeleteDay = signal(false);
+
+    showManageRooms = model<boolean>(false);
+    showManageDay = model<boolean>(false);
+    showAssignRooms = model<boolean>(false);
+
+    manageDaySelectedDayId = signal<string | null>(null);
+    manageDayCreateMode = signal(false);
+
+    @ViewChild(TimelineConfigDayDialogComponent) dayDialog?: TimelineConfigDayDialogComponent;
+    @ViewChild(TimelineConfigRoomsDialogComponent) roomsDialog?: TimelineConfigRoomsDialogComponent;
+    @ViewChild(TimelineConfigAssignDialogComponent) assignDialog?: TimelineConfigAssignDialogComponent;
 
     readonly roomBoundariesById = computed(() => {
         const range = this.rangeSelectedDay();
@@ -82,6 +120,11 @@ export class TimelineTalksComponent {
         const days = this.days();
         if (!days.length) {
             return null;
+        }
+
+        this.daysMenuCache.clear();
+        for (const current of days) {
+            this.daysMenuCache.set(current.id, this.dayActionItems(current.id));
         }
 
         const id = this.selectedDayId();
@@ -501,6 +544,113 @@ export class TimelineTalksComponent {
 
     private getRoomBounds(roomId: string): RoomBounds {
         return this.roomBoundariesById().get(roomId) ?? {start: 0, end: this.timeSlots().length};
+    }
+
+    addNewDay() {
+        // création : on génère un id temporaire et on ouvre le dialog
+        this.manageDayCreateMode.set(true);
+        this.manageDaySelectedDayId.set(this.newId());
+        this.showManageDay.set(true);
+    }
+
+    onManageDayConfirm(next: any /* TimelineData */) {
+        const createdId = this.manageDaySelectedDayId();
+
+        this.configuration.set(next);
+        this.showManageDay.set(false);
+
+        // si création : on sélectionne le nouveau jour APRES confirm uniquement
+        if (this.manageDayCreateMode() && createdId) {
+            this.selectedDayId.set(createdId);
+        }
+
+        // reset
+        this.manageDayCreateMode.set(false);
+        this.manageDaySelectedDayId.set(null);
+    }
+
+    onManageDayCancel() {
+        this.showManageDay.set(false);
+        this.manageDayCreateMode.set(false);
+        this.manageDaySelectedDayId.set(null);
+    }
+
+    private newId(): string {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+        return 'id_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    dayActionItems(dayId: string): MenuItem[] {
+
+        if (!dayId) return [];
+
+        return [
+            {
+                label: 'Configurer le jour',
+                icon: 'pi pi-calendar',
+                command: () => this.openManageSelectedDay(dayId),
+            },
+            {
+                label: 'Configurer les assignations de salles',
+                icon: 'pi pi-link',
+                command: () => this.showAssignRooms.set(true),
+            },
+            {
+                label: 'Supprimer le jour',
+                icon: 'pi pi-trash',
+                styleClass: 'p-menuitem-danger', // si ton thème le supporte, sinon retire
+                command: () => this.openDeleteDayConfirm(),
+            },
+        ];
+    }
+
+    openManageSelectedDay(dayId: string) {
+        this.manageDayCreateMode.set(false);
+        this.manageDaySelectedDayId.set(dayId);
+        this.showManageDay.set(true);
+    }
+
+    openDeleteDayConfirm() {
+        // juste ouvre le dialog de confirmation
+        this.showConfirmDeleteDay.set(true);
+    }
+
+    confirmDeleteSelectedDay() {
+        const id = this.selectedDayId();
+        if (!id) return;
+
+        // suppression en DRAFT (clone) puis commit dans le modèle uniquement ici
+        const next = structuredClone(this.configuration());
+        next.days = next.days.filter(d => d.id !== id);
+
+        // si tu as aussi des talks/assignations dépendantes, nettoie ici (optionnel)
+        // next.talks = next.talks.filter(t => t.dayId !== id) etc.
+
+        this.configuration.set(next);
+
+        // sélection d’un autre jour si besoin
+        const remaining = next.days;
+        if (remaining.length > 0) {
+            this.selectedDayId.set(remaining[0].id);
+        } else {
+            // selon ton app : peut-être null autorisé ?
+            // si non, garde un fallback
+            // this.selectedDayId.set(null);
+        }
+
+        this.showConfirmDeleteDay.set(false);
+    }
+
+    dayPanelConfirm() {
+        this.dayDialog?.confirm();
+    }
+
+    roomsPanelConfirm() {
+        this.roomsDialog?.confirm();
+    }
+
+    assignPanelConfirm() {
+        this.assignDialog?.confirm();
     }
 }
 

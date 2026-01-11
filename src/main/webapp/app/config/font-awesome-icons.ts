@@ -93,7 +93,7 @@ import {
     faUsersCog,
     faUserSlash,
     faWandMagicSparkles,
-    faWrench, faGift,
+    faWrench, faGift, faGear,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const fontAwesomeIcons = [
@@ -134,6 +134,7 @@ export const fontAwesomeIcons = [
     faFlag,
     faFloppyDisk,
     faFileInvoice,
+    faGear,
     faGift,
     faHandshakeSimple,
     faHeart,
