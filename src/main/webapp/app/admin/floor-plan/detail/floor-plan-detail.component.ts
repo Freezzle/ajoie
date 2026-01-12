@@ -10,7 +10,7 @@ import {
     IFloorPlan,
     IFloorPlanData,
     mapFloorPlan,
-    mapFloorPlanLight,
+    mapFloorPlanLight
 } from '../floor-plan.model';
 import {IStand} from '../../stand/model/stand.interface';
 import {v4} from 'uuid';
@@ -32,87 +32,76 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 import {CommonModule} from '@angular/common';
 import {Status} from '../../enumerations/status.model';
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {ContextMenu} from "primeng/contextmenu";
-import {MenuItem, PrimeIcons} from "primeng/api";
-import {Tag} from "primeng/tag";
-import {Category, formatterCategory} from "../../enumerations/category.model";
-import {FloorPlanDimensionTileComponent} from "./floor-plan-dimension-tile/floor-plan-dimension-tile.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import ColorStatusPipe from "../../../shared/pipe/color-status.pipe";
-import StatusPipe from "../../../shared/pipe/status.pipe";
-import {Textarea} from "primeng/textarea";
-import {IftaLabel} from "primeng/iftalabel";
-import {DialogBoxComponent} from "../../../shared/components/dialog-box/dialog-box.component";
-import {Divider} from "primeng/divider";
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {ContextMenu} from 'primeng/contextmenu';
+import {MenuItem, PrimeIcons} from 'primeng/api';
+import {Tag} from 'primeng/tag';
+import {Category, formatterCategory} from '../../enumerations/category.model';
+import {FloorPlanDimensionTileComponent} from './floor-plan-dimension-tile/floor-plan-dimension-tile.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
+import StatusPipe from '../../../shared/pipe/status.pipe';
+import {Textarea} from 'primeng/textarea';
+import {IftaLabel} from 'primeng/iftalabel';
+import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
+import {Divider} from 'primeng/divider';
 
 @Component({
-    selector: 'floor-plan',
-    templateUrl: './floor-plan-detail.component.html',
-    styleUrl: './floor-plan-detail.component.scss',
-    imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule, ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Tag, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe, Textarea, IftaLabel, DialogBoxComponent, Divider]
-})
+               selector: 'floor-plan',
+               templateUrl: './floor-plan-detail.component.html',
+               styleUrl: './floor-plan-detail.component.scss',
+               imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule, ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Tag, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe, Textarea, IftaLabel, DialogBoxComponent, Divider]
+           })
 export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     @ViewChild('cm', {static: true}) cm!: ContextMenu;
-
-    protected modalService = inject(NgbModal);
-    private salonService = inject(SalonService);
-    private standService = inject(StandService);
-    private floorPlanService = inject(FloorPlanService);
-    private activatedRoute = inject(ActivatedRoute);
-
-    private clickTimer: any;
-    private readonly clickDelay = 220;
-
     PIXELS = 20;
     DEFAULT_HIGHLIGHT = '#FFFFFF';
-
     contextMenuItems: MenuItem[] = [];
     currentCell: GridCell | null = null;
     standDialogVisible = model<boolean>(false);
-
     @ViewChild('gridDropList')
     gridContainer!: ElementRef;
-
     floorPlans: IFloorPlan[] = [];
-
     indexActiveFloorPlan = 0;
-
     nbWidthTiles = 60;
     nbHeightTiles = 30;
     sizeRealCell = 2;
     isLoading = false;
-
     stands: IStand[] = [];
     availableStandDimensions: DimensionCell[] = [];
     availableDimensions: DimensionCell[] = [];
     salon?: ISalon;
     gridCellPopOver: GridCell | null = null;
     floorPlansToRemove: string[] = [];
-
-    idOnlydisplaySensibleInformation = signal<string | null>(null)
-
+    idOnlydisplaySensibleInformation = signal<string | null>(null);
     isNumberAttribution: FormControl<boolean | null> = new FormControl<boolean>(false);
     automaticallyIncrementNumber: FormControl<boolean | null> = new FormControl<boolean>(true);
-
     nextPosition: FormControl<number | null> = new FormControl<number>(1);
     isReadOnly = true;
-
     displayFullname = false;
     displayTechnical = false;
     showDimensions = false;
     showAvailableStands = false;
     displayHeader = true;
-
     isDragging = false;
     draggingCell: GridCell | null = null;
-
     prereservedDialogVisible = model<boolean>(false);
     prereservedNote: string | null = null;
+    protected modalService = inject(NgbModal);
+    protected readonly getFormattedParticipationName = getFormattedParticipationName;
+    protected readonly formatterCategory = formatterCategory;
+    protected readonly Category = Category;
+    protected readonly Validators = Validators;
+    private salonService = inject(SalonService);
+    private standService = inject(StandService);
+    private floorPlanService = inject(FloorPlanService);
+    private activatedRoute = inject(ActivatedRoute);
+    private clickTimer: any;
+    private readonly clickDelay = 220;
     private prereservedTargetDimension: DimensionCell | null = null;
 
     resetPalette(): void {
@@ -144,87 +133,75 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
             if (this.salon?.id) {
                 this.isLoading = true;
                 combineLatest([
-                    this.standService.query({idSalon: this.salon.id}).pipe(map(response => response ?? [])),
-                    this.floorPlanService.load(this.salon.id),
-                    this.salonService.getDimensionStands(this.salon?.id ?? null),
-                ]).pipe(finalize(() => this.isLoading = false))
-                    .subscribe(([stands, floorPlans, dimensionStands]) => {
-                        this.availableDimensions = convertAvailableDimensionCells(dimensionStands);
-                        this.stands = stands;
-                        let availableStands = stands.filter(
-                            stand => stand.status !== Status.CANCELED && stand.status !== Status.REFUSED);
+                                  this.standService.query({idSalon: this.salon.id}).pipe(map(response => response ?? [])),
+                                  this.floorPlanService.load(this.salon.id),
+                                  this.salonService.getDimensionStands(this.salon?.id ?? null)
+                              ]).pipe(finalize(() => this.isLoading = false))
+                                .subscribe(([stands, floorPlans, dimensionStands]) => {
+                                    this.availableDimensions = convertAvailableDimensionCells(dimensionStands);
+                                    this.stands = stands;
+                                    let availableStands = stands.filter(
+                                        stand => stand.status !== Status.CANCELED && stand.status !== Status.REFUSED);
 
-                        if (floorPlans.length > 0) {
-                            floorPlans.forEach(floorPlan => {
-                                this.floorPlans.push(mapFloorPlanLight(floorPlan, this.availableDimensions, this.stands));
+                                    if (floorPlans.length > 0) {
+                                        floorPlans.forEach(floorPlan => {
+                                            this.floorPlans.push(mapFloorPlanLight(floorPlan, this.availableDimensions, this.stands));
 
-                                availableStands = availableStands.filter(
-                                    stand => !floorPlan.data.cells.flatMap(row => row.flatMap(column => column.dimension?.stand?.id))
-                                        .includes(stand.id));
+                                            availableStands = availableStands.filter(
+                                                stand => !floorPlan.data.cells.flatMap(row => row.flatMap(column => column.dimension?.stand?.id))
+                                                                   .includes(stand.id));
 
-                                this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
-                            });
-                        } else {
-                            this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
+                                            this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
+                                        });
+                                    } else {
+                                        this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
 
-                            this.floorPlans.push({
-                                id: null,
-                                position: 1,
-                                name: 'default',
-                                data: {
-                                    cells: Array.from({length: 30}, () =>
-                                        Array.from(
-                                            {length: 60},
-                                            () =>
-                                                ({
-                                                    id: null,
-                                                    firstCell: false,
-                                                    colorHighlight: this.DEFAULT_HIGHLIGHT,
-                                                    dimension: null,
-                                                    unusable: false,
-                                                }) as GridCell,
-                                        ),
-                                    ),
-                                    widthMeter: 30,
-                                    heightMeter: 15,
-                                    spacingMeter: 0.5,
-                                } as IFloorPlanData,
-                            });
-                        }
-
-                        this.indexActiveFloorPlan = 0;
-                        this.sizeRealCell = 1 / this.getActiveFloorPlanData().spacingMeter;
-                        this.nbWidthTiles = this.getActiveFloorPlanData().widthMeter * this.sizeRealCell;
-                        this.nbHeightTiles = this.getActiveFloorPlanData().heightMeter * this.sizeRealCell;
-
-                        let max = 0;
-                        for (const plan of floorPlans) {
-                            for (const row of plan.data.cells) {
-                                for (const cell of row) {
-                                    const position = cell.dimension?.position;
-                                    if (typeof position === 'number' && position > max) {
-                                        max = position;
+                                        this.floorPlans.push({
+                                                                 id: null,
+                                                                 position: 1,
+                                                                 name: 'default',
+                                                                 data: {
+                                                                     cells: Array.from({length: 30}, () =>
+                                                                         Array.from(
+                                                                             {length: 60},
+                                                                             () =>
+                                                                                 ({
+                                                                                     id: null,
+                                                                                     firstCell: false,
+                                                                                     colorHighlight: this.DEFAULT_HIGHLIGHT,
+                                                                                     dimension: null,
+                                                                                     unusable: false
+                                                                                 }) as GridCell
+                                                                         )
+                                                                     ),
+                                                                     widthMeter: 30,
+                                                                     heightMeter: 15,
+                                                                     spacingMeter: 0.5
+                                                                 } as IFloorPlanData
+                                                             });
                                     }
-                                }
-                            }
-                        }
 
-                        this.nextPosition.setValue(Number(max + 1));
-                    });
+                                    this.indexActiveFloorPlan = 0;
+                                    this.sizeRealCell = 1 / this.getActiveFloorPlanData().spacingMeter;
+                                    this.nbWidthTiles = this.getActiveFloorPlanData().widthMeter * this.sizeRealCell;
+                                    this.nbHeightTiles = this.getActiveFloorPlanData().heightMeter * this.sizeRealCell;
+
+                                    let max = 0;
+                                    for (const plan of floorPlans) {
+                                        for (const row of plan.data.cells) {
+                                            for (const cell of row) {
+                                                const position = cell.dimension?.position;
+                                                if (typeof position === 'number' && position > max) {
+                                                    max = position;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    this.nextPosition.setValue(Number(max + 1));
+                                });
             }
         });
-    }
-
-    private initializeState(): void {
-        this.currentCell = null;
-        this.stands = [];
-        this.availableDimensions = [];
-        this.availableStandDimensions = [];
-        this.gridCellPopOver = null;
-        this.floorPlans = [];
-        this.indexActiveFloorPlan = 0;
-        this.floorPlansToRemove = [];
-        this.resetPalette();
     }
 
     activateReadOnlyMode(): void {
@@ -349,14 +326,6 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         this.draggingCell = null;
     }
 
-    private resetCell(cell: GridCell) {
-        cell.id = null;
-        cell.firstCell = false;
-        cell.dimension = null;
-        cell.colorHighlight = this.DEFAULT_HIGHLIGHT;
-        cell.unusable = false;
-    }
-
     highlightCells(event: any) {
         this.clearHighlights();
         const shape = event.source.data;
@@ -409,24 +378,24 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
         const observables: Observable<any>[] = [
             ...this.floorPlans
-                .map(floorPlan => {
-                    if (!this.salon?.id) {
-                        return null;
-                    }
+                   .map(floorPlan => {
+                       if (!this.salon?.id) {
+                           return null;
+                       }
 
-                    const floorToSave = mapFloorPlan(floorPlan);
+                       const floorToSave = mapFloorPlan(floorPlan);
 
-                    if (floorToSave.id) {
-                        return this.floorPlanService.save(this.salon.id, floorToSave.id, floorToSave);
-                    } else {
-                        return this.floorPlanService.create(this.salon.id, floorToSave);
-                    }
-                }).filter((obs): obs is Observable<any> => obs !== null),
+                       if (floorToSave.id) {
+                           return this.floorPlanService.save(this.salon.id, floorToSave.id, floorToSave);
+                       } else {
+                           return this.floorPlanService.create(this.salon.id, floorToSave);
+                       }
+                   }).filter((obs): obs is Observable<any> => obs !== null),
 
             ...this.floorPlansToRemove
-                .map(floorPlanToRemoveId => (this.salon?.id ? this.floorPlanService.delete(this.salon.id, floorPlanToRemoveId) :
-                    null))
-                .filter((obs): obs is Observable<any> => obs !== null),
+                   .map(floorPlanToRemoveId => (this.salon?.id ? this.floorPlanService.delete(this.salon.id, floorPlanToRemoveId) :
+                                                null))
+                   .filter((obs): obs is Observable<any> => obs !== null)
         ];
 
         if (observables.length > 0) {
@@ -479,41 +448,41 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     openAddDialog(): void {
         const modalRef = this.modalService.open(AddPlanDialogComponent, {
             size: 'lg',
-            backdrop: 'static',
+            backdrop: 'static'
         });
 
         modalRef.closed
-            .pipe(filter((result) => result.event === ITEM_ADDED_EVENT))
-            .subscribe(result => {
-                const info = result.data as AddPlanInfo;
+                .pipe(filter((result) => result.event === ITEM_ADDED_EVENT))
+                .subscribe(result => {
+                    const info = result.data as AddPlanInfo;
 
-                const spacingMultiply = (1 / info.spacingMeter);
-                this.floorPlans.push({
-                    id: null,
-                    position: this.floorPlans.length + 1,
-                    name: info.name,
-                    data: {
-                        cells: Array.from({length: info.heightMeter * spacingMultiply}, () =>
-                            Array.from(
-                                {length: info.widthMeter * spacingMultiply},
-                                () =>
-                                    ({
-                                        id: null,
-                                        firstCell: false,
-                                        colorHighlight: this.DEFAULT_HIGHLIGHT,
-                                        dimension: null,
-                                        unusable: false,
-                                    }) as GridCell,
-                            ),
-                        ),
-                        widthMeter: info.widthMeter,
-                        heightMeter: info.heightMeter,
-                        spacingMeter: info.spacingMeter,
-                    } as IFloorPlanData,
+                    const spacingMultiply = (1 / info.spacingMeter);
+                    this.floorPlans.push({
+                                             id: null,
+                                             position: this.floorPlans.length + 1,
+                                             name: info.name,
+                                             data: {
+                                                 cells: Array.from({length: info.heightMeter * spacingMultiply}, () =>
+                                                     Array.from(
+                                                         {length: info.widthMeter * spacingMultiply},
+                                                         () =>
+                                                             ({
+                                                                 id: null,
+                                                                 firstCell: false,
+                                                                 colorHighlight: this.DEFAULT_HIGHLIGHT,
+                                                                 dimension: null,
+                                                                 unusable: false
+                                                             }) as GridCell
+                                                     )
+                                                 ),
+                                                 widthMeter: info.widthMeter,
+                                                 heightMeter: info.heightMeter,
+                                                 spacingMeter: info.spacingMeter
+                                             } as IFloorPlanData
+                                         });
+
+                    this.changePlanView(this.floorPlans.length - 1);
                 });
-
-                this.changePlanView(this.floorPlans.length - 1);
-            });
     }
 
     changePlanView(index: number): void {
@@ -530,41 +499,41 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     rename(): void {
         const modalRef = this.modalService.open(RenamePlanDialogComponent, {
             size: 'lg',
-            backdrop: 'static',
+            backdrop: 'static'
         });
         modalRef.componentInstance.floorName = this.getActiveFloorPlan().name;
 
         modalRef.closed
-            .pipe(filter((result) => result.event === ITEM_UPDATED_EVENT))
-            .subscribe(result => {
-                this.getActiveFloorPlan().name = result.data;
-            });
+                .pipe(filter((result) => result.event === ITEM_UPDATED_EVENT))
+                .subscribe(result => {
+                    this.getActiveFloorPlan().name = result.data;
+                });
     }
 
     delete(): void {
         const modalRef = this.modalService.open(DeleteDialogComponent, {
             size: 'lg',
-            backdrop: 'static',
+            backdrop: 'static'
         });
         modalRef.componentInstance.translateKey = 'floorPlan.delete.question';
         modalRef.componentInstance.translateValues = {floorName: this.getActiveFloorPlan().name};
 
         modalRef.closed
-            .pipe(filter((reason) => reason === ITEM_DELETED_EVENT))
-            .subscribe(() => {
-                if (this.salon?.id) {
-                    if (this.getActiveFloorPlan().id) {
-                        this.floorPlansToRemove.push(this.getActiveFloorPlan().id!);
+                .pipe(filter((reason) => reason === ITEM_DELETED_EVENT))
+                .subscribe(() => {
+                    if (this.salon?.id) {
+                        if (this.getActiveFloorPlan().id) {
+                            this.floorPlansToRemove.push(this.getActiveFloorPlan().id!);
+                        }
+                        this.floorPlans.splice(this.indexActiveFloorPlan, 1);
+                        let position = 1;
+                        this.floorPlans.sort((a, b) => a.position - b.position).forEach(floor => {
+                            floor.position = position;
+                            position += 1;
+                        });
+                        this.indexActiveFloorPlan = this.indexActiveFloorPlan - 1;
                     }
-                    this.floorPlans.splice(this.indexActiveFloorPlan, 1);
-                    let position = 1;
-                    this.floorPlans.sort((a, b) => a.position - b.position).forEach(floor => {
-                        floor.position = position;
-                        position += 1;
-                    });
-                    this.indexActiveFloorPlan = this.indexActiveFloorPlan - 1;
-                }
-            });
+                });
     }
 
     onClick(event: MouseEvent, cell: GridCell) {
@@ -573,7 +542,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
         clearTimeout(this.clickTimer);
         this.clickTimer = setTimeout(() => {
-            (!this.isReadOnly && this.isNumberAttribution.value) ? this.onClickNumberAttribution(cell) : this.openStandDialog(cell)
+            (!this.isReadOnly && this.isNumberAttribution.value) ? this.onClickNumberAttribution(cell) : this.openStandDialog(cell);
         }, this.clickDelay);
     }
 
@@ -630,21 +599,6 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
             this.changeRotation(dimension);
             return dimension;
         });
-    }
-
-    private changeRotation(dimension: DimensionCell) {
-        const rows = dimension.rows;
-        const cols = dimension.cols;
-        dimension.cols = rows;
-        dimension.rows = cols;
-    }
-
-    private forEachCell(callback: (cell: GridCell) => void): void {
-        this.getActiveFloorPlanData().cells.forEach(row => row.forEach(cell => callback(cell)));
-    }
-
-    private getCell(row: number, col: number): GridCell {
-        return this.getActiveFloorPlanData().cells[row][col];
     }
 
     changeAutoIncrement(): void {
@@ -706,14 +660,6 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         this.cm?.hide();
     }
 
-    private unassignCell(cell: GridCell) {
-        if (cell.dimension?.stand) {
-            this.availableStandDimensions.push(convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand));
-            cell.dimension.stand = null;
-            cell.dimension.color = getColorStand(cell.dimension.stand);
-        }
-    }
-
     assign(givenStand: IStand, givenCell: GridCell | null) {
         if (!givenCell) {
             return;
@@ -748,68 +694,6 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         this.cm?.show(event);
     }
 
-    private buildContextMenuItems(cell: GridCell): MenuItem[] {
-        const items: MenuItem[] = [];
-
-        // CAS 1 : pas de stand -> on propose "Attribuer à..." (avec sous-menu)
-        if (!cell.dimension?.stand) {
-            if (this.availableStandDimensions.length) {
-                items.push({
-                    label: 'Attribuer à...',
-                    icon: PrimeIcons.USER_PLUS + ' text-success',
-                    items: this.availableStandDimensions.map(dim => ({
-                        label: this.getFormattedParticipationName(dim.stand!.participation),
-                        // petit indicateur si la dimension colle
-                        icon:
-                            dim.stand!.dimension?.id === cell.dimension?.idDimension
-                                ? PrimeIcons.VERIFIED + ' text-success'
-                                : PrimeIcons.EXCLAMATION_CIRCLE + ' text-warning',
-                        command: () => this.assign(dim.stand!, cell),
-                    })),
-                });
-            } else {
-                items.push({
-                    label: 'Aucun stand disponible',
-                    icon: PrimeIcons.USER,
-                    disabled: true,
-                });
-            }
-        }
-
-        // CAS 2 : stand présent -> "Désattribuer"
-        if (cell.dimension?.stand) {
-            items.push({
-                label: 'Désattribuer',
-                icon: PrimeIcons.USER_MINUS + ' text-warning',
-                command: () => this.unassign(cell.id),
-            });
-        }
-
-        if (cell.dimension?.prereserved) {
-            items.push({
-                label: 'Annuler la réservation',
-                icon: PrimeIcons.TAG + ' text-warning',
-                command: () => this.cancelPrereserved(cell.dimension!),
-            });
-        }
-        if (!cell.dimension?.stand && !cell.dimension?.prereserved) {
-            items.push({
-                label: 'Réserver la place...',
-                icon: PrimeIcons.TAG + ' text-success',
-                command: () => this.prereserved(cell.dimension!),
-            });
-        }
-
-        // commun : supprimer le stand
-        items.push({
-            label: 'Supprimer l\'emplacement',
-            icon: PrimeIcons.TRASH + ' text-danger',
-            command: () => this.removeShapeById(cell.id),
-        });
-
-        return items;
-    }
-
     openStandDialog(cell: GridCell | null): void {
         if (!cell || !cell.dimension?.stand) {
             return;
@@ -822,7 +706,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     prereserved(dimension: DimensionCell) {
         this.prereservedTargetDimension = dimension;
         this.prereservedNote = null;
-        this.prereservedDialogVisible.set(true)
+        this.prereservedDialogVisible.set(true);
         this.cm?.hide();
     }
 
@@ -830,7 +714,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         // optionnel : reset quand on ferme
         this.prereservedNote = null;
         this.prereservedTargetDimension = null;
-        this.prereservedDialogVisible.set(false)
+        this.prereservedDialogVisible.set(false);
     }
 
     canConfirmPrereserved(): boolean {
@@ -838,14 +722,116 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     }
 
     confirmPrereserved() {
-        if (!this.prereservedTargetDimension || !this.prereservedNote) return;
+        if (!this.prereservedTargetDimension || !this.prereservedNote) {
+            return;
+        }
         this.prereservedTargetDimension.prereserved = ({note: this.prereservedNote.trim()});
 
         this.onPrereservedDialogHide();
     }
 
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
-    protected readonly formatterCategory = formatterCategory;
-    protected readonly Category = Category;
-    protected readonly Validators = Validators;
+    private initializeState(): void {
+        this.currentCell = null;
+        this.stands = [];
+        this.availableDimensions = [];
+        this.availableStandDimensions = [];
+        this.gridCellPopOver = null;
+        this.floorPlans = [];
+        this.indexActiveFloorPlan = 0;
+        this.floorPlansToRemove = [];
+        this.resetPalette();
+    }
+
+    private resetCell(cell: GridCell) {
+        cell.id = null;
+        cell.firstCell = false;
+        cell.dimension = null;
+        cell.colorHighlight = this.DEFAULT_HIGHLIGHT;
+        cell.unusable = false;
+    }
+
+    private changeRotation(dimension: DimensionCell) {
+        const rows = dimension.rows;
+        const cols = dimension.cols;
+        dimension.cols = rows;
+        dimension.rows = cols;
+    }
+
+    private forEachCell(callback: (cell: GridCell) => void): void {
+        this.getActiveFloorPlanData().cells.forEach(row => row.forEach(cell => callback(cell)));
+    }
+
+    private getCell(row: number, col: number): GridCell {
+        return this.getActiveFloorPlanData().cells[row][col];
+    }
+
+    private unassignCell(cell: GridCell) {
+        if (cell.dimension?.stand) {
+            this.availableStandDimensions.push(convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand));
+            cell.dimension.stand = null;
+            cell.dimension.color = getColorStand(cell.dimension.stand);
+        }
+    }
+
+    private buildContextMenuItems(cell: GridCell): MenuItem[] {
+        const items: MenuItem[] = [];
+
+        // CAS 1 : pas de stand -> on propose "Attribuer à..." (avec sous-menu)
+        if (!cell.dimension?.stand) {
+            if (this.availableStandDimensions.length) {
+                items.push({
+                               label: 'Attribuer à...',
+                               icon: PrimeIcons.USER_PLUS + ' text-success',
+                               items: this.availableStandDimensions.map(dim => ({
+                                   label: this.getFormattedParticipationName(dim.stand!.participation),
+                                   // petit indicateur si la dimension colle
+                                   icon:
+                                       dim.stand!.dimension?.id === cell.dimension?.idDimension
+                                       ? PrimeIcons.VERIFIED + ' text-success'
+                                       : PrimeIcons.EXCLAMATION_CIRCLE + ' text-warning',
+                                   command: () => this.assign(dim.stand!, cell)
+                               }))
+                           });
+            } else {
+                items.push({
+                               label: 'Aucun stand disponible',
+                               icon: PrimeIcons.USER,
+                               disabled: true
+                           });
+            }
+        }
+
+        // CAS 2 : stand présent -> "Désattribuer"
+        if (cell.dimension?.stand) {
+            items.push({
+                           label: 'Désattribuer',
+                           icon: PrimeIcons.USER_MINUS + ' text-warning',
+                           command: () => this.unassign(cell.id)
+                       });
+        }
+
+        if (cell.dimension?.prereserved) {
+            items.push({
+                           label: 'Annuler la réservation',
+                           icon: PrimeIcons.TAG + ' text-warning',
+                           command: () => this.cancelPrereserved(cell.dimension!)
+                       });
+        }
+        if (!cell.dimension?.stand && !cell.dimension?.prereserved) {
+            items.push({
+                           label: 'Réserver la place...',
+                           icon: PrimeIcons.TAG + ' text-success',
+                           command: () => this.prereserved(cell.dimension!)
+                       });
+        }
+
+        // commun : supprimer le stand
+        items.push({
+                       label: 'Supprimer l\'emplacement',
+                       icon: PrimeIcons.TRASH + ' text-danger',
+                       command: () => this.removeShapeById(cell.id)
+                   });
+
+        return items;
+    }
 }

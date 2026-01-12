@@ -3,36 +3,39 @@ import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ErrorBoxComponent} from '../../error-box/error-box.component';
-import {IftaLabel} from "primeng/iftalabel";
-import {InputNumber} from "primeng/inputnumber";
-import {FloatLabel} from "primeng/floatlabel";
+import {IftaLabel} from 'primeng/iftalabel';
+import {InputNumber} from 'primeng/inputnumber';
+import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
-    imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, InputNumber, FloatLabel],
-    selector: 'number-box',
-    templateUrl: './number-box.component.html'
-})
+               imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, InputNumber, FloatLabel],
+               selector: 'number-box',
+               templateUrl: './number-box.component.html'
+           })
 export class NumberBoxComponent implements ControlValueAccessor {
     @Input()
     translateKey: string | undefined;
     @Input()
     fieldName: string = '';
     @Input() modeDecimal = false;
-
-    protected readonly Validators = Validators;
-
     disabled: boolean = false;
     value: number | null = null;
-
-    // placeholder methods
-    onChange = (_: any) => {
-    };
-    onTouched = () => {
-    };
+    protected readonly Validators = Validators;
 
     constructor(@Self() public controlDir: NgControl) {
         this.controlDir.valueAccessor = this;
     }
+
+    get control(): FormControl<any> {
+        return this.controlDir.control as FormControl<any>;
+    }
+
+    // placeholder methods
+    onChange = (_: any) => {
+    };
+
+    onTouched = () => {
+    };
 
     writeValue(value: any): void {
         this.value = value;
@@ -54,9 +57,5 @@ export class NumberBoxComponent implements ControlValueAccessor {
         this.value = (event.target as HTMLInputElement).value as unknown as number;
         this.onChange(this.value);
         this.onTouched();
-    }
-
-    get control(): FormControl<any> {
-        return this.controlDir.control as FormControl<any>;
     }
 }

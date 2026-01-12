@@ -11,6 +11,6 @@ export class PasswordResetFinishService {
 
     save(key: string, newPassword: string): Observable<unknown> {
         return this.http.post(this.applicationConfigService.getEndpointFor('api/account/reset-password/finish'),
-            {key, newPassword});
+                              {key, newPassword});
     }
 }

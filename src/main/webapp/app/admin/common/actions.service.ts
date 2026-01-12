@@ -26,13 +26,16 @@ export class ActionsService {
 
     emailAction(context: string, idEntity: string, emailMessage: EmailMessage): Observable<unknown> {
         const payload: { [key: string]: any } = {
-            emailMessage,
+            emailMessage
         };
 
         return this.http.post<unknown>(`${this.resourceActionsUrl}/email/${context}/${idEntity}`, payload);
     }
 
     downloadAction(context: string, idEntity: string): Observable<HttpResponse<Blob>> {
-        return this.http.get(`${this.resourceActionsUrl}/download/${context}/${idEntity}`, {responseType: 'blob', observe: 'response'});
+        return this.http.get(`${this.resourceActionsUrl}/download/${context}/${idEntity}`, {
+            responseType: 'blob',
+            observe: 'response'
+        });
     }
 }

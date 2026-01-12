@@ -1,7 +1,7 @@
-import {TimelineDay} from "./timeline-day";
-import {TimelineRoom} from "./timeline-room";
+import {TimelineDay} from './timeline-day';
+import {TimelineRoom} from './timeline-room';
 
-import {IntervalMinutes} from "./interval-minutes";
+import {IntervalMinutes} from './interval-minutes';
 
 export interface TimelineData {
     eventId: string;

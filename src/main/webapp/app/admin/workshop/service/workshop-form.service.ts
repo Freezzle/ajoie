@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {IWorkshop} from '../model/workshop.interface';
-import {Status} from "../../enumerations/status.model";
+import {Status} from '../../enumerations/status.model';
 
 export type WorkshopFormGroup = {
     id: FormControl<IWorkshop['id'] | null>;
@@ -18,20 +18,20 @@ export class WorkshopFormService {
     createWorkshopFormGroup(workshop: IWorkshop | null): FormGroup<WorkshopFormGroup> {
         const raw: IWorkshop = {
             ...this.getDefaultWorkshopFormValue() as IWorkshop,
-            ...(workshop ?? {}),
+            ...(workshop ?? {})
         };
 
         return new FormGroup<WorkshopFormGroup>({
-            id: new FormControl(raw.id),
-            title: new FormControl(raw.title, [Validators.required]),
-            description: new FormControl(raw.description, [
-                Validators.required,
-                Validators.maxLength(500),
-            ]),
-            status: new FormControl(raw.status, Validators.required),
-            extraInformation: new FormControl(raw.extraInformation),
-            participation: new FormControl(raw.participation, Validators.required),
-        });
+                                                    id: new FormControl(raw.id),
+                                                    title: new FormControl(raw.title, [Validators.required]),
+                                                    description: new FormControl(raw.description, [
+                                                        Validators.required,
+                                                        Validators.maxLength(500)
+                                                    ]),
+                                                    status: new FormControl(raw.status, Validators.required),
+                                                    extraInformation: new FormControl(raw.extraInformation),
+                                                    participation: new FormControl(raw.participation, Validators.required)
+                                                });
     }
 
     getWorkshop(form: FormGroup<WorkshopFormGroup>): IWorkshop {
@@ -40,7 +40,7 @@ export class WorkshopFormService {
 
     private getDefaultWorkshopFormValue(): Pick<IWorkshop, 'status'> {
         return {
-            status: Status.IN_VERIFICATION,
+            status: Status.IN_VERIFICATION
         };
     }
 }

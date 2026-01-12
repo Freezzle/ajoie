@@ -53,7 +53,9 @@ export function hhmm(d: Date): string {
 }
 
 export function normalizeHex(v: string): string | null {
-    if (!v) return null;
+    if (!v) {
+        return null;
+    }
     const s = v.startsWith('#') ? v : `#${v}`;
     return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(s) ? s : null;
 }
@@ -63,7 +65,9 @@ export type TimeSlot = { index: number; label: string };
 export function computeTimeSlots(startTime: Date, endTime: Date, interval: IntervalMinutes): TimeSlot[] {
     const s = normalizeTime(startTime);
     const e = normalizeTime(endTime);
-    if (e.getTime() <= s.getTime()) return [];
+    if (e.getTime() <= s.getTime()) {
+        return [];
+    }
 
     const diffMin = Math.floor((e.getTime() - s.getTime()) / 60000);
     const steps = Math.floor(diffMin / interval);
@@ -71,7 +75,7 @@ export function computeTimeSlots(startTime: Date, endTime: Date, interval: Inter
     const slots: TimeSlot[] = [];
     for (let i = 0; i < steps; i++) {
         const t = new Date(s.getTime() + i * interval * 60000);
-        slots.push({ index: i, label: hhmm(t) });
+        slots.push({index: i, label: hhmm(t)});
     }
     return slots;
 }

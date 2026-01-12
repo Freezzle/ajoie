@@ -2,9 +2,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 import {Status} from '../../admin/enumerations/status.model';
 
 @Pipe({
-    standalone: true,
-    name: 'colorStatus',
-})
+          standalone: true,
+          name: 'colorStatus'
+      })
 export default class ColorStatusPipe implements PipeTransform {
     transform(value: string | Status | null | undefined): string {
         if (value === Status.ACCEPTED || value === Status.VALIDATED) {

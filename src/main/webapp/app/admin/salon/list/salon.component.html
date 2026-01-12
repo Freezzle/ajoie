@@ -4,23 +4,23 @@
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    faIcon="arrow-left"
                     [isDisabled]="isLoading"
-                    translateKey="common.back"
-                    [showText]="false"/>
+                    [showText]="false"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
         <button-box (clickedEvent)="load()"
-                    faIcon="sync"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
                     [isDisabled]="isLoading"
                     [showText]="false"
+                    faIcon="sync"
                     translateKey="common.refresh"/>
-        <button-box [modeLink]="true"
+        <button-box [isDisabled]="isLoading"
                     [links]="['./new']"
-                    [isDisabled]="isLoading"
+                    [modeLink]="true"
                     [showText]="false"
-                    type="success"
                     faIcon="plus"
-                    translateKey="common.create"/>
+                    translateKey="common.create"
+                    type="success"/>
     </div>
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
@@ -30,23 +30,25 @@
         <div appCardBody>
             <div class="row">
                 <p-table #dt2
-                         [value]="salons"
-                         dataKey="id"
-                         [rows]="10"
-                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [globalFilterFields]="['place', 'referenceNumber']"
                          [loading]="isLoading"
                          [paginator]="true"
-                         [globalFilterFields]="['place', 'referenceNumber']"
-                         sortField="startingDate"
+                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [rows]="10"
                          [sortOrder]="-1"
-                         [tableStyle]="{ 'min-width': '60rem' }">
+                         [tableStyle]="{ 'min-width': '60rem' }"
+                         [value]="salons"
+                         dataKey="id"
+                         sortField="startingDate">
                     <ng-template #caption>
                         <div class="flex">
-                            <p-iconfield iconPosition="left" class="ml-auto">
+                            <p-iconfield class="ml-auto" iconPosition="left">
                                 <p-inputicon>
                                     <i class="pi pi-search"></i>
                                 </p-inputicon>
-                                <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Recherche" />
+                                <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
+                                       placeholder="Recherche"
+                                       type="text"/>
                             </p-iconfield>
                         </div>
                     </ng-template>
@@ -61,47 +63,47 @@
                             <th pSortableColumn="startingDate">
                                 {{ 'salon.startingDate' | translate }}
                                 <p-sortIcon field="startingDate"/>
-                                <p-columnFilter type="date"
+                                <p-columnFilter display="menu"
                                                 field="startingDate"
-                                                size="small"
                                                 matchMode="dateAfter"
-                                                display="menu"></p-columnFilter>
+                                                size="small"
+                                                type="date"></p-columnFilter>
                             </th>
                             <th pSortableColumn="endingDate">
                                 {{ 'salon.endingDate' | translate }}
                                 <p-sortIcon field="endingDate"/>
-                                <p-columnFilter type="date"
+                                <p-columnFilter display="menu"
                                                 field="endingDate"
-                                                size="small"
                                                 matchMode="dateBefore"
-                                                display="menu"></p-columnFilter>
+                                                size="small"
+                                                type="date"></p-columnFilter>
                             </th>
                             <th>&nbsp;</th>
                         </tr>
                     </ng-template>
                     <ng-template #body let-salon>
                         <tr>
-                            <td class="clickable truncate-medium"
-                                [routerLink]="['./', salon.id, 'participations']">{{ salon.place }}
+                            <td [routerLink]="['./', salon.id, 'participations']"
+                                class="clickable truncate-medium">{{ salon.place }}
                             </td>
-                            <td class="clickable truncate-small"
-                                [routerLink]="['./', salon.id, 'participations']">{{ salon.referenceNumber }}
+                            <td [routerLink]="['./', salon.id, 'participations']"
+                                class="clickable truncate-small">{{ salon.referenceNumber }}
                             </td>
-                            <td class="clickable truncate-small" [routerLink]="['./', salon.id, 'participations']">{{
+                            <td [routerLink]="['./', salon.id, 'participations']" class="clickable truncate-small">{{
                                     salon.startingDate | formatMediumDate
                                 }}
                             </td>
-                            <td class="clickable truncate-small" [routerLink]="['./', salon.id, 'participations']">{{
+                            <td [routerLink]="['./', salon.id, 'participations']" class="clickable truncate-small">{{
                                     salon.endingDate | formatMediumDate
                                 }}
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     <button-box (clickedEvent)="delete($event, salon)"
-                                                type="danger"
                                                 [showText]="false"
+                                                faIcon="times"
                                                 translateKey="common.delete"
-                                                faIcon="times"/>
+                                                type="danger"/>
                                 </div>
                             </td>
                         </tr>

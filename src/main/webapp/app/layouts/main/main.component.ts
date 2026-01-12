@@ -7,22 +7,20 @@ import {AccountService} from 'app/core/auth/account.service';
 import {AppPageTitleStrategy} from 'app/app-page-title-strategy';
 
 @Component({
-    selector: 'app-main',
-    templateUrl: './main.component.html',
-    styleUrl: './main.component.scss',
-    providers: [AppPageTitleStrategy],
-    imports: [RouterOutlet]
-})
+               selector: 'app-main',
+               templateUrl: './main.component.html',
+               styleUrl: './main.component.scss',
+               providers: [AppPageTitleStrategy],
+               imports: [RouterOutlet]
+           })
 export default class MainComponent implements OnInit {
+    readonly inDevelopementMode = signal<boolean>(false);
     private renderer: Renderer2;
-
     private router = inject(Router);
     private appPageTitleStrategy = inject(AppPageTitleStrategy);
     private accountService = inject(AccountService);
     private translateService = inject(TranslateService);
     private rootRenderer = inject(RendererFactory2);
-
-    readonly inDevelopementMode = signal<boolean>(false);
 
     constructor() {
         this.renderer = this.rootRenderer.createRenderer(document.querySelector('html'), null);

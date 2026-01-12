@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {IConference} from '../model/conference.interface';
-import {Status} from "../../enumerations/status.model";
+import {Status} from '../../enumerations/status.model';
 
 export type ConferenceFormGroup = {
     id: FormControl<IConference['id'] | null>;
@@ -18,20 +18,20 @@ export class ConferenceFormService {
     createConferenceFormGroup(conference: IConference | null): FormGroup<ConferenceFormGroup> {
         const raw: IConference = {
             ...this.getDefaultConferenceFormValue() as IConference,
-            ...(conference ?? {}),
+            ...(conference ?? {})
         };
 
         return new FormGroup<ConferenceFormGroup>({
-            id: new FormControl(raw.id),
-            title: new FormControl(raw.title, [Validators.required]),
-            description: new FormControl(raw.description, [
-                Validators.required,
-                Validators.maxLength(500),
-            ]),
-            status: new FormControl(raw.status, Validators.required),
-            extraInformation: new FormControl(raw.extraInformation),
-            participation: new FormControl(raw.participation, Validators.required),
-        });
+                                                      id: new FormControl(raw.id),
+                                                      title: new FormControl(raw.title, [Validators.required]),
+                                                      description: new FormControl(raw.description, [
+                                                          Validators.required,
+                                                          Validators.maxLength(500)
+                                                      ]),
+                                                      status: new FormControl(raw.status, Validators.required),
+                                                      extraInformation: new FormControl(raw.extraInformation),
+                                                      participation: new FormControl(raw.participation, Validators.required)
+                                                  });
     }
 
     getConference(form: FormGroup<ConferenceFormGroup>): IConference {
@@ -40,7 +40,7 @@ export class ConferenceFormService {
 
     private getDefaultConferenceFormValue(): Pick<IConference, 'status'> {
         return {
-            status: Status.IN_VERIFICATION,
+            status: Status.IN_VERIFICATION
         };
     }
 }

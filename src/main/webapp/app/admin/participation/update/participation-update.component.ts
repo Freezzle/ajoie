@@ -34,36 +34,51 @@ import {AvailableAction} from '../../../shared/model/available-action';
 import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.component';
 import {EmailMessage} from '../../../shared/email-dialog/email-message';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
-import {IWorkshop} from "../../workshop/model/workshop.interface";
-import {WorkshopService} from "../../workshop/service/workshop.service";
-import {formatterModePaymentMeals, ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
-import {formatterInvoiceMethod, InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {Tab, TabList, TabPanel, TabPanels, Tabs} from "primeng/tabs";
-import {Badge} from "primeng/badge";
-import {Tag} from "primeng/tag";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import {MenuBoxComponent} from "../../../shared/components/menu-box/menu-box.component";
-import {MenuItem, PrimeIcons} from "primeng/api";
-import {TranslateService} from "@ngx-translate/core";
-import {TableModule} from "primeng/table";
+import {IWorkshop} from '../../workshop/model/workshop.interface';
+import {WorkshopService} from '../../workshop/service/workshop.service';
+import {formatterModePaymentMeals, ModePaymentMeals} from '../../enumerations/mode-payment-meals.model';
+import {formatterInvoiceMethod, InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {Badge} from 'primeng/badge';
+import {Tag} from 'primeng/tag';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {MenuItem, PrimeIcons} from 'primeng/api';
+import {TranslateService} from '@ngx-translate/core';
+import {TableModule} from 'primeng/table';
 
 @Component({
-    selector: 'app-participation-update',
-    templateUrl: './participation-update.component.html',
-    imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
-        ButtonBoxComponent, LinkBoxComponent, SelectBoxComponent, DateBoxComponent,
-        NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, Tab, TabList, Tabs, TabPanels, TabPanel, Badge, Tag, CardComponent, ContentPageComponent, MenuBoxComponent, TableModule]
-})
+               selector: 'app-participation-update',
+               templateUrl: './participation-update.component.html',
+               imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
+                         ButtonBoxComponent, LinkBoxComponent, SelectBoxComponent, DateBoxComponent,
+                         NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, Tab, TabList, Tabs, TabPanels, TabPanel, Badge, Tag, CardComponent, ContentPageComponent, MenuBoxComponent, TableModule]
+           })
 export class ParticipationUpdateComponent implements OnInit {
+    tabActive = '0';
+    isLoading = false;
+    isReadOnly = false;
+    eventId!: string;
+    isNew: boolean = false;
+    initialParticipation: IParticipation | null = null;
+    statusValues = Object.keys(Status);
+    modePaymentMealsValues = Object.keys(ModePaymentMeals);
+    invoiceSendingMethodValues = Object.keys(InvoiceSendingMethod);
+    exhibitorsOptions: IExhibitor[] = [];
+    menuCache: MenuItem[] = [];
+    conferences$: Observable<IConference[]> | undefined;
+    workshops$: Observable<IWorkshop[]> | undefined;
+    stands$: Observable<IStand[]> | undefined;
     protected participationService = inject(ParticipationService);
     protected participationFormService = inject(ParticipationFormService);
+    editForm: FormGroup<ParticipationFormGroup> = this.participationFormService.createParticipationFormGroup(null);
     protected conferenceService = inject(ConferenceService);
     protected standService = inject(StandService);
     protected workshopService = inject(WorkshopService);
@@ -75,54 +90,17 @@ export class ParticipationUpdateComponent implements OnInit {
     protected actionsService = inject(ActionsService);
     protected translateService = inject(TranslateService);
     protected router = inject(Router);
-
-    tabActive = '0';
-    isLoading = false;
-    isReadOnly = false;
-    eventId!: string;
-    isNew: boolean = false;
-
-    initialParticipation: IParticipation | null = null;
-    statusValues = Object.keys(Status);
-    modePaymentMealsValues = Object.keys(ModePaymentMeals);
-    invoiceSendingMethodValues = Object.keys(InvoiceSendingMethod);
-    exhibitorsOptions: IExhibitor[] = [];
-    editForm: FormGroup<ParticipationFormGroup> = this.participationFormService.createParticipationFormGroup(null);
-
-    menuCache: MenuItem[] = [];
-    conferences$: Observable<IConference[]> | undefined;
-    workshops$: Observable<IWorkshop[]> | undefined;
-    stands$: Observable<IStand[]> | undefined;
+    protected readonly formatterStatus = formatterStatus;
+    protected readonly formatterExhibitor = formatterExhibitor;
+    protected readonly formatterModePaymentMeals = formatterModePaymentMeals;
+    protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
+    protected readonly selectFilterExhibitor = selectFilterExhibitor;
 
     ngOnInit(): void {
         const data = this.activatedRoute.snapshot.data;
         this.eventId = this.activatedRoute.snapshot.paramMap.get('idSalon')!;
 
-        this.load({...data['participation']}, data['readonly'])
-    }
-
-    private load(participation: IParticipation | null, readonly: boolean): void {
-        this.stands$ = undefined;
-        this.conferences$ = undefined;
-        this.workshops$ = undefined;
-
-        this.initialParticipation = participation;
-        this.editForm = this.participationFormService.createParticipationFormGroup(this.initialParticipation);
-
-        this.isNew = !this.editForm.controls.id.value
-        if (readonly) {
-            this.isReadOnly = true;
-            this.editForm.disable();
-            if (this.initialParticipation) {
-                this.actionsService.getAvailableActions('participation', this.initialParticipation.id).subscribe(availableActions => {
-                    this.menuCache = this.buildInvoicingPlanMenuItems(availableActions);
-                });
-            }
-        } else {
-            this.edit();
-        }
-
-        this.loadRelationshipsOptions(this.initialParticipation);
+        this.load({...data['participation']}, data['readonly']);
     }
 
     loadStandsOnce(): Observable<IStand[]> {
@@ -134,7 +112,7 @@ export class ParticipationUpdateComponent implements OnInit {
             this.stands$ = this.standService.query(queryObject).pipe(
                 map(res => res ?? []),
                 catchError(() => of([])),
-                shareReplay(1),
+                shareReplay(1)
             );
         }
         return this.stands$;
@@ -149,7 +127,7 @@ export class ParticipationUpdateComponent implements OnInit {
             this.conferences$ = this.conferenceService.query(queryObject).pipe(
                 map(res => res ?? []),
                 catchError(() => of([])),
-                shareReplay(1),
+                shareReplay(1)
             );
         }
         return this.conferences$;
@@ -164,7 +142,7 @@ export class ParticipationUpdateComponent implements OnInit {
             this.workshops$ = this.workshopService.query(queryObject).pipe(
                 map(res => res ?? []),
                 catchError(() => of([])),
-                shareReplay(1),
+                shareReplay(1)
             );
         }
         return this.workshops$;
@@ -195,26 +173,26 @@ export class ParticipationUpdateComponent implements OnInit {
 
         const participation = this.participationFormService.getParticipation(this.editForm);
         const saveOperation = participation.id != null
-            ? this.participationService.update(participation)
-            : this.participationService.create(participation);
+                              ? this.participationService.update(participation)
+                              : this.participationService.create(participation);
 
         saveOperation.pipe(finalize(() => (this.isLoading = false)),
-            tap((part) => {
-                if (this.isNew) {
-                    this.router.navigate(['../', part.body?.id, 'view'], {
-                        relativeTo: this.activatedRoute,
-                        replaceUrl: true,
-                    });
-                } else {
-                    this.load(part.body, true)
-                }
-            }))
-            .subscribe();
+                           tap((part) => {
+                               if (this.isNew) {
+                                   this.router.navigate(['../', part.body?.id, 'view'], {
+                                       relativeTo: this.activatedRoute,
+                                       replaceUrl: true
+                                   });
+                               } else {
+                                   this.load(part.body, true);
+                               }
+                           }))
+                     .subscribe();
     }
 
     deleteEntity(htmlElement: HTMLElement, entity: IConference | IStand | IWorkshop, type: 'conference' | 'stand' | 'workshop'): void {
         const participationId = this.initialParticipation?.id;
-        if(!participationId){
+        if (!participationId) {
             return;
         }
 
@@ -227,24 +205,9 @@ export class ParticipationUpdateComponent implements OnInit {
             .subscribe((participation) => this.load(participation.body, this.isReadOnly));
     }
 
-    protected loadRelationshipsOptions(participation: IParticipation | null): void {
-        this.exhibitorService
-            .query()
-            .pipe(map((res: HttpResponse<IExhibitor[]>) => res.body ?? []))
-            .subscribe((exhibitors: IExhibitor[]) => (this.exhibitorsOptions = exhibitors));
-
-        this.salonService
-            .find(this.eventId)
-            .pipe(map((res: HttpResponse<ISalon>) => {
-                const salon = res.body ?? null;
-                this.editForm.controls.salon.setValue(salon ?? null);
-            }))
-            .subscribe();
-    }
-
     clickAction(action: AvailableAction): void {
         const participationId = this.initialParticipation?.id;
-        if(!participationId){
+        if (!participationId) {
             return;
         }
 
@@ -279,18 +242,9 @@ export class ParticipationUpdateComponent implements OnInit {
         }
     }
 
-    private getFilenameFromContentDisposition(cd: string): string | null {
-        // gère filename*=UTF-8''... et filename="..."
-        const utf8 = cd.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
-        if (utf8?.[1]) {return decodeURIComponent(utf8[1]);}
-
-        const ascii = cd.match(/filename\s*=\s*"([^"]+)"/i) ?? cd.match(/filename\s*=\s*([^;]+)/i);
-        return ascii?.[1]?.trim() ?? null;
-    }
-
     openEmailPopup(action: AvailableAction, id: string) {
         const participationId = this.initialParticipation?.id;
-        if(!participationId){
+        if (!participationId) {
             return;
         }
         this.actionsService.templateEmailAction(action.contextCode, id).subscribe(template => {
@@ -304,7 +258,7 @@ export class ParticipationUpdateComponent implements OnInit {
                     this.isLoading = true;
                     this.actionsService.emailAction(action.contextCode, id, result)
                         .pipe(finalize(() => this.isLoading = false),
-                            switchMap(() => this.participationService.find(participationId)))
+                              switchMap(() => this.participationService.find(participationId)))
                         .subscribe((participation) => this.load(participation.body, this.isReadOnly));
                 }
             });
@@ -323,21 +277,65 @@ export class ParticipationUpdateComponent implements OnInit {
 
         for (const action of availableActions ?? []) {
             items.push({
-                label: this.translateService.instant(action.labelKey) as string,
-                disabled: action.disabled,
-                command: () => this.clickAction(action),
-                data: {type: action.type},
-                icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
-                    : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF
-                        : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined,
-            });
+                           label: this.translateService.instant(action.labelKey) as string,
+                           disabled: action.disabled,
+                           command: () => this.clickAction(action),
+                           data: {type: action.type},
+                           icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
+                                                         : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF
+                                                                                      : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined
+                       });
         }
         return items;
     }
 
-    protected readonly formatterStatus = formatterStatus;
-    protected readonly formatterExhibitor = formatterExhibitor;
-    protected readonly formatterModePaymentMeals = formatterModePaymentMeals;
-    protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
-    protected readonly selectFilterExhibitor = selectFilterExhibitor;
+    protected loadRelationshipsOptions(participation: IParticipation | null): void {
+        this.exhibitorService
+            .query()
+            .pipe(map((res: HttpResponse<IExhibitor[]>) => res.body ?? []))
+            .subscribe((exhibitors: IExhibitor[]) => (this.exhibitorsOptions = exhibitors));
+
+        this.salonService
+            .find(this.eventId)
+            .pipe(map((res: HttpResponse<ISalon>) => {
+                const salon = res.body ?? null;
+                this.editForm.controls.salon.setValue(salon ?? null);
+            }))
+            .subscribe();
+    }
+
+    private load(participation: IParticipation | null, readonly: boolean): void {
+        this.stands$ = undefined;
+        this.conferences$ = undefined;
+        this.workshops$ = undefined;
+
+        this.initialParticipation = participation;
+        this.editForm = this.participationFormService.createParticipationFormGroup(this.initialParticipation);
+
+        this.isNew = !this.editForm.controls.id.value;
+        if (readonly) {
+            this.isReadOnly = true;
+            this.editForm.disable();
+            if (this.initialParticipation) {
+                this.actionsService.getAvailableActions('participation', this.initialParticipation.id).subscribe(availableActions => {
+                    this.menuCache = this.buildInvoicingPlanMenuItems(availableActions);
+                });
+            }
+        } else {
+            this.edit();
+        }
+
+        this.loadRelationshipsOptions(this.initialParticipation);
+    }
+
+    private getFilenameFromContentDisposition(cd: string): string | null {
+        // gère filename*=UTF-8''... et filename="..."
+        const utf8 = cd.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
+        if (utf8?.[1]) {
+            return decodeURIComponent(utf8[1]);
+        }
+
+        const ascii = cd.match(/filename\s*=\s*"([^"]+)"/i) ?? cd.match(/filename\s*=\s*([^;]+)/i);
+        return ascii?.[1]?.trim() ?? null;
+    }
 }

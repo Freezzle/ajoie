@@ -1,7 +1,9 @@
-<div class="talk-container" [style.width.px]="widthInPx() -2">
+<div [style.width.px]="widthInPx() -2" class="talk-container">
     <div class="text-overflow">
         <p-badge [severity]="conferenceType() ? undefined : 'warn'"
-                 [value]="conferenceType() ? 'C' : 'A'"/> {{ talk().title }}</div>
+                 [value]="conferenceType() ? 'C' : 'A'"/>
+        {{ talk().title }}
+    </div>
     <div class="text-overflow">
         <small>{{ talk().client }}</small>
     </div>

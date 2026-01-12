@@ -24,49 +24,49 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.component';
 import {ActionsService} from '../../common/actions.service';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
-import {formatterInvoiceMethod, InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
-import {TextBoxComponent} from "../../../shared/components/text-box/text-box.component";
-import {SelectBoxComponent} from "../../../shared/components/select-box/select-box.component";
-import {TextareaBoxComponent} from "../../../shared/components/textarea-box/textarea-box.component";
-import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.component";
-import {AccordionModule, AccordionTabCloseEvent, AccordionTabOpenEvent} from "primeng/accordion";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {Badge} from "primeng/badge";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {MenuBoxComponent} from "../../../shared/components/menu-box/menu-box.component";
-import {MenuItem, PrimeIcons} from "primeng/api";
-import {TranslateService} from "@ngx-translate/core";
+import {formatterInvoiceMethod, InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
+import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
+import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
+import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
+import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
+import {AccordionModule, AccordionTabCloseEvent, AccordionTabOpenEvent} from 'primeng/accordion';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {Badge} from 'primeng/badge';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {MenuItem, PrimeIcons} from 'primeng/api';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
-    selector: 'app-participation-stats',
-    templateUrl: './billing.component.html',
-    imports: [
-        SharedModule,
-        RouterModule,
-        FormatMediumDatePipe,
-        FormsModule,
-        ReactiveFormsModule,
-        CheckboxBoxComponent,
-        ButtonBoxComponent,
-        TextBoxComponent,
-        SelectBoxComponent,
-        TextareaBoxComponent,
-        LinkBoxComponent,
-        AccordionModule,
-        AlertComponent,
-        AlertErrorComponent,
-        ConfirmPopup,
-        Toast,
-        Badge,
-        ContentPageComponent,
-        CardComponent,
-        MenuBoxComponent
-    ]
-})
+               selector: 'app-participation-stats',
+               templateUrl: './billing.component.html',
+               imports: [
+                   SharedModule,
+                   RouterModule,
+                   FormatMediumDatePipe,
+                   FormsModule,
+                   ReactiveFormsModule,
+                   CheckboxBoxComponent,
+                   ButtonBoxComponent,
+                   TextBoxComponent,
+                   SelectBoxComponent,
+                   TextareaBoxComponent,
+                   LinkBoxComponent,
+                   AccordionModule,
+                   AlertComponent,
+                   AlertErrorComponent,
+                   ConfirmPopup,
+                   Toast,
+                   Badge,
+                   ContentPageComponent,
+                   CardComponent,
+                   MenuBoxComponent
+               ]
+           })
 export class BillingComponent implements OnInit {
     participation = input<IParticipation | null>(null);
 
@@ -86,19 +86,42 @@ export class BillingComponent implements OnInit {
     protected actionsService = inject(ActionsService);
     protected modalService = inject(NgbModal);
     protected translateService = inject(TranslateService);
+    protected readonly Status = Status;
+    protected readonly dayjs = dayjs;
+    protected readonly getFormattedParticipationName = getFormattedParticipationName;
+    protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
+    protected readonly formatterParticipation = formatterParticipation;
+    protected readonly formatterStatus = formatterStatus;
+    protected readonly Object = Object;
+    protected readonly InvoiceSendingMethod = InvoiceSendingMethod;
 
     ngOnInit(): void {
         this.billingInfoForm = new FormGroup<BillingInfoGroup>({
-            participation: new FormControl({value: this.participation(), disabled: true}),
-            exhibitorEmail: new FormControl({value: this.participation()!.exhibitor?.email ?? null, disabled: true}),
-            invoiceSendingMethod: new FormControl({
-                value: this.participation()!.invoiceSendingMethod ?? null,
-                disabled: true
-            }),
-            needArrangement: new FormControl({value: this.participation()!.needArrangement ?? null, disabled: true}),
-            status: new FormControl({value: this.participation()!.status ?? null, disabled: true}),
-            extraInformation: new FormControl({value: this.participation()!.extraInformation ?? null, disabled: true})
-        });
+                                                                   participation: new FormControl({
+                                                                                                      value: this.participation(),
+                                                                                                      disabled: true
+                                                                                                  }),
+                                                                   exhibitorEmail: new FormControl({
+                                                                                                       value: this.participation()!.exhibitor?.email ?? null,
+                                                                                                       disabled: true
+                                                                                                   }),
+                                                                   invoiceSendingMethod: new FormControl({
+                                                                                                             value: this.participation()!.invoiceSendingMethod ?? null,
+                                                                                                             disabled: true
+                                                                                                         }),
+                                                                   needArrangement: new FormControl({
+                                                                                                        value: this.participation()!.needArrangement ?? null,
+                                                                                                        disabled: true
+                                                                                                    }),
+                                                                   status: new FormControl({
+                                                                                               value: this.participation()!.status ?? null,
+                                                                                               disabled: true
+                                                                                           }),
+                                                                   extraInformation: new FormControl({
+                                                                                                         value: this.participation()!.extraInformation ?? null,
+                                                                                                         disabled: true
+                                                                                                     })
+                                                               });
         this.loadInvoicePlans();
     }
 
@@ -132,7 +155,7 @@ export class BillingComponent implements OnInit {
                 });
 
                 return invoicingPlansList.length ? of(invoicingPlansList) : EMPTY;
-            }),
+            })
         );
     }
 
@@ -186,7 +209,7 @@ export class BillingComponent implements OnInit {
 
     totalPayments(invoicingPlan: IInvoicingPlan): number {
         return (invoicingPlan.payments ?? []).map(payment => Number(payment.amount ?? 0))
-            .reduce((previousValue, defaultAmount) => previousValue + defaultAmount, 0);
+                                             .reduce((previousValue, defaultAmount) => previousValue + defaultAmount, 0);
     }
 
     remainingTotal(invoicingPlan: IInvoicingPlan): number {
@@ -205,24 +228,6 @@ export class BillingComponent implements OnInit {
         invoice.readMode = false;
     }
 
-    private saveInvoice(invoicingPlanId: string, invoice: IInvoice) {
-        return invoice.id
-            ? this.invoicingPlanService.updateInvoice(invoicingPlanId, invoice)
-            : this.invoicingPlanService.createInvoice(invoicingPlanId, invoice);
-    }
-
-    private applyInvoiceResponse(invoice: IInvoice, response: HttpResponse<IInvoice>): void {
-        const body = response.body;
-        if (!body) {return;}
-
-        invoice.id = body.id;
-        invoice.defaultAmount = body.defaultAmount;
-        invoice.customAmount = body.customAmount;
-        invoice.extraInformation = body.extraInformation;
-        invoice.generationDate = body.generationDate;
-        invoice.lock = body.lock;
-    }
-
     updatePayment(invoicingPlan: IInvoicingPlan, payment: IPayment): void {
         payment.readMode = true;
 
@@ -236,46 +241,29 @@ export class BillingComponent implements OnInit {
         payment.readMode = false;
     }
 
-    private applyPaymentResponse(payment: IPayment, response: HttpResponse<IPayment>): void {
-        const body = response.body;
-        if (!body) {return;}
-
-        payment.id = body.id;
-        payment.paymentMode = body.paymentMode;
-        payment.extraInformation = body.extraInformation;
-        payment.billingDate = body.billingDate;
-        payment.amount = body.amount;
-    }
-
-    private savePayment(invoicingPlanId: string, payment: IPayment) {
-        return payment.id
-            ? this.invoicingPlanService.updatePayment(invoicingPlanId, payment)
-            : this.invoicingPlanService.createPayment(invoicingPlanId, payment);
-    }
-
     addInvoice(invoicingPlan: IInvoicingPlan): void {
         invoicingPlan.invoices?.push({
-            customAmount: null,
-            defaultAmount: null,
-            extraInformation: null,
-            generationDate: dayjs(),
-            label: null,
-            lock: true,
-            quantity: 1,
-            readMode: false,
-            type: Type.OTHERS,
-            selected: false,
-        } as IInvoice);
+                                         customAmount: null,
+                                         defaultAmount: null,
+                                         extraInformation: null,
+                                         generationDate: dayjs(),
+                                         label: null,
+                                         lock: true,
+                                         quantity: 1,
+                                         readMode: false,
+                                         type: Type.OTHERS,
+                                         selected: false
+                                     } as IInvoice);
     }
 
     addPayment(invoicingPlan: IInvoicingPlan): void {
         invoicingPlan.payments?.push({
-            amount: null,
-            paymentMode: Mode.BANK,
-            billingDate: dayjs(),
-            extraInformation: null,
-            readMode: false,
-        } as IPayment);
+                                         amount: null,
+                                         paymentMode: Mode.BANK,
+                                         billingDate: dayjs(),
+                                         extraInformation: null,
+                                         readMode: false
+                                     } as IPayment);
     }
 
     deleteInvoice(invoicingPlan: IInvoicingPlan, invoiceToRemove: IInvoice): void {
@@ -397,15 +385,6 @@ export class BillingComponent implements OnInit {
         }
     }
 
-    private getFilenameFromContentDisposition(cd: string): string | null {
-        // gère filename*=UTF-8''... et filename="..."
-        const utf8 = cd.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
-        if (utf8?.[1]) {return decodeURIComponent(utf8[1]);}
-
-        const ascii = cd.match(/filename\s*=\s*"([^"]+)"/i) ?? cd.match(/filename\s*=\s*([^;]+)/i);
-        return ascii?.[1]?.trim() ?? null;
-    }
-
     generate(): void {
         this.participationService.generateInvoices(this.participation()!.id).subscribe(() => {
             this.loadInvoicePlans();
@@ -515,7 +494,7 @@ export class BillingComponent implements OnInit {
 
     isInvoicingPlanBlocked(invoicingPlan: IInvoicingPlan): boolean {
         return invoicingPlan.state === State.CANCELLED || invoicingPlan.state === State.PAID
-            || this.participation()?.status === Status.CLOSED;
+               || this.participation()?.status === Status.CLOSED;
     }
 
     isInvoicingPlanCancelled(invoicingPlan: IInvoicingPlan): boolean {
@@ -523,7 +502,7 @@ export class BillingComponent implements OnInit {
     }
 
     isInvoicingPlanPaid(invoicingPlan: IInvoicingPlan): boolean {
-        return invoicingPlan.state === State.PAID
+        return invoicingPlan.state === State.PAID;
     }
 
     openHistoryModal(): void {
@@ -545,56 +524,123 @@ export class BillingComponent implements OnInit {
 
         if (this.showDeactivateArrangement(invoicingPlan)) {
             items.push({
-                label: 'Annuler arrangement',
-                disabled: this.mustDisableSendButton(invoicingPlan),
-                command: () => this.deactivateArrangement(invoicingPlan),
-            });
+                           label: 'Annuler arrangement',
+                           disabled: this.mustDisableSendButton(invoicingPlan),
+                           command: () => this.deactivateArrangement(invoicingPlan)
+                       });
         }
 
         if (this.showActivateArrangement(invoicingPlan)) {
             items.push({
-                label: 'Activer arrangement',
-                disabled: this.mustDisableSendButton(invoicingPlan),
-                command: () => this.activateArrangement(invoicingPlan),
-            });
+                           label: 'Activer arrangement',
+                           disabled: this.mustDisableSendButton(invoicingPlan),
+                           command: () => this.activateArrangement(invoicingPlan)
+                       });
         }
 
         if (this.showSwitchToEmail(invoicingPlan)) {
             items.push({
-                label: 'Changer pour envoyer par email',
-                disabled: this.mustDisableSendButton(invoicingPlan),
-                command: () => this.switchSendingToEmail(invoicingPlan),
-            });
+                           label: 'Changer pour envoyer par email',
+                           disabled: this.mustDisableSendButton(invoicingPlan),
+                           command: () => this.switchSendingToEmail(invoicingPlan)
+                       });
         }
 
         if (this.showSwitchToPostal(invoicingPlan)) {
             items.push({
-                label: 'Changer pour envoyer par la poste',
-                disabled: this.mustDisableSendButton(invoicingPlan),
-                command: () => this.switchSendingToPostal(invoicingPlan),
-            });
+                           label: 'Changer pour envoyer par la poste',
+                           disabled: this.mustDisableSendButton(invoicingPlan),
+                           command: () => this.switchSendingToPostal(invoicingPlan)
+                       });
         }
 
         if (this.showSplit(invoicingPlan) && !this.isPlanOnSplitMode(invoicingPlan)) {
             items.push({
-                label: 'Fractionner la facture',
-                disabled: this.mustDisableSendButton(invoicingPlan),
-                command: () => this.startSplit(invoicingPlan),
-            });
+                           label: 'Fractionner la facture',
+                           disabled: this.mustDisableSendButton(invoicingPlan),
+                           command: () => this.startSplit(invoicingPlan)
+                       });
         }
 
         for (const action of invoicingPlan.availableActions ?? []) {
             items.push({
-                label: this.translateService.instant(action.labelKey) as string,
-                disabled: !!action.disabled || this.disableActionButton(invoicingPlan),
-                command: () => this.clickAction(action, invoicingPlan),
-                data: {type: action.type},
-                icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
-                    : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF
-                        : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined,
-            });
+                           label: this.translateService.instant(action.labelKey) as string,
+                           disabled: !!action.disabled || this.disableActionButton(invoicingPlan),
+                           command: () => this.clickAction(action, invoicingPlan),
+                           data: {type: action.type},
+                           icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
+                                                         : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF
+                                                                                      : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined
+                       });
         }
         return items;
+    }
+
+    getInvoicingPlanStateBadgeClass(plan: IInvoicingPlan): string {
+        switch (plan.state) {
+            case State.PAID:
+                return 'bg-primary';
+            case State.CANCELLED:
+                return 'bg-danger';
+            case State.ISSUED:
+                return 'bg-info';
+            case State.DRAFT:
+            case State.ISOLATED:
+            case State.IS_ISSUING:
+                return 'bg-success';
+            default:
+                return 'bg-warning';
+        }
+    }
+
+    private saveInvoice(invoicingPlanId: string, invoice: IInvoice) {
+        return invoice.id
+               ? this.invoicingPlanService.updateInvoice(invoicingPlanId, invoice)
+               : this.invoicingPlanService.createInvoice(invoicingPlanId, invoice);
+    }
+
+    private applyInvoiceResponse(invoice: IInvoice, response: HttpResponse<IInvoice>): void {
+        const body = response.body;
+        if (!body) {
+            return;
+        }
+
+        invoice.id = body.id;
+        invoice.defaultAmount = body.defaultAmount;
+        invoice.customAmount = body.customAmount;
+        invoice.extraInformation = body.extraInformation;
+        invoice.generationDate = body.generationDate;
+        invoice.lock = body.lock;
+    }
+
+    private applyPaymentResponse(payment: IPayment, response: HttpResponse<IPayment>): void {
+        const body = response.body;
+        if (!body) {
+            return;
+        }
+
+        payment.id = body.id;
+        payment.paymentMode = body.paymentMode;
+        payment.extraInformation = body.extraInformation;
+        payment.billingDate = body.billingDate;
+        payment.amount = body.amount;
+    }
+
+    private savePayment(invoicingPlanId: string, payment: IPayment) {
+        return payment.id
+               ? this.invoicingPlanService.updatePayment(invoicingPlanId, payment)
+               : this.invoicingPlanService.createPayment(invoicingPlanId, payment);
+    }
+
+    private getFilenameFromContentDisposition(cd: string): string | null {
+        // gère filename*=UTF-8''... et filename="..."
+        const utf8 = cd.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
+        if (utf8?.[1]) {
+            return decodeURIComponent(utf8[1]);
+        }
+
+        const ascii = cd.match(/filename\s*=\s*"([^"]+)"/i) ?? cd.match(/filename\s*=\s*([^;]+)/i);
+        return ascii?.[1]?.trim() ?? null;
     }
 
     private isParticipationClosed(): boolean {
@@ -616,32 +662,6 @@ export class BillingComponent implements OnInit {
     private canMutatePlan(plan: IInvoicingPlan): boolean {
         return !this.isInvoicingPlanBlocked(plan) && !this.isPlanOnSplitMode(plan);
     }
-
-    getInvoicingPlanStateBadgeClass(plan: IInvoicingPlan): string {
-        switch (plan.state) {
-            case State.PAID:
-                return 'bg-primary';
-            case State.CANCELLED:
-                return 'bg-danger';
-            case State.ISSUED:
-                return 'bg-info';
-            case State.DRAFT:
-            case State.ISOLATED:
-            case State.IS_ISSUING:
-                return 'bg-success';
-            default:
-                return 'bg-warning';
-        }
-    }
-
-    protected readonly Status = Status;
-    protected readonly dayjs = dayjs;
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
-    protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
-    protected readonly formatterParticipation = formatterParticipation;
-    protected readonly formatterStatus = formatterStatus;
-    protected readonly Object = Object;
-    protected readonly InvoiceSendingMethod = InvoiceSendingMethod;
 }
 
 export type BillingInfoGroup = {

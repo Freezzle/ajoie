@@ -9,8 +9,8 @@
       <span>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
-                    faIcon="arrow-left"
-                    translateKey="common.back" [showText]="false"/>
+                    [showText]="false"
+                    faIcon="arrow-left" translateKey="common.back"/>
       </span>
         </div>
     </h2>
@@ -26,19 +26,19 @@
             </tr>
             </thead>
             <tbody>
-            @for (session of sessions; track $index) {
-                <tr>
-                    <td>{{ session.ipAddress }}</td>
-                    <td>{{ session.userAgent }}</td>
-                    <td>{{ session.tokenDate | date: 'longDate' }}</td>
-                    <td>
-                        <button type="submit" class="btn btn-primary" (click)="invalidate(session.series)"
-                                jhiTranslate="sessions.table.button">
-                            Invalider
-                        </button>
-                    </td>
-                </tr>
-            }
+                @for (session of sessions; track $index) {
+                    <tr>
+                        <td>{{ session.ipAddress }}</td>
+                        <td>{{ session.userAgent }}</td>
+                        <td>{{ session.tokenDate | date: 'longDate' }}</td>
+                        <td>
+                            <button (click)="invalidate(session.series)" class="btn btn-primary" jhiTranslate="sessions.table.button"
+                                    type="submit">
+                                Invalider
+                            </button>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

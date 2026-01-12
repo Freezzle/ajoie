@@ -1,6 +1,6 @@
 import {IStand} from '../stand/model/stand.interface';
 import {Category} from '../enumerations/category.model';
-import {IPriceStandSalon, sortPriceStandSalon} from "../salon/model/price-stand-salon.interface";
+import {IPriceStandSalon, sortPriceStandSalon} from '../salon/model/price-stand-salon.interface';
 
 export interface IFloorPlan {
     id: string | null;
@@ -79,7 +79,7 @@ export function mapDimensionCell(dimension?: DimensionCell | null): DimensionCel
         rows: dimension.rows,
         stand: dimension.stand ? {id: dimension.stand.id} : null,
         prereserved: dimension.prereserved,
-        position: dimension.position,
+        position: dimension.position
     };
 }
 
@@ -88,7 +88,7 @@ export function mapGridCell(cell: GridCell): GridCellLight {
         id: cell.id,
         firstCell: cell.firstCell,
         dimension: mapDimensionCell(cell.dimension),
-        unusable: cell.unusable,
+        unusable: cell.unusable
     };
 }
 
@@ -97,7 +97,7 @@ export function mapFloorPlan(floorPlan: IFloorPlan): IFloorPlanLight {
         id: floorPlan.id,
         position: floorPlan.position,
         name: floorPlan.name,
-        data: mapFloorPlanData(floorPlan.data),
+        data: mapFloorPlanData(floorPlan.data)
     };
 }
 
@@ -106,14 +106,14 @@ export function mapFloorPlanData(floorPlanData: IFloorPlanData): IFloorPlanDataL
         cells: floorPlanData.cells.map((row) => row.map((cell) => mapGridCell(cell))),
         widthMeter: floorPlanData.widthMeter,
         heightMeter: floorPlanData.heightMeter,
-        spacingMeter: floorPlanData.spacingMeter,
+        spacingMeter: floorPlanData.spacingMeter
     };
 }
 
 export function mapDimensionCellLight(
     dimensionsStands: DimensionCell[],
     stands: IStand[],
-    dimension?: DimensionCellLight | null,
+    dimension?: DimensionCellLight | null
 ): DimensionCell | null {
     if (!dimension) {
         return null;
@@ -134,7 +134,7 @@ export function mapDimensionCellLight(
         color: getColorStand(standFound ?? null),
         stand: standFound,
         prereserved: dimension.prereserved,
-        position: dimension.position,
+        position: dimension.position
     };
 }
 
@@ -161,14 +161,14 @@ export function getColorStand(stand: IStand | null): string {
 export function mapGridCellLight(
     gridCellLight: GridCellLight,
     dimensionCells: DimensionCell[],
-    stands: IStand[],
+    stands: IStand[]
 ): GridCell {
     return {
         id: gridCellLight.id,
         firstCell: gridCellLight.firstCell,
         colorHighlight: 'white',
         dimension: gridCellLight.firstCell ? mapDimensionCellLight(dimensionCells, stands, gridCellLight.dimension) : null,
-        unusable: !!gridCellLight.id,
+        unusable: !!gridCellLight.id
     };
 }
 
@@ -198,15 +198,15 @@ export function convertAvailableDimensionCell(dimensionStand: IPriceStandSalon, 
 export function mapFloorPlanDataLight(
     floorPlanDataLight: IFloorPlanDataLight,
     dimensionCells: DimensionCell[],
-    stands: IStand[],
+    stands: IStand[]
 ): IFloorPlanData {
     return {
         cells: floorPlanDataLight.cells.map((row) =>
-            row.map((cell) => mapGridCellLight(cell, dimensionCells, stands)),
+                                                row.map((cell) => mapGridCellLight(cell, dimensionCells, stands))
         ),
         widthMeter: floorPlanDataLight.widthMeter,
         heightMeter: floorPlanDataLight.heightMeter,
-        spacingMeter: floorPlanDataLight.spacingMeter,
+        spacingMeter: floorPlanDataLight.spacingMeter
     };
 }
 

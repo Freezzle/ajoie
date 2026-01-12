@@ -1,20 +1,20 @@
 <p-iftalabel>
-    <p-select [options]="options"
+    <p-select [dataKey]="dataKeyToUse"
+              [filterBy]="filterByToUse"
+              [filter]="enableFilter"
               [formControl]="control"
               [inputId]="'field_' + fieldName"
               [invalid]="control.invalid && control.touched"
-              [dataKey]="dataKeyToUse"
-              [filter]="enableFilter"
-              [filterBy]="filterByToUse"
+              [options]="options"
               [showClear]="!control.hasValidator(Validators.required)"
               fluid>
         <!-- Affichage dans la liste -->
-        <ng-template pTemplate="item" let-item>
+        <ng-template let-item pTemplate="item">
             {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
         </ng-template>
 
         <!-- Affichage de la valeur sélectionnée -->
-        <ng-template pTemplate="selectedItem" let-item>
+        <ng-template let-item pTemplate="selectedItem">
             {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
         </ng-template>
     </p-select>

@@ -21,40 +21,40 @@ import {TranslateModule} from '@ngx-translate/core';
 import {Category, computeTimeSlots, Day, Planning, TimeSlot, Tool, Volunteer} from './volunteer-planning-model';
 
 import {VolunteerPlanningPanelComponent} from './volunteer-planning-panel/volunteer-planning-panel.component';
-import {Tab, TabList, TabPanels, Tabs} from "primeng/tabs";
-import {DialogBoxComponent} from "../../../shared/components/dialog-box/dialog-box.component";
+import {Tab, TabList, TabPanels, Tabs} from 'primeng/tabs';
+import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 
 @Component({
-    selector: 'app-volunteer-planning',
-    standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        DividerModule,
-        DatePickerModule,
-        SelectModule,
-        DialogModule,
-        ConfirmPopup,
-        Toast,
-        ContentPageComponent,
-        TranslateModule,
-        ButtonBoxComponent,
-        AlertComponent,
-        AlertErrorComponent,
-        CardComponent,
-        VolunteerPlanningPanelComponent,
-        TabPanels,
-        TabList,
-        Tabs,
-        Tab,
-        DialogBoxComponent,
-    ],
-    templateUrl: './volunteer-planning.component.html',
-    styleUrls: ['./volunteer-planning.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-})
+               selector: 'app-volunteer-planning',
+               standalone: true,
+               imports: [
+                   CommonModule,
+                   FormsModule,
+                   TableModule,
+                   ButtonModule,
+                   DividerModule,
+                   DatePickerModule,
+                   SelectModule,
+                   DialogModule,
+                   ConfirmPopup,
+                   Toast,
+                   ContentPageComponent,
+                   TranslateModule,
+                   ButtonBoxComponent,
+                   AlertComponent,
+                   AlertErrorComponent,
+                   CardComponent,
+                   VolunteerPlanningPanelComponent,
+                   TabPanels,
+                   TabList,
+                   Tabs,
+                   Tab,
+                   DialogBoxComponent
+               ],
+               templateUrl: './volunteer-planning.component.html',
+               styleUrls: ['./volunteer-planning.component.scss'],
+               changeDetection: ChangeDetectionStrategy.OnPush
+           })
 export class VolunteerPlanningComponent {
     planning = signal<Planning>(this.makeInitialPlanning());
 
@@ -64,52 +64,54 @@ export class VolunteerPlanningComponent {
     selectedTool = signal<Tool>({kind: 'ERASER'});
 
     painting = signal(false);
-    private lastKey: string | null = null;
-
     // ✅ Dialog pour ton panel (admin)
     panelVisible = model(false);
-
-    // perf: rAF throttle optionnel
-    private rafId: number | null = null;
-    private pendingPaint: { vId: string; slot: number } | null = null;
-
     // ---------- computed ----------
     dayOptions = computed(() => this.planning().days.map(d => ({id: d.id, label: d.label})));
-
     selectedDay = computed(() => {
         const id = this.selectedDayId();
         return this.planning().days.find(d => d.id === id) ?? null;
     });
-
     timeSlots = computed<TimeSlot[]>(() => {
         const day = this.selectedDay();
-        if (!day) return [];
+        if (!day) {
+            return [];
+        }
         return computeTimeSlots(day.startTime, day.endTime, this.planning().intervalMinutes);
     });
-
     // ✅ map categories by id
     categoryMap = computed(() => new Map(this.planning().categories.map(c => [c.id, c])));
-
     // ✅ cellMap: key => categoryId
     cellMap = computed(() => {
         const day = this.selectedDay();
         const m = new Map<string, string>();
-        if (!day) return m;
-        for (const c of day.cells) m.set(this.cellKey(c.volunteerId, c.slotIndex), c.categoryId);
+        if (!day) {
+            return m;
+        }
+        for (const c of day.cells) {
+            m.set(this.cellKey(c.volunteerId, c.slotIndex), c.categoryId);
+        }
         return m;
     });
-
     // ✅ volunteers visibles : si le jour a des assignations, on filtre
     visibleVolunteers = computed<Volunteer[]>(() => {
         const day = this.selectedDay();
         const all = this.planning().volunteers;
-        if (!day) return all;
+        if (!day) {
+            return all;
+        }
 
         const assigned = day.assignedVolunteerIds ?? [];
-        if (assigned.length === 0) return all; // choix: si aucun assigné, afficher tous
+        if (assigned.length === 0) {
+            return all;
+        } // choix: si aucun assigné, afficher tous
         const set = new Set(assigned);
         return all.filter(v => set.has(v.id));
     });
+    private lastKey: string | null = null;
+    // perf: rAF throttle optionnel
+    private rafId: number | null = null;
+    private pendingPaint: { vId: string; slot: number } | null = null;
 
     // ---------- Panel (admin) ----------
     openPanel() {
@@ -152,12 +154,16 @@ export class VolunteerPlanningComponent {
     }
 
     uiFor(categoryId: string | null): Category | null {
-        if (!categoryId) return null;
+        if (!categoryId) {
+            return null;
+        }
         return this.categoryMap().get(categoryId) ?? null;
     }
 
     startPaint(volunteerId: string, slotIndex: number, ev: PointerEvent): void {
-        if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+        if (ev.pointerType === 'mouse' && ev.button !== 0) {
+            return;
+        }
 
         this.painting.set(true);
         this.lastKey = `${volunteerId}-${slotIndex}`;
@@ -180,7 +186,9 @@ export class VolunteerPlanningComponent {
     }
 
     onPaintMove(ev: PointerEvent): void {
-        if (!this.painting()) return;
+        if (!this.painting()) {
+            return;
+        }
 
         // strict: uniquement si bouton gauche appuyé
         if (ev.pointerType === 'mouse' && (ev.buttons & 1) === 0) {
@@ -190,14 +198,20 @@ export class VolunteerPlanningComponent {
 
         const el = document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null;
         const cell = el?.closest('.paint-cell') as HTMLElement | null;
-        if (!cell) return;
+        if (!cell) {
+            return;
+        }
 
         const vIdStr = cell.dataset['volunteerId'];
         const slotStr = cell.dataset['slotIndex'];
-        if (vIdStr == null || slotStr == null) return;
+        if (vIdStr == null || slotStr == null) {
+            return;
+        }
 
         const key = `${vIdStr}-${slotStr}`;
-        if (key === this.lastKey) return;
+        if (key === this.lastKey) {
+            return;
+        }
         this.lastKey = key;
 
         // ✅ throttle (optionnel mais recommandé)
@@ -218,7 +232,9 @@ export class VolunteerPlanningComponent {
 
     applyTool(volunteerId: string, slotIndex: number) {
         const day = this.selectedDay();
-        if (!day) return;
+        if (!day) {
+            return;
+        }
 
         const tool = this.selectedTool();
         const categoryId: string | null = tool.kind === 'ERASER' ? null : tool.categoryId;
@@ -226,18 +242,31 @@ export class VolunteerPlanningComponent {
         this.setCellCategory(day.id, volunteerId, slotIndex, categoryId);
     }
 
+    @HostListener('window:pointerup')
+    @HostListener('window:pointercancel')
+    @HostListener('window:blur')
+    onGlobalStop(): void {
+        this.stopPaint();
+    }
+
     // ✅ update minimal-copy (perf)
     private setCellCategory(dayId: string, volunteerId: string, slotIndex: number, categoryId: string | null) {
         const cur = this.planning();
         const dayIndex = cur.days.findIndex(d => d.id === dayId);
-        if (dayIndex < 0) return;
+        if (dayIndex < 0) {
+            return;
+        }
 
         const day = cur.days[dayIndex];
         const i = day.cells.findIndex(c => c.volunteerId === volunteerId && c.slotIndex === slotIndex);
 
         // no-op
-        if (categoryId === null && i < 0) return;
-        if (categoryId !== null && i >= 0 && day.cells[i].categoryId === categoryId) return;
+        if (categoryId === null && i < 0) {
+            return;
+        }
+        if (categoryId !== null && i >= 0 && day.cells[i].categoryId === categoryId) {
+            return;
+        }
 
         const days = [...cur.days];
         const nextDay: Day = {...day};
@@ -246,8 +275,11 @@ export class VolunteerPlanningComponent {
         if (categoryId === null) {
             cells.splice(i, 1);
         } else {
-            if (i >= 0) cells[i] = {...cells[i], categoryId};
-            else cells.push({volunteerId, slotIndex, categoryId});
+            if (i >= 0) {
+                cells[i] = {...cells[i], categoryId};
+            } else {
+                cells.push({volunteerId, slotIndex, categoryId});
+            }
         }
 
         nextDay.cells = cells;
@@ -258,13 +290,17 @@ export class VolunteerPlanningComponent {
 
     private queuePaint(vId: string, slot: number) {
         this.pendingPaint = {vId, slot};
-        if (this.rafId !== null) return;
+        if (this.rafId !== null) {
+            return;
+        }
 
         this.rafId = requestAnimationFrame(() => {
             this.rafId = null;
             const p = this.pendingPaint;
             this.pendingPaint = null;
-            if (!p) return;
+            if (!p) {
+                return;
+            }
             this.applyTool(p.vId, p.slot);
         });
     }
@@ -280,13 +316,6 @@ export class VolunteerPlanningComponent {
         return d;
     }
 
-    @HostListener('window:pointerup')
-    @HostListener('window:pointercancel')
-    @HostListener('window:blur')
-    onGlobalStop(): void {
-        this.stopPaint();
-    }
-
     private makeInitialPlanning(): Planning {
         const volunteers: Volunteer[] = [
             {id: 'v1', label: 'Charlène'},
@@ -298,7 +327,7 @@ export class VolunteerPlanningComponent {
             {id: 'v7', label: 'Cathy'},
             {id: 'v8', label: 'Leila'},
             {id: 'v9', label: 'Michael'},
-            {id: 'v10', label: 'Papa'},
+            {id: 'v10', label: 'Papa'}
         ];
 
         const categories: Category[] = [
@@ -306,7 +335,7 @@ export class VolunteerPlanningComponent {
             {id: 'c2', label: 'Lavage', icon: 'pi pi-sparkles', color: '#C1D9E1'},
             {id: 'c3', label: 'Cuisine', icon: 'pi pi-shop', color: '#FFDDC1'},
             {id: 'c4', label: 'Logistique', icon: 'pi pi-box', color: '#ffe8b5'},
-            {id: 'c5', label: 'Non disponible', icon: 'pi pi-times', color: '#DDDDDD'},
+            {id: 'c5', label: 'Non disponible', icon: 'pi pi-times', color: '#DDDDDD'}
         ];
 
         return {

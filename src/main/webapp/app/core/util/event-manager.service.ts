@@ -5,7 +5,7 @@ import {filter, share} from 'rxjs/operators';
 export class EventWithContent<T> {
     constructor(
         public name: string,
-        public content: T,
+        public content: T
     ) {
     }
 }
@@ -14,8 +14,8 @@ export class EventWithContent<T> {
  * An utility class to manage RX events
  */
 @Injectable({
-    providedIn: 'root',
-})
+                providedIn: 'root'
+            })
 export class EventManager {
     observable: Observable<EventWithContent<unknown> | string>;
     observer?: Observer<EventWithContent<unknown> | string>;
@@ -46,18 +46,18 @@ export class EventManager {
             eventNames = [eventNames];
         }
         return this.observable
-            .pipe(
-                filter((event: EventWithContent<unknown> | string) => {
-                    for (const eventName of eventNames) {
-                        if ((typeof event === 'string' && event === eventName) ||
-                            (typeof event !== 'string' && event.name === eventName)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }),
-            )
-            .subscribe(callback);
+                   .pipe(
+                       filter((event: EventWithContent<unknown> | string) => {
+                           for (const eventName of eventNames) {
+                               if ((typeof event === 'string' && event === eventName) ||
+                                   (typeof event !== 'string' && event.name === eventName)) {
+                                   return true;
+                               }
+                           }
+                           return false;
+                       })
+                   )
+                   .subscribe(callback);
     }
 
     /**

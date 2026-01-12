@@ -10,41 +10,41 @@ const standRoute: Routes = [
         path: '',
         component: StandComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idStand/view',
         component: StandUpdateComponent,
         resolve: {
-            stand: StandResolve,
+            stand: StandResolve
         },
         data: {
-            readonly: true,
+            readonly: true
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: 'new',
         component: StandUpdateComponent,
         resolve: {
-            stand: StandResolve,
+            stand: StandResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idStand/edit',
         component: StandUpdateComponent,
         resolve: {
-            stand: StandResolve,
+            stand: StandResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
-    },
+        canActivate: [UserRouteAccessService]
+    }
 ];
 
 export default standRoute;

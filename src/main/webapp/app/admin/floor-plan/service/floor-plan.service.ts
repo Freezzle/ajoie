@@ -13,7 +13,7 @@ export class FloorPlanService {
 
     create(idSalon: string, floorPlan: IFloorPlanLight): Observable<IFloorPlanLight> {
         return this.http.post<IFloorPlanLight>(`${this.resourceUrl}/${idSalon}/floor-plan`,
-            this.mapFloorPlanToBackend(floorPlan));
+                                               this.mapFloorPlanToBackend(floorPlan));
     }
 
     save(idSalon: string, idFloorPlan: string, floorPlan: IFloorPlanLight): Observable<IFloorPlanLight> {
@@ -27,7 +27,7 @@ export class FloorPlanService {
 
     load(idSalon: string): Observable<IFloorPlanLight[]> {
         return this.http.get<IFloorPlanLight[]>(`${this.resourceUrl}/${idSalon}/floor-plan`)
-            .pipe(map(floors => floors.map(this.mapFloorPlanFromBackend)));
+                   .pipe(map(floors => floors.map(this.mapFloorPlanFromBackend)));
     }
 
     private mapFloorPlanFromBackend(result: {
@@ -40,7 +40,7 @@ export class FloorPlanService {
             id: result.id,
             position: result.position,
             name: result.name,
-            data: JSON.parse(result.data) as IFloorPlanDataLight,
+            data: JSON.parse(result.data) as IFloorPlanDataLight
         };
     }
 
@@ -54,7 +54,7 @@ export class FloorPlanService {
             id: result.id,
             position: result.position,
             name: result.name,
-            data: JSON.stringify(result.data),
+            data: JSON.stringify(result.data)
         };
     }
 }

@@ -11,15 +11,15 @@ import TranslateDirective from './language/translate.directive';
  * Application wide Module
  */
 @NgModule({
-    imports: [FindLanguageFromKeyPipe, TranslateDirective],
-    exports: [
-        CommonModule,
-        NgbModule,
-        FontAwesomeModule,
-        TranslateModule,
-        FindLanguageFromKeyPipe,
-        TranslateDirective
-    ]
-})
+              imports: [FindLanguageFromKeyPipe, TranslateDirective],
+              exports: [
+                  CommonModule,
+                  NgbModule,
+                  FontAwesomeModule,
+                  TranslateModule,
+                  FindLanguageFromKeyPipe,
+                  TranslateDirective
+              ]
+          })
 export default class SharedModule {
 }

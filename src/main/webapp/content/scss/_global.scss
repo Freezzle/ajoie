@@ -5,6 +5,7 @@ Bootstrap tweaks
 html {
   font-size: 14px !important;
 }
+
 body {
   font-weight: 300;
   font-family: 'Lato', sans-serif !important;
@@ -122,6 +123,7 @@ ui bootstrap tweaks
 
 a {
   color: var(--app-primary) !important;
+
   &:hover {
     cursor: pointer;
     color: var(--app-secondary) !important;
@@ -324,6 +326,7 @@ a {
 
   &.p-disabled {
     border: 1px dashed var(--app-primary) !important;
+
     & .p-chip-remove-icon {
       display: none; /* cache la petite croix */
     }

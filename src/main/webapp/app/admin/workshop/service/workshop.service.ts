@@ -21,7 +21,7 @@ export class WorkshopService {
 
     find(idWorkshop: string): Observable<HttpResponse<IWorkshop>> {
         return this.http.get<IWorkshop>(`${this.resourceUrl}/${idWorkshop}`, {
-            observe: 'response',
+            observe: 'response'
         });
     }
 

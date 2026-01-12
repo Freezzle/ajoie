@@ -1,13 +1,13 @@
 <p-iftalabel>
     <p-datepicker
+            [dateFormat]="'dd.mm.yy'"
+            [firstDayOfWeek]="1"
             [formControl]="control"
             [inputId]="'field_' + fieldName"
             [invalid]="controlDir.control?.invalid && controlDir.control?.touched"
-            showIcon
-            [firstDayOfWeek]="1"
-            [dateFormat]="'dd.mm.yy'"
+            fluid
             iconDisplay="input"
-            fluid></p-datepicker>
+            showIcon></p-datepicker>
     @if (translateKey) {
         <label [for]="'field_' + fieldName">{{ translateKey | translate }}
             @if (control.hasValidator(Validators.required)) {

@@ -4,12 +4,12 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import {ITEM_DELETED_EVENT} from 'app/config/navigation.constants';
-import {AlertErrorComponent} from "../alert/alert-error.component";
+import {AlertErrorComponent} from '../alert/alert-error.component';
 
 @Component({
-    templateUrl: './delete-dialog.component.html',
-    imports: [SharedModule, FormsModule, AlertErrorComponent]
-})
+               templateUrl: './delete-dialog.component.html',
+               imports: [SharedModule, FormsModule, AlertErrorComponent]
+           })
 export class DeleteDialogComponent {
     translateKey: string = '';
     translateValues: { [key: string]: unknown } = {};

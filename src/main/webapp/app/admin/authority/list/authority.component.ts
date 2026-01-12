@@ -9,28 +9,28 @@ import {DEFAULT_SORT_DATA, SORT} from 'app/config/navigation.constants';
 import {IAuthority} from '../authority.model';
 import {AuthorityService, EntityArrayResponseType} from '../service/authority.service';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
-import {ConfirmDialog} from "primeng/confirmdialog";
-import {Toast} from "primeng/toast";
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
 
 @Component({
-    selector: 'app-authority',
-    templateUrl: './authority.component.html',
-    imports: [
-        RouterModule,
-        FormsModule,
-        SharedModule,
-        SortDirective,
-        SortByDirective,
-        ButtonBoxComponent,
-        AlertErrorComponent,
-        AlertComponent,
-        ConfirmDialog,
-        Toast,
-    ]
-})
+               selector: 'app-authority',
+               templateUrl: './authority.component.html',
+               imports: [
+                   RouterModule,
+                   FormsModule,
+                   SharedModule,
+                   SortDirective,
+                   SortByDirective,
+                   ButtonBoxComponent,
+                   AlertErrorComponent,
+                   AlertComponent,
+                   ConfirmDialog,
+                   Toast
+               ]
+           })
 export class AuthorityComponent implements OnInit {
     subscription: Subscription | null = null;
     authorities?: IAuthority[];
@@ -55,7 +55,7 @@ export class AuthorityComponent implements OnInit {
                     if (!this.authorities || this.authorities.length === 0) {
                         this.load();
                     }
-                }),
+                })
             )
             .subscribe();
     }
@@ -69,17 +69,17 @@ export class AuthorityComponent implements OnInit {
             .pipe(
                 filter(confirmed => confirmed),
                 switchMap(() => this.authorityService.delete(authority.name)),
-                tap(() => this.load()), // Recharge les données
+                tap(() => this.load()) // Recharge les données
             )
-            .subscribe()
+            .subscribe();
     }
 
     load(): void {
         this.queryBackend().subscribe({
-            next: (res: EntityArrayResponseType) => {
-                this.onResponseSuccess(res);
-            },
-        });
+                                          next: (res: EntityArrayResponseType) => {
+                                              this.onResponseSuccess(res);
+                                          }
+                                      });
     }
 
     navigateToWithComponentValues(event: SortState): void {
@@ -107,20 +107,20 @@ export class AuthorityComponent implements OnInit {
     protected queryBackend(): Observable<EntityArrayResponseType> {
         this.isLoading = true;
         const queryObject: any = {
-            sort: this.sortService.buildSortParam(this.sortState()),
+            sort: this.sortService.buildSortParam(this.sortState())
         };
         return this.authorityService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
     }
 
     protected handleNavigation(sortState: SortState): void {
         const queryParamsObj = {
-            sort: this.sortService.buildSortParam(sortState),
+            sort: this.sortService.buildSortParam(sortState)
         };
 
         this.ngZone.run(() => {
             this.router.navigate(['./'], {
                 relativeTo: this.activatedRoute,
-                queryParams: queryParamsObj,
+                queryParams: queryParamsObj
             });
         });
     }

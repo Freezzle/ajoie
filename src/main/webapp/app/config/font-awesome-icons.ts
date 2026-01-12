@@ -21,9 +21,9 @@ import {
     faClockRotateLeft,
     faCloud,
     faCogs,
-    faCopy,
     faComments,
     faCommentsDollar,
+    faCopy,
     faCreditCard,
     faCube,
     faDatabase,
@@ -37,6 +37,8 @@ import {
     faFireBurner,
     faFlag,
     faFloppyDisk,
+    faGear,
+    faGift,
     faHandshakeSimple,
     faHeart,
     faHome,
@@ -93,7 +95,7 @@ import {
     faUsersCog,
     faUserSlash,
     faWandMagicSparkles,
-    faWrench, faGift, faGear,
+    faWrench
 } from '@fortawesome/free-solid-svg-icons';
 
 export const fontAwesomeIcons = [
@@ -193,5 +195,5 @@ export const fontAwesomeIcons = [
     faUsers,
     faUsersCog,
     faWandMagicSparkles,
-    faWrench,
+    faWrench
 ];

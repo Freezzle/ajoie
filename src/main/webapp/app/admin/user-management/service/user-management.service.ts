@@ -37,7 +37,7 @@ export class UserManagementService {
 
     authorities(): Observable<string[]> {
         return this.http
-            .get<Array<{ name: string }>>(this.applicationConfigService.getEndpointFor('api/authorities'))
-            .pipe(map(authorities => authorities.map(a => a.name)));
+                   .get<Array<{ name: string }>>(this.applicationConfigService.getEndpointFor('api/authorities'))
+                   .pipe(map(authorities => authorities.map(a => a.name)));
     }
 }

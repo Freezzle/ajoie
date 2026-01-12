@@ -20,20 +20,20 @@
                     }
                     <div class="mt-4 col-12">
                         <input #username
+                               [placeholder]="'global.form.username.placeholder' | translate"
                                class="form-control"
                                formControlName="username"
                                id="username"
                                name="username"
-                               [placeholder]="'global.form.username.placeholder' | translate"
                                type="text"/>
                     </div>
 
                     <div class="mt-4 col-12">
-                        <input class="form-control"
+                        <input [placeholder]="'login.form.password.placeholder' | translate"
+                               class="form-control"
                                formControlName="password"
                                id="password"
                                name="password"
-                               [placeholder]="'login.form.password.placeholder' | translate"
                                type="password"/>
                     </div>
 

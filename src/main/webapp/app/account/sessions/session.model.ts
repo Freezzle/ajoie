@@ -3,7 +3,7 @@ export class Session {
         public series: string,
         public tokenDate: Date,
         public ipAddress: string,
-        public userAgent: string,
+        public userAgent: string
     ) {
     }
 }

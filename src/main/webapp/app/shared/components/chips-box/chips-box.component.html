@@ -1,13 +1,13 @@
 <p-iftalabel>
-    <p-auto-complete [id]="'field_' + fieldName"
-                     multiple
-                     [inputSize]="maxChips"
-                     [typeahead]="false"
+    <p-auto-complete [addOnBlur]="true"
                      [addOnTab]="true"
-                     [addOnBlur]="true"
                      [formControl]="control"
+                     [id]="'field_' + fieldName"
+                     [inputSize]="maxChips"
                      [showClear]="!control.disabled"
-                     fluid="true"/>
+                     [typeahead]="false"
+                     fluid="true"
+                     multiple/>
 
     <label [for]="'field_' + fieldName">
         @if (translateKey) {

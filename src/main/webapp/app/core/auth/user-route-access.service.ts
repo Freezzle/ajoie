@@ -4,7 +4,7 @@ import {map} from 'rxjs/operators';
 
 import {AccountService} from 'app/core/auth/account.service';
 import {StateStorageService} from './state-storage.service';
-import {PresenceService} from "../../admin/presence/service/presence.service";
+import {PresenceService} from '../../admin/presence/service/presence.service';
 
 export const UserRouteAccessService: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const accountService = inject(AccountService);
@@ -33,6 +33,6 @@ export const UserRouteAccessService: CanActivateFn = (next: ActivatedRouteSnapsh
             stateStorageService.storeUrl(state.url);
             router.navigate(['/login']);
             return false;
-        }),
+        })
     );
 };

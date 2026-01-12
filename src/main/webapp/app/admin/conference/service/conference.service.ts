@@ -21,7 +21,7 @@ export class ConferenceService {
 
     find(idConference: string): Observable<HttpResponse<IConference>> {
         return this.http.get<IConference>(`${this.resourceUrl}/${idConference}`, {
-            observe: 'response',
+            observe: 'response'
         });
     }
 

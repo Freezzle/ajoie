@@ -10,45 +10,42 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {WorkshopService} from '../service/workshop.service';
 import {IWorkshop} from '../model/workshop.interface';
 import {WorkshopFormGroup, WorkshopFormService} from '../service/workshop-form.service';
-import {
-    IParticipation,
-    selectFilterParticipation
-} from '../../participation/model/participation.interface';
+import {IParticipation, selectFilterParticipation} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
 import {formatterStatus, Status} from '../../enumerations/status.model';
-import {ErrorModel} from '../../../shared/field-error/error.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
-import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.component";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
+import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
 
 @Component({
-    selector: 'app-workshop-update',
-    templateUrl: './workshop-update.component.html',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
-        TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, ContentPageComponent, CardComponent]
-})
+               selector: 'app-workshop-update',
+               templateUrl: './workshop-update.component.html',
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
+                         TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, ContentPageComponent, CardComponent]
+           })
 export class WorkshopUpdateComponent implements OnInit {
-    protected workshopService = inject(WorkshopService);
-    protected workshopFormService = inject(WorkshopFormService);
-    protected participationService = inject(ParticipationService);
-    protected activatedRoute = inject(ActivatedRoute);
-
     isLoading = false;
     isReadOnly = false;
     eventId!: string;
-
     initialWorkshop: IWorkshop | null = null;
     statusValues = Object.keys(Status);
     participationsOptions: IParticipation[] = [];
+    protected workshopService = inject(WorkshopService);
+    protected workshopFormService = inject(WorkshopFormService);
     editForm: FormGroup<WorkshopFormGroup> = this.workshopFormService.createWorkshopFormGroup(null);
+    protected participationService = inject(ParticipationService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected readonly formatterParticipation = formatterParticipation;
+    protected readonly formatterStatus = formatterStatus;
+    protected readonly selectFilterParticipation = selectFilterParticipation;
 
     ngOnInit(): void {
         const data = this.activatedRoute.snapshot.data;
@@ -93,8 +90,8 @@ export class WorkshopUpdateComponent implements OnInit {
 
         const workshop = this.workshopFormService.getWorkshop(this.editForm);
         const saveOperation = workshop.id != null
-            ? this.workshopService.update(workshop)
-            : this.workshopService.create(workshop);
+                              ? this.workshopService.update(workshop)
+                              : this.workshopService.create(workshop);
 
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
@@ -106,7 +103,7 @@ export class WorkshopUpdateComponent implements OnInit {
                 map((participations) => {
                     if (participationId) {
                         this.editForm.get('participation')?.setValue(
-                            participations.find(p => p.id === participationId) ?? null,
+                            participations.find(p => p.id === participationId) ?? null
                         );
                     }
                     return participations;
@@ -114,8 +111,4 @@ export class WorkshopUpdateComponent implements OnInit {
                 catchError(() => of([])))
             .subscribe((participations) => (this.participationsOptions = participations));
     }
-
-    protected readonly formatterParticipation = formatterParticipation;
-    protected readonly formatterStatus = formatterStatus;
-    protected readonly selectFilterParticipation = selectFilterParticipation;
 }

@@ -9,23 +9,23 @@
         <div class="d-flex justify-content-between mt-4">
       <span>
         <button-box (clickedEvent)="previousState()"
-                    faIcon="arrow-left"
                     [isDisabled]="isLoading()"
-                    translateKey="common.back" [showText]="false"/>
+                    [showText]="false"
+                    faIcon="arrow-left" translateKey="common.back"/>
       </span>
 
             <span>
         <button-box (clickedEvent)="load()"
-                    faIcon="sync"
                     [faIconAnimation]="isLoading() ? 'spin' : undefined"
                     [isDisabled]="isLoading()"
+                    faIcon="sync"
                     translateKey="common.refresh"/>
 
-        <link-box [links]="['./new']"
-                  type="success"
-                  translateKey="common.create" [showText]="false"
-                  faIcon="plus"
-                  [isDisabled]="isLoading()"/>
+        <link-box [isDisabled]="isLoading()"
+                  [links]="['./new']"
+                  [showText]="false" faIcon="plus"
+                  translateKey="common.create"
+                  type="success"/>
       </span>
         </div>
     </h2>
@@ -36,9 +36,9 @@
 
     @if (users()) {
         <div class="table-responsive table-entities" id="entities">
-            <table class="table table-hover" aria-describedby="page-heading">
+            <table aria-describedby="page-heading" class="table table-hover">
                 <thead class="thead-primary">
-                <tr jhiSort [sortState]="sortState" (sortChange)="transition($event)">
+                <tr (sortChange)="transition($event)" [sortState]="sortState" jhiSort>
                     <th jhiSortBy="login">
                         <span jhiTranslate="userManagement.login">Login</span>
                         <fa-icon icon="sort"></fa-icon>
@@ -67,44 +67,46 @@
                 </tr>
                 </thead>
                 <tbody>
-                @for (user of users(); track trackIdentity($index, user)) {
-                    <tr>
-                        <td class="clickable" [routerLink]="['./', user.login, 'view']">{{ user.login }}</td>
-                        <td class="clickable" [routerLink]="['./', user.login, 'view']">{{ user.email }}</td>
-                        <td class="clickable text-center" [routerLink]="['./', user.login, 'view']">
-                            <fa-icon [icon]="user.activated | checkBool" [class]="user.activated | colorBool"></fa-icon>
-                        </td>
-                        <td class="clickable text-center" [routerLink]="['./', user.login, 'view']">{{ user.langKey }}
-                        </td>
-                        <td class="clickable text-center" [routerLink]="['./', user.login, 'view']">
-                            @for (authority of user.authorities; track $index) {
-                                <div>
-                                    <span class="badge bg-primary">{{ authority }}</span>
+                    @for (user of users(); track trackIdentity($index, user)) {
+                        <tr>
+                            <td [routerLink]="['./', user.login, 'view']" class="clickable">{{ user.login }}</td>
+                            <td [routerLink]="['./', user.login, 'view']" class="clickable">{{ user.email }}</td>
+                            <td [routerLink]="['./', user.login, 'view']" class="clickable text-center">
+                                <fa-icon [class]="user.activated | colorBool"
+                                         [icon]="user.activated | checkBool"></fa-icon>
+                            </td>
+                            <td [routerLink]="['./', user.login, 'view']"
+                                class="clickable text-center">{{ user.langKey }}
+                            </td>
+                            <td [routerLink]="['./', user.login, 'view']" class="clickable text-center">
+                                @for (authority of user.authorities; track $index) {
+                                    <div>
+                                        <span class="badge bg-primary">{{ authority }}</span>
+                                    </div>
+                                }
+                            </td>
+                            <td [routerLink]="['./', user.login, 'view']" class="clickable text-center">
+                                {{ user.createdDate | date: 'dd/MM/yy HH:mm' }}
+                            </td>
+                            <td [routerLink]="['./', user.login, 'view']"
+                                class="clickable text-center">{{ user.lastModifiedBy }}
+                            </td>
+                            <td [routerLink]="['./', user.login, 'view']" class="clickable text-center">
+                                {{ user.lastModifiedDate | date: 'dd/MM/yy HH:mm' }}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button (click)="deleteUser($event, user)"
+                                            [disabled]="!currentAccount() || currentAccount()?.login === user.login"
+                                            class="btn btn-danger btn-sm"
+                                            type="button">
+                                        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
+                                        <span jhiTranslate="common.delete">Delete</span>
+                                    </button>
                                 </div>
-                            }
-                        </td>
-                        <td class="clickable text-center" [routerLink]="['./', user.login, 'view']">
-                            {{ user.createdDate | date: 'dd/MM/yy HH:mm' }}
-                        </td>
-                        <td class="clickable text-center"
-                            [routerLink]="['./', user.login, 'view']">{{ user.lastModifiedBy }}
-                        </td>
-                        <td class="clickable text-center" [routerLink]="['./', user.login, 'view']">
-                            {{ user.lastModifiedDate | date: 'dd/MM/yy HH:mm' }}
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group">
-                                <button type="button"
-                                        (click)="deleteUser($event, user)"
-                                        class="btn btn-danger btn-sm"
-                                        [disabled]="!currentAccount() || currentAccount()?.login === user.login">
-                                    <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                    <span jhiTranslate="common.delete">Delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                }
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -116,13 +118,13 @@
             </div>
 
             <div class="d-flex justify-content-center">
-                <ngb-pagination [collectionSize]="totalItems()"
+                <ngb-pagination (pageChange)="transition()"
                                 [(page)]="page"
-                                [pageSize]="itemsPerPage"
-                                [maxSize]="5"
-                                [rotate]="true"
                                 [boundaryLinks]="true"
-                                (pageChange)="transition()"></ngb-pagination>
+                                [collectionSize]="totalItems()"
+                                [maxSize]="5"
+                                [pageSize]="itemsPerPage"
+                                [rotate]="true"></ngb-pagination>
             </div>
         </div>
     }

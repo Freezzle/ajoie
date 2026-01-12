@@ -3,35 +3,38 @@ import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ErrorBoxComponent} from '../../error-box/error-box.component';
-import {IftaLabel} from "primeng/iftalabel";
-import {DatePicker} from "primeng/datepicker";
+import {IftaLabel} from 'primeng/iftalabel';
+import {DatePicker} from 'primeng/datepicker';
 
 @Component({
-    imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, DatePicker],
-    selector: 'date-box',
-    templateUrl: './date-box.component.html'
-})
+               imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, DatePicker],
+               selector: 'date-box',
+               templateUrl: './date-box.component.html'
+           })
 export class DateBoxComponent implements ControlValueAccessor {
     @Input()
     translateKey: string | undefined;
 
     @Input()
     fieldName: string = '';
-
-    protected readonly Validators = Validators;
-
     disabled: boolean = false;
     value: string = '';
-
-    // placeholder methods
-    onChange = (_: any) => {
-    };
-    onTouched = () => {
-    };
+    protected readonly Validators = Validators;
 
     constructor(@Self() public controlDir: NgControl) {
         this.controlDir.valueAccessor = this;
     }
+
+    get control(): FormControl<Date> {
+        return this.controlDir.control as FormControl<Date>;
+    }
+
+    // placeholder methods
+    onChange = (_: any) => {
+    };
+
+    onTouched = () => {
+    };
 
     writeValue(value: any): void {
         this.value = value;
@@ -53,9 +56,5 @@ export class DateBoxComponent implements ControlValueAccessor {
         this.value = (event.target as HTMLInputElement).value;
         this.onChange(this.value);
         this.onTouched();
-    }
-
-    get control(): FormControl<Date> {
-        return this.controlDir.control as FormControl<Date>;
     }
 }

@@ -7,7 +7,7 @@ const settingsRoute: Route = {
     path: 'settings',
     component: SettingsComponent,
     title: 'global.menu.account.settings',
-    canActivate: [UserRouteAccessService],
+    canActivate: [UserRouteAccessService]
 };
 
 export default settingsRoute;

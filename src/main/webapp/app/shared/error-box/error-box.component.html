@@ -1,19 +1,19 @@
 @if (formControlElement()?.invalid && (formControlElement()?.dirty || formControlElement()?.touched)) {
-  @if (formControlElement()?.errors; as errors) {
-      <p-message severity="error" size="small" variant="simple">
-      @for (error of errorKeys(errors); track error) {
-          @if (error === 'minlength') {
-            {{ 'common.validation.minlength' | translate: {min: errors?.minlength?.requiredLength} }}
-          } @else if (error === 'maxlength') {
-            {{ 'common.validation.maxlength' | translate: {max: errors?.maxlength?.requiredLength} }}
-          } @else if (error === 'phonenumber') {
-            {{ 'common.validation.pattern' | translate: {pattern: errors?.phonenumber?.requiredPattern} }}
-          } @else if (error === 'pattern') {
-            {{ 'common.validation.pattern' | translate: {pattern: errors?.pattern?.requiredPattern} }}
-          } @else {
-            {{ 'common.validation.' + error | translate }}
-          }
-      }
-      </p-message>
-  }
+    @if (formControlElement()?.errors; as errors) {
+        <p-message severity="error" size="small" variant="simple">
+            @for (error of errorKeys(errors); track error) {
+                @if (error === 'minlength') {
+                    {{ 'common.validation.minlength' | translate: {min: errors?.minlength?.requiredLength} }}
+                } @else if (error === 'maxlength') {
+                    {{ 'common.validation.maxlength' | translate: {max: errors?.maxlength?.requiredLength} }}
+                } @else if (error === 'phonenumber') {
+                    {{ 'common.validation.pattern' | translate: {pattern: errors?.phonenumber?.requiredPattern} }}
+                } @else if (error === 'pattern') {
+                    {{ 'common.validation.pattern' | translate: {pattern: errors?.pattern?.requiredPattern} }}
+                } @else {
+                    {{ 'common.validation.' + error | translate }}
+                }
+            }
+        </p-message>
+    }
 }

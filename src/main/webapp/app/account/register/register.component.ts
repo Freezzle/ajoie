@@ -12,11 +12,11 @@ import {ErrorModel} from '../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../shared/field-error/field-error.component';
 
 @Component({
-    selector: 'app-register',
-    imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
-        FieldErrorComponent],
-    templateUrl: './register.component.html'
-})
+               selector: 'app-register',
+               imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
+                         FieldErrorComponent],
+               templateUrl: './register.component.html'
+           })
 export default class RegisterComponent implements AfterViewInit {
     login = viewChild.required<ElementRef>('login');
 
@@ -27,32 +27,48 @@ export default class RegisterComponent implements AfterViewInit {
     success = signal(false);
 
     registerForm = new FormGroup({
-        login: new FormControl('', {
-            nonNullable: true,
-            validators: [
-                Validators.required,
-                Validators.minLength(1),
-                Validators.maxLength(50),
-                Validators.pattern(
-                    '^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$'),
-            ],
-        }),
-        email: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email],
-        }),
-        password: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
-        }),
-        confirmPassword: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
-        }),
-    });
-
+                                     login: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [
+                                             Validators.required,
+                                             Validators.minLength(1),
+                                             Validators.maxLength(50),
+                                             Validators.pattern(
+                                                 '^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$')
+                                         ]
+                                     }),
+                                     email: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email]
+                                     }),
+                                     password: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)]
+                                     }),
+                                     confirmPassword: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)]
+                                     })
+                                 });
+    protected readonly ErrorModel = ErrorModel;
     private translateService = inject(TranslateService);
     private registerService = inject(RegisterService);
+
+    get getLogin(): FormControl {
+        return this.registerForm.get('login') as FormControl;
+    }
+
+    get getEmail(): FormControl {
+        return this.registerForm.get('email') as FormControl;
+    }
+
+    get getPassword(): FormControl {
+        return this.registerForm.get('password') as FormControl;
+    }
+
+    get getConfirmPassword(): FormControl {
+        return this.registerForm.get('confirmPassword') as FormControl;
+    }
 
     ngAfterViewInit(): void {
         this.login().nativeElement.focus();
@@ -84,22 +100,4 @@ export default class RegisterComponent implements AfterViewInit {
             this.error.set(true);
         }
     }
-
-    get getLogin(): FormControl {
-        return this.registerForm.get('login') as FormControl;
-    }
-
-    get getEmail(): FormControl {
-        return this.registerForm.get('email') as FormControl;
-    }
-
-    get getPassword(): FormControl {
-        return this.registerForm.get('password') as FormControl;
-    }
-
-    get getConfirmPassword(): FormControl {
-        return this.registerForm.get('confirmPassword') as FormControl;
-    }
-
-    protected readonly ErrorModel = ErrorModel;
 }

@@ -1,5 +1,5 @@
-import {computed, Injectable, signal} from "@angular/core";
-import {ISalon} from "../../admin/salon/model/salon.interface";
+import {computed, Injectable, signal} from '@angular/core';
+import {ISalon} from '../../admin/salon/model/salon.interface';
 
 @Injectable({providedIn: 'root'})
 export class NavigationStateService {

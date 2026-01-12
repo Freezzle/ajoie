@@ -20,7 +20,7 @@ const participationResolve = (route: ActivatedRouteSnapshot): Observable<null | 
                         inject(Router).navigate(['404']);
                         return EMPTY;
                     }
-                }),
+                })
             );
     }
     return of(null);

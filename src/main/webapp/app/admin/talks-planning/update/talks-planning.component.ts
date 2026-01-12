@@ -11,51 +11,53 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import {ConferenceService} from '../../conference/service/conference.service';
 import {forkJoin, map, switchMap, tap} from 'rxjs';
-import {Talk} from "../../../shared/components/talk-slot/talk-slot.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import {WorkshopService} from "../../workshop/service/workshop.service";
-import {IWorkshop} from "../../workshop/model/workshop.interface";
-import {IConference} from "../../conference/model/conference.interface";
-import {Status} from "../../enumerations/status.model";
-import {finalize} from "rxjs/operators";
-import {SalonService} from "../../salon/service/salon.service";
-import {TimelineDay} from "../../../shared/components/talks-planning/model/timeline-day";
-import {TimelineRoom} from "../../../shared/components/talks-planning/model/timeline-room";
-import {TimelineData} from "../../../shared/components/talks-planning/model/timeline-data";
-import {IntervalMinutes} from "../../../shared/components/talks-planning/model/interval-minutes";
-import {TpComponent} from "../../../shared/components/talks-planning/tp.component";
+import {Talk} from '../../../shared/components/talk-slot/talk-slot.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {WorkshopService} from '../../workshop/service/workshop.service';
+import {IWorkshop} from '../../workshop/model/workshop.interface';
+import {IConference} from '../../conference/model/conference.interface';
+import {Status} from '../../enumerations/status.model';
+import {finalize} from 'rxjs/operators';
+import {SalonService} from '../../salon/service/salon.service';
+import {TimelineDay} from '../../../shared/components/talks-planning/model/timeline-day';
+import {TimelineRoom} from '../../../shared/components/talks-planning/model/timeline-room';
+import {TimelineData} from '../../../shared/components/talks-planning/model/timeline-data';
+import {IntervalMinutes} from '../../../shared/components/talks-planning/model/interval-minutes';
+import {TpComponent} from '../../../shared/components/talks-planning/tp.component';
 
 @Component({
-    selector: 'planning-talks',
-    templateUrl: './talks-planning.component.html',
-    imports: [
-        RouterModule,
-        FormsModule,
-        SharedModule,
-        ButtonBoxComponent,
-        AlertErrorComponent,
-        AlertComponent,
-        Toast,
-        ConfirmPopup,
-        TpComponent,
-        CardComponent,
-        ContentPageComponent,
-        TpComponent,
-    ]
-})
+               selector: 'talks-planning',
+               templateUrl: './talks-planning.component.html',
+               imports: [
+                   RouterModule,
+                   FormsModule,
+                   SharedModule,
+                   ButtonBoxComponent,
+                   AlertErrorComponent,
+                   AlertComponent,
+                   Toast,
+                   ConfirmPopup,
+                   TpComponent,
+                   CardComponent,
+                   ContentPageComponent,
+                   TpComponent
+               ]
+           })
 export class TalksPlanningComponent implements OnInit {
+    readonly isLoading = signal<boolean>(false);
+    readonly isReadOnly = signal<boolean>(true);
+    readonly talks = model<Talk[]>([]);
+    configuration: TimelineData | undefined;
     private readonly salonService = inject(SalonService);
     private readonly conferenceService = inject(ConferenceService);
     private readonly workshopService = inject(WorkshopService);
     private readonly activatedRoute = inject(ActivatedRoute);
-
-    readonly isLoading = signal<boolean>(false);
-    readonly isReadOnly = signal<boolean>(true);
-    readonly talks = model<Talk[]>([]);
-
-    configuration: TimelineData | undefined;
     private idSalon!: string;
+
+    get hasConfiguration(): boolean {
+        return (this.configuration?.days?.length ?? 0) > 0;
+    }
 
     ngOnInit(): void {
         this.activatedRoute.paramMap
@@ -64,28 +66,28 @@ export class TalksPlanningComponent implements OnInit {
                 tap(idSalon => (this.idSalon = idSalon)),
                 tap(() => this.isLoading.set(true)),
                 switchMap(idSalon =>
-                    forkJoin({
-                        // 1) load planning (config + placements)
-                        planning: this.salonService.getPlanningTalks(idSalon),
-                        // 2) load talks sources
-                        conferences: this.conferenceService
-                            .query({idSalon})
-                            .pipe(map(confs => confs.filter(conf => conf.status !== Status.REFUSED && conf.status !== Status.CANCELED))),
-                        workshops: this.workshopService
-                            .query({idSalon})
-                            .pipe(map(works => works.filter(work => work.status !== Status.REFUSED && work.status !== Status.CANCELED))),
-                    }).pipe(finalize(() => this.isLoading.set(false)))
+                              forkJoin({
+                                           // 1) load planning (config + placements)
+                                           planning: this.salonService.getPlanningTalks(idSalon),
+                                           // 2) load talks sources
+                                           conferences: this.conferenceService
+                                                            .query({idSalon})
+                                                            .pipe(map(confs => confs.filter(conf => conf.status !== Status.REFUSED && conf.status !== Status.CANCELED))),
+                                           workshops: this.workshopService
+                                                          .query({idSalon})
+                                                          .pipe(map(works => works.filter(work => work.status !== Status.REFUSED && work.status !== Status.CANCELED)))
+                                       }).pipe(finalize(() => this.isLoading.set(false)))
                 ),
                 map(({planning, conferences, workshops}) => {
                     // --- configuration
                     const configuration: TimelineData = planning?.configuration
-                        ? this.fromTimelineDto(planning.configuration)
-                        : this.buildConfiguration(this.idSalon);
+                                                        ? this.fromTimelineDto(planning.configuration)
+                                                        : this.buildConfiguration(this.idSalon);
 
                     // --- talks complets (depuis conf + workshop)
                     const baseTalks: Talk[] = [
                         ...conferences.map(con => this.toTalk(con, 'CONFERENCE', 60, 45)),
-                        ...workshops.map(work => this.toTalk(work, 'WORKSHOP', 75, 60)),
+                        ...workshops.map(work => this.toTalk(work, 'WORKSHOP', 75, 60))
                     ];
 
                     // --- merge placements sauvegardés
@@ -96,13 +98,13 @@ export class TalksPlanningComponent implements OnInit {
                     const mergedTalks = baseTalks.map(t => {
                         const saved = savedMap.get(`${t.type}:${t.id}`);
                         return saved
-                            ? {
+                               ? {
                                 ...t,
                                 roomId: saved.roomId,
                                 dayId: saved.dayId,
-                                startSlot: saved.startSlot,
+                                startSlot: saved.startSlot
                             }
-                            : t;
+                               : t;
                     });
 
                     return {configuration, mergedTalks};
@@ -142,6 +144,10 @@ export class TalksPlanningComponent implements OnInit {
             });
     }
 
+    previousState(): void {
+        window.history.back();
+    }
+
     private buildConfiguration(eventId: string): TimelineData {
         const rooms: TimelineRoom[] = [];
         const days: TimelineDay[] = [];
@@ -152,14 +158,6 @@ export class TalksPlanningComponent implements OnInit {
             days,
             rooms
         };
-    }
-
-    get hasConfiguration(): boolean {
-        return (this.configuration?.days?.length ?? 0) > 0;
-    }
-
-    previousState(): void {
-        window.history.back();
     }
 
     private toTalk(talk: IWorkshop | IConference, type: TalkType, durationTotal: number, duration: number): Talk {
@@ -173,7 +171,7 @@ export class TalksPlanningComponent implements OnInit {
             description: talk.description,
             roomId: null,
             dayId: null,
-            startSlot: 0,
+            startSlot: 0
         };
     }
 
@@ -183,7 +181,7 @@ export class TalksPlanningComponent implements OnInit {
             type: t.type as TalkType,
             roomId: t.roomId,
             dayId: t.dayId,
-            startSlot: t.startSlot,
+            startSlot: t.startSlot
         };
     }
 
@@ -197,8 +195,8 @@ export class TalksPlanningComponent implements OnInit {
                 rooms: day.rooms.map(room => ({
                     roomId: room.roomId,
                     startingHour: new Date(room.startingHour),
-                    endingHour: new Date(room.endingHour),
-                })),
+                    endingHour: new Date(room.endingHour)
+                }))
             })),
             rooms: dto.rooms.map(room => ({
                 id: room.id,
@@ -217,12 +215,12 @@ export class TalksPlanningComponent implements OnInit {
                 rooms: day.rooms.map(room => ({
                     roomId: room.roomId,
                     startingHour: room.startingHour.toISOString(),
-                    endingHour: room.endingHour.toISOString(),
-                })),
+                    endingHour: room.endingHour.toISOString()
+                }))
             })),
             rooms: data.rooms.map(room => ({
                 id: room.id,
-                label: room.label,
+                label: room.label
             }))
         };
     }

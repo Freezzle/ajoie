@@ -5,9 +5,9 @@
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
+                    [showText]="false"
                     faIcon="arrow-left"
-                    translateKey="common.back"
-                    [showText]="false"/>
+                    translateKey="common.back"/>
         @if (standardView) {
             <button-box (clickedEvent)="changeTechnicalView()"
                         [isDisabled]="isLoading"
@@ -15,16 +15,16 @@
             <button-box (clickedEvent)="refresh()"
                         [faIconAnimation]="isLoading ? 'spin' : undefined"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="sync"
-                        [showText]="false"
                         translateKey="common.refresh"/>
-            <button-box [modeLink]="true"
+            <button-box [isDisabled]="isLoading"
                         [links]="['./new']"
-                        [isDisabled]="isLoading"
+                        [modeLink]="true"
                         [showText]="false"
-                        type="success"
                         faIcon="plus"
-                        translateKey="common.create"/>
+                        translateKey="common.create"
+                        type="success"/>
         } @else {
             <button-box (clickedEvent)="standardView = true"
                         [faIconAnimation]="isLoading ? 'spin' : undefined"
@@ -42,25 +42,25 @@
             <div class="row">
                 @if (standardView) {
                     <p-table #dt2
-                             [value]="stands"
-                             dataKey="id"
-                             [rows]="10"
-                             [rowsPerPageOptions]="[10, 25, 50]"
+                             [globalFilterFields]="['participation.exhibitor.fullName', 'participation.therapistName']"
                              [loading]="isLoading"
                              [paginator]="true"
-                             [globalFilterFields]="['participation.exhibitor.fullName', 'participation.therapistName']"
-                             sortField="registrationDate"
+                             [rowsPerPageOptions]="[10, 25, 50]"
+                             [rows]="10"
                              [sortOrder]="-1"
-                             [tableStyle]="{ 'min-width': '75rem' }">
+                             [tableStyle]="{ 'min-width': '75rem' }"
+                             [value]="stands"
+                             dataKey="id"
+                             sortField="registrationDate">
                         <ng-template #caption>
                             <div class="flex">
-                                <p-iconfield iconPosition="left" class="ml-auto">
+                                <p-iconfield class="ml-auto" iconPosition="left">
                                     <p-inputicon>
                                         <i class="pi pi-search"></i>
                                     </p-inputicon>
-                                    <input pInputText type="text"
-                                           (input)="dt2.filterGlobal($event.target.value, 'contains')"
-                                           placeholder="Recherche"/>
+                                    <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
+                                           placeholder="Recherche"
+                                           type="text"/>
                                 </p-iconfield>
                             </div>
                         </ng-template>
@@ -71,10 +71,10 @@
                                 </th>
                                 <th pSortableColumn="description">{{ 'stand.description' | translate }}
                                     <p-sortIcon field="description"/>
-                                    <p-columnFilter type="text"
+                                    <p-columnFilter display="menu"
                                                     field="description"
                                                     matchMode="contains"
-                                                    display="menu"></p-columnFilter>
+                                                    type="text"></p-columnFilter>
                                 </th>
                                 <th pSortableColumn="category">{{ 'stand.category.label' | translate }}
                                     <p-sortIcon field="category"/>
@@ -85,13 +85,17 @@
                                 <th>Info</th>
                                 <th pSortableColumn="status">{{ 'stand.status.label' | translate }}
                                     <p-sortIcon field="status"/>
-                                    <p-columnFilter field="status" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
-                                        <ng-template #filter let-value let-filter="filterCallback">
-                                            <p-multiselect [ngModel]="value" [options]="statusValues" (ngModelChange)="filter($event)" style="min-width: 14rem" [panelStyle]="{ minWidth: '16rem' }">
-                                                <ng-template let-option #item>
+                                    <p-columnFilter [showAddButton]="false" [showMatchModes]="false" [showOperator]="false"
+                                                    display="menu" field="status"
+                                                    matchMode="in">
+                                        <ng-template #filter let-filter="filterCallback" let-value>
+                                            <p-multiselect (ngModelChange)="filter($event)" [ngModel]="value"
+                                                           [options]="statusValues" [panelStyle]="{ minWidth: '16rem' }"
+                                                           style="min-width: 14rem">
+                                                <ng-template #item let-option>
                                                     <div class="flex items-center gap-2">
-                                                        <fa-icon [icon]="option | status"
-                                                                 [class]="option | colorStatus"
+                                                        <fa-icon [class]="option | colorStatus"
+                                                                 [icon]="option | status"
                                                                  [title]="'stand.status.list.' + option | translate"></fa-icon>
                                                         <span>{{ 'stand.status.list.' + option | translate }}</span>
                                                     </div>
@@ -105,14 +109,14 @@
                         </ng-template>
                         <ng-template #body let-stand>
                             <tr>
-                                <td class="clickable truncate-medium" [routerLink]="['./', stand.id, 'view']">
+                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate-medium">
                                     @if (stand.participation) {
-                                        <a [routerLink]="['/admin','salons',params.get('idSalon'),'participations',stand.participation.id,'view']"
-                                           (click)="$event.stopPropagation()">{{ stand.fullNameFilter }}
+                                        <a (click)="$event.stopPropagation()"
+                                           [routerLink]="['/admin','salons',params.get('idSalon'),'participations',stand.participation.id,'view']">{{ stand.fullNameFilter }}
                                         </a>
                                     }
                                 </td>
-                                <td class="clickable truncate" [routerLink]="['./', stand.id, 'view']">
+                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate">
                                     {{ stand.description }}
                                     @if (stand.subCategories.length > 0) {
                                         <div>
@@ -122,40 +126,40 @@
                                         </div>
                                     }
                                 </td>
-                                <td class="clickable truncate-small" [routerLink]="['./', stand.id, 'view']">
+                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate-small">
                                     {{ 'stand.category.list.' + stand.category | translate }}
                                 </td>
-                                <td class="clickable truncate-medium"
-                                    [routerLink]="['./', stand.id, 'view']">{{ stand.dimension.dimension }}
+                                <td [routerLink]="['./', stand.id, 'view']"
+                                    class="clickable truncate-medium">{{ stand.dimension.dimension }}
                                 </td>
-                                <td class="clickable truncate-medium" [routerLink]="['./', stand.id, 'view']">
+                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate-medium">
                                     @if (stand.participation.crushOfHeart) {
-                                        <fa-icon icon="heart" class="text-danger"></fa-icon>
+                                        <fa-icon class="text-danger" icon="heart"></fa-icon>
                                     }
                                     @if (stand.participation.guestOfHonor) {
-                                        <fa-icon icon="star" class="golden-icon"></fa-icon>
+                                        <fa-icon class="golden-icon" icon="star"></fa-icon>
                                     }
                                     @if (stand.shared) {
-                                        <fa-icon icon="people-arrows" class="text-primary"></fa-icon>
+                                        <fa-icon class="text-primary" icon="people-arrows"></fa-icon>
                                     }
                                     @if (stand.extraInformation) {
-                                        <fa-icon icon="note-sticky"
+                                        <fa-icon [title]="stand.extraInformation"
                                                  class="text-warning"
-                                                 [title]="stand.extraInformation"/>
+                                                 icon="note-sticky"/>
                                     }
                                 </td>
-                                <td class="clickable" [routerLink]="['./', stand.id, 'view']">
-                                    <fa-icon [icon]="stand.status | status"
-                                             [class]="stand.status | colorStatus"
+                                <td [routerLink]="['./', stand.id, 'view']" class="clickable">
+                                    <fa-icon [class]="stand.status | colorStatus"
+                                             [icon]="stand.status | status"
                                              [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
                                 </td>
                                 <td class="text-end">
                                     <div class="btn-group">
                                         <button-box (clickedEvent)="delete($event, stand)"
-                                                    type="danger"
                                                     [showText]="false"
+                                                    faIcon="times"
                                                     translateKey="common.delete"
-                                                    faIcon="times"/>
+                                                    type="danger"/>
                                     </div>
                                 </td>
                             </tr>
@@ -185,36 +189,36 @@
                             <tbody>
                                 @if (isLoading) {
                                     <tr>
-                                        <td colspan="8" class="text-center">
-                                            <p-progress-spinner strokeWidth="5"
-                                                                fill="transparent"
+                                        <td class="text-center" colspan="8">
+                                            <p-progress-spinner [style]="{ width: '50px', height: '50px' }"
                                                                 animationDuration="1s"
-                                                                [style]="{ width: '50px', height: '50px' }"/>
+                                                                fill="transparent"
+                                                                strokeWidth="5"/>
                                         </td>
                                     </tr>
                                 } @else {
                                     @for (stand of stands; track stand) {
                                         <tr>
-                                            <td class="{{stand.participation.therapistName ? 'clipboard' : ''}} truncate-small"
-                                                (click)="clipboard(stand.participation.therapistName)">{{ stand.participation.therapistName }}
+                                            <td (click)="clipboard(stand.participation.therapistName)"
+                                                class="{{stand.participation.therapistName ? 'clipboard' : ''}} truncate-small">{{ stand.participation.therapistName }}
                                             </td>
-                                            <td class="{{stand.participation.exhibitor ? 'clipboard' : ''}} truncate-small"
-                                                (click)="clipboard(getFirstExhibitorName(stand.participation.exhibitor))">{{ getFirstExhibitorName(stand.participation.exhibitor) }}
+                                            <td (click)="clipboard(getFirstExhibitorName(stand.participation.exhibitor))"
+                                                class="{{stand.participation.exhibitor ? 'clipboard' : ''}} truncate-small">{{ getFirstExhibitorName(stand.participation.exhibitor) }}
                                             </td>
-                                            <td class="{{stand.description ? 'clipboard' : ''}} truncate-small"
-                                                (click)="clipboard(stand.description)">{{ stand.description }}
+                                            <td (click)="clipboard(stand.description)"
+                                                class="{{stand.description ? 'clipboard' : ''}} truncate-small">{{ stand.description }}
                                             </td>
-                                            <td class="{{stand.website ? 'clipboard' : ''}} truncate-small"
-                                                (click)="clipboard(stand.website)">{{ stand.website ?? '' }}
+                                            <td (click)="clipboard(stand.website)"
+                                                class="{{stand.website ? 'clipboard' : ''}} truncate-small">{{ stand.website ?? '' }}
                                             </td>
-                                            <td class="{{stand.facebook ? 'clipboard' : ''}} truncate-small"
-                                                (click)="clipboard(stand.facebook)">{{ stand.facebook ?? '' }}
+                                            <td (click)="clipboard(stand.facebook)"
+                                                class="{{stand.facebook ? 'clipboard' : ''}} truncate-small">{{ stand.facebook ?? '' }}
                                             </td>
-                                            <td class="{{stand.instagram ? 'clipboard' : ''}} truncate-small"
-                                                (click)="clipboard(stand.instagram)">{{ stand.instagram ?? '' }}
+                                            <td (click)="clipboard(stand.instagram)"
+                                                class="{{stand.instagram ? 'clipboard' : ''}} truncate-small">{{ stand.instagram ?? '' }}
                                             </td>
-                                            <td class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small"
-                                                (click)="clipboard(stand.urlPicture)">{{ stand.urlPicture ?? '' }}
+                                            <td (click)="clipboard(stand.urlPicture)"
+                                                class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small">{{ stand.urlPicture ?? '' }}
                                             </td>
                                             <td class="truncate-small">{{ stand.category ? (formatterCategory(Category[stand.category]) | translate) : '' }}</td>
                                             <td class="truncate-small">{{ stand.status ? (formatterStatus(Status[stand.status]) | translate) : '' }}</td>

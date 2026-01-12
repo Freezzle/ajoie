@@ -2,8 +2,8 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, map, timer} from 'rxjs';
 import {Client} from '@stomp/stompjs';
-import {ApplicationConfigService} from "../../../core/config/application-config.service";
-import SockJS from "sockjs-client";
+import {ApplicationConfigService} from '../../../core/config/application-config.service';
+import SockJS from 'sockjs-client';
 
 export interface PresenceSummary {
     login: string;
@@ -15,11 +15,10 @@ export interface PresenceSummary {
 
 @Injectable({providedIn: 'root'})
 export class PresenceService {
+    onlineCount$ = this.presence$.pipe(map(list => list.filter(x => x.online).length));
     private applicationConfigService = inject(ApplicationConfigService);
     private presenceSubject = new BehaviorSubject<PresenceSummary[]>([]);
     presence$ = this.presenceSubject.asObservable();
-    onlineCount$ = this.presence$.pipe(map(list => list.filter(x => x.online).length));
-
     private client?: Client;
     private pingTimer?: any;
 
@@ -28,27 +27,29 @@ export class PresenceService {
 
     loadOnce() {
         this.http.get<PresenceSummary[]>(this.applicationConfigService.getEndpointFor('api/presence/summary')).subscribe({
-            next: data => this.presenceSubject.next(data),
-        });
+                                                                                                                             next: data => this.presenceSubject.next(data)
+                                                                                                                         });
     }
 
     connect() {
-        if (this.client?.active) return;
+        if (this.client?.active) {
+            return;
+        }
 
         this.client = new Client({
-            webSocketFactory: () => new SockJS(this.applicationConfigService.getEndpointFor('/ws')),
-            reconnectDelay: 5000,
-            onConnect: () => {
-                this.client?.subscribe('/topic/presence', msg => {
-                    this.presenceSubject.next(JSON.parse(msg.body) as PresenceSummary[]);
-                });
+                                     webSocketFactory: () => new SockJS(this.applicationConfigService.getEndpointFor('/ws')),
+                                     reconnectDelay: 5000,
+                                     onConnect: () => {
+                                         this.client?.subscribe('/topic/presence', msg => {
+                                             this.presenceSubject.next(JSON.parse(msg.body) as PresenceSummary[]);
+                                         });
 
-                // initial
-                this.loadOnce();
-                this.startPing();
-            },
-            onStompError: () => this.startRestFallback(),
-        });
+                                         // initial
+                                         this.loadOnce();
+                                         this.startPing();
+                                     },
+                                     onStompError: () => this.startRestFallback()
+                                 });
 
         this.client.activate();
     }
@@ -69,7 +70,9 @@ export class PresenceService {
     }
 
     private stopPing() {
-        if (this.pingTimer) clearInterval(this.pingTimer);
+        if (this.pingTimer) {
+            clearInterval(this.pingTimer);
+        }
         this.pingTimer = undefined;
     }
 

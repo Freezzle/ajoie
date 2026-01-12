@@ -11,52 +11,50 @@ import {ExhibitorService} from '../service/exhibitor.service';
 import {ExhibitorFormService} from '../service/exhibitor-form.service';
 import {finalize} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {Toast} from "primeng/toast";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
-import {TableModule} from "primeng/table";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {InputText} from "primeng/inputtext";
-import {copyToClipboard} from "../../../core/util/utils";
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {Toast} from 'primeng/toast';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
+import {TableModule} from 'primeng/table';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {copyToClipboard} from '../../../core/util/utils';
 
 @Component({
-    selector: 'app-exhibitor',
-    templateUrl: './exhibitor.component.html',
-    imports: [
-        RouterModule,
-        FormsModule,
-        SharedModule,
-        ReactiveFormsModule,
-        ButtonBoxComponent,
-        AlertErrorComponent,
-        Toast,
-        ConfirmPopup,
-        TableModule,
-        AlertComponent,
-        ContentPageComponent,
-        CardComponent,
-        IconField,
-        InputIcon,
-        InputText,
-    ]
-})
+               selector: 'app-exhibitor',
+               templateUrl: './exhibitor.component.html',
+               imports: [
+                   RouterModule,
+                   FormsModule,
+                   SharedModule,
+                   ReactiveFormsModule,
+                   ButtonBoxComponent,
+                   AlertErrorComponent,
+                   Toast,
+                   ConfirmPopup,
+                   TableModule,
+                   AlertComponent,
+                   ContentPageComponent,
+                   CardComponent,
+                   IconField,
+                   InputIcon,
+                   InputText
+               ]
+           })
 export class ExhibitorComponent implements OnInit {
     public router = inject(Router);
+    sortState = sortStateSignal({});
+    isLoading = false;
+    exhibitors: IExhibitor[] = [];
     protected activatedRoute = inject(ActivatedRoute);
     protected sortService = inject(SortService);
     protected confirmDialogService = inject(ConfirmDialogService);
     protected exhibitorService = inject(ExhibitorService);
     protected exhibitorFormService = inject(ExhibitorFormService);
-
-    sortState = sortStateSignal({});
-
-    isLoading = false;
-    exhibitors: IExhibitor[] = [];
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
@@ -66,7 +64,7 @@ export class ExhibitorComponent implements OnInit {
                     if (!this.exhibitors || this.exhibitors.length === 0) {
                         this.load();
                     }
-                }),
+                })
             )
             .subscribe();
     }
@@ -75,7 +73,7 @@ export class ExhibitorComponent implements OnInit {
         this.isLoading = true;
 
         const queryObject: any = {
-            sort: this.sortService.buildSortParam(this.sortState()),
+            sort: this.sortService.buildSortParam(this.sortState())
         };
 
         this.exhibitorService
@@ -92,11 +90,11 @@ export class ExhibitorComponent implements OnInit {
 
     delete(htmlElement: HTMLElement, exhibitor: IExhibitor): void {
         this.confirmDialogService.delete(htmlElement, 'exhibitor.delete.question',
-            {id: getFirstExhibitorName(exhibitor)}
+                                         {id: getFirstExhibitorName(exhibitor)}
         ).pipe(
             filter(confirmed => confirmed),
             switchMap(() => this.exhibitorService.delete(exhibitor.id)),
-            tap(() => this.load()), // Recharge les données
+            tap(() => this.load()) // Recharge les données
         ).subscribe();
     }
 
@@ -107,7 +105,7 @@ export class ExhibitorComponent implements OnInit {
             .pipe(finalize(() => this.isLoading = false))
             .subscribe(exhibitors => {
                 copyToClipboard(exhibitors.map(exhibitor => exhibitor.email).join(','));
-            })
+            });
     }
 
     previousState(): void {
@@ -116,7 +114,7 @@ export class ExhibitorComponent implements OnInit {
 
     protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
         this.sortState.set(
-            this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]),
+            this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA])
         );
     }
 }

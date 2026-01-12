@@ -1,18 +1,18 @@
 import {Component, EventEmitter, Input, model, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CdkDrag, CdkDragEnd, CdkDragHandle, CdkDragMove, CdkDragStart} from '@angular/cdk/drag-drop';
-import ColorStatusPipe from "../../../../shared/pipe/color-status.pipe";
-import StatusPipe from "../../../../shared/pipe/status.pipe";
-import SharedModule from "../../../../shared/shared.module";
-import {DimensionCell} from "../../floor-plan.model";
-import {getFirstExhibitorName} from "../../../exhibitor/model/exhibitor.interface";
+import ColorStatusPipe from '../../../../shared/pipe/color-status.pipe';
+import StatusPipe from '../../../../shared/pipe/status.pipe';
+import SharedModule from '../../../../shared/shared.module';
+import {DimensionCell} from '../../floor-plan.model';
+import {getFirstExhibitorName} from '../../../exhibitor/model/exhibitor.interface';
 
 @Component({
-    selector: 'floor-plan-dimension-tile',
-    imports: [CommonModule, SharedModule, CdkDrag, CdkDragHandle, ColorStatusPipe, StatusPipe],
-    templateUrl: './floor-plan-dimension-tile.component.html',
-    styleUrl: './floor-plan-dimension-tile.component.scss'
-})
+               selector: 'floor-plan-dimension-tile',
+               imports: [CommonModule, SharedModule, CdkDrag, CdkDragHandle, ColorStatusPipe, StatusPipe],
+               templateUrl: './floor-plan-dimension-tile.component.html',
+               styleUrl: './floor-plan-dimension-tile.component.scss'
+           })
 export class FloorPlanDimensionTileComponent {
     @Input({required: true}) dimension!: DimensionCell;
 

@@ -9,7 +9,7 @@
     <p-tabpanels>
         <!-- ================= TAB PLANNING ================= -->
         <p-tabpanel value="0">
-            <p-tabs [(value)]="planningTab" (valueChange)="ensureSelectedDay()" lazy>
+            <p-tabs (valueChange)="ensureSelectedDay()" [(value)]="planningTab" lazy>
                 <p-tablist>
                     <p-tab value="0">Jours</p-tab>
                     <p-tab value="1">Bénévoles</p-tab>
@@ -21,16 +21,16 @@
                     <p-tabpanel value="0">
                         <label>Intervalle (minutes)</label>
                         <p-select
-                                [options]="intervalOptions"
-                                [ngModel]="planning().intervalMinutes"
                                 (ngModelChange)="onIntervalChange($event)"
+                                [ngModel]="planning().intervalMinutes"
+                                [options]="intervalOptions"
                         ></p-select>
 
                         <div class="toolbar">
-                            <p-button label="Ajouter un jour" icon="pi pi-plus" (onClick)="addDay()"></p-button>
+                            <p-button (onClick)="addDay()" icon="pi pi-plus" label="Ajouter un jour"></p-button>
                         </div>
 
-                        <p-table [value]="planning().days" [rowHover]="true">
+                        <p-table [rowHover]="true" [value]="planning().days">
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th style="width: 22rem;">Label</th>
@@ -40,45 +40,45 @@
                                 </tr>
                             </ng-template>
 
-                            <ng-template pTemplate="body" let-d>
+                            <ng-template let-d pTemplate="body">
                                 <tr>
                                     <td>
                                         <input
-                                                pInputText
-                                                class="w-full"
-                                                [ngModel]="d.label"
                                                 (ngModelChange)="updateDayLabel(d.id, $event)"
+                                                [ngModel]="d.label"
+                                                class="w-full"
+                                                pInputText
                                         />
                                     </td>
 
                                     <td>
                                         <p-datepicker
-                                                [ngModel]="d.startTime"
                                                 (ngModelChange)="updateDayTimes(d.id, $event, d.endTime)"
+                                                [ngModel]="d.startTime"
+                                                [showIcon]="true"
                                                 [showTime]="true"
                                                 [timeOnly]="true"
                                                 hourFormat="24"
-                                                [showIcon]="true"
                                         ></p-datepicker>
                                     </td>
 
                                     <td>
                                         <p-datepicker
-                                                [ngModel]="d.endTime"
                                                 (ngModelChange)="updateDayTimes(d.id, d.startTime, $event)"
+                                                [ngModel]="d.endTime"
+                                                [showIcon]="true"
                                                 [showTime]="true"
                                                 [timeOnly]="true"
                                                 hourFormat="24"
-                                                [showIcon]="true"
                                         ></p-datepicker>
                                     </td>
 
                                     <td>
                                         <p-button
-                                                icon="pi pi-trash"
-                                                [text]="true"
-                                                severity="danger"
                                                 (onClick)="confirmDeleteDay(d.id, d.label)"
+                                                [text]="true"
+                                                icon="pi pi-trash"
+                                                severity="danger"
                                         ></p-button>
                                     </td>
                                 </tr>
@@ -89,11 +89,11 @@
                     <!-- -------- BENEVOLES (inline editable) -------- -->
                     <p-tabpanel value="1">
                         <div class="toolbar">
-                            <p-button label="Ajouter un bénévole" icon="pi pi-plus"
-                                      (onClick)="addVolunteer()"></p-button>
+                            <p-button (onClick)="addVolunteer()" icon="pi pi-plus"
+                                      label="Ajouter un bénévole"></p-button>
                         </div>
 
-                        <p-table [value]="planning().volunteers" [rowHover]="true">
+                        <p-table [rowHover]="true" [value]="planning().volunteers">
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th>Label</th>
@@ -101,23 +101,23 @@
                                 </tr>
                             </ng-template>
 
-                            <ng-template pTemplate="body" let-v>
+                            <ng-template let-v pTemplate="body">
                                 <tr>
                                     <td>
                                         <input
-                                                pInputText
-                                                class="w-full"
-                                                [ngModel]="v.label"
                                                 (ngModelChange)="updateVolunteerLabel(v.id, $event)"
+                                                [ngModel]="v.label"
+                                                class="w-full"
+                                                pInputText
                                         />
                                     </td>
 
                                     <td>
                                         <p-button
-                                                icon="pi pi-trash"
-                                                [text]="true"
-                                                severity="danger"
                                                 (onClick)="confirmDeleteVolunteer(v.id, v.label)"
+                                                [text]="true"
+                                                icon="pi pi-trash"
+                                                severity="danger"
                                         ></p-button>
                                     </td>
                                 </tr>
@@ -131,9 +131,9 @@
                             <div class="assign-left">
                                 <label>Jour</label>
                                 <p-select
-                                        [options]="dayOptions()"
-                                        [ngModel]="selectedDayId()"
                                         (ngModelChange)="selectedDayId.set($event)"
+                                        [ngModel]="selectedDayId()"
+                                        [options]="dayOptions()"
                                         placeholder="Choisir un jour"
                                 ></p-select>
 
@@ -141,21 +141,21 @@
 
                                 <label>Ajouter des bénévoles</label>
                                 <p-multiSelect
-                                        [options]="unassignedVolunteerOptions()"
-                                        optionLabel="label"
-                                        optionValue="value"
+                                        (ngModelChange)="selectedVolunteerIdsToAssign.set($event)"
                                         [display]="'chip'"
                                         [ngModel]="selectedVolunteerIdsToAssign()"
-                                        (ngModelChange)="selectedVolunteerIdsToAssign.set($event)"
+                                        [options]="unassignedVolunteerOptions()"
                                         defaultLabel="Sélectionner..."
+                                        optionLabel="label"
+                                        optionValue="value"
                                 ></p-multiSelect>
 
                                 <p-button
-                                        label="Assigner"
-                                        icon="pi pi-plus"
-                                        class="assign-btn"
                                         (onClick)="assignSelectedVolunteers()"
                                         [disabled]="!selectedDay() || selectedVolunteerIdsToAssign().length === 0"
+                                        class="assign-btn"
+                                        icon="pi pi-plus"
+                                        label="Assigner"
                                 ></p-button>
                             </div>
 
@@ -163,7 +163,7 @@
                                 <h4 class="title">Bénévoles assignés</h4>
 
                                 @if (selectedDay(); as d) {
-                                    <p-table [value]="assignedVolunteers()" [rowHover]="true">
+                                    <p-table [rowHover]="true" [value]="assignedVolunteers()">
                                         <ng-template pTemplate="header">
                                             <tr>
                                                 <th>Label</th>
@@ -171,15 +171,15 @@
                                             </tr>
                                         </ng-template>
 
-                                        <ng-template pTemplate="body" let-v>
+                                        <ng-template let-v pTemplate="body">
                                             <tr>
                                                 <td>{{ v.label }}</td>
                                                 <td class="actions">
                                                     <p-button
-                                                            icon="pi pi-times"
-                                                            [text]="true"
-                                                            severity="danger"
                                                             (onClick)="unassignVolunteer(d.id, v.id)"
+                                                            [text]="true"
+                                                            icon="pi pi-times"
+                                                            severity="danger"
                                                     ></p-button>
                                                 </td>
                                             </tr>
@@ -198,10 +198,10 @@
         <!-- ================= TAB CATEGORIES ================= -->
         <p-tabpanel value="1">
             <div class="toolbar">
-                <p-button label="Ajouter une catégorie" icon="pi pi-plus" (onClick)="addCategory()"></p-button>
+                <p-button (onClick)="addCategory()" icon="pi pi-plus" label="Ajouter une catégorie"></p-button>
             </div>
 
-            <p-table [value]="planning().categories" [rowHover]="true">
+            <p-table [rowHover]="true" [value]="planning().categories">
                 <ng-template pTemplate="header">
                     <tr>
                         <th style="width: 14rem;">Icon</th>
@@ -211,16 +211,16 @@
                     </tr>
                 </ng-template>
 
-                <ng-template pTemplate="body" let-c>
+                <ng-template let-c pTemplate="body">
                     <tr>
                         <td class="d-flex justify-content-between">
                             <p-select
-                                    class="w-full"
-                                    [options]="iconOptions"
-                                    optionLabel="label"
-                                    optionValue="value"
+                                    (ngModelChange)="updateCategoryIcon(c.id, $event)"
                                     [ngModel]="c.icon"
-                                    (ngModelChange)="updateCategoryIcon(c.id, $event)"></p-select>
+                                    [options]="iconOptions"
+                                    class="w-full"
+                                    optionLabel="label"
+                                    optionValue="value"></p-select>
 
                             <div class="icon-preview">
                                 <i [class]="c.icon"></i>
@@ -230,27 +230,27 @@
                         <td>
                             <div class="color-row">
                                 <p-color-picker
-                                        [ngModel]="c.color"
                                         (ngModelChange)="updateCategoryColor(c.id, $event)"
-                                        [format]="'hex'"/>
+                                        [format]="'hex'"
+                                        [ngModel]="c.color"/>
                                 <span class="mono">{{ c.color }}</span>
                             </div>
                         </td>
 
                         <td>
-                            <input pInputText
-                                   class="w-full"
+                            <input (ngModelChange)="updateCategoryLabel(c.id, $event)"
                                    [ngModel]="c.label"
-                                   (ngModelChange)="updateCategoryLabel(c.id, $event)"
+                                   class="w-full"
+                                   pInputText
                             />
                         </td>
 
                         <td class="actions">
                             <p-button
-                                    icon="pi pi-trash"
-                                    [text]="true"
-                                    severity="danger"
                                     (onClick)="confirmDeleteCategory(c.id, c.label)"
+                                    [text]="true"
+                                    icon="pi pi-trash"
+                                    severity="danger"
                             ></p-button>
                         </td>
                     </tr>

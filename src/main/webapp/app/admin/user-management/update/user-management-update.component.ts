@@ -10,22 +10,22 @@ import {ErrorModel} from '../../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../../shared/field-error/field-error.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {AlertComponent} from "../../../shared/alert/alert.component";
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {AlertComponent} from '../../../shared/alert/alert.component';
 
 const userTemplate = {} as IUser;
 
 const newUser: IUser = {
     langKey: 'fr',
-    activated: true,
+    activated: true
 } as IUser;
 
 @Component({
-    selector: 'app-user-mgmt-update',
-    templateUrl: './user-management-update.component.html',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent,
-        CheckboxBoxComponent, AlertErrorComponent, AlertComponent]
-})
+               selector: 'app-user-mgmt-update',
+               templateUrl: './user-management-update.component.html',
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent,
+                         CheckboxBoxComponent, AlertErrorComponent, AlertComponent]
+           })
 export default class UserManagementUpdateComponent implements OnInit {
     languages = LANGUAGES;
     user: IUser | null = null;
@@ -34,30 +34,46 @@ export default class UserManagementUpdateComponent implements OnInit {
     isReadOnly = false;
 
     editForm = new FormGroup({
-        id: new FormControl(userTemplate.id),
-        login: new FormControl(userTemplate.login, {
-            nonNullable: true,
-            validators: [
-                Validators.required,
-                Validators.minLength(1),
-                Validators.maxLength(50),
-                Validators.pattern(
-                    '^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$'),
-            ],
-        }),
-        firstName: new FormControl(userTemplate.firstName, {validators: [Validators.maxLength(50)]}),
-        lastName: new FormControl(userTemplate.lastName, {validators: [Validators.maxLength(50)]}),
-        email: new FormControl(userTemplate.email, {
-            nonNullable: true,
-            validators: [Validators.minLength(5), Validators.maxLength(254), Validators.email],
-        }),
-        activated: new FormControl(userTemplate.activated, {nonNullable: true}),
-        langKey: new FormControl(userTemplate.langKey, {nonNullable: true}),
-        authorities: new FormControl(userTemplate.authorities, {nonNullable: true}),
-    });
-
+                                 id: new FormControl(userTemplate.id),
+                                 login: new FormControl(userTemplate.login, {
+                                     nonNullable: true,
+                                     validators: [
+                                         Validators.required,
+                                         Validators.minLength(1),
+                                         Validators.maxLength(50),
+                                         Validators.pattern(
+                                             '^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$')
+                                     ]
+                                 }),
+                                 firstName: new FormControl(userTemplate.firstName, {validators: [Validators.maxLength(50)]}),
+                                 lastName: new FormControl(userTemplate.lastName, {validators: [Validators.maxLength(50)]}),
+                                 email: new FormControl(userTemplate.email, {
+                                     nonNullable: true,
+                                     validators: [Validators.minLength(5), Validators.maxLength(254), Validators.email]
+                                 }),
+                                 activated: new FormControl(userTemplate.activated, {nonNullable: true}),
+                                 langKey: new FormControl(userTemplate.langKey, {nonNullable: true}),
+                                 authorities: new FormControl(userTemplate.authorities, {nonNullable: true})
+                             });
+    protected readonly ErrorModel = ErrorModel;
     private userService = inject(UserManagementService);
     private activatedRoute = inject(ActivatedRoute);
+
+    get getLogin(): FormControl {
+        return this.editForm.get('login') as FormControl;
+    }
+
+    get getLastName(): FormControl {
+        return this.editForm.get('lastName') as FormControl;
+    }
+
+    get getFirstName(): FormControl {
+        return this.editForm.get('firstName') as FormControl;
+    }
+
+    get getEmail(): FormControl {
+        return this.editForm.get('email') as FormControl;
+    }
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({user, readonly}) => {
@@ -98,14 +114,14 @@ export default class UserManagementUpdateComponent implements OnInit {
         const user = this.editForm.getRawValue();
         if (user.id !== null) {
             this.userService.update(user).subscribe({
-                next: () => this.onSaveSuccess(),
-                error: () => this.onSaveError(),
-            });
+                                                        next: () => this.onSaveSuccess(),
+                                                        error: () => this.onSaveError()
+                                                    });
         } else {
             this.userService.create(user).subscribe({
-                next: () => this.onSaveSuccess(),
-                error: () => this.onSaveError(),
-            });
+                                                        next: () => this.onSaveSuccess(),
+                                                        error: () => this.onSaveError()
+                                                    });
         }
     }
 
@@ -117,22 +133,4 @@ export default class UserManagementUpdateComponent implements OnInit {
     private onSaveError(): void {
         this.isLoading.set(false);
     }
-
-    get getLogin(): FormControl {
-        return this.editForm.get('login') as FormControl;
-    }
-
-    get getLastName(): FormControl {
-        return this.editForm.get('lastName') as FormControl;
-    }
-
-    get getFirstName(): FormControl {
-        return this.editForm.get('firstName') as FormControl;
-    }
-
-    get getEmail(): FormControl {
-        return this.editForm.get('email') as FormControl;
-    }
-
-    protected readonly ErrorModel = ErrorModel;
 }

@@ -3,7 +3,7 @@ import {State} from '../../enumerations/state.model';
 import {Type} from '../../enumerations/type.model';
 import {Mode} from '../../enumerations/mode.model';
 import {AvailableAction} from '../../../shared/model/available-action';
-import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
+import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 
 export interface IInvoicingPlan {
     id: string;

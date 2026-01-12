@@ -5,11 +5,11 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {Alert, AlertService} from 'app/core/util/alert.service';
 
 @Component({
-    selector: 'app-alert',
-    templateUrl: './alert.component.html',
-    imports: [CommonModule, NgbModule],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
-})
+               selector: 'app-alert',
+               templateUrl: './alert.component.html',
+               imports: [CommonModule, NgbModule],
+               schemas: [CUSTOM_ELEMENTS_SCHEMA]
+           })
 export class AlertComponent implements OnInit, OnDestroy {
     alerts = signal<Alert[]>([]);
 

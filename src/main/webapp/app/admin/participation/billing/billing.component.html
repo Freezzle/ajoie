@@ -5,9 +5,9 @@
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
+                    [showText]="false"
                     faIcon="arrow-left"
-                    translateKey="common.back"
-                    [showText]="false"/>
+                    translateKey="common.back"/>
     </div>
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
@@ -24,28 +24,28 @@
             </div>
         </div>
         <div appCardBody>
-            <div class="row" [formGroup]="billingInfoForm">
+            <div [formGroup]="billingInfoForm" class="row">
                 <div class="mt-4 col-lg-6 d-flex">
                     <select-box [formatterFunction]="formatterParticipation"
                                 [options]="[billingInfoForm.controls.participation.value]"
+                                class="w-100"
                                 fieldName="participation"
                                 formControlName="participation"
-                                translateKey="conference.participation"
-                                class="w-100"/>
+                                translateKey="conference.participation"/>
                     @if (participation()!.id && participation()!.salon) {
-                        <link-box class="align-content-center"
-                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"
-                                  [links]="['/admin', 'salons', participation()!.salon!.id, 'participations', participation()!.id ,'view']"
+                        <link-box [links]="['/admin', 'salons', participation()!.salon!.id, 'participations', participation()!.id ,'view']"
                                   [showText]="false"
-                                  faIcon="link"/>
+                                  class="align-content-center"
+                                  faIcon="link"
+                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
                     }
                 </div>
                 <div class="mt-4 col-lg-6">
-                    <text-box fieldName="email" translateKey="exhibitor.email" formControlName="exhibitorEmail"/>
+                    <text-box fieldName="email" formControlName="exhibitorEmail" translateKey="exhibitor.email"/>
                 </div>
                 <div class="mt-4 col-lg-4">
-                    <checkbox-box formControlName="needArrangement"
-                                  fieldName="needArrangement"
+                    <checkbox-box fieldName="needArrangement"
+                                  formControlName="needArrangement"
                                   translateKey="participation.needArrangement"/>
                 </div>
                 <div class="mt-4 col-sm-6 col-lg-4">
@@ -65,9 +65,9 @@
                                 translateKey="participation.status.label"/>
                 </div>
                 <div class="mt-4 col-12 align-content-center">
-                    <textarea-box fieldName="extraInformation"
+                    <textarea-box [rows]="3"
+                                  fieldName="extraInformation"
                                   formControlName="extraInformation"
-                                  [rows]="3"
                                   translateKey="participation.extraInformation"/>
                 </div>
             </div>
@@ -77,7 +77,7 @@
         <div appCardHeader>
             <div class="d-flex w-100 justify-content-between">
                 <h4>{{ 'invoicingPlan.invoicingPlans' | translate }}</h4>
-                <button class="btn btn-primary btn-sm" (click)="generate()">
+                <button (click)="generate()" class="btn btn-primary btn-sm">
                     <span jhiTranslate="common.refresh">Rafraichir</span>
                 </button>
             </div>
@@ -85,9 +85,9 @@
         <div appCardBody>
             <div class="row">
                 <div class="mt-4 col-12">
-                    <p-accordion [(value)]="openPlanId"
+                    <p-accordion (onClose)="onClosingCollapseChange($event)"
                                  (onOpen)="onOpeningCollapseChange($event)"
-                                 (onClose)="onClosingCollapseChange($event)">
+                                 [(value)]="openPlanId">
                         @for (invoicingPlan of (invoicingPlans$ | async); track invoicingPlan.id) {
                             <p-accordion-panel [value]="invoicingPlan.id">
                                 <p-accordion-header>
@@ -95,18 +95,18 @@
                                         <div class="d-flex justify-content-between">
                                             <span>
                                                 <u>
-                                                    <span jhiTranslate="invoicingPlan.title"
-                                                          [translateValues]="{ billingNumber: invoicingPlan.billingNumber }"></span>
+                                                    <span [translateValues]="{ billingNumber: invoicingPlan.billingNumber }"
+                                                          jhiTranslate="invoicingPlan.title"></span>
                                                 </u>
                                             </span>
                                             <span>
                                                 <h5 class="m-0">
-                                                    <p-badge badgeSize="large"
-                                                             [value]="'invoicingPlan.state.' + invoicingPlan.state | translate | uppercase"
-                                                             [ngClass]="getInvoicingPlanStateBadgeClass(invoicingPlan)"
+                                                    <p-badge [ngClass]="getInvoicingPlanStateBadgeClass(invoicingPlan)"
                                                              [title]="isDraftState(invoicingPlan)
                                                             ? ('Généré le ' + (invoicingPlan.generationDate | formatMediumDate))
-                                                            : ('Envoyé le ' + (invoicingPlan.issuedDate | formatMediumDate))"/>
+                                                            : ('Envoyé le ' + (invoicingPlan.issuedDate | formatMediumDate))"
+                                                             [value]="'invoicingPlan.state.' + invoicingPlan.state | translate | uppercase"
+                                                             badgeSize="large"/>
                                                 </h5>
                                             </span>
                                         </div>
@@ -117,27 +117,27 @@
                                         </div>
                                         <div class="col-6 align-content-center ms-1">
                                             @if (invoicingPlan.needArrangement) {
-                                                <fa-icon icon="handshake-simple"
-                                                         [class]="openPlanId === invoicingPlan.id ? 'text-white' : 'text-primary'"
-                                                         size="lg"
-                                                         [title]="'invoicingPlan.needArrangement.checked' | translate"></fa-icon>
+                                                <fa-icon [class]="openPlanId === invoicingPlan.id ? 'text-white' : 'text-primary'"
+                                                         [title]="'invoicingPlan.needArrangement.checked' | translate"
+                                                         icon="handshake-simple"
+                                                         size="lg"></fa-icon>
                                             }
                                             @if (invoicingPlan.invoiceSendingMethod === InvoiceSendingMethod.POSTAL) {
-                                                <fa-icon icon="envelope"
-                                                         [class]="openPlanId === invoicingPlan.id ? 'text-white' : 'text-primary'"
-                                                         size="lg"
-                                                         [title]="'participation.invoiceSendingMethod.list.' + invoicingPlan.invoiceSendingMethod | translate"></fa-icon>
+                                                <fa-icon [class]="openPlanId === invoicingPlan.id ? 'text-white' : 'text-primary'"
+                                                         [title]="'participation.invoiceSendingMethod.list.' + invoicingPlan.invoiceSendingMethod | translate"
+                                                         icon="envelope"
+                                                         size="lg"></fa-icon>
                                             }
                                             @if (isIssuedState(invoicingPlan) && isDateExpired(invoicingPlan)) {
-                                                <fa-icon icon="clock"
+                                                <fa-icon [title]="'Expiré depuis le ' + (invoicingPlan.expirationDate | formatMediumDate)"
                                                          class="text-danger"
-                                                         size="lg"
-                                                         [title]="'Expiré depuis le ' + (invoicingPlan.expirationDate | formatMediumDate)"></fa-icon>
+                                                         icon="clock"
+                                                         size="lg"></fa-icon>
                                             } @else if (!isDraftState(invoicingPlan)) {
-                                                <fa-icon icon="clock"
-                                                         [class]="openPlanId === invoicingPlan.id ? 'text-white' : 'text-primary'"
-                                                         size="lg"
-                                                         [title]="'Date d\'expiration ' + (invoicingPlan.expirationDate | formatMediumDate)"></fa-icon>
+                                                <fa-icon [class]="openPlanId === invoicingPlan.id ? 'text-white' : 'text-primary'"
+                                                         [title]="'Date d\'expiration ' + (invoicingPlan.expirationDate | formatMediumDate)"
+                                                         icon="clock"
+                                                         size="lg"></fa-icon>
                                             }
                                         </div>
                                     </div>
@@ -149,12 +149,12 @@
                                                 <div class="mt-4">
                                                     <button-box (clickedEvent)="cancelSplit(invoicingPlan)"
                                                                 [isDisabled]="mustDisableSendButton(invoicingPlan)"
-                                                                type="secondary"
-                                                                translateKey="common.cancel"/>
+                                                                translateKey="common.cancel"
+                                                                type="secondary"/>
                                                     <button-box (clickedEvent)="validateSplit(invoicingPlan)"
-                                                                type="warning"
                                                                 [isDisabled]="mustDisableSendButton(invoicingPlan) || selectedInvoices.length == 0"
-                                                                translateKey="invoicingPlan.split"/>
+                                                                translateKey="invoicingPlan.split"
+                                                                type="warning"/>
                                                 </div>
                                             }
                                             @if (showInvoicingAction(invoicingPlan)) {
@@ -163,13 +163,14 @@
                                                              [title]="'event.buttonTitle' | translate"
                                                              class="clickable"
                                                              icon="clock-rotate-left"></fa-icon>
-                                                    <menu-box [items]="menuCachePlans.get(invoicingPlan.id) ?? []"/>
+                                                    <menu-box [items]="menuCachePlans.get(invoicingPlan.id) ?? []"
+                                                              buttonTranslateKey="common.actions"/>
                                                 </div>
                                             }
                                         </div>
 
                                         <div class="mt-4 col-12 table-responsive table-entities">
-                                            <table class="table table-hover" aria-describedby="page-heading">
+                                            <table aria-describedby="page-heading" class="table table-hover">
                                                 <thead class="thead-primary">
                                                 <tr>
                                                     <th>
@@ -213,9 +214,9 @@
                                                             </td>
                                                             <td class="align-middle text-end">
                                                                 @if (showCreateInvoice(invoicingPlan)) {
-                                                                    <button id="jh-create-invoice"
+                                                                    <button (click)="addInvoice(invoicingPlan)"
                                                                             class="btn btn-success btn-sm"
-                                                                            (click)="addInvoice(invoicingPlan)">
+                                                                            id="jh-create-invoice">
                                                                         <fa-icon icon="plus"></fa-icon>
                                                                     </button>
                                                                 }
@@ -234,25 +235,25 @@
                                                                 <tr>
                                                                     <td>{{ invoice.generationDate | formatMediumDate }}</td>
                                                                     <td>
-                                                                        <input type="text"
-                                                                               (blur)="onLabelChange($event, invoice)"
+                                                                        <input (blur)="onLabelChange($event, invoice)"
                                                                                [disabled]="mustInvoiceBeDisabled(invoice, invoicingPlan)"
+                                                                               type="text"
                                                                                value="{{ invoice.label }}"/>
                                                                     </td>
 
                                                                     <td class="text-center">
                                                                         @if (hasDiffCustomAndDefault(invoice) && invoice.id) {
-                                                                            <fa-icon icon="circle-info"
+                                                                            <fa-icon [title]="'invoicingPlan.amount.different' | translate: { defaultPrice: invoice.defaultAmount }"
                                                                                      class="text-warning"
-                                                                                     [title]="'invoicingPlan.amount.different' | translate: { defaultPrice: invoice.defaultAmount }"></fa-icon>
+                                                                                     icon="circle-info"></fa-icon>
                                                                         }
                                                                         &nbsp;
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        <input type="number"
-                                                                               class="text-center"
-                                                                               (blur)="onCustomAmountChange($event, invoice)"
+                                                                        <input (blur)="onCustomAmountChange($event, invoice)"
                                                                                [disabled]="mustInvoiceBeDisabled(invoice, invoicingPlan)"
+                                                                               class="text-center"
+                                                                               type="number"
                                                                                value="{{ invoice.customAmount }}"/>
                                                                     </td>
                                                                     <td class="text-center">{{ invoice.quantity }}</td>
@@ -260,17 +261,17 @@
                                                                         {{ (invoice.quantity ?? 1) * (invoice.customAmount ?? 0) | currency: 'CHF' }}
                                                                     </td>
                                                                     <td>
-                                                                        <input type="text"
-                                                                               (blur)="onExtraInformationChange($event, invoice)"
+                                                                        <input (blur)="onExtraInformationChange($event, invoice)"
                                                                                [disabled]="mustInvoiceBeDisabled(invoice, invoicingPlan)"
+                                                                               type="text"
                                                                                value="{{ invoice.extraInformation }}"/>
                                                                     </td>
                                                                     <td class="text-end">
                                                                         @if (!isInvoiceEditable(invoice) && isPlanOnSplitMode(invoicingPlan)) {
                                                                             <div>
-                                                                                <input type="checkbox"
+                                                                                <input (change)="onSelectInvoice(invoice)"
                                                                                        [value]="invoice.selected"
-                                                                                       (change)="onSelectInvoice(invoice)"/>
+                                                                                       type="checkbox"/>
 
                                                                             </div>
                                                                         }
@@ -280,23 +281,23 @@
                                                                                     <button-box
                                                                                             (clickedEvent)="editInvoice(invoice)"
                                                                                             [showText]="false"
-                                                                                            translateKey="common.edit"
-                                                                                            faIcon="pencil-alt"/>
+                                                                                            faIcon="pencil-alt"
+                                                                                            translateKey="common.edit"/>
                                                                                 }
                                                                                 @if (!invoice.readMode) {
                                                                                     <button-box
                                                                                             (clickedEvent)="updateInvoice(invoicingPlan, invoice)"
                                                                                             [showText]="false"
-                                                                                            translateKey="common.save"
-                                                                                            faIcon="floppy-disk"/>
+                                                                                            faIcon="floppy-disk"
+                                                                                            translateKey="common.save"/>
                                                                                 }
                                                                                 @if (invoice.readMode && (!invoice.type || invoice.type === 'OTHERS')) {
                                                                                     <button-box
                                                                                             (clickedEvent)="deleteInvoice(invoicingPlan, invoice)"
                                                                                             [showText]="false"
-                                                                                            type="danger"
+                                                                                            faIcon="times"
                                                                                             translateKey="common.delete"
-                                                                                            faIcon="times"/>
+                                                                                            type="danger"/>
                                                                                 }
                                                                             </span>
                                                                         }
@@ -315,9 +316,9 @@
                                                                 </td>
                                                                 <td class="align-middle text-end">
                                                                     @if (showCreatePayment(invoicingPlan)) {
-                                                                        <button id="create-payment"
+                                                                        <button (click)="addPayment(invoicingPlan)"
                                                                                 class="btn btn-success btn-sm"
-                                                                                (click)="addPayment(invoicingPlan)">
+                                                                                id="create-payment">
                                                                             <fa-icon icon="plus"></fa-icon>
                                                                         </button>
                                                                     }
@@ -337,20 +338,20 @@
                                                                     <tr>
                                                                         <td>{{ payment.billingDate | formatMediumDate }}</td>
                                                                         <td>
-                                                                            <input type="text"
-                                                                                   (blur)="onExtraInformationPaymentChange($event, payment)"
+                                                                            <input (blur)="onExtraInformationPaymentChange($event, payment)"
                                                                                    [disabled]="!isPaymentEditable(payment) || mustPaymentBeDisabled(payment, invoicingPlan)"
+                                                                                   type="text"
                                                                                    value="{{ payment.extraInformation }}"/>
                                                                         </td>
                                                                         <td>
-                                                                            <select name="mode"
-                                                                                    id="field_mode"
-                                                                                    [value]="payment.paymentMode"
+                                                                            <select (blur)="onPaymentModeChange($event, payment)"
                                                                                     [disabled]="!isPaymentEditable(payment) || mustPaymentBeDisabled(payment, invoicingPlan)"
-                                                                                    (blur)="onPaymentModeChange($event, payment)">
+                                                                                    [value]="payment.paymentMode"
+                                                                                    id="field_mode"
+                                                                                    name="mode">
                                                                                 @for (mode of modeValues; track $index) {
-                                                                                    <option [value]="mode"
-                                                                                            [selected]="payment.paymentMode === mode">{{
+                                                                                    <option [selected]="payment.paymentMode === mode"
+                                                                                            [value]="mode">{{
                                                                                             'payment.type.list.' + mode | translate
                                                                                         }}
                                                                                     </option>
@@ -361,9 +362,9 @@
                                                                         <td>&nbsp;</td>
                                                                         <td class="text-center">
                                                                             @if (isPaymentEditable(payment)) {
-                                                                                <input type="number"
+                                                                                <input (blur)="onAmountPaymentChange($event, payment)"
                                                                                        class="text-center"
-                                                                                       (blur)="onAmountPaymentChange($event, payment)"
+                                                                                       type="number"
                                                                                        value="{{ payment.amount }}"/>
                                                                             }
                                                                             @if (mustPaymentBeDisabled(payment, invoicingPlan)) {
@@ -378,23 +379,23 @@
                                                                                         <button-box
                                                                                                 (clickedEvent)="editPayment(payment)"
                                                                                                 [showText]="false"
-                                                                                                translateKey="common.edit"
-                                                                                                faIcon="pencil-alt"/>
+                                                                                                faIcon="pencil-alt"
+                                                                                                translateKey="common.edit"/>
                                                                                     }
                                                                                     @if (!payment.readMode) {
                                                                                         <button-box
                                                                                                 (clickedEvent)="updatePayment(invoicingPlan, payment)"
                                                                                                 [showText]="false"
-                                                                                                translateKey="common.save"
-                                                                                                faIcon="floppy-disk"/>
+                                                                                                faIcon="floppy-disk"
+                                                                                                translateKey="common.save"/>
                                                                                     }
                                                                                     @if (payment.readMode) {
                                                                                         <button-box
                                                                                                 (clickedEvent)="deletePayment(invoicingPlan, payment)"
                                                                                                 [showText]="false"
-                                                                                                type="danger"
+                                                                                                faIcon="times"
                                                                                                 translateKey="common.delete"
-                                                                                                faIcon="times"/>
+                                                                                                type="danger"/>
                                                                                     }
                                                                                 </span>
                                                                             }
@@ -409,7 +410,7 @@
                                                     <td class="table-section-ending align-middle"
                                                         jhiTranslate="invoicingPlan.result">Résultat
                                                     </td>
-                                                    <td colspan="4" class="table-section-ending">&nbsp;</td>
+                                                    <td class="table-section-ending" colspan="4">&nbsp;</td>
                                                     <td class="table-section-ending text-center align-middle">
                                                         {{ remainingTotal(invoicingPlan) | currency: 'CHF' }}
                                                     </td>

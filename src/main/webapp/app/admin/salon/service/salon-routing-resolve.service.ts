@@ -20,7 +20,7 @@ const salonResolve = (route: ActivatedRouteSnapshot): Observable<null | ISalon> 
                         inject(Router).navigate(['404']);
                         return EMPTY;
                     }
-                }),
+                })
             );
     }
     return of(null);

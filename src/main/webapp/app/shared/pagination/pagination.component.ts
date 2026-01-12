@@ -4,13 +4,13 @@ import ItemCountComponent from './item-count.component';
 import {PaginationEvent} from './pagination-event.interface';
 
 @Component({
-    selector: 'app-pagination',
-    templateUrl: './pagination.component.html',
-    imports: [
-        NgbPagination,
-        ItemCountComponent,
-    ]
-})
+               selector: 'app-pagination',
+               templateUrl: './pagination.component.html',
+               imports: [
+                   NgbPagination,
+                   ItemCountComponent
+               ]
+           })
 export class PaginationComponent implements OnInit {
     @Input()
     collectionSize!: number;

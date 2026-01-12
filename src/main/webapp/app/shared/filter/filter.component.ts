@@ -3,10 +3,10 @@ import SharedModule from '../shared.module';
 import {IFilterOptions} from './filter.model';
 
 @Component({
-    selector: 'app-filter',
-    imports: [SharedModule],
-    templateUrl: './filter.component.html'
-})
+               selector: 'app-filter',
+               imports: [SharedModule],
+               templateUrl: './filter.component.html'
+           })
 export default class FilterComponent {
     @Input() filters!: IFilterOptions;
 

@@ -14,9 +14,9 @@ import {AccountService} from 'app/core/auth/account.service';
  * ```
  */
 @Directive({
-    standalone: true,
-    selector: '[jhiHasAnyAuthority]',
-})
+               standalone: true,
+               selector: '[jhiHasAnyAuthority]'
+           })
 export default class HasAnyAuthorityDirective {
     public authorities = input<string | string[]>([], {alias: 'jhiHasAnyAuthority'});
 

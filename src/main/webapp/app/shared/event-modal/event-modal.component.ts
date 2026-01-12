@@ -8,15 +8,15 @@ import EventTypePipe from '../pipe/event-type.pipe';
 import {ButtonBoxComponent} from '../components/button-box/button-box.component';
 import HasAnyAuthorityDirective from '../auth/has-any-authority.directive';
 import {EventService} from './event.service';
-import {formatDate} from "@angular/common";
+import {formatDate} from '@angular/common';
 
 type EventVm = EventLog & { showDate: boolean };
 
 @Component({
-    templateUrl: './event-modal.component.html',
-    styleUrl: './event-modal.component.scss',
-    imports: [SharedModule, ReactiveFormsModule, EventTypePipe, ButtonBoxComponent, HasAnyAuthorityDirective]
-})
+               templateUrl: './event-modal.component.html',
+               styleUrl: './event-modal.component.scss',
+               imports: [SharedModule, ReactiveFormsModule, EventTypePipe, ButtonBoxComponent, HasAnyAuthorityDirective]
+           })
 export class EventModalComponent implements OnInit {
 
     @Input() events: EventVm[] = [];
@@ -35,7 +35,7 @@ export class EventModalComponent implements OnInit {
 
             return {
                 ...e,
-                showDate: currDay !== prevDay,
+                showDate: currDay !== prevDay
             };
         });
     }

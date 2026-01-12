@@ -5,29 +5,31 @@ import {Router, RouterModule} from '@angular/router';
 import SharedModule from 'app/shared/shared.module';
 import {LoginService} from 'app/login/login.service';
 import {AccountService} from 'app/core/auth/account.service';
-import {ContentPageComponent} from "../shared/components/content-page/content-page.component";
-import {AlertComponent} from "../shared/alert/alert.component";
-import {AlertErrorComponent} from "../shared/alert/alert-error.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {CardComponent} from "../shared/components/card/card.component";
-import {PresenceService} from "../admin/presence/service/presence.service";
+import {ContentPageComponent} from '../shared/components/content-page/content-page.component';
+import {AlertComponent} from '../shared/alert/alert.component';
+import {AlertErrorComponent} from '../shared/alert/alert-error.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {CardComponent} from '../shared/components/card/card.component';
 
 @Component({
-    selector: 'app-login',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, ContentPageComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, CardComponent],
-    templateUrl: './login.component.html'
-})
+               selector: 'app-login',
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, ContentPageComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, CardComponent],
+               templateUrl: './login.component.html'
+           })
 export default class LoginComponent implements OnInit, AfterViewInit {
     username = viewChild.required<ElementRef>('username');
 
     authenticationError = signal(false);
 
     loginForm = new FormGroup({
-        username: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
-        password: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
-        rememberMe: new FormControl(false, {nonNullable: true, validators: [Validators.required]}),
-    });
+                                  username: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
+                                  password: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
+                                  rememberMe: new FormControl(false, {
+                                      nonNullable: true,
+                                      validators: [Validators.required]
+                                  })
+                              });
 
     private accountService = inject(AccountService);
     private loginService = inject(LoginService);
@@ -48,14 +50,14 @@ export default class LoginComponent implements OnInit, AfterViewInit {
 
     login(): void {
         this.loginService.login(this.loginForm.getRawValue()).subscribe({
-            next: () => {
-                this.authenticationError.set(false);
-                if (!this.router.currentNavigation()) {
-                    // There were no routing during login (eg from navigationToStoredUrl)
-                    this.router.navigate(['']);
-                }
-            },
-            error: () => this.authenticationError.set(true),
-        });
+                                                                            next: () => {
+                                                                                this.authenticationError.set(false);
+                                                                                if (!this.router.currentNavigation()) {
+                                                                                    // There were no routing during login (eg from navigationToStoredUrl)
+                                                                                    this.router.navigate(['']);
+                                                                                }
+                                                                            },
+                                                                            error: () => this.authenticationError.set(true)
+                                                                        });
     }
 }

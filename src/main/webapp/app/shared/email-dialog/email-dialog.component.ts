@@ -5,29 +5,26 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import SharedModule from 'app/shared/shared.module';
 import {EmailMessage} from './email-message';
 import {TextBoxComponent} from '../components/text-box/text-box.component';
-import {Editor, EditorModule} from "primeng/editor";
-import {ActionsService} from "../../admin/common/actions.service";
-import {EmailAttachment} from "./email-attachment";
-import {finalize} from "rxjs/operators";
-import Quill from "quill";
+import {Editor, EditorModule} from 'primeng/editor';
+import {ActionsService} from '../../admin/common/actions.service';
+import {EmailAttachment} from './email-attachment';
+import {finalize} from 'rxjs/operators';
+import Quill from 'quill';
 
 @Component({
-    templateUrl: './email-dialog.component.html',
-    styleUrl: './email-dialog.component.scss',
-    imports: [SharedModule, FormsModule, EditorModule, ReactiveFormsModule, TextBoxComponent, Editor]
-})
+               templateUrl: './email-dialog.component.html',
+               styleUrl: './email-dialog.component.scss',
+               imports: [SharedModule, FormsModule, EditorModule, ReactiveFormsModule, TextBoxComponent, Editor]
+           })
 export class EmailDialogComponent implements OnInit {
-
-    private readonly actionsService = inject(ActionsService);
 
     @Input() template!: EmailMessage;
     @Input() context!: string;
     @Input() entityId!: number;
-
     isLoading = false;
     form!: FormGroup;
-
     quill?: Quill;
+    private readonly actionsService = inject(ActionsService);
     private pendingHtml?: string;
 
     constructor(private fb: FormBuilder, public activeModal: NgbActiveModal) {
@@ -35,12 +32,15 @@ export class EmailDialogComponent implements OnInit {
 
     ngOnInit() {
         this.form = this.fb.group({
-            from: [{value: this.template.from, disabled: true}, [Validators.required, Validators.email]],
-            to: [this.template.to, [Validators.required, Validators.email]],
-            subject: [this.template.subject, Validators.required],
-            body: [this.template.body, Validators.required],
-            attachments: [this.template.attachments]
-        });
+                                      from: [{
+                                          value: this.template.from,
+                                          disabled: true
+                                      }, [Validators.required, Validators.email]],
+                                      to: [this.template.to, [Validators.required, Validators.email]],
+                                      subject: [this.template.subject, Validators.required],
+                                      body: [this.template.body, Validators.required],
+                                      attachments: [this.template.attachments]
+                                  });
         this.pendingHtml = this.template.body ?? '';
     }
 
@@ -50,7 +50,7 @@ export class EmailDialogComponent implements OnInit {
         if (this.quill && this.pendingHtml != null) {
             this.quill.clipboard.dangerouslyPasteHTML(this.pendingHtml, 'silent');
             // optionnel: sync le formControl avec l’HTML réellement accepté par Quill
-            this.form.get('body')?.setValue(this.quill.root.innerHTML, { emitEvent: false });
+            this.form.get('body')?.setValue(this.quill.root.innerHTML, {emitEvent: false});
             this.pendingHtml = undefined;
         }
     }
@@ -80,16 +80,18 @@ export class EmailDialogComponent implements OnInit {
         });
     }
 
+    cancel() {
+        this.activeModal.dismiss();
+    }
+
     private getFilenameFromContentDisposition(cd: string): string | null {
         // gère filename*=UTF-8''... et filename="..."
         const utf8 = cd.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
-        if (utf8?.[1]) {return decodeURIComponent(utf8[1]);}
+        if (utf8?.[1]) {
+            return decodeURIComponent(utf8[1]);
+        }
 
         const ascii = cd.match(/filename\s*=\s*"([^"]+)"/i) ?? cd.match(/filename\s*=\s*([^;]+)/i);
         return ascii?.[1]?.trim() ?? null;
-    }
-
-    cancel() {
-        this.activeModal.dismiss();
     }
 }

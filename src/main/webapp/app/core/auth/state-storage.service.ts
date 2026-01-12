@@ -31,7 +31,7 @@ export class StateStorageService {
 
     getAuthenticationToken(): string | null {
         const authenticationToken = localStorage.getItem(this.authenticationKey) ??
-            sessionStorage.getItem(this.authenticationKey);
+                                    sessionStorage.getItem(this.authenticationKey);
         return authenticationToken ? (JSON.parse(authenticationToken) as string | null) : authenticationToken;
     }
 

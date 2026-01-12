@@ -1,4 +1,4 @@
-import {Component, effect, ElementRef, HostListener, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, inject, OnInit, signal, ViewChild} from '@angular/core';
 import {NavigationEnd, Router, RouterModule} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -11,16 +11,15 @@ import {LoginService} from 'app/login/login.service';
 import {filter} from 'rxjs';
 import {SalonService} from '../../admin/salon/service/salon.service';
 import {map} from 'rxjs/operators';
-import {NavigationStateService} from "./navigation-state.service";
-import {PresenceComponent} from "../../admin/presence/component/presence.component";
-import {PresenceService} from "../../admin/presence/service/presence.service";
+import {NavigationStateService} from './navigation-state.service';
+import {PresenceComponent} from '../../admin/presence/component/presence.component';
 
 @Component({
-    selector: 'app-navbar',
-    templateUrl: './navbar.component.html',
-    styleUrl: './navbar.component.scss',
-    imports: [RouterModule, SharedModule, HasAnyAuthorityDirective, PresenceComponent]
-})
+               selector: 'app-navbar',
+               templateUrl: './navbar.component.html',
+               styleUrl: './navbar.component.scss',
+               imports: [RouterModule, SharedModule, HasAnyAuthorityDirective, PresenceComponent]
+           })
 export default class NavbarComponent implements OnInit {
     @ViewChild('sidebar', {static: true}) sidebar!: ElementRef<HTMLElement>;
 
@@ -77,7 +76,7 @@ export default class NavbarComponent implements OnInit {
     toggleDropdown(menu: string) {
         this.dropdowns.update(d => ({
             ...d,
-            [menu]: !d[menu],
+            [menu]: !d[menu]
         }));
     }
 

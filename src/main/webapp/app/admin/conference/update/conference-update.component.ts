@@ -17,35 +17,36 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
-import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.component";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
+import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
 
 @Component({
-    selector: 'app-conference-update',
-    templateUrl: './conference-update.component.html',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
-        TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContentPageComponent, CardComponent]
-})
+               selector: 'app-conference-update',
+               templateUrl: './conference-update.component.html',
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
+                         TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContentPageComponent, CardComponent]
+           })
 export class ConferenceUpdateComponent implements OnInit {
-    protected conferenceService = inject(ConferenceService);
-    protected conferenceFormService = inject(ConferenceFormService);
-    protected participationService = inject(ParticipationService);
-    protected activatedRoute = inject(ActivatedRoute);
-
     isLoading = false;
     isReadOnly = false;
     eventId!: string;
-
     initialConference: IConference | null = null;
     statusValues = Object.keys(Status);
     params!: ParamMap;
     participationsOptions: IParticipation[] = [];
+    protected conferenceService = inject(ConferenceService);
+    protected conferenceFormService = inject(ConferenceFormService);
     editForm: FormGroup<ConferenceFormGroup> = this.conferenceFormService.createConferenceFormGroup(null);
+    protected participationService = inject(ParticipationService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected readonly formatterParticipation = formatterParticipation;
+    protected readonly formatterStatus = formatterStatus;
+    protected readonly selectFilterParticipation = selectFilterParticipation;
 
     ngOnInit(): void {
         const data = this.activatedRoute.snapshot.data;
@@ -90,8 +91,8 @@ export class ConferenceUpdateComponent implements OnInit {
 
         const conference = this.conferenceFormService.getConference(this.editForm);
         const saveOperation = conference.id != null
-            ? this.conferenceService.update(conference)
-            : this.conferenceService.create(conference);
+                              ? this.conferenceService.update(conference)
+                              : this.conferenceService.create(conference);
 
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
@@ -103,7 +104,7 @@ export class ConferenceUpdateComponent implements OnInit {
                 map((participations) => {
                     if (participationId) {
                         this.editForm.get('participation')?.setValue(
-                            participations.find(p => p.id === participationId) ?? null,
+                            participations.find(p => p.id === participationId) ?? null
                         );
                     }
                     return participations;
@@ -111,8 +112,4 @@ export class ConferenceUpdateComponent implements OnInit {
                 catchError(() => of([])))
             .subscribe((participations) => (this.participationsOptions = participations));
     }
-
-    protected readonly formatterParticipation = formatterParticipation;
-    protected readonly formatterStatus = formatterStatus;
-    protected readonly selectFilterParticipation = selectFilterParticipation;
 }

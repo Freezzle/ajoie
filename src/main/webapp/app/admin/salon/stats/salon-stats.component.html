@@ -3,7 +3,7 @@
         <h3 jhiTranslate="salon.statistiques">Statistiques</h3>
     </div>
     <div appMenuBarEnd>
-        <button-box (clickedEvent)="previousState()" faIcon="arrow-left" translateKey="common.back" [showText]="false"/>
+        <button-box (clickedEvent)="previousState()" [showText]="false" faIcon="arrow-left" translateKey="common.back"/>
     </div>
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
@@ -110,18 +110,18 @@
                                     <td class="text-center">
                                         @if (factuGraph[0] || factuGraph[1] || factuGraph[2]) {
                                             <ngb-progressbar-stacked>
-                                                <ngb-progressbar type="success"
+                                                <ngb-progressbar [striped]="false"
                                                                  [title]="'réduction [' + factuGraph[2].toFixed(2) + '%]'"
-                                                                 [striped]="false"
-                                                                 [value]="factuGraph[2]"></ngb-progressbar>
-                                                <ngb-progressbar type="primary"
+                                                                 [value]="factuGraph[2]"
+                                                                 type="success"></ngb-progressbar>
+                                                <ngb-progressbar [striped]="false"
                                                                  [title]="'payé [' + factuGraph[1].toFixed(2) + '%]'"
-                                                                 [striped]="false"
-                                                                 [value]="factuGraph[1]"></ngb-progressbar>
-                                                <ngb-progressbar class="custom-remaining"
+                                                                 [value]="factuGraph[1]"
+                                                                 type="primary"></ngb-progressbar>
+                                                <ngb-progressbar [striped]="false"
                                                                  [title]="'restant [' + factuGraph[0].toFixed(2) + '%]'"
-                                                                 [striped]="false"
-                                                                 [value]="factuGraph[0]"></ngb-progressbar>
+                                                                 [value]="factuGraph[0]"
+                                                                 class="custom-remaining"></ngb-progressbar>
                                             </ngb-progressbar-stacked>
                                         }
                                     </td>
@@ -200,8 +200,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                @for (
-                                        category of packStatsByKey(combinedStats[0].categoriesStands, combinedStats[1].categoriesStands, combinedStats[2].categoriesStands); track $index) {
+                                @for (category of packStatsByKey(combinedStats[0].categoriesStands, combinedStats[1].categoriesStands, combinedStats[2].categoriesStands); track $index) {
                                     <tr>
                                         <td>{{ 'stand.category.list.' + category[0] | translate }}</td>
                                         <td class="text-center">{{ category[1][2] }}</td>
@@ -227,8 +226,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                @for (
-                                        dimension of packStatsByKey(combinedStats[0].dimensionStands, combinedStats[1].dimensionStands, combinedStats[2].dimensionStands); track $index) {
+                                @for (dimension of packStatsByKey(combinedStats[0].dimensionStands, combinedStats[1].dimensionStands, combinedStats[2].dimensionStands); track $index) {
                                     <tr>
                                         <td>{{ dimension[0] }}</td>
                                         <td class="text-center">{{ dimension[1][2] }}</td>
@@ -248,8 +246,11 @@
         </div>
         <div appCardBody>
             <div class="row mt-4">
-                <div class="col-9"><input type="file" id="fileUpload" (change)="onFileSelected($event)" #fileInput/></div>
-                <div class="col-3 text-end"><button-box translateKey="common.import" (clickedEvent)="importFile()" [isSubmit]="true"/></div>
+                <div class="col-9"><input #fileInput (change)="onFileSelected($event)" id="fileUpload" type="file"/>
+                </div>
+                <div class="col-3 text-end">
+                    <button-box (clickedEvent)="importFile()" [isSubmit]="true" translateKey="common.import"/>
+                </div>
             </div>
         </div>
     </app-card>

@@ -5,22 +5,22 @@
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
+                    [showText]="false"
                     faIcon="arrow-left"
-                    translateKey="common.back"
-                    [showText]="false"/>
+                    translateKey="common.back"/>
         <button-box (clickedEvent)="refresh()"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
                     [isDisabled]="isLoading"
+                    [showText]="false"
                     faIcon="sync"
-                    [showText]="false"
                     translateKey="common.refresh"/>
-        <button-box [modeLink]="true"
+        <button-box [isDisabled]="isLoading"
                     [links]="['./new']"
-                    [isDisabled]="isLoading"
+                    [modeLink]="true"
                     [showText]="false"
-                    type="success"
                     faIcon="plus"
-                    translateKey="common.create"/>
+                    translateKey="common.create"
+                    type="success"/>
     </div>
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
@@ -30,23 +30,25 @@
         <div appCardBody>
             <div class="row">
                 <p-table #dt2
-                         [value]="participations"
-                         dataKey="id"
-                         [rows]="10"
-                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [globalFilterFields]="['exhibitor.fullName', 'therapistName']"
                          [loading]="isLoading"
                          [paginator]="true"
-                         [globalFilterFields]="['exhibitor.fullName', 'therapistName']"
-                         sortField="registrationDate"
+                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [rows]="10"
                          [sortOrder]="-1"
-                         [tableStyle]="{ 'min-width': '75rem' }">
+                         [tableStyle]="{ 'min-width': '75rem' }"
+                         [value]="participations"
+                         dataKey="id"
+                         sortField="registrationDate">
                     <ng-template #caption>
                         <div class="flex">
-                            <p-iconfield iconPosition="left" class="ml-auto">
+                            <p-iconfield class="ml-auto" iconPosition="left">
                                 <p-inputicon>
                                     <i class="pi pi-search"></i>
                                 </p-inputicon>
-                                <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Recherche" />
+                                <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
+                                       placeholder="Recherche"
+                                       type="text"/>
                             </p-iconfield>
                         </div>
                     </ng-template>
@@ -60,20 +62,23 @@
                             </th>
                             <th pSortableColumn="registrationDate">{{ 'participation.registrationDate' | translate }}
                                 <p-sortIcon field="registrationDate"/>
-                                <p-columnFilter type="date"
+                                <p-columnFilter display="menu"
                                                 field="registrationDate"
                                                 matchMode="dateAfter"
-                                                display="menu"></p-columnFilter>
+                                                type="date"></p-columnFilter>
                             </th>
                             <th pSortableColumn="status">{{ 'participation.status.label' | translate }}
                                 <p-sortIcon field="status"/>
-                                <p-columnFilter field="status" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
-                                    <ng-template #filter let-value let-filter="filterCallback">
-                                        <p-multiselect [ngModel]="value" [options]="statusValues" (ngModelChange)="filter($event)" style="min-width: 14rem" [panelStyle]="{ minWidth: '16rem' }">
-                                            <ng-template let-option #item>
+                                <p-columnFilter [showAddButton]="false" [showMatchModes]="false" [showOperator]="false" display="menu"
+                                                field="status" matchMode="in">
+                                    <ng-template #filter let-filter="filterCallback" let-value>
+                                        <p-multiselect (ngModelChange)="filter($event)" [ngModel]="value"
+                                                       [options]="statusValues" [panelStyle]="{ minWidth: '16rem' }"
+                                                       style="min-width: 14rem">
+                                            <ng-template #item let-option>
                                                 <div class="flex items-center gap-2">
-                                                    <fa-icon [icon]="option | status"
-                                                             [class]="option | colorStatus"
+                                                    <fa-icon [class]="option | colorStatus"
+                                                             [icon]="option | status"
                                                              [title]="'participation.status.list.' + option | translate"></fa-icon>
                                                     <span>{{ 'participation.status.list.' + option | translate }}</span>
                                                 </div>
@@ -89,55 +94,56 @@
                     </ng-template>
                     <ng-template #body let-participation>
                         <tr>
-                            <td class="clickable truncate-medium" [routerLink]="['./', participation.id, 'view']">
+                            <td [routerLink]="['./', participation.id, 'view']" class="clickable truncate-medium">
                                 @if (participation.exhibitor) {
                                     <div class="d-flex gap-1">
-                                        <a [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']"
-                                           (click)="$event.stopPropagation()">
+                                        <a (click)="$event.stopPropagation()"
+                                           [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']">
                                             {{ participation.exhibitor.fullName }}
                                         </a>
                                         @if (participation.exhibitor.redFlag) {
-                                            <fa-icon icon="flag"
-                                                     [title]="'exhibitor.redFlag' | translate"
-                                                     class="text-danger"></fa-icon>
+                                            <fa-icon [title]="'exhibitor.redFlag' | translate"
+                                                     class="text-danger"
+                                                     icon="flag"></fa-icon>
                                         }
                                         @if (participation.exhibitor.duplicateDetected) {
-                                            <fa-icon icon="triangle-exclamation"
-                                                     [title]="'exhibitor.duplicateDetected' | translate"
-                                                     class="text-warning"></fa-icon>
+                                            <fa-icon [title]="'exhibitor.duplicateDetected' | translate"
+                                                     class="text-warning"
+                                                     icon="triangle-exclamation"></fa-icon>
                                         }
                                     </div>
                                 }
                             </td>
-                            <td class="clickable truncate" [routerLink]="['./', participation.id, 'view']">
+                            <td [routerLink]="['./', participation.id, 'view']" class="clickable truncate">
                                 {{ participation.therapistName }}
                             </td>
-                            <td class="clickable truncate-small" [routerLink]="['./', participation.id, 'view']">
+                            <td [routerLink]="['./', participation.id, 'view']" class="clickable truncate-small">
                                 {{ participation.registrationDate | formatMediumDate }}
                             </td>
-                            <td class="clickable" [routerLink]="['./', participation.id, 'view']">
-                                <fa-icon [icon]="participation.status | status"
-                                         [class]="participation.status | colorStatus"
+                            <td [routerLink]="['./', participation.id, 'view']" class="clickable">
+                                <fa-icon [class]="participation.status | colorStatus"
+                                         [icon]="participation.status | status"
                                          [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
                             </td>
-                            <td class="clickable" [routerLink]="['./', participation.id, 'view']">
+                            <td [routerLink]="['./', participation.id, 'view']" class="clickable">
                                 @if (participation.crushOfHeart) {
-                                    <fa-icon icon="heart" class="text-danger"></fa-icon>
+                                    <fa-icon class="text-danger" icon="heart"></fa-icon>
                                 }
                                 @if (participation.guestOfHonor) {
-                                    <fa-icon icon="star" class="golden-icon"></fa-icon>
+                                    <fa-icon class="golden-icon" icon="star"></fa-icon>
                                 }
                                 @if (participation.extraInformation) {
-                                    <fa-icon icon="note-sticky" class="text-warning" [title]="participation.extraInformation"/>
+                                    <fa-icon [title]="participation.extraInformation" class="text-warning"
+                                             icon="note-sticky"/>
                                 }
                                 @if (participation.needArrangement) {
-                                    <fa-icon icon="handshake-simple" class="text-primary"></fa-icon>
+                                    <fa-icon class="text-primary" icon="handshake-simple"></fa-icon>
                                 }
                                 @if (participation.hasOffer) {
-                                    <fa-icon icon="gift" [title]="participation.offer" class="text-primary"></fa-icon>
+                                    <fa-icon [title]="participation.offer" class="text-primary" icon="gift"></fa-icon>
                                 }
                             </td>
-                            <td class="clickable" [routerLink]="['./', participation.id, 'view']">
+                            <td [routerLink]="['./', participation.id, 'view']" class="clickable">
                                 @let infoInvoice = getInfoInvoice(participation.id);
                                 @if (infoInvoice) {
                                     <div class="d-flex flex-wrap gap-2">
@@ -145,54 +151,55 @@
                                             <p-overlay-badge [value]="infoInvoice.nbDraft"
                                                              class="p-badge-xs"
                                                              severity="success">
-                                                <fa-icon icon="sheet-plastic"
-                                                         [title]="'invoicingPlan.drafts' | translate"
-                                                         class="text-success"></fa-icon>
+                                                <fa-icon [title]="'invoicingPlan.drafts' | translate"
+                                                         class="text-success"
+                                                         icon="sheet-plastic"></fa-icon>
                                             </p-overlay-badge>
                                         } @else if (infoInvoice.nbDraft == 1) {
-                                            <fa-icon icon="sheet-plastic"
-                                                     [title]="'invoicingPlan.drafts' | translate"
-                                                     class="text-success"></fa-icon>
+                                            <fa-icon [title]="'invoicingPlan.drafts' | translate"
+                                                     class="text-success"
+                                                     icon="sheet-plastic"></fa-icon>
                                         }
 
                                         @if (infoInvoice.nbIssued > 1) {
-                                            <p-overlay-badge [value]="infoInvoice.nbIssued" class="p-badge-xs" severity="info">
-                                                <fa-icon icon="file-import"
-                                                         [title]="'invoicingPlan.waitingPayments' | translate"
-                                                         class="text-info"></fa-icon>
+                                            <p-overlay-badge [value]="infoInvoice.nbIssued" class="p-badge-xs"
+                                                             severity="info">
+                                                <fa-icon [title]="'invoicingPlan.waitingPayments' | translate"
+                                                         class="text-info"
+                                                         icon="file-import"></fa-icon>
                                             </p-overlay-badge>
                                         } @else if (infoInvoice.nbIssued == 1) {
-                                            <fa-icon icon="file-import"
-                                                     [title]="'invoicingPlan.waitingPayments' | translate"
-                                                     class="text-info"></fa-icon>
+                                            <fa-icon [title]="'invoicingPlan.waitingPayments' | translate"
+                                                     class="text-info"
+                                                     icon="file-import"></fa-icon>
                                         }
 
                                         @if (infoInvoice.nbPaid > 1) {
                                             <p-overlay-badge [value]="infoInvoice.nbPaid"
                                                              class="p-badge-xs"
                                                              severity="contrast">
-                                                <fa-icon icon="file-circle-check"
-                                                         [title]="'invoicingPlan.paids' | translate"
-                                                         class="text-primary"></fa-icon>
+                                                <fa-icon [title]="'invoicingPlan.paids' | translate"
+                                                         class="text-primary"
+                                                         icon="file-circle-check"></fa-icon>
                                             </p-overlay-badge>
                                         } @else if (infoInvoice.nbPaid == 1) {
-                                            <fa-icon icon="file-circle-check"
-                                                     [title]="'invoicingPlan.paids' | translate"
-                                                     class="text-primary"></fa-icon>
+                                            <fa-icon [title]="'invoicingPlan.paids' | translate"
+                                                     class="text-primary"
+                                                     icon="file-circle-check"></fa-icon>
                                         }
 
                                         @if (infoInvoice.nbExpired > 1) {
                                             <p-overlay-badge [value]="infoInvoice.nbExpired"
                                                              class="p-badge-xs"
                                                              severity="danger">
-                                                <fa-icon icon="clock"
-                                                         [title]="'invoicingPlan.expirations' | translate"
-                                                         class="text-danger"></fa-icon>
+                                                <fa-icon [title]="'invoicingPlan.expirations' | translate"
+                                                         class="text-danger"
+                                                         icon="clock"></fa-icon>
                                             </p-overlay-badge>
                                         } @else if (infoInvoice.nbExpired == 1) {
-                                            <fa-icon icon="clock"
-                                                     [title]="'invoicingPlan.expirations' | translate"
-                                                     class="text-danger"></fa-icon>
+                                            <fa-icon [title]="'invoicingPlan.expirations' | translate"
+                                                     class="text-danger"
+                                                     icon="clock"></fa-icon>
                                         }
                                     </div>
                                 }
@@ -200,10 +207,10 @@
                             <td class="text-end">
                                 <div class="btn-group">
                                     <button-box (clickedEvent)="delete($event, participation)"
-                                                type="danger"
                                                 [showText]="false"
+                                                faIcon="times"
                                                 translateKey="common.delete"
-                                                faIcon="times"/>
+                                                type="danger"/>
                                 </div>
                             </td>
                         </tr>
@@ -223,7 +230,7 @@
         </div>
         <div appCardBody>
             @if (start && end) {
-                <timeline-dot [points]="points" [startDate]="start" [endDate]="end"/>
+                <timeline-dot [endDate]="end" [points]="points" [startDate]="start"/>
             }
         </div>
     </app-card>

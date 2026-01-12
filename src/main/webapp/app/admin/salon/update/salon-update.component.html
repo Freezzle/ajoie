@@ -11,23 +11,23 @@
         <div appMenuBarEnd>
             <button-box (clickedEvent)="previousState()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="arrow-left"
-                        translateKey="common.back"
-                        [showText]="false"/>
+                        translateKey="common.back"/>
             @if (isReadOnly) {
                 <button-box (clickedEvent)="activateEditMode()"
                             [isDisabled]="isLoading"
+                            [showText]="false"
                             faIcon="pencil-alt"
-                            translateKey="common.edit"
-                            [showText]="false"/>
+                            translateKey="common.edit"/>
             }
 
             @if (editForm.controls.id.value && !isReadOnly) {
                 <button-box (clickedEvent)="activateReadOnlyMode()"
                             [isDisabled]="isLoading"
+                            [showText]="false"
                             faIcon="ban"
                             translateKey="common.cancel"
-                            [showText]="false"
                             type="secondary"/>
             }
 
@@ -35,9 +35,9 @@
                 <button-box (clickedEvent)="save()"
                             [isDisabled]="editForm.invalid || isLoading"
                             [isSubmit]="true"
+                            [showText]="false"
                             faIcon="floppy-disk"
-                            translateKey="common.save"
-                            [showText]="false"/>
+                            translateKey="common.save"/>
             }
         </div>
         <app-alert-error></app-alert-error>
@@ -130,8 +130,8 @@
             <div appCardBody>
                 <div class="row">
                     <p-table #dt2
-                             [value]="priceStandSalons.controls"
                              [tableStyle]="{ 'min-width': '50rem' }"
+                             [value]="priceStandSalons.controls"
                              class="mt-4">
                         <!-- HEADER -->
                         <ng-template #header>

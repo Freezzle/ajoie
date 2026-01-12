@@ -5,7 +5,7 @@ import {SortState} from './sort-state';
 export class SortService {
     private collator = new Intl.Collator(undefined, {
         numeric: true,
-        sensitivity: 'base',
+        sensitivity: 'base'
     });
 
     public startSort({predicate, order}: Required<SortState>, fallback?: Required<SortState>): (a: any,

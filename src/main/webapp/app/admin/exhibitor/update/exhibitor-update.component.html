@@ -9,23 +9,23 @@
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
+                    [showText]="false"
                     faIcon="arrow-left"
-                    translateKey="common.back"
-                    [showText]="false"/>
+                    translateKey="common.back"/>
         @if (isReadOnly) {
             <button-box (clickedEvent)="edit()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="pencil-alt"
-                        translateKey="common.edit"
-                        [showText]="false"/>
+                        translateKey="common.edit"/>
         }
 
         @if (editForm.controls.id.value && !isReadOnly) {
             <button-box (clickedEvent)="cancel()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="ban"
                         translateKey="common.cancel"
-                        [showText]="false"
                         type="secondary"/>
         }
 
@@ -33,9 +33,9 @@
             <button-box (clickedEvent)="save()"
                         [isDisabled]="editForm.invalid || isLoading"
                         [isSubmit]="true"
+                        [showText]="false"
                         faIcon="floppy-disk"
-                        translateKey="common.save"
-                        [showText]="false"/>
+                        translateKey="common.save"/>
         }
     </div>
     <app-alert-error></app-alert-error>
@@ -86,8 +86,8 @@
                 </div>
                 <div class="mt-4 col-sm-6">
                     <select-box [formatterFunction]="formatterCountry"
-                                [options]="countryService.getAll()"
                                 [needTranslation]="true"
+                                [options]="countryService.getAll()"
                                 fieldName="name"
                                 formControlName="isoCountry"
                                 translateKey="exhibitor.country"/>
@@ -140,35 +140,35 @@
             <div appCardBody>
                 <div class="row">
                     <p-table #dt2
-                             class="mt-2"
-                             [value]="(participations$ | async)!"
-                             dataKey="id"
-                             [rows]="10"
-                             [rowsPerPageOptions]="[10, 25, 50]"
                              [loading]="isLoading"
                              [paginator]="true"
-                             sortField="registrationDate"
-                             [sortOrder]="-1">
+                             [rowsPerPageOptions]="[10, 25, 50]"
+                             [rows]="10"
+                             [sortOrder]="-1"
+                             [value]="(participations$ | async)!"
+                             class="mt-2"
+                             dataKey="id"
+                             sortField="registrationDate">
                         <ng-template #header>
                             <tr>
                                 <th pSortableColumn="place">{{ 'salon.place' | translate }}
                                     <p-sortIcon field="place"/>
-                                    <p-columnFilter type="text"
+                                    <p-columnFilter display="menu"
                                                     field="place"
                                                     matchMode="contains"
-                                                    display="menu"></p-columnFilter>
+                                                    type="text"></p-columnFilter>
                                 </th>
                                 <th>{{ 'participation.status.label' | translate }}</th>
                             </tr>
                         </ng-template>
                         <ng-template #body let-participation>
                             <tr>
-                                <td class="clickable truncate-medium"
-                                    [routerLink]="['/admin',  'salons',  participation.salon.id,  'participations',  participation.id,  'view']">{{ participation.salon.place }}
+                                <td [routerLink]="['/admin',  'salons',  participation.salon.id,  'participations',  participation.id,  'view']"
+                                    class="clickable truncate-medium">{{ participation.salon.place }}
                                 </td>
                                 <td class="clickable">
-                                    <fa-icon [icon]="participation.status | status"
-                                             [class]="participation.status | colorStatus"
+                                    <fa-icon [class]="participation.status | colorStatus"
+                                             [icon]="participation.status | status"
                                              [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
                                 </td>
                             </tr>

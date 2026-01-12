@@ -3,8 +3,8 @@
         <p-inputnumber [formControl]="control"
                        [inputId]="'field_' + fieldName"
                        [invalid]="control.invalid && control.touched"
-                       mode="currency" currency="CHF" locale="en-US"
-                       fluid
+                       currency="CHF" fluid locale="en-US"
+                       mode="currency"
         ></p-inputnumber>
         <label [for]="'field_' + fieldName">{{ translateKey | translate }}
             @if (control.hasValidator(Validators.required)) {
@@ -17,8 +17,8 @@
         <p-inputnumber [formControl]="control"
                        [inputId]="'field_' + fieldName"
                        [invalid]="control.invalid && control.touched"
-                       mode="currency" currency="CHF" locale="en-US"
-                       fluid
+                       currency="CHF" fluid locale="en-US"
+                       mode="currency"
         ></p-inputnumber>
     </p-float-label>
 }

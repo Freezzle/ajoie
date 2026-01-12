@@ -20,7 +20,7 @@ const exhibitorResolve = (route: ActivatedRouteSnapshot): Observable<null | IExh
                         inject(Router).navigate(['404']);
                         return EMPTY;
                     }
-                }),
+                })
             );
     }
     return of(null);

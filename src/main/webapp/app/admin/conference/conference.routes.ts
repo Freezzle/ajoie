@@ -10,41 +10,41 @@ const conferenceRoute: Routes = [
         path: ':idConference/view',
         component: ConferenceUpdateComponent,
         resolve: {
-            conference: ConferenceResolve,
+            conference: ConferenceResolve
         },
         data: {
-            readonly: true,
+            readonly: true
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: 'new',
         component: ConferenceUpdateComponent,
         resolve: {
-            conference: ConferenceResolve,
+            conference: ConferenceResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idConference/edit',
         component: ConferenceUpdateComponent,
         resolve: {
-            conference: ConferenceResolve,
+            conference: ConferenceResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: '',
         component: ConferenceComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
-    },
+        canActivate: [UserRouteAccessService]
+    }
 ];
 
 export default conferenceRoute;

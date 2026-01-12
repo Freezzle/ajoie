@@ -25,26 +25,26 @@ import {
 } from '../volunteer-planning-model';
 
 @Component({
-    selector: 'volunteer-planning-panel',
-    standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TabsModule,
-        TableModule,
-        ButtonModule,
-        InputTextModule,
-        DatePickerModule,
-        SelectModule,
-        MultiSelectModule,
-        ColorPickerModule,
-        ConfirmDialogModule
-    ],
-    providers: [ConfirmationService],
-    templateUrl: './volunteer-planning-panel.component.html',
-    styleUrls: ['./volunteer-planning-panel.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-})
+               selector: 'volunteer-planning-panel',
+               standalone: true,
+               imports: [
+                   CommonModule,
+                   FormsModule,
+                   TabsModule,
+                   TableModule,
+                   ButtonModule,
+                   InputTextModule,
+                   DatePickerModule,
+                   SelectModule,
+                   MultiSelectModule,
+                   ColorPickerModule,
+                   ConfirmDialogModule
+               ],
+               providers: [ConfirmationService],
+               templateUrl: './volunteer-planning-panel.component.html',
+               styleUrls: ['./volunteer-planning-panel.component.scss'],
+               changeDetection: ChangeDetectionStrategy.OnPush
+           })
 export class VolunteerPlanningPanelComponent {
     intervalOptions: IntervalMinutes[] = [5, 15, 30, 60];
     planning = input.required<Planning>();
@@ -64,7 +64,7 @@ export class VolunteerPlanningPanelComponent {
         {label: 'Times', value: 'pi pi-times'},
         {label: 'Calendar', value: 'pi pi-calendar'},
         {label: 'Users', value: 'pi pi-users'},
-        {label: 'Wrench', value: 'pi pi-wrench'},
+        {label: 'Wrench', value: 'pi pi-wrench'}
     ];
 
     dayOptions = computed(() => this.planning().days.map(d => ({label: d.label, value: d.id})));
@@ -72,13 +72,17 @@ export class VolunteerPlanningPanelComponent {
 
     selectedDay = computed(() => {
         const id = this.selectedDayId();
-        if (!id) return null;
+        if (!id) {
+            return null;
+        }
         return this.planning().days.find(d => d.id === id) ?? null;
     });
 
     assignedVolunteers = computed(() => {
         const day = this.selectedDay();
-        if (!day) return [];
+        if (!day) {
+            return [];
+        }
         const set = new Set(day.assignedVolunteerIds);
         return this.planning().volunteers.filter(v => set.has(v.id));
     });
@@ -86,7 +90,9 @@ export class VolunteerPlanningPanelComponent {
     unassignedVolunteerOptions = computed(() => {
         const day = this.selectedDay();
         const all = this.planning().volunteers;
-        if (!day) return all.map(v => ({label: v.label, value: v.id}));
+        if (!day) {
+            return all.map(v => ({label: v.label, value: v.id}));
+        }
         const assigned = new Set(day.assignedVolunteerIds);
         return all.filter(v => !assigned.has(v.id)).map(v => ({label: v.label, value: v.id}));
     });
@@ -116,7 +122,7 @@ export class VolunteerPlanningPanelComponent {
             startTime: start,
             endTime: end,
             assignedVolunteerIds: [],
-            cells: [],
+            cells: []
         };
 
         this.planningChange.emit({...cur, days: [...cur.days, newDay]});
@@ -141,8 +147,12 @@ export class VolunteerPlanningPanelComponent {
         const label = (labelRaw ?? '').trim();
         const cur = this.planning();
         const idx = cur.days.findIndex(d => d.id === dayId);
-        if (idx < 0) return;
-        if (cur.days[idx].label === label) return;
+        if (idx < 0) {
+            return;
+        }
+        if (cur.days[idx].label === label) {
+            return;
+        }
 
         const days = [...cur.days];
         days[idx] = {...days[idx], label};
@@ -152,14 +162,20 @@ export class VolunteerPlanningPanelComponent {
     updateDayTimes(dayId: string, startTime: Date, endTime: Date) {
         const cur = this.planning();
         const idx = cur.days.findIndex(d => d.id === dayId);
-        if (idx < 0) return;
+        if (idx < 0) {
+            return;
+        }
 
         const s = normalizeTime(startTime);
         const e = normalizeTime(endTime);
-        if (e.getTime() <= s.getTime()) return;
+        if (e.getTime() <= s.getTime()) {
+            return;
+        }
 
         const d = cur.days[idx];
-        if (d.startTime.getTime() === s.getTime() && d.endTime.getTime() === e.getTime()) return;
+        if (d.startTime.getTime() === s.getTime() && d.endTime.getTime() === e.getTime()) {
+            return;
+        }
 
         const days = [...cur.days];
         days[idx] = {...d, startTime: s, endTime: e};
@@ -168,17 +184,17 @@ export class VolunteerPlanningPanelComponent {
 
     confirmDeleteDay(dayId: string, label: string) {
         this.confirm.confirm({
-            message: `Supprimer le jour "${label}" ?`,
-            accept: () => {
-                const cur = this.planning();
-                const days = cur.days.filter(d => d.id !== dayId);
-                this.planningChange.emit({...cur, days});
+                                 message: `Supprimer le jour "${label}" ?`,
+                                 accept: () => {
+                                     const cur = this.planning();
+                                     const days = cur.days.filter(d => d.id !== dayId);
+                                     this.planningChange.emit({...cur, days});
 
-                if (this.selectedDayId() === dayId) {
-                    this.selectedDayId.set(days[0]?.id ?? null);
-                }
-            },
-        });
+                                     if (this.selectedDayId() === dayId) {
+                                         this.selectedDayId.set(days[0]?.id ?? null);
+                                     }
+                                 }
+                             });
     }
 
     // ===================== UPDATE VOLUNTEERS (inline) =====================
@@ -186,8 +202,12 @@ export class VolunteerPlanningPanelComponent {
         const label = (labelRaw ?? '').trim();
         const cur = this.planning();
         const idx = cur.volunteers.findIndex(v => v.id === volunteerId);
-        if (idx < 0) return;
-        if (cur.volunteers[idx].label === label) return;
+        if (idx < 0) {
+            return;
+        }
+        if (cur.volunteers[idx].label === label) {
+            return;
+        }
 
         const volunteers = [...cur.volunteers];
         volunteers[idx] = {...volunteers[idx], label};
@@ -196,38 +216,44 @@ export class VolunteerPlanningPanelComponent {
 
     confirmDeleteVolunteer(volunteerId: string, label: string) {
         this.confirm.confirm({
-            message: `Supprimer le bénévole "${label}" ?\n\nSes affectations et ses cellules seront aussi supprimées.`,
-            accept: () => {
-                const cur = this.planning();
+                                 message: `Supprimer le bénévole "${label}" ?\n\nSes affectations et ses cellules seront aussi supprimées.`,
+                                 accept: () => {
+                                     const cur = this.planning();
 
-                const volunteers = cur.volunteers.filter(v => v.id !== volunteerId);
+                                     const volunteers = cur.volunteers.filter(v => v.id !== volunteerId);
 
-                const days = cur.days.map(d => ({
-                    ...d,
-                    assignedVolunteerIds: d.assignedVolunteerIds.filter(id => id !== volunteerId),
-                    cells: d.cells.filter(c => c.volunteerId !== volunteerId),
-                }));
+                                     const days = cur.days.map(d => ({
+                                         ...d,
+                                         assignedVolunteerIds: d.assignedVolunteerIds.filter(id => id !== volunteerId),
+                                         cells: d.cells.filter(c => c.volunteerId !== volunteerId)
+                                     }));
 
-                this.planningChange.emit({...cur, volunteers, days});
-            },
-        });
+                                     this.planningChange.emit({...cur, volunteers, days});
+                                 }
+                             });
     }
 
     // ===================== ASSIGN / UNASSIGN =====================
     assignSelectedVolunteers() {
         const day = this.selectedDay();
         const toAdd = this.selectedVolunteerIdsToAssign();
-        if (!day || toAdd.length === 0) return;
+        if (!day || toAdd.length === 0) {
+            return;
+        }
 
         const cur = this.planning();
         const idx = cur.days.findIndex(d => d.id === day.id);
-        if (idx < 0) return;
+        if (idx < 0) {
+            return;
+        }
 
         const days = [...cur.days];
         const d = days[idx];
 
         const set = new Set(d.assignedVolunteerIds);
-        for (const id of toAdd) set.add(id);
+        for (const id of toAdd) {
+            set.add(id);
+        }
 
         days[idx] = {...d, assignedVolunteerIds: [...set]};
         this.planningChange.emit({...cur, days});
@@ -238,7 +264,9 @@ export class VolunteerPlanningPanelComponent {
     unassignVolunteer(dayId: string, volunteerId: string) {
         const cur = this.planning();
         const idx = cur.days.findIndex(d => d.id === dayId);
-        if (idx < 0) return;
+        if (idx < 0) {
+            return;
+        }
 
         const days = [...cur.days];
         const d = days[idx];
@@ -246,7 +274,7 @@ export class VolunteerPlanningPanelComponent {
         days[idx] = {
             ...d,
             assignedVolunteerIds: d.assignedVolunteerIds.filter(id => id !== volunteerId),
-            cells: d.cells.filter(c => c.volunteerId !== volunteerId),
+            cells: d.cells.filter(c => c.volunteerId !== volunteerId)
         };
 
         this.planningChange.emit({...cur, days});
@@ -257,8 +285,12 @@ export class VolunteerPlanningPanelComponent {
         const label = (labelRaw ?? '').trim();
         const cur = this.planning();
         const idx = cur.categories.findIndex(c => c.id === categoryId);
-        if (idx < 0) return;
-        if (cur.categories[idx].label === label) return;
+        if (idx < 0) {
+            return;
+        }
+        if (cur.categories[idx].label === label) {
+            return;
+        }
 
         const categories = [...cur.categories];
         categories[idx] = {...categories[idx], label};
@@ -268,8 +300,12 @@ export class VolunteerPlanningPanelComponent {
     updateCategoryIcon(categoryId: string, icon: string) {
         const cur = this.planning();
         const idx = cur.categories.findIndex(c => c.id === categoryId);
-        if (idx < 0) return;
-        if (cur.categories[idx].icon === icon) return;
+        if (idx < 0) {
+            return;
+        }
+        if (cur.categories[idx].icon === icon) {
+            return;
+        }
 
         const categories = [...cur.categories];
         categories[idx] = {...categories[idx], icon};
@@ -284,7 +320,7 @@ export class VolunteerPlanningPanelComponent {
             const slotsCount = computeTimeSlots(d.startTime, d.endTime, interval).length;
             return {
                 ...d,
-                cells: d.cells.filter(c => c.slotIndex >= 0 && c.slotIndex < slotsCount),
+                cells: d.cells.filter(c => c.slotIndex >= 0 && c.slotIndex < slotsCount)
             };
         });
 
@@ -293,12 +329,18 @@ export class VolunteerPlanningPanelComponent {
 
     updateCategoryColor(categoryId: string, colorRaw: string) {
         const color = normalizeHex(colorRaw);
-        if (!color) return;
+        if (!color) {
+            return;
+        }
 
         const cur = this.planning();
         const idx = cur.categories.findIndex(c => c.id === categoryId);
-        if (idx < 0) return;
-        if (cur.categories[idx].color === color) return;
+        if (idx < 0) {
+            return;
+        }
+        if (cur.categories[idx].color === color) {
+            return;
+        }
 
         const categories = [...cur.categories];
         categories[idx] = {...categories[idx], color};
@@ -307,19 +349,19 @@ export class VolunteerPlanningPanelComponent {
 
     confirmDeleteCategory(categoryId: string, label: string) {
         this.confirm.confirm({
-            message: `Supprimer la catégorie "${label}" ?\n\nLes cellules qui l'utilisent seront nettoyées.`,
-            accept: () => {
-                const cur = this.planning();
+                                 message: `Supprimer la catégorie "${label}" ?\n\nLes cellules qui l'utilisent seront nettoyées.`,
+                                 accept: () => {
+                                     const cur = this.planning();
 
-                const categories = cur.categories.filter(c => c.id !== categoryId);
+                                     const categories = cur.categories.filter(c => c.id !== categoryId);
 
-                const days = cur.days.map(d => ({
-                    ...d,
-                    cells: d.cells.filter(cell => cell.categoryId !== categoryId),
-                }));
+                                     const days = cur.days.map(d => ({
+                                         ...d,
+                                         cells: d.cells.filter(cell => cell.categoryId !== categoryId),
+                                     }));
 
-                this.planningChange.emit({...cur, categories, days});
-            },
-        });
+                                     this.planningChange.emit({...cur, categories, days});
+                                 },
+                             });
     }
 }

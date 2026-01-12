@@ -7,7 +7,7 @@ const passwordRoute: Route = {
     path: 'password',
     component: PasswordComponent,
     title: 'global.menu.account.password',
-    canActivate: [UserRouteAccessService],
+    canActivate: [UserRouteAccessService]
 };
 
 export default passwordRoute;

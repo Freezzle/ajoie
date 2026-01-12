@@ -1,13 +1,13 @@
 <div class="row">
-    <div class="col-12" *ngIf="day() as day; else missing">
+    <div *ngIf="day() as day; else missing" class="col-12">
         <div class="mt-3">
             <label>Libellé</label>
             <input
-                    pInputText
-                    fluid="true"
-                    [ngModel]="dayLabel(day)"
-                    (ngModelChange)="setDayLabelDraft(day.id, $event)"
                     (blur)="commitDayLabel(day.id)"
+                    (ngModelChange)="setDayLabelDraft(day.id, $event)"
+                    [ngModel]="dayLabel(day)"
+                    fluid="true"
+                    pInputText
             />
         </div>
 
@@ -15,7 +15,7 @@
 
         <h4>Affectations</h4>
         <div class="mt-4">
-            <p-table [value]="selectedDayRoomRows()" [rowTrackBy]="trackByRoomId" [rowHover]="true">
+            <p-table [rowHover]="true" [rowTrackBy]="trackByRoomId" [value]="selectedDayRoomRows()">
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Salle</th>
@@ -25,39 +25,39 @@
                     </tr>
                 </ng-template>
 
-                <ng-template pTemplate="body" let-row>
+                <ng-template let-row pTemplate="body">
                     <tr>
                         <td>{{ row.roomLabel }}</td>
 
                         <td>
                             <p-datepicker
-                                    [ngModel]="row.startingHour"
                                     (ngModelChange)="updateRoomTime(row.roomId, $event, row.endingHour)"
+                                    [appendTo]="'body'"
+                                    [ngModel]="row.startingHour"
+                                    [showIcon]="true"
                                     [showTime]="true"
                                     [timeOnly]="true"
                                     hourFormat="24"
-                                    [appendTo]="'body'"
-                                    [showIcon]="true"
                             ></p-datepicker>
                         </td>
 
                         <td>
                             <p-datepicker
-                                    [ngModel]="row.endingHour"
                                     (ngModelChange)="updateRoomTime(row.roomId, row.startingHour, $event)"
+                                    [appendTo]="'body'"
+                                    [ngModel]="row.endingHour"
+                                    [showIcon]="true"
                                     [showTime]="true"
                                     [timeOnly]="true"
                                     hourFormat="24"
-                                    [appendTo]="'body'"
-                                    [showIcon]="true"
                             ></p-datepicker>
                         </td>
 
                         <td>
                             <button
-                                    pButton type="button" icon="pi pi-trash"
-                                    class="p-button-text p-button-danger"
-                                    (click)="removeRoomFromDay(row.roomId)"
+                                    (click)="removeRoomFromDay(row.roomId)" class="p-button-text p-button-danger" icon="pi pi-trash"
+                                    pButton
+                                    type="button"
                             ></button>
                         </td>
                     </tr>
@@ -67,37 +67,38 @@
                     <tr>
                         <td>
                             <p-select
+                                    [formControl]="addRoomToDayForm.controls.roomId"
                                     [options]="availableRoomsForDay()"
+                                    appendTo="body"
+                                    fluid="true"
                                     optionLabel="label"
                                     optionValue="id"
-                                    [formControl]="addRoomToDayForm.controls.roomId"
-                                    fluid="true"
-                                    appendTo="body"
                                     placeholder="Choisir une salle"
                             ></p-select>
                         </td>
                         <td>
                             <p-datepicker
+                                    [appendTo]="'body'"
                                     [formControl]="addRoomToDayForm.controls.startingHour"
+                                    [showIcon]="true"
                                     [showTime]="true"
                                     [timeOnly]="true"
                                     hourFormat="24"
-                                    [showIcon]="true"
-                                    [appendTo]="'body'"
                             ></p-datepicker>
                         </td>
                         <td>
                             <p-datepicker
+                                    [appendTo]="'body'"
                                     [formControl]="addRoomToDayForm.controls.endingHour"
+                                    [showIcon]="true"
                                     [showTime]="true"
                                     [timeOnly]="true"
                                     hourFormat="24"
-                                    [showIcon]="true"
-                                    [appendTo]="'body'"
                             ></p-datepicker>
                         </td>
                         <td>
-                            <button pButton type="button" size="small" icon="pi pi-plus" label="Attribuer" (click)="addRoomToDay()"></button>
+                            <button (click)="addRoomToDay()" icon="pi pi-plus" label="Attribuer" pButton size="small"
+                                    type="button"></button>
                         </td>
                     </tr>
                 </ng-template>

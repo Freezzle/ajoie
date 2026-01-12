@@ -15,8 +15,8 @@ export interface FileLoadError {
  * An utility service for data.
  */
 @Injectable({
-    providedIn: 'root',
-})
+                providedIn: 'root'
+            })
 export class DataUtils {
     /**
      * Method to find the byte size of the string provides
@@ -38,7 +38,7 @@ export class DataUtils {
         }
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], {
-            type: contentType,
+            type: contentType
         });
         const fileURL = window.URL.createObjectURL(blob);
         const win = window.open(fileURL);
@@ -67,16 +67,16 @@ export class DataUtils {
                     const error: FileLoadError = {
                         message: `File was expected to be an image but was found to be '${file.type}'`,
                         key: 'not.image',
-                        params: {fileType: file.type},
+                        params: {fileType: file.type}
                     };
                     observer.error(error);
                 } else {
                     const fieldContentType: string = field + 'ContentType';
                     this.toBase64(file, (base64Data: string) => {
                         editForm.patchValue({
-                            [field]: base64Data,
-                            [fieldContentType]: file.type,
-                        });
+                                                [field]: base64Data,
+                                                [fieldContentType]: file.type
+                                            });
                         observer.next();
                         observer.complete();
                     });
@@ -85,7 +85,7 @@ export class DataUtils {
                 const error: FileLoadError = {
                     message: 'Could not extract file',
                     key: 'could.not.extract',
-                    params: {event},
+                    params: {event}
                 };
                 observer.error(error);
             }

@@ -1,20 +1,20 @@
-import {Component, input, model, output, TemplateRef} from '@angular/core';
-import {Dialog} from "primeng/dialog";
-import {ButtonDirective} from "primeng/button";
-import {PrimeTemplate} from "primeng/api";
+import {Component, input, model, output} from '@angular/core';
+import {Dialog} from 'primeng/dialog';
+import {ButtonDirective} from 'primeng/button';
+import {PrimeTemplate} from 'primeng/api';
 
 export type AppDialogMode = 'view' | 'edit';
 
 @Component({
-    selector: 'dialog-box',
-    imports: [
-        Dialog,
-        ButtonDirective,
-        PrimeTemplate
-    ],
-    templateUrl: './dialog-box.component.html',
-    styleUrl: './dialog-box.component.scss',
-})
+               selector: 'dialog-box',
+               imports: [
+                   Dialog,
+                   ButtonDirective,
+                   PrimeTemplate
+               ],
+               templateUrl: './dialog-box.component.html',
+               styleUrl: './dialog-box.component.scss'
+           })
 export class DialogBoxComponent {
     // Dialog purpose
     visible = model<boolean>(false);

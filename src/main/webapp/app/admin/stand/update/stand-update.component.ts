@@ -20,62 +20,66 @@ import {TextBoxComponent} from '../../../shared/components/text-box/text-box.com
 import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
-import {LinkBoxComponent} from "../../../shared/components/link-box/link-box.component";
-import {SalonService} from "../../salon/service/salon.service";
+import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
+import {SalonService} from '../../salon/service/salon.service';
 import {
     formatterDimensionStand,
     IPriceStandSalon,
     selectFilterDimension,
     sortPriceStandSalon
-} from "../../salon/model/price-stand-salon.interface";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {ChipsBoxComponent} from "../../../shared/components/chips-box/chips-box.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+} from '../../salon/model/price-stand-salon.interface';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {ChipsBoxComponent} from '../../../shared/components/chips-box/chips-box.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 
 @Component({
-    selector: 'app-stand-update',
-    templateUrl: './stand-update.component.html',
-    imports: [
-        SharedModule,
-        FormsModule,
-        ReactiveFormsModule,
-        ButtonBoxComponent,
-        TextareaBoxComponent,
-        TextBoxComponent,
-        NumberBoxComponent,
-        SelectBoxComponent,
-        CheckboxBoxComponent,
-        LinkBoxComponent,
-        AlertComponent,
-        AlertErrorComponent,
-        ConfirmPopup,
-        Toast,
-        ChipsBoxComponent,
-        CardComponent,
-        ContentPageComponent,
-    ]
-})
+               selector: 'app-stand-update',
+               templateUrl: './stand-update.component.html',
+               imports: [
+                   SharedModule,
+                   FormsModule,
+                   ReactiveFormsModule,
+                   ButtonBoxComponent,
+                   TextareaBoxComponent,
+                   TextBoxComponent,
+                   NumberBoxComponent,
+                   SelectBoxComponent,
+                   CheckboxBoxComponent,
+                   LinkBoxComponent,
+                   AlertComponent,
+                   AlertErrorComponent,
+                   ConfirmPopup,
+                   Toast,
+                   ChipsBoxComponent,
+                   CardComponent,
+                   ContentPageComponent
+               ]
+           })
 export class StandUpdateComponent implements OnInit {
-    protected salonService = inject(SalonService);
-    protected standService = inject(StandService);
-    protected standFormService = inject(StandFormService);
-    protected participationService = inject(ParticipationService);
-    protected activatedRoute = inject(ActivatedRoute);
-
     isLoading = false;
     isReadOnly = false;
     eventId!: string;
-
     initialStand: IStand | null = null;
     statusValues = Object.keys(Status);
     categoryValues = Object.keys(Category);
     participationsOptions: IParticipation[] = [];
     dimensionsOptions: IPriceStandSalon[] = [];
+    protected salonService = inject(SalonService);
+    protected standService = inject(StandService);
+    protected standFormService = inject(StandFormService);
     editForm: FormGroup<StandFormGroup> = this.standFormService.createStandFormGroup(null);
+    protected participationService = inject(ParticipationService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected readonly formatterParticipation = formatterParticipation;
+    protected readonly formatterDimensionStand = formatterDimensionStand;
+    protected readonly formatterStatus = formatterStatus;
+    protected readonly formatterCategory = formatterCategory;
+    protected readonly selectFilterDimension = selectFilterDimension;
+    protected readonly selectFilterParticipation = selectFilterParticipation;
 
     ngOnInit(): void {
         const data = this.activatedRoute.snapshot.data;
@@ -120,8 +124,8 @@ export class StandUpdateComponent implements OnInit {
 
         const stand = this.standFormService.getStand(this.editForm);
         const saveOperation = stand.id != null
-            ? this.standService.update(stand)
-            : this.standService.create(stand);
+                              ? this.standService.update(stand)
+                              : this.standService.create(stand);
 
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
@@ -135,7 +139,7 @@ export class StandUpdateComponent implements OnInit {
                     map((participations) => {
                         if (participationId) {
                             this.editForm.get('participation')?.setValue(
-                                participations.find((p) => p.id === participationId) ?? null,
+                                participations.find((p) => p.id === participationId) ?? null
                             );
                         }
                         return participations;
@@ -155,11 +159,4 @@ export class StandUpdateComponent implements OnInit {
                 this.dimensionsOptions = dimensions;
             });
     }
-
-    protected readonly formatterParticipation = formatterParticipation;
-    protected readonly formatterDimensionStand = formatterDimensionStand;
-    protected readonly formatterStatus = formatterStatus;
-    protected readonly formatterCategory = formatterCategory;
-    protected readonly selectFilterDimension = selectFilterDimension;
-    protected readonly selectFilterParticipation = selectFilterParticipation;
 }

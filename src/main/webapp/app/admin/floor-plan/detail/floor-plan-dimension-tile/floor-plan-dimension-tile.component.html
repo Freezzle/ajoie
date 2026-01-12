@@ -1,18 +1,18 @@
-<div class="dimension-tile no-selection"
-     [ngClass]="[variant, dragging ? 'dragging' : '']"
-     cdkDrag
-     [cdkDragDisabled]="dragDisabled"
-     [cdkDragData]="dragData ?? dimension"
-     (cdkDragStarted)="dragStarted.emit($event)"
+<div (cdkDragEnded)="dragEnded.emit($event)"
      (cdkDragMoved)="dragMoved.emit($event)"
-     (cdkDragEnded)="dragEnded.emit($event)"
+     (cdkDragStarted)="dragStarted.emit($event)"
+     [cdkDragData]="dragData ?? dimension"
+     [cdkDragDisabled]="dragDisabled"
      [cdkDragStartDelay]="150"
+     [ngClass]="[variant, dragging ? 'dragging' : '']"
      [style.background-color]="dimension.color"
+     [style.cursor]="cursor"
      [style.height.px]="dimension.rows * pixels"
      [style.width.px]="dimension.cols * pixels"
-     [style.cursor]="cursor">
+     cdkDrag
+     class="dimension-tile no-selection">
     <!-- handle pleine surface -->
-    <div class="handle" cdkDragHandle>
+    <div cdkDragHandle class="handle">
         <div class="shape-inside">
             @if (!displayTechnical) {
                 <div class="business-info">
@@ -35,9 +35,9 @@
                 <div class="technical-header">
                     <div class="technical-info-item gap-1 justify-content-start ps-1">
                         @if (displaySensibleInformation() && dimension.stand?.participation; as participation) {
-                            <fa-icon [title]="'participation.status.list.' + participation.status | translate"
+                            <fa-icon [class]="participation.status | colorStatus"
                                      [icon]="participation.status | status"
-                                     [class]="participation.status | colorStatus"></fa-icon>
+                                     [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
                         }
                         @if (displaySensibleInformation() && dimension.stand && dimension.stand.dimension.id !== dimension.idDimension) {
                             <fa-icon [title]="'floorPlan.differentDimension' | translate"
@@ -67,27 +67,27 @@
 
                     @if (dimension.stand; as stand) {
                         @if (stand.needElectricity) {
-                            <div class="technical-info-item" [title]="'stand.needElectricity' | translate">
+                            <div [title]="'stand.needElectricity' | translate" class="technical-info-item">
                                 <fa-icon class="icon-warning-active" icon="bolt-lightning"></fa-icon>
                             </div>
                         }
 
                         @if (stand.nbChair > 0) {
-                            <div class="technical-info-item" [title]="'stand.nbChair' | translate">
+                            <div [title]="'stand.nbChair' | translate" class="technical-info-item">
                                 {{ stand.nbChair }}
                                 <fa-icon class="icon-active" icon="chair"></fa-icon>
                             </div>
                         }
 
                         @if (stand.nbTable > 0) {
-                            <div class="technical-info-item" [title]="'stand.nbTable' | translate">
+                            <div [title]="'stand.nbTable' | translate" class="technical-info-item">
                                 {{ stand.nbTable }}
                                 <fa-icon class="icon-active" icon="cube"></fa-icon>
                             </div>
                         }
 
                         @if (stand.shared) {
-                            <div class="technical-info-item" [title]="'stand.shared' | translate">
+                            <div [title]="'stand.shared' | translate" class="technical-info-item">
                                 <fa-icon class="icon-active" icon="people-arrows"></fa-icon>
                             </div>
                         }

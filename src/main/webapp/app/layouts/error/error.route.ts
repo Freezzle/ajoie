@@ -6,26 +6,26 @@ export const errorRoute: Routes = [
     {
         path: 'error',
         component: ErrorComponent,
-        title: 'error.title',
+        title: 'error.title'
     },
     {
         path: 'accessdenied',
         component: ErrorComponent,
         data: {
-            errorMessage: 'error.http.403',
+            errorMessage: 'error.http.403'
         },
-        title: 'error.title',
+        title: 'error.title'
     },
     {
         path: '404',
         component: ErrorComponent,
         data: {
-            errorMessage: 'error.http.404',
+            errorMessage: 'error.http.404'
         },
-        title: 'error.title',
+        title: 'error.title'
     },
     {
         path: '**',
-        redirectTo: '/404',
-    },
+        redirectTo: '/404'
+    }
 ];

@@ -1,13 +1,13 @@
 <p-menu #menu
-        [popup]="true"
+        [appendTo]="appendTo"
         [model]="items"
-        [appendTo]="appendTo"/>
+        [popup]="true"/>
 
 <p-button (onClick)="menu.toggle($event)"
-          [disabled]="buttonDisabled"
           [attr.title]="buttonTranslateKey ? (buttonTranslateKey | translate) : undefined"
-          size="small"
-          [severity]="colorButton">
+          [disabled]="buttonDisabled"
+          [severity]="colorButton"
+          size="small">
     @if (buttonIcon) {
         <fa-icon [icon]="buttonIcon"></fa-icon>
     }

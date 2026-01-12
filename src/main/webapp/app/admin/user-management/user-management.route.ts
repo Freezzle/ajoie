@@ -20,39 +20,39 @@ const userManagementRoute: Routes = [
         path: '',
         component: UserManagementComponent,
         data: {
-            defaultSort: 'id,asc',
-        },
+            defaultSort: 'id,asc'
+        }
     },
     {
         path: ':login/view',
         component: UserManagementUpdateComponent,
         resolve: {
-            user: UserManagementResolve,
+            user: UserManagementResolve
         },
         data: {
-            readonly: true,
-        },
+            readonly: true
+        }
     },
     {
         path: 'new',
         component: UserManagementUpdateComponent,
         resolve: {
-            user: UserManagementResolve,
+            user: UserManagementResolve
         },
         data: {
-            readonly: false,
-        },
+            readonly: false
+        }
     },
     {
         path: ':login/edit',
         component: UserManagementUpdateComponent,
         resolve: {
-            user: UserManagementResolve,
+            user: UserManagementResolve
         },
         data: {
-            readonly: false,
-        },
-    },
+            readonly: false
+        }
+    }
 ];
 
 export default userManagementRoute;

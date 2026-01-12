@@ -3,7 +3,7 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
 import {IInvoice, IPayment} from '../model/invoicing-plan.interface';
-import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
+import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 
 @Injectable({providedIn: 'root'})
 export class InvoicingPlanService {
@@ -13,22 +13,22 @@ export class InvoicingPlanService {
 
     createInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
         return this.http.post<IInvoice>(`${this.resourceUrl}/${idInvoicingPlan}/invoices`, invoice,
-            {observe: 'response'});
+                                        {observe: 'response'});
     }
 
     updateInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
         return this.http.put<IInvoice>(`${this.resourceUrl}/${idInvoicingPlan}/invoices/${invoice.id}`, invoice,
-            {observe: 'response'});
+                                       {observe: 'response'});
     }
 
     createPayment(idInvoicingPlan: string, payment: IPayment): Observable<HttpResponse<IPayment>> {
         return this.http.post<IPayment>(`${this.resourceUrl}/${idInvoicingPlan}/payments`, payment,
-            {observe: 'response'});
+                                        {observe: 'response'});
     }
 
     updatePayment(idInvoicingPlan: string, payment: IPayment): Observable<HttpResponse<IPayment>> {
         return this.http.put<IPayment>(`${this.resourceUrl}/${idInvoicingPlan}/payments/${payment.id}`, payment,
-            {observe: 'response'});
+                                       {observe: 'response'});
     }
 
     switchArrangement(idInvoicingPlan: string): Observable<unknown> {
@@ -41,12 +41,12 @@ export class InvoicingPlanService {
 
     deleteInvoice(idInvoicingPlan: string, idInvoice: string): Observable<HttpResponse<void>> {
         return this.http.delete<void>(`${this.resourceUrl}/${idInvoicingPlan}/invoices/${idInvoice}`,
-            {observe: 'response'});
+                                      {observe: 'response'});
     }
 
     deletePayment(idInvoicingPlan: string, idPayment: string): Observable<HttpResponse<void>> {
         return this.http.delete<void>(`${this.resourceUrl}/${idInvoicingPlan}/payments/${idPayment}`,
-            {observe: 'response'});
+                                      {observe: 'response'});
     }
 
     getEventLogs(idInvoicingPlan: string): Observable<HttpResponse<unknown[]>> {
@@ -56,7 +56,7 @@ export class InvoicingPlanService {
     splitInvoicingPlan(idInvoicingPlan: string, invoicesIdsToMove: (string | null)[]): Observable<HttpResponse<unknown>> {
 
         return this.http.post<unknown>(`${this.resourceUrl}/${idInvoicingPlan}/split-invoices`,
-            {invoicesIds: invoicesIdsToMove},
-            {observe: 'response'});
+                                       {invoicesIds: invoicesIdsToMove},
+                                       {observe: 'response'});
     }
 }

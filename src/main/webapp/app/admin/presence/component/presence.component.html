@@ -1,11 +1,11 @@
 <p-button
-        type="button"
-        icon="pi pi-user"
-        [badge]="'' + ((onlineCount$ | async) ?? 0)"
         (click)="toggle($event)"
+        [badge]="'' + ((onlineCount$ | async) ?? 0)"
+        icon="pi pi-user"
+        type="button"
 ></p-button>
 
-<p-popover #pop [style]="{ minWidth: '300px' }" [baseZIndex]="9999">
+<p-popover #pop [baseZIndex]="9999" [style]="{ minWidth: '300px' }">
     <div class="flex align-items-center justify-content-between mb-2">
         <span class="font-bold">Utilisateurs en ligne</span>
     </div>
@@ -19,11 +19,12 @@
             </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-row>
+        <ng-template let-row pTemplate="body">
             <tr>
                 <td>
                     <div class="flex flex-column">
-                        <span class="font-medium" [class.fw-bold]="account()?.login === row.login">{{ row.displayName }}</span>
+                        <span [class.fw-bold]="account()?.login === row.login"
+                              class="font-medium">{{ row.displayName }}</span>
                     </div>
                 </td>
 

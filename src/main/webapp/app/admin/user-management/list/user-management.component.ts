@@ -16,27 +16,27 @@ import CheckBoolPipe from '../../../shared/pipe/check-boolean.pipe';
 import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 
 @Component({
-    selector: 'app-user-mgmt',
-    templateUrl: './user-management.component.html',
-    imports: [
-        RouterModule,
-        SharedModule,
-        SortDirective,
-        SortByDirective,
-        ItemCountComponent,
-        CheckBoolPipe,
-        ColorBoolPipe,
-        ButtonBoxComponent,
-        LinkBoxComponent,
-        AlertErrorComponent,
-        AlertComponent,
-    ]
-})
+               selector: 'app-user-mgmt',
+               templateUrl: './user-management.component.html',
+               imports: [
+                   RouterModule,
+                   SharedModule,
+                   SortDirective,
+                   SortByDirective,
+                   ItemCountComponent,
+                   CheckBoolPipe,
+                   ColorBoolPipe,
+                   ButtonBoxComponent,
+                   LinkBoxComponent,
+                   AlertErrorComponent,
+                   AlertComponent
+               ]
+           })
 export default class UserManagementComponent implements OnInit {
     currentAccount = inject(AccountService).trackCurrentAccount();
     users = signal<User[] | null>(null);
@@ -72,7 +72,7 @@ export default class UserManagementComponent implements OnInit {
         this.confirmDialogService.delete(event.target as HTMLElement, 'userManagement.delete.question', {login: user.login}).pipe(
             filter(confirmed => confirmed),
             switchMap(() => this.userService.delete(user.login)),
-            tap(() => this.load()), // Recharge les données
+            tap(() => this.load()) // Recharge les données
         ).subscribe();
     }
 
@@ -80,17 +80,17 @@ export default class UserManagementComponent implements OnInit {
         this.isLoading.set(true);
         this.userService
             .query({
-                page: this.page - 1,
-                size: this.itemsPerPage,
-                sort: this.sortService.buildSortParam(this.sortState(), 'id'),
-            })
+                       page: this.page - 1,
+                       size: this.itemsPerPage,
+                       sort: this.sortService.buildSortParam(this.sortState(), 'id')
+                   })
             .subscribe({
-                next: (res: HttpResponse<User[]>) => {
-                    this.isLoading.set(false);
-                    this.onSuccess(res.body, res.headers);
-                },
-                error: () => this.isLoading.set(false),
-            });
+                           next: (res: HttpResponse<User[]>) => {
+                               this.isLoading.set(false);
+                               this.onSuccess(res.body, res.headers);
+                           },
+                           error: () => this.isLoading.set(false)
+                       });
     }
 
     transition(sortState?: SortState): void {
@@ -98,8 +98,8 @@ export default class UserManagementComponent implements OnInit {
             relativeTo: this.activatedRoute.parent,
             queryParams: {
                 page: this.page,
-                sort: this.sortService.buildSortParam(sortState ?? this.sortState()),
-            },
+                sort: this.sortService.buildSortParam(sortState ?? this.sortState())
+            }
         });
     }
 

@@ -19,17 +19,18 @@
                     Attachements
                 </div>
                 <div class="d-flex w-100">
-                @for (attachment of form.get('attachments')?.value; track attachment.id) {
-                    <a class="underline text-primary" (click)="downloadAttachment(attachment)"><small>{{attachment.filename}}</small></a>
-                } @empty {
-                    <small>Aucun</small>
-                }
+                    @for (attachment of form.get('attachments')?.value; track attachment.id) {
+                        <a (click)="downloadAttachment(attachment)"
+                           class="underline text-primary"><small>{{ attachment.filename }}</small></a>
+                    } @empty {
+                        <small>Aucun</small>
+                    }
                 </div>
             </div>
             <div class="mt-4 col-12">
-                <p-editor formControlName="body"
+                <p-editor (onInit)="onEditorInit($event)"
                           [style]="{ height: '240px' }"
-                          (onInit)="onEditorInit($event)"
+                          formControlName="body"
                 />
             </div>
         </div>

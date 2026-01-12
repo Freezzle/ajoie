@@ -8,8 +8,8 @@ const floorPlanRoutes: Routes = [
         path: '',
         component: FloorPlanDetailComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
-    },
+        canActivate: [UserRouteAccessService]
+    }
 ];
 
 export default floorPlanRoutes;

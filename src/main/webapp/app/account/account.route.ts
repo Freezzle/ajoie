@@ -15,7 +15,7 @@ const accountRoutes: Routes = [
     passwordResetInitRoute,
     registerRoute,
     sessionsRoute,
-    settingsRoute,
+    settingsRoute
 ];
 
 export default accountRoutes;

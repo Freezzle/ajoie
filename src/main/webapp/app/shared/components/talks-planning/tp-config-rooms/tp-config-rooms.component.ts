@@ -1,98 +1,107 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {Component, computed, EventEmitter, Input, Output, signal} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { InputTextModule } from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {TableModule} from 'primeng/table';
+import {InputTextModule} from 'primeng/inputtext';
 
-import { TimelineData } from '../model/timeline-data';
-import { TimelineRoom } from '../model/timeline-room';
+import {TimelineData} from '../model/timeline-data';
+import {TimelineRoom} from '../model/timeline-room';
 
 @Component({
-  selector: 'tp-config-rooms',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule],
-  templateUrl: './tp-config-rooms.component.html',
-})
+               selector: 'tp-config-rooms',
+               standalone: true,
+               imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule],
+               templateUrl: './tp-config-rooms.component.html'
+           })
 export class TpConfigRoomsComponent {
-  _draft = signal<TimelineData | null>(null);
+    _draft = signal<TimelineData | null>(null);
+    @Output() confirmDraft = new EventEmitter<TimelineData>();
+    @Output() cancelDraft = new EventEmitter<void>();
+    rooms = computed(() => this._draft()?.rooms ?? []);
+    // Drafts de saisie
+    private roomLabelDraft = signal<Record<string, string>>({});
 
-  @Input({ required: true })
-  set data(value: TimelineData) {
-    this._draft.set(structuredClone(value));
-  }
+    @Input({required: true})
+    set data(value: TimelineData) {
+        this._draft.set(structuredClone(value));
+    }
 
-  @Output() confirmDraft = new EventEmitter<TimelineData>();
-  @Output() cancelDraft = new EventEmitter<void>();
+    // stabilise DOM
+    trackById = (_: number, item: { id: string }) => item.id;
 
-  rooms = computed(() => this._draft()?.rooms ?? []);
+    roomLabel(room: TimelineRoom): string {
+        return this.roomLabelDraft()[room.id] ?? room.label;
+    }
 
-  // stabilise DOM
-  trackById = (_: number, item: { id: string }) => item.id;
+    setRoomLabelDraft(roomId: string, value: string) {
+        this.roomLabelDraft.update(m => ({...m, [roomId]: value}));
+    }
 
-  // Drafts de saisie
-  private roomLabelDraft = signal<Record<string, string>>({});
+    commitRoomLabel(roomId: string) {
+        const value = this.roomLabelDraft()[roomId];
+        if (value === undefined) {
+            return;
+        }
 
-  roomLabel(room: TimelineRoom): string {
-    return this.roomLabelDraft()[room.id] ?? room.label;
-  }
+        const v = value.trim();
+        if (!v) {
+            return;
+        }
 
-  setRoomLabelDraft(roomId: string, value: string) {
-    this.roomLabelDraft.update(m => ({ ...m, [roomId]: value }));
-  }
+        this.commit(next => {
+            const r = next.rooms.find(x => x.id === roomId);
+            if (r) {
+                r.label = v;
+            }
+        });
 
-  commitRoomLabel(roomId: string) {
-    const value = this.roomLabelDraft()[roomId];
-    if (value === undefined) return;
+        this.roomLabelDraft.update(m => {
+            const copy = {...m};
+            delete copy[roomId];
+            return copy;
+        });
+    }
 
-    const v = value.trim();
-    if (!v) return;
+    addRoom() {
+        this.commit(next => next.rooms.push({id: this.newId(), label: 'Nouvelle salle'}));
+    }
 
-    this.commit(next => {
-      const r = next.rooms.find(x => x.id === roomId);
-      if (r) r.label = v;
-    });
+    deleteRoom(roomId: string) {
+        // supprime la salle + nettoie toutes les assignations (comme ton code)
+        this.commit(next => {
+            next.rooms = next.rooms.filter(r => r.id !== roomId);
+            next.days = next.days.map(d => ({...d, rooms: d.rooms.filter(rd => rd.roomId !== roomId)}));
+        });
+    }
 
-    this.roomLabelDraft.update(m => {
-      const copy = { ...m };
-      delete copy[roomId];
-      return copy;
-    });
-  }
+    confirm() {
+        const d = this._draft();
+        if (!d) {
+            return;
+        }
+        this.confirmDraft.emit(structuredClone(d));
+    }
 
-  addRoom() {
-    this.commit(next => next.rooms.push({ id: this.newId(), label: 'Nouvelle salle' }));
-  }
+    cancel() {
+        this.cancelDraft.emit();
+    }
 
-  deleteRoom(roomId: string) {
-    // supprime la salle + nettoie toutes les assignations (comme ton code)
-    this.commit(next => {
-      next.rooms = next.rooms.filter(r => r.id !== roomId);
-      next.days = next.days.map(d => ({ ...d, rooms: d.rooms.filter(rd => rd.roomId !== roomId) }));
-    });
-  }
+    private commit(mutator: (next: TimelineData) => void) {
+        const current = this._draft();
+        if (!current) {
+            return;
+        }
+        const next = structuredClone(current);
+        mutator(next);
+        this._draft.set(next);
+    }
 
-  confirm() {
-    const d = this._draft();
-    if (!d) return;
-    this.confirmDraft.emit(structuredClone(d));
-  }
-
-  cancel() {
-    this.cancelDraft.emit();
-  }
-
-  private commit(mutator: (next: TimelineData) => void) {
-    const current = this._draft();
-    if (!current) return;
-    const next = structuredClone(current);
-    mutator(next);
-    this._draft.set(next);
-  }
-
-  private newId(): string {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-    return 'id_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
-  }
+    private newId(): string {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        return 'id_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
 }

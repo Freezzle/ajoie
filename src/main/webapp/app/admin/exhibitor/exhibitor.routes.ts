@@ -10,41 +10,41 @@ const exhibitorRoute: Routes = [
         path: '',
         component: ExhibitorComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idExhibitor/view',
         component: ExhibitorUpdateComponent,
         resolve: {
-            exhibitor: ExhibitorResolve,
+            exhibitor: ExhibitorResolve
         },
         data: {
-            readonly: true,
+            readonly: true
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: 'new',
         component: ExhibitorUpdateComponent,
         resolve: {
-            exhibitor: ExhibitorResolve,
+            exhibitor: ExhibitorResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idExhibitor/edit',
         component: ExhibitorUpdateComponent,
         resolve: {
-            exhibitor: ExhibitorResolve,
+            exhibitor: ExhibitorResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
-    },
+        canActivate: [UserRouteAccessService]
+    }
 ];
 
 export default exhibitorRoute;

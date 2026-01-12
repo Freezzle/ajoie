@@ -11,32 +11,44 @@ import {ErrorModel} from '../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../shared/field-error/field-error.component';
 
 @Component({
-    selector: 'app-password',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, FieldErrorComponent],
-    templateUrl: './password.component.html'
-})
+               selector: 'app-password',
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, FieldErrorComponent],
+               templateUrl: './password.component.html'
+           })
 export default class PasswordComponent implements OnInit {
     doNotMatch = signal(false);
     error = signal(false);
     success = signal(false);
     account$?: Observable<Account | null>;
     passwordForm = new FormGroup({
-        currentPassword: new FormControl('', {
-            nonNullable: true,
-            validators: Validators.required,
-        }),
-        newPassword: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
-        }),
-        confirmPassword: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
-        }),
-    });
-
+                                     currentPassword: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: Validators.required
+                                     }),
+                                     newPassword: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)]
+                                     }),
+                                     confirmPassword: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)]
+                                     })
+                                 });
+    protected readonly ErrorModel = ErrorModel;
     private passwordService = inject(PasswordService);
     private accountService = inject(AccountService);
+
+    get getCurrentPassword(): FormControl {
+        return this.passwordForm.get('currentPassword') as FormControl;
+    }
+
+    get getNewPassword(): FormControl {
+        return this.passwordForm.get('newPassword') as FormControl;
+    }
+
+    get getConfirmPassword(): FormControl {
+        return this.passwordForm.get('confirmPassword') as FormControl;
+    }
 
     ngOnInit(): void {
         this.account$ = this.accountService.identity();
@@ -52,23 +64,9 @@ export default class PasswordComponent implements OnInit {
             this.doNotMatch.set(true);
         } else {
             this.passwordService.save(newPassword, currentPassword).subscribe({
-                next: () => this.success.set(true),
-                error: () => this.error.set(true),
-            });
+                                                                                  next: () => this.success.set(true),
+                                                                                  error: () => this.error.set(true)
+                                                                              });
         }
     }
-
-    get getCurrentPassword(): FormControl {
-        return this.passwordForm.get('currentPassword') as FormControl;
-    }
-
-    get getNewPassword(): FormControl {
-        return this.passwordForm.get('newPassword') as FormControl;
-    }
-
-    get getConfirmPassword(): FormControl {
-        return this.passwordForm.get('confirmPassword') as FormControl;
-    }
-
-    protected readonly ErrorModel = ErrorModel;
 }

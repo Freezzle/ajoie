@@ -3,11 +3,11 @@
     <p-button
             #btn
             (onClick)="onClick()"
-            [disabled]="isDisabled"
             [attr.title]="translateKey | translate"
-            size="small"
+            [disabled]="isDisabled"
+            [routerLink]="links"
             [severity]="colorButton"
-            [routerLink]="links">
+            size="small">
         @if (faIcon) {
             <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
         }
@@ -20,11 +20,11 @@
     <p-button
             #btn
             (onClick)="onClick()"
-            [disabled]="isDisabled"
             [attr.title]="translateKey | translate"
             [attr.type]="isSubmit ? 'submit' : 'button'"
-            size="small"
-            [severity]="colorButton">
+            [disabled]="isDisabled"
+            [severity]="colorButton"
+            size="small">
         @if (faIcon) {
             <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
         }

@@ -10,11 +10,11 @@ import {EventManager, EventWithContent} from 'app/core/util/event-manager.servic
 import {AlertError} from './alert-error.model';
 
 @Component({
-    selector: 'app-alert-error',
-    templateUrl: './alert-error.component.html',
-    imports: [CommonModule, NgbModule],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
-})
+               selector: 'app-alert-error',
+               templateUrl: './alert-error.component.html',
+               imports: [CommonModule, NgbModule],
+               schemas: [CUSTOM_ELEMENTS_SCHEMA]
+           })
 export class AlertErrorComponent implements OnDestroy {
     alerts = signal<Alert[]>([]);
     errorListener: Subscription;
@@ -27,15 +27,15 @@ export class AlertErrorComponent implements OnDestroy {
 
     constructor() {
         this.errorListener = this.eventManager.subscribe('salonApp.error',
-            (response: EventWithContent<unknown> | string) => {
-                const errorResponse = (response as EventWithContent<AlertError>).content;
-                this.addErrorAlert(errorResponse.message, errorResponse.key, errorResponse.params);
-            });
+                                                         (response: EventWithContent<unknown> | string) => {
+                                                             const errorResponse = (response as EventWithContent<AlertError>).content;
+                                                             this.addErrorAlert(errorResponse.message, errorResponse.key, errorResponse.params);
+                                                         });
 
         this.httpErrorListener = this.eventManager.subscribe('salonApp.httpError',
-            (response: EventWithContent<unknown> | string) => {
-                this.handleHttpError(response);
-            });
+                                                             (response: EventWithContent<unknown> | string) => {
+                                                                 this.handleHttpError(response);
+                                                             });
     }
 
     setClasses(alert: Alert): { [key: string]: boolean } {
@@ -103,7 +103,7 @@ export class AlertErrorComponent implements OnDestroy {
             this.addErrorAlert(
                 httpErrorResponse.error.detail ?? httpErrorResponse.error.message,
                 httpErrorResponse.error.message,
-                httpErrorResponse.error.params,
+                httpErrorResponse.error.params
             );
         } else {
             this.addErrorAlert(httpErrorResponse.error, httpErrorResponse.error);
@@ -115,7 +115,7 @@ export class AlertErrorComponent implements OnDestroy {
             this.addErrorAlert(
                 httpErrorResponse.error.detail ?? httpErrorResponse.error.message,
                 httpErrorResponse.error.message,
-                httpErrorResponse.error.params,
+                httpErrorResponse.error.params
             );
         } else {
             this.addErrorAlert(httpErrorResponse.error, httpErrorResponse.error);

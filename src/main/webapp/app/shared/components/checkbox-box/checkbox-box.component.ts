@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Optional, Output, Self} from '@angular/core';
+import {Component, Input, OnInit, Optional, Self} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
     ControlValueAccessor,
@@ -6,17 +6,17 @@ import {
     FormsModule,
     NgControl,
     ReactiveFormsModule,
-    Validators,
+    Validators
 } from '@angular/forms';
 import SharedModule from '../../shared.module';
-import {ToggleButton} from "primeng/togglebutton";
-import {PrimeIcons} from "primeng/api";
+import {ToggleButton} from 'primeng/togglebutton';
+import {PrimeIcons} from 'primeng/api';
 
 @Component({
-    imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule, ToggleButton],
-    selector: 'checkbox-box',
-    templateUrl: './checkbox-box.component.html'
-})
+               imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule, ToggleButton],
+               selector: 'checkbox-box',
+               templateUrl: './checkbox-box.component.html'
+           })
 export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
     @Input() translateKey?: string;
     @Input() fieldName: string = '';
@@ -25,11 +25,8 @@ export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
 
     isFormControlUsed: boolean = false; // Détecter l'utilisation du formControl
     disabled: boolean = false;
-
-    onChange = (_: any) => {
-    };
-    onTouched = () => {
-    };
+    protected readonly Validators = Validators;
+    protected readonly PrimeIcons = PrimeIcons;
 
     constructor(@Self() @Optional() public controlDir: NgControl) {
         if (this.controlDir) {
@@ -37,6 +34,16 @@ export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
             this.isFormControlUsed = true;
         }
     }
+
+    get control(): FormControl<any> {
+        return this.controlDir.control as FormControl<any>;
+    }
+
+    onChange = (_: any) => {
+    };
+
+    onTouched = () => {
+    };
 
     ngOnInit() {
         if (this.isFormControlUsed && this.controlDir?.control) {
@@ -60,11 +67,4 @@ export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
     setDisabledState?(isDisabled: boolean): void {
         this.disabled = this.forceDisabled || isDisabled;
     }
-
-    get control(): FormControl<any> {
-        return this.controlDir.control as FormControl<any>;
-    }
-
-    protected readonly Validators = Validators;
-    protected readonly PrimeIcons = PrimeIcons;
 }

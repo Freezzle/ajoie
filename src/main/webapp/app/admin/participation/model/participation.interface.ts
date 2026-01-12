@@ -1,8 +1,8 @@
 import {ISalon} from '../../salon/model/salon.interface';
 import {Status} from '../../enumerations/status.model';
 import {IExhibitor, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
-import {ModePaymentMeals} from "../../enumerations/mode-payment-meals.model";
-import {InvoiceSendingMethod} from "../../enumerations/invoice-sending-method.model";
+import {ModePaymentMeals} from '../../enumerations/mode-payment-meals.model';
+import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 
 export interface IParticipation {
     id: string;
@@ -45,7 +45,7 @@ export function containsParticipationName(participation: IParticipation | null,
 
     return (
         (participation.exhibitor?.fullName?.toLocaleLowerCase().includes(filterText) ||
-            participation.therapistName?.toLocaleLowerCase().includes(filterText)) ??
+         participation.therapistName?.toLocaleLowerCase().includes(filterText)) ??
         false
     );
 }

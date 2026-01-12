@@ -10,10 +10,10 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {finalize} from 'rxjs/operators';
 
 @Component({
-    selector: 'app-sessions',
-    imports: [SharedModule, ButtonBoxComponent, FormsModule, ReactiveFormsModule],
-    templateUrl: './sessions.component.html'
-})
+               selector: 'app-sessions',
+               imports: [SharedModule, ButtonBoxComponent, FormsModule, ReactiveFormsModule],
+               templateUrl: './sessions.component.html'
+           })
 export default class SessionsComponent implements OnInit {
     account: Account | null = null;
     error = false;
@@ -43,7 +43,7 @@ export default class SessionsComponent implements OnInit {
                     this.success = true;
                     this.sessionsService.findAll().subscribe(sessions => (this.sessions = sessions));
                 },
-                () => (this.error = true),
+                () => (this.error = true)
             );
     }
 

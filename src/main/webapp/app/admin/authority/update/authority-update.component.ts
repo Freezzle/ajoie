@@ -13,14 +13,14 @@ import {AuthorityFormGroup, AuthorityFormService} from './authority-form.service
 import {ErrorModel} from '../../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../../shared/field-error/field-error.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {AlertComponent} from "../../../shared/alert/alert.component";
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {AlertComponent} from '../../../shared/alert/alert.component';
 
 @Component({
-    selector: 'app-authority-update',
-    templateUrl: './authority-update.component.html',
-    imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent, AlertErrorComponent, AlertComponent]
-})
+               selector: 'app-authority-update',
+               templateUrl: './authority-update.component.html',
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent, AlertErrorComponent, AlertComponent]
+           })
 export class AuthorityUpdateComponent implements OnInit {
     isLoading = false;
     authority: IAuthority | null = null;
@@ -31,6 +31,11 @@ export class AuthorityUpdateComponent implements OnInit {
     // eslint-disable-next-line @typescript-eslint/member-ordering
     editForm: AuthorityFormGroup = this.authorityFormService.createAuthorityFormGroup();
     protected activatedRoute = inject(ActivatedRoute);
+    protected readonly ErrorModel = ErrorModel;
+
+    get getName(): FormControl {
+        return this.editForm.get('name') as FormControl;
+    }
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({authority, readonly}) => {
@@ -67,9 +72,9 @@ export class AuthorityUpdateComponent implements OnInit {
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IAuthority>>): void {
         result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-            next: () => this.onSaveSuccess(),
-            error: () => this.onSaveError(),
-        });
+                                                                         next: () => this.onSaveSuccess(),
+                                                                         error: () => this.onSaveError()
+                                                                     });
     }
 
     protected onSaveSuccess(): void {
@@ -88,10 +93,4 @@ export class AuthorityUpdateComponent implements OnInit {
         this.authority = authority;
         this.authorityFormService.resetForm(this.editForm, authority);
     }
-
-    get getName(): FormControl {
-        return this.editForm.get('name') as FormControl;
-    }
-
-    protected readonly ErrorModel = ErrorModel;
 }

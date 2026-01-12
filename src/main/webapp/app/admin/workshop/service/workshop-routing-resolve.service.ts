@@ -20,7 +20,7 @@ const workshopResolve = (route: ActivatedRouteSnapshot): Observable<null | IWork
                         inject(Router).navigate(['404']);
                         return EMPTY;
                     }
-                }),
+                })
             );
     }
     return of(null);

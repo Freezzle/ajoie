@@ -27,7 +27,7 @@ export interface IFilterOption {
 export class FilterOption implements IFilterOption {
     constructor(
         public name: string,
-        public values: string[] = [],
+        public values: string[] = []
     ) {
         this.values = [...new Set(values)];
     }
@@ -106,13 +106,13 @@ export class FilterOptions implements IFilterOptions {
 
         const filterRegex = /filter\[(.+)\]/;
         params.keys
-            .filter(paramKey => filterRegex.test(paramKey))
-            .forEach(matchingParam => {
-                const matches = filterRegex.exec(matchingParam);
-                if (matches && matches.length > 1) {
-                    this.getFilterOptionByName(matches[1], true).addValue(...params.getAll(matchingParam));
-                }
-            });
+              .filter(paramKey => filterRegex.test(paramKey))
+              .forEach(matchingParam => {
+                  const matches = filterRegex.exec(matchingParam);
+                  if (matches && matches.length > 1) {
+                      this.getFilterOptionByName(matches[1], true).addValue(...params.getAll(matchingParam));
+                  }
+              });
 
         if (oldFilters.equals(this)) {
             return false;
@@ -164,6 +164,6 @@ export class FilterOptions implements IFilterOptions {
         };
 
         return this._filterOptions.find(thisOption => thisOption.name === name) ??
-            (add ? addOption(new FilterOption(name)) : null);
+               (add ? addOption(new FilterOption(name)) : null);
     }
 }

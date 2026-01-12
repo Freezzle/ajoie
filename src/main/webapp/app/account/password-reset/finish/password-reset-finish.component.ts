@@ -9,11 +9,11 @@ import {ErrorModel} from '../../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../../shared/field-error/field-error.component';
 
 @Component({
-    selector: 'app-password-reset-finish',
-    imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
-        FieldErrorComponent],
-    templateUrl: './password-reset-finish.component.html'
-})
+               selector: 'app-password-reset-finish',
+               imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
+                         FieldErrorComponent],
+               templateUrl: './password-reset-finish.component.html'
+           })
 export default class PasswordResetFinishComponent implements OnInit, AfterViewInit {
     newPassword = viewChild.required<ElementRef>('newPassword');
 
@@ -24,18 +24,26 @@ export default class PasswordResetFinishComponent implements OnInit, AfterViewIn
     key = signal('');
 
     passwordForm = new FormGroup({
-        newPassword: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
-        }),
-        confirmPassword: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
-        }),
-    });
-
+                                     newPassword: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)]
+                                     }),
+                                     confirmPassword: new FormControl('', {
+                                         nonNullable: true,
+                                         validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)]
+                                     })
+                                 });
+    protected readonly ErrorModel = ErrorModel;
     private passwordResetFinishService = inject(PasswordResetFinishService);
     private route = inject(ActivatedRoute);
+
+    get getNewPassword(): FormControl {
+        return this.passwordForm.get('newPassword') as FormControl;
+    }
+
+    get getConfirmPassword(): FormControl {
+        return this.passwordForm.get('confirmPassword') as FormControl;
+    }
 
     ngOnInit(): void {
         this.route.queryParams.subscribe(params => {
@@ -60,19 +68,9 @@ export default class PasswordResetFinishComponent implements OnInit, AfterViewIn
             this.doNotMatch.set(true);
         } else {
             this.passwordResetFinishService.save(this.key(), newPassword).subscribe({
-                next: () => this.success.set(true),
-                error: () => this.error.set(true),
-            });
+                                                                                        next: () => this.success.set(true),
+                                                                                        error: () => this.error.set(true)
+                                                                                    });
         }
     }
-
-    get getNewPassword(): FormControl {
-        return this.passwordForm.get('newPassword') as FormControl;
-    }
-
-    get getConfirmPassword(): FormControl {
-        return this.passwordForm.get('confirmPassword') as FormControl;
-    }
-
-    protected readonly ErrorModel = ErrorModel;
 }

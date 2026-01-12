@@ -4,14 +4,14 @@
     </div>
 
     <div appMenuBarEnd>
-        <button-box faIcon="arrow-left" translateKey="common.back" [showText]="false"/>
+        <button-box [showText]="false" faIcon="arrow-left" translateKey="common.back"/>
 
-        <button pButton
-                type="button"
-                icon="pi pi-cog"
+        <button (click)="openPanel()"
                 class="p-button-text"
-                (click)="openPanel()"
+                icon="pi pi-cog"
+                pButton
                 title="Configurer"
+                type="button"
         ></button>
     </div>
 
@@ -21,15 +21,15 @@
     <p-confirmpopup/>
 
     <dialog-box
-            [header]="'Configuration'"
-            [mode]="'edit'"
-            [(visible)]="panelVisible"
             (cancel)="panelVisible.set(false)"
-            (confirm)="panelVisible.set(false)">
+            (confirm)="panelVisible.set(false)"
+            [(visible)]="panelVisible"
+            [header]="'Configuration'"
+            [mode]="'edit'">
 
         <volunteer-planning-panel
-                [planning]="planning()"
-                (planningChange)="onPlanningChange($event)"/>
+                (planningChange)="onPlanningChange($event)"
+                [planning]="planning()"/>
     </dialog-box>
 
     <app-card [showHeader]="false">
@@ -38,13 +38,13 @@
                 <p-tabs [value]="sd.id" scrollable>
                     <p-tablist class="justify-content-center">
                         @for (day of dayOptions(); track day.id) {
-                            <p-tab [value]="day.id" (click)="selectedDayId.set(day.id)">{{ day.label }}</p-tab>
+                            <p-tab (click)="selectedDayId.set(day.id)" [value]="day.id">{{ day.label }}</p-tab>
                         }
                     </p-tablist>
 
                     <p-tabpanels>
                         <div class="main mt-4">
-                            <div class="table-wrap" (pointermove)="onPaintMove($event)" (pointerleave)="stopPaint()">
+                            <div (pointerleave)="stopPaint()" (pointermove)="onPaintMove($event)" class="table-wrap">
                                 <p-table [value]="visibleVolunteers()" class="planning-table">
                                     <ng-template pTemplate="header">
                                         <tr>
@@ -55,7 +55,7 @@
                                         </tr>
                                     </ng-template>
 
-                                    <ng-template pTemplate="body" let-v>
+                                    <ng-template let-v pTemplate="body">
                                         <tr>
                                             <td class="col-volunteer sticky-col row-label">{{ v.label }}</td>
 
@@ -65,15 +65,15 @@
 
                                                 <td class="slot-cell">
                                                     <div
-                                                            class="paint-cell"
-                                                            [attr.data-volunteer-id]="v.id"
-                                                            [attr.data-slot-index]="slot.index"
+                                                            (click)="!painting() ? applyTool(v.id, slot.index) : undefined"
                                                             (pointerdown)="startPaint(v.id, slot.index, $event)"
-                                                            (click)="!painting() ? applyTool(v.id, slot.index) : undefined">
+                                                            [attr.data-slot-index]="slot.index"
+                                                            [attr.data-volunteer-id]="v.id"
+                                                            class="paint-cell">
                                                         @if (cat) {
-                                                            <span class="cat-badge"
-                                                                  [style.background-color]="cat.color"
-                                                                  [title]="cat.label">
+                                                            <span [style.background-color]="cat.color"
+                                                                  [title]="cat.label"
+                                                                  class="cat-badge">
                                                                 <i [class]="cat.icon"></i>
                                                             </span>
                                                         }
@@ -88,26 +88,26 @@
                             <!-- palette fixe à droite -->
                             <aside class="palette">
                                 <div class="palette-grid">
-                                    <button pButton
-                                            type="button"
+                                    <button (click)="selectEraser()"
+                                            [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
                                             class="p-button-secondary"
                                             icon="pi pi-eraser"
-                                            [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
-                                            (click)="selectEraser()"
+                                            pButton
+                                            type="button"
                                     ></button>
 
                                     <p-divider></p-divider>
 
                                     @for (c of planning().categories; track c.id) {
                                         <button
+                                                (click)="selectCategory(c.id)"
+                                                [icon]="c.icon"
+                                                [style.background-color]="c.color"
+                                                [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
+                                                [style.color]="'black'"
+                                                [title]="c.label"
                                                 pButton
                                                 type="button"
-                                                [icon]="c.icon"
-                                                [style.color]="'black'"
-                                                [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
-                                                [style.background-color]="c.color"
-                                                (click)="selectCategory(c.id)"
-                                                [title]="c.label"
                                         ></button>
                                     }
                                 </div>

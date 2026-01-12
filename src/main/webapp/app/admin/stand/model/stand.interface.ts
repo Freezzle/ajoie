@@ -1,7 +1,7 @@
 import {IParticipation} from '../../participation/model/participation.interface';
 import {Status} from '../../enumerations/status.model';
 import {Category} from '../../enumerations/category.model';
-import {IPriceStandSalon} from "../../salon/model/price-stand-salon.interface";
+import {IPriceStandSalon} from '../../salon/model/price-stand-salon.interface';
 
 export interface IStand {
     id: string;

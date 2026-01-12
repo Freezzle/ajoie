@@ -9,74 +9,73 @@ import conferenceRoutes from '../conference/conference.routes';
 import standRoutes from '../stand/stand.routes';
 import participationRoutes from '../participation/participation.routes';
 import floorPlanRoutes from '../floor-plan/floor-plan.routes';
-import workshopRoutes from "../workshop/workshop.routes";
-import talksPlanningRoute from "../talk-planning/talks-planning.routes";
-import {Authority} from "../../config/authority.constants";
-import volunteersPlanningRoute from "../volunteer-planning/volunteer-planning.routes";
+import workshopRoutes from '../workshop/workshop.routes';
+import talksPlanningRoute from '../talks-planning/talks-planning.routes';
+import volunteersPlanningRoute from '../volunteer-planning/volunteer-planning.routes';
 
 const salonRoute: Routes = [
     {
         path: '',
         component: SalonComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idSalon/stats',
         component: SalonStatsComponent,
         resolve: {
-            salon: SalonResolve,
+            salon: SalonResolve
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idSalon/view',
         component: SalonUpdateComponent,
         resolve: {
-            salon: SalonResolve,
+            salon: SalonResolve
         },
         data: {
-            readonly: true,
+            readonly: true
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: 'new',
         component: SalonUpdateComponent,
         resolve: {
-            salon: SalonResolve,
+            salon: SalonResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idSalon/edit',
         component: SalonUpdateComponent,
         resolve: {
-            salon: SalonResolve,
+            salon: SalonResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idSalon/conferences',
-        children: conferenceRoutes,
+        children: conferenceRoutes
     },
     {
         path: ':idSalon/workshops',
-        children: workshopRoutes,
+        children: workshopRoutes
     },
     {
         path: ':idSalon/stands',
-        children: standRoutes,
+        children: standRoutes
     },
     {
         path: ':idSalon/participations',
-        children: participationRoutes,
+        children: participationRoutes
     },
     {
         path: ':idSalon/talks-planning',
@@ -89,9 +88,9 @@ const salonRoute: Routes = [
     {
         path: ':idSalon/floor-plan',
         resolve: {
-            salon: SalonResolve,
+            salon: SalonResolve
         },
-        children: floorPlanRoutes,
+        children: floorPlanRoutes
     }
 ];
 

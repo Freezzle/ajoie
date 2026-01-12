@@ -29,6 +29,6 @@ export function formatterDimensionStand(dimension: IPriceStandSalon | null): str
     return dimension?.dimension ?? '';
 }
 
-export function selectFilterDimension() : string {
+export function selectFilterDimension(): string {
     return 'dimension';
 }

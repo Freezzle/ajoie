@@ -20,7 +20,7 @@ const standResolve = (route: ActivatedRouteSnapshot): Observable<null | IStand> 
                         inject(Router).navigate(['404']);
                         return EMPTY;
                     }
-                }),
+                })
             );
     }
     return of(null);

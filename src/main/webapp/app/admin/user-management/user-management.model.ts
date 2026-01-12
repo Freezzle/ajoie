@@ -26,7 +26,7 @@ export class User implements IUser {
         public createdBy?: string,
         public createdDate?: Date,
         public lastModifiedBy?: string,
-        public lastModifiedDate?: Date,
+        public lastModifiedDate?: Date
     ) {
     }
 }

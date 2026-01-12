@@ -7,7 +7,7 @@ const sessionsRoute: Route = {
     path: 'sessions',
     component: SessionsComponent,
     title: 'global.menu.account.sessions',
-    canActivate: [UserRouteAccessService],
+    canActivate: [UserRouteAccessService]
 };
 
 export default sessionsRoute;

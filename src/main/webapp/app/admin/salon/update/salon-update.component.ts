@@ -15,47 +15,52 @@ import {TextBoxComponent} from '../../../shared/components/text-box/text-box.com
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {DateBoxComponent} from '../../../shared/components/date-box/date-box.component';
 import {sortPriceStandSalon} from '../model/price-stand-salon.interface';
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {CurrencyBoxComponent} from "../../../shared/components/currency-box/currency-box.component";
-import {NumberBoxComponent} from "../../../shared/components/number-box/number-box.component";
-import {TableModule} from "primeng/table";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {CurrencyBoxComponent} from '../../../shared/components/currency-box/currency-box.component';
+import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
+import {TableModule} from 'primeng/table';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 
 @Component({
-    selector: 'app-salon-update',
-    templateUrl: './salon-update.component.html',
-    imports: [
-        SharedModule,
-        FormsModule,
-        ReactiveFormsModule,
-        ButtonBoxComponent,
-        TextBoxComponent,
-        TextareaBoxComponent,
-        DateBoxComponent,
-        AlertComponent,
-        AlertErrorComponent,
-        CurrencyBoxComponent,
-        NumberBoxComponent,
-        TableModule,
-        ConfirmPopup,
-        Toast,
-        CardComponent,
-        ContentPageComponent,
-    ]
-})
+               selector: 'app-salon-update',
+               templateUrl: './salon-update.component.html',
+               imports: [
+                   SharedModule,
+                   FormsModule,
+                   ReactiveFormsModule,
+                   ButtonBoxComponent,
+                   TextBoxComponent,
+                   TextareaBoxComponent,
+                   DateBoxComponent,
+                   AlertComponent,
+                   AlertErrorComponent,
+                   CurrencyBoxComponent,
+                   NumberBoxComponent,
+                   TableModule,
+                   ConfirmPopup,
+                   Toast,
+                   CardComponent,
+                   ContentPageComponent
+               ]
+           })
 export class SalonUpdateComponent implements OnInit {
-    protected salonService = inject(SalonService);
-    protected salonFormService = inject(SalonFormService);
-    protected activatedRoute = inject(ActivatedRoute);
-
     isLoading = false;
     initialSalon: ISalon | null = null;
     isReadOnly = true;
+    protected salonService = inject(SalonService);
+    protected salonFormService = inject(SalonFormService);
     editForm: FormGroup<SalonFormGroup> = this.salonFormService.createSalonFormGroup(null);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected readonly State = State;
+    protected readonly Status = Status;
+
+    get priceStandSalons(): FormArray<FormGroup<PriceStandGroup>> {
+        return this.editForm.controls.priceStandSalons;
+    }
 
     ngOnInit(): void {
         this.activateReadOnlyMode(false);
@@ -70,20 +75,11 @@ export class SalonUpdateComponent implements OnInit {
                 this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
 
                 if (this.isReadOnly) {
-                    this.activateReadOnlyMode()
+                    this.activateReadOnlyMode();
                 } else {
                     this.activateEditMode();
                 }
             });
-    }
-
-    private processSalonData(): void {
-        if (!this.initialSalon) {
-            this.initialSalon = {} as ISalon;
-            this.initialSalon.priceStandSalons = [];
-        }
-
-        sortPriceStandSalon(this.initialSalon.priceStandSalons ?? []);
     }
 
     activateReadOnlyMode(reset: boolean = true): void {
@@ -113,28 +109,30 @@ export class SalonUpdateComponent implements OnInit {
         const salon = this.salonFormService.getSalon(this.editForm);
 
         const saveOperation = salon.id != null
-            ? this.salonService.update(salon)
-            : this.salonService.create(salon);
+                              ? this.salonService.update(salon)
+                              : this.salonService.create(salon);
 
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
 
     addPriceStand(): void {
         const newLine = new FormGroup<PriceStandGroup>({
-            id: new FormControl(null),
-            price: new FormControl(null),
-            dimension: new FormControl(null),
-            widthMeter: new FormControl(null),
-            heightMeter: new FormControl(null)
-        });
+                                                           id: new FormControl(null),
+                                                           price: new FormControl(null),
+                                                           dimension: new FormControl(null),
+                                                           widthMeter: new FormControl(null),
+                                                           heightMeter: new FormControl(null)
+                                                       });
 
         this.editForm.controls['priceStandSalons'].push(this.salonFormService.createPriceStand(null));
     }
 
-    get priceStandSalons(): FormArray<FormGroup<PriceStandGroup>> {
-        return this.editForm.controls.priceStandSalons;
-    }
+    private processSalonData(): void {
+        if (!this.initialSalon) {
+            this.initialSalon = {} as ISalon;
+            this.initialSalon.priceStandSalons = [];
+        }
 
-    protected readonly State = State;
-    protected readonly Status = Status;
+        sortPriceStandSalon(this.initialSalon.priceStandSalons ?? []);
+    }
 }

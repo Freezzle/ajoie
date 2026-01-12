@@ -1,8 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
-
-import {isPresent} from 'app/core/util/operators';
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
 import {createRequestOption} from 'app/core/request/request-util';
 import {getFirstExhibitorName, IExhibitor} from '../model/exhibitor.interface';

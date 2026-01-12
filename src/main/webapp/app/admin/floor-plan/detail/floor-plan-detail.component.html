@@ -6,32 +6,32 @@
         @if (isReadOnly) {
             <button-box (clickedEvent)="previousState()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="arrow-left"
-                        translateKey="common.back"
-                        [showText]="false"/>
+                        translateKey="common.back"/>
         }
         @if (isReadOnly) {
             <button-box (clickedEvent)="activateEditMode()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="pencil-alt"
-                        translateKey="common.edit"
-                        [showText]="false"/>
+                        translateKey="common.edit"/>
         }
         @if (!isReadOnly) {
             <button-box (clickedEvent)="activateReadOnlyMode()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="ban"
                         translateKey="common.cancel"
-                        [showText]="false"
                         type="secondary"/>
         }
         @if (!isReadOnly) {
             <button-box (clickedEvent)="save()"
                         [isDisabled]="isLoading"
                         [isSubmit]="true"
+                        [showText]="false"
                         faIcon="floppy-disk"
-                        translateKey="common.save"
-                        [showText]="false"/>
+                        translateKey="common.save"/>
         }
     </div>
     <app-alert-error></app-alert-error>
@@ -136,19 +136,19 @@
                                  class="row shapes-container">
                                 @for (dimension of availableStandDimensions; track dimension.stand?.id) {
                                     <div class="col-12 shape-container">
-                                        <floor-plan-dimension-tile variant="palette"
+                                        <floor-plan-dimension-tile (dragEnded)="isDragging = false"
+                                                                   (dragMoved)="highlightCells($event)"
+                                                                   (dragStarted)="isDragging = true"
                                                                    [dimension]="dimension"
-                                                                   [pixels]="PIXELS"
-                                                                   [dragDisabled]="isReadOnly"
-                                                                   [dragData]="dimension"
-                                                                   [dragging]="isDragging"
-                                                                   cursor="move"
+                                                                   [displayFullname]="displayFullname"
                                                                    [displayHeader]="displayHeader"
                                                                    [displayTechnical]="displayTechnical"
-                                                                   [displayFullname]="displayFullname"
-                                                                   (dragEnded)="isDragging = false"
-                                                                   (dragMoved)="highlightCells($event)"
-                                                                   (dragStarted)="isDragging = true"/>
+                                                                   [dragData]="dimension"
+                                                                   [dragDisabled]="isReadOnly"
+                                                                   [dragging]="isDragging"
+                                                                   [pixels]="PIXELS"
+                                                                   cursor="move"
+                                                                   variant="palette"/>
                                     </div>
                                 }
                             </div>
@@ -169,29 +169,29 @@
                                  class="row shapes-container">
                                 @for (dimension of availableDimensions; track dimension) {
                                     <div class="col-12 shape-container">
-                                        <floor-plan-dimension-tile variant="palette"
+                                        <floor-plan-dimension-tile (dragEnded)="isDragging = false"
+                                                                   (dragMoved)="highlightCells($event)"
+                                                                   (dragStarted)="isDragging = true"
                                                                    [dimension]="dimension"
-                                                                   [pixels]="PIXELS"
-                                                                   [dragDisabled]="isReadOnly"
-                                                                   [dragData]="dimension"
-                                                                   [dragging]="isDragging"
-                                                                   cursor="move"
+                                                                   [displayFullname]="displayFullname"
                                                                    [displayHeader]="displayHeader"
                                                                    [displayTechnical]="displayTechnical"
-                                                                   [displayFullname]="displayFullname"
-                                                                   (dragEnded)="isDragging = false"
-                                                                   (dragMoved)="highlightCells($event)"
-                                                                   (dragStarted)="isDragging = true"/>
+                                                                   [dragData]="dimension"
+                                                                   [dragDisabled]="isReadOnly"
+                                                                   [dragging]="isDragging"
+                                                                   [pixels]="PIXELS"
+                                                                   cursor="move"
+                                                                   variant="palette"/>
                                     </div>
                                 }
                             </div>
                         </div>
                     }
                     <!-- ############ DRAWING ############ -->
-                    <div class="main-column" [ngClass]="{
+                    <div [ngClass]="{
                         'col-12': !showAvailableStands && !showDimensions,
                         'col-10': showAvailableStands || showDimensions
-                    }">
+                    }" class="main-column">
                         <div class="drawing-area">
                             <div class="content-around-drawing">
                                 <div class="palette">
@@ -292,22 +292,22 @@
                                                             class="cell">
                                                             @if (cell.dimension) {
                                                                 @if (cell.dimension; as dimension) {
-                                                                    <floor-plan-dimension-tile variant="grid"
-                                                                                               [dimension]="dimension"
-                                                                                               [pixels]="PIXELS"
-                                                                                               [dragDisabled]="isReadOnly || (!showDimensions && !showAvailableStands)"
-                                                                                               [dragData]="dimension"
-                                                                                               [dragging]="isDragging"
-                                                                                               [cursor]="adaptCursor(cell)"
-                                                                                               [displayHeader]="displayHeader"
-                                                                                               [displayTechnical]="displayTechnical"
-                                                                                               [displayFullname]="displayFullname"
-                                                                                               [displaySensibleInformation]="idOnlydisplaySensibleInformation() === null || this.idOnlydisplaySensibleInformation() === cell.id"
+                                                                    <floor-plan-dimension-tile (click)="onClick($event, cell)"
                                                                                                (dblclick)="onDoubleClick($event, cell)"
-                                                                                               (click)="onClick($event, cell)"
-                                                                                               (dragStarted)="startDragging(cell)"
                                                                                                (dragEnded)="finishDragging(cell)"
-                                                                                               (dragMoved)="highlightCells($event)"/>
+                                                                                               (dragMoved)="highlightCells($event)"
+                                                                                               (dragStarted)="startDragging(cell)"
+                                                                                               [cursor]="adaptCursor(cell)"
+                                                                                               [dimension]="dimension"
+                                                                                               [displayFullname]="displayFullname"
+                                                                                               [displayHeader]="displayHeader"
+                                                                                               [displaySensibleInformation]="idOnlydisplaySensibleInformation() === null || this.idOnlydisplaySensibleInformation() === cell.id"
+                                                                                               [displayTechnical]="displayTechnical"
+                                                                                               [dragData]="dimension"
+                                                                                               [dragDisabled]="isReadOnly || (!showDimensions && !showAvailableStands)"
+                                                                                               [dragging]="isDragging"
+                                                                                               [pixels]="PIXELS"
+                                                                                               variant="grid"/>
                                                                 }
                                                             }
                                                         </td>
@@ -332,10 +332,10 @@
 
                 <!-- ############ POPINS ############ -->
 
-                <dialog-box [header]="'Détail de l\'emplacement'"
+                <dialog-box (closed)="standDialogVisible.set(false)"
                             [(visible)]="standDialogVisible"
                             [dismissableMask]="true"
-                            (closed)="standDialogVisible.set(false)">
+                            [header]="'Détail de l\'emplacement'">
 
                     <!-- CONTENU -->
                     @if (gridCellPopOver) {
@@ -350,15 +350,15 @@
                                 <b>Status</b>
                                 <span>
                                             <fa-icon
-                                                    [title]="'participation.status.list.' + stand.participation.status | translate"
+                                                    [class]="stand.participation.status | colorStatus"
                                                     [icon]="stand.participation.status | status"
-                                                    [class]="stand.participation.status | colorStatus"></fa-icon>
+                                                    [title]="'participation.status.list.' + stand.participation.status | translate"></fa-icon>
                                         </span>
 
                                 <b>Catégorie</b>
                                 <span>
-                                            <p-tag severity="warn"
-                                                   [value]="formatterCategory(stand.category ? Category[stand.category] : null) | translate"></p-tag>
+                                            <p-tag [value]="formatterCategory(stand.category ? Category[stand.category] : null) | translate"
+                                                   severity="warn"></p-tag>
                                         </span>
 
                                 <b>Tags</b>
@@ -388,17 +388,17 @@
                             @if (gridCellPopOver.dimension?.stand; as stand) {
                                 @if (stand.participation && isReadOnly) {
                                     <div class="d-flex w-100 justify-content-center gap-2">
-                                        <button-box [modeLink]="true"
-                                                    [links]="['../', 'participations', stand.participation.id, 'view']"
-                                                    type="warning"
+                                        <button-box [links]="['../', 'participations', stand.participation.id, 'view']"
+                                                    [modeLink]="true"
                                                     faIcon="link"
-                                                    translateKey="common.view"/>
+                                                    translateKey="common.view"
+                                                    type="warning"/>
 
-                                        <button-box [modeLink]="true"
-                                                    [links]="['../', 'participations', stand.participation.id, 'billing']"
-                                                    type="warning"
+                                        <button-box [links]="['../', 'participations', stand.participation.id, 'billing']"
+                                                    [modeLink]="true"
                                                     faIcon="link"
-                                                    translateKey="participation.billing.title"/>
+                                                    translateKey="participation.billing.title"
+                                                    type="warning"/>
                                     </div>
                                 }
                             }
@@ -410,17 +410,17 @@
             </div>
 
             <dialog-box
-                    [header]="'Réserver la place'"
-                    [mode]="'edit'"
-                    [(visible)]="prereservedDialogVisible"
-                    [dismissableMask]="true"
-                    [confirmDisabled]="!canConfirmPrereserved()"
                     (cancel)="onPrereservedDialogHide()"
-                    (confirm)="confirmPrereserved()">
+                    (confirm)="confirmPrereserved()"
+                    [(visible)]="prereservedDialogVisible"
+                    [confirmDisabled]="!canConfirmPrereserved()"
+                    [dismissableMask]="true"
+                    [header]="'Réserver la place'"
+                    [mode]="'edit'">
 
                 <p-iftalabel>
-                        <textarea pTextarea
-                                  [(ngModel)]="prereservedNote" rows="2" fluid></textarea>
+                        <textarea [(ngModel)]="prereservedNote"
+                                  fluid pTextarea rows="2"></textarea>
                     <label [for]="'field_prereservedNote'">Note</label>
                 </p-iftalabel>
             </dialog-box>

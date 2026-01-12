@@ -11,53 +11,53 @@ import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import {Status} from '../../enumerations/status.model';
 import {finalize, map} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {getFormattedParticipationName,} from '../../participation/model/participation.interface';
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {Toast} from "primeng/toast";
-import {ConfirmDialogService} from "../../../shared/delete-dialog/confirm-dialog.service";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {TableModule} from "primeng/table";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {InputText} from "primeng/inputtext";
-import {MultiSelect} from "primeng/multiselect";
+import {getFormattedParticipationName} from '../../participation/model/participation.interface';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Toast} from 'primeng/toast';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {TableModule} from 'primeng/table';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {MultiSelect} from 'primeng/multiselect';
 
 @Component({
-    selector: 'app-workshop',
-    templateUrl: './workshop.component.html',
-    imports: [
-        RouterModule,
-        FormsModule,
-        SharedModule,
-        StatusPipe,
-        ColorStatusPipe,
-        ReactiveFormsModule,
-        ButtonBoxComponent,
-        AlertErrorComponent,
-        ConfirmPopup,
-        Toast,
-        AlertComponent,
-        TableModule,
-        ContentPageComponent,
-        CardComponent,
-        IconField,
-        InputIcon,
-        InputText,
-        MultiSelect,
-    ]
-})
+               selector: 'app-workshop',
+               templateUrl: './workshop.component.html',
+               imports: [
+                   RouterModule,
+                   FormsModule,
+                   SharedModule,
+                   StatusPipe,
+                   ColorStatusPipe,
+                   ReactiveFormsModule,
+                   ButtonBoxComponent,
+                   AlertErrorComponent,
+                   ConfirmPopup,
+                   Toast,
+                   AlertComponent,
+                   TableModule,
+                   ContentPageComponent,
+                   CardComponent,
+                   IconField,
+                   InputIcon,
+                   InputText,
+                   MultiSelect
+               ]
+           })
 export class WorkshopComponent implements OnInit {
-    protected activatedRoute = inject(ActivatedRoute);
-    protected confirmDialogService = inject(ConfirmDialogService);
-    protected workshopService = inject(WorkshopService);
-
     workshops: IWorkshop[] = [];
     isLoading = false;
     params!: ParamMap;
     statusValues = Object.keys(Status);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected confirmDialogService = inject(ConfirmDialogService);
+    protected workshopService = inject(WorkshopService);
+    protected readonly getFormattedParticipationName = getFormattedParticipationName;
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -67,7 +67,7 @@ export class WorkshopComponent implements OnInit {
                 if (!this.workshops || this.workshops.length === 0) {
                     this.load();
                 }
-            },
+            }
         );
     }
 
@@ -76,9 +76,9 @@ export class WorkshopComponent implements OnInit {
             .pipe(
                 filter(confirmed => confirmed),
                 switchMap(() => this.workshopService.delete(workshop.id)),
-                tap(() => this.load()),
+                tap(() => this.load())
             )
-            .subscribe()
+            .subscribe();
     }
 
     load(): void {
@@ -86,17 +86,17 @@ export class WorkshopComponent implements OnInit {
 
         const queryObject: any = {
             idSalon: this.params.get('idSalon'),
-            idParticipation: this.params.get('idParticipation'),
+            idParticipation: this.params.get('idParticipation')
         };
 
         this.workshopService
             .query(queryObject)
             .pipe(map(workshops => workshops.map(workshop => ({
-                        ...workshop,
-                        fullNameFilter: getFormattedParticipationName(workshop.participation)
-                    }))
-                ),
-                finalize(() => (this.isLoading = false)))
+                          ...workshop,
+                          fullNameFilter: getFormattedParticipationName(workshop.participation)
+                      }))
+                  ),
+                  finalize(() => (this.isLoading = false)))
             .subscribe((result) => {
                 this.workshops = result ?? [];
             });
@@ -109,6 +109,4 @@ export class WorkshopComponent implements OnInit {
     previousState(): void {
         window.history.back();
     }
-
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
 }

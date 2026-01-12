@@ -9,23 +9,23 @@
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
+                    [showText]="false"
                     faIcon="arrow-left"
-                    translateKey="common.back"
-                    [showText]="false"/>
+                    translateKey="common.back"/>
         @if (isReadOnly) {
             <button-box (clickedEvent)="edit()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="pencil-alt"
-                        translateKey="common.edit"
-                        [showText]="false"/>
+                        translateKey="common.edit"/>
         }
 
         @if (editForm.controls.id.value && !isReadOnly) {
             <button-box (clickedEvent)="cancel()"
                         [isDisabled]="isLoading"
+                        [showText]="false"
                         faIcon="ban"
                         translateKey="common.cancel"
-                        [showText]="false"
                         type="secondary"/>
         }
 
@@ -33,9 +33,9 @@
             <button-box (clickedEvent)="save()"
                         [isDisabled]="editForm.invalid || isLoading"
                         [isSubmit]="true"
+                        [showText]="false"
                         faIcon="floppy-disk"
-                        translateKey="common.save"
-                        [showText]="false"/>
+                        translateKey="common.save"/>
         }
     </div>
     <app-alert-error></app-alert-error>
@@ -48,16 +48,17 @@
                 <h4>{{ 'common.info-basic' | translate }}</h4>
                 @if (isReadOnly) {
                     <div class="d-flex gap-2 align-items-center">
-                        <button-box [modeLink]="true"
+                        <button-box [isDisabled]="isLoading"
                                     [links]="['../billing']"
-                                    [isDisabled]="isLoading"
-                                    type="warning"
-                                    translateKey="participation.billing.title"/>
+                                    [modeLink]="true"
+                                    translateKey="participation.billing.title"
+                                    type="warning"/>
                         <fa-icon (click)="openHistoryModal()"
                                  [title]="'event.buttonTitle' | translate"
                                  class="clickable"
                                  icon="clock-rotate-left"></fa-icon>
-                        <menu-box [items]="menuCache"/>
+                        <menu-box [items]="menuCache"
+                                  buttonTranslateKey="common.actions"/>
                     </div>
                 }
             </div>
@@ -120,20 +121,20 @@
         <div appCardBody>
             <div class="row">
                 <div class="mt-4 col-lg-4 d-flex">
-                    <select-box [formatterFunction]="formatterExhibitor"
-                                [options]="exhibitorsOptions"
-                                [enableFilter]="true"
+                    <select-box [enableFilter]="true"
                                 [filterFields]="selectFilterExhibitor()"
+                                [formatterFunction]="formatterExhibitor"
+                                [options]="exhibitorsOptions"
+                                class="w-100"
                                 fieldName="exhibitor"
                                 formControlName="exhibitor"
-                                translateKey="participation.exhibitor"
-                                class="w-100"/>
+                                translateKey="participation.exhibitor"/>
                     @if (isReadOnly) {
-                        <link-box class="align-content-center"
-                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"
-                                  [links]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']"
+                        <link-box [links]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']"
                                   [showText]="false"
-                                  faIcon="link"/>
+                                  class="align-content-center"
+                                  faIcon="link"
+                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
                     }
                 </div>
 
@@ -200,35 +201,35 @@
                             <p-tablist>
                                 <p-tab value="0">{{ 'stand.title' | translate }}
                                     @if (stands.length > 0) {
-                                        <p-badge [value]="stands.length"
-                                                 [severity]="tabActive === '0' ? undefined : 'contrast'"></p-badge>
+                                        <p-badge [severity]="tabActive === '0' ? undefined : 'contrast'"
+                                                 [value]="stands.length"></p-badge>
                                     }
                                 </p-tab>
                                 <p-tab value="1">{{ 'conference.title' |translate }}
                                     @if (conferences.length > 0) {
-                                        <p-badge [value]="conferences.length"
-                                                 [severity]="tabActive === '1' ? undefined : 'contrast'"></p-badge>
+                                        <p-badge [severity]="tabActive === '1' ? undefined : 'contrast'"
+                                                 [value]="conferences.length"></p-badge>
                                     }
                                 </p-tab>
                                 <p-tab value="2">{{ 'workshop.title' |translate }}
                                     @if (workshops.length > 0) {
-                                        <p-badge [value]="workshops.length"
-                                                 [severity]="tabActive === '2' ? undefined : 'contrast'"></p-badge>
+                                        <p-badge [severity]="tabActive === '2' ? undefined : 'contrast'"
+                                                 [value]="workshops.length"></p-badge>
                                     }
                                 </p-tab>
                             </p-tablist>
                             <p-tabpanels>
                                 <p-tabpanel value="0">
                                     <p-table #standTable
-                                             class="mt-2"
-                                             [value]="stands"
-                                             dataKey="id"
-                                             [rows]="10"
-                                             [rowsPerPageOptions]="[10, 25, 50]"
                                              [loading]="isLoading"
                                              [paginator]="true"
-                                             sortField="registrationDate"
-                                             [sortOrder]="-1">
+                                             [rowsPerPageOptions]="[10, 25, 50]"
+                                             [rows]="10"
+                                             [sortOrder]="-1"
+                                             [value]="stands"
+                                             class="mt-2"
+                                             dataKey="id"
+                                             sortField="registrationDate">
                                         <ng-template #header>
                                             <tr>
                                                 <th>{{ 'stand.description' | translate }}</th>
@@ -239,8 +240,8 @@
                                         </ng-template>
                                         <ng-template #body let-stand>
                                             <tr>
-                                                <td class="clickable truncate"
-                                                    [routerLink]="['../stands', stand.id, 'view']">
+                                                <td [routerLink]="['../stands', stand.id, 'view']"
+                                                    class="clickable truncate">
                                                     {{ stand.description }}
                                                     @if (stand.subCategories.length > 0) {
                                                         <div>
@@ -250,13 +251,13 @@
                                                         </div>
                                                     }
                                                 </td>
-                                                <td class="clickable truncate-medium"
-                                                    [routerLink]="['../stands', stand.id, 'view']">{{ stand.dimension.dimension }}
+                                                <td [routerLink]="['../stands', stand.id, 'view']"
+                                                    class="clickable truncate-medium">{{ stand.dimension.dimension }}
                                                 </td>
-                                                <td class="clickable"
-                                                    [routerLink]="['../stands', stand.id, 'view']">
-                                                    <fa-icon [icon]="stand.status | status"
-                                                             [class]="stand.status | colorStatus"
+                                                <td [routerLink]="['../stands', stand.id, 'view']"
+                                                    class="clickable">
+                                                    <fa-icon [class]="stand.status | colorStatus"
+                                                             [icon]="stand.status | status"
                                                              [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
                                                 </td>
                                                 <td class="text-end">
@@ -264,9 +265,9 @@
                                                         <button-box
                                                                 (clickedEvent)="deleteEntity($event, stand, 'stand')"
                                                                 [showText]="false"
-                                                                type="danger"
+                                                                faIcon="times"
                                                                 translateKey="common.delete"
-                                                                faIcon="times"/>
+                                                                type="danger"/>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -279,11 +280,11 @@
                                         <ng-template #footer>
                                             <tr>
                                                 <td colspan="4">
-                                                    <button-box [modeLink]="true"
-                                                                [links]="['../stands/new']"
-                                                                type="success"
+                                                    <button-box [links]="['../stands/new']"
+                                                                [modeLink]="true"
                                                                 faIcon="plus"
-                                                                translateKey="participation.newStand"/>
+                                                                translateKey="participation.newStand"
+                                                                type="success"/>
                                                 </td>
                                             </tr>
                                         </ng-template>
@@ -291,15 +292,15 @@
                                 </p-tabpanel>
                                 <p-tabpanel value="1">
                                     <p-table #conferenceTable
-                                             [value]="conferences"
-                                             dataKey="id"
-                                             class="mt-2"
-                                             [rows]="10"
-                                             [rowsPerPageOptions]="[10, 25, 50]"
                                              [loading]="isLoading"
                                              [paginator]="true"
-                                             sortField="registrationDate"
-                                             [sortOrder]="-1">
+                                             [rowsPerPageOptions]="[10, 25, 50]"
+                                             [rows]="10"
+                                             [sortOrder]="-1"
+                                             [value]="conferences"
+                                             class="mt-2"
+                                             dataKey="id"
+                                             sortField="registrationDate">
                                         <ng-template #header>
                                             <tr>
                                                 <th>{{ 'conference.titleField' | translate }}</th>
@@ -309,14 +310,14 @@
                                         </ng-template>
                                         <ng-template #body let-conference>
                                             <tr>
-                                                <td class="clickable truncate"
-                                                    style="white-space: nowrap"
-                                                    [routerLink]="['../conferences', conference.id, 'view']">{{ conference.title }}
+                                                <td [routerLink]="['../conferences', conference.id, 'view']"
+                                                    class="clickable truncate"
+                                                    style="white-space: nowrap">{{ conference.title }}
                                                 </td>
-                                                <td class="clickable"
-                                                    [routerLink]="['../conferences', conference.id, 'view']">
-                                                    <fa-icon [icon]="conference.status | status"
-                                                             [class]="conference.status | colorStatus"
+                                                <td [routerLink]="['../conferences', conference.id, 'view']"
+                                                    class="clickable">
+                                                    <fa-icon [class]="conference.status | colorStatus"
+                                                             [icon]="conference.status | status"
                                                              [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
                                                 </td>
                                                 <td class="text-end">
@@ -324,9 +325,9 @@
                                                         <button-box
                                                                 (clickedEvent)="deleteEntity($event, conference, 'conference')"
                                                                 [showText]="false"
-                                                                type="danger"
+                                                                faIcon="times"
                                                                 translateKey="common.delete"
-                                                                faIcon="times"/>
+                                                                type="danger"/>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -339,11 +340,11 @@
                                         <ng-template #footer>
                                             <tr>
                                                 <td colspan="3">
-                                                    <button-box [modeLink]="true"
-                                                                [links]="['../conferences/new']"
-                                                                type="success"
+                                                    <button-box [links]="['../conferences/new']"
+                                                                [modeLink]="true"
                                                                 faIcon="plus"
-                                                                translateKey="participation.newConference"/>
+                                                                translateKey="participation.newConference"
+                                                                type="success"/>
                                                 </td>
                                             </tr>
                                         </ng-template>
@@ -351,15 +352,15 @@
                                 </p-tabpanel>
                                 <p-tabpanel value="2">
                                     <p-table #workshopTable
-                                             class="mt-2"
-                                             [value]="workshops"
-                                             dataKey="id"
-                                             [rows]="10"
-                                             [rowsPerPageOptions]="[10, 25, 50]"
                                              [loading]="isLoading"
                                              [paginator]="true"
-                                             sortField="registrationDate"
-                                             [sortOrder]="-1">
+                                             [rowsPerPageOptions]="[10, 25, 50]"
+                                             [rows]="10"
+                                             [sortOrder]="-1"
+                                             [value]="workshops"
+                                             class="mt-2"
+                                             dataKey="id"
+                                             sortField="registrationDate">
                                         <ng-template #header>
                                             <tr>
                                                 <th>{{ 'workshop.titleField' | translate }}</th>
@@ -369,14 +370,14 @@
                                         </ng-template>
                                         <ng-template #body let-workshop>
                                             <tr>
-                                                <td class="clickable truncate"
-                                                    style="white-space: nowrap"
-                                                    [routerLink]="['../workshops', workshop.id, 'view']">{{ workshop.title }}
+                                                <td [routerLink]="['../workshops', workshop.id, 'view']"
+                                                    class="clickable truncate"
+                                                    style="white-space: nowrap">{{ workshop.title }}
                                                 </td>
-                                                <td class="clickable"
-                                                    [routerLink]="['../workshops', workshop.id, 'view']">
-                                                    <fa-icon [icon]="workshop.status | status"
-                                                             [class]="workshop.status | colorStatus"
+                                                <td [routerLink]="['../workshops', workshop.id, 'view']"
+                                                    class="clickable">
+                                                    <fa-icon [class]="workshop.status | colorStatus"
+                                                             [icon]="workshop.status | status"
                                                              [title]="'workshop.status.list.' + workshop.status | translate"></fa-icon>
                                                 </td>
                                                 <td class="text-end">
@@ -384,9 +385,9 @@
                                                         <button-box
                                                                 (clickedEvent)="deleteEntity($event, workshop, 'workshop')"
                                                                 [showText]="false"
-                                                                type="danger"
+                                                                faIcon="times"
                                                                 translateKey="common.delete"
-                                                                faIcon="times"/>
+                                                                type="danger"/>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -399,11 +400,11 @@
                                         <ng-template #footer>
                                             <tr>
                                                 <td colspan="3">
-                                                    <button-box [modeLink]="true"
-                                                                [links]="['../workshops/new']"
-                                                                type="success"
+                                                    <button-box [links]="['../workshops/new']"
+                                                                [modeLink]="true"
                                                                 faIcon="plus"
-                                                                translateKey="participation.newWorkshop"/>
+                                                                translateKey="participation.newWorkshop"
+                                                                type="success"/>
                                                 </td>
                                             </tr>
                                         </ng-template>

@@ -4,28 +4,28 @@
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    faIcon="arrow-left"
                     [isDisabled]="isLoading"
-                    translateKey="common.back"
-                    [showText]="false"/>
+                    [showText]="false"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
         <button-box (clickedEvent)="clipboardNewsLetterExhibitors()"
-                    faIcon="copy"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
                     [isDisabled]="isLoading"
+                    faIcon="copy"
                     translateKey="exhibitor.copyNewsletter"/>
         <button-box (clickedEvent)="refresh()"
-                    faIcon="sync"
                     [faIconAnimation]="isLoading ? 'spin' : undefined"
                     [isDisabled]="isLoading"
                     [showText]="false"
+                    faIcon="sync"
                     translateKey="common.refresh"/>
-        <button-box [modeLink]="true"
+        <button-box [isDisabled]="isLoading"
                     [links]="['./new']"
-                    [isDisabled]="isLoading"
+                    [modeLink]="true"
                     [showText]="false"
-                    type="success"
                     faIcon="plus"
-                    translateKey="common.create"/>
+                    translateKey="common.create"
+                    type="success"/>
     </div>
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
@@ -35,22 +35,24 @@
         <div appCardBody>
             <div class="row">
                 <p-table #dt2
-                         [value]="exhibitors"
-                         dataKey="id"
-                         [rows]="10"
-                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [globalFilterFields]="['fullName', 'email', 'phoneNumber']"
                          [loading]="isLoading"
                          [paginator]="true"
-                         [globalFilterFields]="['fullName', 'email', 'phoneNumber']"
-                         sortField="fullName"
-                         [tableStyle]="{ 'min-width': '60rem' }">
+                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [rows]="10"
+                         [tableStyle]="{ 'min-width': '60rem' }"
+                         [value]="exhibitors"
+                         dataKey="id"
+                         sortField="fullName">
                     <ng-template #caption>
                         <div class="flex">
-                            <p-iconfield iconPosition="left" class="ml-auto">
+                            <p-iconfield class="ml-auto" iconPosition="left">
                                 <p-inputicon>
                                     <i class="pi pi-search"></i>
                                 </p-inputicon>
-                                <input pInputText type="text" (input)="dt2.filterGlobal($event.target.value, 'contains')" placeholder="Recherche" />
+                                <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
+                                       placeholder="Recherche"
+                                       type="text"/>
                             </p-iconfield>
                         </div>
                     </ng-template>
@@ -58,22 +60,23 @@
                         <tr>
                             <th pSortableColumn="fullName">{{ 'exhibitor.fullName' | translate }}
                                 <p-sortIcon field="fullName"/>
-                                <p-columnFilter type="text"
+                                <p-columnFilter display="menu"
                                                 field="fullName"
-                                                size="small"
                                                 matchMode="contains"
-                                                display="menu"></p-columnFilter>
+                                                size="small"
+                                                type="text"></p-columnFilter>
                             </th>
                             <th pSortableColumn="email">{{ 'exhibitor.email' | translate }}
                                 <p-sortIcon field="email"/>
-                                <p-columnFilter type="text" field="email" matchMode="contains" display="menu"></p-columnFilter>
+                                <p-columnFilter display="menu" field="email" matchMode="contains"
+                                                type="text"></p-columnFilter>
                             </th>
                             <th pSortableColumn="phoneNumber">{{ 'exhibitor.phoneNumber' | translate }}
                                 <p-sortIcon field="phoneNumber"/>
-                                <p-columnFilter type="text"
+                                <p-columnFilter display="menu"
                                                 field="phoneNumber"
                                                 matchMode="contains"
-                                                display="menu"></p-columnFilter>
+                                                type="text"></p-columnFilter>
                             </th>
                             <th>&nbsp;</th>
                             <th>&nbsp;</th>
@@ -81,37 +84,37 @@
                     </ng-template>
                     <ng-template #body let-exhibitor>
                         <tr>
-                            <td class="clickable truncate-medium"
-                                [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.fullName }}
+                            <td [routerLink]="['./', exhibitor.id, 'view']"
+                                class="clickable truncate-medium">{{ exhibitor.fullName }}
                             </td>
-                            <td class="clickable truncate-medium"
-                                [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.email }}
+                            <td [routerLink]="['./', exhibitor.id, 'view']"
+                                class="clickable truncate-medium">{{ exhibitor.email }}
                             </td>
-                            <td class="clickable truncate-small"
-                                [routerLink]="['./', exhibitor.id, 'view']">{{ exhibitor.phoneNumber }}
+                            <td [routerLink]="['./', exhibitor.id, 'view']"
+                                class="clickable truncate-small">{{ exhibitor.phoneNumber }}
                             </td>
-                            <td class="clickable" [routerLink]="['./', exhibitor.id, 'view']">
+                            <td [routerLink]="['./', exhibitor.id, 'view']" class="clickable">
                                 <div class="d-flex">
                                     @if (exhibitor.redFlag) {
-                                        <fa-icon icon="flag"
-                                                 [title]="'exhibitor.redFlag' | translate"
-                                                 class="text-danger"></fa-icon>
+                                        <fa-icon [title]="'exhibitor.redFlag' | translate"
+                                                 class="text-danger"
+                                                 icon="flag"></fa-icon>
                                     }
                                     @if (exhibitor.duplicateDetected) {
-                                        <fa-icon icon="triangle-exclamation"
-                                                 [title]="'exhibitor.duplicateDetected' | translate"
-                                                 class="text-warning"></fa-icon>
+                                        <fa-icon [title]="'exhibitor.duplicateDetected' | translate"
+                                                 class="text-warning"
+                                                 icon="triangle-exclamation"></fa-icon>
                                     }
                                 </div>
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     <button-box (clickedEvent)="delete($event, exhibitor)"
+                                                [isSubmit]="true"
                                                 [showText]="false"
-                                                translateKey="common.delete"
                                                 faIcon="times"
-                                                type="danger"
-                                                [isSubmit]="true"/>
+                                                translateKey="common.delete"
+                                                type="danger"/>
                                 </div>
                             </td>
                         </tr>

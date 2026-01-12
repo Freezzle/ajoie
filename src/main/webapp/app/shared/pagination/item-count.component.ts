@@ -5,11 +5,11 @@ import TranslateDirective from '../language/translate.directive';
  * A component that will take care of item count statistics of a pagination.
  */
 @Component({
-    selector: 'app-item-count',
-    template: `
+               selector: 'app-item-count',
+               template: `
     <div jhiTranslate="global.item-count" [translateValues]="{ first: first, second: second, total: total }"></div> `,
-    imports: [TranslateDirective]
-})
+               imports: [TranslateDirective]
+           })
 export default class ItemCountComponent {
     first?: number;
     second?: number;
@@ -25,7 +25,7 @@ export default class ItemCountComponent {
         if (params.page && params.totalItems !== undefined && params.itemsPerPage) {
             this.first = (params.page - 1) * params.itemsPerPage + 1;
             this.second = params.page * params.itemsPerPage < params.totalItems ? params.page * params.itemsPerPage :
-                params.totalItems;
+                          params.totalItems;
         } else {
             this.first = undefined;
             this.second = undefined;

@@ -2,7 +2,7 @@
     @for (alert of alerts(); track $index) {
         <div [ngClass]="setClasses(alert)">
             @if (alert.message) {
-                <ngb-alert [type]="alert.type" (closed)="close(alert)">
+                <ngb-alert (closed)="close(alert)" [type]="alert.type">
                     <pre [innerHTML]="alert.message"></pre>
                 </ngb-alert>
             }

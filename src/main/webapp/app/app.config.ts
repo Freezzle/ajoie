@@ -7,22 +7,19 @@ import {
     RouterFeatures,
     TitleStrategy,
     withComponentInputBinding,
-    withNavigationErrorHandler,
+    withNavigationErrorHandler
 } from '@angular/router';
-import {ServiceWorkerModule} from '@angular/service-worker';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-
-import {DEBUG_INFO_ENABLED} from 'app/app.constants';
 import './config/dayjs';
 import {TranslationModule} from 'app/shared/language/translation.module';
 import {httpInterceptorProviders} from './core/interceptor';
 import routes from './app.routes';
 import {AppPageTitleStrategy} from './app-page-title-strategy';
-import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
-import {providePrimeNG} from "primeng/config";
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {providePrimeNG} from 'primeng/config';
 import Material from '@primeuix/themes/material';
-import {ConfirmationService, MessageService} from "primeng/api";
-import {definePreset, palette} from "@primeuix/themes";
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {definePreset, palette} from '@primeuix/themes';
 
 const routerFeatures: Array<RouterFeatures> = [
     withComponentInputBinding(),
@@ -37,7 +34,7 @@ const routerFeatures: Array<RouterFeatures> = [
         } else {
             router.navigate(['/error']);
         }
-    }),
+    })
 ];
 
 // Surfaces (light) : on force quelques niveaux clés (border/text)
@@ -100,18 +97,18 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(withInterceptorsFromDi()),
         provideAnimationsAsync(),
         providePrimeNG({
-            theme: {
-                preset: MyPreset,
-                options: {
-                    darkModeSelector: false
-                }
-            }
-        }),
+                           theme: {
+                               preset: MyPreset,
+                               options: {
+                                   darkModeSelector: false
+                               }
+                           }
+                       }),
         MessageService,
         ConfirmationService,
         Title,
         {provide: LOCALE_ID, useValue: 'fr'},
         httpInterceptorProviders,
-        {provide: TitleStrategy, useClass: AppPageTitleStrategy},
-    ],
+        {provide: TitleStrategy, useClass: AppPageTitleStrategy}
+    ]
 };

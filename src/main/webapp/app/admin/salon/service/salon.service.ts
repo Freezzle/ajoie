@@ -9,9 +9,9 @@ import {createRequestOption} from 'app/core/request/request-util';
 import {ISalon, NewSalon} from '../model/salon.interface';
 import {Status} from '../../enumerations/status.model';
 import {ISalonStats} from '../model/salon-stats.interface';
-import {IPriceStandSalon} from "../model/price-stand-salon.interface";
-import {IParticipation} from "../../participation/model/participation.interface";
-import {PlanningTalksDto} from "../../talk-planning/update/talks-planning.component";
+import {IPriceStandSalon} from '../model/price-stand-salon.interface';
+import {IParticipation} from '../../participation/model/participation.interface';
+import {PlanningTalksDto} from '../../talks-planning/update/talks-planning.component';
 
 @Injectable({providedIn: 'root'})
 export class SalonService {
@@ -22,20 +22,20 @@ export class SalonService {
     create(salon: ISalon): Observable<HttpResponse<ISalon>> {
         const copy = this.convertDateFromClient(salon);
         return this.http.post<ISalon>(this.resourceUrl, copy, {observe: 'response'})
-            .pipe(map(res => this.convertResponseFromServer(res)));
+                   .pipe(map(res => this.convertResponseFromServer(res)));
     }
 
     update(salon: ISalon): Observable<HttpResponse<ISalon>> {
         const copy = this.convertDateFromClient(salon);
         return this.http
-            .put<ISalon>(`${this.resourceUrl}/${this.getSalonIdentifier(salon)}`, copy, {observe: 'response'})
-            .pipe(map(res => this.convertResponseFromServer(res)));
+                   .put<ISalon>(`${this.resourceUrl}/${this.getSalonIdentifier(salon)}`, copy, {observe: 'response'})
+                   .pipe(map(res => this.convertResponseFromServer(res)));
     }
 
     find(idSalon: string): Observable<HttpResponse<ISalon>> {
         return this.http
-            .get<ISalon>(`${this.resourceUrl}/${idSalon}`, {observe: 'response'})
-            .pipe(map(res => this.convertResponseFromServer(res)));
+                   .get<ISalon>(`${this.resourceUrl}/${idSalon}`, {observe: 'response'})
+                   .pipe(map(res => this.convertResponseFromServer(res)));
     }
 
     stats(idSalon: string, statuses: Status[]): Observable<HttpResponse<ISalonStats>> {
@@ -58,8 +58,8 @@ export class SalonService {
     query(req?: any): Observable<HttpResponse<ISalon[]>> {
         const options = createRequestOption(req);
         return this.http
-            .get<ISalon[]>(this.resourceUrl, {params: options, observe: 'response'})
-            .pipe(map(res => this.convertResponseArrayFromServer(res)));
+                   .get<ISalon[]>(this.resourceUrl, {params: options, observe: 'response'})
+                   .pipe(map(res => this.convertResponseArrayFromServer(res)));
     }
 
     generate(idSalon: string, selectedFile: File): Observable<IParticipation[]> {
@@ -85,21 +85,21 @@ export class SalonService {
 
     protected convertResponseFromServer(res: HttpResponse<ISalon>): HttpResponse<ISalon> {
         return res.clone({
-            body: res.body ? this.convertDateFromServer(res.body) : null,
-        });
+                             body: res.body ? this.convertDateFromServer(res.body) : null
+                         });
     }
 
     protected convertResponseArrayFromServer(res: HttpResponse<ISalon[]>): HttpResponse<ISalon[]> {
         return res.clone({
-            body: res.body ? res.body.map(item => this.convertDateFromServer(item)) : null,
-        });
+                             body: res.body ? res.body.map(item => this.convertDateFromServer(item)) : null
+                         });
     }
 
     protected convertDateFromClient<T extends ISalon | NewSalon>(salon: T): T {
         return {
             ...salon,
             startingDate: dayjs(salon.startingDate)?.toJSON() ?? null,
-            endingDate: dayjs(salon.endingDate)?.toJSON() ?? null,
+            endingDate: dayjs(salon.endingDate)?.toJSON() ?? null
         };
     }
 
@@ -107,7 +107,7 @@ export class SalonService {
         return {
             ...restSalon,
             startingDate: dayjs(restSalon.startingDate).toDate() ?? null,
-            endingDate: dayjs(restSalon.endingDate).toDate() ?? null,
+            endingDate: dayjs(restSalon.endingDate).toDate() ?? null
         };
     }
 }

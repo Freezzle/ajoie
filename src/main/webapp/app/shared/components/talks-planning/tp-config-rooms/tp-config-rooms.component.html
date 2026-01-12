@@ -2,10 +2,10 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <h4>Salles</h4>
-            <button pButton type="button" icon="pi pi-plus" size="small" label="Ajouter" (click)="addRoom()"></button>
+            <button (click)="addRoom()" icon="pi pi-plus" label="Ajouter" pButton size="small" type="button"></button>
         </div>
 
-        <p-table class="mt-4" [value]="rooms()" dataKey="id" [rowTrackBy]="trackById" [rowHover]="true">
+        <p-table [rowHover]="true" [rowTrackBy]="trackById" [value]="rooms()" class="mt-4" dataKey="id">
             <ng-template pTemplate="header">
                 <tr>
                     <th>Libellé</th>
@@ -13,22 +13,22 @@
                 </tr>
             </ng-template>
 
-            <ng-template pTemplate="body" let-room>
+            <ng-template let-room pTemplate="body">
                 <tr>
                     <td>
                         <input
-                                pInputText
-                                fluid="true"
-                                [ngModel]="roomLabel(room)"
-                                (ngModelChange)="setRoomLabelDraft(room.id, $event)"
                                 (blur)="commitRoomLabel(room.id)"
+                                (ngModelChange)="setRoomLabelDraft(room.id, $event)"
+                                [ngModel]="roomLabel(room)"
+                                fluid="true"
+                                pInputText
                         />
                     </td>
                     <td>
                         <button
-                                pButton type="button" icon="pi pi-trash"
-                                class="p-button-text p-button-danger"
-                                (click)="deleteRoom(room.id)"
+                                (click)="deleteRoom(room.id)" class="p-button-text p-button-danger" icon="pi pi-trash"
+                                pButton
+                                type="button"
                         ></button>
                     </td>
                 </tr>

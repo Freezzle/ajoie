@@ -11,15 +11,15 @@
     <p-tabs [value]="day?.id">
         <p-tablist>
             @for (currentDay of daysList; track currentDay.id) {
-                <p-tab [value]="currentDay.id" (click)="selectedDayId.set(currentDay.id)">
+                <p-tab (click)="selectedDayId.set(currentDay.id)" [value]="currentDay.id">
                     <div class="d-flex align-items-center justify-content-between gap-2">
                         <span>{{ currentDay.label }}</span>
 
                         @if (editionMode() && day?.id === currentDay.id) {
-                            <menu-box [items]="dayMenus().get(currentDay.id)!"
+                            <menu-box [appendTo]="'body'"
+                                      [items]="dayMenus().get(currentDay.id)!"
                                       buttonIcon="gear"
-                                      type="secondary"
-                                      [appendTo]="'body'"/>
+                                      type="secondary"/>
                         }
                     </div>
                 </p-tab>
@@ -27,11 +27,11 @@
 
             @if (editionMode()) {
                 <p-tab [value]="'__ADD__'">
-                    <button-box type="secondary"
-                                faIcon="plus"
+                    <button-box (clickedEvent)="addNewDay()"
                                 [showText]="!daysList.length"
+                                faIcon="plus"
                                 translateKey="common.create"
-                                (clickedEvent)="addNewDay()"/>
+                                type="secondary"/>
                 </p-tab>
             }
         </p-tablist>
@@ -41,8 +41,8 @@
                     <div class="mt-4 me-2 d-flex justify-content-end">
                         <div>
                             Prévisualiser ?
-                            <p-toggleswitch [ngModel]="!showGrid()"
-                                            (ngModelChange)="showGrid.set(!$event)"/>
+                            <p-toggleswitch (ngModelChange)="showGrid.set(!$event)"
+                                            [ngModel]="!showGrid()"/>
                         </div>
                     </div>
 
@@ -52,13 +52,13 @@
                         @let cols = gridColumns();
                         @let hover = hoverRange();
 
-                        <div class="mt-4 schedule"
+                        <div [style.--cell-height.px]="60"
+                             [style.--cell-width.px]="slotW"
                              [style.--slot-count]="slots.length"
-                             [style.--cell-height.px]="60"
-                             [style.--cell-width.px]="slotW">
+                             class="mt-4 schedule">
                             <div class="header-row">
                                 <div class="time-cell">{{ 'planningTalks.grid.headerRoomHour' | translate }}</div>
-                                <div class="time-track" [style.grid-template-columns]="cols">
+                                <div [style.grid-template-columns]="cols" class="time-track">
                                     @for (currentTimeHeader of slots; track currentTimeHeader) {
                                         <div class="time-cell">{{ currentTimeHeader }}</div>
                                     }
@@ -74,29 +74,29 @@
                                         {{ roomsById().get(roomData.roomId)?.label }}
                                     </div>
 
-                                    <div class="room-track"
-                                         #roomTrack
+                                    <div #roomTrack
                                          [attr.data-room-id]="roomData.roomId"
-                                         [style.grid-template-columns]="cols">
+                                         [style.grid-template-columns]="cols"
+                                         class="room-track">
 
                                         @for (currentTimeSlotRoom of slots; track currentTimeSlotRoom; let i = $index) {
                                             @let disabled = !bounds || i < bounds.start || i >= bounds.end;
 
-                                            <div class="slot-cell"
-                                                 [class.slot-disabled]="disabled"
-                                                 [class.slot-highlight]="!disabled && hover && hover.roomId === roomData.roomId && i >= hover.start && i < hover.end"></div>
+                                            <div [class.slot-disabled]="disabled"
+                                                 [class.slot-highlight]="!disabled && hover && hover.roomId === roomData.roomId && i >= hover.start && i < hover.end"
+                                                 class="slot-cell"></div>
                                         }
 
                                         @for (assignedTalk of (talksByRoom().get(roomData.roomId) ?? []); track assignedTalk.id) {
-                                            <talk-slot class="talk-assigned"
-                                                       [style.cursor]="editionMode() ? 'move' : 'default'"
-                                                       [widthInPx]="getTalkNbPeriods(assignedTalk) * slotW"
-                                                       [talk]="assignedTalk"
-                                                       cdkDrag
-                                                       [style.left.px]="(assignedTalk.startSlot * slotW)"
-                                                       [cdkDragDisabled]="!editionMode()"
+                                            <talk-slot (cdkDragEnded)="onTalkDragEnded($event, assignedTalk, day)"
                                                        (cdkDragMoved)="onTalkDragMoved($event, assignedTalk)"
-                                                       (cdkDragEnded)="onTalkDragEnded($event, assignedTalk, day)"/>
+                                                       [cdkDragDisabled]="!editionMode()"
+                                                       [style.cursor]="editionMode() ? 'move' : 'default'"
+                                                       [style.left.px]="(assignedTalk.startSlot * slotW)"
+                                                       [talk]="assignedTalk"
+                                                       [widthInPx]="getTalkNbPeriods(assignedTalk) * slotW"
+                                                       cdkDrag
+                                                       class="talk-assigned"/>
                                         }
                                     </div>
                                 </div>
@@ -112,14 +112,14 @@
                             @if (unassigned.length) {
                                 <div class="unassigned-list">
                                     @for (currentUnassigned of unassigned; track currentUnassigned.id) {
-                                        <talk-slot class="talk-unassigned"
+                                        <talk-slot (cdkDragEnded)="onTalkDragEnded($event, currentUnassigned, day)"
+                                                   (cdkDragMoved)="onTalkDragMoved($event, currentUnassigned)"
+                                                   [cdkDragDisabled]="!editionMode()"
                                                    [style.cursor]="editionMode() ? 'move' : 'default'"
                                                    [talk]="currentUnassigned"
-                                                   cdkDrag
                                                    [widthInPx]="getTalkNbPeriods(currentUnassigned) * slotW"
-                                                   [cdkDragDisabled]="!editionMode()"
-                                                   (cdkDragMoved)="onTalkDragMoved($event, currentUnassigned)"
-                                                   (cdkDragEnded)="onTalkDragEnded($event, currentUnassigned, day)"/>
+                                                   cdkDrag
+                                                   class="talk-unassigned"/>
                                     }
                                 </div>
                             } @else {
@@ -142,8 +142,8 @@
                                                 <ng-template #marker let-talk>
                                                     <p-badge
                                                             [severity]="talk.type === 'CONFERENCE' ? undefined : 'warn'"
-                                                            size="large"
-                                                            [value]="getTalkStartTimeLabel(talk)"/>
+                                                            [value]="getTalkStartTimeLabel(talk)"
+                                                            size="large"/>
                                                 </ng-template>
 
                                                 <ng-template #content let-talk>
@@ -186,36 +186,36 @@
 }
 
 <!-- DIALOG : Manage Rooms -->
-<dialog-box [header]="'Gestion des salles'"
-            [mode]="'edit'"
+<dialog-box (cancel)="showManageRooms.set(false)"
+            (confirm)="roomsPanelConfirm()"
             [(visible)]="showManageRooms"
-            (cancel)="showManageRooms.set(false)"
-            (confirm)="roomsPanelConfirm()">
-    <tp-config-rooms [data]="configuration()"
+            [header]="'Gestion des salles'"
+            [mode]="'edit'">
+    <tp-config-rooms (cancelDraft)="showManageRooms.set(false)"
                      (confirmDraft)="configuration.set($event); showManageRooms.set(false)"
-                     (cancelDraft)="showManageRooms.set(false)"/>
+                     [data]="configuration()"/>
 </dialog-box>
 
 <!-- DIALOG : Manage selected day -->
-<dialog-box [header]="manageDayCreateMode() ? 'Création d\'un jour' : 'Configuration'"
-            [mode]="'edit'"
+<dialog-box (cancel)="onManageDayCancel()"
+            (confirm)="assignPanelConfirm()"
             [(visible)]="showAssignRooms"
-            (cancel)="onManageDayCancel()"
-            (confirm)="assignPanelConfirm()">
+            [header]="manageDayCreateMode() ? 'Création d\'un jour' : 'Configuration'"
+            [mode]="'edit'">
     @if (manageDaySelectedDayId()) {
-        <tp-config-day [data]="configuration()"
-                       [selectedDayId]="manageDaySelectedDayId()!"
-                       [createIfMissing]="manageDayCreateMode()"
+        <tp-config-day (cancelDraft)="onManageDayCancel()"
                        (confirmDraft)="onManageDayConfirm($event)"
-                       (cancelDraft)="onManageDayCancel()"/>
+                       [createIfMissing]="manageDayCreateMode()"
+                       [data]="configuration()"
+                       [selectedDayId]="manageDaySelectedDayId()!"/>
     }
 </dialog-box>
 
 <!-- DIALOG : Removing selected day -->
-<dialog-box [header]="'Supprimer le jour'"
-            [mode]="'edit'"
+<dialog-box (cancel)="showConfirmDeleteDay.set(false)"
+            (confirm)="confirmDeleteSelectedDay()"
             [(visible)]="showConfirmDeleteDay"
-            (cancel)="showConfirmDeleteDay.set(false)"
-            (confirm)="confirmDeleteSelectedDay()">
+            [header]="'Supprimer le jour'"
+            [mode]="'edit'">
     <div [innerHTML]="'planningTalks.removeDay' | translate: {day: selectedDay()?.label}"></div>
 </dialog-box>

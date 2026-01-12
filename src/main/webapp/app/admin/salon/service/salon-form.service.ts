@@ -32,48 +32,48 @@ export class SalonFormService {
     createSalonFormGroup(salon: ISalon | null): FormGroup<SalonFormGroup> {
         const raw: ISalon = {
             ...this.getDefaultSalonFormValue() as ISalon,
-            ...(salon ?? {}),
+            ...(salon ?? {})
         };
 
         return new FormGroup<SalonFormGroup>({
-            id: new FormControl({value: raw.id, disabled: true}),
-            place: new FormControl(raw.place, {
-                validators: [Validators.required, Validators.minLength(5), Validators.maxLength(50)],
-            }),
-            referenceNumber: new FormControl(raw.referenceNumber, {
-                validators: [Validators.required, Validators.maxLength(10)],
-            }),
-            startingDate: new FormControl(raw.startingDate,
-                {validators: [Validators.required]},
-            ),
-            endingDate: new FormControl(raw.endingDate,
-                {validators: [Validators.required]},
-            ),
-            priceMeal1: new FormControl(raw.priceMeal1, Validators.required),
-            priceMeal2: new FormControl(raw.priceMeal2, Validators.required),
-            priceMeal3: new FormControl(raw.priceMeal3, Validators.required),
-            priceConference: new FormControl(raw.priceConference, Validators.required),
-            priceWorkshop: new FormControl(raw.priceWorkshop, Validators.required),
-            priceSharingStand: new FormControl(raw.priceSharingStand, Validators.required),
-            priceStandSalons: new FormArray<FormGroup<PriceStandGroup>>(
-                (raw.priceStandSalons).map(priceStand => this.createPriceStand(priceStand)),
-            ),
-            extraInformation: new FormControl(raw.extraInformation)
-        });
+                                                 id: new FormControl({value: raw.id, disabled: true}),
+                                                 place: new FormControl(raw.place, {
+                                                     validators: [Validators.required, Validators.minLength(5), Validators.maxLength(50)]
+                                                 }),
+                                                 referenceNumber: new FormControl(raw.referenceNumber, {
+                                                     validators: [Validators.required, Validators.maxLength(10)]
+                                                 }),
+                                                 startingDate: new FormControl(raw.startingDate,
+                                                                               {validators: [Validators.required]}
+                                                 ),
+                                                 endingDate: new FormControl(raw.endingDate,
+                                                                             {validators: [Validators.required]}
+                                                 ),
+                                                 priceMeal1: new FormControl(raw.priceMeal1, Validators.required),
+                                                 priceMeal2: new FormControl(raw.priceMeal2, Validators.required),
+                                                 priceMeal3: new FormControl(raw.priceMeal3, Validators.required),
+                                                 priceConference: new FormControl(raw.priceConference, Validators.required),
+                                                 priceWorkshop: new FormControl(raw.priceWorkshop, Validators.required),
+                                                 priceSharingStand: new FormControl(raw.priceSharingStand, Validators.required),
+                                                 priceStandSalons: new FormArray<FormGroup<PriceStandGroup>>(
+                                                     (raw.priceStandSalons).map(priceStand => this.createPriceStand(priceStand))
+                                                 ),
+                                                 extraInformation: new FormControl(raw.extraInformation)
+                                             });
     }
 
     createPriceStand(priceStand: IPriceStandSalon | null): FormGroup<PriceStandGroup> {
         const raw = {
             ...this.getDefaultPriceDimensionFormValue() as IPriceStandSalon,
             ...priceStand ?? {}
-        }
+        };
         return new FormGroup<PriceStandGroup>({
-            id: new FormControl({value: raw.id, disabled: true}),
-            price: new FormControl(raw.price, Validators.required),
-            dimension: new FormControl(raw.dimension, Validators.required),
-            widthMeter: new FormControl(raw.widthMeter, Validators.required),
-            heightMeter: new FormControl(raw.heightMeter, Validators.required)
-        })
+                                                  id: new FormControl({value: raw.id, disabled: true}),
+                                                  price: new FormControl(raw.price, Validators.required),
+                                                  dimension: new FormControl(raw.dimension, Validators.required),
+                                                  widthMeter: new FormControl(raw.widthMeter, Validators.required),
+                                                  heightMeter: new FormControl(raw.heightMeter, Validators.required)
+                                              });
     }
 
     getSalon(form: FormGroup<SalonFormGroup>): ISalon {

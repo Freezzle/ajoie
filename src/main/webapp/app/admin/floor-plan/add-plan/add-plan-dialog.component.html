@@ -7,22 +7,22 @@
         <app-alert-error></app-alert-error>
         <div class="row">
             <div class="col-sm-12 fw-bold align-content-center position-relative">
-                <label for="field_name">Nom du plan</label> <input class="form-control" [(ngModel)]="info.name"
+                <label for="field_name">Nom du plan</label> <input [(ngModel)]="info.name" class="form-control"
                                                                    id="field_name" name="name" type="text"/>
             </div>
             <div class="col-sm-4 fw-bold align-content-center position-relative">
                 <label for="field_width">Longueur (m)</label>
-                <input class="form-control" [(ngModel)]="info.widthMeter" id="field_width" name="widthMeter"
+                <input [(ngModel)]="info.widthMeter" class="form-control" id="field_width" name="widthMeter"
                        type="number"/>
             </div>
             <div class="col-sm-4 fw-bold align-content-center position-relative">
                 <label for="field_height">Hauteur (m)</label>
-                <input class="form-control" [(ngModel)]="info.heightMeter" id="field_height" name="heightMeter"
+                <input [(ngModel)]="info.heightMeter" class="form-control" id="field_height" name="heightMeter"
                        type="number"/>
             </div>
             <div class="col-sm-4 fw-bold align-content-center position-relative">
                 <label for="field_spacing">Taille d'un carré (m)</label>
-                <input class="form-control" [(ngModel)]="info.spacingMeter" id="field_spacing" name="spacingMeter"
+                <input [(ngModel)]="info.spacingMeter" class="form-control" id="field_spacing" name="spacingMeter"
                        type="number"/>
             </div>
         </div>

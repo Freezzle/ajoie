@@ -12,34 +12,34 @@ import {Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {ISalonStats} from '../model/salon-stats.interface';
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
-import {Toast, ToastModule} from "primeng/toast";
-import {MessageService} from "primeng/api";
-import {formatDate} from "@angular/common";
-import {AlertComponent} from "../../../shared/alert/alert.component";
-import {AlertErrorComponent} from "../../../shared/alert/alert-error.component";
-import {ConfirmPopup} from "primeng/confirmpopup";
-import {CardComponent} from "../../../shared/components/card/card.component";
-import {ContentPageComponent} from "../../../shared/components/content-page/content-page.component";
+import {Toast, ToastModule} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {formatDate} from '@angular/common';
+import {AlertComponent} from '../../../shared/alert/alert.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 
 @Component({
-    selector: 'app-salon-stats',
-    templateUrl: './salon-stats.component.html',
-    styleUrl: './salon-stats.component.scss',
-    imports: [
-        SharedModule,
-        RouterModule,
-        FormsModule,
-        ReactiveFormsModule,
-        ToastModule,
-        ButtonBoxComponent,
-        Toast,
-        AlertComponent,
-        AlertErrorComponent,
-        ConfirmPopup,
-        CardComponent,
-        ContentPageComponent,
-    ]
-})
+               selector: 'app-salon-stats',
+               templateUrl: './salon-stats.component.html',
+               styleUrl: './salon-stats.component.scss',
+               imports: [
+                   SharedModule,
+                   RouterModule,
+                   FormsModule,
+                   ReactiveFormsModule,
+                   ToastModule,
+                   ButtonBoxComponent,
+                   Toast,
+                   AlertComponent,
+                   AlertErrorComponent,
+                   ConfirmPopup,
+                   CardComponent,
+                   ContentPageComponent
+               ]
+           })
 export class SalonStatsComponent implements OnInit {
     @ViewChild('fileInput') fileInput!: ElementRef;
 
@@ -47,6 +47,7 @@ export class SalonStatsComponent implements OnInit {
     combinedStats$: Observable<ISalonStats[]> | undefined;
     selectedFile: File | null = null;
     protected salonService = inject(SalonService);
+    protected readonly getFormattedParticipationName = getFormattedParticipationName;
     private readonly messageService = inject(MessageService);
     private readonly locale = inject(LOCALE_ID);
 
@@ -83,31 +84,31 @@ export class SalonStatsComponent implements OnInit {
 
     loadStats(): void {
         this.combinedStats$ = combineLatest([
-            this.salonService.stats(this.salon()!.id, [Status.IN_VERIFICATION]).pipe(
-                mergeMap((stats: HttpResponse<ISalonStats>) => {
-                    if (stats.body) {
-                        return of(stats.body);
-                    }
-                    return EMPTY;
-                }),
-            ),
-            this.salonService.stats(this.salon()!.id, [Status.ACCEPTED, Status.VALIDATED, Status.CLOSED]).pipe(
-                mergeMap((stats: HttpResponse<ISalonStats>) => {
-                    if (stats.body) {
-                        return of(stats.body);
-                    }
-                    return EMPTY;
-                }),
-            ),
-            this.salonService.stats(this.salon()!.id, [Status.CANCELED, Status.REFUSED]).pipe(
-                mergeMap((stats: HttpResponse<ISalonStats>) => {
-                    if (stats.body) {
-                        return of(stats.body);
-                    }
-                    return EMPTY;
-                }),
-            ),
-        ]);
+                                                this.salonService.stats(this.salon()!.id, [Status.IN_VERIFICATION]).pipe(
+                                                    mergeMap((stats: HttpResponse<ISalonStats>) => {
+                                                        if (stats.body) {
+                                                            return of(stats.body);
+                                                        }
+                                                        return EMPTY;
+                                                    })
+                                                ),
+                                                this.salonService.stats(this.salon()!.id, [Status.ACCEPTED, Status.VALIDATED, Status.CLOSED]).pipe(
+                                                    mergeMap((stats: HttpResponse<ISalonStats>) => {
+                                                        if (stats.body) {
+                                                            return of(stats.body);
+                                                        }
+                                                        return EMPTY;
+                                                    })
+                                                ),
+                                                this.salonService.stats(this.salon()!.id, [Status.CANCELED, Status.REFUSED]).pipe(
+                                                    mergeMap((stats: HttpResponse<ISalonStats>) => {
+                                                        if (stats.body) {
+                                                            return of(stats.body);
+                                                        }
+                                                        return EMPTY;
+                                                    })
+                                                )
+                                            ]);
     }
 
     onFileSelected(event: Event): void {
@@ -126,17 +127,17 @@ export class SalonStatsComponent implements OnInit {
             const detailMessage = participationsNew.map(part => {
                 const therapistName = part.therapistName?.length > 10 ? part.therapistName.slice(0, 10) + '...' : part.therapistName;
                 return '<' + therapistName + '> inscrit le ' + (part.registrationDate
-                    ? formatDate(part.registrationDate, 'dd.MM.yyyy HH:mm', this.locale)
-                    : '-');
+                                                                ? formatDate(part.registrationDate, 'dd.MM.yyyy HH:mm', this.locale)
+                                                                : '-');
             });
 
             this.messageService.add({
-                severity: 'info',
-                summary: 'Résultat',
-                detail: 'Nombre d\'inscriptions importées : ' + participationsNew.length + '\n\n' + detailMessage.join('\n'),
-                closable: true,
-                sticky: true
-            });
+                                        severity: 'info',
+                                        summary: 'Résultat',
+                                        detail: 'Nombre d\'inscriptions importées : ' + participationsNew.length + '\n\n' + detailMessage.join('\n'),
+                                        closable: true,
+                                        sticky: true
+                                    });
 
             if (this.fileInput) {
                 this.fileInput.nativeElement.value = ''; // Reset the file input field
@@ -160,6 +161,4 @@ export class SalonStatsComponent implements OnInit {
 
         return [remaining, resultPaid, resultDiscount];
     }
-
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
 }

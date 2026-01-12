@@ -1,16 +1,16 @@
-<p-dialog [visible]="visible()"
+<p-dialog (onHide)="onHide()"
           (visibleChange)="visible.set($event)"
-          (onHide)="onHide()"
-          [modal]="true"
-          appendTo="body"
+          [blockScroll]="blockScroll()"
+          [breakpoints]="{ '1024px': '90vw', '640px': '95vw' }"
           [closable]="closable()"
           [closeOnEscape]="closeOnEscape()"
           [dismissableMask]="dismissableMask()"
-          [blockScroll]="blockScroll()"
-          [style]="{ width: '1080px', maxWidth: '1080px' }"
-          [breakpoints]="{ '1024px': '90vw', '640px': '95vw' }"
           [draggable]="false"
-          [resizable]="false">
+          [modal]="true"
+          [resizable]="false"
+          [style]="{ width: '1080px', maxWidth: '1080px' }"
+          [visible]="visible()"
+          appendTo="body">
     <ng-template pTemplate="header">
         <div class="dialog-header">
             <span class="dialog-title"><h4>{{ header() }}</h4></span>
@@ -23,18 +23,18 @@
         @case ('edit') {
             <ng-template pTemplate="footer">
                 <div class="dialog-footer">
-                    <button pButton
-                            type="button"
+                    <button (click)="onCancelClick()"
                             class="p-button-text"
-                            (click)="onCancelClick()">
+                            pButton
+                            type="button">
                         {{ cancelLabel() }}
                     </button>
 
-                    <button pButton
-                            type="button"
+                    <button (click)="onConfirmClick()"
                             [disabled]="confirmDisabled() || confirmLoading()"
                             [loading]="confirmLoading()"
-                            (click)="onConfirmClick()">
+                            pButton
+                            type="button">
                         {{ confirmLabel() }}
                     </button>
                 </div>

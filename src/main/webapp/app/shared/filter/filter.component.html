@@ -1,8 +1,8 @@
 @if (filters.hasAnyFilterSet()) {
     <div class="filter-display">
         <span jhiTranslate="entity.filters.set">Following filters are set</span>
-        <button class="btn" (click)="clearAllFilters()" (keydown.enter)="clearAllFilters()">
-            <fa-icon icon="times" [title]="'entity.filters.clearAll' | translate"></fa-icon>
+        <button (click)="clearAllFilters()" (keydown.enter)="clearAllFilters()" class="btn">
+            <fa-icon [title]="'entity.filters.clearAll' | translate" icon="times"></fa-icon>
         </button>
         <ul>
             @for (filterOption of filters.filterOptions; track filterOption.name) {
@@ -10,9 +10,9 @@
                     <li>
                         <span>{{ filterOption.name }}:</span>
                         {{ value }}
-                        <button class="btn" (click)="clearFilter(filterOption.name, value)"
-                                (keydown.enter)="clearFilter(filterOption.name, value)">
-                            <fa-icon icon="times" [title]="'entity.filters.clear' | translate"></fa-icon>
+                        <button (click)="clearFilter(filterOption.name, value)" (keydown.enter)="clearFilter(filterOption.name, value)"
+                                class="btn">
+                            <fa-icon [title]="'entity.filters.clear' | translate" icon="times"></fa-icon>
                         </button>
                     </li>
                 }

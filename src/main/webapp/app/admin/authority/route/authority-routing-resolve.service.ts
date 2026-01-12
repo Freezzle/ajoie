@@ -20,7 +20,7 @@ const authorityResolve = (route: ActivatedRouteSnapshot): Observable<null | IAut
                         inject(Router).navigate(['404']);
                         return EMPTY;
                     }
-                }),
+                })
             );
     }
     return of(null);

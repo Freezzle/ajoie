@@ -8,9 +8,9 @@ export interface SortChangeDirective<T> {
 }
 
 @Directive({
-    standalone: true,
-    selector: '[jhiSort]',
-})
+               standalone: true,
+               selector: '[jhiSort]'
+           })
 export class SortDirective implements SortChangeDirective<string> {
     @Input() sortState!: SortStateSignal;
 

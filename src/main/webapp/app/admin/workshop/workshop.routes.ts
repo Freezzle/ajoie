@@ -10,41 +10,41 @@ const workshopRoute: Routes = [
         path: '',
         component: WorkshopComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idWorkshop/view',
         component: WorkshopUpdateComponent,
         resolve: {
-            workshop: WorkshopResolve,
+            workshop: WorkshopResolve
         },
         data: {
-            readonly: true,
+            readonly: true
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: 'new',
         component: WorkshopUpdateComponent,
         resolve: {
-            workshop: WorkshopResolve,
+            workshop: WorkshopResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idWorkshop/edit',
         component: WorkshopUpdateComponent,
         resolve: {
-            workshop: WorkshopResolve,
+            workshop: WorkshopResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
-    },
+        canActivate: [UserRouteAccessService]
+    }
 ];
 
 export default workshopRoute;

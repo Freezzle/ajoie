@@ -4,10 +4,10 @@ import SharedModule from '../../shared.module';
 import {RouterLink} from '@angular/router';
 
 @Component({
-    imports: [SharedModule, RouterLink],
-    selector: 'link-box',
-    templateUrl: './link-box.component.html'
-})
+               imports: [SharedModule, RouterLink],
+               selector: 'link-box',
+               templateUrl: './link-box.component.html'
+           })
 export class LinkBoxComponent {
     @Input()
     links: string[] = [];

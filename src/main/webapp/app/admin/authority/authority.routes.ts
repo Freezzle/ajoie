@@ -11,41 +11,41 @@ const authorityRoute: Routes = [
         path: '',
         component: AuthorityComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':name/view',
         component: AuthorityUpdateComponent,
         resolve: {
-            authority: AuthorityResolve,
+            authority: AuthorityResolve
         },
         data: {
-            readonly: true,
+            readonly: true
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':name/edit',
         component: AuthorityUpdateComponent,
         resolve: {
-            salon: SalonResolve,
+            salon: SalonResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: 'new',
         component: AuthorityUpdateComponent,
         resolve: {
-            authority: AuthorityResolve,
+            authority: AuthorityResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
-    },
+        canActivate: [UserRouteAccessService]
+    }
 ];
 
 export default authorityRoute;

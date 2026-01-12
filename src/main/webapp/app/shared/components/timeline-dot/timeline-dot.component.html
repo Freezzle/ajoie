@@ -19,10 +19,10 @@
             <div class="timeline-endpoint timeline-point-startend timeline-endpoint--end"></div>
 
             <!-- Points intermédiaires -->
-            @for(point of computedPoints; track point) {
-                <div class="timeline-point" [style.left.%]="point.position">
+            @for (point of computedPoints; track point) {
+                <div [style.left.%]="point.position" class="timeline-point">
                     <div [class.timeline-point-dot]="!point.isMilestone"
-                    [class.timeline-point-milestone]="point.isMilestone"></div>
+                         [class.timeline-point-milestone]="point.isMilestone"></div>
                     <div class="timeline-point-label">
                         <div class="timeline-point-label-text">
                             {{ point.label ?? '' }}

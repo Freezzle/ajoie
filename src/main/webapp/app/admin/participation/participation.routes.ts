@@ -7,68 +7,68 @@ import {ParticipationUpdateComponent} from './update/participation-update.compon
 import ParticipationResolve from './service/participation-routing-resolve.service';
 import conferenceRoutes from '../conference/conference.routes';
 import standRoutes from '../stand/stand.routes';
-import workshopRoutes from "../workshop/workshop.routes";
+import workshopRoutes from '../workshop/workshop.routes';
 
 const participationRoute: Routes = [
     {
         path: '',
         component: ParticipationComponent,
         data: {},
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: 'new',
         component: ParticipationUpdateComponent,
         resolve: {
-            salon: ParticipationResolve,
+            salon: ParticipationResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idParticipation/billing',
         component: BillingComponent,
         resolve: {
-            participation: ParticipationResolve,
+            participation: ParticipationResolve
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idParticipation/view',
         component: ParticipationUpdateComponent,
         resolve: {
-            participation: ParticipationResolve,
+            participation: ParticipationResolve
         },
         data: {
-            readonly: true,
+            readonly: true
         },
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: ':idParticipation/conferences',
-        children: conferenceRoutes,
+        children: conferenceRoutes
     },
     {
         path: ':idParticipation/workshops',
-        children: workshopRoutes,
+        children: workshopRoutes
     },
     {
         path: ':idParticipation/stands',
-        children: standRoutes,
+        children: standRoutes
     },
     {
         path: ':idParticipation/edit',
         component: ParticipationUpdateComponent,
         resolve: {
-            participation: ParticipationResolve,
+            participation: ParticipationResolve
         },
         data: {
-            readonly: false,
+            readonly: false
         },
-        canActivate: [UserRouteAccessService],
-    },
+        canActivate: [UserRouteAccessService]
+    }
 ];
 
 export default participationRoute;

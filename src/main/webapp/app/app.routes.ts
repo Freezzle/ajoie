@@ -13,31 +13,31 @@ const routes: Routes = [
         path: '',
         component: HomeComponent,
         title: 'home.title',
-        canActivate: [UserRouteAccessService],
+        canActivate: [UserRouteAccessService]
     },
     {
         path: '',
         component: NavbarComponent,
-        outlet: 'navbar',
+        outlet: 'navbar'
     },
     {
         path: 'admin',
         data: {
-            authorities: [Authority.ADMIN, Authority.ADMIN_BUSINESS],
+            authorities: [Authority.ADMIN, Authority.ADMIN_BUSINESS]
         },
         canActivate: [UserRouteAccessService],
-        loadChildren: () => import('./admin/admin.routes'),
+        loadChildren: () => import('./admin/admin.routes')
     },
     {
         path: 'account',
-        loadChildren: () => import('./account/account.route'),
+        loadChildren: () => import('./account/account.route')
     },
     {
         path: 'login',
         component: LoginComponent,
-        title: 'login.title',
+        title: 'login.title'
     },
-    ...errorRoute,
+    ...errorRoute
 ];
 
 export default routes;

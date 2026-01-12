@@ -5,20 +5,20 @@ import {missingTranslationHandler, translatePartialLoader} from 'app/config/tran
 import {StateStorageService} from 'app/core/auth/state-storage.service';
 
 @NgModule({
-    imports: [
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: translatePartialLoader,
-                deps: [HttpClient],
-            },
-            missingTranslationHandler: {
-                provide: MissingTranslationHandler,
-                useFactory: missingTranslationHandler,
-            },
-        })
-    ],
-})
+              imports: [
+                  TranslateModule.forRoot({
+                                              loader: {
+                                                  provide: TranslateLoader,
+                                                  useFactory: translatePartialLoader,
+                                                  deps: [HttpClient]
+                                              },
+                                              missingTranslationHandler: {
+                                                  provide: MissingTranslationHandler,
+                                                  useFactory: missingTranslationHandler
+                                              }
+                                          })
+              ]
+          })
 export class TranslationModule {
     private readonly translateService = inject(TranslateService);
     private readonly stateStorageService = inject(StateStorageService);

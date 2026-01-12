@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {Injectable} from '@angular/core';
 
 export interface Country {
     name: string;
@@ -53,7 +53,7 @@ export class CountryService {
         'CH',
         'UA',
         'VA',
-        'MK',
+        'MK'
     ];
 
     getAll(): string[] {
@@ -61,8 +61,9 @@ export class CountryService {
     }
 
     getByIsoCode(isoCode: string | null): string | null {
-        if (!isoCode)
-            {return null;}
+        if (!isoCode) {
+            return null;
+        }
 
         const normalized = isoCode.trim().toUpperCase();
         return this.countries.find(country => country === normalized) ?? null;

@@ -8,46 +8,81 @@ import {DatePickerModule} from 'primeng/datepicker';
 import {ButtonModule} from 'primeng/button';
 
 import {TimelineData} from '../model/timeline-data';
-import {InputText} from "primeng/inputtext";
-import {Divider} from "primeng/divider";
-import {TimelineDay} from "../model/timeline-day";
+import {InputText} from 'primeng/inputtext';
+import {Divider} from 'primeng/divider';
+import {TimelineDay} from '../model/timeline-day';
 
 type IdLabel = { id: string; label: string };
 
 @Component({
-    selector: 'tp-config-day',
-    standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        TableModule,
-        SelectModule,
-        DatePickerModule,
-        ButtonModule,
-        InputText,
-        Divider,
-    ],
-    templateUrl: './tp-config-day.component.html',
-})
+               selector: 'tp-config-day',
+               standalone: true,
+               imports: [
+                   CommonModule,
+                   FormsModule,
+                   ReactiveFormsModule,
+                   TableModule,
+                   SelectModule,
+                   DatePickerModule,
+                   ButtonModule,
+                   InputText,
+                   Divider
+               ],
+               templateUrl: './tp-config-day.component.html'
+           })
 export class TpConfigDayComponent {
+    _draft = signal<TimelineData | null>(null);
+    @Input() newDayDefaultLabel = 'Nouveau jour';
+    @Output() confirmDraft = new EventEmitter<TimelineData>();
+    @Output() cancelDraft = new EventEmitter<void>();
+    rooms = computed(() => this._draft()?.rooms ?? []);
+    roomOptions = computed<IdLabel[]>(() =>
+                                          this.rooms()
+                                              .slice()
+                                              .sort((a, b) => a.label.localeCompare(b.label))
+                                              .map(r => ({id: r.id, label: r.label}))
+    );
+    selectedDayRoomRows = computed(() => {
+        const day = this.day();
+        if (!day) {
+            return [];
+        }
+        const roomsById = new Map(this.rooms().map(r => [r.id, r]));
+        return day.rooms
+                  .map(rd => ({
+                      roomId: rd.roomId,
+                      roomLabel: roomsById.get(rd.roomId)?.label ?? '(salle supprimée)',
+                      startingHour: rd.startingHour,
+                      endingHour: rd.endingHour
+                  }))
+                  .sort((a, b) => a.roomLabel.localeCompare(b.roomLabel));
+    });
+    availableRoomsForDay = computed<IdLabel[]>(() => {
+        const day = this.day();
+        if (!day) {
+            return this.roomOptions();
+        }
+        const used = new Set(day.rooms.map(x => x.roomId));
+        return this.roomOptions().filter(r => !used.has(r.id));
+    });
     private readonly TIME_REF = new Date(2000, 0, 1, 0, 0, 0, 0);
     private fb = inject(NonNullableFormBuilder);
+    addRoomToDayForm = this.fb.group({
+                                         roomId: this.fb.control<string | null>(null, {validators: [Validators.required]}),
+                                         startingHour: this.fb.control<Date>(this.timeAt(8, 0)),
+                                         endingHour: this.fb.control<Date>(this.timeAt(18, 0))
+                                     });
+    private dayLabelDraft = signal<Record<string, string>>({});
 
-    _draft = signal<TimelineData | null>(null);
     private _selectedDayId = signal<string | null>(null);
-    private _createIfMissing = signal(false);
-    @Input()
-    set createIfMissing(v: boolean) {
-        this._createIfMissing.set(!!v);
-        this.ensureSelectedDayExistsInDraft();
-    }
 
-    get createIfMissing(): boolean {
-        return this._createIfMissing();
+    get selectedDayId(): string {
+        const v = this._selectedDayId();
+        if (!v) {
+            throw new Error('selectedDayId required');
+        }
+        return v;
     }
-
-    @Input() newDayDefaultLabel = 'Nouveau jour';
 
     @Input({required: true})
     set selectedDayId(value: string | null) {
@@ -55,10 +90,25 @@ export class TpConfigDayComponent {
         this.ensureSelectedDayExistsInDraft();
     }
 
-    get selectedDayId(): string {
-        const v = this._selectedDayId();
-        if (!v) throw new Error('selectedDayId required');
-        return v;
+    day = computed(() => {
+        const d = this._draft();
+        const id = this._selectedDayId();
+        if (!d || !id) {
+            return null;
+        }
+        return d.days.find(x => x.id === id) ?? null;
+    });
+
+    private _createIfMissing = signal(false);
+
+    get createIfMissing(): boolean {
+        return this._createIfMissing();
+    }
+
+    @Input()
+    set createIfMissing(v: boolean) {
+        this._createIfMissing.set(!!v);
+        this.ensureSelectedDayExistsInDraft();
     }
 
     @Input({required: true})
@@ -74,54 +124,7 @@ export class TpConfigDayComponent {
         this.ensureSelectedDayExistsInDraft();
     }
 
-    @Output() confirmDraft = new EventEmitter<TimelineData>();
-    @Output() cancelDraft = new EventEmitter<void>();
-
-    rooms = computed(() => this._draft()?.rooms ?? []);
-    day = computed(() => {
-        const d = this._draft();
-        const id = this._selectedDayId();
-        if (!d || !id) return null;
-        return d.days.find(x => x.id === id) ?? null;
-    });
-
-    roomOptions = computed<IdLabel[]>(() =>
-        this.rooms()
-            .slice()
-            .sort((a, b) => a.label.localeCompare(b.label))
-            .map(r => ({id: r.id, label: r.label}))
-    );
-
     trackByRoomId = (_: number, item: { roomId: string }) => item.roomId;
-
-    selectedDayRoomRows = computed(() => {
-        const day = this.day();
-        if (!day) return [];
-        const roomsById = new Map(this.rooms().map(r => [r.id, r]));
-        return day.rooms
-            .map(rd => ({
-                roomId: rd.roomId,
-                roomLabel: roomsById.get(rd.roomId)?.label ?? '(salle supprimée)',
-                startingHour: rd.startingHour,
-                endingHour: rd.endingHour,
-            }))
-            .sort((a, b) => a.roomLabel.localeCompare(b.roomLabel));
-    });
-
-    availableRoomsForDay = computed<IdLabel[]>(() => {
-        const day = this.day();
-        if (!day) return this.roomOptions();
-        const used = new Set(day.rooms.map(x => x.roomId));
-        return this.roomOptions().filter(r => !used.has(r.id));
-    });
-
-    addRoomToDayForm = this.fb.group({
-        roomId: this.fb.control<string | null>(null, {validators: [Validators.required]}),
-        startingHour: this.fb.control<Date>(this.timeAt(8, 0)),
-        endingHour: this.fb.control<Date>(this.timeAt(18, 0)),
-    });
-
-    private dayLabelDraft = signal<Record<string, string>>({});
 
     dayLabel(day: TimelineDay): string {
         return this.dayLabelDraft()[day.id] ?? day.label;
@@ -133,7 +136,9 @@ export class TpConfigDayComponent {
 
     addRoomToDay() {
         const day = this.day();
-        if (!day) return;
+        if (!day) {
+            return;
+        }
 
         if (this.addRoomToDayForm.invalid) {
             this.addRoomToDayForm.markAllAsTouched();
@@ -143,32 +148,44 @@ export class TpConfigDayComponent {
         const roomId = this.addRoomToDayForm.controls.roomId.value!;
         const start = this.normalizeTime(this.addRoomToDayForm.controls.startingHour.value);
         const end = this.normalizeTime(this.addRoomToDayForm.controls.endingHour.value);
-        if (end.getTime() <= start.getTime()) return;
+        if (end.getTime() <= start.getTime()) {
+            return;
+        }
 
         this.commit(next => {
             const d = next.days.find(x => x.id === day.id);
-            if (!d) return;
-            if (d.rooms.some(r => r.roomId === roomId)) return;
+            if (!d) {
+                return;
+            }
+            if (d.rooms.some(r => r.roomId === roomId)) {
+                return;
+            }
             d.rooms.push({roomId, startingHour: start, endingHour: end});
         });
 
         this.addRoomToDayForm.reset({
-            roomId: null,
-            startingHour: this.timeAt(8, 0),
-            endingHour: this.timeAt(18, 0),
-        });
+                                        roomId: null,
+                                        startingHour: this.timeAt(8, 0),
+                                        endingHour: this.timeAt(18, 0)
+                                    });
     }
 
     commitDayLabel(dayId: string) {
         const value = this.dayLabelDraft()[dayId];
-        if (value === undefined) return;
+        if (value === undefined) {
+            return;
+        }
 
         const v = value.trim();
-        if (!v) return;
+        if (!v) {
+            return;
+        }
 
         this.commit(next => {
             const d = next.days.find(x => x.id === dayId);
-            if (d) d.label = v;
+            if (d) {
+                d.label = v;
+            }
         });
 
         this.dayLabelDraft.update(m => {
@@ -180,17 +197,25 @@ export class TpConfigDayComponent {
 
     updateRoomTime(roomId: string, startingHour: Date, endingHour: Date) {
         const day = this.day();
-        if (!day) return;
+        if (!day) {
+            return;
+        }
 
         const start = this.normalizeTime(startingHour);
         const end = this.normalizeTime(endingHour);
-        if (end.getTime() <= start.getTime()) return;
+        if (end.getTime() <= start.getTime()) {
+            return;
+        }
 
         this.commit(next => {
             const d = next.days.find(x => x.id === day.id);
-            if (!d) return;
+            if (!d) {
+                return;
+            }
             const rd = d.rooms.find(x => x.roomId === roomId);
-            if (!rd) return;
+            if (!rd) {
+                return;
+            }
             rd.startingHour = start;
             rd.endingHour = end;
         });
@@ -198,11 +223,15 @@ export class TpConfigDayComponent {
 
     removeRoomFromDay(roomId: string) {
         const day = this.day();
-        if (!day) return;
+        if (!day) {
+            return;
+        }
 
         this.commit(next => {
             const d = next.days.find(x => x.id === day.id);
-            if (!d) return;
+            if (!d) {
+                return;
+            }
             d.rooms = d.rooms.filter(x => x.roomId !== roomId);
         });
     }
@@ -210,7 +239,9 @@ export class TpConfigDayComponent {
     confirm() {
         const d = this._draft();
         const day = this.day();
-        if (!d || !day) return;
+        if (!d || !day) {
+            return;
+        }
         this.confirmDraft.emit(structuredClone(d));
     }
 
@@ -220,7 +251,9 @@ export class TpConfigDayComponent {
 
     private commit(mutator: (next: TimelineData) => void) {
         const current = this._draft();
-        if (!current) return;
+        if (!current) {
+            return;
+        }
         const next = structuredClone(current);
         mutator(next);
         this._draft.set(next);
@@ -229,20 +262,26 @@ export class TpConfigDayComponent {
     private ensureSelectedDayExistsInDraft() {
         const draft = this._draft();
         const id = this._selectedDayId();
-        if (!draft || !id) return;
+        if (!draft || !id) {
+            return;
+        }
 
         const exists = draft.days.some(d => d.id === id);
-        if (exists) return;
+        if (exists) {
+            return;
+        }
 
-        if (!this._createIfMissing()) return;
+        if (!this._createIfMissing()) {
+            return;
+        }
 
         // création UNIQUEMENT dans le draft
         this.commit(next => {
             next.days.push({
-                id,
-                label: this.newDayDefaultLabel ?? 'Nouveau jour',
-                rooms: [],
-            });
+                               id,
+                               label: this.newDayDefaultLabel ?? 'Nouveau jour',
+                               rooms: [],
+                           });
         });
     }
 

@@ -1,5 +1,5 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {DatePipe} from "@angular/common";
+import {DatePipe} from '@angular/common';
 
 interface ComputedTimelinePoint extends DateTimelinePoint {
     position: number; // 0–100 (%)
@@ -7,13 +7,13 @@ interface ComputedTimelinePoint extends DateTimelinePoint {
 }
 
 @Component({
-    selector: 'timeline-dot',
-    imports: [
-        DatePipe
-    ],
-    templateUrl: './timeline-dot.component.html',
-    styleUrl: './timeline-dot.component.scss',
-})
+               selector: 'timeline-dot',
+               imports: [
+                   DatePipe
+               ],
+               templateUrl: './timeline-dot.component.html',
+               styleUrl: './timeline-dot.component.scss'
+           })
 export class TimelineDotComponent implements OnChanges {
     /**
      * Date de début de la timeline (incluse)
@@ -53,13 +53,17 @@ export class TimelineDotComponent implements OnChanges {
             const clamped = ratio < 0 || ratio > 1;
 
             // Clamp dans [0, 1] pour rester sur la ligne
-            if (ratio < 0) {ratio = 0;}
-            if (ratio > 1) {ratio = 1;}
+            if (ratio < 0) {
+                ratio = 0;
+            }
+            if (ratio > 1) {
+                ratio = 1;
+            }
 
             return {
                 ...p,
                 position: ratio * 100,
-                clamped,
+                clamped
             };
         });
     }

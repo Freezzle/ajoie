@@ -2,14 +2,14 @@ import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@an
 
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import SharedModule from '../../shared.module';
-import {Button} from "primeng/button";
-import {RouterLink} from "@angular/router";
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
 
 @Component({
-    imports: [FaIconComponent, SharedModule, Button, RouterLink],
-    selector: 'button-box',
-    templateUrl: './button-box.component.html'
-})
+               imports: [FaIconComponent, SharedModule, Button, RouterLink],
+               selector: 'button-box',
+               templateUrl: './button-box.component.html'
+           })
 export class ButtonBoxComponent {
     @ViewChild('btn') btn!: ElementRef<HTMLButtonElement>;
 
@@ -35,10 +35,6 @@ export class ButtonBoxComponent {
     @Output()
     clickedEvent = new EventEmitter<HTMLElement>();
 
-    onClick(): void {
-        this.clickedEvent.emit(this.btn.nativeElement);
-    }
-
     get colorButton() {
         if (this.type === 'primary') {
             return 'primary';
@@ -53,5 +49,9 @@ export class ButtonBoxComponent {
         } else {
             return 'primary';
         }
+    }
+
+    onClick(): void {
+        this.clickedEvent.emit(this.btn.nativeElement);
     }
 }

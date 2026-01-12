@@ -5,11 +5,11 @@ import SharedModule from 'app/shared/shared.module';
 import {IAuthority} from '../authority.model';
 
 @Component({
-    standalone: true,
-    selector: 'app-authority-stats',
-    templateUrl: './authority-detail.component.html',
-    imports: [SharedModule, RouterModule],
-})
+               standalone: true,
+               selector: 'app-authority-stats',
+               templateUrl: './authority-detail.component.html',
+               imports: [SharedModule, RouterModule]
+           })
 export class AuthorityDetailComponent {
     authority = input<IAuthority | null>(null);
 

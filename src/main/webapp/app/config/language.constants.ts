@@ -5,7 +5,7 @@
 export const LANGUAGES: string[] = [
     'fr',
     'en',
-    'de',
+    'de'
 ];
 
 

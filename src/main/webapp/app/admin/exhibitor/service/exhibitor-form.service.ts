@@ -27,25 +27,25 @@ export class ExhibitorFormService {
     createExhibitorFormGroup(exhibitor: IExhibitor | null): ExhibitorFormGroup {
         const raw: IExhibitor = {
             ...this.getDefaultExhibitorFormValue() as IExhibitor,
-            ...(exhibitor ?? {}),
+            ...(exhibitor ?? {})
         };
 
         return new FormGroup<ExhibitorFormGroupContent>({
-            id: new FormControl({value: raw.id, disabled: true}),
-            fullName: new FormControl(raw.fullName, Validators.required),
-            email: new FormControl(raw.email, {validators: [Validators.required, Validators.email]}),
-            phoneNumber: new FormControl(raw.phoneNumber, {validators: [this.phoneValidator()]}),
-            address: new FormControl(raw.address, Validators.required),
-            npaLocalite: new FormControl(raw.npaLocalite, Validators.required),
-            isoCountry: new FormControl(raw.isoCountry, Validators.required),
-            extraInformation: new FormControl(raw.extraInformation),
-            language: new FormControl(raw.language, Validators.required),
-            differentBillingAddress: new FormControl(raw.differentBillingAddress, Validators.required),
-            billingAddress: new FormControl(raw.billingAddress),
-            newsletter: new FormControl(raw.newsletter, Validators.required),
-            redFlag: new FormControl(raw.redFlag, Validators.required),
-            duplicateDetected: new FormControl(raw.duplicateDetected, Validators.required),
-        });
+                                                            id: new FormControl({value: raw.id, disabled: true}),
+                                                            fullName: new FormControl(raw.fullName, Validators.required),
+                                                            email: new FormControl(raw.email, {validators: [Validators.required, Validators.email]}),
+                                                            phoneNumber: new FormControl(raw.phoneNumber, {validators: [this.phoneValidator()]}),
+                                                            address: new FormControl(raw.address, Validators.required),
+                                                            npaLocalite: new FormControl(raw.npaLocalite, Validators.required),
+                                                            isoCountry: new FormControl(raw.isoCountry, Validators.required),
+                                                            extraInformation: new FormControl(raw.extraInformation),
+                                                            language: new FormControl(raw.language, Validators.required),
+                                                            differentBillingAddress: new FormControl(raw.differentBillingAddress, Validators.required),
+                                                            billingAddress: new FormControl(raw.billingAddress),
+                                                            newsletter: new FormControl(raw.newsletter, Validators.required),
+                                                            redFlag: new FormControl(raw.redFlag, Validators.required),
+                                                            duplicateDetected: new FormControl(raw.duplicateDetected, Validators.required)
+                                                        });
     }
 
     phoneValidator() {

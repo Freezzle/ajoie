@@ -7,9 +7,9 @@
         <div class="d-flex justify-content-between mt-4">
             <span>
                 <button-box (clickedEvent)="previousState()"
-                            faIcon="arrow-left"
                             [isDisabled]="isLoading"
-                            translateKey="common.back" [showText]="false"/>
+                            [showText]="false"
+                            faIcon="arrow-left" translateKey="common.back"/>
             </span>
 
             <span>
@@ -33,9 +33,9 @@
 
     @if (authorities) {
         <div class="table-responsive table-entities" id="entities">
-            <table class="table table-hover" aria-describedby="page-heading">
+            <table aria-describedby="page-heading" class="table table-hover">
                 <thead class="thead-primary">
-                <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+                <tr (sortChange)="navigateToWithComponentValues($event)" [sortState]="sortState" jhiSort>
                     <th class="text-white" jhiSortBy="name">
                         <div class="d-flex">
                             <span jhiTranslate="authority.name">Name</span>
@@ -56,14 +56,14 @@
                     } @else {
                         @for (authority of authorities; track trackName($index, authority)) {
                             <tr>
-                                <td class="clickable" [routerLink]="['./', authority.name, 'view']">
+                                <td [routerLink]="['./', authority.name, 'view']" class="clickable">
                                     {{ authority.name }}
                                 </td>
                                 <td class="text-end">
                                     <div class="btn-group">
-                                        <button type="submit"
-                                                (click)="delete($event, authority)"
-                                                class="btn btn-danger btn-sm">
+                                        <button (click)="delete($event, authority)"
+                                                class="btn btn-danger btn-sm"
+                                                type="submit">
                                             <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
                                             <span jhiTranslate="common.delete"></span>
                                         </button>

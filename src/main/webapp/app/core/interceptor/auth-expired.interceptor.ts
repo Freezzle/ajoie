@@ -16,18 +16,18 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(
             tap({
-                error: (err: HttpErrorResponse) => {
-                    if (err.status === 401 && err.url && !err.url.includes('api/account')) {
-                        if (err.url.includes(this.loginService.logoutUrl())) {
-                            this.loginService.logoutInClient();
-                            return;
+                    error: (err: HttpErrorResponse) => {
+                        if (err.status === 401 && err.url && !err.url.includes('api/account')) {
+                            if (err.url.includes(this.loginService.logoutUrl())) {
+                                this.loginService.logoutInClient();
+                                return;
+                            }
+                            this.stateStorageService.storeUrl(this.router.routerState.snapshot.url);
+                            this.loginService.logout();
+                            this.router.navigate(['/login']);
                         }
-                        this.stateStorageService.storeUrl(this.router.routerState.snapshot.url);
-                        this.loginService.logout();
-                        this.router.navigate(['/login']);
                     }
-                },
-            }),
+                })
         );
     }
 }

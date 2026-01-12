@@ -5,9 +5,9 @@ import {faSort, faSortDown, faSortUp, IconDefinition} from '@fortawesome/free-so
 import {SortDirective} from './sort.directive';
 
 @Directive({
-    standalone: true,
-    selector: '[jhiSortBy]',
-})
+               standalone: true,
+               selector: '[jhiSortBy]'
+           })
 export class SortByDirective {
     @Input() jhiSortBy!: string;
 

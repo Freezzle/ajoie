@@ -1,4 +1,4 @@
-import {EmailAttachment} from "./email-attachment";
+import {EmailAttachment} from './email-attachment';
 
 export interface EmailMessage {
     from: string;

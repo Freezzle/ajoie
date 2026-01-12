@@ -1,9 +1,9 @@
-<nav [class.collapsed]="isCollapsed()"
+<nav #sidebar
+     (click)="$event.stopPropagation()"
+     [class.collapsed]="isCollapsed()"
      [class.desktop]="!isMobile()"
      [class.mobile]="isMobile()"
      [class.open]="!isCollapsed()"
-     (click)="$event.stopPropagation()"
-     #sidebar
      class="sidebar">
 
     <!-- Always-visible toggle button -->
@@ -129,7 +129,8 @@
                             <a>Gestion technique</a> &nbsp;<fa-icon icon="sort-down"></fa-icon>
                         </li>
                     </ul>
-                    <ul *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="dropdowns().admin" class="dropdown-list ms-3">
+                    <ul *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="dropdowns().admin"
+                        class="dropdown-list ms-3">
                         <li (click)="closeMobile()"
                             *jhiHasAnyAuthority="['ROLE_ADMIN']"
                             [routerLinkActiveOptions]="{ exact: true }"
@@ -156,38 +157,38 @@
                 @if (false) {
                     <div (click)="closeMobile()">
                         <a routerLink="/account/settings" routerLinkActive="active">
-                            <fa-icon icon="wrench" class="text-white" [fixedWidth]="true"></fa-icon>
+                            <fa-icon [fixedWidth]="true" class="text-white" icon="wrench"></fa-icon>
                         </a>
                     </div>
                 }
                 @if (false) {
                     <div (click)="closeMobile()">
                         <a routerLink="/account/password" routerLinkActive="active">
-                            <fa-icon icon="lock" class="text-white" [fixedWidth]="true"></fa-icon>
+                            <fa-icon [fixedWidth]="true" class="text-white" icon="lock"></fa-icon>
                         </a>
                     </div>
                 }
                 <div class="d-flex gap-2 align-items-center">
                     <app-presence *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"></app-presence>
-                    <a  (click)="closeMobile()" routerLink="/account/sessions" routerLinkActive="active">
-                        <fa-icon icon="cloud" class="text-white" [fixedWidth]="true"></fa-icon>
+                    <a (click)="closeMobile()" routerLink="/account/sessions" routerLinkActive="active">
+                        <fa-icon [fixedWidth]="true" class="text-white" icon="cloud"></fa-icon>
                     </a>
                 </div>
                 <div (click)="closeMobile()">
                     <a (click)="logout()" id="logout">
-                        <fa-icon icon="sign-out-alt" class="text-white" [fixedWidth]="true"></fa-icon>
+                        <fa-icon [fixedWidth]="true" class="text-white" icon="sign-out-alt"></fa-icon>
                     </a>
                 </div>
             } @else {
                 <div (click)="closeMobile()">
                     <a (click)="login()" id="login">
-                        <fa-icon icon="sign-in-alt" class="text-white" [fixedWidth]="true"></fa-icon>
+                        <fa-icon [fixedWidth]="true" class="text-white" icon="sign-in-alt"></fa-icon>
                         <span>Login</span>
                     </a>
                 </div>
                 <div (click)="closeMobile()">
                     <a routerLink="/account/register" routerLinkActive="active">
-                        <fa-icon icon="user-plus" class="text-white" [fixedWidth]="true"></fa-icon>
+                        <fa-icon [fixedWidth]="true" class="text-white" icon="user-plus"></fa-icon>
                     </a>
                 </div>
             }
