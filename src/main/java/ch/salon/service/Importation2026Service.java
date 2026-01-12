@@ -225,7 +225,7 @@ public class Importation2026Service {
 
         p.setSalon(salon);
         p.setExhibitor(exhibitor);
-        p.setTherapistName(sub100(therapistName));
+        p.setTherapistName(therapistName != null ? sub100(therapistName) : exhibitor.getFullName());
         p.setNbMeal1(meal1);
         p.setNbMeal2(meal2);
         p.setNbMeal3(meal3);

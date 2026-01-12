@@ -11,8 +11,6 @@ import {RouterLink} from '@angular/router';
                templateUrl: './button-box.component.html'
            })
 export class ButtonBoxComponent {
-    @ViewChild('btn') btn!: ElementRef<HTMLButtonElement>;
-
     @Input()
     modeLink: boolean = false;
     @Input()
@@ -51,7 +49,7 @@ export class ButtonBoxComponent {
         }
     }
 
-    onClick(): void {
-        this.clickedEvent.emit(this.btn.nativeElement);
+    onClick(event: MouseEvent): void {
+        this.clickedEvent.emit(event.currentTarget as HTMLElement);
     }
 }

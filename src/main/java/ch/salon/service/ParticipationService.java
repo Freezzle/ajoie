@@ -7,11 +7,7 @@ import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
-import ch.salon.repository.ConferenceRepository;
-import ch.salon.repository.InvoicingPlanRepository;
-import ch.salon.repository.ParticipationRepository;
-import ch.salon.repository.SalonRepository;
-import ch.salon.repository.StandRepository;
+import ch.salon.repository.*;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.ParticipationDTO;
 import ch.salon.service.mapper.EventLogMapper;
@@ -23,13 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +46,11 @@ public class ParticipationService {
         if (participation.getId() != null) {
             throw new BadRequestAlertException("A new participation cannot already have an ID", ENTITY_NAME,
                     "id.exists");
+        }
+
+        if (participationRepository.findByExhibitorIdAndSalonId(participation.getExhibitor().getId(), participation.getSalon().getId()) != null) {
+            throw new BadRequestAlertException("That exhibitor already participates in this event", ENTITY_NAME,
+                    "exhibitor.event.exists");
         }
 
         Salon salonFound = salonRepository.findById(participation.getSalon().getId()).orElseThrow(
@@ -119,6 +114,13 @@ public class ParticipationService {
         Participation existingParticipation = participationRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
+        if (!existingParticipation.getExhibitor().getId().equals(participation.getExhibitor().getId())) {
+            if (participationRepository.findByExhibitorIdAndSalonId(participation.getExhibitor().getId(), participation.getSalon().getId()) != null) {
+                throw new BadRequestAlertException("You cannot change the exhibitor with one who already participates in this event", ENTITY_NAME,
+                        "exhibitor.event.exists");
+            }
+        }
+
         participation.setClientNumber(existingParticipation.getClientNumber());
 
         if (Participation.diffArrangement(participation, existingParticipation)) {
@@ -168,7 +170,7 @@ public class ParticipationService {
         }
 
         return this.participationRepository.findByExhibitorIdOrderByRegistrationDateDesc(idExhibitor).stream()
-                                           .map(participationMapper::toDto).toList();
+                .map(participationMapper::toDto).toList();
     }
 
     public List<Participation> findAll(UUID idSalon) {
@@ -201,7 +203,7 @@ public class ParticipationService {
         }
 
         return this.eventLogService.findAllEventLog(EntityType.PARTICIPATION, idParticipation).stream()
-                                   .map(eventLogMapper::toDto).toList();
+                .map(eventLogMapper::toDto).toList();
     }
 
     private boolean isAllOf(Set<Status> stands, Set<Status> conferences, Status status) {

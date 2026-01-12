@@ -1,8 +1,7 @@
 @if (modeLink) {
     <!-- Version "lien" (visuel lien, mais garde exactement tes features) -->
     <p-button
-            #btn
-            (onClick)="onClick()"
+            (onClick)="onClick($event)"
             [attr.title]="translateKey | translate"
             [disabled]="isDisabled"
             [routerLink]="links"
@@ -18,8 +17,7 @@
 } @else {
     <!-- Version bouton normale -->
     <p-button
-            #btn
-            (onClick)="onClick()"
+            (onClick)="onClick($event)"
             [attr.title]="translateKey | translate"
             [attr.type]="isSubmit ? 'submit' : 'button'"
             [disabled]="isDisabled"

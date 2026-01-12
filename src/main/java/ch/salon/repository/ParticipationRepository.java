@@ -25,6 +25,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
     String findMaxClientNumber(UUID idSalon);
 
     Participation findByExhibitorEmailAndSalonId(String email, UUID idSalon);
+    Participation findByExhibitorIdAndSalonId(UUID idExhibitor, UUID idSalon);
 
     @EntityGraph(attributePaths = {"exhibitor", "exhibitor.billingAddress"})
     List<Participation> findBySalonIdAndStatusIn(UUID idSalon, List<Status> statuses);

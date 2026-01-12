@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, map, timer} from 'rxjs';
+import {BehaviorSubject, map, Observable, of, timer} from 'rxjs';
 import {Client} from '@stomp/stompjs';
 import {ApplicationConfigService} from '../../../core/config/application-config.service';
 import SockJS from 'sockjs-client';
@@ -15,7 +15,7 @@ export interface PresenceSummary {
 
 @Injectable({providedIn: 'root'})
 export class PresenceService {
-    onlineCount$ = this.presence$.pipe(map(list => list.filter(x => x.online).length));
+    onlineCount$ : Observable<number> = of(0);
     private applicationConfigService = inject(ApplicationConfigService);
     private presenceSubject = new BehaviorSubject<PresenceSummary[]>([]);
     presence$ = this.presenceSubject.asObservable();
@@ -23,6 +23,7 @@ export class PresenceService {
     private pingTimer?: any;
 
     constructor(private http: HttpClient) {
+        this.onlineCount$ = this.presence$.pipe(map(list => list.filter(x => x.online).length));
     }
 
     loadOnce() {
