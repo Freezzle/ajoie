@@ -5,6 +5,7 @@
      [cdkDragDisabled]="dragDisabled"
      [cdkDragStartDelay]="150"
      [ngClass]="[variant, dragging ? 'dragging' : '']"
+     [style.border]="dimension.searched ? '3px solid var(--app-contrast)': undefined"
      [style.background-color]="dimension.color"
      [style.cursor]="cursor"
      [style.height.px]="dimension.rows * pixels"

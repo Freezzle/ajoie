@@ -33,6 +33,7 @@ export interface DimensionCell {
     stand?: IStand | null;
     prereserved: Prereserved | null;
     position: number | null;
+    searched: boolean;
 }
 
 export interface Prereserved {
@@ -134,7 +135,8 @@ export function mapDimensionCellLight(
         color: getColorStand(standFound ?? null),
         stand: standFound,
         prereserved: dimension.prereserved,
-        position: dimension.position
+        position: dimension.position,
+        searched: false
     };
 }
 
@@ -191,7 +193,8 @@ export function convertAvailableDimensionCell(dimensionStand: IPriceStandSalon, 
         cols: (dimensionStand.heightMeter ?? 1) * 2,
         rows: (dimensionStand.widthMeter ?? 1) * 2,
         prereserved: null,
-        position: null
+        position: null,
+        searched: false
     };
 }
 

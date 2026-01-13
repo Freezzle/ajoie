@@ -37,7 +37,7 @@ import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {Toast} from 'primeng/toast';
 import {ContextMenu} from 'primeng/contextmenu';
-import {MenuItem, PrimeIcons} from 'primeng/api';
+import {MenuItem, MessageService, PrimeIcons} from 'primeng/api';
 import {Tag} from 'primeng/tag';
 import {Category, formatterCategory} from '../../enumerations/category.model';
 import {FloorPlanDimensionTileComponent} from './floor-plan-dimension-tile/floor-plan-dimension-tile.component';
@@ -49,12 +49,16 @@ import {Textarea} from 'primeng/textarea';
 import {IftaLabel} from 'primeng/iftalabel';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {Divider} from 'primeng/divider';
+import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
+import {removeAccents} from '../../../shared/utils/string.util';
+import {selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {formatterParticipation} from '../../participation/service/participation.service';
 
 @Component({
                selector: 'floor-plan',
                templateUrl: './floor-plan-detail.component.html',
                styleUrl: './floor-plan-detail.component.scss',
-               imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule, ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Tag, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe, Textarea, IftaLabel, DialogBoxComponent, Divider]
+               imports: [SharedModule, CommonModule, RouterModule, CdkDropList, FormsModule, ReactiveFormsModule, ButtonBoxComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, ContextMenu, Tag, FloorPlanDimensionTileComponent, CardComponent, ContentPageComponent, ColorStatusPipe, StatusPipe, Textarea, IftaLabel, DialogBoxComponent, Divider, SelectBoxComponent]
            })
 export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     @ViewChild('cm', {static: true}) cm!: ContextMenu;
@@ -73,6 +77,8 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     isLoading = false;
     stands: IStand[] = [];
     availableStandDimensions: DimensionCell[] = [];
+    searchDimensionCell: FormControl<DimensionCell | null> = new FormControl(null);
+    assignedStandDimensions: DimensionCell[] = [];
     availableDimensions: DimensionCell[] = [];
     salon?: ISalon;
     gridCellPopOver: GridCell | null = null;
@@ -100,6 +106,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
     private standService = inject(StandService);
     private floorPlanService = inject(FloorPlanService);
     private activatedRoute = inject(ActivatedRoute);
+    private messageService = inject(MessageService);
     private clickTimer: any;
     private readonly clickDelay = 220;
     private prereservedTargetDimension: DimensionCell | null = null;
@@ -145,15 +152,20 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
                                     if (floorPlans.length > 0) {
                                         floorPlans.forEach(floorPlan => {
-                                            this.floorPlans.push(mapFloorPlanLight(floorPlan, this.availableDimensions, this.stands));
+                                            const floorPlanFull = mapFloorPlanLight(floorPlan, this.availableDimensions, this.stands);
+                                            this.floorPlans.push(floorPlanFull);
+
+                                            this.assignedStandDimensions.push(...floorPlanFull.data.cells
+                                                                                              .flatMap(row => row.filter(c => c.firstCell && c.dimension && c.dimension.stand).map(grid => grid.dimension!)));
 
                                             availableStands = availableStands.filter(
-                                                stand => !floorPlan.data.cells.flatMap(row => row.flatMap(column => column.dimension?.stand?.id))
+                                                stand => !floorPlan.data.cells.flatMap(row => row.filter(c => c.firstCell).flatMap(column => column.dimension?.stand?.id))
                                                                    .includes(stand.id));
 
                                             this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
                                         });
                                     } else {
+                                        this.assignedStandDimensions = [];
                                         this.availableStandDimensions = availableStands.map(stand => convertAvailableDimensionCell(stand.dimension, stand));
 
                                         this.floorPlans.push({
@@ -201,6 +213,33 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
                                     this.nextPosition.setValue(Number(max + 1));
                                 });
             }
+
+            this.searchDimensionCell.valueChanges.subscribe(dimensionCell => {
+                this.floorPlans.forEach((floor) => {
+                    floor.data.cells.forEach(rows => {
+                        rows.forEach(cell => {
+                            if (cell.dimension) {
+                                cell.dimension.searched = false;
+                            }
+                        });
+                    });
+                });
+
+                if (!dimensionCell) {
+                    return;
+                }
+
+                this.floorPlans.forEach((floor, index) => {
+                    floor.data.cells.forEach(rows => {
+                        rows.filter(cell => cell.firstCell).forEach(cell => {
+                            if (cell.dimension?.stand?.id && cell.dimension?.stand?.id === dimensionCell.stand?.id) {
+                                this.changePlanView(index);
+                                cell.dimension.searched = true;
+                            }
+                        });
+                    });
+                });
+            });
         });
     }
 
@@ -294,6 +333,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
         const standId = dimensionCell?.stand?.id;
         if (standId) {
+            this.assignedStandDimensions.push(dimensionCell);
             this.availableStandDimensions = this.availableStandDimensions.filter(d => d.stand!.id !== standId);
         }
     }
@@ -669,12 +709,11 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
             if (cell.dimension && cell.id === givenCell.id) {
                 cell.dimension.stand = structuredClone(givenStand);
                 cell.dimension.color = getColorStand(cell.dimension.stand);
+                this.assignedStandDimensions.push(cell.dimension);
             }
         });
 
-        this.availableStandDimensions = this.availableStandDimensions.filter(
-            dim => dim.stand!.id !== givenStand.id
-        );
+        this.availableStandDimensions = this.availableStandDimensions.filter(dim => dim.stand!.id !== givenStand.id);
         this.cm?.hide();
     }
 
@@ -735,6 +774,8 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
         this.stands = [];
         this.availableDimensions = [];
         this.availableStandDimensions = [];
+        this.assignedStandDimensions = [];
+        this.searchDimensionCell = new FormControl(null);
         this.gridCellPopOver = null;
         this.floorPlans = [];
         this.indexActiveFloorPlan = 0;
@@ -767,6 +808,7 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
     private unassignCell(cell: GridCell) {
         if (cell.dimension?.stand) {
+            this.assignedStandDimensions = this.assignedStandDimensions.filter(c => c.stand!.id !== cell.dimension?.stand!.id);
             this.availableStandDimensions.push(convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand));
             cell.dimension.stand = null;
             cell.dimension.color = getColorStand(cell.dimension.stand);
@@ -834,4 +876,15 @@ export class FloorPlanDetailComponent implements OnInit, OnDestroy {
 
         return items;
     }
+
+    protected readonly formatterStandDimension = formatterStandDimension;
+    protected readonly selectFilterStandDimension = selectFilterStandDimension;
+}
+
+export function formatterStandDimension(cell: DimensionCell): string {
+    return removeAccents(getFormattedParticipationName(cell.stand?.participation));
+}
+
+export function selectFilterStandDimension(): string {
+    return `stand.participation.therapistName,stand.participation.exhibitor.${selectFilterExhibitor().split(',').join(',exhibitor.')}`;
 }
