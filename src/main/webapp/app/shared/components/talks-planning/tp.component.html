@@ -139,14 +139,14 @@
 
                                         @if (roomTalks.length) {
                                             <p-timeline [value]="roomTalks" align="left">
-                                                <ng-template #marker let-talk>
+                                                <ng-template pTemplate="marker" let-talk>
                                                     <p-badge
                                                             [severity]="talk.type === 'CONFERENCE' ? undefined : 'warn'"
                                                             [value]="getTalkStartTimeLabel(talk)"
                                                             size="large"/>
                                                 </ng-template>
 
-                                                <ng-template #content let-talk>
+                                                <ng-template pTemplate="content" let-talk>
                                                     <app-card>
                                                         <div appCardHeader>
                                                             <h4>{{ talk.title }}</h4>
