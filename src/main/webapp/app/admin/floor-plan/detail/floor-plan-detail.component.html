@@ -2,108 +2,120 @@
     <div appMenuBarStart>
         <h3 jhiTranslate="salon.floorPlan">Plan de la salle</h3>
     </div>
+
     <div appMenuBarEnd>
-        @if (isReadOnly) {
+        @if (isReadOnly()) {
             <button-box (clickedEvent)="previousState()"
-                        [isDisabled]="isLoading"
+                        [isDisabled]="isLoading()"
                         [showText]="false"
                         faIcon="arrow-left"
                         translateKey="common.back"/>
         }
-        @if (isReadOnly) {
+
+        @if (isReadOnly()) {
             <button-box (clickedEvent)="activateEditMode()"
-                        [isDisabled]="isLoading"
+                        [isDisabled]="isLoading()"
                         [showText]="false"
                         faIcon="pencil-alt"
                         translateKey="common.edit"/>
         }
-        @if (!isReadOnly) {
+
+        @if (!isReadOnly()) {
             <button-box (clickedEvent)="activateReadOnlyMode()"
-                        [isDisabled]="isLoading"
+                        [isDisabled]="isLoading()"
                         [showText]="false"
                         faIcon="ban"
                         translateKey="common.cancel"
                         type="secondary"/>
         }
-        @if (!isReadOnly) {
+
+        @if (!isReadOnly()) {
             <button-box (clickedEvent)="save()"
-                        [isDisabled]="isLoading"
+                        [isDisabled]="isLoading()"
                         [isSubmit]="true"
                         [showText]="false"
                         faIcon="floppy-disk"
                         translateKey="common.save"/>
         }
     </div>
+
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
+
     <p-toast/>
     <p-confirmpopup/>
+
     <app-card [showHeader]="false">
         <div appCardBody>
             <div class="row">
-
                 <!-- ############ HEADERS ############ -->
                 <div class="col-12">
                     <div class="d-flex justify-content-end">
                         <select-box [enableFilter]="true"
                                     [filterFields]="selectFilterStandDimension()"
                                     [formatterFunction]="formatterStandDimension"
-                                    [options]="assignedStandDimensions"
+                                    [options]="assignedStandDimensions()"
                                     [dataKey]="'stand.id'"
                                     [formControl]="searchDimensionCell"
                                     fieldName="dimensionCellSearch"
                                     class="w-100"
                                     translateKey="floorPlan.standSearching"/>
                     </div>
+
                     <div class="mt-4 d-flex justify-content-center">
                         <ul class="nav nav-tabs" id="tabId" role="tablist">
-                            @for (floorPlan of floorPlans; track floorPlan; let floorIndex = $index) {
+                            @for (floorPlan of floorPlans(); track (floorPlan.id ?? floorPlan.position); let floorIndex = $index) {
                                 <li class="nav-item" role="presentation">
                                     <div class="btn-group">
                                         <button (click)="changePlanView(floorIndex)"
-                                                [class.disabled]="isLoading"
-                                                class="nav-link {{ indexActiveFloorPlan === floorIndex ? 'active' : '' }}"
+                                                [class.disabled]="isLoading()"
+                                                class="nav-link {{ activeIndex() === floorIndex ? 'active' : '' }}"
                                                 id="floorPlan-tab-{{ floorIndex }}"
                                                 role="tab"
                                                 type="button">
                                             {{ floorPlan.name }}
                                         </button>
-                                        @if (!isReadOnly && indexActiveFloorPlan === floorIndex) {
-                                            <div class="btn-group {{ indexActiveFloorPlan === floorIndex ? 'active' : '' }}"
+
+                                        @if (!isReadOnly() && activeIndex() === floorIndex) {
+                                            <div class="btn-group {{ activeIndex() === floorIndex ? 'active' : '' }}"
                                                  ngbDropdown
                                                  role="group">
-                                                <button [class.disabled]="isLoading"
+                                                <button [class.disabled]="isLoading()"
                                                         class="btn btn-outline-primary"
                                                         ngbDropdownToggle
                                                         type="button">
                                                     <fa-icon [title]="'common.edit' | translate"
-                                                             icon="pencil-alt"></fa-icon>
+                                                             icon="pencil-alt"/>
                                                 </button>
+
                                                 <div class="dropdown-menu" ngbDropdownMenu>
                                                     @if (canMoveFloorPlan('right')) {
                                                         <button (click)="movePositionFloorPlan('right')"
-                                                                [class.disabled]="isLoading"
-                                                                id="rename-tab"
+                                                                [class.disabled]="isLoading()"
+                                                                id="move-right-tab"
                                                                 ngbDropdownItem>
-                                                            Déplacer ->
+                                                            Déplacer -&gt;
                                                         </button>
                                                     }
+
                                                     @if (canMoveFloorPlan('left')) {
                                                         <button (click)="movePositionFloorPlan('left')"
-                                                                [class.disabled]="isLoading"
-                                                                id="rename-tab"
+                                                                [class.disabled]="isLoading()"
+                                                                id="move-left-tab"
                                                                 ngbDropdownItem>
-                                                            <- Déplacer
+                                                            &lt;- Déplacer
                                                         </button>
                                                     }
+
                                                     <button (click)="rename()"
-                                                            [class.disabled]="isLoading"
+                                                            [class.disabled]="isLoading()"
                                                             id="rename-tab"
                                                             ngbDropdownItem>
                                                         Renommer
                                                     </button>
+
                                                     <button (click)="delete()"
-                                                            [class.disabled]="isLoading"
+                                                            [class.disabled]="isLoading()"
                                                             id="delete-tab"
                                                             ngbDropdownItem>
                                                         Supprimer
@@ -114,10 +126,11 @@
                                     </div>
                                 </li>
                             }
-                            @if (!isReadOnly) {
+
+                            @if (!isReadOnly()) {
                                 <li class="nav-item" role="presentation">
                                     <button (click)="openAddDialog()"
-                                            [class.disabled]="isLoading"
+                                            [class.disabled]="isLoading()"
                                             class="nav-link"
                                             id="add-tab"
                                             role="tab"
@@ -131,31 +144,32 @@
                 </div>
 
                 <!-- ############ PANELS ############ -->
-                @if (!showDimensions && showAvailableStands) {
+                @if (!showDimensions() && showAvailableStands()) {
                     <div class="col-2 side-column">
                         <button-box (clickedEvent)="changeRotationAvailableStands()"
                                     [showText]="false"
                                     faIcon="rotate"
                                     translateKey="floorPlan.changeRotation"/>
+
                         <!-- AVAILABLE STANDS -->
                         <div #shapesDimensionsStandsDropList
-                             (cdkDropListDropped)="drop($event)"
-                             [cdkDropListDisabled]="isReadOnly"
                              cdkDropList
                              cdkDropListSortingDisabled
+                             (cdkDropListDropped)="drop($event)"
+                             [cdkDropListDisabled]="isReadOnly()"
                              class="row shapes-container">
-                            @for (dimension of availableStandDimensions; track dimension.stand?.id) {
+                            @for (dimension of unassignedStandDimensions(); track dimension.stand?.id) {
                                 <div class="col-12 shape-container">
-                                    <floor-plan-dimension-tile (dragEnded)="isDragging = false"
+                                    <floor-plan-dimension-tile (dragEnded)="isDragging.set(false)"
                                                                (dragMoved)="highlightCells($event)"
-                                                               (dragStarted)="isDragging = true"
+                                                               (dragStarted)="isDragging.set(true)"
                                                                [dimension]="dimension"
-                                                               [displayFullname]="displayFullname"
-                                                               [displayHeader]="displayHeader"
-                                                               [displayTechnical]="displayTechnical"
+                                                               [displayFullname]="displayFullname()"
+                                                               [displayHeader]="displayHeader()"
+                                                               [displayTechnical]="displayTechnical()"
                                                                [dragData]="dimension"
-                                                               [dragDisabled]="isReadOnly"
-                                                               [dragging]="isDragging"
+                                                               [dragDisabled]="isReadOnly()"
+                                                               [dragging]="isDragging()"
                                                                [pixels]="PIXELS"
                                                                cursor="move"
                                                                variant="palette"/>
@@ -164,31 +178,33 @@
                         </div>
                     </div>
                 }
-                @if (!showAvailableStands && showDimensions) {
+
+                @if (!showAvailableStands() && showDimensions()) {
                     <div class="col-2 side-column">
                         <button-box (clickedEvent)="changeRotationAvailableDimensions()"
                                     [showText]="false"
                                     faIcon="rotate"
                                     translateKey="floorPlan.changeRotation"/>
+
                         <!-- DIMENSIONS -->
                         <div #shapesDimensionsDropList
-                             (cdkDropListDropped)="drop($event)"
-                             [cdkDropListDisabled]="isReadOnly"
                              cdkDropList
                              cdkDropListSortingDisabled
+                             (cdkDropListDropped)="drop($event)"
+                             [cdkDropListDisabled]="isReadOnly()"
                              class="row shapes-container">
-                            @for (dimension of availableDimensions; track dimension) {
+                            @for (dimension of availableDimensions(); track $index) {
                                 <div class="col-12 shape-container">
-                                    <floor-plan-dimension-tile (dragEnded)="isDragging = false"
+                                    <floor-plan-dimension-tile (dragEnded)="isDragging.set(false)"
                                                                (dragMoved)="highlightCells($event)"
-                                                               (dragStarted)="isDragging = true"
+                                                               (dragStarted)="isDragging.set(true)"
                                                                [dimension]="dimension"
-                                                               [displayFullname]="displayFullname"
-                                                               [displayHeader]="displayHeader"
-                                                               [displayTechnical]="displayTechnical"
+                                                               [displayFullname]="displayFullname()"
+                                                               [displayHeader]="displayHeader()"
+                                                               [displayTechnical]="displayTechnical()"
                                                                [dragData]="dimension"
-                                                               [dragDisabled]="isReadOnly"
-                                                               [dragging]="isDragging"
+                                                               [dragDisabled]="isReadOnly()"
+                                                               [dragging]="isDragging()"
                                                                [pixels]="PIXELS"
                                                                cursor="move"
                                                                variant="palette"/>
@@ -197,46 +213,46 @@
                         </div>
                     </div>
                 }
+
                 <!-- ############ DRAWING ############ -->
-                <div [ngClass]="{
-                        'col-12': !showAvailableStands && !showDimensions,
-                        'col-10': showAvailableStands || showDimensions
-                    }" class="main-column">
+                <div class="main-column"
+                     [ngClass]="{'col-12': !showAvailableStands() && !showDimensions(),'col-10': showAvailableStands() || showDimensions()}">
                     <div class="drawing-area">
                         <div class="content-around-drawing">
                             <div class="palette">
-                                @if (!isReadOnly) {
+                                @if (!isReadOnly()) {
                                     <div class="block-icon">
                                         <fa-icon
-                                                (click)="showAvailableStands = !showAvailableStands; showDimensions = false"
-                                                [class.icon-active]="showAvailableStands"
-                                                [class.icon-inactive]="!showAvailableStands"
+                                                (click)="showAvailableStands.set(!showAvailableStands()); showDimensions.set(false)"
+                                                [class.icon-active]="showAvailableStands()"
+                                                [class.icon-inactive]="!showAvailableStands()"
                                                 icon="person"
                                                 style="cursor:pointer;"/>
                                         <div>
                                             <fa-icon
-                                                    (click)="showDimensions = !showDimensions; showAvailableStands = false"
-                                                    [class.icon-active]="showDimensions"
-                                                    [class.icon-inactive]="!showDimensions"
+                                                    (click)="showDimensions.set(!showDimensions()); showAvailableStands.set(false)"
+                                                    [class.icon-active]="showDimensions()"
+                                                    [class.icon-inactive]="!showDimensions()"
                                                     icon="map-location-dot"
                                                     style="cursor:pointer;"/>
                                         </div>
                                         <hr/>
                                     </div>
                                 }
+
                                 <div class="block-icon">
                                     <div>
                                         <fa-icon (click)="changeHeader()"
-                                                 [class.icon-active]="displayHeader"
-                                                 [class.icon-inactive]="!displayHeader"
+                                                 [class.icon-active]="displayHeader()"
+                                                 [class.icon-inactive]="!displayHeader()"
                                                  icon="pager"
                                                  style="cursor:pointer;"/>
                                     </div>
 
                                     <div>
                                         <fa-icon (click)="changeTechnicalInfo()"
-                                                 [class.icon-active]="displayTechnical"
-                                                 [class.icon-inactive]="!displayTechnical"
+                                                 [class.icon-active]="displayTechnical()"
+                                                 [class.icon-inactive]="!displayTechnical()"
                                                  [ngbTooltip]="'floorPlan.technicalInfo' | translate"
                                                  [openDelay]="500"
                                                  icon="circle-info"
@@ -245,10 +261,11 @@
                                     </div>
                                     <hr/>
                                 </div>
+
                                 <div class="block-icon">
                                     <fa-icon (click)="changeDisplayName()"
-                                             [class.icon-active]="displayTechnical"
-                                             [class.icon-inactive]="!displayTechnical"
+                                             [class.icon-active]="displayFullname()"
+                                             [class.icon-inactive]="!displayFullname()"
                                              [ngbTooltip]="'floorPlan.displayName' | translate"
                                              [openDelay]="500"
                                              icon="signature"
@@ -256,27 +273,30 @@
                                              style="cursor:pointer;"/>
                                     <hr/>
                                 </div>
-                                @if (!isReadOnly) {
+
+                                @if (!isReadOnly()) {
                                     <div class="block-icon">
                                         <fa-icon (click)="changeAttributionMode()"
-                                                 [class.icon-active]="isNumberAttribution.value"
-                                                 [class.icon-inactive]="!isNumberAttribution.value"
+                                                 [class.icon-active]="isNumberAttribution()"
+                                                 [class.icon-inactive]="!isNumberAttribution()"
                                                  [ngbTooltip]="'floorPlan.attributionMode' | translate"
                                                  [openDelay]="500"
                                                  icon="location-dot"
                                                  placement="start"
                                                  style="cursor:pointer;"/>
-                                        @if (isNumberAttribution.value) {
+
+                                        @if (isNumberAttribution()) {
                                             <input [formControl]="nextPosition"
                                                    [ngbTooltip]="'floorPlan.nextPosition' | translate"
                                                    [openDelay]="500"
                                                    placement="start"
-                                                   style="min-width:2em;width:2em;max-width:3em; border:1px dashed grey;text-align: center;"/>
+                                                   style="min-width:2em;width:2em;max-width:3em; border:1px dashed grey;text-align:center;"/>
                                         }
-                                        @if (isNumberAttribution.value) {
+
+                                        @if (isNumberAttribution()) {
                                             <fa-icon (click)="changeAutoIncrement()"
-                                                     [class.icon-active]="automaticallyIncrementNumber.value"
-                                                     [class.icon-inactive]="!automaticallyIncrementNumber.value"
+                                                     [class.icon-active]="automaticallyIncrementNumber()"
+                                                     [class.icon-inactive]="!automaticallyIncrementNumber()"
                                                      [ngbTooltip]="'floorPlan.automaticallyIncrementNumber' | translate"
                                                      [openDelay]="500"
                                                      icon="wand-magic-sparkles"
@@ -287,45 +307,45 @@
                                     </div>
                                 }
                             </div>
-                            <table #gridDropList cdkDropList class="grid">
+
+                            <!-- ✅ UN SEUL DROPLIST SUR LA TABLE -->
+                            <table #gridDropList
+                                   cdkDropList
+                                   cdkDropListSortingDisabled
+                                   (cdkDropListDropped)="drop($event)"
+                                   class="grid">
                                 <tbody>
-                                    @if (!isLoading && getActiveFloorPlan()) {
-                                        @for (row of getActiveFloorPlanData().cells; track row; let
-                                                rowIndex = $index) {
+                                    @if (!isLoading() && activePlan()) {
+                                        @for (row of activeCells(); track $index) {
                                             <tr>
-                                                @for (cell of row; track cell; let colIndex = $index) {
-                                                    <td (cdkDropListDropped)="drop($event)"
-                                                        (contextmenu)="openContextMenu($event, cell)"
+                                                @for (cell of row; track $index) {
+                                                    <td (contextmenu)="openContextMenu($event, cell)"
                                                         [attr.data-shape-id]="cell.id"
-                                                        [ngStyle]="{ 'background-color': cell.colorHighlight }"
-                                                        cdkDropList
+                                                        [style.background-color]="cell.colorHighlight"
                                                         class="cell">
-                                                        @if (cell.dimension) {
-                                                            @if (cell.dimension; as dimension) {
-                                                                <floor-plan-dimension-tile
-                                                                        (click)="onClick($event, cell)"
-                                                                        (dblclick)="onDoubleClick($event, cell)"
-                                                                        (dragEnded)="finishDragging(cell)"
-                                                                        (dragMoved)="highlightCells($event)"
-                                                                        (dragStarted)="startDragging(cell)"
-                                                                        [cursor]="adaptCursor(cell)"
-                                                                        [dimension]="dimension"
-                                                                        [displayFullname]="displayFullname"
-                                                                        [displayHeader]="displayHeader"
-                                                                        [displaySensibleInformation]="idOnlydisplaySensibleInformation() === null || this.idOnlydisplaySensibleInformation() === cell.id"
-                                                                        [displayTechnical]="displayTechnical"
-                                                                        [dragData]="dimension"
-                                                                        [dragDisabled]="isReadOnly || (!showDimensions && !showAvailableStands)"
-                                                                        [dragging]="isDragging"
-                                                                        [pixels]="PIXELS"
-                                                                        variant="grid"/>
-                                                            }
+                                                        @if (cell.dimension; as dimension) {
+                                                            <floor-plan-dimension-tile (click)="onClick($event, cell)"
+                                                                                       (dblclick)="onDoubleClick($event, cell)"
+                                                                                       (dragEnded)="finishDragging(cell)"
+                                                                                       (dragMoved)="highlightCells($event)"
+                                                                                       (dragStarted)="startDragging(cell)"
+                                                                                       [cursor]="adaptCursor(cell)"
+                                                                                       [dimension]="dimension"
+                                                                                       [displayFullname]="displayFullname()"
+                                                                                       [displayHeader]="displayHeader()"
+                                                                                       [displaySensibleInformation]="idDisplaySensibleInformation() === null || idDisplaySensibleInformation() === cell.id"
+                                                                                       [displayTechnical]="displayTechnical()"
+                                                                                       [dragData]="dimension"
+                                                                                       [dragDisabled]="isReadOnly() || (!showDimensions() && !showAvailableStands())"
+                                                                                       [dragging]="isDragging()"
+                                                                                       [pixels]="PIXELS"
+                                                                                       variant="grid"/>
                                                         }
                                                     </td>
                                                 }
                                             </tr>
                                         }
-                                    } @else if (isLoading) {
+                                    } @else if (isLoading()) {
                                         <tr>
                                             <td>Chargement en cours...</td>
                                         </tr>
@@ -347,11 +367,9 @@
                         [(visible)]="standDialogVisible"
                         [dismissableMask]="true"
                         [header]="'Détail de l\'emplacement'">
-
-                <!-- CONTENU -->
-                @if (gridCellPopOver) {
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; row-gap: 0.5em">
-                        @if (gridCellPopOver.dimension?.stand; as stand) {
+                @if (selectStandDialog(); as pop) {
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; row-gap: 0.5em">
+                        @if (pop.dimension?.stand; as stand) {
                             <b>Thérapeute</b>
                             <span>{{ stand.participation.therapistName }}</span>
 
@@ -360,29 +378,28 @@
 
                             <b>Status</b>
                             <span>
-                                            <fa-icon
-                                                    [class]="stand.participation.status | colorStatus"
-                                                    [icon]="stand.participation.status | status"
-                                                    [title]="'participation.status.list.' + stand.participation.status | translate"></fa-icon>
-                                        </span>
+                                <fa-icon [class]="stand.participation.status | colorStatus"
+                                         [icon]="stand.participation.status | status"
+                                         [title]="'participation.status.list.' + stand.participation.status | translate"/>
+                            </span>
 
                             <b>Catégorie</b>
                             <span>
-                                            <p-tag [value]="formatterCategory(stand.category ? Category[stand.category] : null) | translate"
-                                                   severity="warn"></p-tag>
-                                        </span>
+                                <p-tag [value]="formatterCategory(stand.category ? Category[stand.category] : null) | translate"
+                                       severity="warn"/>
+                            </span>
 
                             <b>Tags</b>
                             <span>
-                                            @for (subCategorie of stand.subCategories; track subCategorie) {
-                                                <p-tag [value]="subCategorie"></p-tag>
-                                            } @empty {
-                                                -
-                                            }
-                                        </span>
+                                @for (subCategorie of stand.subCategories; track subCategorie) {
+                                    <p-tag [value]="subCategorie"/>
+                                } @empty {
+                                    -
+                                }
+                            </span>
 
                             <b>Dimension sur plan</b>
-                            <span>{{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</span>
+                            <span>{{ pop.dimension?.dimension ?? 'Inconnu' }}</span>
 
                             <b>Dimension participation</b>
                             <span>{{ stand.dimension.dimension }}</span>
@@ -391,13 +408,15 @@
                             <span>{{ stand.participation.extraInformation ?? '-' }}</span>
                         } @else {
                             <b>Dimension :</b>
-                            <span>{{ gridCellPopOver.dimension?.dimension ?? 'Inconnu' }}</span>
+                            <span>{{ pop.dimension?.dimension ?? 'Inconnu' }}</span>
                         }
                     </div>
+
                     <p-divider class="mt-4"></p-divider>
+
                     <div class="mt-4">
-                        @if (gridCellPopOver.dimension?.stand; as stand) {
-                            @if (stand.participation && isReadOnly) {
+                        @if (pop.dimension?.stand; as stand) {
+                            @if (stand.participation && isReadOnly()) {
                                 <div class="d-flex w-100 justify-content-center gap-2">
                                     <button-box [links]="['../', 'participations', stand.participation.id, 'view']"
                                                 [modeLink]="true"
@@ -416,22 +435,24 @@
                     </div>
                 }
             </dialog-box>
-            <dialog-box
-                    (cancel)="onPrereservedDialogHide()"
-                    (confirm)="confirmPrereserved()"
-                    [(visible)]="prereservedDialogVisible"
-                    [confirmDisabled]="!canConfirmPrereserved()"
-                    [dismissableMask]="true"
-                    [header]="'Réserver la place'"
-                    [mode]="'edit'">
 
+            <dialog-box (cancel)="onPrereservedDialogHide()"
+                        (confirm)="confirmPrereserved()"
+                        [(visible)]="prereservedDialogVisible"
+                        [confirmDisabled]="!canConfirmPrereserved()"
+                        [dismissableMask]="true"
+                        [header]="'Réserver la place'"
+                        [mode]="'edit'">
                 <p-iftalabel>
-                        <textarea [(ngModel)]="prereservedNote"
-                                  fluid pTextarea rows="2"></textarea>
+                    <textarea [(ngModel)]="prereservedNote"
+                              fluid
+                              pTextarea
+                              rows="2"></textarea>
                     <label [for]="'field_prereservedNote'">Note</label>
                 </p-iftalabel>
             </dialog-box>
-            <p-contextMenu #cm [model]="contextMenuItems" appendTo="body"></p-contextMenu>
+
+            <p-contextMenu #cm [model]="contextMenuItems()" appendTo="body"></p-contextMenu>
         </div>
     </app-card>
 </app-content-page>
