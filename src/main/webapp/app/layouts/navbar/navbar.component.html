@@ -168,16 +168,23 @@
                         </a>
                     </div>
                 }
-                <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex align-items-start">
                     <app-presence *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"></app-presence>
-                    <a (click)="closeMobile()" routerLink="/account/sessions" routerLinkActive="active">
-                        <fa-icon [fixedWidth]="true" class="text-white" icon="cloud"></fa-icon>
-                    </a>
+                    <p-button
+                            (click)="navigationService.hideSensibleInformation.set(!navigationService.hideSensibleInformation())"
+                            [icon]="navigationService.hideSensibleInformation() ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                            type="button"></p-button>
                 </div>
-                <div (click)="closeMobile()">
-                    <a (click)="logout()" id="logout">
-                        <fa-icon [fixedWidth]="true" class="text-white" icon="sign-out-alt"></fa-icon>
-                    </a>
+                <div class="d-flex align-items-end">
+                    <p-button (click)="closeMobile()"
+                              routerLink="/account/sessions"
+                              routerLinkActive="active"
+                              [icon]="'pi pi-cloud'"
+                              type="button"></p-button>
+                    <p-button (click)="logout()"
+                              id="logout"
+                              [icon]="'pi pi-sign-out'"
+                              type="button"></p-button>
                 </div>
             } @else {
                 <div (click)="closeMobile()">

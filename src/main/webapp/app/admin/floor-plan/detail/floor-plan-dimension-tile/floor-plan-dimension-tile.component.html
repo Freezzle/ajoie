@@ -20,7 +20,7 @@
                     @if (!dimension.stand) {
                         <span>{{ dimension.dimension }}</span>
                     }
-                    @if (displaySensibleInformation() && dimension.stand?.participation; as participation) {
+                    @if (displayParticipationName() && dimension.stand?.participation; as participation) {
                         <div>
                             @if (displayFullname) {
                                 {{ getFirstExhibitorName(participation.exhibitor) }}

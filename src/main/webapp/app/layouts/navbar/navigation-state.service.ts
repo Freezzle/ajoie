@@ -6,8 +6,9 @@ export class NavigationStateService {
     private readonly _salon = signal<ISalon | null>(null);
 
     readonly salon = computed(() => this._salon());
-    readonly hasSalon = computed(() => this._salon() !== null);
     readonly salonId = computed(() => this._salon()?.id ?? null);
+
+    hideSensibleInformation = signal<boolean>(false);
 
     reset(): void {
         this._salon.set(null);

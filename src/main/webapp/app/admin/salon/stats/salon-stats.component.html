@@ -62,74 +62,76 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-lg-6 table-responsive table-entities">
-                        <table aria-describedby="page-heading" class="table table-hover">
-                            <thead class="thead-primary">
-                            <tr>
-                                <th class="width-80">
-                                    <span>Facturations</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>En cours</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>Accepté/Payé</span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Totaux des prestations</td>
-                                <td class="text-center">{{ (combinedStats[0].facturation.total > 0) ? (combinedStats[0].facturation.total | currency : 'CHF') : '-' }}</td>
-                                <td class="text-center">{{ (combinedStats[1].facturation.total > 0) ? (combinedStats[1].facturation.total | currency : 'CHF') : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Réductions appliquées</td>
-                                <td class="text-center">{{ (combinedStats[0].facturation.discount > 0) ? (combinedStats[0].facturation.discount | currency : 'CHF') : '-' }}</td>
-                                <td class="text-center">{{ (combinedStats[1].facturation.discount > 0) ? (combinedStats[1].facturation.discount | currency : 'CHF') : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Totaux réels attendus</td>
-                                <td class="text-center">{{ (combinedStats[0].facturation.expected > 0) ? (combinedStats[0].facturation.expected | currency : 'CHF') : '-' }}</td>
-                                <td class="text-center">{{ (combinedStats[1].facturation.expected > 0) ? (combinedStats[1].facturation.expected | currency : 'CHF') : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Paiements réels</td>
-                                <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.paid | currency : 'CHF') : '-' }}</td>
-                                <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.paid | currency : 'CHF') : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Restant à payer</td>
-                                <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.remaining | currency : 'CHF') : '-' }}</td>
-                                <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.remaining | currency : 'CHF') : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                @if (calculateFacturation(combinedStats[1].facturation); as factuGraph) {
-                                    <td class="text-center">
-                                        @if (factuGraph[0] || factuGraph[1] || factuGraph[2]) {
-                                            <ngb-progressbar-stacked>
-                                                <ngb-progressbar [striped]="false"
-                                                                 [title]="'réduction [' + factuGraph[2].toFixed(2) + '%]'"
-                                                                 [value]="factuGraph[2]"
-                                                                 type="success"></ngb-progressbar>
-                                                <ngb-progressbar [striped]="false"
-                                                                 [title]="'payé [' + factuGraph[1].toFixed(2) + '%]'"
-                                                                 [value]="factuGraph[1]"
-                                                                 type="primary"></ngb-progressbar>
-                                                <ngb-progressbar [striped]="false"
-                                                                 [title]="'restant [' + factuGraph[0].toFixed(2) + '%]'"
-                                                                 [value]="factuGraph[0]"
-                                                                 class="custom-remaining"></ngb-progressbar>
-                                            </ngb-progressbar-stacked>
-                                        }
-                                    </td>
-                                }
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    @if (!navigationService.hideSensibleInformation()) {
+                        <div class="col-lg-6 table-responsive table-entities">
+                            <table aria-describedby="page-heading" class="table table-hover">
+                                <thead class="thead-primary">
+                                <tr>
+                                    <th class="width-80">
+                                        <span>Facturations</span>
+                                    </th>
+                                    <th class="width-10 text-center">
+                                        <span>En cours</span>
+                                    </th>
+                                    <th class="width-10 text-center">
+                                        <span>Accepté/Payé</span>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Totaux des prestations</td>
+                                    <td class="text-center">{{ (combinedStats[0].facturation.total > 0) ? (combinedStats[0].facturation.total | currency : 'CHF') : '-' }}</td>
+                                    <td class="text-center">{{ (combinedStats[1].facturation.total > 0) ? (combinedStats[1].facturation.total | currency : 'CHF') : '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Réductions appliquées</td>
+                                    <td class="text-center">{{ (combinedStats[0].facturation.discount > 0) ? (combinedStats[0].facturation.discount | currency : 'CHF') : '-' }}</td>
+                                    <td class="text-center">{{ (combinedStats[1].facturation.discount > 0) ? (combinedStats[1].facturation.discount | currency : 'CHF') : '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Totaux réels attendus</td>
+                                    <td class="text-center">{{ (combinedStats[0].facturation.expected > 0) ? (combinedStats[0].facturation.expected | currency : 'CHF') : '-' }}</td>
+                                    <td class="text-center">{{ (combinedStats[1].facturation.expected > 0) ? (combinedStats[1].facturation.expected | currency : 'CHF') : '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Paiements réels</td>
+                                    <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.paid | currency : 'CHF') : '-' }}</td>
+                                    <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.paid | currency : 'CHF') : '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Restant à payer</td>
+                                    <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.remaining | currency : 'CHF') : '-' }}</td>
+                                    <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.remaining | currency : 'CHF') : '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    @if (calculateFacturation(combinedStats[1].facturation); as factuGraph) {
+                                        <td class="text-center">
+                                            @if (factuGraph[0] || factuGraph[1] || factuGraph[2]) {
+                                                <ngb-progressbar-stacked>
+                                                    <ngb-progressbar [striped]="false"
+                                                                     [title]="'réduction [' + factuGraph[2].toFixed(2) + '%]'"
+                                                                     [value]="factuGraph[2]"
+                                                                     type="success"></ngb-progressbar>
+                                                    <ngb-progressbar [striped]="false"
+                                                                     [title]="'payé [' + factuGraph[1].toFixed(2) + '%]'"
+                                                                     [value]="factuGraph[1]"
+                                                                     type="primary"></ngb-progressbar>
+                                                    <ngb-progressbar [striped]="false"
+                                                                     [title]="'restant [' + factuGraph[0].toFixed(2) + '%]'"
+                                                                     [value]="factuGraph[0]"
+                                                                     class="custom-remaining"></ngb-progressbar>
+                                                </ngb-progressbar-stacked>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                     <div class="col-lg-6 table-responsive table-entities">
                         <table aria-describedby="page-heading" class="table table-hover">
                             <thead class="thead-primary">

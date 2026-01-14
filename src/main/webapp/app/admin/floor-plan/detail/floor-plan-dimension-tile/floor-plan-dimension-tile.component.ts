@@ -24,6 +24,7 @@ export class FloorPlanDimensionTileComponent {
     @Input() displayTechnical = false;
     @Input() displayFullname = false;
     displaySensibleInformation = model<boolean>(true);
+    displayParticipationName = model<boolean>(true);
 
     // comportement
     @Input() dragDisabled = false;

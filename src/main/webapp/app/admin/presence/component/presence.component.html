@@ -2,8 +2,7 @@
         (click)="toggle($event)"
         [badge]="'' + ((onlineCount$ | async) ?? 0)"
         icon="pi pi-user"
-        type="button"
-></p-button>
+        type="button"></p-button>
 
 <p-popover #pop [baseZIndex]="9999" [style]="{ minWidth: '300px' }">
     <div class="flex align-items-center justify-content-between mb-2">

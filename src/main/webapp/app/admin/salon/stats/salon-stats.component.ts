@@ -11,7 +11,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {ISalonStats} from '../model/salon-stats.interface';
-import {getFormattedParticipationName} from '../../participation/model/participation.interface';
 import {Toast, ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import {formatDate} from '@angular/common';
@@ -20,6 +19,7 @@ import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 @Component({
                selector: 'app-salon-stats',
@@ -47,8 +47,8 @@ export class SalonStatsComponent implements OnInit {
     combinedStats$: Observable<ISalonStats[]> | undefined;
     selectedFile: File | null = null;
     protected salonService = inject(SalonService);
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
     private readonly messageService = inject(MessageService);
+    readonly navigationService = inject(NavigationStateService);
     private readonly locale = inject(LOCALE_ID);
 
     ngOnInit(): void {

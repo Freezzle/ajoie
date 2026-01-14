@@ -71,6 +71,7 @@ import {getFormattedParticipationName} from '../../participation/model/participa
 import {Category, formatterCategory} from '../../enumerations/category.model';
 import {removeAccents} from '../../../shared/utils/string.util';
 import {selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 @Component({
                selector: 'floor-plan',
@@ -116,6 +117,7 @@ export class FloorPlanDetailComponent {
     private readonly salonService = inject(SalonService);
     private readonly standService = inject(StandService);
     private readonly floorPlanService = inject(FloorPlanService);
+    readonly navigationService = inject(NavigationStateService);
     private readonly route = inject(ActivatedRoute);
 
     // ---- route salon (signal)
@@ -163,7 +165,7 @@ export class FloorPlanDetailComponent {
     readonly isNumberAttribution = signal(false);
     readonly automaticallyIncrementNumber = signal(true);
 
-    // ---- derived (computed): no more getters called 1000x in template
+    // ---- derived (computed)
     readonly activePlan = computed(() => this.floorPlans()[this.activeIndex()] ?? null);
     readonly activeData = computed(() => this.activePlan()?.data ?? null);
     readonly activeCells = computed(() => this.activeData()?.cells ?? []);
