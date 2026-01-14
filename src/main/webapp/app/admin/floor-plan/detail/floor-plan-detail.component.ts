@@ -135,6 +135,7 @@ export class FloorPlanDetailComponent {
     readonly displayTechnical = signal(false);
     readonly showDimensions = signal(false);
     readonly showAvailableStands = signal(false);
+    readonly showSearchStands = signal(false);
     readonly displayHeader = signal(true);
 
     readonly isDragging = signal(false);
@@ -423,6 +424,7 @@ export class FloorPlanDetailComponent {
 
         this.activeIndex.set(hit.planIndex);
         hit.dimension.searched = true;
+        this.showSearchStands.set(false);
     }
 
     // ---------------------------------------------------------------------------

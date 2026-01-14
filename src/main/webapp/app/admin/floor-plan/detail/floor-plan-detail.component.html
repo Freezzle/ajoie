@@ -50,19 +50,7 @@
             <div class="row">
                 <!-- ############ HEADERS ############ -->
                 <div class="col-12">
-                    <div class="d-flex justify-content-end">
-                        <select-box [enableFilter]="true"
-                                    [filterFields]="selectFilterStandDimension()"
-                                    [formatterFunction]="formatterStandDimension"
-                                    [options]="assignedStandDimensions()"
-                                    [dataKey]="'stand.id'"
-                                    [formControl]="searchDimensionCell"
-                                    fieldName="dimensionCellSearch"
-                                    class="w-100"
-                                    translateKey="floorPlan.standSearching"/>
-                    </div>
-
-                    <div class="mt-4 d-flex justify-content-center">
+                    <div class="d-flex justify-content-center">
                         <ul class="nav nav-tabs" id="tabId" role="tablist">
                             @for (floorPlan of floorPlans(); track (floorPlan.id ?? floorPlan.position); let floorIndex = $index) {
                                 <li class="nav-item" role="presentation">
@@ -220,6 +208,14 @@
                     <div class="drawing-area">
                         <div class="content-around-drawing">
                             <div class="palette">
+                                <div class="block-icon">
+                                    <fa-icon (click)="showSearchStands.set(!showSearchStands())"
+                                             [class.icon-active]="showSearchStands()"
+                                             [class.icon-inactive]="!showSearchStands()"
+                                             icon="search"
+                                             style="cursor:pointer;"/>
+                                    <hr/>
+                                </div>
                                 @if (!isReadOnly()) {
                                     <div class="block-icon">
                                         <fa-icon
@@ -451,6 +447,22 @@
                               rows="2"></textarea>
                     <label [for]="'field_prereservedNote'">Note</label>
                 </p-iftalabel>
+            </dialog-box>
+
+            <dialog-box #searchDialog
+                    (closed)="showSearchStands.set(false)"
+                        [(visible)]="showSearchStands"
+                        [dismissableMask]="true"
+                        [header]="'Rechercher un stand attribué'">
+                <select-box [enableFilter]="true"
+                            [filterFields]="selectFilterStandDimension()"
+                            [formatterFunction]="formatterStandDimension"
+                            [options]="assignedStandDimensions()"
+                            [dataKey]="'stand.id'"
+                            [formControl]="searchDimensionCell"
+                            fieldName="dimensionCellSearch"
+                            class="w-100"
+                            translateKey="floorPlan.standSearching"/>
             </dialog-box>
 
             <p-contextMenu #cm [model]="contextMenuItems()" appendTo="body"></p-contextMenu>
