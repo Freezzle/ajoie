@@ -11,6 +11,7 @@ import {TimelineData} from '../model/timeline-data';
 import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
 import {TimelineDay} from '../model/timeline-day';
+import {ButtonBoxComponent} from '../../button-box/button-box.component';
 
 type IdLabel = { id: string; label: string };
 
@@ -26,7 +27,8 @@ type IdLabel = { id: string; label: string };
                    DatePickerModule,
                    ButtonModule,
                    InputText,
-                   Divider
+                   Divider,
+                   ButtonBoxComponent
                ],
                templateUrl: './tp-config-day.component.html'
            })
@@ -34,7 +36,6 @@ export class TpConfigDayComponent {
     _draft = signal<TimelineData | null>(null);
     @Input() newDayDefaultLabel = 'Nouveau jour';
     @Output() confirmDraft = new EventEmitter<TimelineData>();
-    @Output() cancelDraft = new EventEmitter<void>();
     rooms = computed(() => this._draft()?.rooms ?? []);
     roomOptions = computed<IdLabel[]>(() =>
                                           this.rooms()
@@ -245,10 +246,6 @@ export class TpConfigDayComponent {
         this.confirmDraft.emit(structuredClone(d));
     }
 
-    cancel() {
-        this.cancelDraft.emit();
-    }
-
     private commit(mutator: (next: TimelineData) => void) {
         const current = this._draft();
         if (!current) {
@@ -280,7 +277,7 @@ export class TpConfigDayComponent {
             next.days.push({
                                id,
                                label: this.newDayDefaultLabel ?? 'Nouveau jour',
-                               rooms: [],
+                               rooms: []
                            });
         });
     }

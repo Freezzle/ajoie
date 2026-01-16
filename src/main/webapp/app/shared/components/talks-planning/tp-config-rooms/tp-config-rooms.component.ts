@@ -8,17 +8,17 @@ import {InputTextModule} from 'primeng/inputtext';
 
 import {TimelineData} from '../model/timeline-data';
 import {TimelineRoom} from '../model/timeline-room';
+import {ButtonBoxComponent} from '../../button-box/button-box.component';
 
 @Component({
                selector: 'tp-config-rooms',
                standalone: true,
-               imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule],
+               imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, ButtonBoxComponent],
                templateUrl: './tp-config-rooms.component.html'
            })
 export class TpConfigRoomsComponent {
     _draft = signal<TimelineData | null>(null);
     @Output() confirmDraft = new EventEmitter<TimelineData>();
-    @Output() cancelDraft = new EventEmitter<void>();
     rooms = computed(() => this._draft()?.rooms ?? []);
     // Drafts de saisie
     private roomLabelDraft = signal<Record<string, string>>({});
@@ -82,10 +82,6 @@ export class TpConfigRoomsComponent {
             return;
         }
         this.confirmDraft.emit(structuredClone(d));
-    }
-
-    cancel() {
-        this.cancelDraft.emit();
     }
 
     private commit(mutator: (next: TimelineData) => void) {

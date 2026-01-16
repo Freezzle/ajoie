@@ -161,8 +161,6 @@ export class TpComponent {
         return {roomId, start, end: start + this.getTalkNbPeriods(talk)};
     });
     @ViewChildren('roomTrack') private roomTracks!: QueryList<ElementRef<HTMLDivElement>>;
-    @ViewChild(TpConfigRoomsComponent) private roomsDialog?: TpConfigRoomsComponent;
-    @ViewChild(TpConfigDayComponent) private assignDialog?: TpConfigDayComponent;
 
     constructor() {
         effect(() => this.ensureSelectedDayId());
@@ -299,14 +297,6 @@ export class TpComponent {
         this.talks.update(ts => ts.map(t => (t.dayId === dayId ? this.unassignTalk(t) : t)));
 
         this.showConfirmDeleteDay.set(false);
-    }
-
-    roomsPanelConfirm(): void {
-        this.roomsDialog?.confirm();
-    }
-
-    assignPanelConfirm(): void {
-        this.assignDialog?.confirm();
     }
 
     private ensureSelectedDayId(): void {

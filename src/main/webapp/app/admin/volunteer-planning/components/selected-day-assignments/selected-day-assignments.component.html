@@ -1,0 +1,45 @@
+<p-table [rowHover]="true" [value]="assignedVolunteers()">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Label</th>
+            <th></th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-v>
+        <tr>
+            <td>{{ v.label }}</td>
+            <td class="text-end">
+                <button-box (clickedEvent)="unassign(v.id)"
+                            [showText]="false"
+                            faIcon="times"
+                            translateKey="common.delete"
+                            type="danger"/>
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <tr>
+            <td>
+                <p-multiSelect appendTo="body"
+                               [fluid]="true"
+                               [options]="unassignedOptions()"
+                               [display]="'chip'"
+                               [ngModel]="selectedToAssign()"
+                               (ngModelChange)="selectedToAssign.set($event)"
+                               defaultLabel="Sélectionner..."
+                               optionLabel="label"
+                               optionValue="value"></p-multiSelect>
+            </td>
+            <td class="text-end">
+                <button-box (clickedEvent)="assignSelected()"
+                            [showText]="false"
+                            faIcon="plus"
+                            translateKey="common.create"
+                            [isDisabled]="selectedToAssign().length === 0"
+                            type="success"/>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

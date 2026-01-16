@@ -1,0 +1,35 @@
+<div class="row">
+    <div class="col-12">
+        <label>Libellé du jour</label>
+        <input pInputText
+               [fluid]="true"
+               [ngModel]="dayLabel()"
+               (ngModelChange)="setDayLabelDraft($event)"
+               (blur)="commitDayLabel()"
+               (keydown.enter)="commitDayLabel()"/>
+    </div>
+
+    <div class="mt-4 col-6">
+        <div>Début</div>
+        <p-datepicker [fluid]="true"
+                      [ngModel]="day()?.startTime"
+                      (ngModelChange)="updateStartTime($event)"
+                      [timeOnly]="true"
+                      [showTime]="true"
+                      hourFormat="24"
+                      appendTo="body"
+                      [stepMinute]="interval()"></p-datepicker>
+    </div>
+
+    <div class="mt-4 col-6">
+        <div>Fin</div>
+        <p-datepicker [fluid]="true"
+                      [ngModel]="day()?.endTime"
+                      (ngModelChange)="updateEndTime($event)"
+                      [timeOnly]="true"
+                      [showTime]="true"
+                      hourFormat="24"
+                      appendTo="body"
+                      [stepMinute]="interval()"></p-datepicker>
+    </div>
+</div>

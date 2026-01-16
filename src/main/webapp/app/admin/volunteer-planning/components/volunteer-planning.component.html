@@ -4,15 +4,34 @@
     </div>
 
     <div appMenuBarEnd>
-        <button-box [showText]="false" faIcon="arrow-left" translateKey="common.back"/>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading()"
+                    [showText]="false"
+                    faIcon="arrow-left"
+                    translateKey="common.back"/>
 
-        <button (click)="openPanel()"
-                class="p-button-text"
-                icon="pi pi-cog"
-                pButton
-                title="Configurer"
-                type="button"
-        ></button>
+        @if (isReadOnly()) {
+            <button-box (clickedEvent)="activateEditMode()"
+                        [isDisabled]="isLoading()"
+                        [showText]="false"
+                        faIcon="pencil-alt"
+                        translateKey="common.edit"/>
+        }
+
+        @if (!isReadOnly()) {
+            <button-box (clickedEvent)="activateReadOnlyMode()"
+                        [isDisabled]="isLoading()"
+                        [showText]="false"
+                        faIcon="ban"
+                        translateKey="common.cancel"
+                        type="secondary"/>
+            <button-box (clickedEvent)="save()"
+                        [isDisabled]="isLoading()"
+                        [isSubmit]="true"
+                        [showText]="false"
+                        faIcon="floppy-disk"
+                        translateKey="common.save"/>
+        }
     </div>
 
     <app-alert-error></app-alert-error>
@@ -20,102 +39,185 @@
     <p-toast/>
     <p-confirmpopup/>
 
-    <dialog-box
-            (cancel)="panelVisible.set(false)"
-            (confirm)="panelVisible.set(false)"
-            [(visible)]="panelVisible"
-            [header]="'Configuration'"
-            [mode]="'edit'">
-
-        <volunteer-planning-panel
-                (planningChange)="onPlanningChange($event)"
-                [planning]="planning()"/>
-    </dialog-box>
-
     <app-card [showHeader]="false">
         <div appCardBody>
+            @if (!isReadOnly()) {
+                <div class="d-flex justify-content-end gap-2 align-items-center">
+                    <button-box (clickedEvent)="volunteersDialogVisible.set(true)"
+                                translateKey="planningVolunteers.manageVolunteers"/>
+                    <button-box (clickedEvent)="categoriesDialogVisible.set(true)"
+                                translateKey="planningVolunteers.manageCategories"/>
+                </div>
+            }
             @if (selectedDay(); as sd) {
                 <p-tabs [value]="sd.id" scrollable>
                     <p-tablist class="justify-content-center">
                         @for (day of dayOptions(); track day.id) {
-                            <p-tab (click)="selectedDayId.set(day.id)" [value]="day.id">{{ day.label }}</p-tab>
+                            <p-tab (click)="selectedDayId.set(day.id)" [value]="day.id">
+                                <div class="d-flex align-items-center justify-content-between gap-2">
+                                    <span>{{ day.label }}</span>
+
+                                    @if (!isReadOnly() && day?.id === sd.id) {
+                                        <menu-box [appendTo]="'body'"
+                                                  [items]="dayMenus().get(sd.id)!"
+                                                  buttonIcon="gear"
+                                                  type="secondary"/>
+                                    }
+                                </div>
+                            </p-tab>
+                        }
+
+                        @if (!isReadOnly()) {
+                            <p-tab [value]="'__ADD__'">
+                                <button-box (clickedEvent)="addNewDay()"
+                                            [showText]="!planning().days.length"
+                                            faIcon="plus"
+                                            translateKey="common.create"
+                                            type="secondary"/>
+                            </p-tab>
                         }
                     </p-tablist>
 
                     <p-tabpanels>
-                        <div class="main mt-4">
-                            <div (pointerleave)="stopPaint()" (pointermove)="onPaintMove($event)" class="table-wrap">
-                                <p-table [value]="visibleVolunteers()" class="planning-table">
-                                    <ng-template pTemplate="header">
-                                        <tr>
-                                            <th class="col-volunteer p-0 sticky-col sticky-header"></th>
-                                            @for (slot of timeSlots(); track slot.index) {
-                                                <th class="slot-col sticky-header">{{ slot.label }}</th>
+                        @if (selectedDay()) {
+                            <p-tabpanel [value]="selectedDay()?.id">
+                                <div class="main mt-4">
+                                    <div (pointerleave)="stopPaint()" (pointermove)="onPaintMove($event)"
+                                         class="table-wrap">
+                                        <p-table [value]="visibleVolunteers()" class="planning-table">
+                                            <ng-template pTemplate="header">
+                                                <tr>
+                                                    <th class="col-volunteer p-0 sticky-col sticky-header"></th>
+                                                    @for (slot of timeSlots(); track slot.index) {
+                                                        <th class="slot-col sticky-header">{{ slot.label }}</th>
+                                                    }
+                                                </tr>
+                                            </ng-template>
+
+                                            <ng-template let-v pTemplate="body">
+                                                <tr>
+                                                    <td class="col-volunteer sticky-col row-label">{{ v.label }}</td>
+
+                                                    @for (slot of timeSlots(); track slot.index) {
+                                                        @let categoryId = getCategoryId(v.id, slot.index);
+                                                        @let cat = uiFor(categoryId);
+
+                                                        <td class="slot-cell">
+                                                            <div
+                                                                    (click)="!painting() ? applyTool(v.id, slot.index) : undefined"
+                                                                    (pointerdown)="startPaint(v.id, slot.index, $event)"
+                                                                    [attr.data-slot-index]="slot.index"
+                                                                    [attr.data-volunteer-id]="v.id"
+                                                                    class="paint-cell">
+                                                                @if (cat) {
+                                                                    <span [style.background-color]="cat.color"
+                                                                          [title]="cat.label"
+                                                                          class="cat-badge">
+                                                                        <i [class]="cat.icon"></i>
+                                                                    </span>
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            </ng-template>
+                                        </p-table>
+                                    </div>
+
+                                    <!-- palette fixe à droite -->
+                                    <aside class="palette">
+                                        <div class="palette-grid">
+                                            <button (click)="selectEraser()"
+                                                    [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
+                                                    class="p-button-secondary"
+                                                    icon="pi pi-eraser"
+                                                    pButton
+                                                    type="button"
+                                            ></button>
+
+                                            <p-divider></p-divider>
+
+                                            @for (c of planning().categories; track c.id) {
+                                                <button
+                                                        (click)="selectCategory(c.id)"
+                                                        [icon]="c.icon"
+                                                        [style.background-color]="c.color"
+                                                        [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
+                                                        [style.color]="'black'"
+                                                        [title]="c.label"
+                                                        pButton
+                                                        type="button"
+                                                ></button>
                                             }
-                                        </tr>
-                                    </ng-template>
-
-                                    <ng-template let-v pTemplate="body">
-                                        <tr>
-                                            <td class="col-volunteer sticky-col row-label">{{ v.label }}</td>
-
-                                            @for (slot of timeSlots(); track slot.index) {
-                                                @let categoryId = getCategoryId(v.id, slot.index);
-                                                @let cat = uiFor(categoryId);
-
-                                                <td class="slot-cell">
-                                                    <div
-                                                            (click)="!painting() ? applyTool(v.id, slot.index) : undefined"
-                                                            (pointerdown)="startPaint(v.id, slot.index, $event)"
-                                                            [attr.data-slot-index]="slot.index"
-                                                            [attr.data-volunteer-id]="v.id"
-                                                            class="paint-cell">
-                                                        @if (cat) {
-                                                            <span [style.background-color]="cat.color"
-                                                                  [title]="cat.label"
-                                                                  class="cat-badge">
-                                                                <i [class]="cat.icon"></i>
-                                                            </span>
-                                                        }
-                                                    </div>
-                                                </td>
-                                            }
-                                        </tr>
-                                    </ng-template>
-                                </p-table>
-                            </div>
-
-                            <!-- palette fixe à droite -->
-                            <aside class="palette">
-                                <div class="palette-grid">
-                                    <button (click)="selectEraser()"
-                                            [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
-                                            class="p-button-secondary"
-                                            icon="pi pi-eraser"
-                                            pButton
-                                            type="button"
-                                    ></button>
-
-                                    <p-divider></p-divider>
-
-                                    @for (c of planning().categories; track c.id) {
-                                        <button
-                                                (click)="selectCategory(c.id)"
-                                                [icon]="c.icon"
-                                                [style.background-color]="c.color"
-                                                [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
-                                                [style.color]="'black'"
-                                                [title]="c.label"
-                                                pButton
-                                                type="button"
-                                        ></button>
-                                    }
+                                        </div>
+                                    </aside>
                                 </div>
-                            </aside>
-                        </div>
+                            </p-tabpanel>
+                        }
                     </p-tabpanels>
                 </p-tabs>
             }
         </div>
+
+        @if (dayDialogVisible()) {
+            <dialog-box (cancel)="dayDialogVisible.set(false)"
+                        (confirm)="dayEditor.confirm()"
+                        [(visible)]="dayDialogVisible"
+                        [header]="'Configuration du jour'"
+                        [mode]="'edit'">
+                <selected-day-editor #dayEditor
+                                     [data]="daySlice()"
+                                     (confirmDraft)="applyDaySlice($event)"/>
+            </dialog-box>
+        }
+
+        <!-- ================= DIALOG: BENEVOLES ================= -->
+        @if (volunteersDialogVisible()) {
+            <dialog-box (cancel)="volunteersDialogVisible.set(false)"
+                        (confirm)="volEditor.confirm()"
+                        [(visible)]="volunteersDialogVisible"
+                        [header]="'Configuration des bénévoles'"
+                        [mode]="'edit'">
+                <volunteer-manager #volEditor
+                                   [data]="planning().volunteers"
+                                   (confirmDraft)="applyVolunteers($event)"/>
+            </dialog-box>
+        }
+
+        <!-- ================= DIALOG: ASSIGNATIONS (jour selectionné) ================= -->
+        @if (assignmentsDialogVisible()) {
+            <dialog-box (cancel)="assignmentsDialogVisible.set(false)"
+                        (confirm)="assignEditor.confirm()"
+                        [(visible)]="assignmentsDialogVisible"
+                        [header]="'Assignations du jour'"
+                        [mode]="'edit'">
+                <selected-day-assignments #assignEditor
+                                          [data]="assignmentsSlice()"
+                                          (confirmDraft)="applyAssignmentsSlice($event)"/>
+            </dialog-box>
+        }
+
+        <!-- ================= DIALOG: CATEGORIES ================= -->
+        @if (categoriesDialogVisible()) {
+            <dialog-box (cancel)="categoriesDialogVisible.set(false)"
+                        (confirm)="catEditor.confirm()"
+                        [(visible)]="categoriesDialogVisible"
+                        [header]="'Configuration des catégories'"
+                        [mode]="'edit'">
+                <category-manager #catEditor
+                                  [data]="planning().categories"
+                                  (confirmDraft)="applyCategories($event)"/>
+            </dialog-box>
+        }
+
+        @if (showConfirmDeleteDay()) {
+            <dialog-box (cancel)="showConfirmDeleteDay.set(false)"
+                        (confirm)="confirmDeleteSelectedDay()"
+                        [(visible)]="showConfirmDeleteDay"
+                        [header]="'Supprimer le jour'"
+                        [mode]="'edit'">
+                <div [innerHTML]="'planningVolunteers.removeDay' | translate: {day: selectedDay()?.label}"></div>
+            </dialog-box>
+        }
     </app-card>
 </app-content-page>

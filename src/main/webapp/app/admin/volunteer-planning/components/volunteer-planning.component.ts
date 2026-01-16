@@ -20,9 +20,15 @@ import {TranslateModule} from '@ngx-translate/core';
 
 import {Category, computeTimeSlots, Day, Planning, TimeSlot, Tool, Volunteer} from './volunteer-planning-model';
 
-import {VolunteerPlanningPanelComponent} from './volunteer-planning-panel/volunteer-planning-panel.component';
-import {Tab, TabList, TabPanels, Tabs} from 'primeng/tabs';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {MenuItem} from 'primeng/api';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
+import {CategoryManagerComponent} from './category-manager/category-manager.component';
+import {SelectedDayAssignmentsComponent} from './selected-day-assignments/selected-day-assignments.component';
+import {VolunteerManagerComponent} from './volunteer-manager/volunteer-manager.component';
+import {SelectedDayEditorComponent} from './selected-day-editor/selected-day-editor.component';
+import {AssignmentsSlice, DayConfigSlice} from './volunteer-planning-slices';
 
 @Component({
                selector: 'app-volunteer-planning',
@@ -44,12 +50,17 @@ import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-b
                    AlertComponent,
                    AlertErrorComponent,
                    CardComponent,
-                   VolunteerPlanningPanelComponent,
                    TabPanels,
                    TabList,
                    Tabs,
                    Tab,
-                   DialogBoxComponent
+                   MenuBoxComponent,
+                   DialogBoxComponent,
+                   CategoryManagerComponent,
+                   SelectedDayAssignmentsComponent,
+                   VolunteerManagerComponent,
+                   SelectedDayEditorComponent,
+                   TabPanel
                ],
                templateUrl: './volunteer-planning.component.html',
                styleUrls: ['./volunteer-planning.component.scss'],
@@ -57,21 +68,67 @@ import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-b
            })
 export class VolunteerPlanningComponent {
     planning = signal<Planning>(this.makeInitialPlanning());
-
     selectedDayId = signal<string>(this.planning().days[0].id);
+    readonly isLoading = signal<boolean>(false);
+    readonly isReadOnly = signal<boolean>(true);
+    readonly dayMenus = computed(() => new Map(this.planning().days.map(d => [d.id, this.dayActionItems()])));
 
     // ✅ Nouveau : tool = categoryId, plus TaskCategory
     selectedTool = signal<Tool>({kind: 'ERASER'});
-
     painting = signal(false);
+
     // ✅ Dialog pour ton panel (admin)
-    panelVisible = model(false);
+    dayDialogVisible = model(false);
+    volunteersDialogVisible = model(false);
+    assignmentsDialogVisible = model(false);
+    categoriesDialogVisible = model(false);
+    showConfirmDeleteDay = signal(false);
+
     // ---------- computed ----------
     dayOptions = computed(() => this.planning().days.map(d => ({id: d.id, label: d.label})));
     selectedDay = computed(() => {
+        const days = this.planning().days;
+        if (!days.length) {
+            return null;
+        }
+
         const id = this.selectedDayId();
-        return this.planning().days.find(d => d.id === id) ?? null;
+        return this.planning().days.find(d => d.id === id) ?? this.planning().days[0];
     });
+
+    daySlice = computed<DayConfigSlice>(() => {
+        const day = this.selectedDay();
+        // fallback propre
+        const safeDay: Day = day ?? this.planning().days[0];
+        return {
+            intervalMinutes: this.planning().intervalMinutes,
+            day: safeDay
+        };
+    });
+
+    activateReadOnlyMode(): void {
+        this.isReadOnly.set(true);
+    }
+
+    activateEditMode(): void {
+        this.isReadOnly.set(false);
+    }
+
+    save(): void {
+
+    }
+
+    assignmentsSlice = computed<AssignmentsSlice>(() => {
+        const day = this.selectedDay();
+        const safeDay = day ?? this.planning().days[0];
+        return {
+            dayId: safeDay.id,
+            dayLabel: safeDay.label,
+            volunteers: this.planning().volunteers,
+            assignedVolunteerIds: safeDay.assignedVolunteerIds ?? []
+        };
+    });
+
     timeSlots = computed<TimeSlot[]>(() => {
         const day = this.selectedDay();
         if (!day) {
@@ -79,6 +136,76 @@ export class VolunteerPlanningComponent {
         }
         return computeTimeSlots(day.startTime, day.endTime, this.planning().intervalMinutes);
     });
+
+    // ----- APPLY (confirm only) -----
+
+    applyVolunteers(volunteers: Volunteer[]) {
+        // nettoyage: retirer volunteerId des assignations + cells dans tous les jours
+        const cur = this.planning();
+        const keptIds = new Set(volunteers.map(v => v.id));
+
+        const days = cur.days.map(d => ({
+            ...d,
+            assignedVolunteerIds: d.assignedVolunteerIds.filter(id => keptIds.has(id)),
+            cells: d.cells.filter(c => keptIds.has(c.volunteerId))
+        }));
+
+        this.planning.set({...cur, volunteers, days});
+    }
+
+    applyCategories(categories: Category[]) {
+        // nettoyage: enlever les cellules qui utilisent une catégorie supprimée
+        const cur = this.planning();
+        const kept = new Set(categories.map(c => c.id));
+
+        const days = cur.days.map(d => ({
+            ...d,
+            cells: d.cells.filter(cell => kept.has(cell.categoryId))
+        }));
+
+        this.planning.set({...cur, categories, days});
+    }
+
+    applyDaySlice(slice: DayConfigSlice) {
+        const cur = this.planning();
+
+        // maj interval
+        let next: Planning = {...cur, intervalMinutes: slice.intervalMinutes};
+
+        // maj du jour (par id)
+        const idx = next.days.findIndex(d => d.id === slice.day.id);
+        if (idx >= 0) {
+            const days = [...next.days];
+            days[idx] = structuredClone(slice.day);
+            next = {...next, days};
+        }
+
+        this.planning.set(next);
+    }
+
+    applyAssignmentsSlice(slice: AssignmentsSlice) {
+        const cur = this.planning();
+        const idx = cur.days.findIndex(d => d.id === slice.dayId);
+        if (idx < 0) {
+            return;
+        }
+
+        // nettoyage: si un bénévole est désassigné, supprimer ses cells du jour
+        const day = cur.days[idx];
+        const set = new Set(slice.assignedVolunteerIds);
+
+        const nextDay: Day = {
+            ...day,
+            assignedVolunteerIds: [...set],
+            cells: day.cells.filter(c => set.has(c.volunteerId))
+        };
+
+        const days = [...cur.days];
+        days[idx] = nextDay;
+
+        this.planning.set({...cur, days});
+    }
+
     // ✅ map categories by id
     categoryMap = computed(() => new Map(this.planning().categories.map(c => [c.id, c])));
     // ✅ cellMap: key => categoryId
@@ -112,27 +239,6 @@ export class VolunteerPlanningComponent {
     // perf: rAF throttle optionnel
     private rafId: number | null = null;
     private pendingPaint: { vId: string; slot: number } | null = null;
-
-    // ---------- Panel (admin) ----------
-    openPanel() {
-        this.panelVisible.set(true);
-    }
-
-    onPlanningChange(next: Planning) {
-        this.planning.set(next);
-
-        // si jour supprimé => fallback
-        const selected = this.selectedDayId();
-        if (!next.days.some(d => d.id === selected)) {
-            this.selectedDayId.set(next.days[0]?.id ?? selected);
-        }
-
-        // si catégorie sélectionnée supprimée => gomme
-        const t = this.selectedTool();
-        if (t.kind === 'CATEGORY' && !next.categories.some(c => c.id === t.categoryId)) {
-            this.selectedTool.set({kind: 'ERASER'});
-        }
-    }
 
     // ---------- Palette ----------
     selectEraser() {
@@ -242,6 +348,13 @@ export class VolunteerPlanningComponent {
         this.setCellCategory(day.id, volunteerId, slotIndex, categoryId);
     }
 
+    openDeleteDayConfirm(): void {
+        this.showConfirmDeleteDay.set(true);
+    }
+
+    addNewDay(): void {
+    }
+
     @HostListener('window:pointerup')
     @HostListener('window:pointercancel')
     @HostListener('window:blur')
@@ -288,6 +401,25 @@ export class VolunteerPlanningComponent {
         this.planning.set({...cur, days});
     }
 
+    confirmDeleteSelectedDay(): void {
+        const dayId = this.selectedDay()?.id;
+        if (!dayId) {
+            return;
+        }
+
+        // Remove day
+        this.planning.update(planning => ({
+            ...planning,
+            days: (planning.days ?? []).filter(d => d.id !== dayId)
+        }));
+
+        this.showConfirmDeleteDay.set(false);
+    }
+
+    previousState(): void {
+        window.history.back();
+    }
+
     private queuePaint(vId: string, slot: number) {
         this.pendingPaint = {vId, slot};
         if (this.rafId !== null) {
@@ -314,6 +446,31 @@ export class VolunteerPlanningComponent {
         const d = new Date();
         d.setHours(h, m, 0, 0);
         return d;
+    }
+
+    private dayActionItems(): MenuItem[] {
+        return [
+            {
+                label: 'Configuration',
+                icon: 'pi pi-calendar',
+                command: () => {
+                    this.dayDialogVisible.set(true);
+                }
+            },
+            {
+                label: 'Assignement des bénévoles',
+                icon: 'pi pi-user',
+                command: () => {
+                    this.assignmentsDialogVisible.set(true);
+                }
+            },
+            {
+                label: 'Supprimer le jour',
+                icon: 'pi pi-trash',
+                styleClass: 'p-menuitem-danger',
+                command: () => this.openDeleteDayConfirm()
+            }
+        ];
     }
 
     private makeInitialPlanning(): Planning {
@@ -349,7 +506,7 @@ export class VolunteerPlanningComponent {
                     startTime: this.timeAt(8, 0),
                     endTime: this.timeAt(19, 0),
                     assignedVolunteerIds: volunteers.map(v => v.id), // par défaut assignés
-                    cells: [],
+                    cells: []
                 },
                 {
                     id: 'd2',
@@ -357,9 +514,9 @@ export class VolunteerPlanningComponent {
                     startTime: this.timeAt(8, 0),
                     endTime: this.timeAt(19, 0),
                     assignedVolunteerIds: volunteers.map(v => v.id),
-                    cells: [],
-                },
-            ],
+                    cells: []
+                }
+            ]
         };
     }
 }

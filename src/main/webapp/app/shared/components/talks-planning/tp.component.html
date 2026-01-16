@@ -186,30 +186,31 @@
 }
 
 <!-- DIALOG : Manage Rooms -->
-<dialog-box (cancel)="showManageRooms.set(false)"
-            (confirm)="roomsPanelConfirm()"
-            [(visible)]="showManageRooms"
-            [header]="'Gestion des salles'"
-            [mode]="'edit'">
-    <tp-config-rooms (cancelDraft)="showManageRooms.set(false)"
-                     (confirmDraft)="configuration.set($event); showManageRooms.set(false)"
-                     [data]="configuration()"/>
-</dialog-box>
+@if (showManageRooms()) {
+    <dialog-box (cancel)="showManageRooms.set(false)"
+                (confirm)="roomsDialog.confirm()"
+                [(visible)]="showManageRooms"
+                [header]="'Gestion des salles'"
+                [mode]="'edit'">
+        <tp-config-rooms #roomsDialog (confirmDraft)="configuration.set($event)"
+                         [data]="configuration()"/>
+    </dialog-box>
+}
 
 <!-- DIALOG : Manage selected day -->
-<dialog-box (cancel)="onManageDayCancel()"
-            (confirm)="assignPanelConfirm()"
-            [(visible)]="showAssignRooms"
-            [header]="manageDayCreateMode() ? 'Création d\'un jour' : 'Configuration'"
-            [mode]="'edit'">
-    @if (manageDaySelectedDayId()) {
-        <tp-config-day (cancelDraft)="onManageDayCancel()"
+@if (showAssignRooms()) {
+    <dialog-box (cancel)="onManageDayCancel()"
+                (confirm)="assignDialog.confirm()"
+                [(visible)]="showAssignRooms"
+                [header]="manageDayCreateMode() ? 'Création d\'un jour' : 'Configuration'"
+                [mode]="'edit'">
+        <tp-config-day #assignDialog
                        (confirmDraft)="onManageDayConfirm($event)"
                        [createIfMissing]="manageDayCreateMode()"
                        [data]="configuration()"
                        [selectedDayId]="manageDaySelectedDayId()!"/>
-    }
-</dialog-box>
+    </dialog-box>
+}
 
 <!-- DIALOG : Removing selected day -->
 <dialog-box (cancel)="showConfirmDeleteDay.set(false)"
