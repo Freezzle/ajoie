@@ -54,7 +54,6 @@ import {MenuItem, PrimeIcons} from 'primeng/api';
 import {TranslateService} from '@ngx-translate/core';
 import {TableModule} from 'primeng/table';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
-import {Rating} from 'primeng/rating';
 import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.component';
 
 @Component({
@@ -62,7 +61,7 @@ import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.componen
                templateUrl: './participation-update.component.html',
                imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
                          ButtonBoxComponent, LinkBoxComponent, SelectBoxComponent, DateBoxComponent,
-                         NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, Tab, TabList, Tabs, TabPanels, TabPanel, Badge, Tag, CardComponent, ContentPageComponent, MenuBoxComponent, TableModule, Rating, RatingBoxComponent]
+                         NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, Tab, TabList, Tabs, TabPanels, TabPanel, Badge, Tag, CardComponent, ContentPageComponent, MenuBoxComponent, TableModule, RatingBoxComponent]
            })
 export class ParticipationUpdateComponent implements OnInit {
     tabActive = '0';

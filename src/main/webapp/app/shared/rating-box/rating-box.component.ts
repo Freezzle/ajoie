@@ -8,14 +8,13 @@ import {
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
-import {ToggleButton} from 'primeng/togglebutton';
 import {PrimeIcons} from 'primeng/api';
 import {Rating} from 'primeng/rating';
 import {IftaLabel} from 'primeng/iftalabel';
 import SharedModule from '../shared.module';
 
 @Component({
-               imports: [CommonModule, ReactiveFormsModule, FormsModule, ToggleButton, Rating, IftaLabel, SharedModule],
+               imports: [CommonModule, ReactiveFormsModule, FormsModule, Rating, IftaLabel, SharedModule],
                selector: 'rating-box',
                templateUrl: './rating-box.component.html',
                styleUrl: './rating-box.component.scss'
