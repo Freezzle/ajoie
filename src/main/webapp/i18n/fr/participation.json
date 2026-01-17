@@ -45,9 +45,9 @@
     "notFound": "Aucune participation",
     "offer": "Description de l'offre",
     "rating": "Evaluation",
-    "ratingFriendliness": "Amicale",
-    "ratingPaymentSpeed": "Facilité de paiement",
-    "ratingServiceQuality": "Qualité de service",
+    "ratingFriendliness": "Aimabilité",
+    "ratingPaymentSpeed": "Fiabilité de paiement",
+    "ratingServiceQuality": "Prestations soignées",
     "registrationDate": "Date d'inscription",
     "linkedServices": "Les prestations souscrites",
     "status": {
