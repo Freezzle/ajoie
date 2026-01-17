@@ -1,13 +1,14 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, EventEmitter, Input, Output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {Component, computed, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
-import { SelectModule } from 'primeng/select';
-import { InputTextModule } from 'primeng/inputtext';
-import { DatePickerModule } from 'primeng/datepicker';
+import {SelectModule} from 'primeng/select';
+import {InputTextModule} from 'primeng/inputtext';
+import {DatePickerModule} from 'primeng/datepicker';
 
-import { Day, IntervalMinutes } from '../volunteer-planning-model';
-import { DayConfigSlice } from '../volunteer-planning-slices';
+import {Day, IntervalMinutes} from '../volunteer-planning-model';
+import {DayConfigSlice} from '../volunteer-planning-slices';
+import {DialogDraftService} from '../../../../shared/services/dialog-draft.service';
 
 @Component({
                selector: 'selected-day-editor',
@@ -15,19 +16,17 @@ import { DayConfigSlice } from '../volunteer-planning-slices';
                imports: [CommonModule, FormsModule, SelectModule, InputTextModule, DatePickerModule],
                templateUrl: './selected-day-editor.component.html'
            })
-export class SelectedDayEditorComponent {
+export class SelectedDayEditorComponent implements OnInit, OnDestroy {
     private readonly TIME_REF = new Date(2000, 0, 1, 0, 0, 0, 0);
+    private readonly draftService = inject(DialogDraftService);
 
     _draft = signal<DayConfigSlice | null>(null);
-
-    @Output() confirmDraft = new EventEmitter<DayConfigSlice>();
-
     day = computed<Day | null>(() => this._draft()?.day ?? null);
     interval = computed<IntervalMinutes>(() => this._draft()?.intervalMinutes ?? 60);
 
     private dayLabelDraft = signal<string | null>(null);
 
-    @Input({ required: true })
+    @Input({required: true})
     set data(value: DayConfigSlice) {
         const normalized = structuredClone(value);
 
@@ -36,7 +35,7 @@ export class SelectedDayEditorComponent {
         normalized.day.startTime = this.normalizeTime(new Date(normalized.day.startTime));
         normalized.day.endTime = this.normalizeTime(new Date(normalized.day.endTime));
 
-        // Optionnel: si valeurs incohérentes, on remet un défaut “safe”
+        // Optionnel: si valeurs incohérentes, on remet un défaut "safe"
         if (normalized.day.endTime.getTime() <= normalized.day.startTime.getTime()) {
             normalized.day.startTime = this.timeAt(8, 0);
             normalized.day.endTime = this.timeAt(18, 0);
@@ -46,10 +45,22 @@ export class SelectedDayEditorComponent {
         this.dayLabelDraft.set(null);
     }
 
-    // draft label editing
+    ngOnInit() {
+        this.draftService.registerDraft(() => {
+            const d = this._draft();
+            return d ? structuredClone(d) : null;
+        });
+    }
+
+    ngOnDestroy() {
+        this.draftService.unregisterDraft();
+    }
+
     dayLabel(): string {
         const d = this.day();
-        if (!d) return '';
+        if (!d) {
+            return '';
+        }
         return this.dayLabelDraft() ?? d.label;
     }
 
@@ -59,9 +70,13 @@ export class SelectedDayEditorComponent {
 
     commitDayLabel() {
         const raw = this.dayLabelDraft();
-        if (raw == null) return;
+        if (raw == null) {
+            return;
+        }
         const v = raw.trim();
-        if (!v) return;
+        if (!v) {
+            return;
+        }
 
         this.commit(next => {
             next.day.label = v;
@@ -72,12 +87,16 @@ export class SelectedDayEditorComponent {
 
     updateStartTime(start: Date) {
         const d = this.day();
-        if (!d) return;
+        if (!d) {
+            return;
+        }
 
         const s = this.normalizeTime(start);
         const e = this.normalizeTime(d.endTime);
 
-        if (e.getTime() <= s.getTime()) return;
+        if (e.getTime() <= s.getTime()) {
+            return;
+        }
 
         this.commit(next => {
             next.day.startTime = s;
@@ -88,12 +107,16 @@ export class SelectedDayEditorComponent {
 
     updateEndTime(end: Date) {
         const d = this.day();
-        if (!d) return;
+        if (!d) {
+            return;
+        }
 
         const s = this.normalizeTime(d.startTime);
         const e = this.normalizeTime(end);
 
-        if (e.getTime() <= s.getTime()) return;
+        if (e.getTime() <= s.getTime()) {
+            return;
+        }
 
         this.commit(next => {
             next.day.endTime = e;
@@ -101,15 +124,11 @@ export class SelectedDayEditorComponent {
         });
     }
 
-    confirm() {
-        const d = this._draft();
-        if (!d) return;
-        this.confirmDraft.emit(structuredClone(d));
-    }
-
     private commit(mutator: (next: DayConfigSlice) => void) {
         const current = this._draft();
-        if (!current) return;
+        if (!current) {
+            return;
+        }
         const next = structuredClone(current);
         mutator(next);
         this._draft.set(next);

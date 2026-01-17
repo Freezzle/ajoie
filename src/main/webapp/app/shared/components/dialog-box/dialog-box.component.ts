@@ -1,7 +1,8 @@
-import {Component, input, model, output} from '@angular/core';
+import {Component, inject, input, model, OnDestroy, output} from '@angular/core';
 import {Dialog} from 'primeng/dialog';
 import {ButtonDirective} from 'primeng/button';
 import {PrimeTemplate} from 'primeng/api';
+import {DialogDraftService} from '../../services/dialog-draft.service';
 
 export type AppDialogMode = 'view' | 'edit';
 
@@ -15,7 +16,9 @@ export type AppDialogMode = 'view' | 'edit';
                templateUrl: './dialog-box.component.html',
                styleUrl: './dialog-box.component.scss'
            })
-export class DialogBoxComponent {
+export class DialogBoxComponent implements OnDestroy {
+    private readonly draftService = inject(DialogDraftService);
+
     // Dialog purpose
     visible = model<boolean>(false);
     closable = input(true);
@@ -34,10 +37,8 @@ export class DialogBoxComponent {
     confirmDisabled = input(false);
     confirmLoading = input(false);
 
-
-    // Outputs modernes
     cancel = output<void>();
-    confirm = output<void>();
+    confirm = output<any>();
     closed = output<void>();
 
     onHide() {
@@ -52,14 +53,19 @@ export class DialogBoxComponent {
 
     onCancelClick() {
         this.cancel.emit();
-        this.requestClose();
+        this.requestClose(); // requestClose appelle déjà resetDraft()
     }
 
     onConfirmClick() {
-        this.confirm.emit();
+        const draft = this.draftService.getDraft();
+        this.confirm.emit(draft);
 
         if (!this.confirmLoading()) {
             this.requestClose();
         }
+    }
+
+    ngOnDestroy() {
+        this.draftService.unregisterDraft();
     }
 }

@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import {Component, computed, EventEmitter, Input, Output, signal} from '@angular/core';
+import {Component, computed, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
 import {ButtonModule} from 'primeng/button';
@@ -10,6 +10,7 @@ import {ConfirmationService} from 'primeng/api';
 
 import {newId, Volunteer} from '../volunteer-planning-model';
 import {ButtonBoxComponent} from '../../../../shared/components/button-box/button-box.component';
+import {DialogDraftService} from '../../../../shared/services/dialog-draft.service';
 
 @Component({
                selector: 'volunteer-manager',
@@ -18,20 +19,28 @@ import {ButtonBoxComponent} from '../../../../shared/components/button-box/butto
                providers: [ConfirmationService],
                templateUrl: './volunteer-manager.component.html'
            })
-export class VolunteerManagerComponent {
+export class VolunteerManagerComponent implements OnInit, OnDestroy {
+    private readonly draftService = inject(DialogDraftService);
+
     _draft = signal<Volunteer[] | null>(null);
-
-    @Output() confirmDraft = new EventEmitter<Volunteer[]>();
-
     volunteers = computed(() => this._draft() ?? []);
-
-    // Drafts de saisie (comme ton pattern rooms)
     private labelDraft = signal<Record<string, string>>({});
 
     @Input({required: true})
     set data(value: Volunteer[]) {
         this._draft.set(structuredClone(value));
         this.labelDraft.set({});
+    }
+
+    ngOnInit() {
+        this.draftService.registerDraft(() => {
+            const d = this._draft();
+            return d ? structuredClone(d) : null;
+        });
+    }
+
+    ngOnDestroy() {
+        this.draftService.unregisterDraft();
     }
 
     volunteerLabel(v: Volunteer): string {
@@ -71,21 +80,13 @@ export class VolunteerManagerComponent {
         this.commit(next => next.push({id: newId('v'), label: 'Nouveau bénévole'}));
     }
 
-    deleteVolunteer(volunteerId: string, label: string) {
+    deleteVolunteer(volunteerId: string, _label: string) {
         this.commit(next => {
             const idx = next.findIndex(v => v.id === volunteerId);
             if (idx >= 0) {
                 next.splice(idx, 1);
             }
         });
-    }
-
-    confirm() {
-        const d = this._draft();
-        if (!d) {
-            return;
-        }
-        this.confirmDraft.emit(structuredClone(d));
     }
 
     private commit(mutator: (next: Volunteer[]) => void) {

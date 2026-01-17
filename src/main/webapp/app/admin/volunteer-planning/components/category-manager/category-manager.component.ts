@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import {Component, computed, EventEmitter, Input, Output, signal} from '@angular/core';
+import {Component, computed, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
 import {ButtonModule} from 'primeng/button';
@@ -12,6 +12,7 @@ import {ConfirmationService} from 'primeng/api';
 
 import {Category, newId, normalizeHex} from '../volunteer-planning-model';
 import {ButtonBoxComponent} from '../../../../shared/components/button-box/button-box.component';
+import {DialogDraftService} from '../../../../shared/services/dialog-draft.service';
 
 @Component({
                selector: 'category-manager',
@@ -30,14 +31,11 @@ import {ButtonBoxComponent} from '../../../../shared/components/button-box/butto
                providers: [ConfirmationService],
                templateUrl: './category-manager.component.html'
            })
-export class CategoryManagerComponent {
+export class CategoryManagerComponent implements OnInit, OnDestroy {
+    private readonly draftService = inject(DialogDraftService);
+
     _draft = signal<Category[] | null>(null);
-
-    @Output() confirmDraft = new EventEmitter<Category[]>();
-    @Output() cancelDraft = new EventEmitter<void>();
-
     categories = computed(() => this._draft() ?? []);
-
     private labelDraft = signal<Record<string, string>>({});
 
     iconOptions = [
@@ -55,6 +53,17 @@ export class CategoryManagerComponent {
     set data(value: Category[]) {
         this._draft.set(structuredClone(value));
         this.labelDraft.set({});
+    }
+
+    ngOnInit() {
+        this.draftService.registerDraft(() => {
+            const d = this._draft();
+            return d ? structuredClone(d) : null;
+        });
+    }
+
+    ngOnDestroy() {
+        this.draftService.unregisterDraft();
     }
 
     categoryLabel(c: Category): string {
@@ -119,25 +128,13 @@ export class CategoryManagerComponent {
         });
     }
 
-    deleteCategory(categoryId: string, label: string) {
+    deleteCategory(categoryId: string) {
         this.commit(next => {
             const idx = next.findIndex(c => c.id === categoryId);
             if (idx >= 0) {
                 next.splice(idx, 1);
             }
         });
-    }
-
-    confirm() {
-        const d = this._draft();
-        if (!d) {
-            return;
-        }
-        this.confirmDraft.emit(structuredClone(d));
-    }
-
-    cancel() {
-        this.cancelDraft.emit();
     }
 
     private commit(mutator: (next: Category[]) => void) {

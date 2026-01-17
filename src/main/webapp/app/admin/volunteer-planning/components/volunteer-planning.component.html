@@ -159,54 +159,47 @@
             }
         </div>
 
+
         @if (dayDialogVisible()) {
             <dialog-box (cancel)="dayDialogVisible.set(false)"
-                        (confirm)="dayEditor.confirm()"
+                        (confirm)="applyDaySlice($event)"
                         [(visible)]="dayDialogVisible"
                         [header]="'Configuration du jour'"
                         [mode]="'edit'">
-                <selected-day-editor #dayEditor
-                                     [data]="daySlice()"
-                                     (confirmDraft)="applyDaySlice($event)"/>
+                <selected-day-editor [data]="daySlice()"/>
             </dialog-box>
         }
 
         <!-- ================= DIALOG: BENEVOLES ================= -->
         @if (volunteersDialogVisible()) {
             <dialog-box (cancel)="volunteersDialogVisible.set(false)"
-                        (confirm)="volEditor.confirm()"
+                        (confirm)="applyVolunteers($event)"
                         [(visible)]="volunteersDialogVisible"
                         [header]="'Configuration des bénévoles'"
                         [mode]="'edit'">
-                <volunteer-manager #volEditor
-                                   [data]="planning().volunteers"
-                                   (confirmDraft)="applyVolunteers($event)"/>
+                <volunteer-manager [data]="planning().volunteers"/>
             </dialog-box>
         }
 
         <!-- ================= DIALOG: ASSIGNATIONS (jour selectionné) ================= -->
         @if (assignmentsDialogVisible()) {
             <dialog-box (cancel)="assignmentsDialogVisible.set(false)"
-                        (confirm)="assignEditor.confirm()"
+                        (confirm)="applyAssignmentsSlice($event)"
                         [(visible)]="assignmentsDialogVisible"
                         [header]="'Assignations du jour'"
                         [mode]="'edit'">
-                <selected-day-assignments #assignEditor
-                                          [data]="assignmentsSlice()"
-                                          (confirmDraft)="applyAssignmentsSlice($event)"/>
+                <selected-day-assignments [data]="assignmentsSlice()"/>
             </dialog-box>
         }
 
         <!-- ================= DIALOG: CATEGORIES ================= -->
         @if (categoriesDialogVisible()) {
             <dialog-box (cancel)="categoriesDialogVisible.set(false)"
-                        (confirm)="catEditor.confirm()"
+                        (confirm)="applyCategories($event)"
                         [(visible)]="categoriesDialogVisible"
                         [header]="'Configuration des catégories'"
                         [mode]="'edit'">
-                <category-manager #catEditor
-                                  [data]="planning().categories"
-                                  (confirmDraft)="applyCategories($event)"/>
+                <category-manager [data]="planning().categories"/>
             </dialog-box>
         }
 
