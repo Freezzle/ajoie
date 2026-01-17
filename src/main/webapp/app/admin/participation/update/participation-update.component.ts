@@ -53,6 +53,7 @@ import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.com
 import {MenuItem, PrimeIcons} from 'primeng/api';
 import {TranslateService} from '@ngx-translate/core';
 import {TableModule} from 'primeng/table';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 @Component({
                selector: 'app-participation-update',
@@ -81,6 +82,7 @@ export class ParticipationUpdateComponent implements OnInit {
     editForm: FormGroup<ParticipationFormGroup> = this.participationFormService.createParticipationFormGroup(null);
     protected conferenceService = inject(ConferenceService);
     protected standService = inject(StandService);
+    protected stateService = inject(NavigationStateService);
     protected workshopService = inject(WorkshopService);
     protected exhibitorService = inject(ExhibitorService);
     protected salonService = inject(SalonService);

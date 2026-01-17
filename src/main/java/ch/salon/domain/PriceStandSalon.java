@@ -35,4 +35,7 @@ public class PriceStandSalon implements Serializable {
     @NotNull
     @Column(name = "height_meter", nullable = false)
     private Double heightMeter;
+
+    @Column(name="nb_selling_side")
+    private Long nbSellingSide;
 }

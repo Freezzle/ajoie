@@ -26,6 +26,9 @@ export interface IParticipation {
     extraInformation: string | null;
     exhibitor: IExhibitor;
     salon: ISalon;
+    ratingFriendliness: number;
+    ratingPaymentSpeed: number;
+    ratingServiceQuality: number;
 }
 
 export interface IInfoInvoice {

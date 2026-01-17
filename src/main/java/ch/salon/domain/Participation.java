@@ -4,15 +4,7 @@ import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -92,6 +84,15 @@ public class Participation implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = {"priceStandSalons"}, allowSetters = true)
     private Salon salon;
+
+    @Column(name = "rating_friendliness")
+    private Double ratingFriendliness;
+
+    @Column(name = "rating_payment_speed")
+    private Double ratingPaymentSpeed;
+
+    @Column(name = "rating_service_quality")
+    private Double ratingServiceQuality;
 
     public static boolean diffMeal(int indexMeal, Participation part1, Participation part2) {
         if (part1 == null && part2 != null) {

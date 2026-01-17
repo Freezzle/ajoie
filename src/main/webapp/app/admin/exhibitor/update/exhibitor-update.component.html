@@ -158,6 +158,9 @@
                                                     matchMode="contains"
                                                     type="text"></p-columnFilter>
                                 </th>
+                                @if (!stateService.hideSensibleInformation()) {
+                                    <th>{{ 'participation.rating' | translate }}</th>
+                                }
                                 <th>{{ 'participation.status.label' | translate }}</th>
                             </tr>
                         </ng-template>
@@ -166,6 +169,23 @@
                                 <td [routerLink]="['/admin',  'salons',  participation.salon.id,  'participations',  participation.id,  'view']"
                                     class="clickable truncate-medium">{{ participation.salon.place }}
                                 </td>
+                                @if (!stateService.hideSensibleInformation()) {
+                                    <td [routerLink]="['/admin',  'salons',  participation.salon.id,  'participations',  participation.id,  'view']"
+                                        class="clickable">
+                                        <div>
+                                            <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingFriendliness" [disabled]="true"
+                                                      [stars]="6"/>
+                                        </div>
+                                        <div>
+                                            <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingPaymentSpeed" [disabled]="true"
+                                                      [stars]="6"/>
+                                        </div>
+                                        <div>
+                                            <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingServiceQuality" [disabled]="true"
+                                                      [stars]="6"/>
+                                        </div>
+                                    </td>
+                                }
                                 <td class="clickable">
                                     <fa-icon [class]="participation.status | colorStatus"
                                              [icon]="participation.status | status"

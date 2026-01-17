@@ -27,6 +27,9 @@ export type ParticipationFormGroup = {
     extraInformation: FormControl<IParticipation['extraInformation'] | null>;
     exhibitor: FormControl<IParticipation['exhibitor'] | null>;
     salon: FormControl<IParticipation['salon'] | null>;
+    ratingFriendliness: FormControl<IParticipation['ratingFriendliness'] | null>;
+    ratingPaymentSpeed: FormControl<IParticipation['ratingPaymentSpeed'] | null>;
+    ratingServiceQuality: FormControl<IParticipation['ratingServiceQuality'] | null>;
 };
 
 @Injectable({providedIn: 'root'})
@@ -66,7 +69,16 @@ export class ParticipationFormService {
                                                          additionnalInformation: new FormControl(raw.additionnalInformation),
                                                          extraInformation: new FormControl(raw.extraInformation),
                                                          exhibitor: new FormControl(raw.exhibitor, Validators.required),
-                                                         salon: new FormControl(raw.salon, Validators.required)
+                                                         salon: new FormControl(raw.salon, Validators.required),
+                                                         ratingFriendliness: new FormControl(raw.ratingFriendliness, [
+                                                             CustomValidatorModel.onlyNumbers
+                                                         ]),
+                                                         ratingPaymentSpeed: new FormControl(raw.ratingPaymentSpeed, [
+                                                             CustomValidatorModel.onlyNumbers
+                                                         ]),
+                                                         ratingServiceQuality: new FormControl(raw.ratingServiceQuality, [
+                                                             CustomValidatorModel.onlyNumbers
+                                                         ])
                                                      });
     }
 

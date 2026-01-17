@@ -33,4 +33,7 @@ public class ParticipationDTO implements Serializable {
     private String extraInformation;
     private ExhibitorLightDTO exhibitor;
     private SalonLightDTO salon;
+    private Double ratingFriendliness;
+    private Double ratingPaymentSpeed;
+    private Double ratingServiceQuality;
 }

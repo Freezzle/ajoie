@@ -15,5 +15,8 @@ public class ParticipationLightDTO implements Serializable {
     private Status status;
     private Boolean guestOfHonor;
     private Boolean crushOfHeart;
+    private Double ratingFriendliness;
+    private Double ratingPaymentSpeed;
+    private Double ratingServiceQuality;
     private String extraInformation;
 }

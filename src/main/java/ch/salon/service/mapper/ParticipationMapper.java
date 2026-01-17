@@ -22,5 +22,8 @@ public interface ParticipationMapper {
     @Mapping(target = "extraInformation", ignore = true)
     @Mapping(target = "crushOfHeart", ignore = true)
     @Mapping(target = "guestOfHonor", ignore = true)
+    @Mapping(target = "ratingFriendliness", ignore = true)
+    @Mapping(target = "ratingPaymentSpeed", ignore = true)
+    @Mapping(target = "ratingServiceQuality", ignore = true)
     Participation toLightEntity(ParticipationLightDTO participation);
 }

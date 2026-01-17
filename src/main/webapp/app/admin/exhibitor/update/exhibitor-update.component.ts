@@ -25,6 +25,8 @@ import {Toast} from 'primeng/toast';
 import {CountryService, formatterCountry} from '../../../shared/country.service';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {Rating} from 'primeng/rating';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 @Component({
                selector: 'app-exhibitor-update',
@@ -47,7 +49,8 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
                    ConfirmPopup,
                    Toast,
                    CardComponent,
-                   ContentPageComponent
+                   ContentPageComponent,
+                   Rating
                ]
            })
 export class ExhibitorUpdateComponent implements OnInit {
@@ -58,6 +61,7 @@ export class ExhibitorUpdateComponent implements OnInit {
     participations$: Observable<IParticipation[]> = of([]);
     protected exhibitorService = inject(ExhibitorService);
     protected countryService = inject(CountryService);
+    stateService = inject(NavigationStateService);
     protected exhibitorFormService = inject(ExhibitorFormService);
     editForm: ExhibitorFormGroup = this.exhibitorFormService.createExhibitorFormGroup(null);
     protected activatedRoute = inject(ActivatedRoute);

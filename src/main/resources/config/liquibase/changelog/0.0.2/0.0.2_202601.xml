@@ -17,4 +17,22 @@
             <column name="last_seen_at" type="timestamp"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="0.0.2_202601-3" author="claudedy">
+        <addColumn tableName="participation">
+            <column name="rating_friendliness" type="double"/>
+        </addColumn>
+        <addColumn tableName="participation">
+            <column name="rating_payment_speed" type="double"/>
+        </addColumn>
+        <addColumn tableName="participation">
+            <column name="rating_service_quality" type="double"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-4" author="claudedy">
+        <addColumn tableName="price_stand_salon">
+            <column name="nb_selling_side" type="bigint"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

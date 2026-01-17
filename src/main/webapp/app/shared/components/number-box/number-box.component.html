@@ -6,6 +6,8 @@
                        [maxFractionDigits]="modeDecimal ? '2': '0'"
                        [minFractionDigits]="0"
                        [showButtons]="true"
+                       [min]="minValue ?? undefined"
+                       [max]="maxValue ?? undefined"
                        fluid
                        mode="decimal"
         ></p-inputnumber>

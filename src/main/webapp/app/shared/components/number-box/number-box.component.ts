@@ -17,7 +17,12 @@ export class NumberBoxComponent implements ControlValueAccessor {
     translateKey: string | undefined;
     @Input()
     fieldName: string = '';
-    @Input() modeDecimal = false;
+    @Input()
+    modeDecimal = false;
+    @Input()
+    minValue: number = 0;
+    @Input()
+    maxValue: number | undefined = undefined;
     disabled: boolean = false;
     value: number | null = null;
     protected readonly Validators = Validators;

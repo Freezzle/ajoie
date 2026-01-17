@@ -114,78 +114,99 @@
             </div>
         </div>
     </app-card>
-    <app-card>
-        <div appCardHeader>
-            <h4>{{ 'common.info-intern' | translate }}</h4>
-        </div>
-        <div appCardBody>
-            <div class="row">
-                <div class="mt-4 col-lg-4 d-flex">
-                    <select-box [enableFilter]="true"
-                                [filterFields]="selectFilterExhibitor()"
-                                [formatterFunction]="formatterExhibitor"
-                                [options]="exhibitorsOptions"
-                                class="w-100"
-                                fieldName="exhibitor"
-                                formControlName="exhibitor"
-                                translateKey="participation.exhibitor"/>
-                    @if (isReadOnly) {
-                        <link-box [links]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']"
-                                  [showText]="false"
-                                  class="align-content-center"
-                                  faIcon="link"
-                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
-                    }
-                </div>
+    @if (!stateService.hideSensibleInformation() || !editForm.controls.id.value) {
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'common.info-intern' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <div class="row">
+                    <div class="mt-4 col-lg-4 d-flex">
+                        <select-box [enableFilter]="true"
+                                    [filterFields]="selectFilterExhibitor()"
+                                    [formatterFunction]="formatterExhibitor"
+                                    [options]="exhibitorsOptions"
+                                    class="w-100"
+                                    fieldName="exhibitor"
+                                    formControlName="exhibitor"
+                                    translateKey="participation.exhibitor"/>
+                        @if (isReadOnly) {
+                            <link-box
+                                    [links]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']"
+                                    [showText]="false"
+                                    class="align-content-center"
+                                    faIcon="link"
+                                    style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
+                        }
+                    </div>
 
-                <div class="mt-4 col-lg-4">
-                    <date-box fieldName="registrationDate"
-                              formControlName="registrationDate"
-                              translateKey="participation.registrationDate"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <select-box [formatterFunction]="formatterStatus"
-                                [needTranslation]="true"
-                                [options]="statusValues"
-                                fieldName="status"
-                                formControlName="status"
-                                translateKey="participation.status.label"/>
-                </div>
+                    <div class="mt-4 col-lg-4">
+                        <date-box fieldName="registrationDate"
+                                  formControlName="registrationDate"
+                                  translateKey="participation.registrationDate"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <select-box [formatterFunction]="formatterStatus"
+                                    [needTranslation]="true"
+                                    [options]="statusValues"
+                                    fieldName="status"
+                                    formControlName="status"
+                                    translateKey="participation.status.label"/>
+                    </div>
 
-                <div class="mt-4 col-lg-4">
-                    <checkbox-box fieldName="acceptedChart"
-                                  formControlName="acceptedChart"
-                                  translateKey="participation.acceptedChart"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <checkbox-box fieldName="acceptedContract"
-                                  formControlName="acceptedContract"
-                                  translateKey="participation.acceptedContract"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <checkbox-box fieldName="needArrangement"
-                                  formControlName="needArrangement"
-                                  translateKey="participation.needArrangement"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <checkbox-box fieldName="crushOfHeart"
-                                  formControlName="crushOfHeart"
-                                  translateKey="participation.crushOfHeart"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <checkbox-box fieldName="guestOfHonor"
-                                  formControlName="guestOfHonor"
-                                  translateKey="participation.guestOfHonor"/>
-                </div>
-                <div class="mt-4 col-12">
-                    <textarea-box fieldName="extraInformation"
-                                  formControlName="extraInformation"
-                                  translateKey="participation.extraInformation"/>
+                    <div class="mt-4 col-lg-4">
+                        <checkbox-box fieldName="acceptedChart"
+                                      formControlName="acceptedChart"
+                                      translateKey="participation.acceptedChart"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <checkbox-box fieldName="acceptedContract"
+                                      formControlName="acceptedContract"
+                                      translateKey="participation.acceptedContract"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <checkbox-box fieldName="needArrangement"
+                                      formControlName="needArrangement"
+                                      translateKey="participation.needArrangement"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <checkbox-box fieldName="crushOfHeart"
+                                      formControlName="crushOfHeart"
+                                      translateKey="participation.crushOfHeart"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <checkbox-box fieldName="guestOfHonor"
+                                      formControlName="guestOfHonor"
+                                      translateKey="participation.guestOfHonor"/>
+                    </div>
+                    <div class="mt-4 col-lg-4"></div>
+                    <div class="mt-4 col-lg-4">
+                        <number-box fieldName="ratingFriendliness"
+                                    translateKey="participation.ratingFriendliness"
+                                    formControlName="ratingFriendliness"
+                                    [minValue]="0" [maxValue]="6"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <number-box fieldName="ratingPaymentSpeed"
+                                    translateKey="participation.ratingPaymentSpeed"
+                                    formControlName="ratingPaymentSpeed"
+                                    [minValue]="0" [maxValue]="6"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <number-box fieldName="ratingServiceQuality"
+                                    translateKey="participation.ratingServiceQuality"
+                                    formControlName="ratingServiceQuality"
+                                    [minValue]="0" [maxValue]="6"/>
+                    </div>
+                    <div class="mt-4 col-12">
+                        <textarea-box fieldName="extraInformation"
+                                      formControlName="extraInformation"
+                                      translateKey="participation.extraInformation"/>
+                    </div>
                 </div>
             </div>
-        </div>
-    </app-card>
-
+        </app-card>
+    }
     @if (isReadOnly) {
         <app-card>
             <div appCardHeader>
