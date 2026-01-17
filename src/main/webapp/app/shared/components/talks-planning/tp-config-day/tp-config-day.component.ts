@@ -1,5 +1,16 @@
 import {CommonModule} from '@angular/common';
-import {Component, computed, EventEmitter, inject, Input, Output, signal} from '@angular/core';
+import {
+    Component,
+    computed,
+    EventEmitter,
+    inject,
+    Input,
+    Output,
+    signal,
+    OnInit,
+    OnDestroy,
+    input
+} from '@angular/core';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 
 import {TableModule} from 'primeng/table';
@@ -9,9 +20,9 @@ import {ButtonModule} from 'primeng/button';
 
 import {TimelineData} from '../model/timeline-data';
 import {InputText} from 'primeng/inputtext';
-import {Divider} from 'primeng/divider';
 import {TimelineDay} from '../model/timeline-day';
 import {ButtonBoxComponent} from '../../button-box/button-box.component';
+import {DialogDraftService} from '../../../services/dialog-draft.service';
 
 type IdLabel = { id: string; label: string };
 
@@ -27,15 +38,17 @@ type IdLabel = { id: string; label: string };
                    DatePickerModule,
                    ButtonModule,
                    InputText,
-                   Divider,
                    ButtonBoxComponent
                ],
                templateUrl: './tp-config-day.component.html'
            })
-export class TpConfigDayComponent {
+export class TpConfigDayComponent implements OnInit, OnDestroy {
+    private readonly TIME_REF = new Date(2000, 0, 1, 0, 0, 0, 0);
+    private readonly draftService = inject(DialogDraftService);
+    private readonly fb = inject(NonNullableFormBuilder);
+
+    newDayDefaultLabel = input<string>('Nouveau jour');
     _draft = signal<TimelineData | null>(null);
-    @Input() newDayDefaultLabel = 'Nouveau jour';
-    @Output() confirmDraft = new EventEmitter<TimelineData>();
     rooms = computed(() => this._draft()?.rooms ?? []);
     roomOptions = computed<IdLabel[]>(() =>
                                           this.rooms()
@@ -66,14 +79,24 @@ export class TpConfigDayComponent {
         const used = new Set(day.rooms.map(x => x.roomId));
         return this.roomOptions().filter(r => !used.has(r.id));
     });
-    private readonly TIME_REF = new Date(2000, 0, 1, 0, 0, 0, 0);
-    private fb = inject(NonNullableFormBuilder);
     addRoomToDayForm = this.fb.group({
                                          roomId: this.fb.control<string | null>(null, {validators: [Validators.required]}),
                                          startingHour: this.fb.control<Date>(this.timeAt(8, 0)),
                                          endingHour: this.fb.control<Date>(this.timeAt(18, 0))
                                      });
     private dayLabelDraft = signal<Record<string, string>>({});
+
+    ngOnInit() {
+        this.draftService.registerDraft(() => {
+            const d = this._draft();
+            return d ? structuredClone(d) : null;
+        });
+    }
+
+    ngOnDestroy() {
+        this.draftService.unregisterDraft();
+    }
+
 
     private _selectedDayId = signal<string | null>(null);
 
@@ -237,15 +260,6 @@ export class TpConfigDayComponent {
         });
     }
 
-    confirm() {
-        const d = this._draft();
-        const day = this.day();
-        if (!d || !day) {
-            return;
-        }
-        this.confirmDraft.emit(structuredClone(d));
-    }
-
     private commit(mutator: (next: TimelineData) => void) {
         const current = this._draft();
         if (!current) {
@@ -276,7 +290,7 @@ export class TpConfigDayComponent {
         this.commit(next => {
             next.days.push({
                                id,
-                               label: this.newDayDefaultLabel ?? 'Nouveau jour',
+                               label: this.newDayDefaultLabel() ?? 'Nouveau jour',
                                rooms: []
                            });
         });

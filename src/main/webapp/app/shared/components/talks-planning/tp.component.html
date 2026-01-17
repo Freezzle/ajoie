@@ -188,35 +188,34 @@
 <!-- DIALOG : Manage Rooms -->
 @if (showManageRooms()) {
     <dialog-box (cancel)="showManageRooms.set(false)"
-                (confirm)="roomsDialog.confirm()"
+                (confirm)="configuration.set($event)"
                 [(visible)]="showManageRooms"
                 [header]="'Gestion des salles'"
                 [mode]="'edit'">
-        <tp-config-rooms #roomsDialog (confirmDraft)="configuration.set($event)"
-                         [data]="configuration()"/>
+        <tp-config-rooms [data]="configuration()"/>
     </dialog-box>
 }
 
 <!-- DIALOG : Manage selected day -->
 @if (showAssignRooms()) {
     <dialog-box (cancel)="onManageDayCancel()"
-                (confirm)="assignDialog.confirm()"
+                (confirm)="onManageDayConfirm($event)"
                 [(visible)]="showAssignRooms"
                 [header]="manageDayCreateMode() ? 'Création d\'un jour' : 'Configuration'"
                 [mode]="'edit'">
-        <tp-config-day #assignDialog
-                       (confirmDraft)="onManageDayConfirm($event)"
-                       [createIfMissing]="manageDayCreateMode()"
+        <tp-config-day [createIfMissing]="manageDayCreateMode()"
                        [data]="configuration()"
                        [selectedDayId]="manageDaySelectedDayId()!"/>
     </dialog-box>
 }
 
 <!-- DIALOG : Removing selected day -->
-<dialog-box (cancel)="showConfirmDeleteDay.set(false)"
-            (confirm)="confirmDeleteSelectedDay()"
-            [(visible)]="showConfirmDeleteDay"
-            [header]="'Supprimer le jour'"
-            [mode]="'edit'">
-    <div [innerHTML]="'planningTalks.removeDay' | translate: {day: selectedDay()?.label}"></div>
-</dialog-box>
+@if (showConfirmDeleteDay()) {
+    <dialog-box (cancel)="showConfirmDeleteDay.set(false)"
+                (confirm)="confirmDeleteSelectedDay()"
+                [(visible)]="showConfirmDeleteDay"
+                [header]="'Supprimer le jour'"
+                [mode]="'edit'">
+        <div [innerHTML]="'planningTalks.removeDay' | translate: {day: selectedDay()?.label}"></div>
+    </dialog-box>
+}

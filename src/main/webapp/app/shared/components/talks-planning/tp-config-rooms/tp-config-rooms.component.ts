@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import {Component, computed, EventEmitter, Input, Output, signal} from '@angular/core';
+import {Component, computed, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
 import {ButtonModule} from 'primeng/button';
@@ -9,6 +9,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {TimelineData} from '../model/timeline-data';
 import {TimelineRoom} from '../model/timeline-room';
 import {ButtonBoxComponent} from '../../button-box/button-box.component';
+import {DialogDraftService} from '../../../services/dialog-draft.service';
 
 @Component({
                selector: 'tp-config-rooms',
@@ -16,16 +17,27 @@ import {ButtonBoxComponent} from '../../button-box/button-box.component';
                imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, ButtonBoxComponent],
                templateUrl: './tp-config-rooms.component.html'
            })
-export class TpConfigRoomsComponent {
+export class TpConfigRoomsComponent implements OnInit, OnDestroy {
+    private readonly draftService = inject(DialogDraftService);
+
     _draft = signal<TimelineData | null>(null);
-    @Output() confirmDraft = new EventEmitter<TimelineData>();
     rooms = computed(() => this._draft()?.rooms ?? []);
-    // Drafts de saisie
     private roomLabelDraft = signal<Record<string, string>>({});
 
     @Input({required: true})
     set data(value: TimelineData) {
         this._draft.set(structuredClone(value));
+    }
+
+    ngOnInit() {
+        this.draftService.registerDraft(() => {
+            const d = this._draft();
+            return d ? structuredClone(d) : null;
+        });
+    }
+
+    ngOnDestroy() {
+        this.draftService.unregisterDraft();
     }
 
     // stabilise DOM
@@ -74,14 +86,6 @@ export class TpConfigRoomsComponent {
             next.rooms = next.rooms.filter(r => r.id !== roomId);
             next.days = next.days.map(d => ({...d, rooms: d.rooms.filter(rd => rd.roomId !== roomId)}));
         });
-    }
-
-    confirm() {
-        const d = this._draft();
-        if (!d) {
-            return;
-        }
-        this.confirmDraft.emit(structuredClone(d));
     }
 
     private commit(mutator: (next: TimelineData) => void) {
