@@ -1,0 +1,45 @@
+/* Wrapper */
+.p-iftalabel.iftalabel-rating {
+  display: block;
+}
+
+/* Le "champ" qui imite un input */
+.p-iftalabel.iftalabel-rating .iftalabel-rating__field {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--p-select-border-color);
+  border-radius: var(--p-inputtext-border-radius);
+
+  /* espace pour le label "in-field top aligned" */
+  padding:
+          var(--p-iftalabel-input-padding-top)
+          var(--p-inputtext-padding-x)
+          var(--p-iftalabel-input-padding-bottom);
+
+  transition:
+          border-color var(--p-inputtext-transition-duration, 150ms),
+          box-shadow var(--p-inputtext-transition-duration, 150ms);
+}
+
+.p-iftalabel.iftalabel-rating:has(.p-rating.p-disabled) .iftalabel-rating__field {
+  background-color: var(--app-surface) !important;
+  border: 1px dashed var(--p-select-border-color);
+  border-radius: var(--p-inputtext-border-radius);
+}
+
+/* Focus (quand le rating reçoit le focus clavier) */
+.p-iftalabel.iftalabel-rating:focus-within .iftalabel-rating__field {
+  border-color: var(--p-inputtext-focus-border-color);
+  box-shadow: var(--p-inputtext-focus-ring-shadow);
+}
+
+/* Invalid (si tu veux border rouge quand invalid) */
+.p-iftalabel.iftalabel-rating.iftalabel-rating--invalid .iftalabel-rating__field {
+  border-color: var(--p-inputtext-invalid-border-color);
+}
+.p-iftalabel.iftalabel-rating.iftalabel-rating--invalid > label {
+  color: var(--p-iftalabel-invalid-color);
+}

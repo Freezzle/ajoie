@@ -181,22 +181,19 @@
                     </div>
                     <div class="mt-4 col-lg-4"></div>
                     <div class="mt-4 col-lg-4">
-                        <number-box fieldName="ratingFriendliness"
-                                    translateKey="participation.ratingFriendliness"
-                                    formControlName="ratingFriendliness"
-                                    [minValue]="0" [maxValue]="6"/>
+                        <rating-box formControlName="ratingFriendliness"
+                                    fieldName="ratingFriendliness"
+                                    translateKey="participation.ratingFriendliness"/>
                     </div>
                     <div class="mt-4 col-lg-4">
-                        <number-box fieldName="ratingPaymentSpeed"
-                                    translateKey="participation.ratingPaymentSpeed"
-                                    formControlName="ratingPaymentSpeed"
-                                    [minValue]="0" [maxValue]="6"/>
+                        <rating-box formControlName="ratingPaymentSpeed"
+                                    fieldName="ratingPaymentSpeed"
+                                    translateKey="participation.ratingPaymentSpeed"/>
                     </div>
                     <div class="mt-4 col-lg-4">
-                        <number-box fieldName="ratingServiceQuality"
-                                    translateKey="participation.ratingServiceQuality"
-                                    formControlName="ratingServiceQuality"
-                                    [minValue]="0" [maxValue]="6"/>
+                        <rating-box formControlName="ratingServiceQuality"
+                                    fieldName="ratingServiceQuality"
+                                    translateKey="participation.ratingServiceQuality"/>
                     </div>
                     <div class="mt-4 col-12">
                         <textarea-box fieldName="extraInformation"

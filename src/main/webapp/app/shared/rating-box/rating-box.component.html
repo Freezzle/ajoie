@@ -1,0 +1,13 @@
+<p-iftalabel class="iftalabel-rating" [title]="translateKey ? (translateKey | translate) : undefined">
+    <div class="iftalabel-rating__field">
+        <p-rating id="field_{{fieldName}}"
+                  [formControl]="control"
+                  [stars]="6"
+                  [invalid]="control!.invalid && control!.touched">
+        </p-rating>
+    </div>
+
+    @if (translateKey) {
+        <label for="field_{{fieldName}}">{{ translateKey | translate }}</label>
+    }
+</p-iftalabel>
