@@ -8,7 +8,9 @@
     },
     "differentDimension": "Les dimensions diffèrent",
     "displayName": "Voir nom / nom de thérapeute",
+    "name": "Nom du plan",
     "nextPosition": "Position",
+    "rename": "Renommer le plan",
     "standSearching": "Recherche de la position d'un stand attribué",
     "technicalInfo": "Voir information technique"
   }

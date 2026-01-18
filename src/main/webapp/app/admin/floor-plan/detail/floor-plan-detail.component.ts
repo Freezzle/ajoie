@@ -66,6 +66,7 @@ import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
+import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
 import {Category, formatterCategory} from '../../enumerations/category.model';
@@ -101,7 +102,8 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    IftaLabel,
                    DialogBoxComponent,
                    Divider,
-                   SelectBoxComponent
+                   SelectBoxComponent,
+                   TextBoxComponent
                ]
            })
 export class FloorPlanDetailComponent {
@@ -146,6 +148,7 @@ export class FloorPlanDetailComponent {
     // dialogs (model = 2-way friendly)
     readonly standDialogVisible = model(false);
     readonly prereservedDialogVisible = model(false);
+    readonly renameDialogVisible = model(false);
 
     readonly selectStandDialog = signal<GridCell | null>(null);
 
@@ -165,6 +168,7 @@ export class FloorPlanDetailComponent {
     readonly nextPosition = new FormControl<number | null>(1);
     readonly isNumberAttribution = signal(false);
     readonly automaticallyIncrementNumber = signal(true);
+    readonly renamePlanName = new FormControl<string>('');
 
     // ---- derived (computed)
     readonly activePlan = computed(() => this.floorPlans()[this.activeIndex()] ?? null);
@@ -506,21 +510,35 @@ export class FloorPlanDetailComponent {
     }
 
     rename(): void {
-        const modalRef = this.modalService.open(RenamePlanDialogComponent, {size: 'lg', backdrop: 'static'});
         const plan = this.activePlan();
         if (!plan) {
             return;
         }
 
-        modalRef.componentInstance.floorName = plan.name;
+        this.renamePlanName.setValue(plan.name);
+        this.renameDialogVisible.set(true);
+    }
 
-        modalRef.closed
-                .pipe(filter(r => r.event === ITEM_UPDATED_EVENT), takeUntilDestroyed(this.destroyRef))
-                .subscribe(r => {
-                    plan.name = r.data;
-                    // keep same array ref? => force minimal update
-                    this.floorPlans.set([...this.floorPlans()]);
-                });
+    onRenamePlanCancel(): void {
+        this.renameDialogVisible.set(false);
+        this.renamePlanName.reset();
+    }
+
+    confirmRenamePlan(): void {
+        const newName = this.renamePlanName.value;
+        if (!newName || !newName.trim()) {
+            return;
+        }
+
+        const plan = this.activePlan();
+        if (!plan) {
+            return;
+        }
+
+        plan.name = newName;
+        this.floorPlans.set([...this.floorPlans()]);
+        this.renameDialogVisible.set(false);
+        this.renamePlanName.reset();
     }
 
     delete(): void {

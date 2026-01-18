@@ -1,4 +1,4 @@
-import {Component, Input, Self} from '@angular/core';
+import {Component, EventEmitter, Input, Optional, Output, Self} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -20,17 +20,27 @@ export class TextBoxComponent implements ControlValueAccessor {
     fieldName: string = '';
     @Input()
     maxLength: number = 255;
-    disabled: boolean = false;
+    @Input()
     value: string = '';
+    @Output()
+    valueChange = new EventEmitter<string>();
+
+    disabled: boolean = false;
     protected readonly Validators = Validators;
     protected readonly ErrorModel = ErrorModel;
 
-    constructor(@Self() public controlDir: NgControl) {
-        this.controlDir.valueAccessor = this;
+    constructor(@Self() @Optional() public controlDir: NgControl | null) {
+        if (this.controlDir) {
+            this.controlDir.valueAccessor = this;
+        }
     }
 
-    get control(): FormControl<any> {
-        return this.controlDir.control as FormControl<any>;
+    get control(): FormControl<any> | null {
+        return this.controlDir?.control as FormControl<any> | null;
+    }
+
+    get isFormControl(): boolean {
+        return this.controlDir !== null && this.controlDir.control !== null;
     }
 
     // placeholder methods
@@ -57,8 +67,14 @@ export class TextBoxComponent implements ControlValueAccessor {
     }
 
     onInput(event: Event) {
-        this.value = (event.target as HTMLInputElement).value;
-        this.onChange(this.value);
-        this.onTouched();
+        const newValue = (event.target as HTMLInputElement).value;
+        this.value = newValue;
+
+        if (this.isFormControl) {
+            this.onChange(newValue);
+            this.onTouched();
+        } else {
+            this.valueChange.emit(newValue);
+        }
     }
 }

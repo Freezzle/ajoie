@@ -465,6 +465,17 @@
                             translateKey="floorPlan.standSearching"/>
             </dialog-box>
 
+            <dialog-box (cancel)="onRenamePlanCancel()"
+                        (confirm)="confirmRenamePlan()"
+                        [(visible)]="renameDialogVisible"
+                        [dismissableMask]="true"
+                        [header]="'Renommer le plan'"
+                        [mode]="'edit'">
+                <text-box [formControl]="renamePlanName"
+                          [fieldName]="'planName'"
+                          [translateKey]="'floorPlan.name'"/>
+            </dialog-box>
+
             <p-contextMenu #cm [model]="contextMenuItems()" appendTo="body"></p-contextMenu>
         </div>
     </app-card>
