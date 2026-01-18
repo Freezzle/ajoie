@@ -99,14 +99,13 @@
                                                             [class.disabled]="isLoading()"
                                                             id="rename-tab"
                                                             ngbDropdownItem>
-                                                        Renommer
+                                                        {{ 'floorPlan.rename' | translate }}
                                                     </button>
-
                                                     <button (click)="delete()"
                                                             [class.disabled]="isLoading()"
                                                             id="delete-tab"
                                                             ngbDropdownItem>
-                                                        Supprimer
+                                                        {{ 'floorPlan.delete.button' | translate }}
                                                     </button>
                                                 </div>
                                             </div>
@@ -123,7 +122,7 @@
                                             id="add-tab"
                                             role="tab"
                                             type="button">
-                                        +
+                                        {{ 'floorPlan.addNew' | translate }}
                                     </button>
                                 </li>
                             }
@@ -344,7 +343,7 @@
                                         }
                                     } @else if (isLoading()) {
                                         <tr>
-                                            <td>Chargement en cours...</td>
+                                            <td>{{ 'floorPlan.loading' | translate }}</td>
                                         </tr>
                                     } @else {
                                         <tr>
@@ -363,30 +362,30 @@
             <dialog-box (closed)="standDialogVisible.set(false)"
                         [(visible)]="standDialogVisible"
                         [dismissableMask]="true"
-                        [header]="'Détail de l\'emplacement'">
+                        [header]="'floorPlan.detail.location' | translate">
                 @if (selectStandDialog(); as pop) {
                     <div style="display:grid; grid-template-columns: 1fr 1fr; row-gap: 0.5em">
                         @if (pop.dimension?.stand; as stand) {
-                            <b>Thérapeute</b>
+                            <b>{{ 'floorPlan.detail.therapist' | translate }}</b>
                             <span>{{ stand.participation.therapistName }}</span>
 
-                            <b>Nom</b>
+                            <b>{{ 'floorPlan.detail.name' | translate }}</b>
                             <span>{{ stand.participation.exhibitor.fullName }}</span>
 
-                            <b>Status</b>
+                            <b>{{ 'floorPlan.detail.status' | translate }}</b>
                             <span>
                                 <fa-icon [class]="stand.participation.status | colorStatus"
                                          [icon]="stand.participation.status | status"
                                          [title]="'participation.status.list.' + stand.participation.status | translate"/>
                             </span>
 
-                            <b>Catégorie</b>
+                            <b>{{ 'floorPlan.detail.category' | translate }}</b>
                             <span>
                                 <p-tag [value]="formatterCategory(stand.category ? Category[stand.category] : null) | translate"
                                        severity="warn"/>
                             </span>
 
-                            <b>Tags</b>
+                            <b>{{ 'floorPlan.detail.tags' | translate }}</b>
                             <span>
                                 @for (subCategorie of stand.subCategories; track subCategorie) {
                                     <p-tag [value]="subCategorie"/>
@@ -395,17 +394,17 @@
                                 }
                             </span>
 
-                            <b>Dimension sur plan</b>
-                            <span>{{ pop.dimension?.dimension ?? 'Inconnu' }}</span>
+                            <b>{{ 'floorPlan.detail.dimensionPlan' | translate }}</b>
+                            <span>{{ pop.dimension?.dimension ?? ('floorPlan.unknown' | translate) }}</span>
 
-                            <b>Dimension participation</b>
+                            <b>{{ 'floorPlan.detail.dimensionParticipation' | translate }}</b>
                             <span>{{ stand.dimension.dimension }}</span>
 
-                            <b>Commentaire</b>
+                            <b>{{ 'floorPlan.detail.comment' | translate }}</b>
                             <span>{{ stand.participation.extraInformation ?? '-' }}</span>
                         } @else {
-                            <b>Dimension :</b>
-                            <span>{{ pop.dimension?.dimension ?? 'Inconnu' }}</span>
+                            <b>{{ 'floorPlan.detail.dimension' | translate }}</b>
+                            <span>{{ pop.dimension?.dimension ?? ('floorPlan.unknown' | translate) }}</span>
                         }
                     </div>
 
@@ -438,7 +437,7 @@
                         [(visible)]="prereservedDialogVisible"
                         [confirmDisabled]="!canConfirmPrereserved()"
                         [dismissableMask]="true"
-                        [header]="'Réserver la place'"
+                        [header]="'floorPlan.reserve.title' | translate"
                         [mode]="'edit'">
                 <p-iftalabel>
                     <textarea [(ngModel)]="prereservedNote"
@@ -450,7 +449,7 @@
             </dialog-box>
 
             <dialog-box #searchDialog
-                    (closed)="showSearchStands.set(false)"
+                        (closed)="showSearchStands.set(false)"
                         [(visible)]="showSearchStands"
                         [dismissableMask]="true"
                         [header]="'Rechercher un stand attribué'">
@@ -469,7 +468,7 @@
                         (confirm)="confirmRenamePlan()"
                         [(visible)]="renameDialogVisible"
                         [dismissableMask]="true"
-                        [header]="'Renommer le plan'"
+                        [header]="'floorPlan.rename' | translate"
                         [mode]="'edit'">
                 <text-box [formControl]="renamePlanName"
                           [fieldName]="'planName'"

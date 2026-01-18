@@ -1,17 +1,42 @@
 {
   "floorPlan": {
+    "addNew": "+",
     "attributionMode": "Attribuer une position",
     "automaticallyIncrementNumber": "Incrémenter position automatiquement",
     "changeRotation": "Changer de rotation",
     "delete": {
+      "button": "Supprimer",
       "question": "Voulez-vous supprimer le plan \"{{floorName}}\" ?"
+    },
+    "detail": {
+      "category": "Catégorie",
+      "comment": "Commentaire",
+      "dimension": "Dimension :",
+      "dimensionParticipation": "Dimension participation",
+      "dimensionPlan": "Dimension sur plan",
+      "location": "Détail de l'emplacement",
+      "name": "Nom",
+      "status": "Status",
+      "tags": "Tags",
+      "therapist": "Thérapeute"
     },
     "differentDimension": "Les dimensions diffèrent",
     "displayName": "Voir nom / nom de thérapeute",
+    "loading": "Chargement en cours...",
+    "move": {
+      "left": "<- Déplacer",
+      "right": "Déplacer ->"
+    },
     "name": "Nom du plan",
     "nextPosition": "Position",
+    "noFloorPlanFound": "Aucun plan trouvé. Veuiller en créer un !",
     "rename": "Renommer le plan",
+    "reserve": {
+      "note": "Note",
+      "title": "Réserver la place"
+    },
     "standSearching": "Recherche de la position d'un stand attribué",
-    "technicalInfo": "Voir information technique"
+    "technicalInfo": "Voir information technique",
+    "unknown": "Inconnu"
   }
 }
