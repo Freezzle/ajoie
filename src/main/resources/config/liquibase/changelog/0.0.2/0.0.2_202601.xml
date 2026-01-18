@@ -35,4 +35,70 @@
             <column name="nb_selling_side" type="bigint"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="0.0.2_202601-5" author="system">
+        <createTable tableName="chat_conversation">
+            <column name="id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="participant_a" type="varchar(50)" remarks="Login of first participant">
+                <constraints nullable="false"/>
+            </column>
+            <column name="participant_b" type="varchar(50)" remarks="Login of second participant">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_message_time" type="datetime" remarks="Timestamp of last message"/>
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime" defaultValueDate="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="datetime"/>
+        </createTable>
+        <createIndex indexName="idx_conv_users" tableName="chat_conversation" unique="true">
+            <column name="participant_a"/>
+            <column name="participant_b"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create chat_message table -->
+    <changeSet id="0.0.2_202601-6" author="system">
+        <createTable tableName="chat_message">
+            <column name="id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_id" type="varchar(50)" remarks="Login of sender">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="varchar(50)" remarks="Login of recipient">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="text" remarks="Message content">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="datetime" defaultValueDate="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_read" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime" defaultValueDate="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="datetime"/>
+        </createTable>
+        <createIndex indexName="idx_msg_participants" tableName="chat_message">
+            <column name="sender_id"/>
+            <column name="recipient_id"/>
+        </createIndex>
+        <createIndex indexName="idx_msg_timestamp" tableName="chat_message">
+            <column name="timestamp"/>
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>

@@ -170,6 +170,7 @@
                 }
                 <div class="d-flex align-items-start">
                     <app-presence *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"></app-presence>
+                    <app-chat-messages *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"></app-chat-messages>
                     <p-button
                             (click)="navigationService.hideSensibleInformation.set(!navigationService.hideSensibleInformation())"
                             [icon]="navigationService.hideSensibleInformation() ? 'pi pi-eye-slash' : 'pi pi-eye'"

@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, map, Observable, of, timer} from 'rxjs';
 import {Client} from '@stomp/stompjs';
 import {ApplicationConfigService} from '../../../core/config/application-config.service';
+import {AccountService} from '../../../core/auth/account.service';
 import SockJS from 'sockjs-client';
 
 export interface PresenceSummary {
@@ -17,13 +18,39 @@ export interface PresenceSummary {
 export class PresenceService {
     onlineCount$ : Observable<number> = of(0);
     private applicationConfigService = inject(ApplicationConfigService);
+    private accountService = inject(AccountService);
     private presenceSubject = new BehaviorSubject<PresenceSummary[]>([]);
     presence$ = this.presenceSubject.asObservable();
     private client?: Client;
     private pingTimer?: any;
+    private currentUsername: string | null = null;
+
+    // Exposer le client pour les autres services (ChatService)
+    getClient(): Client | undefined {
+        return this.client;
+    }
 
     constructor(private http: HttpClient) {
         this.onlineCount$ = this.presence$.pipe(map(list => list.filter(x => x.online).length));
+        // Récupérer le login de l'utilisateur courant au démarrage
+        const account = this.accountService.trackCurrentAccount();
+        if (account()) {
+            this.currentUsername = account()?.login || null;
+        }
+    }
+
+    /**
+     * Récupère le login de l'utilisateur courant
+     */
+    getCurrentUsername(): string | null {
+        // Essayer de récupérer depuis le service account si pas encore stocké
+        if (!this.currentUsername) {
+            const account = this.accountService.trackCurrentAccount();
+            if (account()) {
+                this.currentUsername = account()?.login || null;
+            }
+        }
+        return this.currentUsername;
     }
 
     loadOnce() {
@@ -53,6 +80,15 @@ export class PresenceService {
                                  });
 
         this.client.activate();
+    }
+
+    /**
+     * Récupère le displayName d'un utilisateur depuis la liste de présence
+     */
+    getDisplayName(login: string): string {
+        const users = this.presenceSubject.value;
+        const user = users.find(u => u.login === login);
+        return user?.displayName || login;
     }
 
     disconnect() {
