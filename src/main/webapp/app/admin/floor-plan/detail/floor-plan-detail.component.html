@@ -400,11 +400,17 @@
                             <b>{{ 'floorPlan.detail.dimensionParticipation' | translate }}</b>
                             <span>{{ stand.dimension.dimension }}</span>
 
+                            <b>{{ 'floorPlan.detail.prereserved' | translate }}</b>
+                            <span>{{ pop.dimension?.prereserved?.note ?? '-' }}</span>
+
                             <b>{{ 'floorPlan.detail.comment' | translate }}</b>
                             <span>{{ stand.participation.extraInformation ?? '-' }}</span>
                         } @else {
                             <b>{{ 'floorPlan.detail.dimension' | translate }}</b>
                             <span>{{ pop.dimension?.dimension ?? ('floorPlan.unknown' | translate) }}</span>
+
+                            <b>{{ 'floorPlan.detail.prereserved' | translate }}</b>
+                            <span>{{ pop.dimension?.prereserved?.note ?? '-' }}</span>
                         }
                     </div>
 

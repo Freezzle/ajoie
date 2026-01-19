@@ -199,7 +199,7 @@ export class FloorPlanDetailComponent {
 
     // single/double click
     private clickTimer: any;
-    private readonly clickDelay = 220;
+    private readonly clickDelay = 140;
 
     // ---- perf: highlight only previous highlighted cells + rAF throttle
     private highlightedCells: GridCell[] = [];
@@ -611,9 +611,6 @@ export class FloorPlanDetailComponent {
         if (this.showDimensions() || this.showAvailableStands()) {
             return 'move';
         }
-        if (!cell?.dimension?.stand) {
-            return 'default';
-        }
         return 'pointer';
     }
 
@@ -928,9 +925,6 @@ export class FloorPlanDetailComponent {
     }
 
     openStandDialog(cell: GridCell | null): void {
-        if (!cell?.dimension?.stand) {
-            return;
-        }
         this.selectStandDialog.set(cell);
         this.standDialogVisible.set(true);
     }

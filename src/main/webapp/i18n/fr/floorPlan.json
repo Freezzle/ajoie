@@ -11,11 +11,12 @@
     "detail": {
       "category": "Catégorie",
       "comment": "Commentaire",
-      "dimension": "Dimension :",
+      "dimension": "Dimension",
       "dimensionParticipation": "Dimension participation",
       "dimensionPlan": "Dimension sur plan",
       "location": "Détail de l'emplacement",
       "name": "Nom",
+      "prereserved": "Pré-réservé",
       "status": "Status",
       "tags": "Tags",
       "therapist": "Thérapeute"
