@@ -19,7 +19,7 @@
                 <div class="business-info">
                     @if (!dimension.stand) {
                         @if (dimension.prereserved) {
-                            <div><strong>{{ 'floorPlan.detail.prereserved' | translate }}</strong></div>
+                            <div class="text-primary fw-bolder">{{ 'floorPlan.detail.prereserved' | translate }}</div>
                             <div>{{ dimension.prereserved.note }}</div>
                         } @else {
                             <span>{{ dimension.dimension }}</span>
