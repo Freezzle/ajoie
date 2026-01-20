@@ -6,26 +6,9 @@
   display: flex;
   flex-direction: column;
 
-  .sidebar-toggle {
-    padding: 0.5rem;
-    display: flex;
-    justify-content: end;
-  }
-
-  .sidebar-end-toggle {
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top-width: 1px !important;
-    border-top-style: solid;
-  }
-
   .sidebar-content {
     padding-right: 2rem !important;
     flex: 1 1 0 !important;
-    border-top-width: 1px !important;
-    border-top-style: solid;
 
     .nav-link {
       color: var(--app-surface) !important;
@@ -70,40 +53,32 @@
 
   /* ---- Mobile Style ---- */
   &.mobile {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1050;
-    height: auto;
-
     &.collapsed {
-      border-radius: 0;
+      display: none;
     }
 
     &.open {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      z-index: 9999;
       min-width: 300px;
-      height: 100dvh;
+      height: calc(100dvh - 60px);
     }
   }
 
   /* ---- Desktop Style ---- */
   &.desktop {
-    position: relative; // ⬅️ la sidebar suit le flux, n'est plus flottante
-    top: 0;
-    height: 100dvh; // ⬅️ garantit 100% de la hauteur de l'écran
-    z-index: 1050;
+    position: relative;
+    height: calc(100dvh - 60px);
 
     &.collapsed {
-      height: 100dvh; // ⬅️ Garder la hauteur en collapsed aussi
-
-      .sidebar-content {
-        display: none;
-      }
+      display: none;
     }
 
     &.open {
       min-width: 300px;
-      height: 100dvh; // ⬅️ Toujours 100vh
+      height: calc(100dvh - 60px);
     }
   }
 }

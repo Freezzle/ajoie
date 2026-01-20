@@ -1,24 +1,42 @@
 .app-layout {
   display: flex;
-  height: 100%;
+  flex-direction: column;
+  height: 100dvh;
   overflow: hidden;
   max-width: 1786px;
   margin: 0 auto;
 
-  .main-content {
-    flex: 1;
-    overflow-y: auto;
-    height: 100dvh;
-    background-color: var(--app-surface-muted);
+  app-topbar {
+    flex-shrink: 0;
+    width: 100%;
   }
 
-  .inDevelopement {
-    background: repeating-linear-gradient(
-                    135deg,
-                    var(--app-surface-muted) 0,
-                    var(--app-surface-muted) 29px,
-                    var(--app-contrast) 29px,
-                    var(--app-contrast) 30px
-    ) !important;
+  > div:not(app-topbar) {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .app-layout-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      height: auto;
+      background-color: var(--app-surface-muted);
+    }
+
+    .inDevelopement {
+      background: repeating-linear-gradient(
+                      135deg,
+                      var(--app-surface-muted) 0,
+                      var(--app-surface-muted) 29px,
+                      var(--app-contrast) 29px,
+                      var(--app-contrast) 30px
+      ) !important;
+    }
   }
 }

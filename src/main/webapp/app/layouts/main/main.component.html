@@ -1,11 +1,18 @@
 <div class="app-layout">
-    <!-- Sidebar injected via named router-outlet -->
-    <router-outlet name="navbar"></router-outlet>
+    <!-- Top navbar -->
+    <app-topbar></app-topbar>
 
-    <!-- Main content card -->
-    <div [class.inDevelopement]="inDevelopementMode()" class="main-content">
-        <div>
-            <router-outlet></router-outlet>
+    <div class="app-layout-body">
+        <!-- Sidebar injected via named router-outlet -->
+        <router-outlet name="navbar"></router-outlet>
+
+        <!-- Main content card -->
+        <div [class.inDevelopement]="inDevelopementMode()" class="main-content">
+            <div>
+                <router-outlet></router-outlet>
+            </div>
         </div>
     </div>
 </div>
+
+

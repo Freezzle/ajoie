@@ -1,0 +1,63 @@
+<div class="topbar">
+    <!-- Left section: Toggle sidebar button -->
+    <div class="topbar-left">
+        <button (click)="toggleSidebar()"
+                class="topbar-btn toggle-btn"
+                [title]="'navbar.toggle' | translate">
+            <fa-icon icon="bars"></fa-icon>
+        </button>
+    </div>
+
+    <!-- Right section: User actions and settings -->
+    <div class="topbar-right">
+        <!-- Presence component -->
+        <app-presence *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" class="topbar-item"></app-presence>
+
+        <!-- Chat messages component -->
+        <app-chat-messages *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" class="topbar-item"></app-chat-messages>
+
+        <!-- Eye toggle button for sensitive information -->
+        <button (click)="navigationService.hideSensibleInformation.set(!navigationService.hideSensibleInformation())"
+                class="topbar-btn"
+                [title]="navigationService.hideSensibleInformation() ? ('navbar.showInfo' | translate) : ('navbar.hideInfo' | translate)">
+            <fa-icon [icon]="navigationService.hideSensibleInformation() ? 'eye-slash' : 'eye'"></fa-icon>
+        </button>
+
+        <!-- User authenticated section -->
+        @if (account() !== null) {
+            <!-- Sessions button -->
+            <button (click)="$event.stopPropagation()"
+                    [routerLink]="'/account/sessions'"
+                    routerLinkActive="active"
+                    class="topbar-btn"
+                    [title]="'navbar.sessions' | translate">
+                <fa-icon icon="cloud"></fa-icon>
+            </button>
+
+            <!-- Logout button -->
+            <button (click)="logout()"
+                    id="logout"
+                    class="topbar-btn"
+                    [title]="'navbar.logout' | translate">
+                <fa-icon icon="sign-out-alt"></fa-icon>
+            </button>
+        } @else {
+            <!-- Login button -->
+            <button (click)="login()"
+                    id="login"
+                    class="topbar-btn"
+                    [title]="'navbar.login' | translate">
+                <fa-icon icon="sign-in-alt"></fa-icon>
+            </button>
+
+            <!-- Register button -->
+            <button (click)="$event.stopPropagation()"
+                    [routerLink]="'/account/register'"
+                    routerLinkActive="active"
+                    class="topbar-btn"
+                    [title]="'navbar.register' | translate">
+                <fa-icon icon="user-plus"></fa-icon>
+            </button>
+        }
+    </div>
+</div>

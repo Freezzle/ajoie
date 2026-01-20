@@ -5,13 +5,14 @@ import dayjs from 'dayjs/esm';
 
 import {AccountService} from 'app/core/auth/account.service';
 import {AppPageTitleStrategy} from 'app/app-page-title-strategy';
+import TopbarComponent from '../topbar/topbar.component';
 
 @Component({
                selector: 'app-main',
                templateUrl: './main.component.html',
                styleUrl: './main.component.scss',
                providers: [AppPageTitleStrategy],
-               imports: [RouterOutlet]
+               imports: [RouterOutlet, TopbarComponent]
            })
 export default class MainComponent implements OnInit {
     readonly inDevelopementMode = signal<boolean>(false);

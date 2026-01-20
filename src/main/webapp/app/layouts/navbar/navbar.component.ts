@@ -6,32 +6,24 @@ import {StateStorageService} from 'app/core/auth/state-storage.service';
 import SharedModule from 'app/shared/shared.module';
 import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
 import {LANGUAGES} from 'app/config/language.constants';
-import {AccountService} from 'app/core/auth/account.service';
-import {LoginService} from 'app/login/login.service';
 import {filter} from 'rxjs';
 import {SalonService} from '../../admin/salon/service/salon.service';
 import {map} from 'rxjs/operators';
 import {NavigationStateService} from './navigation-state.service';
-import {PresenceComponent} from '../../admin/presence/component/presence.component';
-import {ChatMessagesComponent} from '../../admin/chat/component/chat-messages.component';
-import {Button} from 'primeng/button';
 
 @Component({
                selector: 'app-navbar',
                templateUrl: './navbar.component.html',
                styleUrl: './navbar.component.scss',
-               imports: [RouterModule, SharedModule, HasAnyAuthorityDirective, PresenceComponent, ChatMessagesComponent, Button]
+               imports: [RouterModule, SharedModule, HasAnyAuthorityDirective]
            })
 export default class NavbarComponent implements OnInit {
     @ViewChild('sidebar', {static: true}) sidebar!: ElementRef<HTMLElement>;
 
     languages = LANGUAGES;
-    account = inject(AccountService).trackCurrentAccount();
     navigationService = inject(NavigationStateService);
-    isCollapsed = signal(false);
     dropdowns = signal<{ [key: string]: boolean }>({admin: false, adminBusiness: true});
 
-    private loginService = inject(LoginService);
     private translateService = inject(TranslateService);
     private stateStorageService = inject(StateStorageService);
     private router = inject(Router);
@@ -57,22 +49,9 @@ export default class NavbarComponent implements OnInit {
         }
     }
 
-    toggleSidebar(): void {
-        this.isCollapsed.update(v => !v);
-    }
-
     changeLanguage(languageKey: string): void {
         this.stateStorageService.storeLocale(languageKey);
         this.translateService.use(languageKey);
-    }
-
-    login(): void {
-        this.router.navigate(['/login']);
-    }
-
-    logout(): void {
-        this.loginService.logout();
-        this.router.navigate(['']);
     }
 
     toggleDropdown(menu: string) {
@@ -86,15 +65,15 @@ export default class NavbarComponent implements OnInit {
         return window.innerWidth <= 768;
     }
 
-    closeMobile() {
-        if (this.isMobile()) {
-            this.isCollapsed.set(true);
+    closeMobile(): void {
+        if (this.isMobile() && !this.navigationService.sidebarCollapsed()) {
+            this.navigationService.toggleSidebar();
         }
     }
 
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: MouseEvent): void {
-        if (!this.isMobile() || this.isCollapsed()) {
+        if (!this.isMobile() || this.navigationService.sidebarCollapsed()) {
             return;
         }
 
@@ -106,7 +85,7 @@ export default class NavbarComponent implements OnInit {
         const clickedInside = this.sidebar.nativeElement.contains(target);
 
         if (!clickedInside) {
-            this.closeMobile();
+            this.navigationService.toggleSidebar();
         }
     }
 }

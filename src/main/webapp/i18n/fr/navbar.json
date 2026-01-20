@@ -1,0 +1,11 @@
+{
+  "navbar": {
+    "toggle": "Basculer la barre de navigation",
+    "showInfo": "Afficher les informations sensibles",
+    "hideInfo": "Masquer les informations sensibles",
+    "sessions": "Sessions",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'enregistrer"
+  }
+}
