@@ -18,7 +18,12 @@
             @if (!displayTechnical) {
                 <div class="business-info">
                     @if (!dimension.stand) {
-                        <span>{{ dimension.dimension }}</span>
+                        @if (dimension.prereserved) {
+                            <div><strong>{{ 'floorPlan.detail.prereserved' | translate }}</strong></div>
+                            <div>{{ dimension.prereserved.note }}</div>
+                        } @else {
+                            <span>{{ dimension.dimension }}</span>
+                        }
                     }
                     @if (displayParticipationName() && dimension.stand?.participation; as participation) {
                         <div>
