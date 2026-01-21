@@ -409,25 +409,25 @@
                             [mode]="'edit'">
                     <div class="row">
                         <div class="col-12">
-                            <label for="addPlanName" class="form-label">{{ 'floorPlan.name' | translate }}</label>
-                            <input [formControl]="addPlanName" class="form-control" id="addPlanName" type="text"/>
+                            <text-box [formControl]="addPlanName"
+                                      [fieldName]="'addPlanName'"
+                                      [translateKey]="'floorPlan.name'"/>
                         </div>
-                        <div class="col-4">
-                            <label for="addPlanWidth" class="form-label">{{ 'floorPlan.width' | translate }} (m)</label>
-                            <input [formControl]="addPlanWidth" class="form-control" id="addPlanWidth" type="number"
-                                   step="0.1"/>
+                        <div class="mt-4 col-4">
+                            <number-box [formControl]="addPlanWidth"
+                                        [fieldName]="'addPlanWidth'"
+                                        [translateKey]="'floorPlan.width'"/>
                         </div>
-                        <div class="col-4">
-                            <label for="addPlanHeight" class="form-label">{{ 'floorPlan.height' | translate }}
-                                (m)</label>
-                            <input [formControl]="addPlanHeight" class="form-control" id="addPlanHeight" type="number"
-                                   step="0.1"/>
+                        <div class="mt-4 col-4">
+                            <number-box [formControl]="addPlanHeight"
+                                        [fieldName]="'addPlanHeight'"
+                                        [translateKey]="'floorPlan.height'"/>
                         </div>
-                        <div class="col-4">
-                            <label for="addPlanSpacing" class="form-label">{{ 'floorPlan.spacing' | translate }}
-                                (m)</label>
-                            <input [formControl]="addPlanSpacing" class="form-control" id="addPlanSpacing" type="number"
-                                   step="0.01"/>
+                        <div class="mt-4 col-4">
+                            <number-box [formControl]="addPlanSpacing"
+                                        [fieldName]="'addPlanSpacing'"
+                                        [modeDecimal]="true"
+                                        [translateKey]="'floorPlan.spacing'"/>
                         </div>
                     </div>
                 </dialog-box>
@@ -441,7 +441,7 @@
                             [dismissableMask]="true"
                             [header]="'floorPlan.delete.button' | translate"
                             [mode]="'edit'">
-                    <div [innerHTML]="'floorPlan.delete.question' | translate: {floorName: activePlan()?.name}"></div>
+                    <div [innerHTML]="'floorPlan.delete.question' | translate: {floorName: activePlan().name}"></div>
                 </dialog-box>
             }
 

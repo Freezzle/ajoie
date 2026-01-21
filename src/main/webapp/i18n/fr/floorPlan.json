@@ -1,6 +1,6 @@
 {
   "floorPlan": {
-    "addNew": "+",
+    "addNew": "Nouveau plan",
     "attributionMode": "Attribuer une position",
     "automaticallyIncrementNumber": "Incrémenter position automatiquement",
     "changeRotation": "Changer de rotation",
@@ -23,6 +23,7 @@
     },
     "differentDimension": "Les dimensions diffèrent",
     "displayName": "Voir nom / nom de thérapeute",
+    "height": "Hauteur (m)",
     "loading": "Chargement en cours...",
     "move": {
       "left": "Déplacer",
@@ -36,8 +37,10 @@
       "note": "Note",
       "title": "Réserver la place"
     },
+    "spacing": "Espacement (m)",
     "standSearching": "Recherche de la position d'un stand attribué",
     "technicalInfo": "Voir information technique",
-    "unknown": "Inconnu"
+    "unknown": "Inconnu",
+    "width": "Largeur (m)"
   }
 }

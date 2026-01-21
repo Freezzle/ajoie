@@ -69,6 +69,7 @@ import {removeAccents} from '../../../shared/utils/string.util';
 import {selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
 
 @Component({
                selector: 'floor-plan',
@@ -101,7 +102,8 @@ import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.com
                    SelectBoxComponent,
                    TextBoxComponent,
                    TabsModule,
-                   MenuBoxComponent
+                   MenuBoxComponent,
+                   NumberBoxComponent
                ]
            })
 export class FloorPlanDetailComponent {
