@@ -103,10 +103,7 @@
                                      [formControlElement]="getConfirmPassword"></field-error>
                     </div>
 
-                    <button [disabled]="registerForm.invalid" class="btn btn-primary" jhiTranslate="register.form.button"
-                            type="submit">
-                        Enregistrement
-                    </button>
+                    <button-box [isDisabled]="registerForm.invalid" [isSubmit]="true" translateKey="register.form.button" type="primary"/>
                 </form>
             }
         </div>

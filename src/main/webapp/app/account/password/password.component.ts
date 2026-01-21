@@ -9,10 +9,11 @@ import {PasswordService} from './password.service';
 import PasswordStrengthBarComponent from './password-strength-bar/password-strength-bar.component';
 import {ErrorModel} from '../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../shared/field-error/field-error.component';
+import {ButtonBoxComponent} from '../../shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-password',
-               imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, FieldErrorComponent],
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, FieldErrorComponent, ButtonBoxComponent],
                templateUrl: './password.component.html'
            })
 export default class PasswordComponent implements OnInit {

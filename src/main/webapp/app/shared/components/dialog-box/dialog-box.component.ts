@@ -1,8 +1,8 @@
 import {Component, inject, input, model, OnDestroy, output} from '@angular/core';
 import {Dialog} from 'primeng/dialog';
-import {ButtonDirective} from 'primeng/button';
 import {PrimeTemplate} from 'primeng/api';
 import {DialogDraftService} from '../../services/dialog-draft.service';
+import {ButtonBoxComponent} from '../button-box/button-box.component';
 
 export type AppDialogMode = 'view' | 'edit';
 
@@ -10,8 +10,8 @@ export type AppDialogMode = 'view' | 'edit';
                selector: 'dialog-box',
                imports: [
                    Dialog,
-                   ButtonDirective,
-                   PrimeTemplate
+                   PrimeTemplate,
+                   ButtonBoxComponent
                ],
                templateUrl: './dialog-box.component.html',
                styleUrl: './dialog-box.component.scss'
@@ -31,9 +31,9 @@ export class DialogBoxComponent implements OnDestroy {
 
     // Footer purpose
     mode = input<AppDialogMode>('view');
-    cancelLabel = input('Annuler');
-    confirmLabel = input('Valider');
-    closeLabel = input('Fermer');
+    cancelLabel = input('common.cancel');
+    confirmLabel = input('common.validate');
+    closeLabel = input('common.close');
     confirmDisabled = input(false);
     confirmLoading = input(false);
 

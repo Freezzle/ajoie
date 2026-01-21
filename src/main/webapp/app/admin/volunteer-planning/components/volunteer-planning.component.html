@@ -127,13 +127,11 @@
                                     <!-- palette fixe à droite -->
                                     <aside class="palette">
                                         <div class="palette-grid">
-                                            <button (click)="selectEraser()"
-                                                    [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
-                                                    class="p-button-secondary"
-                                                    icon="pi pi-eraser"
-                                                    pButton
-                                                    type="button"
-                                            ></button>
+                                            <button-box (clickedEvent)="selectEraser()"
+                                                        [showText]="false"
+                                                        primeIcon="pi-eraser"
+                                                        translateKey="common.eraser"
+                                                        type="secondary"/>
 
                                             <p-divider></p-divider>
 

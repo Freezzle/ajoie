@@ -14,14 +14,8 @@
     </div>
 
     <div class="modal-footer">
-        <button (click)="cancel()" class="btn btn-secondary" data-dismiss="modal" type="button">
-            <fa-icon [title]="'common.cancel' | translate" icon="ban"></fa-icon>
-            <span jhiTranslate="common.cancel">Cancel</span>
-        </button>
+        <button-box (clickedEvent)="cancel()" [showText]="true" translateKey="common.cancel" type="secondary"/>
 
-        <button class="btn btn-primary" id="jhi-confirm-add" type="submit">
-            <fa-icon [title]="'common.validate' | translate" icon="check"></fa-icon>
-            <span jhiTranslate="common.validate">Valider</span>
-        </button>
+        <button-box (clickedEvent)="confirmAdd()" [isSubmit]="true" translateKey="common.validate" type="primary"/>
     </div>
 </form>

@@ -3,13 +3,12 @@ import {MenuItem} from 'primeng/api';
 import {MenuModule} from 'primeng/menu';
 import {CommonModule} from '@angular/common';
 import {ButtonModule} from 'primeng/button';
-import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {TranslateModule} from '@ngx-translate/core';
 import {ButtonBoxComponent} from '../button-box/button-box.component';
 
 @Component({
                selector: 'menu-box',
-               imports: [CommonModule, MenuModule, ButtonModule, FaIconComponent, TranslateModule, ButtonBoxComponent],
+               imports: [CommonModule, MenuModule, ButtonModule, TranslateModule, ButtonBoxComponent],
                templateUrl: './menu-box.component.html',
                styleUrl: './menu-box.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush

@@ -76,38 +76,37 @@
                                                              icon="pencil-alt"/>
                                                 </button>
 
-                                                <div class="dropdown-menu" ngbDropdownMenu>
-                                                    @if (canMoveFloorPlan('right')) {
-                                                        <button (click)="movePositionFloorPlan('right')"
-                                                                [class.disabled]="isLoading()"
-                                                                id="move-right-tab"
-                                                                ngbDropdownItem>
-                                                            Déplacer -&gt;
-                                                        </button>
-                                                    }
+                                <div class="dropdown-menu" ngbDropdownMenu>
+                                    <button-box (clickedEvent)="rename()"
+                                                [isDisabled]="isLoading()"
+                                                [showText]="true"
+                                                primeIcon="pi-pencil"
+                                                translateKey="floorPlan.rename"
+                                                type="secondary"/>
+                                    @if (canMoveFloorPlan('right')) {
+                                        <button-box (clickedEvent)="movePositionFloorPlan('right')"
+                                                    [isDisabled]="isLoading()"
+                                                    [showText]="true"
+                                                    primeIcon="pi-arrow-right"
+                                                    translateKey="floorPlan.move.right"
+                                                    type="secondary"/>
+                                    }
 
-                                                    @if (canMoveFloorPlan('left')) {
-                                                        <button (click)="movePositionFloorPlan('left')"
-                                                                [class.disabled]="isLoading()"
-                                                                id="move-left-tab"
-                                                                ngbDropdownItem>
-                                                            &lt;- Déplacer
-                                                        </button>
-                                                    }
-
-                                                    <button (click)="rename()"
-                                                            [class.disabled]="isLoading()"
-                                                            id="rename-tab"
-                                                            ngbDropdownItem>
-                                                        {{ 'floorPlan.rename' | translate }}
-                                                    </button>
-                                                    <button (click)="delete()"
-                                                            [class.disabled]="isLoading()"
-                                                            id="delete-tab"
-                                                            ngbDropdownItem>
-                                                        {{ 'floorPlan.delete.button' | translate }}
-                                                    </button>
-                                                </div>
+                                    @if (canMoveFloorPlan('left')) {
+                                        <button-box (clickedEvent)="movePositionFloorPlan('left')"
+                                                    [isDisabled]="isLoading()"
+                                                    [showText]="true"
+                                                    primeIcon="pi-arrow-left"
+                                                    translateKey="floorPlan.move.left"
+                                                    type="secondary"/>
+                                    }
+                                    <button-box (clickedEvent)="delete()"
+                                                [isDisabled]="isLoading()"
+                                                [showText]="true"
+                                                primeIcon="pi-trash"
+                                                translateKey="floorPlan.delete.button"
+                                                type="secondary"/>
+                                </div>
                                             </div>
                                         }
                                     </div>
@@ -116,14 +115,12 @@
 
                             @if (!isReadOnly()) {
                                 <li class="nav-item" role="presentation">
-                                    <button (click)="openAddDialog()"
-                                            [class.disabled]="isLoading()"
-                                            class="nav-link"
-                                            id="add-tab"
-                                            role="tab"
-                                            type="button">
-                                        {{ 'floorPlan.addNew' | translate }}
-                                    </button>
+                                    <button-box (clickedEvent)="openAddDialog()"
+                                                [isDisabled]="isLoading()"
+                                                [showText]="false"
+                                                primeIcon="pi-plus"
+                                                translateKey="floorPlan.addNew"
+                                                type="success"/>
                                 </li>
                             }
                         </ul>

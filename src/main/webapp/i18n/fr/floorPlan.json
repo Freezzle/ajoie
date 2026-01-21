@@ -25,13 +25,13 @@
     "displayName": "Voir nom / nom de thérapeute",
     "loading": "Chargement en cours...",
     "move": {
-      "left": "<- Déplacer",
-      "right": "Déplacer ->"
+      "left": "Déplacer",
+      "right": "Déplacer"
     },
     "name": "Nom du plan",
     "nextPosition": "Position",
     "noFloorPlanFound": "Aucun plan trouvé. Veuiller en créer un !",
-    "rename": "Renommer le plan",
+    "rename": "Renommer",
     "reserve": {
       "note": "Note",
       "title": "Réserver la place"

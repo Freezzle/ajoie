@@ -1,12 +1,11 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
-import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import SharedModule from '../../shared.module';
 import {Button} from 'primeng/button';
 import {RouterLink} from '@angular/router';
 
 @Component({
-               imports: [FaIconComponent, SharedModule, Button, RouterLink],
+               imports: [SharedModule, Button, RouterLink],
                selector: 'button-box',
                templateUrl: './button-box.component.html'
            })
@@ -34,9 +33,13 @@ export class ButtonBoxComponent {
     @Input()
     showText: boolean = true;
     @Input()
+    rounded: boolean = false;
+    @Input()
     badge: string | undefined = undefined;
     @Input()
     badgeSeverity: 'success' | 'secondary' | 'info' | 'warn' | 'danger' | undefined = undefined;
+    @Input()
+    loading: boolean = false;
 
     @Output()
     clickedEvent = new EventEmitter<HTMLElement>();

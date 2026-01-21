@@ -69,10 +69,7 @@
                         </div>
                     }
 
-                    <button [disabled]="settingsForm.invalid" class="btn btn-primary" jhiTranslate="settings.form.button"
-                            type="submit">
-                        Sauvegarder
-                    </button>
+                    <button-box [isDisabled]="settingsForm.invalid" [isSubmit]="true" translateKey="settings.form.button" type="primary"/>
                 </form>
             }
         </div>

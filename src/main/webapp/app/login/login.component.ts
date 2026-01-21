@@ -11,10 +11,11 @@ import {AlertErrorComponent} from '../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {Toast} from 'primeng/toast';
 import {CardComponent} from '../shared/components/card/card.component';
+import {ButtonBoxComponent} from '../shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-login',
-               imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, ContentPageComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, CardComponent],
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, ContentPageComponent, AlertComponent, AlertErrorComponent, ConfirmPopup, Toast, CardComponent, ButtonBoxComponent],
                templateUrl: './login.component.html'
            })
 export default class LoginComponent implements OnInit, AfterViewInit {

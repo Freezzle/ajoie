@@ -21,10 +21,7 @@
                     </dd>
                 </dl>
 
-                <button (click)="previousState()" class="btn btn-info" type="submit">
-                    <fa-icon [title]="'common.back' | translate" icon="arrow-left"></fa-icon>
-                    <span jhiTranslate="common.back">Back</span>
-                </button>
+                <button-box (clickedEvent)="previousState()" [showText]="true" primeIcon="pi-arrow-left" translateKey="common.back" type="primary"/>
             </div>
         }
     </div>

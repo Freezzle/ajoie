@@ -166,13 +166,11 @@
                             <ng-template #footer>
                                 <tr>
                                     <td colspan="4">
-                                        <button (click)="addPriceStand()"
-                                                class="btn btn-success btn-sm w-100"
-                                                id="create-invoice"
-                                                type="button">
-                                            <fa-icon icon="plus"></fa-icon>
-                                            <span jhiTranslate="common.create">Create</span>
-                                        </button>
+                                        <button-box (clickedEvent)="addPriceStand()"
+                                                    [showText]="true"
+                                                    primeIcon="pi-plus"
+                                                    translateKey="common.create"
+                                                    type="success"/>
                                     </td>
                                 </tr>
                             </ng-template>

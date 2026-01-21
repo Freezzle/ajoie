@@ -23,20 +23,9 @@
         @case ('edit') {
             <ng-template pTemplate="footer">
                 <div class="dialog-footer">
-                    <button (click)="onCancelClick()"
-                            class="p-button-text"
-                            pButton
-                            type="button">
-                        {{ cancelLabel() }}
-                    </button>
+                    <button-box (clickedEvent)="onCancelClick()" [translateKey]="cancelLabel()" [showText]="true" type="secondary"/>
 
-                    <button (click)="onConfirmClick()"
-                            [disabled]="confirmDisabled() || confirmLoading()"
-                            [loading]="confirmLoading()"
-                            pButton
-                            type="button">
-                        {{ confirmLabel() }}
-                    </button>
+                    <button-box (clickedEvent)="onConfirmClick()" [isDisabled]="confirmDisabled() || confirmLoading()" [loading]="confirmLoading()" [showText]="true" [translateKey]="confirmLabel()" type="primary"/>
                 </div>
             </ng-template>
         }

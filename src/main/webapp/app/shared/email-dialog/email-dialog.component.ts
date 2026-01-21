@@ -10,11 +10,12 @@ import {ActionsService} from '../../admin/common/actions.service';
 import {EmailAttachment} from './email-attachment';
 import {finalize} from 'rxjs/operators';
 import Quill from 'quill';
+import {ButtonBoxComponent} from '../components/button-box/button-box.component';
 
 @Component({
                templateUrl: './email-dialog.component.html',
                styleUrl: './email-dialog.component.scss',
-               imports: [SharedModule, FormsModule, EditorModule, ReactiveFormsModule, TextBoxComponent, Editor]
+               imports: [SharedModule, FormsModule, EditorModule, ReactiveFormsModule, TextBoxComponent, Editor, ButtonBoxComponent]
            })
 export class EmailDialogComponent implements OnInit {
 

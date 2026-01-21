@@ -64,8 +64,8 @@ export class AuthorityComponent implements OnInit {
         window.history.back();
     }
 
-    delete(event: Event, authority: IAuthority): void {
-        this.confirmDialogService.delete(event.target as HTMLElement, 'authority.delete.question', {id: authority.name})
+    delete(event: HTMLElement, authority: IAuthority): void {
+        this.confirmDialogService.delete(event, 'authority.delete.question', {id: authority.name})
             .pipe(
                 filter(confirmed => confirmed),
                 switchMap(() => this.authorityService.delete(authority.name)),

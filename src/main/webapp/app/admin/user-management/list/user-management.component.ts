@@ -68,8 +68,8 @@ export default class UserManagementComponent implements OnInit {
         return item.id!;
     }
 
-    deleteUser(event: Event, user: User): void {
-        this.confirmDialogService.delete(event.target as HTMLElement, 'userManagement.delete.question', {login: user.login}).pipe(
+    deleteUser(event: HTMLElement, user: User): void {
+        this.confirmDialogService.delete(event, 'userManagement.delete.question', {login: user.login}).pipe(
             filter(confirmed => confirmed),
             switchMap(() => this.userService.delete(user.login)),
             tap(() => this.load()) // Recharge les données

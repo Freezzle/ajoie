@@ -42,8 +42,6 @@
     </div>
 
     <div class="modal-footer">
-        <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
-            <span jhiTranslate="common.back">Close</span>
-        </button>
+        <button-box (clickedEvent)="close()" [showText]="true" translateKey="common.close" type="primary"/>
     </div>
 </form>

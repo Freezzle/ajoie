@@ -7,11 +7,12 @@ import SharedModule from 'app/shared/shared.module';
 import {PasswordResetFinishService} from './password-reset-finish.service';
 import {ErrorModel} from '../../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../../shared/field-error/field-error.component';
+import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-password-reset-finish',
                imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
-                         FieldErrorComponent],
+                         FieldErrorComponent, ButtonBoxComponent],
                templateUrl: './password-reset-finish.component.html'
            })
 export default class PasswordResetFinishComponent implements OnInit, AfterViewInit {

@@ -16,7 +16,6 @@ import {InvoicingPlanService} from '../service/invoicing-plan.service';
 import dayjs from 'dayjs/esm';
 import {Mode} from '../../enumerations/mode.model';
 import {formatterStatus, Status} from '../../enumerations/status.model';
-import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AvailableAction} from '../../../shared/model/available-action';
 import {EmailMessage} from '../../../shared/email-dialog/email-message';
@@ -25,10 +24,6 @@ import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.co
 import {ActionsService} from '../../common/actions.service';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
 import {formatterInvoiceMethod, InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
-import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
-import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
-import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
-import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
 import {AccordionModule, AccordionTabCloseEvent, AccordionTabOpenEvent} from 'primeng/accordion';
 import {AlertComponent} from '../../../shared/alert/alert.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
@@ -50,12 +45,7 @@ import {TranslateService} from '@ngx-translate/core';
                    FormatMediumDatePipe,
                    FormsModule,
                    ReactiveFormsModule,
-                   CheckboxBoxComponent,
                    ButtonBoxComponent,
-                   TextBoxComponent,
-                   SelectBoxComponent,
-                   TextareaBoxComponent,
-                   LinkBoxComponent,
                    AccordionModule,
                    AlertComponent,
                    AlertErrorComponent,

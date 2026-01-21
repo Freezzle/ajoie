@@ -16,70 +16,8 @@
     <app-card>
         <div appCardHeader>
             <div class="d-flex w-100 justify-content-between">
-                <h4>{{ 'participation.billing.details' | translate }}</h4>
-                <fa-icon (click)="openHistoryModal()"
-                         [title]="'event.buttonTitle' | translate"
-                         class="clickable"
-                         icon="clock-rotate-left"></fa-icon>
-            </div>
-        </div>
-        <div appCardBody>
-            <div [formGroup]="billingInfoForm" class="row">
-                <div class="mt-4 col-lg-6 d-flex">
-                    <select-box [formatterFunction]="formatterParticipation"
-                                [options]="[billingInfoForm.controls.participation.value]"
-                                class="w-100"
-                                fieldName="participation"
-                                formControlName="participation"
-                                translateKey="conference.participation"/>
-                    @if (participation()!.id && participation()!.salon) {
-                        <link-box [links]="['/admin', 'salons', participation()!.salon!.id, 'participations', participation()!.id ,'view']"
-                                  [showText]="false"
-                                  class="align-content-center"
-                                  primeIcon="pi-link"
-                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
-                    }
-                </div>
-                <div class="mt-4 col-lg-6">
-                    <text-box fieldName="email" formControlName="exhibitorEmail" translateKey="exhibitor.email"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <checkbox-box fieldName="needArrangement"
-                                  formControlName="needArrangement"
-                                  translateKey="participation.needArrangement"/>
-                </div>
-                <div class="mt-4 col-sm-6 col-lg-4">
-                    <select-box [formatterFunction]="formatterInvoiceMethod"
-                                [needTranslation]="true"
-                                [options]="Object.keys(InvoiceSendingMethod)"
-                                fieldName="invoiceSendingMethod"
-                                formControlName="invoiceSendingMethod"
-                                translateKey="participation.invoiceSendingMethod.label"/>
-                </div>
-                <div class="mt-4 col-sm-6 col-lg-4 align-content-center">
-                    <select-box [formatterFunction]="formatterStatus"
-                                [needTranslation]="true"
-                                [options]="Object.keys(Status)"
-                                fieldName="status"
-                                formControlName="status"
-                                translateKey="participation.status.label"/>
-                </div>
-                <div class="mt-4 col-12 align-content-center">
-                    <textarea-box [rows]="3"
-                                  fieldName="extraInformation"
-                                  formControlName="extraInformation"
-                                  translateKey="participation.extraInformation"/>
-                </div>
-            </div>
-        </div>
-    </app-card>
-    <app-card>
-        <div appCardHeader>
-            <div class="d-flex w-100 justify-content-between">
                 <h4>{{ 'invoicingPlan.invoicingPlans' | translate }}</h4>
-                <button (click)="generate()" class="btn btn-primary btn-sm">
-                    <span jhiTranslate="common.refresh">Rafraichir</span>
-                </button>
+                <button-box (clickedEvent)="generate()" [showText]="true" primeIcon="pi-refresh" translateKey="common.refresh" type="primary"/>
             </div>
         </div>
         <div appCardBody>
@@ -215,11 +153,11 @@
                                                             </td>
                                                             <td class="align-middle text-end">
                                                                 @if (showCreateInvoice(invoicingPlan)) {
-                                                                    <button (click)="addInvoice(invoicingPlan)"
-                                                                            class="btn btn-success btn-sm"
-                                                                            id="jh-create-invoice">
-                                                                        <fa-icon icon="plus"></fa-icon>
-                                                                    </button>
+                                                                    <button-box (clickedEvent)="addInvoice(invoicingPlan)"
+                                                                                [showText]="false"
+                                                                                primeIcon="pi-plus"
+                                                                                translateKey="common.create"
+                                                                                type="success"/>
                                                                 }
                                                             </td>
                                                         </tr>
@@ -317,11 +255,11 @@
                                                                 </td>
                                                                 <td class="align-middle text-end">
                                                                     @if (showCreatePayment(invoicingPlan)) {
-                                                                        <button (click)="addPayment(invoicingPlan)"
-                                                                                class="btn btn-success btn-sm"
-                                                                                id="create-payment">
-                                                                            <fa-icon icon="plus"></fa-icon>
-                                                                        </button>
+                                                                        <button-box (clickedEvent)="addPayment(invoicingPlan)"
+                                                                                    [showText]="false"
+                                                                                    primeIcon="pi-plus"
+                                                                                    translateKey="common.create"
+                                                                                    type="success"/>
                                                                     }
                                                                 </td>
                                                             </tr>

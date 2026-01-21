@@ -67,9 +67,9 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
         emailMessage.setAttachments(List.of(new EmailAttachment(downloadInvoiceHandler.getFilename(payload, null),
                 ContextActionType.INVOICE_DOWNLOAD.code(), payload.getId())));
 
-        String contentToLoad = "billing/invoice-content";
+        String contentToLoad = "billing/invoice";
         if (payload.getNeedArrangement()) {
-            contentToLoad = "billing/invoice-arrangement-content";
+            contentToLoad = "billing/invoice-arrangement";
         }
 
         Context thymeleafCtxt = new Context(locale);

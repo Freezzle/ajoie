@@ -95,13 +95,12 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    <button (click)="deleteUser($event, user)"
-                                            [disabled]="!currentAccount() || currentAccount()?.login === user.login"
-                                            class="btn btn-danger btn-sm"
-                                            type="button">
-                                        <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                        <span jhiTranslate="common.delete">Delete</span>
-                                    </button>
+                                    <button-box (clickedEvent)="deleteUser($event, user)"
+                                                [isDisabled]="!currentAccount() || currentAccount()?.login === user.login"
+                                                [showText]="true"
+                                                primeIcon="pi-times"
+                                                translateKey="common.delete"
+                                                type="danger"/>
                                 </div>
                             </td>
                         </tr>

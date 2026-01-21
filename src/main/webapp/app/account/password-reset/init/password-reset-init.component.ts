@@ -6,10 +6,11 @@ import {PasswordResetInitService} from './password-reset-init.service';
 import {ErrorModel} from '../../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../../shared/field-error/field-error.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-password-reset-init',
-               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, AlertErrorComponent],
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, AlertErrorComponent, ButtonBoxComponent],
                templateUrl: './password-reset-init.component.html'
            })
 export default class PasswordResetInitComponent implements AfterViewInit {

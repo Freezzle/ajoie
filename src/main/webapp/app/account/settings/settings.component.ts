@@ -9,12 +9,13 @@ import {LANGUAGES} from 'app/config/language.constants';
 import {FieldErrorComponent} from '../../shared/field-error/field-error.component';
 import {ErrorModel} from '../../shared/field-error/error.model';
 import {AlertErrorComponent} from '../../shared/alert/alert-error.component';
+import {ButtonBoxComponent} from '../../shared/components/button-box/button-box.component';
 
 const initialAccount: Account = {} as Account;
 
 @Component({
                selector: 'app-settings',
-               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, AlertErrorComponent],
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, AlertErrorComponent, ButtonBoxComponent],
                templateUrl: './settings.component.html'
            })
 export default class SettingsComponent implements OnInit {

@@ -10,11 +10,12 @@ import PasswordStrengthBarComponent from '../password/password-strength-bar/pass
 import {RegisterService} from './register.service';
 import {ErrorModel} from '../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../shared/field-error/field-error.component';
+import {ButtonBoxComponent} from '../../shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-register',
                imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent,
-                         FieldErrorComponent],
+                         FieldErrorComponent, ButtonBoxComponent],
                templateUrl: './register.component.html'
            })
 export default class RegisterComponent implements AfterViewInit {

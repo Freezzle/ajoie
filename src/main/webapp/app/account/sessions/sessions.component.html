@@ -32,10 +32,7 @@
                         <td>{{ session.userAgent }}</td>
                         <td>{{ session.tokenDate | date: 'longDate' }}</td>
                         <td>
-                            <button (click)="invalidate(session.series)" class="btn btn-primary" jhiTranslate="sessions.table.button"
-                                    type="submit">
-                                Invalider
-                            </button>
+                            <button-box (clickedEvent)="invalidate(session.series)" [isSubmit]="true" translateKey="sessions.table.button" type="primary"/>
                         </td>
                     </tr>
                 }

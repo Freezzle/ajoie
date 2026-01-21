@@ -13,15 +13,9 @@
             </span>
 
             <span>
-                <button (click)="load()" [disabled]="isLoading" class="btn btn-primary btn-sm">
-                    <fa-icon [animation]="isLoading ? 'spin' : undefined" icon="sync"></fa-icon>
-                    <span jhiTranslate="common.refresh"></span>
-                </button>
+                <button-box (clickedEvent)="load()" [isDisabled]="isLoading" [showText]="true" primeIcon="pi-refresh" translateKey="common.refresh" type="primary"/>
 
-                <button [routerLink]="['./new']" class="btn btn-success btn-sm" id="create-entity">
-                    <fa-icon icon="plus"></fa-icon>
-                    <span jhiTranslate="common.create">Créer</span>
-                </button>
+                <button-box [modeLink]="true" [links]="['./new']" [showText]="true" primeIcon="pi-plus" translateKey="common.create" type="success"/>
             </span>
         </div>
     </h2>
@@ -61,12 +55,11 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="btn-group">
-                                        <button (click)="delete($event, authority)"
-                                                class="btn btn-danger btn-sm"
-                                                type="submit">
-                                            <fa-icon [title]="'common.delete' | translate" icon="times"></fa-icon>
-                                            <span jhiTranslate="common.delete"></span>
-                                        </button>
+                                        <button-box (clickedEvent)="delete($event, authority)"
+                                                    [showText]="true"
+                                                    primeIcon="pi-times"
+                                                    translateKey="common.delete"
+                                                    type="danger"/>
                                     </div>
                                 </td>
                             </tr>
