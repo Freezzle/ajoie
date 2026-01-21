@@ -3,6 +3,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import SharedModule from '../../shared.module';
 import {Button} from 'primeng/button';
 import {RouterLink} from '@angular/router';
+import {convertSeverity, SEVERITY} from '../../utils/severity';
 
 @Component({
                imports: [SharedModule, Button, RouterLink],
@@ -25,11 +26,11 @@ export class ButtonBoxComponent {
     @Input()
     faIconAnimation: 'spin' | undefined = undefined;
     @Input()
-    primeIcon: string | null = null;
+    primeIcon: string | undefined = undefined;
     @Input()
     isSubmit: boolean = false;
     @Input()
-    type: 'primary' | 'secondary' | 'warning' | 'danger' | 'success' = 'primary';
+    type: SEVERITY = 'primary';
     @Input()
     showText: boolean = true;
     @Input()
@@ -45,19 +46,7 @@ export class ButtonBoxComponent {
     clickedEvent = new EventEmitter<HTMLElement>();
 
     get colorButton() {
-        if (this.type === 'primary') {
-            return 'primary';
-        } else if (this.type === 'secondary') {
-            return 'secondary';
-        } else if (this.type === 'warning') {
-            return 'warn';
-        } else if (this.type === 'danger') {
-            return 'danger';
-        } else if (this.type === 'success') {
-            return 'success';
-        } else {
-            return 'primary';
-        }
+        return convertSeverity(this.type);
     }
 
     onClick(event: MouseEvent): void {
