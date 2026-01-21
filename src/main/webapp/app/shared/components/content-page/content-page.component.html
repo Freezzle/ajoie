@@ -1,11 +1,7 @@
-<div class="bg-transparent p-0 p-sm-4">
-    <p-menubar>
-        <ng-template #start>
-            <ng-content select="[appMenuBarStart]"></ng-content>
-        </ng-template>
-        <ng-template #end>
-            <ng-content select="[appMenuBarEnd]"></ng-content>
-        </ng-template>
-    </p-menubar>
+<div class="bg-transparent p-0 pt-4 p-2 p-sm-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <ng-content select="[appMenuBarStart]"></ng-content>
+        <ng-content select="[appMenuBarEnd]"></ng-content>
+    </div>
     <ng-content></ng-content>
 </div>
