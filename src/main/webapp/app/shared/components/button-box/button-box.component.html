@@ -1,14 +1,17 @@
 @if (modeLink) {
     <!-- Version "lien" (visuel lien, mais garde exactement tes features) -->
-    <p-button
-            (onClick)="onClick($event)"
-            [attr.title]="translateKey | translate"
-            [disabled]="isDisabled"
-            [routerLink]="links"
-            [severity]="colorButton"
-            size="small">
+    <p-button (onClick)="onClick($event)"
+              [attr.title]="translateKey | translate"
+              [disabled]="isDisabled"
+              [routerLink]="routerLink || links"
+              [severity]="colorButton"
+              [badge]="badge"
+              [badgeSeverity]="badgeSeverity"
+              size="small">
         @if (faIcon) {
             <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
+        } @else if (primeIcon) {
+            <i [class]="'pi ' + primeIcon"></i>
         }
         @if (showText) {
             <span class="text-uppercase" jhiTranslate="{{ translateKey }}">Edit</span>
@@ -16,13 +19,15 @@
     </p-button>
 } @else {
     <!-- Version bouton normale -->
-    <p-button
-            (onClick)="onClick($event)"
-            [attr.title]="translateKey | translate"
-            [attr.type]="isSubmit ? 'submit' : 'button'"
-            [disabled]="isDisabled"
-            [severity]="colorButton"
-            size="small">
+    <p-button (onClick)="onClick($event)"
+              [attr.title]="translateKey | translate"
+              [attr.type]="isSubmit ? 'submit' : 'button'"
+              [disabled]="isDisabled"
+              [severity]="colorButton"
+              [badge]="badge"
+              [icon]="primeIcon ? ('pi ' + primeIcon) : undefined"
+              [badgeSeverity]="badgeSeverity"
+              size="small">
         @if (faIcon) {
             <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
         }

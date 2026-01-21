@@ -7,12 +7,13 @@ import SharedModule from 'app/shared/shared.module';
 import {PresenceComponent} from '../../admin/presence/component/presence.component';
 import {ChatMessagesComponent} from '../../admin/chat/component/chat-messages.component';
 import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
+import {ButtonBoxComponent} from 'app/shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-topbar',
                templateUrl: './topbar.component.html',
                styleUrl: './topbar.component.scss',
-               imports: [SharedModule, PresenceComponent, ChatMessagesComponent, HasAnyAuthorityDirective, RouterModule]
+               imports: [SharedModule, PresenceComponent, ChatMessagesComponent, HasAnyAuthorityDirective, RouterModule, ButtonBoxComponent]
            })
 export default class TopbarComponent {
     account = inject(AccountService).trackCurrentAccount();

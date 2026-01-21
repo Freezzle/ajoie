@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import SharedModule from '../../shared.module';
@@ -16,6 +16,8 @@ export class ButtonBoxComponent {
     @Input()
     links: string[] = [];
     @Input()
+    routerLink: string | string[] | null = null;
+    @Input()
     isDisabled: boolean = false;
     @Input()
     translateKey!: string;
@@ -24,11 +26,17 @@ export class ButtonBoxComponent {
     @Input()
     faIconAnimation: 'spin' | undefined = undefined;
     @Input()
+    primeIcon: string | null = null;
+    @Input()
     isSubmit: boolean = false;
     @Input()
     type: 'primary' | 'secondary' | 'warning' | 'danger' | 'success' = 'primary';
     @Input()
     showText: boolean = true;
+    @Input()
+    badge: string | undefined = undefined;
+    @Input()
+    badgeSeverity: 'success' | 'secondary' | 'info' | 'warn' | 'danger' | undefined = undefined;
 
     @Output()
     clickedEvent = new EventEmitter<HTMLElement>();

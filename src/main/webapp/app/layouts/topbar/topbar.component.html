@@ -1,11 +1,12 @@
 <div class="topbar">
     <!-- Left section: Toggle sidebar button -->
     <div class="topbar-left">
-        <button (click)="toggleSidebar()"
-                class="topbar-btn toggle-btn"
-                [title]="'navbar.toggle' | translate">
-            <fa-icon icon="bars"></fa-icon>
-        </button>
+        <button-box (clickedEvent)="toggleSidebar()"
+                    [showText]="false"
+                    primeIcon="pi-bars"
+                    translateKey="navbar.toggle"
+                    type="secondary"
+                    class="topbar-btn toggle-btn"></button-box>
     </div>
 
     <!-- Right section: User actions and settings -->
@@ -17,47 +18,48 @@
         <app-chat-messages *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" class="topbar-item"></app-chat-messages>
 
         <!-- Eye toggle button for sensitive information -->
-        <button (click)="navigationService.hideSensibleInformation.set(!navigationService.hideSensibleInformation())"
-                class="topbar-btn"
-                [title]="navigationService.hideSensibleInformation() ? ('navbar.showInfo' | translate) : ('navbar.hideInfo' | translate)">
-            <fa-icon [icon]="navigationService.hideSensibleInformation() ? 'eye-slash' : 'eye'"></fa-icon>
-        </button>
+        <button-box (clickedEvent)="navigationService.hideSensibleInformation.set(!navigationService.hideSensibleInformation())"
+                    [showText]="false"
+                    [primeIcon]="navigationService.hideSensibleInformation() ? 'pi-eye-slash' : 'pi-eye'"
+                    [translateKey]="navigationService.hideSensibleInformation() ? 'navbar.showInfo' : 'navbar.hideInfo'"
+                    type="secondary"
+                    class="topbar-btn"></button-box>
 
         <!-- User authenticated section -->
         @if (account() !== null) {
             <!-- Sessions button -->
-            <button (click)="$event.stopPropagation()"
-                    [routerLink]="'/account/sessions'"
-                    routerLinkActive="active"
-                    class="topbar-btn"
-                    [title]="'navbar.sessions' | translate">
-                <fa-icon icon="cloud"></fa-icon>
-            </button>
+            <button-box [showText]="false"
+                        [routerLink]="['/account/sessions']"
+                        [modeLink]="true"
+                        primeIcon="pi-cloud"
+                        translateKey="navbar.sessions"
+                        type="secondary"
+                        class="topbar-btn"></button-box>
 
             <!-- Logout button -->
-            <button (click)="logout()"
-                    id="logout"
-                    class="topbar-btn"
-                    [title]="'navbar.logout' | translate">
-                <fa-icon icon="sign-out-alt"></fa-icon>
-            </button>
+            <button-box (clickedEvent)="logout()"
+                        [showText]="false"
+                        primeIcon="pi-sign-out"
+                        translateKey="navbar.logout"
+                        type="danger"
+                        class="topbar-btn"></button-box>
         } @else {
             <!-- Login button -->
-            <button (click)="login()"
-                    id="login"
-                    class="topbar-btn"
-                    [title]="'navbar.login' | translate">
-                <fa-icon icon="sign-in-alt"></fa-icon>
-            </button>
+            <button-box (clickedEvent)="login()"
+                        [showText]="false"
+                        primeIcon="pi-sign-in"
+                        translateKey="navbar.login"
+                        type="secondary"
+                        class="topbar-btn"></button-box>
 
             <!-- Register button -->
-            <button (click)="$event.stopPropagation()"
-                    [routerLink]="'/account/register'"
-                    routerLinkActive="active"
-                    class="topbar-btn"
-                    [title]="'navbar.register' | translate">
-                <fa-icon icon="user-plus"></fa-icon>
-            </button>
+            <button-box [showText]="false"
+                        [routerLink]="['/account/register']"
+                        [modeLink]="true"
+                        primeIcon="pi-user-plus"
+                        translateKey="navbar.register"
+                        type="secondary"
+                        class="topbar-btn"></button-box>
         }
     </div>
 </div>

@@ -24,6 +24,7 @@ import {PresenceService} from '../../presence/service/presence.service';
 import {AccountService} from '../../../core/auth/account.service';
 import {TimeSincePipe} from '../../../shared/pipe/time-since.pipe';
 import {Badge} from 'primeng/badge';
+import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-chat-messages',
@@ -38,17 +39,19 @@ import {Badge} from 'primeng/badge';
                    TagModule,
                    FormsModule,
                    TimeSincePipe,
-                   Badge
+                   Badge,
+                   ButtonBoxComponent
                ],
                template: `
                    <!-- Bouton icône Messages dans la navbar -->
-                   <p-button
-                           (click)="toggleDialog()"
-                           [badge]="unreadCount() > 0 ? (unreadCount() + '') : ''"
-                           icon="pi pi-envelope"
-                           badgeSeverity="danger"
-                           type="button">
-                   </p-button>
+                   <button-box (clickedEvent)="toggleDialog()"
+                               [showText]="false"
+                               [badge]="unreadCount() > 0 ? (unreadCount() + '') : ''"
+                               badgeSeverity="danger"
+                               primeIcon="pi-envelope"
+                               translateKey="navbar.messages"
+                               type="secondary">
+                   </button-box>
 
                    <!-- Dialog principal (PrimeNG) -->
                    <p-dialog [visible]="dialogVisible()"

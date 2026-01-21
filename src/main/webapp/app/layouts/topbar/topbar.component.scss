@@ -22,56 +22,14 @@
     gap: 0.75rem;
   }
 
-  .topbar-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    background-color: transparent;
-    color: var(--app-text);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 1rem;
-
-    &:hover {
-      background-color: var(--app-primary);
-      color: var(--app-surface);
-      transform: scale(1.05);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    &.toggle-btn {
-      font-size: 1.1rem;
-    }
-
-    // Handle routerLinkActive
-    &.active {
-      background-color: var(--app-primary);
-      color: var(--app-surface);
-    }
-  }
-
   .topbar-item {
     display: flex;
     align-items: center;
   }
 }
 
-// Responsive design
 @media (max-width: 768px) {
   .topbar {
     padding: 0 1rem;
-
-    .topbar-btn {
-      width: 36px;
-      height: 36px;
-      font-size: 0.9rem;
-    }
   }
 }

@@ -1,8 +1,9 @@
-<p-button
-        (click)="toggle($event)"
-        [badge]="'' + ((onlineCount$ | async) ?? 0)"
-        icon="pi pi-user"
-        type="button"></p-button>
+<button-box (click)="toggle($event)"
+            [showText]="false"
+            [badge]="'' + ((onlineCount$ | async) ?? 0)"
+            primeIcon="pi-user"
+            translateKey="navbar.presence"
+            type="secondary"></button-box>
 
 <p-popover #pop [baseZIndex]="9999" [style]="{ minWidth: '300px' }">
     <div class="flex align-items-center justify-content-between mb-2">
