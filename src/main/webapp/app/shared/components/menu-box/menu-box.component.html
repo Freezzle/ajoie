@@ -3,15 +3,8 @@
         [model]="items"
         [popup]="true"/>
 
-<p-button (onClick)="menu.toggle($event)"
-          [attr.title]="buttonTranslateKey ? (buttonTranslateKey | translate) : undefined"
-          [disabled]="buttonDisabled"
-          [severity]="colorButton"
-          size="small">
-    @if (buttonIcon) {
-        <fa-icon [icon]="buttonIcon"></fa-icon>
-    }
-    @if (buttonTranslateKey) {
-        <span class="text-uppercase">{{ buttonTranslateKey | translate }}</span>
-    }
-</p-button>
+<button-box (click)="menu.toggle($event)"
+            [translateKey]="buttonTranslateKey ?? ''"
+            [isDisabled]="buttonDisabled"
+            [type]="type"
+            [primeIcon]="buttonIcon ?? null"/>

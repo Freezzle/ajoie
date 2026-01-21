@@ -6,24 +6,21 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="arrow-left"
+                    primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
         <button-box (clickedEvent)="clipboardNewsLetterExhibitors()"
-                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [primeIcon]="isLoading ? 'pi-spin' : 'pi-copy'"
                     [isDisabled]="isLoading"
-                    faIcon="copy"
                     translateKey="exhibitor.copyNewsletter"/>
         <button-box (clickedEvent)="refresh()"
-                    [faIconAnimation]="isLoading ? 'spin' : undefined"
-                    [isDisabled]="isLoading"
+                    [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
                     [showText]="false"
-                    faIcon="sync"
                     translateKey="common.refresh"/>
         <button-box [isDisabled]="isLoading"
                     [links]="['./new']"
                     [modeLink]="true"
                     [showText]="false"
-                    faIcon="plus"
+                    primeIcon="pi-plus"
                     translateKey="common.create"
                     type="success"/>
     </div>
@@ -112,7 +109,7 @@
                                     <button-box (clickedEvent)="delete($event, exhibitor)"
                                                 [isSubmit]="true"
                                                 [showText]="false"
-                                                faIcon="times"
+                                                primeIcon="pi-times"
                                                 translateKey="common.delete"
                                                 type="danger"/>
                                 </div>

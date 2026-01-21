@@ -1,6 +1,8 @@
 <a [class.disabled]="isDisabled" [routerLink]="links" class="text-{{colorLink}}">
     @if (faIcon) {
         <fa-icon [animation]="faIconAnimation" [icon]="faIcon" [title]="translateKey | translate"></fa-icon>
+    } @else if (primeIcon) {
+        <i [class]="'pi ' + primeIcon" [title]="translateKey | translate"></i>
     }
     @if (showText) {
         <span class="d-inline" jhiTranslate="{{translateKey}}">Link</span>

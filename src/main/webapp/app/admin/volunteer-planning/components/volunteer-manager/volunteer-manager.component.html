@@ -2,7 +2,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-end">
             <button-box (clickedEvent)="addVolunteer()"
-                        faIcon="plus"
+                        primeIcon="pi-plus"
                         translateKey="common.create"
                         type="success"/>
         </div>
@@ -28,7 +28,7 @@
                     <td class="text-end">
                         <button-box (clickedEvent)="deleteVolunteer(v.id, v.label)"
                                     [showText]="false"
-                                    faIcon="times"
+                                    primeIcon="pi-times"
                                     translateKey="common.delete"
                                     type="danger"/>
                     </td>

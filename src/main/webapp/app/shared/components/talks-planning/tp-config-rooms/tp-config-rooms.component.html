@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-end align-items-center">
-            <button-box (clickedEvent)="addRoom()" faIcon="plus" translateKey="common.create" type="success"/>
+            <button-box (clickedEvent)="addRoom()" primeIcon="pi-plus" translateKey="common.create" type="success"/>
         </div>
         <p-table [rowHover]="true" [rowTrackBy]="trackById" [value]="rooms()" dataKey="id">
             <ng-template pTemplate="header">
@@ -25,7 +25,7 @@
                     <td class="text-end">
                         <button-box (clickedEvent)="deleteRoom(room.id)"
                                     [showText]="false"
-                                    faIcon="times"
+                                    primeIcon="pi-times"
                                     translateKey="common.delete"
                                     type="danger"/>
                     </td>

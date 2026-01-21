@@ -8,7 +8,7 @@
             <button-box (clickedEvent)="previousState()"
                         [isDisabled]="isLoading()"
                         [showText]="false"
-                        faIcon="arrow-left"
+                        primeIcon="pi-arrow-left"
                         translateKey="common.back"/>
         }
 
@@ -16,7 +16,7 @@
             <button-box (clickedEvent)="activateEditMode()"
                         [isDisabled]="isLoading()"
                         [showText]="false"
-                        faIcon="pencil-alt"
+                        primeIcon="pi-pencil"
                         translateKey="common.edit"/>
         }
 
@@ -24,7 +24,7 @@
             <button-box (clickedEvent)="activateReadOnlyMode()"
                         [isDisabled]="isLoading()"
                         [showText]="false"
-                        faIcon="ban"
+                        primeIcon="pi-ban"
                         translateKey="common.cancel"
                         type="secondary"/>
         }
@@ -34,7 +34,7 @@
                         [isDisabled]="isLoading()"
                         [isSubmit]="true"
                         [showText]="false"
-                        faIcon="floppy-disk"
+                        primeIcon="pi-save"
                         translateKey="common.save"/>
         }
     </div>
@@ -135,7 +135,7 @@
                     <div class="col-2 side-column">
                         <button-box (clickedEvent)="changeRotationAvailableStands()"
                                     [showText]="false"
-                                    faIcon="rotate"
+                                    primeIcon="pi-replay"
                                     translateKey="floorPlan.changeRotation"/>
 
                         <!-- AVAILABLE STANDS -->
@@ -170,7 +170,7 @@
                     <div class="col-2 side-column">
                         <button-box (clickedEvent)="changeRotationAvailableDimensions()"
                                     [showText]="false"
-                                    faIcon="rotate"
+                                    primeIcon="pi-replay"
                                     translateKey="floorPlan.changeRotation"/>
 
                         <!-- DIMENSIONS -->
@@ -422,13 +422,13 @@
                                 <div class="d-flex w-100 justify-content-center gap-2">
                                     <button-box [links]="['../', 'participations', stand.participation.id, 'view']"
                                                 [modeLink]="true"
-                                                faIcon="link"
+                                                primeIcon="pi-link"
                                                 translateKey="common.view"
                                                 type="warning"/>
 
                                     <button-box [links]="['../', 'participations', stand.participation.id, 'billing']"
                                                 [modeLink]="true"
-                                                faIcon="link"
+                                                primeIcon="pi-link"
                                                 translateKey="participation.billing.title"
                                                 type="warning"/>
                                 </div>

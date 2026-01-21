@@ -13,26 +13,24 @@
             <hr/>
 
             <div class="d-flex justify-content-between mt-4">
-        <span>
-          <button-box (clickedEvent)="previousState()"
-                      [isDisabled]="isLoading()"
-                      [showText]="false"
-                      faIcon="arrow-left" translateKey="common.back"/>
-          </span>
-
                 <span>
-            @if (isReadOnly) {
-                <button-box (clickedEvent)="activateEditMode()"
-                            [isDisabled]="isLoading()"
-                            [showText]="false"
-                            faIcon="pencil-alt" translateKey="common.edit"/>
-            }
+                  <button-box (clickedEvent)="previousState()"
+                              [isDisabled]="isLoading()"
+                              [showText]="false"
+                              primeIcon="pi-arrow-left" translateKey="common.back"/>
+                    @if (isReadOnly) {
+                        <button-box (clickedEvent)="activateEditMode()"
+                                    [isDisabled]="isLoading()"
+                                    [showText]="false"
+                                    primeIcon="pi-pencil" translateKey="common.edit"/>
+                    }
 
                     @if (user?.id && !isReadOnly) {
                         <button-box (clickedEvent)="activateReadOnlyMode()"
                                     [isDisabled]="isLoading()"
                                     [showText]="false"
-                                    faIcon="ban" translateKey="common.cancel"
+                                    primeIcon="pi-ban"
+                                    translateKey="common.cancel"
                                     type="secondary"/>
                     }
 
@@ -40,9 +38,10 @@
                         <button-box (clickedEvent)="save()"
                                     [isDisabled]="editForm.invalid || isLoading()"
                                     [showText]="false"
-                                    faIcon="floppy-disk" translateKey="common.save"/>
+                                    primeIcon="pi-save"
+                                    translateKey="common.save"/>
                     }
-          </span>
+                  </span>
             </div>
         </h2>
 

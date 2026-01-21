@@ -6,19 +6,18 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="arrow-left"
+                    primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
         <button-box (clickedEvent)="load()"
-                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="sync"
                     translateKey="common.refresh"/>
         <button-box [isDisabled]="isLoading"
                     [links]="['./new']"
                     [modeLink]="true"
                     [showText]="false"
-                    faIcon="plus"
+                    primeIcon="pi-plus"
                     translateKey="common.create"
                     type="success"/>
     </div>
@@ -101,7 +100,7 @@
                                 <div class="btn-group">
                                     <button-box (clickedEvent)="delete($event, salon)"
                                                 [showText]="false"
-                                                faIcon="times"
+                                                primeIcon="pi-times"
                                                 translateKey="common.delete"
                                                 type="danger"/>
                                 </div>

@@ -7,16 +7,9 @@
               [severity]="colorButton"
               [badge]="badge"
               [badgeSeverity]="badgeSeverity"
-              size="small">
-        @if (faIcon) {
-            <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
-        } @else if (primeIcon) {
-            <i [class]="'pi ' + primeIcon"></i>
-        }
-        @if (showText) {
-            <span class="text-uppercase" jhiTranslate="{{ translateKey }}">Edit</span>
-        }
-    </p-button>
+              [icon]="primeIcon ? ('pi ' + primeIcon) : undefined"
+              [label]="showText ? (translateKey | translate) : undefined"
+              size="small"/>
 } @else {
     <!-- Version bouton normale -->
     <p-button (onClick)="onClick($event)"
@@ -25,14 +18,8 @@
               [disabled]="isDisabled"
               [severity]="colorButton"
               [badge]="badge"
+              [label]="showText ? (translateKey | translate) : undefined"
               [icon]="primeIcon ? ('pi ' + primeIcon) : undefined"
               [badgeSeverity]="badgeSeverity"
-              size="small">
-        @if (faIcon) {
-            <fa-icon [animation]="faIconAnimation" [icon]="faIcon"></fa-icon>
-        }
-        @if (showText) {
-            <span class="text-uppercase" jhiTranslate="{{ translateKey }}">Edit</span>
-        }
-    </p-button>
+              size="small"/>
 }

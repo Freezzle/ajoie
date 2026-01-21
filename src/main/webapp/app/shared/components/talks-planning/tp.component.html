@@ -18,7 +18,7 @@
                         @if (editionMode() && day?.id === currentDay.id) {
                             <menu-box [appendTo]="'body'"
                                       [items]="dayMenus().get(currentDay.id)!"
-                                      buttonIcon="gear"
+                                      buttonIcon="pi-cog"
                                       type="secondary"/>
                         }
                     </div>
@@ -29,7 +29,7 @@
                 <p-tab [value]="'__ADD__'">
                     <button-box (clickedEvent)="addNewDay()"
                                 [showText]="!daysList.length"
-                                faIcon="plus"
+                                primeIcon="pi-plus"
                                 translateKey="common.create"
                                 type="secondary"/>
                 </p-tab>

@@ -18,6 +18,8 @@ export class LinkBoxComponent {
     @Input()
     faIconAnimation: 'spin' | undefined = undefined;
     @Input()
+    primeIcon: string | null = null;
+    @Input()
     type: 'primary' | 'secondary' | 'warning' | 'danger' | 'success' = 'primary';
     @Input()
     isDisabled: boolean = false;

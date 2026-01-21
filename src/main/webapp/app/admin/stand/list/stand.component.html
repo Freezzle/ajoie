@@ -6,30 +6,28 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="arrow-left"
+                    primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
         @if (standardView) {
             <button-box (clickedEvent)="changeTechnicalView()"
                         [isDisabled]="isLoading"
                         translateKey="stand.viewClipboard"/>
             <button-box (clickedEvent)="refresh()"
-                        [faIconAnimation]="isLoading ? 'spin' : undefined"
+                        [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
                         [isDisabled]="isLoading"
                         [showText]="false"
-                        faIcon="sync"
                         translateKey="common.refresh"/>
             <button-box [isDisabled]="isLoading"
                         [links]="['./new']"
                         [modeLink]="true"
                         [showText]="false"
-                        faIcon="plus"
+                        primeIcon="pi-plus"
                         translateKey="common.create"
                         type="success"/>
         } @else {
             <button-box (clickedEvent)="standardView = true"
-                        [faIconAnimation]="isLoading ? 'spin' : undefined"
+                        [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
                         [isDisabled]="isLoading"
-                        faIcon="sync"
                         translateKey="stand.viewStandard"/>
         }
     </div>
@@ -92,15 +90,13 @@
                                             <p-multiselect (ngModelChange)="filter($event)" [ngModel]="value"
                                                            [options]="statusValues" [panelStyle]="{ minWidth: '16rem' }"
                                                            style="min-width: 14rem">
-                                                <ng-template #item let-option>
-                                                    <div class="flex items-center gap-2">
-                                                        <fa-icon [class]="option | colorStatus"
-                                                                 [icon]="option | status"
-                                                                 [title]="'stand.status.list.' + option | translate"></fa-icon>
-                                                        <span>{{ 'stand.status.list.' + option | translate }}</span>
-                                                    </div>
-                                                </ng-template>
-                                            </p-multiselect>
+                                                    <ng-template #item let-option>
+                                                        <div class="flex items-center gap-2">
+                                                            <i [class]="'pi ' + (option | status) + ' ' + (option | colorStatus)"></i>
+                                                            <span>{{ 'stand.status.list.' + option | translate }}</span>
+                                                        </div>
+                                                    </ng-template>
+                                                </p-multiselect>
                                         </ng-template>
                                     </p-columnFilter>
                                 </th>
@@ -134,32 +130,29 @@
                                 </td>
                                 <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate-medium">
                                     @if (stand.participation.crushOfHeart) {
-                                        <fa-icon class="text-danger" icon="heart"></fa-icon>
+                                        <i class="pi pi-heart text-danger"></i>
                                     }
                                     @if (stand.participation.guestOfHonor) {
-                                        <fa-icon class="golden-icon" icon="star"></fa-icon>
+                                        <i class="pi pi-star golden-icon"></i>
                                     }
                                     @if (stand.shared) {
-                                        <fa-icon class="text-primary" icon="people-arrows"></fa-icon>
+                                        <i class="pi pi-arrow-right-arrow-left text-primary"></i>
                                     }
                                     @if (stand.extraInformation) {
-                                        <fa-icon [title]="stand.extraInformation"
-                                                 class="text-warning"
-                                                 icon="note-sticky"/>
+                                        <i [title]="stand.extraInformation"
+                                           class="pi pi-sticky-note text-warning"></i>
                                     }
                                 </td>
                                 <td [routerLink]="['./', stand.id, 'view']" class="clickable">
-                                    <fa-icon [class]="stand.status | colorStatus"
-                                             [icon]="stand.status | status"
-                                             [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
+                                    <i [class]="'pi ' + (stand.status | status) + ' ' + (stand.status | colorStatus)"></i>
                                 </td>
                                 <td class="text-end">
                                     <div class="btn-group">
-                                        <button-box (clickedEvent)="delete($event, stand)"
-                                                    [showText]="false"
-                                                    faIcon="times"
-                                                    translateKey="common.delete"
-                                                    type="danger"/>
+                        <button-box (clickedEvent)="delete($event, stand)"
+                                    [showText]="false"
+                                    primeIcon="pi-times"
+                                    translateKey="common.delete"
+                                    type="danger"/>
                                     </div>
                                 </td>
                             </tr>

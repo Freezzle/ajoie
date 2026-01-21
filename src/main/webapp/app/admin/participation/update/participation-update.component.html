@@ -10,13 +10,13 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="arrow-left"
+                    primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
         @if (isReadOnly) {
             <button-box (clickedEvent)="edit()"
                         [isDisabled]="isLoading"
                         [showText]="false"
-                        faIcon="pencil-alt"
+                        primeIcon="pi-pencil"
                         translateKey="common.edit"/>
         }
 
@@ -24,7 +24,7 @@
             <button-box (clickedEvent)="cancel()"
                         [isDisabled]="isLoading"
                         [showText]="false"
-                        faIcon="ban"
+                        primeIcon="pi-ban"
                         translateKey="common.cancel"
                         type="secondary"/>
         }
@@ -34,7 +34,7 @@
                         [isDisabled]="editForm.invalid || isLoading"
                         [isSubmit]="true"
                         [showText]="false"
-                        faIcon="floppy-disk"
+                        primeIcon="pi-save"
                         translateKey="common.save"/>
         }
     </div>
@@ -58,6 +58,7 @@
                                  class="clickable"
                                  icon="clock-rotate-left"></fa-icon>
                         <menu-box [items]="menuCache"
+                                  buttonIcon="pi-cog"
                                   buttonTranslateKey="common.actions"/>
                     </div>
                 }
@@ -135,7 +136,7 @@
                                     [links]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']"
                                     [showText]="false"
                                     class="align-content-center"
-                                    faIcon="link"
+                                    primeIcon="pi-link"
                                     style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
                         }
                     </div>
@@ -280,12 +281,12 @@
                                                 </td>
                                                 <td class="text-end">
                                                     <div class="btn-group">
-                                                        <button-box
-                                                                (clickedEvent)="deleteEntity($event, stand, 'stand')"
-                                                                [showText]="false"
-                                                                faIcon="times"
-                                                                translateKey="common.delete"
-                                                                type="danger"/>
+                                        <button-box
+                                                (clickedEvent)="deleteEntity($event, stand, 'stand')"
+                                                [showText]="false"
+                                                primeIcon="pi-times"
+                                                translateKey="common.delete"
+                                                type="danger"/>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -300,7 +301,7 @@
                                                 <td colspan="4">
                                                     <button-box [links]="['../stands/new']"
                                                                 [modeLink]="true"
-                                                                faIcon="plus"
+                                                                primeIcon="pi-plus"
                                                                 translateKey="participation.newStand"
                                                                 type="success"/>
                                                 </td>
@@ -343,7 +344,7 @@
                                                         <button-box
                                                                 (clickedEvent)="deleteEntity($event, conference, 'conference')"
                                                                 [showText]="false"
-                                                                faIcon="times"
+                                                                primeIcon="pi-plus"
                                                                 translateKey="common.delete"
                                                                 type="danger"/>
                                                     </div>
@@ -360,7 +361,7 @@
                                                 <td colspan="3">
                                                     <button-box [links]="['../conferences/new']"
                                                                 [modeLink]="true"
-                                                                faIcon="plus"
+                                                                primeIcon="pi-plus"
                                                                 translateKey="participation.newConference"
                                                                 type="success"/>
                                                 </td>
@@ -400,12 +401,12 @@
                                                 </td>
                                                 <td class="text-end">
                                                     <div class="btn-group">
-                                                        <button-box
-                                                                (clickedEvent)="deleteEntity($event, workshop, 'workshop')"
-                                                                [showText]="false"
-                                                                faIcon="times"
-                                                                translateKey="common.delete"
-                                                                type="danger"/>
+                                        <button-box
+                                                (clickedEvent)="deleteEntity($event, workshop, 'workshop')"
+                                                [showText]="false"
+                                                primeIcon="pi-times"
+                                                translateKey="common.delete"
+                                                type="danger"/>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -420,7 +421,7 @@
                                                 <td colspan="3">
                                                     <button-box [links]="['../workshops/new']"
                                                                 [modeLink]="true"
-                                                                faIcon="plus"
+                                                                primeIcon="pi-plus"
                                                                 translateKey="participation.newWorkshop"
                                                                 type="success"/>
                                                 </td>

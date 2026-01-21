@@ -7,14 +7,14 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading()"
                     [showText]="false"
-                    faIcon="arrow-left"
+                    primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
 
         @if (isReadOnly()) {
             <button-box (clickedEvent)="activateEditMode()"
                         [isDisabled]="isLoading()"
                         [showText]="false"
-                        faIcon="pencil-alt"
+                        primeIcon="pi-pencil"
                         translateKey="common.edit"/>
         }
 
@@ -22,14 +22,14 @@
             <button-box (clickedEvent)="activateReadOnlyMode()"
                         [isDisabled]="isLoading()"
                         [showText]="false"
-                        faIcon="ban"
+                        primeIcon="pi-ban"
                         translateKey="common.cancel"
                         type="secondary"/>
             <button-box (clickedEvent)="save()"
                         [isDisabled]="isLoading()"
                         [isSubmit]="true"
                         [showText]="false"
-                        faIcon="floppy-disk"
+                        primeIcon="pi-save"
                         translateKey="common.save"/>
         }
     </div>
@@ -60,7 +60,7 @@
                                     @if (!isReadOnly() && day?.id === sd.id) {
                                         <menu-box [appendTo]="'body'"
                                                   [items]="dayMenus().get(sd.id)!"
-                                                  buttonIcon="gear"
+                                                  buttonIcon="pi-cog"
                                                   type="secondary"/>
                                     }
                                 </div>
@@ -71,7 +71,7 @@
                             <p-tab [value]="'__ADD__'">
                                 <button-box (clickedEvent)="addNewDay()"
                                             [showText]="!planning().days.length"
-                                            faIcon="plus"
+                                            primeIcon="pi-plus"
                                             translateKey="common.create"
                                             type="secondary"/>
                             </p-tab>

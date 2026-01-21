@@ -11,19 +11,18 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading()"
                     [showText]="false"
-                    faIcon="arrow-left" translateKey="common.back"/>
+                    primeIcon="pi-arrow-left" translateKey="common.back"/>
       </span>
 
             <span>
         <button-box (clickedEvent)="load()"
-                    [faIconAnimation]="isLoading() ? 'spin' : undefined"
+                    [primeIcon]="isLoading() ? 'pi-spin' : 'pi-sync'"
                     [isDisabled]="isLoading()"
-                    faIcon="sync"
                     translateKey="common.refresh"/>
 
         <link-box [isDisabled]="isLoading()"
                   [links]="['./new']"
-                  [showText]="false" faIcon="plus"
+                  [showText]="false" primeIcon="pi-plus"
                   translateKey="common.create"
                   type="success"/>
       </span>

@@ -10,7 +10,7 @@ export class NavigationStateService {
     readonly salonId = computed(() => this._salon()?.id ?? null);
 
     hideSensibleInformation = signal<boolean>(false);
-    sidebarCollapsed = signal<boolean>(true);
+    sidebarCollapsed = signal<boolean>(window.innerWidth <= 768);
 
     reset(): void {
         this._salon.set(null);

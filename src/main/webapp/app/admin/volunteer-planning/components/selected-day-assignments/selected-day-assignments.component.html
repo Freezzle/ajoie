@@ -12,7 +12,7 @@
             <td class="text-end">
                 <button-box (clickedEvent)="unassign(v.id)"
                             [showText]="false"
-                            faIcon="times"
+                            primeIcon="pi-times"
                             translateKey="common.delete"
                             type="danger"/>
             </td>
@@ -35,7 +35,7 @@
             <td class="text-end">
                 <button-box (clickedEvent)="assignSelected()"
                             [showText]="false"
-                            faIcon="plus"
+                            primeIcon="pi-plus"
                             translateKey="common.create"
                             [isDisabled]="selectedToAssign().length === 0"
                             type="success"/>

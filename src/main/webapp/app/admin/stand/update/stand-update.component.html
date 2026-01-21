@@ -10,13 +10,13 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="arrow-left"
+                    primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
         @if (isReadOnly) {
             <button-box (clickedEvent)="edit()"
                         [isDisabled]="isLoading"
                         [showText]="false"
-                        faIcon="pencil-alt"
+                        primeIcon="pi-pencil"
                         translateKey="common.edit"/>
         }
 
@@ -24,7 +24,7 @@
             <button-box (clickedEvent)="cancel()"
                         [isDisabled]="isLoading"
                         [showText]="false"
-                        faIcon="ban"
+                        primeIcon="pi-ban"
                         translateKey="common.cancel"
                         type="secondary"/>
         }
@@ -34,7 +34,7 @@
                         [isDisabled]="editForm.invalid || isLoading"
                         [isSubmit]="true"
                         [showText]="false"
-                        faIcon="floppy-disk"
+                        primeIcon="pi-save"
                         translateKey="common.save"/>
         }
     </div>
@@ -135,7 +135,7 @@
                         <link-box [links]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '','view']"
                                   [showText]="false"
                                   class="align-content-center"
-                                  faIcon="link"
+                                  primeIcon="pi-link"
                                   style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
                     }
                 </div>

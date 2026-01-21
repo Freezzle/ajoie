@@ -6,19 +6,18 @@
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="arrow-left"
+                    primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
         <button-box (clickedEvent)="refresh()"
-                    [faIconAnimation]="isLoading ? 'spin' : undefined"
+                    [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
                     [isDisabled]="isLoading"
                     [showText]="false"
-                    faIcon="sync"
                     translateKey="common.refresh"/>
         <button-box [isDisabled]="isLoading"
                     [links]="['./new']"
                     [modeLink]="true"
                     [showText]="false"
-                    faIcon="plus"
+                    primeIcon="pi-plus"
                     translateKey="common.create"
                     type="success"/>
     </div>
@@ -115,15 +114,13 @@
                                 }
                             </td>
                             <td [routerLink]="['./', workshop.id, 'view']" class="clickable">
-                                <fa-icon [class]="workshop.status | colorStatus"
-                                         [icon]="workshop.status | status"
-                                         [title]="'workshop.status.list.' + workshop.status | translate"></fa-icon>
+                                <i [class]="'pi ' + (workshop.status | status) + ' ' + (workshop.status | colorStatus)"></i>
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     <button-box (clickedEvent)="delete($event, workshop)"
                                                 [showText]="false"
-                                                faIcon="times"
+                                                primeIcon="pi-times"
                                                 translateKey="common.delete"
                                                 type="danger"/>
                                 </div>
