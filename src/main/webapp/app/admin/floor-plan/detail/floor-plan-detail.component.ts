@@ -13,7 +13,7 @@ import {
 import {CdkDragDrop, CdkDragMove, CdkDropList} from '@angular/cdk/drag-drop';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {distinctUntilChanged, filter, finalize, map, startWith} from 'rxjs/operators';
+import {distinctUntilChanged, finalize, map, startWith} from 'rxjs/operators';
 import {combineLatest, forkJoin, fromEvent, Observable} from 'rxjs';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 
@@ -41,12 +41,6 @@ import {ISalon} from '../../salon/model/salon.interface';
 import {Status} from '../../enumerations/status.model';
 import {v4} from 'uuid';
 
-import {ITEM_ADDED_EVENT, ITEM_DELETED_EVENT, ITEM_UPDATED_EVENT} from '../../../config/navigation.constants';
-import {RenamePlanDialogComponent} from '../rename-plan/rename-plan-dialog.component';
-import {AddPlanDialogComponent} from '../add-plan/add-plan-dialog.component';
-import {DeleteDialogComponent} from '../../../shared/delete-dialog/delete-dialog.component';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {Toast} from 'primeng/toast';
 import {ContextMenu} from 'primeng/contextmenu';
@@ -55,6 +49,7 @@ import {Tag} from 'primeng/tag';
 import {Divider} from 'primeng/divider';
 import {Textarea} from 'primeng/textarea';
 import {IftaLabel} from 'primeng/iftalabel';
+import {TabsModule} from 'primeng/tabs';
 
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertComponent} from '../../../shared/alert/alert.component';
@@ -73,6 +68,7 @@ import {Category, formatterCategory} from '../../enumerations/category.model';
 import {removeAccents} from '../../../shared/utils/string.util';
 import {selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 
 @Component({
                selector: 'floor-plan',
@@ -103,7 +99,9 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    DialogBoxComponent,
                    Divider,
                    SelectBoxComponent,
-                   TextBoxComponent
+                   TextBoxComponent,
+                   TabsModule,
+                   MenuBoxComponent
                ]
            })
 export class FloorPlanDetailComponent {
@@ -115,7 +113,6 @@ export class FloorPlanDetailComponent {
 
     // ---- services / infra
     private readonly destroyRef = inject(DestroyRef);
-    private readonly modalService = inject(NgbModal);
     private readonly salonService = inject(SalonService);
     private readonly standService = inject(StandService);
     private readonly floorPlanService = inject(FloorPlanService);
@@ -132,6 +129,7 @@ export class FloorPlanDetailComponent {
     // ---- UI/state (signals)
     readonly isLoading = signal(false);
     readonly isReadOnly = signal(true);
+    readonly dialogActionPending = signal(false);
 
     readonly displayFullname = signal(false);
     readonly displayTechnical = signal(false);
@@ -149,6 +147,8 @@ export class FloorPlanDetailComponent {
     readonly standDialogVisible = model(false);
     readonly prereservedDialogVisible = model(false);
     readonly renameDialogVisible = model(false);
+    readonly deleteDialogVisible = signal(false);
+    readonly addDialogVisible = signal(false);
 
     readonly selectStandDialog = signal<GridCell | null>(null);
 
@@ -170,6 +170,12 @@ export class FloorPlanDetailComponent {
     readonly automaticallyIncrementNumber = signal(true);
     readonly renamePlanName = new FormControl<string>('');
 
+    // Add plan form controls
+    readonly addPlanName = new FormControl<string>('');
+    readonly addPlanWidth = new FormControl<number>(30);
+    readonly addPlanHeight = new FormControl<number>(15);
+    readonly addPlanSpacing = new FormControl<number>(0.5);
+
     // ---- derived (computed)
     readonly activePlan = computed(() => this.floorPlans()[this.activeIndex()] ?? null);
     readonly activeData = computed(() => this.activePlan()?.data ?? null);
@@ -178,6 +184,16 @@ export class FloorPlanDetailComponent {
     readonly sizeRealCell = computed(() => {
         const d = this.activeData();
         return d ? 1 / d.spacingMeter : 0;
+    });
+
+    // context menu items per plan (fix PrimeNG 20 bug)
+    readonly planContextMenus = computed(() => {
+        const plans = this.floorPlans();
+        const menuMap = new Map<number, MenuItem[]>();
+        for (let idx = 0; idx < plans.length; idx++) {
+            menuMap.set(idx, this.buildContextMenuItemsForPlanIndex(idx));
+        }
+        return menuMap;
     });
 
     readonly nbWidthTiles = computed(() => {
@@ -431,15 +447,6 @@ export class FloorPlanDetailComponent {
         this.showSearchStands.set(false);
     }
 
-    // ---------------------------------------------------------------------------
-    // plan tabs
-    changePlanView(index: number): void {
-        if (index === this.activeIndex()) {
-            return;
-        }
-        this.activeIndex.set(index);
-    }
-
     canMoveFloorPlan(mode: 'right' | 'left'): boolean {
         const plans = this.floorPlans();
         const active = this.activePlan();
@@ -476,37 +483,73 @@ export class FloorPlanDetailComponent {
     }
 
     openAddDialog(): void {
-        const modalRef = this.modalService.open(AddPlanDialogComponent, {size: 'lg', backdrop: 'static'});
+        this.addPlanName.reset('');
+        this.addPlanWidth.reset(30);
+        this.addPlanHeight.reset(15);
+        this.addPlanSpacing.reset(0.5);
+        this.addDialogVisible.set(true);
+    }
 
-        modalRef.closed
-                .pipe(filter(r => r.event === ITEM_ADDED_EVENT), takeUntilDestroyed(this.destroyRef))
-                .subscribe(r => {
-                    const info = r.data as AddPlanInfo;
-                    const spacingMultiply = 1 / info.spacingMeter;
+    onAddPlanConfirm(formData: any): void {
+        if (this.dialogActionPending()) {
+            return; // Prevent multiple clicks
+        }
 
-                    const newPlan: IFloorPlan = {
-                        id: null,
-                        position: this.floorPlans().length + 1,
-                        name: info.name,
-                        data: {
-                            cells: Array.from({length: info.heightMeter * spacingMultiply}, () =>
-                                Array.from({length: info.widthMeter * spacingMultiply}, () => ({
-                                    id: null,
-                                    firstCell: false,
-                                    colorHighlight: this.DEFAULT_HIGHLIGHT,
-                                    dimension: null,
-                                    unusable: false
-                                }) as GridCell)
-                            ),
-                            widthMeter: info.widthMeter,
-                            heightMeter: info.heightMeter,
-                            spacingMeter: info.spacingMeter
-                        } as IFloorPlanData
-                    };
+        const name = this.addPlanName.value?.trim();
+        const width = this.addPlanWidth.value;
+        const height = this.addPlanHeight.value;
+        const spacing = this.addPlanSpacing.value;
 
-                    this.floorPlans.set([...this.floorPlans(), newPlan]);
-                    this.activeIndex.set(this.floorPlans().length - 1);
-                });
+        if (!name || !width || !height || !spacing || width <= 0 || height <= 0 || spacing <= 0) {
+            return; // Validation error
+        }
+
+        this.dialogActionPending.set(true);
+
+        try {
+            const info: AddPlanInfo = {
+                name,
+                widthMeter: width,
+                heightMeter: height,
+                spacingMeter: spacing
+            };
+
+            const spacingMultiply = 1 / info.spacingMeter;
+
+            const newPlan: IFloorPlan = {
+                id: null,
+                position: this.floorPlans().length + 1,
+                name: info.name,
+                data: {
+                    cells: Array.from({length: info.heightMeter * spacingMultiply}, () =>
+                        Array.from({length: info.widthMeter * spacingMultiply}, () => ({
+                            id: null,
+                            firstCell: false,
+                            colorHighlight: this.DEFAULT_HIGHLIGHT,
+                            dimension: null,
+                            unusable: false
+                        }) as GridCell)
+                    ),
+                    widthMeter: info.widthMeter,
+                    heightMeter: info.heightMeter,
+                    spacingMeter: info.spacingMeter
+                } as IFloorPlanData
+            };
+
+            this.floorPlans.set([...this.floorPlans(), newPlan]);
+            this.activeIndex.set(this.floorPlans().length - 1);
+            this.addDialogVisible.set(false);
+        } finally {
+            this.dialogActionPending.set(false);
+        }
+    }
+
+    onAddPlanCancel(): void {
+        this.addDialogVisible.set(false);
+        this.addPlanName.reset('');
+        this.addPlanWidth.reset(30);
+        this.addPlanHeight.reset(15);
+        this.addPlanSpacing.reset(0.5);
     }
 
     rename(): void {
@@ -525,8 +568,12 @@ export class FloorPlanDetailComponent {
     }
 
     confirmRenamePlan(): void {
+        if (this.dialogActionPending()) {
+            return; // Prevent multiple clicks
+        }
+
         const newName = this.renamePlanName.value;
-        if (!newName || !newName.trim()) {
+        if (!newName?.trim()) {
             return;
         }
 
@@ -535,10 +582,16 @@ export class FloorPlanDetailComponent {
             return;
         }
 
-        plan.name = newName;
-        this.floorPlans.set([...this.floorPlans()]);
-        this.renameDialogVisible.set(false);
-        this.renamePlanName.reset();
+        this.dialogActionPending.set(true);
+
+        try {
+            plan.name = newName;
+            this.floorPlans.set([...this.floorPlans()]);
+            this.renameDialogVisible.set(false);
+            this.renamePlanName.reset();
+        } finally {
+            this.dialogActionPending.set(false);
+        }
     }
 
     delete(): void {
@@ -546,30 +599,92 @@ export class FloorPlanDetailComponent {
         if (!plan) {
             return;
         }
+        this.deleteDialogVisible.set(true);
+    }
 
-        const modalRef = this.modalService.open(DeleteDialogComponent, {size: 'lg', backdrop: 'static'});
-        modalRef.componentInstance.translateKey = 'floorPlan.delete.question';
-        modalRef.componentInstance.translateValues = {floorName: plan.name};
+    confirmDeletePlan(): void {
+        if (this.dialogActionPending()) {
+            return; // Prevent multiple clicks
+        }
 
-        modalRef.closed
-                .pipe(filter(reason => reason === ITEM_DELETED_EVENT), takeUntilDestroyed(this.destroyRef))
-                .subscribe(() => {
-                    const salonId = this.salon()?.id;
-                    if (!salonId) {
-                        return;
-                    }
+        const plan = this.activePlan();
+        const salonId = this.salon()?.id;
+        if (!salonId || !plan) {
+            return;
+        }
 
-                    if (plan.id) {
-                        this.floorPlansToRemove.set([...this.floorPlansToRemove(), plan.id]);
-                    }
+        this.dialogActionPending.set(true);
 
-                    const next = this.floorPlans().filter((_, i) => i !== this.activeIndex());
-                    // renumber positions
-                    next.sort((a, b) => a.position - b.position).forEach((fp, i) => (fp.position = i + 1));
+        try {
+            if (plan.id) {
+                this.floorPlansToRemove.set([...this.floorPlansToRemove(), plan.id]);
+            }
 
-                    this.floorPlans.set(next);
-                    this.activeIndex.set(Math.max(0, this.activeIndex() - 1));
-                });
+            const next = this.floorPlans().filter((_, i) => i !== this.activeIndex());
+            // renumber positions
+            next.sort((a, b) => a.position - b.position).forEach((fp, i) => (fp.position = i + 1));
+
+            this.floorPlans.set(next);
+            this.activeIndex.set(Math.max(0, this.activeIndex() - 1));
+            this.deleteDialogVisible.set(false);
+        } finally {
+            this.dialogActionPending.set(false);
+        }
+    }
+
+    onDeletePlanCancel(): void {
+        this.deleteDialogVisible.set(false);
+    }
+
+    // Build context menu items for a given plan index
+    private buildContextMenuItemsForPlanIndex(planIndex: number): MenuItem[] {
+        const items: MenuItem[] = [];
+
+        items.push({
+                       label: 'Configuration',
+                       icon: 'pi pi-pencil',
+                       command: () => {
+                           this.activeIndex.set(planIndex);
+                           this.rename();
+                       }
+                   });
+
+        const canMoveRight = planIndex < this.floorPlans().length - 1;
+        const canMoveLeft = planIndex > 0;
+
+        if (canMoveRight) {
+            items.push({
+                           label: 'Déplacer à droite',
+                           icon: 'pi pi-arrow-right',
+                           command: () => {
+                               this.activeIndex.set(planIndex);
+                               this.movePositionFloorPlan('right');
+                           }
+                       });
+        }
+
+        if (canMoveLeft) {
+            items.push({
+                           label: 'Déplacer à gauche',
+                           icon: 'pi pi-arrow-left',
+                           command: () => {
+                               this.activeIndex.set(planIndex);
+                               this.movePositionFloorPlan('left');
+                           }
+                       });
+        }
+
+        items.push({
+                       label: 'Supprimer',
+                       icon: 'pi pi-trash',
+                       styleClass: 'p-menuitem-danger',
+                       command: () => {
+                           this.activeIndex.set(planIndex);
+                           this.delete();
+                       }
+                   });
+
+        return items;
     }
 
     // ---------------------------------------------------------------------------
@@ -827,7 +942,7 @@ export class FloorPlanDetailComponent {
 
         clearTimeout(this.clickTimer);
         this.clickTimer = setTimeout(() => {
-            this.isReadOnly() || !this.isNumberAttribution()
+            (this.isReadOnly() || !this.isNumberAttribution())
             ? this.openStandDialog(cell)
             : this.onClickNumberAttribution(cell);
         }, this.clickDelay);
@@ -1036,9 +1151,9 @@ export class FloorPlanDetailComponent {
         this.assignedStandDimensions.set(this.assignedStandDimensions().filter(c => c.stand!.id !== standId));
 
         this.unassignedStandDimensions.set([
-                                              ...this.unassignedStandDimensions(),
-                                              convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand)
-                                          ]);
+                                               ...this.unassignedStandDimensions(),
+                                               convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand)
+                                           ]);
 
         // index search
         this.standIndex.delete(standId);
