@@ -5,6 +5,7 @@
   overflow: hidden;
   max-width: 1786px;
   margin: 0 auto;
+  border: 1px solid var(--app-border) !important;
 
   app-topbar {
     flex-shrink: 0;
