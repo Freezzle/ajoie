@@ -9,21 +9,8 @@
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
         @if (standardView) {
-            <button-box (clickedEvent)="changeTechnicalView()"
-                        [isDisabled]="isLoading"
-                        translateKey="stand.viewClipboard"/>
-            <button-box (clickedEvent)="refresh()"
-                        [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
-                        [isDisabled]="isLoading"
-                        [showText]="false"
-                        translateKey="common.refresh"/>
-            <button-box [isDisabled]="isLoading"
-                        [links]="['./new']"
-                        [modeLink]="true"
-                        [showText]="false"
-                        primeIcon="pi-plus"
-                        translateKey="common.create"
-                        type="success"/>
+            <split-menu-box [items]="actionMenuItems"
+                            [buttonDisabled]="isLoading"/>
         } @else {
             <button-box (clickedEvent)="standardView = true"
                         [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"

@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
 
 import SharedModule from 'app/shared/shared.module';
@@ -25,6 +25,9 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
 import {MultiSelect} from 'primeng/multiselect';
+import {SplitMenuBoxComponent} from '../../../shared/components/split-menu-box/split-menu-box.component';
+import {TranslateService} from '@ngx-translate/core';
+import {MenuItem} from 'primeng/api';
 
 @Component({
                selector: 'app-conference',
@@ -47,7 +50,8 @@ import {MultiSelect} from 'primeng/multiselect';
                    IconField,
                    InputIcon,
                    InputText,
-                   MultiSelect
+                   MultiSelect,
+                   SplitMenuBoxComponent
                ]
            })
 export class ConferenceComponent implements OnInit {
@@ -56,10 +60,10 @@ export class ConferenceComponent implements OnInit {
     params!: ParamMap;
     statusValues = Object.keys(Status);
     protected activatedRoute = inject(ActivatedRoute);
+    protected router = inject(Router);
+    protected translateService = inject(TranslateService);
     protected conferenceService = inject(ConferenceService);
-    protected conferenceFormService = inject(ConferenceFormService);
     protected confirmDialogService = inject(ConfirmDialogService);
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -107,6 +111,19 @@ export class ConferenceComponent implements OnInit {
     refresh(): void {
         this.load();
     }
+
+    readonly actionMenuItems: MenuItem[] = [
+        {
+            label: this.translateService.instant('common.refresh') as string,
+            icon: 'pi pi-sync',
+            command: () => this.refresh()
+        },
+        {
+            label: this.translateService.instant('common.create') as string,
+            icon: 'pi pi-plus',
+            command: () => this.router.navigate(['./new'], {relativeTo: this.activatedRoute})
+        }
+    ];
 
     previousState(): void {
         window.history.back();

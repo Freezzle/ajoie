@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
 
 import SharedModule from 'app/shared/shared.module';
@@ -27,6 +27,9 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
 import {MultiSelect} from 'primeng/multiselect';
+import {SplitMenuBoxComponent} from '../../../shared/components/split-menu-box/split-menu-box.component';
+import {TranslateService} from '@ngx-translate/core';
+import {MenuItem} from 'primeng/api';
 
 @Component({
                selector: 'app-participation',
@@ -52,7 +55,8 @@ import {MultiSelect} from 'primeng/multiselect';
                    IconField,
                    InputIcon,
                    InputText,
-                   MultiSelect
+                   MultiSelect,
+                   SplitMenuBoxComponent
                ]
            })
 export class ParticipationComponent implements OnInit {
@@ -67,7 +71,9 @@ export class ParticipationComponent implements OnInit {
     protected confirmDialogService = inject(ConfirmDialogService);
     protected readonly navigationStateService = inject(NavigationStateService);
     private readonly participationService = inject(ParticipationService);
+    private readonly translateService = inject(TranslateService);
     private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
@@ -92,6 +98,19 @@ export class ParticipationComponent implements OnInit {
             tap(() => this.load()) // Recharge les données
         ).subscribe();
     }
+
+    readonly actionMenuItems: MenuItem[] = [
+        {
+            label: this.translateService.instant('common.refresh') as string,
+            icon: 'pi pi-sync',
+            command: () => this.refresh()
+        },
+        {
+            label: this.translateService.instant('common.create') as string,
+            icon: 'pi pi-plus',
+            command: () => this.router.navigate(['./new'], {relativeTo: this.activatedRoute})
+        }
+    ];
 
     load(): void {
         this.isLoading = true;

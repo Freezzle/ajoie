@@ -8,7 +8,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DEFAULT_SORT_DATA, SORT} from 'app/config/navigation.constants';
 import {getFirstExhibitorName, IExhibitor} from '../model/exhibitor.interface';
 import {ExhibitorService} from '../service/exhibitor.service';
-import {ExhibitorFormService} from '../service/exhibitor-form.service';
 import {finalize} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
@@ -23,6 +22,9 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
 import {copyToClipboard} from '../../../core/util/utils';
+import {MenuItem} from 'primeng/api';
+import {SplitMenuBoxComponent} from '../../../shared/components/split-menu-box/split-menu-box.component';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
                selector: 'app-exhibitor',
@@ -42,7 +44,8 @@ import {copyToClipboard} from '../../../core/util/utils';
                    CardComponent,
                    IconField,
                    InputIcon,
-                   InputText
+                   InputText,
+                   SplitMenuBoxComponent
                ]
            })
 export class ExhibitorComponent implements OnInit {
@@ -51,10 +54,31 @@ export class ExhibitorComponent implements OnInit {
     isLoading = false;
     exhibitors: IExhibitor[] = [];
     protected activatedRoute = inject(ActivatedRoute);
+    protected translateService = inject(TranslateService);
     protected sortService = inject(SortService);
     protected confirmDialogService = inject(ConfirmDialogService);
     protected exhibitorService = inject(ExhibitorService);
-    protected exhibitorFormService = inject(ExhibitorFormService);
+
+    // Menu items for split-menu-box
+    readonly actionMenuItems: MenuItem[] = [
+        {
+            label: this.translateService.instant('common.refresh') as string,
+            icon: 'pi pi-sync',
+            command: () => this.refresh()
+        },
+        {
+            label: this.translateService.instant('common.create') as string,
+            icon: 'pi pi-plus',
+            command: () => this.router.navigate(['./new'], {relativeTo: this.activatedRoute})
+        },
+        {
+            label: this.translateService.instant('exhibitor.copyNewsletter') as string,
+            icon: 'pi pi-copy',
+            command: () => this.clipboardNewsLetterExhibitors()
+        }
+    ];
+
+    // ...existing code...
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])

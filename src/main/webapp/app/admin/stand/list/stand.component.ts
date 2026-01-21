@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, ParamMap, RouterModule} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
 
 import SharedModule from 'app/shared/shared.module';
@@ -29,6 +29,9 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
 import {MultiSelect} from 'primeng/multiselect';
+import {MenuItem} from 'primeng/api';
+import {SplitMenuBoxComponent} from '../../../shared/components/split-menu-box/split-menu-box.component';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
                selector: 'app-stand',
@@ -53,7 +56,8 @@ import {MultiSelect} from 'primeng/multiselect';
                    IconField,
                    InputIcon,
                    InputText,
-                   MultiSelect
+                   MultiSelect,
+                   SplitMenuBoxComponent
                ]
            })
 export class StandComponent implements OnInit {
@@ -64,13 +68,33 @@ export class StandComponent implements OnInit {
     params!: ParamMap;
     protected standService = inject(StandService);
     protected activatedRoute = inject(ActivatedRoute);
+    protected router = inject(Router);
     protected confirmDialogService = inject(ConfirmDialogService);
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
+    protected translateService = inject(TranslateService);
     protected readonly getFirstExhibitorName = getFirstExhibitorName;
     protected readonly formatterCategory = formatterCategory;
     protected readonly formatterStatus = formatterStatus;
     protected readonly Status = Status;
     protected readonly Category = Category;
+
+    // Menu items for split-menu-box
+    readonly actionMenuItems: MenuItem[] = [
+        {
+            label: this.translateService.instant('common.refresh') as string,
+            icon: 'pi pi-sync',
+            command: () => this.refresh()
+        },
+        {
+            label: this.translateService.instant('common.create') as string,
+            icon: 'pi pi-plus',
+            command: () => this.router.navigate(['./new'], {relativeTo: this.activatedRoute})
+        },
+        {
+            label: this.translateService.instant('stand.viewClipboard') as string,
+            icon: 'pi pi-clipboard',
+            command: () => this.changeTechnicalView()
+        }
+    ];
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(

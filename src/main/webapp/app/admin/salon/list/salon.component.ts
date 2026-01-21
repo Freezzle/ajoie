@@ -20,6 +20,9 @@ import {CardComponent} from '../../../shared/components/card/card.component';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
+import {SplitMenuBoxComponent} from '../../../shared/components/split-menu-box/split-menu-box.component';
+import {TranslateService} from '@ngx-translate/core';
+import {MenuItem} from 'primeng/api';
 
 @Component({
                selector: 'app-salon',
@@ -39,7 +42,8 @@ import {InputText} from 'primeng/inputtext';
                    CardComponent,
                    IconField,
                    InputIcon,
-                   InputText
+                   InputText,
+                   SplitMenuBoxComponent
                ]
            })
 export class SalonComponent implements OnInit {
@@ -48,6 +52,7 @@ export class SalonComponent implements OnInit {
     isLoading = false;
     protected salonService = inject(SalonService);
     protected activatedRoute = inject(ActivatedRoute);
+    protected translateService = inject(TranslateService);
     protected confirmDialogService = inject(ConfirmDialogService);
 
     ngOnInit(): void {
@@ -74,6 +79,19 @@ export class SalonComponent implements OnInit {
                 this.salons = result.body ?? [];
             });
     }
+
+    readonly actionMenuItems: MenuItem[] = [
+        {
+            label: this.translateService.instant('common.refresh') as string,
+            icon: 'pi pi-sync',
+            command: () => this.load()
+        },
+        {
+            label: this.translateService.instant('common.create') as string,
+            icon: 'pi pi-plus',
+            command: () => this.router.navigate(['./new'], {relativeTo: this.activatedRoute})
+        }
+    ];
 
     previousState(): void {
         window.history.back();

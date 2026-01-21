@@ -1,0 +1,7 @@
+<p-split-button [appendTo]="appendTo"
+                [model]="dropdownItems()"
+                (onClick)="onPrimaryClick()"
+                [disabled]="buttonDisabled || !primaryAction()"
+                [severity]="convertSeverity(type)"
+                [label]="buttonLabel()"
+                [dropdownIcon]="buttonIcon"/>

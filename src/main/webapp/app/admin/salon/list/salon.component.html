@@ -8,18 +8,8 @@
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
-        <button-box (clickedEvent)="load()"
-                    [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
-                    [isDisabled]="isLoading"
-                    [showText]="false"
-                    translateKey="common.refresh"/>
-        <button-box [isDisabled]="isLoading"
-                    [links]="['./new']"
-                    [modeLink]="true"
-                    [showText]="false"
-                    primeIcon="pi-plus"
-                    translateKey="common.create"
-                    type="success"/>
+        <split-menu-box [items]="actionMenuItems"
+                        [buttonDisabled]="isLoading"/>
     </div>
     <app-alert-error></app-alert-error>
     <app-alert></app-alert>
