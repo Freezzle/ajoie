@@ -34,7 +34,7 @@
                 @if (navigationService.salon(); as salon) {
                     <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="salon" class="dropdown-list">
                         <hr class="hr-navbar"/>
-                        <div class="salon-title-navbar"><h6>{{ salon.place }}</h6></div>
+                        <div class="title-navbar"><h6>{{ salon.place }}</h6></div>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
