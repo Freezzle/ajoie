@@ -105,7 +105,9 @@
                                 }
                             </td>
                             <td [routerLink]="['./', workshop.id, 'view']" class="clickable">
-                                <i [class]="'pi ' + (workshop.status | status) + ' ' + (workshop.status | colorStatus)"></i>
+                                <fa-icon [class]="workshop.status | colorStatus"
+                                         [icon]="workshop.status | status"
+                                         [title]="'workshop.status.list.' + workshop.status | translate"></fa-icon>
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
