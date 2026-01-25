@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,11 +14,15 @@ import java.util.UUID;
 @Entity
 @Table(name = "address")
 @Data
-public class Address implements Serializable {
+public class Address implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @Column(name = "formal_line")
     private String formalLine;

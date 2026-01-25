@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,11 +21,15 @@ import java.util.UUID;
 @Table(name = "invoice")
 @Data
 @NoArgsConstructor
-public class Invoice implements Serializable {
+public class Invoice implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @Column(name = "position")
     private Long position;

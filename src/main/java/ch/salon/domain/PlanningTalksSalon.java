@@ -2,6 +2,7 @@ package ch.salon.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -19,6 +20,10 @@ public class PlanningTalksSalon implements Serializable {
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "configuration", nullable = false, columnDefinition = "jsonb")

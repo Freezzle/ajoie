@@ -22,11 +22,15 @@ import java.util.UUID;
 @Entity
 @Table(name = "conference")
 @Data
-public class Conference implements Serializable {
+public class Conference implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @NotNull
     @Column(name = "title", nullable = false)

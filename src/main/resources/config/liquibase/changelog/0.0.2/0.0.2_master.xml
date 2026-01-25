@@ -7,4 +7,5 @@
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202511.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202512.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202601.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202601-tenant.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

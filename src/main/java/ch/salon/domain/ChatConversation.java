@@ -26,6 +26,10 @@ public class ChatConversation extends AbstractAuditingEntity<UUID> implements Se
     private UUID id;
 
     @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
+
+    @NotNull
     @Column(name = "participant_a", nullable = false, length = 50)
     private String participantA;
 

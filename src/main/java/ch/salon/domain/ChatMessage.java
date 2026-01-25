@@ -24,6 +24,10 @@ public class ChatMessage extends AbstractAuditingEntity<UUID> implements Seriali
     private UUID id;
 
     @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
+
+    @NotNull
     @Column(nullable = false, length = 50)
     private String senderId;
 

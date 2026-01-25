@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true, exclude = {"persistentTokens", "authorities"})
 @ToString(callSuper = true, exclude = {"persistentTokens", "authorities"})
@@ -94,6 +95,19 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Column(name = "last_seen_at")
     private Instant lastSeenAt;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
+
+    @NotNull
+    @Column(name = "tenant_owner", nullable = false)
+    private boolean tenantOwner = false;
+
+    @NotNull
+    @Size(min = 1, max = 20)
+    @Column(name = "tenant_member_status", nullable = false, length = 20)
+    private String tenantMemberStatus = "ACTIVE"; // ACTIVE, INVITED, SUSPENDED
 
     @JsonIgnore
     @ManyToMany

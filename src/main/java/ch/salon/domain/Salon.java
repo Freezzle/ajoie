@@ -25,11 +25,15 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "salon")
 @Data
-public class Salon implements Serializable {
+public class Salon implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @Column(length = 10)
     private String referenceNumber;

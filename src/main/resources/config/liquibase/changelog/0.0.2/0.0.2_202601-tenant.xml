@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- =====================================================
+         Create tenant table
+         ===================================================== -->
+    <changeSet id="0.0.2_202601-001-create-tenant-table" author="tenant-system">
+        <createTable tableName="tenant">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="varchar(100)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_tenant_slug"/>
+            </column>
+            <column name="created_at" type="${datetimeType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="${datetimeType}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="tenant" indexName="idx_tenant_slug">
+            <column name="slug"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- =====================================================
+         Add tenant-related columns to jhi_user table
+         ===================================================== -->
+    <changeSet id="0.0.2_202601-002-add-tenant-columns-to-user" author="tenant-system">
+        <addColumn tableName="jhi_user">
+            <column name="tenant_id" type="${uuidType}"/>
+            <column name="tenant_owner" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tenant_member_status" type="varchar(20)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <createIndex tableName="jhi_user" indexName="idx_user_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- =====================================================
+         Create default tenant "L'Ajoie de mieux vivre"
+         Uses a fixed UUID for determinism
+         ===================================================== -->
+    <changeSet id="0.0.2_202601-003-insert-default-tenant" author="tenant-system">
+        <insert tableName="tenant">
+            <column name="id" value="a8d5c7e1-1234-5678-9abc-def012345678"/>
+            <column name="name" value="L'Ajoie de mieux vivre"/>
+            <column name="slug" value="ajoie-de-mieux-vivre"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <!-- =====================================================
+         Assign all existing users to default tenant
+         Set the first admin user (or earliest created) as owner
+         ===================================================== -->
+    <changeSet id="0.0.2_202601-004-assign-users-to-default-tenant" author="tenant-system" runInTransaction="true">
+        <sql>
+            UPDATE jhi_user SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+    </changeSet>
+
+    <!-- Mark admin user as tenant owner if exists -->
+    <changeSet id="0.0.2_202601-005-set-admin-as-tenant-owner" author="tenant-system">
+        <sql>
+            UPDATE jhi_user
+            SET tenant_owner = true
+            WHERE login = 'admin' AND tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678';
+        </sql>
+    </changeSet>
+
+    <!-- If no admin user, mark the earliest created user as owner -->
+    <changeSet id="0.0.2_202601-006-set-earliest-user-as-owner-fallback" author="tenant-system">
+        <sql>
+            UPDATE jhi_user
+            SET tenant_owner = true
+            WHERE tenant_owner = false
+            AND tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            AND id = (
+              SELECT id FROM jhi_user
+              WHERE tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+              ORDER BY created_date ASC NULLS LAST
+              LIMIT 1
+            );
+        </sql>
+    </changeSet>
+
+    <!-- Add NOT NULL constraint to tenant_id in jhi_user -->
+    <changeSet id="0.0.2_202601-007-make-tenant-id-not-null" author="tenant-system">
+        <addNotNullConstraint tableName="jhi_user" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="jhi_user"
+                                 constraintName="fk_user__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- =====================================================
+         Add tenant_id to business entities (tenant-owned)
+         ===================================================== -->
+
+    <!-- Salon -->
+    <changeSet id="0.0.2_202601-010-add-tenant-to-salon" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon"/>
+        </preConditions>
+        <addColumn tableName="salon">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="salon" indexName="idx_salon_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-011-populate-tenant-salon" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon"/>
+            <columnExists tableName="salon" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE salon SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="salon" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="salon"
+                                 constraintName="fk_salon__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Exhibitor -->
+    <changeSet id="0.0.2_202601-012-add-tenant-to-exhibitor" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="exhibitor"/>
+        </preConditions>
+        <addColumn tableName="exhibitor">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="exhibitor" indexName="idx_exhibitor_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-013-populate-tenant-exhibitor" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="exhibitor"/>
+            <columnExists tableName="exhibitor" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE exhibitor SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="exhibitor" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="exhibitor"
+                                 constraintName="fk_exhibitor__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Stand -->
+    <changeSet id="0.0.2_202601-014-add-tenant-to-stand" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="stand"/>
+        </preConditions>
+        <addColumn tableName="stand">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="stand" indexName="idx_stand_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-015-populate-tenant-stand" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="stand"/>
+            <columnExists tableName="stand" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE stand SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="stand" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="stand"
+                                 constraintName="fk_stand__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Conference -->
+    <changeSet id="0.0.2_202601-016-add-tenant-to-conference" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="conference"/>
+        </preConditions>
+        <addColumn tableName="conference">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="conference" indexName="idx_conference_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-017-populate-tenant-conference" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="conference"/>
+            <columnExists tableName="conference" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE conference SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="conference" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="conference"
+                                 constraintName="fk_conference__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Invoice -->
+    <changeSet id="0.0.2_202601-018-add-tenant-to-invoice" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="invoice"/>
+        </preConditions>
+        <addColumn tableName="invoice">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="invoice" indexName="idx_invoice_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-019-populate-tenant-invoice" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="invoice"/>
+            <columnExists tableName="invoice" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE invoice SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="invoice" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="invoice"
+                                 constraintName="fk_invoice__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Participation -->
+    <changeSet id="0.0.2_202601-020-add-tenant-to-participation" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="participation"/>
+        </preConditions>
+        <addColumn tableName="participation">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="participation" indexName="idx_participation_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-021-populate-tenant-participation" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="participation"/>
+            <columnExists tableName="participation" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE participation SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="participation" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="participation"
+                                 constraintName="fk_participation__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Payment -->
+    <changeSet id="0.0.2_202601-022-add-tenant-to-payment" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="payment"/>
+        </preConditions>
+        <addColumn tableName="payment">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="payment" indexName="idx_payment_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-023-populate-tenant-payment" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="payment"/>
+            <columnExists tableName="payment" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE payment SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="payment" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="payment"
+                                 constraintName="fk_payment__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Workshop -->
+    <changeSet id="0.0.2_202601-024-add-tenant-to-workshop" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="workshop"/>
+        </preConditions>
+        <addColumn tableName="workshop">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="workshop" indexName="idx_workshop_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-025-populate-tenant-workshop" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="workshop"/>
+            <columnExists tableName="workshop" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE workshop SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="workshop" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="workshop"
+                                 constraintName="fk_workshop__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- FloorPlanSalon -->
+    <changeSet id="0.0.2_202601-026-add-tenant-to-floor-plan-salon" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="floor_plan_salon"/>
+        </preConditions>
+        <addColumn tableName="floor_plan_salon">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="floor_plan_salon" indexName="idx_floor_plan_salon_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-027-populate-tenant-floor-plan-salon" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="floor_plan_salon"/>
+            <columnExists tableName="floor_plan_salon" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE floor_plan_salon SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="floor_plan_salon" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="floor_plan_salon"
+                                 constraintName="fk_floor_plan_salon__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Address -->
+    <changeSet id="0.0.2_202601-028-add-tenant-to-address" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="address"/>
+        </preConditions>
+        <addColumn tableName="address">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="address" indexName="idx_address_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-029-populate-tenant-address" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="address"/>
+            <columnExists tableName="address" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE address SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="address" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="address"
+                                 constraintName="fk_address__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- PriceStandSalon -->
+    <changeSet id="0.0.2_202601-030-add-tenant-to-price-stand-salon" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="price_stand_salon"/>
+        </preConditions>
+        <addColumn tableName="price_stand_salon">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="price_stand_salon" indexName="idx_price_stand_salon_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-031-populate-tenant-price-stand-salon" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="price_stand_salon"/>
+            <columnExists tableName="price_stand_salon" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE price_stand_salon SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="price_stand_salon" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="price_stand_salon"
+                                 constraintName="fk_price_stand_salon__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Salon talk planning -->
+    <changeSet id="0.0.2_202601-031-add-tenant-to-salon_talk_planning" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon_talk_planning"/>
+        </preConditions>
+        <addColumn tableName="salon_talk_planning">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="salon_talk_planning" indexName="idx_salon_talk_planning_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-031-populate-tenant-salon_talk_planning" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon_talk_planning"/>
+            <columnExists tableName="salon_talk_planning" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE salon_talk_planning SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="salon_talk_planning" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="salon_talk_planning"
+                                 constraintName="fk_salon_talk_planning__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Invoicing plan -->
+    <changeSet id="0.0.2_202601-032-add-tenant-to-invoicing_plan" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="invoicing_plan"/>
+        </preConditions>
+        <addColumn tableName="invoicing_plan">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="invoicing_plan" indexName="idx_invoicing_plan_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-032-populate-tenant-invoicing_plan" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="invoicing_plan"/>
+            <columnExists tableName="invoicing_plan" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE invoicing_plan SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="invoicing_plan" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="invoicing_plan"
+                                 constraintName="fk_invoicing_plan__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Event log -->
+    <changeSet id="0.0.2_202601-033-add-tenant-to-event_log" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_log"/>
+        </preConditions>
+        <addColumn tableName="event_log">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="event_log" indexName="idx_event_log_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-033-populate-tenant-event_log" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="event_log"/>
+            <columnExists tableName="event_log" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE event_log SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="event_log" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="event_log"
+                                 constraintName="fk_event_log__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Chat message -->
+    <changeSet id="0.0.2_202601-034-add-tenant-to-chat_message" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="chat_message"/>
+        </preConditions>
+        <addColumn tableName="chat_message">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="chat_message" indexName="idx_chat_message_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-034-populate-tenant-chat_message" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="chat_message"/>
+            <columnExists tableName="chat_message" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE chat_message SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="chat_message" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="chat_message"
+                                 constraintName="fk_chat_message__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+    <!-- Chat conversation -->
+    <changeSet id="0.0.2_202601-035-add-tenant-to-chat_conversation" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="chat_conversation"/>
+        </preConditions>
+        <addColumn tableName="chat_conversation">
+            <column name="tenant_id" type="${uuidType}"/>
+        </addColumn>
+        <createIndex tableName="chat_conversation" indexName="idx_chat_conversation_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="0.0.2_202601-035-populate-tenant-chat_conversation" author="tenant-system">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="chat_conversation"/>
+            <columnExists tableName="chat_conversation" columnName="tenant_id"/>
+        </preConditions>
+        <sql>
+            UPDATE chat_conversation SET tenant_id = 'a8d5c7e1-1234-5678-9abc-def012345678'
+            WHERE tenant_id IS NULL;
+        </sql>
+        <addNotNullConstraint tableName="chat_conversation" columnName="tenant_id" columnDataType="${uuidType}"/>
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="chat_conversation"
+                                 constraintName="fk_chat_conversation__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+</databaseChangeLog>

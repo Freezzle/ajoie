@@ -5,6 +5,7 @@ import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.Status;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,11 +16,15 @@ import java.util.UUID;
 @Entity
 @Table(name = "participation")
 @Data
-public class Participation implements Serializable {
+public class Participation implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @Column(name = "client_number")
     private String clientNumber;

@@ -20,11 +20,15 @@ import java.util.UUID;
 @Table(name = "payment")
 @Data
 @NoArgsConstructor
-public class Payment implements Serializable {
+public class Payment implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @NotNull
     @Column(name = "amount", nullable = false)

@@ -14,11 +14,15 @@ import java.util.UUID;
 @Entity
 @Table(name = "price_stand_salon")
 @Data
-public class PriceStandSalon implements Serializable {
+public class PriceStandSalon implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
+
+    @NotNull
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
     @NotNull
     @Column(name = "price", nullable = false)
