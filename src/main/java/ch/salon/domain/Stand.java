@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.TenantId;
 import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ public class Stand implements Serializable, TenantOwned {
     @Column(name = "id")
     private UUID id;
 
+    @TenantId
     @NotNull
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;

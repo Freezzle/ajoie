@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class FloorPlanSalon implements Serializable, TenantOwned {
     @Column(name = "id")
     private UUID id;
 
+    @TenantId
     @NotNull
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;

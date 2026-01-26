@@ -23,7 +23,11 @@ import java.util.UUID;
  *
  * For UPDATE (PreUpdate):
  * - If in TENANT mode: verify tenantId matches current tenantId (prevent privilege escalation)
- * - If in SYSTEM mode: allow any tenantId
+ * - If in SYSTEM mode: allow updates but log as audit trail
+ *
+ * IMPORTANT: This listener works in conjunction with Hibernate's @TenantId DISCRIMINATOR strategy.
+ * The @TenantId annotation on fields enables automatic filtering for ALL reads,
+ * while this listener enforces constraints on writes.
  */
 @Component
 public class TenantEnforcementListener implements PreInsertEventListener, PreUpdateEventListener {
@@ -34,11 +38,10 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
     public boolean onPreInsert(PreInsertEvent event) {
         Object entity = event.getEntity();
 
-        if (!(entity instanceof TenantOwned)) {
+        if (!(entity instanceof TenantOwned tenantOwnedEntity)) {
             return false; // Not a tenant-owned entity, proceed normally
         }
 
-        TenantOwned tenantOwnedEntity = (TenantOwned) entity;
         Optional<TenantContextHolder.TenantContext> context = TenantContextHolder.getContext();
 
         if (context.isPresent()) {
@@ -64,16 +67,11 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
             } else if (ctx.isSystem()) {
                 // SYSTEM mode: allow any tenantId, but require it to be set
                 if (tenantOwnedEntity.getTenantId() == null) {
-                    throw new IllegalStateException(
-                            "TenantOwned entity requires explicit tenantId when inserting in SYSTEM mode"
-                    );
+                    throw new IllegalStateException("TenantOwned entity requires explicit tenantId when inserting in SYSTEM mode");
                 }
             }
         } else {
-            // No context: this shouldn't happen for a TenantOwned entity in a normal request
-            logger.warn("No tenant context for TenantOwned entity: {}. This might be scheduled/background task.",
-                    entity.getClass().getSimpleName());
-            // Don't throw here, let the calling code decide if this is acceptable
+            throw new SecurityException("No tenant context ! No reason to insert without tenantId context");
         }
 
         return false; // Return false to continue normal persistence
@@ -83,11 +81,10 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
     public boolean onPreUpdate(PreUpdateEvent event) {
         Object entity = event.getEntity();
 
-        if (!(entity instanceof TenantOwned)) {
+        if (!(entity instanceof TenantOwned tenantOwnedEntity)) {
             return false; // Not a tenant-owned entity, proceed normally
         }
 
-        TenantOwned tenantOwnedEntity = (TenantOwned) entity;
         Optional<TenantContextHolder.TenantContext> context = TenantContextHolder.getContext();
 
         if (context.isPresent()) {
@@ -105,8 +102,13 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
                                     entityTenantId, currentTenantId)
                     );
                 }
+            } else if (ctx.isSystem()) {
+                // SYSTEM mode: allow updates but log as audit trail
+                logger.debug("System mode update on TenantOwned entity: {} with tenantId={}",
+                    entity.getClass().getSimpleName(), tenantOwnedEntity.getTenantId());
             }
-            // SYSTEM mode: allow any operation
+        } else {
+            throw new SecurityException("No tenant context ! No reason to update without tenantId context");
         }
 
         return false; // Return false to continue normal persistence

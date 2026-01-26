@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -34,7 +35,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "jhi_user")
 @Data
-public class User extends AbstractAuditingEntity<Long> implements Serializable {
+public class User extends AbstractAuditingEntity<Long> implements Serializable, TenantOwned {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
@@ -96,6 +97,7 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "last_seen_at")
     private Instant lastSeenAt;
 
+    @TenantId
     @NotNull
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;

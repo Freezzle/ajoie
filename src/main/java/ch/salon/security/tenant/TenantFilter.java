@@ -8,8 +8,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.Filter;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -22,6 +20,13 @@ import java.util.UUID;
 /**
  * Filter that sets up the tenant context for each request.
  * Reads the authenticated user from SecurityContext and loads their tenant_id from the database.
+ *
+ * Flow:
+ * 1. If user is authenticated: Load user from DB and set TENANT mode with their tenant_id
+ * 2. If user is NOT authenticated: Set SYSTEM mode (uses ROOT_TENANT_ID)
+ *    - This allows requests to proceed without blocking
+ *    - But endpoint-level security should prevent access to protected resources
+ *    - Public endpoints (login, register, etc.) can proceed normally
  */
 @Component
 public class TenantFilter extends OncePerRequestFilter {
@@ -43,7 +48,7 @@ public class TenantFilter extends OncePerRequestFilter {
             Optional<String> userLogin = SecurityUtils.getCurrentUserLogin();
 
             if (userLogin.isPresent()) {
-                // Load the user from DB to get their tenant_id
+                // User is authenticated: Load the user from DB to get their tenant_id
                 Optional<User> user = userRepository.findOneByLogin(userLogin.get());
 
                 if (user.isPresent() && user.get().getTenantId() != null) {
@@ -56,7 +61,18 @@ public class TenantFilter extends OncePerRequestFilter {
                         // If User.id is not a UUID in old schema, just use tenantId
                         TenantContextHolder.setTenantMode(tenantId);
                     }
+                    logger.debug("Set TENANT context for user {} with tenant {}", userLogin.get(), tenantId);
+                } else {
+                    // User is authenticated but has no tenant assigned
+                    logger.warn("Authenticated user {} has no tenant assigned", userLogin.get());
+                    TenantContextHolder.setSystemMode();
                 }
+            } else {
+                // User is NOT authenticated: Set SYSTEM mode with ROOT_TENANT_ID
+                // This allows public endpoints to work without authentication
+                // (e.g., login, register, password reset, etc.)
+                TenantContextHolder.setSystemMode();
+                logger.debug("No authentication found - using SYSTEM mode");
             }
 
             filterChain.doFilter(request, response);
@@ -66,9 +82,6 @@ public class TenantFilter extends OncePerRequestFilter {
         }
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        // Don't filter unauthenticated requests (security, register, etc.)
-        return !SecurityUtils.isAuthenticated();
-    }
+    // Don't override shouldNotFilter - we want to filter all requests
+    // to ensure tenant context is always properly set
 }

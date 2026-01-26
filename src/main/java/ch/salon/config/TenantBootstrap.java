@@ -7,7 +7,6 @@ import ch.salon.repository.UserRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -59,13 +58,12 @@ public class TenantBootstrap {
                             .createdAt(Instant.now())
                             .updatedAt(Instant.now())
                             .build();
-                    tenantRepository.save(defaultTenant);
+                    defaultTenant = tenantRepository.save(defaultTenant);
+                    // Ensure all users are assigned to a tenant
+                    assignUsersToTenants(defaultTenant);
                 } else {
                     logger.info("Default tenant already exists with ID: {}", DEFAULT_TENANT_ID);
                 }
-
-                // Ensure all users are assigned to a tenant
-                assignUsersToTenants();
             });
 
             logger.info("Multi-tenancy initialization completed successfully");
@@ -78,29 +76,31 @@ public class TenantBootstrap {
     /**
      * Assign any unassigned users to the default tenant and set ownership
      */
-    private void assignUsersToTenants() {
-        // Find users without a tenant
-        var usersWithoutTenant = userRepository.findAll().stream()
-                .filter(u -> u.getTenantId() == null)
-                .toList();
+    private void assignUsersToTenants(Tenant tenant) {
+        TenantContextHolder.runAsTenant(tenant.getId(), () -> {
+            // Find users without a tenant
+            var usersWithoutTenant = userRepository.findAll().stream()
+                    .filter(u -> u.getTenantId() == null)
+                    .toList();
 
-        if (!usersWithoutTenant.isEmpty()) {
-            logger.info("Assigning {} users to default tenant", usersWithoutTenant.size());
+            if (!usersWithoutTenant.isEmpty()) {
+                logger.info("Assigning {} users to default tenant", usersWithoutTenant.size());
 
-            for (User user : usersWithoutTenant) {
-                user.setTenantId(DEFAULT_TENANT_ID);
-                user.setTenantMemberStatus("ACTIVE");
-                userRepository.save(user);
+                for (User user : usersWithoutTenant) {
+                    user.setTenantId(DEFAULT_TENANT_ID);
+                    user.setTenantMemberStatus("ACTIVE");
+                    userRepository.save(user);
+                }
             }
-        }
 
-        // Set the admin user as tenant owner if not already set
-        var adminUser = userRepository.findOneByLogin("admin");
-        if (adminUser.isPresent() && !adminUser.get().isTenantOwner() &&
-            adminUser.get().getTenantId().equals(DEFAULT_TENANT_ID)) {
-            logger.info("Setting admin user as tenant owner");
-            adminUser.get().setTenantOwner(true);
-            userRepository.save(adminUser.get());
-        }
+            // Set the admin user as tenant owner if not already set
+            var adminUser = userRepository.findOneByLogin("admin");
+            if (adminUser.isPresent() && !adminUser.get().isTenantOwner() &&
+                    adminUser.get().getTenantId().equals(DEFAULT_TENANT_ID)) {
+                logger.info("Setting admin user as tenant owner");
+                adminUser.get().setTenantOwner(true);
+                userRepository.save(adminUser.get());
+            }
+        });
     }
 }

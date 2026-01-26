@@ -18,6 +18,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -30,12 +31,13 @@ import java.util.UUID;
 @Entity
 @Table(name = "invoicing_plan")
 @Data
-public class InvoicingPlan implements Serializable {
+public class InvoicingPlan implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
 
+    @TenantId
     @NotNull
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;

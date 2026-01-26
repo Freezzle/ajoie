@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -17,12 +18,13 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMessage extends AbstractAuditingEntity<UUID> implements Serializable {
+public class ChatMessage extends AbstractAuditingEntity<UUID> implements Serializable, TenantOwned {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private UUID id;
 
+    @TenantId
     @NotNull
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
