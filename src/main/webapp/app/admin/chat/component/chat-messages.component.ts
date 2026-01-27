@@ -1,7 +1,7 @@
 import {
     AfterViewChecked,
     Component,
-    DestroyRef,
+    DestroyRef, effect,
     ElementRef,
     inject,
     OnDestroy,
@@ -269,58 +269,63 @@ export class ChatMessagesComponent implements OnInit, OnDestroy, AfterViewChecke
     currentUserLogin = signal<string | null>(null);
     private shouldScroll = false;
 
-    ngOnInit(): void {
-        // Récupérer l'utilisateur courant
-        const accountSignal = this.accountService.trackCurrentAccount();
-        if (accountSignal()) {
-            this.currentUserLogin.set(accountSignal()!.login || null);
-        }
+    constructor() {
+        effect(() => {
+            // Récupérer l'utilisateur courant
+            const accountSignal = this.accountService.trackCurrentAccount();
+            if (accountSignal()) {
+                this.currentUserLogin.set(accountSignal()!.login || null);
+            }
 
-        console.log('[APP] ngOnInit du chat component');
+            console.log('[APP] ngOnInit du chat component');
 
+            // Charger les conversations
+            this.chatService.loadConversations();
+            this.chatService.conversationList$
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(convs => this.conversations.set(convs));
 
-        // Charger les conversations
-        this.chatService.loadConversations();
-        this.chatService.conversationList$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(convs => this.conversations.set(convs));
+            // Charger le compteur de messages non lus
+            this.chatService.loadUnreadCount();
+            this.chatService.unreadCount$
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(count => this.unreadCount.set(count));
 
-        // Charger le compteur de messages non lus
-        this.chatService.loadUnreadCount();
-        this.chatService.unreadCount$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(count => this.unreadCount.set(count));
-
-        // Écouter les messages entrants
-        this.chatService.messages$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(msgs => {
-                console.log('Messages mis à jour:', msgs);
-                this.messages.set(msgs);
-            });
-
-        // Écouter les événements de scroll
-        this.chatService.shouldScroll$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => {
-                this.scrollToBottom();
-            });
-
-        // Écouter les utilisateurs disponibles
-        this.chatService.availableUsers$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(users => this.availableUsers.set(users));
-
-        // Écouter la présence
-        this.presenceService.presence$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(presences => {
-                const map: { [key: string]: boolean } = {};
-                presences.forEach(p => {
-                    map[p.login] = p.online;
+            // Écouter les messages entrants
+            this.chatService.messages$
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(msgs => {
+                    console.log('Messages mis à jour:', msgs);
+                    this.messages.set(msgs);
                 });
-                this.presenceMap.set(map);
-            });
+
+            // Écouter les événements de scroll
+            this.chatService.shouldScroll$
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(() => {
+                    this.scrollToBottom();
+                });
+
+            // Écouter les utilisateurs disponibles
+            this.chatService.availableUsers$
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(users => this.availableUsers.set(users));
+
+            // Écouter la présence
+            this.presenceService.presence$
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(presences => {
+                    const map: { [key: string]: boolean } = {};
+                    presences.forEach(p => {
+                        map[p.login] = p.online;
+                    });
+                    this.presenceMap.set(map);
+                });
+        });
+    }
+
+    ngOnInit(): void {
+
     }
 
     ngOnDestroy(): void {

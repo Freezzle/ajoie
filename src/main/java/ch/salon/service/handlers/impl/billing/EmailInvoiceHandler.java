@@ -6,6 +6,8 @@ import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
 import ch.salon.repository.InvoicingPlanRepository;
+import ch.salon.security.tenant.TenantContextHolder;
+import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
@@ -43,6 +46,7 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
     private final DownloadInvoiceHandler downloadInvoiceHandler;
     private final EventLogService eventLogService;
     private final InvoicingPlanRepository repository;
+    private final TransactionalTenantOperation transactionalOps;
 
     @Value("${spring.mail.username:}")
     private String senderEmail;
@@ -93,39 +97,43 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan> {
         payload.setExpirationDate(InvoicingPlan.calculateExpirationDate(payload));
         payload.setState(State.IS_ISSUING);
 
-        self.prepareAndSend(payload.getId(), oldState, context);
+        self.prepareAndSendInTenant(payload.getId(), oldState, context, payload.getTenantId());
     }
 
     @Async
-    @Transactional
-    public void prepareAndSend(UUID idPlan, State oldState, Map<String, Object> context) {
-        InvoicingPlan plan = this.repository.getReferenceById(idPlan);
-        Object raw = context.get("emailMessage");
-        EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
-        if (emailMessage == null) {
-            emailMessage = buildTemplate(plan, context);
-        }
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void prepareAndSendInTenant(UUID idPlan, State oldState, Map<String, Object> context, UUID tenantId) {
+        TenantContextHolder.runAsTenant(tenantId, () -> {
+            transactionalOps.execute(() -> {
+                InvoicingPlan plan = this.repository.getReferenceById(idPlan);
+                Object raw = context.get("emailMessage");
+                EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
+                if (emailMessage == null) {
+                    emailMessage = buildTemplate(plan, context);
+                }
 
-        try {
-            InputStreamSource attachment = this.downloadInvoiceHandler.download(plan, context);
-            emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(plan, context), attachment));
-            plan.setIssuedDate(Instant.now());
-            plan.setExpirationDate(InvoicingPlan.calculateExpirationDate(plan));
-            plan.setState(State.ISSUED);
-            eventLogService.eventFromSystem("Facture envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, plan.getId(),
-                    null);
-            eventLogService.eventFromSystem("Facture envoyée " + plan.getBillingNumber(), EventType.EMAIL,
-                    EntityType.PARTICIPATION, plan.getParticipation().getId(), null);
-        } catch (Exception e) {
-            LOGGER.error("Problem during sending email : invoice.html", e);
-            plan.setIssuedDate(null);
-            plan.setExpirationDate(null);
-            plan.setState(oldState);
-            eventLogService.eventFromSystem("Problème d'envoi facture", EventType.EMAIL, EntityType.INVOICE_PLAN,
-                    plan.getId(), null);
-            eventLogService.eventFromSystem("Problème d'envoi facture " + plan.getBillingNumber(), EventType.EMAIL,
-                    EntityType.PARTICIPATION, plan.getParticipation().getId(), null);
-        }
+                try {
+                    InputStreamSource attachment = this.downloadInvoiceHandler.download(plan, context);
+                    emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(plan, context), attachment));
+                    plan.setIssuedDate(Instant.now());
+                    plan.setExpirationDate(InvoicingPlan.calculateExpirationDate(plan));
+                    plan.setState(State.ISSUED);
+                    eventLogService.eventFromSystem("Facture envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, plan.getId(),
+                            null);
+                    eventLogService.eventFromSystem("Facture envoyée " + plan.getBillingNumber(), EventType.EMAIL,
+                            EntityType.PARTICIPATION, plan.getParticipation().getId(), null);
+                } catch (Exception e) {
+                    LOGGER.error("Problem during sending email : invoice.html", e);
+                    plan.setIssuedDate(null);
+                    plan.setExpirationDate(null);
+                    plan.setState(oldState);
+                    eventLogService.eventFromSystem("Problème d'envoi facture", EventType.EMAIL, EntityType.INVOICE_PLAN,
+                            plan.getId(), null);
+                    eventLogService.eventFromSystem("Problème d'envoi facture " + plan.getBillingNumber(), EventType.EMAIL,
+                            EntityType.PARTICIPATION, plan.getParticipation().getId(), null);
+                }
+            });
+        });
     }
 
     @Override

@@ -35,37 +35,32 @@ public class TenantResource {
      */
     @GetMapping("/me")
     public ResponseEntity<TenantDTO> getTenantInfo() {
-        // Get current user login
-        Optional<String> userLogin = SecurityUtils.getCurrentUserLogin();
-        if (userLogin.isEmpty()) {
+        try {
+            // Get current user login
+            String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+
+            // Get user from DB
+            User user = userRepository.findOneByLogin(userLogin).orElseThrow();
+            if (user.getTenantId() == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            // Get tenant info
+            Object tenant = tenantRepository.findById(user.getTenantId()).orElseThrow();
+
+            // Build DTO - manually since we don't have mapstruct setup
+            var tenantDTO = new TenantDTO(
+                    user.getTenantId(),
+                    (String) getFieldValue(tenant, "name"),
+                    (String) getFieldValue(tenant, "slug"),
+                    user.isTenantOwner(),
+                    user.getTenantMemberStatus()
+            );
+
+            return ResponseEntity.ok(tenantDTO);
+        } catch (java.util.NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        // Get user from DB
-        Optional<User> user = userRepository.findOneByLogin(userLogin.get());
-        if (user.isEmpty() || user.get().getTenantId() == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        // Get tenant info
-        User currentUser = user.get();
-        Optional<?> tenantOpt = tenantRepository.findById(currentUser.getTenantId());
-
-        if (tenantOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        // Build DTO - manually since we don't have mapstruct setup
-        var tenant = tenantOpt.get();
-        var tenantDTO = new TenantDTO(
-                currentUser.getTenantId(),
-                (String) getFieldValue(tenant, "name"),
-                (String) getFieldValue(tenant, "slug"),
-                currentUser.isTenantOwner(),
-                currentUser.getTenantMemberStatus()
-        );
-
-        return ResponseEntity.ok(tenantDTO);
     }
 
     /**

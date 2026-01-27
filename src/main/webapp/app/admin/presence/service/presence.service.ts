@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {effect, inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, map, Observable, of, timer} from 'rxjs';
 import {Client} from '@stomp/stompjs';
@@ -31,12 +31,15 @@ export class PresenceService {
     }
 
     constructor(private http: HttpClient) {
-        this.onlineCount$ = this.presence$.pipe(map(list => list.filter(x => x.online).length));
-        // Récupérer le login de l'utilisateur courant au démarrage
-        const account = this.accountService.trackCurrentAccount();
-        if (account()) {
-            this.currentUsername = account()?.login || null;
-        }
+        effect(() => {
+            this.onlineCount$ = this.presence$.pipe(map(list => list.filter(x => x.online).length));
+            // Récupérer le login de l'utilisateur courant au démarrage
+            const account = this.accountService.trackCurrentAccount();
+            if (account()) {
+                this.currentUsername = account()?.login || null;
+                this.loadOnce();
+            }
+        });
     }
 
     /**

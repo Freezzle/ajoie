@@ -22,7 +22,7 @@ public class ActionMarkAsIssuedHandler implements BusinessActionHandler<Invoicin
 
     @Override
     public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState().isDraft() ? SupportType.ALLOWED : SupportType.REJECTED;
+        return payload != null && (payload.getState().isDraft() || payload.getState() == State.IS_ISSUING) ? SupportType.ALLOWED : SupportType.REJECTED;
     }
 
     @Override

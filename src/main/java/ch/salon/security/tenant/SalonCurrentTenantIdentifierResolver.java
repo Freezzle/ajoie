@@ -42,29 +42,27 @@ public class SalonCurrentTenantIdentifierResolver implements CurrentTenantIdenti
 
     @Override
     public UUID resolveCurrentTenantIdentifier() {
-        Optional<TenantContextHolder.TenantContext> context = TenantContextHolder.getContext();
+        try {
+            TenantContextHolder.TenantContext ctx = TenantContextHolder.getContext().orElseThrow();
 
-        if (context.isEmpty()) {
+            if (ctx.isTenant()) {
+                // Normal user request: return their assigned tenant
+                UUID tenantId = ctx.getTenantId();
+                logger.debug("Resolved tenant: {}", tenantId);
+                return tenantId;
+            } else if (ctx.isSystem()) {
+                // SYSTEM mode: return ROOT to bypass multi-tenancy
+                // This is only for internal bootstrapping/provisioning
+                logger.debug("In SYSTEM mode, using ROOT_TENANT_ID");
+                return ROOT_TENANT_ID;
+            }
+        } catch (java.util.NoSuchElementException e) {
             // No context set: return ROOT_TENANT_ID as a safe default during bootstrap
             // This allows EntityManagerFactory initialization without throwing exceptions.
             // In production, requests without a tenant context will still be protected
             // because the filter layer will fail-closed (validate that authenticated requests
             // have a valid tenant context before allowing access to protected endpoints).
             logger.debug("No tenant context available - using ROOT_TENANT_ID for bootstrap/initialization");
-            return ROOT_TENANT_ID;
-        }
-
-        TenantContextHolder.TenantContext ctx = context.get();
-
-        if (ctx.isTenant()) {
-            // Normal user request: return their assigned tenant
-            UUID tenantId = ctx.getTenantId();
-            logger.debug("Resolved tenant: {}", tenantId);
-            return tenantId;
-        } else if (ctx.isSystem()) {
-            // SYSTEM mode: return ROOT to bypass multi-tenancy
-            // This is only for internal bootstrapping/provisioning
-            logger.debug("In SYSTEM mode, using ROOT_TENANT_ID");
             return ROOT_TENANT_ID;
         }
 

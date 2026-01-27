@@ -5,6 +5,9 @@ import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
+import ch.salon.repository.InvoicingPlanRepository;
+import ch.salon.security.tenant.TenantContextHolder;
+import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
@@ -23,12 +26,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -39,6 +44,8 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
     private final EmailCreator emailCreator;
     private final DownloadInvoiceHandler downloadInvoiceHandler;
     private final EventLogService eventLogService;
+    private final InvoicingPlanRepository repository;
+    private final TransactionalTenantOperation transactionalOps;
 
     @Value("${spring.mail.username:}")
     private String senderEmail;
@@ -84,32 +91,37 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
 
     @Override
     public void handle(InvoicingPlan payload, Map<String, Object> context) throws Exception {
-        self.prepareAndSend(payload, context);
+        self.prepareAndSendInTenant(payload.getId(), context, payload.getTenantId());
     }
 
     @Async
-    @Transactional
-    public void prepareAndSend(InvoicingPlan payload, Map<String, Object> context) {
-        Object raw = context.get("emailMessage");
-        EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
-        if (emailMessage == null) {
-            emailMessage = buildTemplate(payload, context);
-        }
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void prepareAndSendInTenant(UUID idPlan, Map<String, Object> context, UUID tenantId) {
+        TenantContextHolder.runAsTenant(tenantId, () -> {
+            transactionalOps.execute(() -> {
+                InvoicingPlan payload = this.repository.getReferenceById(idPlan);
+                Object raw = context.get("emailMessage");
+                EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
+                if (emailMessage == null) {
+                    emailMessage = buildTemplate(payload, context);
+                }
 
-        try {
-            InputStreamSource attachment = this.downloadInvoiceHandler.download(payload, context);
-            emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(payload, context), attachment));
-            eventLogService.eventFromSystem("Facture renvoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, payload.getId(),
-                    null);
-            eventLogService.eventFromSystem("Facture renvoyée " + payload.getBillingNumber(), EventType.EMAIL,
-                    EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
-        } catch (Exception e) {
-            LOGGER.error("Problem during sending email : invoice.html", e);
-            eventLogService.eventFromSystem("Problème de renvoi facture", EventType.EMAIL, EntityType.INVOICE_PLAN,
-                    payload.getId(), null);
-            eventLogService.eventFromSystem("Problème de renvoi facture " + payload.getBillingNumber(), EventType.EMAIL,
-                    EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
-        }
+                try {
+                    InputStreamSource attachment = this.downloadInvoiceHandler.download(payload, context);
+                    emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(payload, context), attachment));
+                    eventLogService.eventFromSystem("Facture renvoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, payload.getId(),
+                            null);
+                    eventLogService.eventFromSystem("Facture renvoyée " + payload.getBillingNumber(), EventType.EMAIL,
+                            EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
+                } catch (Exception e) {
+                    LOGGER.error("Problem during sending email : invoice.html", e);
+                    eventLogService.eventFromSystem("Problème de renvoi facture", EventType.EMAIL, EntityType.INVOICE_PLAN,
+                            payload.getId(), null);
+                    eventLogService.eventFromSystem("Problème de renvoi facture " + payload.getBillingNumber(), EventType.EMAIL,
+                            EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
+                }
+            });
+        });
     }
 
     @Override

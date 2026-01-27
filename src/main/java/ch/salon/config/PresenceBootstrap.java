@@ -3,6 +3,7 @@ package ch.salon.config;
 import ch.salon.domain.User;
 import ch.salon.repository.UserRepository;
 import ch.salon.service.PresenceService;
+import ch.salon.security.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -11,7 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.Duration;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +27,15 @@ public class PresenceBootstrap {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional(readOnly = true)
     public void onReady() {
-        Instant since = Instant.now().minus(BOOT_WINDOW);
+        TenantContextHolder.runAsSystem(() -> {
+            Instant since = Instant.now().minus(BOOT_WINDOW);
+            List<User> users = userRepository.findRecentlyActive(since);
 
-        List<User> users = userRepository.findRecentlyActive(since);
-        presenceService.bootstrapFromDb(users);
-        presenceService.publishNow();
+            Map<UUID, List<User>> usersByTenant = users.stream()
+                    .collect(Collectors.groupingBy(User::getTenantId));
+
+            presenceService.bootstrapFromDb(usersByTenant);
+            presenceService.publishNow();
+        });
     }
 }

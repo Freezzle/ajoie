@@ -42,10 +42,8 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
             return false; // Not a tenant-owned entity, proceed normally
         }
 
-        Optional<TenantContextHolder.TenantContext> context = TenantContextHolder.getContext();
-
-        if (context.isPresent()) {
-            TenantContextHolder.TenantContext ctx = context.get();
+        try {
+            TenantContextHolder.TenantContext ctx = TenantContextHolder.getContext().orElseThrow();
 
             if (ctx.isTenant()) {
                 // We are in TENANT mode: user is creating/modifying their own data
@@ -70,7 +68,7 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
                     throw new IllegalStateException("TenantOwned entity requires explicit tenantId when inserting in SYSTEM mode");
                 }
             }
-        } else {
+        } catch (java.util.NoSuchElementException e) {
             throw new SecurityException("No tenant context ! No reason to insert without tenantId context");
         }
 
@@ -85,10 +83,8 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
             return false; // Not a tenant-owned entity, proceed normally
         }
 
-        Optional<TenantContextHolder.TenantContext> context = TenantContextHolder.getContext();
-
-        if (context.isPresent()) {
-            TenantContextHolder.TenantContext ctx = context.get();
+        try {
+            TenantContextHolder.TenantContext ctx = TenantContextHolder.getContext().orElseThrow();
 
             if (ctx.isTenant()) {
                 // We are in TENANT mode: user is updating their own data
@@ -101,13 +97,19 @@ public class TenantEnforcementListener implements PreInsertEventListener, PreUpd
                             String.format("Tenant mismatch on UPDATE: entity has tenantId=%s but context has tenantId=%s",
                                     entityTenantId, currentTenantId)
                     );
+                } else if(entityTenantId == null && currentTenantId != null) {
+                    // This should not happen normally, but just in case
+                    // Set the tenant_id from context
+                    // FIXME: just a safety net, ideally tenantId should never be null on update
+                    tenantOwnedEntity.setTenantId(currentTenantId);
+                    logger.debug("Set tenantId from context for entity during UPDATE: {}", entity.getClass().getSimpleName());
                 }
             } else if (ctx.isSystem()) {
                 // SYSTEM mode: allow updates but log as audit trail
                 logger.debug("System mode update on TenantOwned entity: {} with tenantId={}",
                     entity.getClass().getSimpleName(), tenantOwnedEntity.getTenantId());
             }
-        } else {
+        } catch (java.util.NoSuchElementException e) {
             throw new SecurityException("No tenant context ! No reason to update without tenantId context");
         }
 

@@ -15,7 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Filter that sets up the tenant context for each request.
@@ -24,9 +23,9 @@ import java.util.UUID;
  * Flow:
  * 1. If user is authenticated: Load user from DB and set TENANT mode with their tenant_id
  * 2. If user is NOT authenticated: Set SYSTEM mode (uses ROOT_TENANT_ID)
- *    - This allows requests to proceed without blocking
- *    - But endpoint-level security should prevent access to protected resources
- *    - Public endpoints (login, register, etc.) can proceed normally
+ * - This allows requests to proceed without blocking
+ * - But endpoint-level security should prevent access to protected resources
+ * - Public endpoints (login, register, etc.) can proceed normally
  */
 @Component
 public class TenantFilter extends OncePerRequestFilter {
@@ -48,23 +47,27 @@ public class TenantFilter extends OncePerRequestFilter {
             Optional<String> userLogin = SecurityUtils.getCurrentUserLogin();
 
             if (userLogin.isPresent()) {
+                String userLoginStr = userLogin.orElseThrow();
                 // User is authenticated: Load the user from DB to get their tenant_id
-                Optional<User> user = userRepository.findOneByLogin(userLogin.get());
-
-                if (user.isPresent() && user.get().getTenantId() != null) {
-                    // Set the tenant context for this request
-                    UUID tenantId = user.get().getTenantId();
-
-                    try {
-                        TenantContextHolder.setTenantMode(tenantId, user.get().getId());
-                    } catch (NumberFormatException e) {
-                        // If User.id is not a UUID in old schema, just use tenantId
-                        TenantContextHolder.setTenantMode(tenantId);
+                try {
+                    User user = userRepository.findOneByLogin(userLoginStr).orElseThrow();
+                    if (user.getTenantId() != null) {
+                        // Set the tenant context for this request
+                        try {
+                            TenantContextHolder.setTenantMode(user.getTenantId(), user.getId());
+                        } catch (NumberFormatException e) {
+                            // If User.id is not a UUID in old schema, just use tenantId
+                            TenantContextHolder.setTenantMode(user.getTenantId());
+                        }
+                        logger.debug("Set TENANT context for user {} with tenant {}", userLoginStr, user.getTenantId());
+                    } else {
+                        // User is authenticated but has no tenant assigned
+                        logger.warn("Authenticated user {} has no tenant assigned", userLoginStr);
+                        TenantContextHolder.setSystemMode();
                     }
-                    logger.debug("Set TENANT context for user {} with tenant {}", userLogin.get(), tenantId);
-                } else {
-                    // User is authenticated but has no tenant assigned
-                    logger.warn("Authenticated user {} has no tenant assigned", userLogin.get());
+                } catch (java.util.NoSuchElementException e) {
+                    // User not found in DB
+                    logger.warn("Authenticated user {} not found in database", userLoginStr);
                     TenantContextHolder.setSystemMode();
                 }
             } else {

@@ -95,11 +95,15 @@ public class TenantBootstrap {
 
             // Set the admin user as tenant owner if not already set
             var adminUser = userRepository.findOneByLogin("admin");
-            if (adminUser.isPresent() && !adminUser.get().isTenantOwner() &&
-                    adminUser.get().getTenantId().equals(DEFAULT_TENANT_ID)) {
-                logger.info("Setting admin user as tenant owner");
-                adminUser.get().setTenantOwner(true);
-                userRepository.save(adminUser.get());
+            try {
+                User admin = adminUser.orElseThrow();
+                if (!admin.isTenantOwner() && admin.getTenantId().equals(DEFAULT_TENANT_ID)) {
+                    logger.info("Setting admin user as tenant owner");
+                    admin.setTenantOwner(true);
+                    userRepository.save(admin);
+                }
+            } catch (java.util.NoSuchElementException e) {
+                logger.debug("Admin user not found during tenant initialization");
             }
         });
     }
