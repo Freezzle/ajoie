@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import {Component, computed, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, OnDestroy, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
 import {TableModule} from 'primeng/table';
@@ -17,19 +17,21 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
                imports: [CommonModule, FormsModule, TableModule, ButtonModule, MultiSelectModule, ButtonBoxComponent],
                templateUrl: './selected-day-assignments.component.html'
            })
-export class SelectedDayAssignmentsComponent implements OnInit, OnDestroy {
+export class SelectedDayAssignmentsComponent implements OnDestroy {
     private readonly draftService = inject(DialogDraftService);
 
+    data = input.required<AssignmentsSlice>();
     _draft = signal<AssignmentsSlice | null>(null);
     selectedToAssign = signal<string[]>([]);
 
-    @Input({required: true})
-    set data(value: AssignmentsSlice) {
-        this._draft.set(structuredClone(value));
-        this.selectedToAssign.set([]);
-    }
+    constructor() {
+        // Register draft service on init and update when data changes
+        effect(() => {
+            const newData = this.data();
+            this._draft.set(structuredClone(newData));
+            this.selectedToAssign.set([]);
+        });
 
-    ngOnInit() {
         this.draftService.registerDraft(() => {
             const d = this._draft();
             return d ? structuredClone(d) : null;

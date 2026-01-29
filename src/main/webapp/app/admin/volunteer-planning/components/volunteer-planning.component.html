@@ -49,17 +49,18 @@
                                 translateKey="planningVolunteers.manageCategories"/>
                 </div>
             }
-            @if (selectedDay(); as sd) {
-                <p-tabs [value]="sd.id" scrollable>
+
+            @if (selectedDay() || !isReadOnly()) {
+                <p-tabs [value]="selectedDay()?.id" scrollable>
                     <p-tablist class="justify-content-center">
                         @for (day of dayOptions(); track day.id) {
                             <p-tab (click)="selectedDayId.set(day.id)" [value]="day.id">
                                 <div class="d-flex align-items-center justify-content-between gap-2">
                                     <span>{{ day.label }}</span>
 
-                                    @if (!isReadOnly() && day?.id === sd.id) {
+                                    @if (!isReadOnly() && day?.id === selectedDay()?.id) {
                                         <menu-box [appendTo]="'body'"
-                                                  [items]="dayMenus().get(sd.id)!"
+                                                  [items]="dayMenus().get(day.id)!"
                                                   buttonIcon="pi-cog"
                                                   type="secondary"/>
                                     }
@@ -80,7 +81,7 @@
 
                     <p-tabpanels>
                         @if (selectedDay()) {
-                            <p-tabpanel [value]="selectedDay()?.id">
+                            <p-tabpanel [value]="selectedDay()!.id">
                                 <div class="main mt-4">
                                     <div (pointerleave)="stopPaint()" (pointermove)="onPaintMove($event)"
                                          class="table-wrap">
@@ -157,13 +158,13 @@
             }
         </div>
 
-
         @if (dayDialogVisible()) {
-            <dialog-box (cancel)="dayDialogVisible.set(false)"
-                        (confirm)="applyDaySlice($event)"
-                        [(visible)]="dayDialogVisible"
-                        [header]="'Configuration du jour'"
-                        [mode]="'edit'">
+            <dialog-box
+                    (cancel)="dayDialogVisible.set(false); manageDayCreateMode.set(false); manageDaySelectedDayId.set('')"
+                    (confirm)="onManageDayConfirm($event)"
+                    [(visible)]="dayDialogVisible"
+                    [header]="manageDayCreateMode() ? 'Créer un jour' : 'Configuration du jour'"
+                    [mode]="'edit'">
                 <selected-day-editor [data]="daySlice()"/>
             </dialog-box>
         }

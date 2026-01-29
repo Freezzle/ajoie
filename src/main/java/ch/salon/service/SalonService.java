@@ -19,12 +19,7 @@ import ch.salon.web.rest.errors.BadRequestAlertException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,9 +37,10 @@ public class SalonService {
     private final InvoicingPlanRepository invoicingPlanRepository;
     private final FloorPlanSalonRepository floorPlanSalonRepository;
     private final SalonMapper salonMapper;
-    private final FloorPlanSalonMapper  floorPlanSalonMapper;
+    private final FloorPlanSalonMapper floorPlanSalonMapper;
     private final PriceStandMapper priceStandMapper;
     private final PlanningTalksSalonRepository planningTalksSalonRepository;
+    private final PlanningVolunteerSalonRepository planningVolunteerSalonRepository;
 
     public UUID create(SalonDTO salon) {
         if (salon == null) {
@@ -70,7 +66,7 @@ public class SalonService {
 
         if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
             salon.setPriceStandSalons(salonFound.getPriceStandSalons().stream().map(priceStandMapper::toDto)
-                                                .collect(Collectors.toSet()));
+                    .collect(Collectors.toSet()));
         }
 
         Salon salonToUpdate = salonMapper.toEntity(salon);
@@ -165,7 +161,7 @@ public class SalonService {
         }
 
         return this.floorPlanSalonRepository.findBySalonIdOrderByPosition(idSalon).stream()
-                                            .map(floorPlanSalonMapper::toDto).toList();
+                .map(floorPlanSalonMapper::toDto).toList();
     }
 
     public PlanningTalksSalon getPlanningTalks(UUID idSalon) {
@@ -192,6 +188,32 @@ public class SalonService {
         }
 
         return this.planningTalksSalonRepository.save(planning);
+    }
+
+    public PlanningVolunteerSalon getPlanningVolunteers(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        return this.planningVolunteerSalonRepository.findBySalonId(idSalon);
+    }
+
+    public PlanningVolunteerSalon updatePlanningVolunteers(UUID idSalon, PlanningVolunteerSalon dto) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        var planning = this.getPlanningVolunteers(idSalon);
+
+        if (planning != null) {
+            planning.setConfiguration(dto.getConfiguration());
+            planning.setVolunteers(dto.getVolunteers());
+        } else {
+            planning = dto;
+            planning.setSalon(this.salonRepository.findById(idSalon).orElseThrow());
+        }
+
+        return this.planningVolunteerSalonRepository.save(planning);
     }
 
     public SalonStatistiques getStatistiques(UUID idSalon, List<Status> statuses) {

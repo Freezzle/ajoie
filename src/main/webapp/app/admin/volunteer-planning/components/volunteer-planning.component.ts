@@ -1,6 +1,7 @@
 import {CommonModule} from '@angular/common';
-import {ChangeDetectionStrategy, Component, computed, HostListener, model, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, HostListener, inject, model, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
+import {ActivatedRoute} from '@angular/router';
 
 import {TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
@@ -29,6 +30,12 @@ import {SelectedDayAssignmentsComponent} from './selected-day-assignments/select
 import {VolunteerManagerComponent} from './volunteer-manager/volunteer-manager.component';
 import {SelectedDayEditorComponent} from './selected-day-editor/selected-day-editor.component';
 import {AssignmentsSlice, DayConfigSlice} from './volunteer-planning-slices';
+import {
+    PlanningVolunteersDto,
+    VolunteerPlanningConfigurationDto,
+    VolunteerPlanningService
+} from '../volunteer-planning.service';
+import {finalize, map} from 'rxjs';
 
 @Component({
                selector: 'app-volunteer-planning',
@@ -66,12 +73,41 @@ import {AssignmentsSlice, DayConfigSlice} from './volunteer-planning-slices';
                styleUrls: ['./volunteer-planning.component.scss'],
                changeDetection: ChangeDetectionStrategy.OnPush
            })
-export class VolunteerPlanningComponent {
-    planning = signal<Planning>(this.makeInitialPlanning());
-    selectedDayId = signal<string>(this.planning().days[0].id);
+export class VolunteerPlanningComponent implements OnInit {
+    planning = signal<Planning>(this.getEmptyPlanning());
+    selectedDayId = signal<string>(this.planning().days[0]?.id ?? '');
     readonly isLoading = signal<boolean>(false);
     readonly isReadOnly = signal<boolean>(true);
     readonly dayMenus = computed(() => new Map(this.planning().days.map(d => [d.id, this.dayActionItems()])));
+
+    private readonly volunteerPlanningService = inject(VolunteerPlanningService);
+    private readonly activatedRoute = inject(ActivatedRoute);
+    private idSalon: string = '';
+
+    // ...existing code...
+
+    ngOnInit(): void {
+        this.activatedRoute.paramMap
+            .pipe(
+                map(params => params.get('idSalon')!)
+            )
+            .subscribe(idSalon => {
+                this.idSalon = idSalon;
+                this.isLoading.set(true);
+                this.volunteerPlanningService.getPlanningVolunteers(idSalon)
+                    .pipe(finalize(() => this.isLoading.set(false)))
+                    .subscribe(
+                        (dto: PlanningVolunteersDto | null) => {
+                            if (dto) {
+                                this.planning.set(this.fromPlanningVolunteersDto(dto));
+                                this.selectedDayId.set(this.planning().days[0]?.id ?? '');
+                            } else {
+                                this.planning.set(this.getEmptyPlanning());
+                            }
+                        }
+                    );
+            });
+    }
 
     // ✅ Nouveau : tool = categoryId, plus TaskCategory
     selectedTool = signal<Tool>({kind: 'ERASER'});
@@ -83,6 +119,8 @@ export class VolunteerPlanningComponent {
     assignmentsDialogVisible = model(false);
     categoriesDialogVisible = model(false);
     showConfirmDeleteDay = signal(false);
+    manageDayCreateMode = signal(false);
+    manageDaySelectedDayId = signal<string>('');
 
     // ---------- computed ----------
     dayOptions = computed(() => this.planning().days.map(d => ({id: d.id, label: d.label})));
@@ -97,9 +135,47 @@ export class VolunteerPlanningComponent {
     });
 
     daySlice = computed<DayConfigSlice>(() => {
+        // Mode création - retourner un jour vide avec l'ID généré
+        if (this.manageDayCreateMode()) {
+            const newDayId = this.manageDaySelectedDayId();
+            return {
+                intervalMinutes: this.planning().intervalMinutes,
+                day: {
+                    id: newDayId,
+                    label: '',
+                    startTime: this.timeAt(8, 0),
+                    endTime: this.timeAt(18, 0),
+                    assignedVolunteerIds: [],
+                    cells: []
+                }
+            };
+        }
+
         const day = this.selectedDay();
+        const days = this.planning().days;
+        if (!day && (!days || days.length === 0)) {
+            // Return empty/fallback slice
+            return {
+                intervalMinutes: this.planning().intervalMinutes,
+                day: {
+                    id: '',
+                    label: '',
+                    startTime: new Date(),
+                    endTime: new Date(),
+                    assignedVolunteerIds: [],
+                    cells: []
+                }
+            };
+        }
         // fallback propre
-        const safeDay: Day = day ?? this.planning().days[0];
+        const safeDay: Day = day ?? (days && days.length > 0 ? days[0] : {
+            id: '',
+            label: '',
+            startTime: new Date(),
+            endTime: new Date(),
+            assignedVolunteerIds: [],
+            cells: []
+        });
         return {
             intervalMinutes: this.planning().intervalMinutes,
             day: safeDay
@@ -115,17 +191,29 @@ export class VolunteerPlanningComponent {
     }
 
     save(): void {
+        const payload: PlanningVolunteersDto = {
+            configuration: this.toPlanningConfigurationDto(this.planning()),
+            volunteers: this.planning().volunteers.map(v => ({id: v.id, label: v.label}))
+        };
 
+        this.isLoading.set(true);
+        this.volunteerPlanningService
+            .savePlanningVolunteers(this.idSalon, payload)
+            .pipe(finalize(() => this.isLoading.set(false)))
+            .subscribe(() => {
+                this.activateReadOnlyMode();
+            });
     }
 
     assignmentsSlice = computed<AssignmentsSlice>(() => {
         const day = this.selectedDay();
-        const safeDay = day ?? this.planning().days[0];
+        const days = this.planning().days;
+        const safeDay = day ?? (days && days.length > 0 ? days[0] : null);
         return {
-            dayId: safeDay.id,
-            dayLabel: safeDay.label,
+            dayId: safeDay?.id ?? '',
+            dayLabel: safeDay?.label ?? '',
             volunteers: this.planning().volunteers,
-            assignedVolunteerIds: safeDay.assignedVolunteerIds ?? []
+            assignedVolunteerIds: safeDay?.assignedVolunteerIds ?? []
         };
     });
 
@@ -225,13 +313,10 @@ export class VolunteerPlanningComponent {
         const day = this.selectedDay();
         const all = this.planning().volunteers;
         if (!day) {
-            return all;
+            return [];
         }
 
         const assigned = day.assignedVolunteerIds ?? [];
-        if (assigned.length === 0) {
-            return all;
-        } // choix: si aucun assigné, afficher tous
         const set = new Set(assigned);
         return all.filter(v => set.has(v.id));
     });
@@ -353,6 +438,33 @@ export class VolunteerPlanningComponent {
     }
 
     addNewDay(): void {
+        this.manageDayCreateMode.set(true);
+        this.manageDaySelectedDayId.set(this.generateUUID());
+        this.dayDialogVisible.set(true);
+    }
+
+    onManageDayConfirm(daySlice: DayConfigSlice): void {
+        if (this.manageDayCreateMode()) {
+            // Mode création - ajouter le nouveau jour
+            const cur = this.planning();
+            const newDay: Day = daySlice.day;
+            const days = [...cur.days, newDay];
+
+            this.planning.set({
+                                  ...cur,
+                                  days,
+                                  intervalMinutes: daySlice.intervalMinutes
+                              });
+
+            this.manageDayCreateMode.set(false);
+            this.manageDaySelectedDayId.set('');
+            this.dayDialogVisible.set(false);
+            this.selectedDayId.set(newDay.id);
+        } else {
+            // Mode édition - mise à jour du jour existant
+            this.applyDaySlice(daySlice);
+            this.dayDialogVisible.set(false);
+        }
     }
 
     @HostListener('window:pointerup')
@@ -420,6 +532,51 @@ export class VolunteerPlanningComponent {
         window.history.back();
     }
 
+    private toPlanningConfigurationDto(planning: Planning): VolunteerPlanningConfigurationDto {
+        return {
+            intervalMinutes: planning.intervalMinutes,
+            categories: planning.categories.map(c => ({
+                id: c.id,
+                label: c.label,
+                icon: c.icon,
+                color: c.color
+            })),
+            days: planning.days.map(d => ({
+                id: d.id,
+                label: d.label,
+                startTime: d.startTime.toISOString(),
+                endTime: d.endTime.toISOString(),
+                assignedVolunteerIds: d.assignedVolunteerIds ?? [],
+                cells: d.cells.map(c => ({
+                    volunteerId: c.volunteerId,
+                    slotIndex: c.slotIndex,
+                    categoryId: c.categoryId
+                }))
+            }))
+        };
+    }
+
+    private fromPlanningVolunteersDto(dto: PlanningVolunteersDto): Planning {
+        return {
+            intervalMinutes: dto.configuration.intervalMinutes,
+            volunteers: dto.volunteers.map(v => ({id: v.id, label: v.label})),
+            categories: dto.configuration.categories.map(c => ({
+                id: c.id,
+                label: c.label,
+                icon: c.icon,
+                color: c.color
+            })),
+            days: dto.configuration.days.map(d => ({
+                id: d.id,
+                label: d.label,
+                startTime: new Date(d.startTime),
+                endTime: new Date(d.endTime),
+                assignedVolunteerIds: d.assignedVolunteerIds ?? [],
+                cells: d.cells ?? []
+            }))
+        };
+    }
+
     private queuePaint(vId: string, slot: number) {
         this.pendingPaint = {vId, slot};
         if (this.rafId !== null) {
@@ -448,6 +605,18 @@ export class VolunteerPlanningComponent {
         return d;
     }
 
+    private generateUUID(): string {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        // Fallback for older browsers
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
     private dayActionItems(): MenuItem[] {
         return [
             {
@@ -471,6 +640,15 @@ export class VolunteerPlanningComponent {
                 command: () => this.openDeleteDayConfirm()
             }
         ];
+    }
+
+    private getEmptyPlanning(): Planning {
+        return {
+            intervalMinutes: 60,
+            volunteers: [],
+            categories: [],
+            days: []
+        };
     }
 
     private makeInitialPlanning(): Planning {
@@ -505,7 +683,7 @@ export class VolunteerPlanningComponent {
                     label: 'Vendredi',
                     startTime: this.timeAt(8, 0),
                     endTime: this.timeAt(19, 0),
-                    assignedVolunteerIds: volunteers.map(v => v.id), // par défaut assignés
+                    assignedVolunteerIds: [],
                     cells: []
                 },
                 {
@@ -513,7 +691,7 @@ export class VolunteerPlanningComponent {
                     label: 'Samedi',
                     startTime: this.timeAt(8, 0),
                     endTime: this.timeAt(19, 0),
-                    assignedVolunteerIds: volunteers.map(v => v.id),
+                    assignedVolunteerIds: [],
                     cells: []
                 }
             ]

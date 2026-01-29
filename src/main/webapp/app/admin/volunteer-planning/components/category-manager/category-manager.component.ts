@@ -10,7 +10,7 @@ import {ColorPickerModule} from 'primeng/colorpicker';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
 
-import {Category, newId, normalizeHex} from '../volunteer-planning-model';
+import {Category, normalizeHex} from '../volunteer-planning-model';
 import {ButtonBoxComponent} from '../../../../shared/components/button-box/button-box.component';
 import {DialogDraftService} from '../../../../shared/services/dialog-draft.service';
 
@@ -101,7 +101,7 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
 
     addCategory() {
         this.commit(next =>
-                        next.push({id: newId('c'), label: 'Nouvelle catégorie', icon: 'pi pi-box', color: '#ffe8b5'})
+                        next.push({id: this.generateUUID(), label: 'Nouvelle catégorie', icon: 'pi pi-box', color: '#ffe8b5'})
         );
     }
 
@@ -145,5 +145,17 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
         const next = structuredClone(current);
         mutator(next);
         this._draft.set(next);
+    }
+
+    private generateUUID(): string {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        // Fallback for older browsers
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
     }
 }
