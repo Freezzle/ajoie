@@ -110,7 +110,7 @@ export class VolunteerPlanningComponent implements OnInit {
     }
 
     // ✅ Nouveau : tool = categoryId, plus TaskCategory
-    selectedTool = signal<Tool>({kind: 'ERASER'});
+    selectedTool = signal<Tool>({kind: 'NONE'});
     painting = signal(false);
 
     // ✅ Dialog pour ton panel (admin)
@@ -352,6 +352,10 @@ export class VolunteerPlanningComponent implements OnInit {
     }
 
     startPaint(volunteerId: string, slotIndex: number, ev: PointerEvent): void {
+        if (this.isReadOnly()) {
+            return;
+        }
+
         if (ev.pointerType === 'mouse' && ev.button !== 0) {
             return;
         }
@@ -422,13 +426,17 @@ export class VolunteerPlanningComponent implements OnInit {
     }
 
     applyTool(volunteerId: string, slotIndex: number) {
+        if (this.isReadOnly()) {
+            return;
+        }
+
         const day = this.selectedDay();
         if (!day) {
             return;
         }
 
         const tool = this.selectedTool();
-        const categoryId: string | null = tool.kind === 'ERASER' ? null : tool.categoryId;
+        const categoryId: string | null = tool.kind === 'CATEGORY' ? tool.categoryId : null;
 
         this.setCellCategory(day.id, volunteerId, slotIndex, categoryId);
     }

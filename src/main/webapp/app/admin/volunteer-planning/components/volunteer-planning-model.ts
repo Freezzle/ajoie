@@ -33,7 +33,7 @@ export type Planning = {
 
 export type Tool =
     | { kind: 'CATEGORY'; categoryId: string }
-    | { kind: 'ERASER' };
+    | { kind: 'ERASER' } | {kind: 'NONE'};
 
 // ---------- helpers ----------
 export function newId(prefix: 'd' | 'v' | 'c'): string {

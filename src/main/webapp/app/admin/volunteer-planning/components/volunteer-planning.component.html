@@ -104,12 +104,12 @@
                                                         @let cat = uiFor(categoryId);
 
                                                         <td class="slot-cell">
-                                                            <div
-                                                                    (click)="!painting() ? applyTool(v.id, slot.index) : undefined"
-                                                                    (pointerdown)="startPaint(v.id, slot.index, $event)"
-                                                                    [attr.data-slot-index]="slot.index"
-                                                                    [attr.data-volunteer-id]="v.id"
-                                                                    class="paint-cell">
+                                                            <div (click)="!painting() ? applyTool(v.id, slot.index) : undefined"
+                                                                 (pointerdown)="startPaint(v.id, slot.index, $event)"
+                                                                 [attr.data-slot-index]="slot.index"
+                                                                 [attr.data-volunteer-id]="v.id"
+                                                                 [style.cursor]="isReadOnly() ? 'default': 'pointer'"
+                                                                 class="paint-cell">
                                                                 @if (cat) {
                                                                     <span [style.background-color]="cat.color"
                                                                           [title]="cat.label"
@@ -128,22 +128,27 @@
                                     <!-- palette fixe à droite -->
                                     <aside class="palette">
                                         <div class="palette-grid">
-                                            <button-box (clickedEvent)="selectEraser()"
-                                                        [showText]="false"
-                                                        primeIcon="pi-eraser"
-                                                        translateKey="common.eraser"
-                                                        type="secondary"/>
+                                            <button (click)="!isReadOnly() ? selectEraser() : undefined"
+                                                    [icon]="'pi pi-eraser'"
+                                                    [style.background-color]="'white'"
+                                                    [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
+                                                    [style.color]="'black'"
+                                                    [title]="'common.eraser' | translate"
+                                                    [style.cursor]="isReadOnly() ? 'default': 'pointer'"
+                                                    pButton
+                                                    type="button"
+                                            ></button>
 
                                             <p-divider></p-divider>
 
                                             @for (c of planning().categories; track c.id) {
-                                                <button
-                                                        (click)="selectCategory(c.id)"
+                                                <button (click)="!isReadOnly() ? selectCategory(c.id) : undefined"
                                                         [icon]="c.icon"
                                                         [style.background-color]="c.color"
                                                         [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
                                                         [style.color]="'black'"
                                                         [title]="c.label"
+                                                        [style.cursor]="isReadOnly() ? 'default': 'pointer'"
                                                         pButton
                                                         type="button"
                                                 ></button>
