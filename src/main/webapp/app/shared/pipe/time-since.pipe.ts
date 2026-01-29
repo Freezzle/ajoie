@@ -21,6 +21,10 @@ export class TimeSincePipe implements PipeTransform {
         // Si la date est dans le futur, on considère "0 minute"
         const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
 
+        if(diffMinutes < 1){
+            return 'A l\'instant';
+        }
+
         if (diffMinutes <= 59) {
             return `Il y a ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
         }
