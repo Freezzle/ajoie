@@ -12,22 +12,26 @@
 }
 
 .col-volunteer {
-  width: 120px;
-  min-width: 120px;
+  width: 80px;
+  min-width: 80px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .row-label {
   justify-content: flex-start;
   font-weight: 600;
+  font-size: smaller;
 }
 
 .slot-col {
   font-weight: 600;
-  padding: 0 0 0 0.5em;
 }
 
 .slot-cell {
-  padding: 0;
+  padding: 0 !important;
 }
 
 .paint-cell {
@@ -66,6 +70,8 @@
 }
 
 .sticky-header {
+  font-size: smaller;
+  padding-left: 0 !important;
   position: sticky;
   top: 0;
   z-index: 2;
@@ -81,6 +87,24 @@
 
 .sticky-col.sticky-header {
   z-index: 4;
+}
+
+@media (max-width: 767px) {
+  .sticky-header {
+    position: static;
+    top: auto;
+    z-index: auto;
+  }
+
+  .sticky-col {
+    position: static;
+    left: auto;
+    z-index: auto;
+  }
+
+  .sticky-col.sticky-header {
+    z-index: auto;
+  }
 }
 
 .palette {
