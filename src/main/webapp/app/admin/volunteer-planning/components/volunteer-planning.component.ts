@@ -184,6 +184,7 @@ export class VolunteerPlanningComponent implements OnInit {
 
     activateReadOnlyMode(): void {
         this.isReadOnly.set(true);
+        this.ngOnInit();
     }
 
     activateEditMode(): void {
