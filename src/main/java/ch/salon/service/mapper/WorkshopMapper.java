@@ -8,11 +8,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring",uses = {ParticipationMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {ParticipationMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface WorkshopMapper {
 
     WorkshopDTO toDto(Workshop workshop);
 
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "registrationDate", ignore = true)
     Workshop toEntity(WorkshopDTO workshop);
 
     WorkshopLightDTO toLightDto(Workshop workshop);

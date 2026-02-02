@@ -8,11 +8,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface PaymentMapper {
 
     PaymentDTO toDto(Payment payment);
 
+    @Mapping(target = "tenantId", ignore = true)
     Payment toEntity(PaymentDTO payment);
 
     PaymentLightDTO toLightDto(Payment payment);

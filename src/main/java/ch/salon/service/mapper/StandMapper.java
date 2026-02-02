@@ -8,11 +8,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring",uses = {ParticipationMapper.class, PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {ParticipationMapper.class, PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface StandMapper {
 
     StandDTO toDto(Stand stand);
 
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "registrationDate", ignore = true)
     Stand toEntity(StandDTO stand);
 
     StandLightDTO toLightDto(Stand stand);

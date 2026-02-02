@@ -8,11 +8,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring",uses = {ParticipationMapper.class, InvoiceMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {ParticipationMapper.class, InvoiceMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface InvoicingPlanMapper {
 
     InvoicingPlanDTO toDto(InvoicingPlan invoice);
 
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "payments", ignore = true)
+    @Mapping(target = "invoices", ignore = true)
     InvoicingPlan toEntity(InvoicingPlanDTO invoice);
 
     InvoicingPlanLightDTO toLightDto(InvoicingPlan invoice);

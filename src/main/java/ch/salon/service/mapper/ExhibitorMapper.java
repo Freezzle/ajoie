@@ -8,11 +8,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring",uses = {AddressMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = {AddressMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface ExhibitorMapper {
 
     ExhibitorDTO toDto(Exhibitor exhibitor);
 
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "registrationDate", ignore = true)
     Exhibitor toEntity(ExhibitorDTO exhibitor);
 
     ExhibitorLightDTO toLightDto(Exhibitor exhibitor);
