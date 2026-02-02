@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Participation;
 import ch.salon.service.dto.ParticipationDTO;
 import ch.salon.service.dto.ParticipationLightDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,14 +17,7 @@ public interface ParticipationMapper {
 
     ParticipationLightDTO toLightDto(Participation participation);
 
-    @Mapping(target = "exhibitor", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "therapistName", ignore = true)
-    @Mapping(target = "extraInformation", ignore = true)
-    @Mapping(target = "crushOfHeart", ignore = true)
-    @Mapping(target = "guestOfHonor", ignore = true)
-    @Mapping(target = "ratingFriendliness", ignore = true)
-    @Mapping(target = "ratingPaymentSpeed", ignore = true)
-    @Mapping(target = "ratingServiceQuality", ignore = true)
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
     Participation toLightEntity(ParticipationLightDTO participation);
 }

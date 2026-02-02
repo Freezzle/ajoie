@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Stand;
 import ch.salon.service.dto.StandDTO;
 import ch.salon.service.dto.StandLightDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,6 +17,7 @@ public interface StandMapper {
 
     StandLightDTO toLightDto(Stand stand);
 
-    @Mapping(target = "description", ignore = true)
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
     Stand toLightEntity(StandLightDTO stand);
 }

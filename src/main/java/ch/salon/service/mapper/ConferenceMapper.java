@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Conference;
 import ch.salon.service.dto.ConferenceDTO;
 import ch.salon.service.dto.ConferenceLightDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,6 +17,7 @@ public interface ConferenceMapper {
 
     ConferenceLightDTO toLightDto(Conference conference);
 
-    @Mapping(target = "title", ignore = true)
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
     Conference toLightEntity(ConferenceLightDTO conference);
 }

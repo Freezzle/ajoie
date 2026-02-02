@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Exhibitor;
 import ch.salon.service.dto.ExhibitorDTO;
 import ch.salon.service.dto.ExhibitorLightDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,8 +17,7 @@ public interface ExhibitorMapper {
 
     ExhibitorLightDTO toLightDto(Exhibitor exhibitor);
 
-    @Mapping(target = "fullName", ignore = true)
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "redFlag", ignore = true)
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
     Exhibitor toLightEntity(ExhibitorLightDTO exhibitor);
 }

@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.InvoicingPlanLightDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,6 +17,7 @@ public interface InvoicingPlanMapper {
 
     InvoicingPlanLightDTO toLightDto(InvoicingPlan invoice);
 
-    @Mapping(target = "billingNumber", ignore = true)
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
     InvoicingPlan toLightEntity(InvoicingPlanLightDTO invoice);
 }

@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Payment;
 import ch.salon.service.dto.PaymentDTO;
 import ch.salon.service.dto.PaymentLightDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,6 +17,7 @@ public interface PaymentMapper {
 
     PaymentLightDTO toLightDto(Payment payment);
 
-    @Mapping(target = "amount", ignore = true)
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
     Payment toLightEntity(PaymentLightDTO payment);
 }

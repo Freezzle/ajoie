@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Workshop;
 import ch.salon.service.dto.WorkshopDTO;
 import ch.salon.service.dto.WorkshopLightDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,6 +17,7 @@ public interface WorkshopMapper {
 
     WorkshopLightDTO toLightDto(Workshop workshop);
 
-    @Mapping(target = "title", ignore = true)
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
     Workshop toLightEntity(WorkshopLightDTO workshop);
 }
