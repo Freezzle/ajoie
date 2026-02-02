@@ -19,5 +19,5 @@ public interface WorkshopMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    Workshop toLightEntity(WorkshopLightDTO workshop);
+    Workshop toRefEntity(WorkshopLightDTO workshop);
 }

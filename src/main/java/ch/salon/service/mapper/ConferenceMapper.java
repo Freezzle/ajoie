@@ -19,5 +19,5 @@ public interface ConferenceMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    Conference toLightEntity(ConferenceLightDTO conference);
+    Conference toRefEntity(ConferenceLightDTO conference);
 }

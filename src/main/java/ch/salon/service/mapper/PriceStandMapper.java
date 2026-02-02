@@ -18,5 +18,5 @@ public interface PriceStandMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    PriceStandSalon toLightEntity(PriceStandLightDTO priceStandSalon);
+    PriceStandSalon toRefEntity(PriceStandLightDTO priceStandSalon);
 }

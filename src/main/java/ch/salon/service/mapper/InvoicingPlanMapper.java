@@ -19,5 +19,5 @@ public interface InvoicingPlanMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    InvoicingPlan toLightEntity(InvoicingPlanLightDTO invoice);
+    InvoicingPlan toRefEntity(InvoicingPlanLightDTO invoice);
 }

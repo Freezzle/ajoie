@@ -19,5 +19,5 @@ public interface SalonMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    Salon toLightEntity(SalonLightDTO salon);
+    Salon toRefEntity(SalonLightDTO salon);
 }

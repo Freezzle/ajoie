@@ -19,5 +19,5 @@ public interface ParticipationMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    Participation toLightEntity(ParticipationLightDTO participation);
+    Participation toRefEntity(ParticipationLightDTO participation);
 }

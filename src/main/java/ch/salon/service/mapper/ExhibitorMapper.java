@@ -19,5 +19,5 @@ public interface ExhibitorMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    Exhibitor toLightEntity(ExhibitorLightDTO exhibitor);
+    Exhibitor toRefEntity(ExhibitorLightDTO exhibitor);
 }

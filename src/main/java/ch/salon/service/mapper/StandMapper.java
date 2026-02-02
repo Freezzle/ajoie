@@ -19,5 +19,5 @@ public interface StandMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    Stand toLightEntity(StandLightDTO stand);
+    Stand toRefEntity(StandLightDTO stand);
 }

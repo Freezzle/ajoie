@@ -19,5 +19,5 @@ public interface PaymentMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    Payment toLightEntity(PaymentLightDTO payment);
+    Payment toRefEntity(PaymentLightDTO payment);
 }
