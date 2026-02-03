@@ -3,10 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Salon;
 import ch.salon.service.dto.SalonDTO;
 import ch.salon.service.dto.SalonLightDTO;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",uses = {PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SalonMapper {
@@ -17,6 +14,12 @@ public interface SalonMapper {
     Salon toEntity(SalonDTO salon);
 
     SalonLightDTO toLightDto(Salon salon);
+
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "priceStandSalons", ignore = true)
+    void updateEntityFromDto(SalonDTO salonDTO, @MappingTarget Salon salon);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")

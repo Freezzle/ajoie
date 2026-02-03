@@ -64,10 +64,6 @@ public class SalonService {
         Salon salonFound = salonRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        if (salon.getPriceStandSalons() == null || salon.getPriceStandSalons().isEmpty()) {
-            salon.setPriceStandSalons(salonFound.getPriceStandSalons().stream().map(priceStandMapper::toDto)
-                    .collect(Collectors.toSet()));
-        }
 
         Salon salonToUpdate = salonMapper.toEntity(salon);
         if (Salon.hasDifference(salonFound, salonToUpdate)) {
@@ -76,7 +72,42 @@ public class SalonService {
                             EventType.EVENT, EntityType.PARTICIPATION, participation.getId(), null));
         }
 
-        return salonMapper.toDto(salonRepository.save(salonToUpdate));
+        salonMapper.updateEntityFromDto(salon, salonFound);
+
+        // Gérer les PriceStandSalon pour éviter l'erreur "Detached entity"
+        updatePriceStandSalons(salonFound, salon.getPriceStandSalons());
+
+        return salonMapper.toDto(salonFound);
+    }
+
+    private void updatePriceStandSalons(Salon salon, Set<PriceStandDTO> priceStandDtos) {
+        if (priceStandDtos == null) {
+            return;
+        }
+
+        // Créer une map des IDs des DTOs reçus
+        Map<UUID, PriceStandDTO> dtoMap = priceStandDtos.stream()
+                .collect(Collectors.toMap(PriceStandDTO::getId, dto -> dto, (d1, d2) -> d1));
+
+        // Créer une map des IDs existants pour faciliter la mise à jour
+        Map<UUID, PriceStandSalon> existingPricesMap = salon.getPriceStandSalons().stream()
+                .collect(Collectors.toMap(PriceStandSalon::getId, p -> p));
+
+        // Supprimer les éléments qui ne sont plus présents (orphanRemoval)
+        salon.getPriceStandSalons().removeIf(priceStand -> !dtoMap.containsKey(priceStand.getId()));
+
+        // Mettre à jour ou ajouter les PriceStandSalon
+        for (PriceStandDTO dto : priceStandDtos) {
+            if (dto.getId() != null && existingPricesMap.containsKey(dto.getId())) {
+                // Mettre à jour l'entité existante (attachée à la session) via le mapper
+                PriceStandSalon priceStand = existingPricesMap.get(dto.getId());
+                priceStandMapper.updateEntityFromDto(dto, priceStand);
+            } else {
+                // Créer une nouvelle entité et l'ajouter à la collection existante
+                PriceStandSalon newPriceStand = priceStandMapper.toEntity(dto);
+                salon.getPriceStandSalons().add(newPriceStand);
+            }
+        }
     }
 
     public List<SalonDTO> findAll() {
