@@ -92,10 +92,9 @@ public class StandService {
                     Map.of("old_status", standExisting.getStatus().name()));
         }
 
-        standToUpdate.setRegistrationDate(standExisting.getRegistrationDate());
-        standToUpdate = standRepository.save(standToUpdate);
+        standMapper.updateEntityFromDto(stand, standExisting);
 
-        return standMapper.toDto(standToUpdate);
+        return standMapper.toDto(standExisting);
     }
 
     public List<StandDTO> findAll(UUID idSalon, UUID idParticipation) {

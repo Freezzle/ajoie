@@ -180,10 +180,9 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid idSalon", ENTITY_NAME, "doesntMatchs");
         }
 
-        floorPlan.setPosition(floorPlanSalonDTO.getPosition());
-        floorPlan.setName(floorPlanSalonDTO.getName());
-        floorPlan.setData(floorPlanSalonDTO.getData());
-        return floorPlanSalonMapper.toDto(this.floorPlanSalonRepository.save(floorPlan));
+        this.floorPlanSalonMapper.updateEntityFromDto(floorPlanSalonDTO, floorPlan);
+
+        return floorPlanSalonMapper.toDto(floorPlan);
     }
 
     public List<FloorPlanSalonDTO> getFloorPlanSalon(UUID idSalon) {

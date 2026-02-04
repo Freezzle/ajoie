@@ -90,10 +90,9 @@ public class WorkshopService {
                     Map.of("old_status", workshopExisting.getStatus().name()));
         }
 
-        workshopToUpdate.setRegistrationDate(workshopExisting.getRegistrationDate());
-        workshopToUpdate = workshopRepository.save(workshopToUpdate);
+        workshopMapper.updateEntityFromDto(workshop, workshopExisting);
 
-        return workshopMapper.toDto(workshopToUpdate);
+        return workshopMapper.toDto(workshopExisting);
     }
 
     public List<WorkshopDTO> findAll(UUID idSalon, UUID idParticipation) {

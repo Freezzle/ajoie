@@ -55,11 +55,9 @@ public class ExhibitorService {
         Exhibitor exhibitorFound = exhibitorRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        Exhibitor exhibitorToUpdate = exhibitorMapper.toEntity(exhibitor);
+        exhibitorMapper.updateEntityFromDto(exhibitor, exhibitorFound);
 
-        exhibitorToUpdate.setRegistrationDate(exhibitorFound.getRegistrationDate());
-
-        return exhibitorMapper.toDto(exhibitorRepository.save(exhibitorToUpdate));
+        return exhibitorMapper.toDto(exhibitorFound);
     }
 
     public List<ExhibitorDTO> findAll() {
