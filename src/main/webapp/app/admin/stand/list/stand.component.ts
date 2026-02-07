@@ -17,9 +17,9 @@ import {Category, formatterCategory} from '../../enumerations/category.model';
 import {copyToClipboard} from '../../../core/util/utils';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
-import {Toast} from 'primeng/toast';
+
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {TableModule} from 'primeng/table';
 import {Tag} from 'primeng/tag';
@@ -45,9 +45,9 @@ import {TranslateService} from '@ngx-translate/core';
                    ReactiveFormsModule,
                    ButtonBoxComponent,
                    ProgressSpinner,
-                   Toast,
+                   
                    ConfirmPopup,
-                   AlertComponent,
+                   
                    AlertErrorComponent,
                    TableModule,
                    Tag,

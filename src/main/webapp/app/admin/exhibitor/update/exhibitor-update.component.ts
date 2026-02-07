@@ -18,10 +18,10 @@ import {SelectBoxComponent} from '../../../shared/components/select-box/select-b
 import {IExhibitor} from '../model/exhibitor.interface';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {TableModule} from 'primeng/table';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {CountryService, formatterCountry} from '../../../shared/country.service';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
@@ -44,10 +44,10 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    SelectBoxComponent,
                    CheckboxBoxComponent,
                    AlertErrorComponent,
-                   AlertComponent,
+                   
                    TableModule,
                    ConfirmPopup,
-                   Toast,
+                   
                    CardComponent,
                    ContentPageComponent,
                    Rating

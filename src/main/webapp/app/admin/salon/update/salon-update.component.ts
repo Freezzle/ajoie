@@ -15,13 +15,13 @@ import {TextBoxComponent} from '../../../shared/components/text-box/text-box.com
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {DateBoxComponent} from '../../../shared/components/date-box/date-box.component';
 import {sortPriceStandSalon} from '../model/price-stand-salon.interface';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CurrencyBoxComponent} from '../../../shared/components/currency-box/currency-box.component';
 import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
 import {TableModule} from 'primeng/table';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 
@@ -36,13 +36,13 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
                    TextBoxComponent,
                    TextareaBoxComponent,
                    DateBoxComponent,
-                   AlertComponent,
+                   
                    AlertErrorComponent,
                    CurrencyBoxComponent,
                    NumberBoxComponent,
                    TableModule,
                    ConfirmPopup,
-                   Toast,
+                   
                    CardComponent,
                    ContentPageComponent
                ]

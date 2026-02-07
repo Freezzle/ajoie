@@ -15,9 +15,9 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
-import {Toast} from 'primeng/toast';
+
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {TableModule} from 'primeng/table';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
@@ -41,9 +41,9 @@ import {MenuItem} from 'primeng/api';
                    ReactiveFormsModule,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-                   Toast,
+                   
                    ConfirmPopup,
-                   AlertComponent,
+                   
                    TableModule,
                    ContentPageComponent,
                    CardComponent,

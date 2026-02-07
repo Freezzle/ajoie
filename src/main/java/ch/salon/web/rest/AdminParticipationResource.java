@@ -9,7 +9,6 @@ import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ch.salon.utils.ResponseUtil;
+import ch.salon.utils.ResourceUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,12 +30,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static ch.salon.service.ParticipationService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.created;
-import static org.springframework.http.ResponseEntity.noContent;
-import static org.springframework.http.ResponseEntity.ok;
-import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
-import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
-import static ch.salon.utils.HeaderUtil.createEntityUpdateAlert;
 
 @RestController
 @RequestMapping("/api/admin/participations")
@@ -47,9 +41,6 @@ public class AdminParticipationResource {
     private final InvoicingPlanService invoicingPlanService;
     private final RefreshInvoicingPlansService refreshInvoicingPlansService;
 
-    @Value("${salon.clientApp.name}")
-    private String applicationName;
-
     public AdminParticipationResource(ParticipationService participationService,
             InvoicingPlanService invoicingPlanService, RefreshInvoicingPlansService refreshInvoicingPlansService) {
         this.participationService = participationService;
@@ -59,14 +50,12 @@ public class AdminParticipationResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Participation> createParticipation(@RequestBody Participation participation)
-            throws URISyntaxException {
+    public ResponseEntity<Participation> createParticipation(@RequestBody Participation participation) {
         log.debug("REST request to save Participation : {}", participation);
 
         UUID id = participationService.create(participation);
 
-        return created(new URI("/api/admin/participations/" + id)).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(participation);
+        return ResourceUtil.created(ENTITY_NAME, id, "/api/admin/participations").body(participation);
     }
 
     @PutMapping("/{idParticipation}")
@@ -78,8 +67,7 @@ public class AdminParticipationResource {
 
         participation = participationService.update(idParticipation, participation);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, idParticipation.toString()))
-                   .body(participation);
+        return ResourceUtil.updated(ENTITY_NAME, idParticipation).body(participation);
     }
 
     @GetMapping("/{idParticipation}")
@@ -97,8 +85,7 @@ public class AdminParticipationResource {
 
         participationService.delete(idParticipation);
 
-        return noContent().headers(
-                createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idParticipation.toString())).build();
+        return ResourceUtil.deleted(ENTITY_NAME, idParticipation).build();
     }
 
     @GetMapping("/{idParticipation}/invoicing-plans")

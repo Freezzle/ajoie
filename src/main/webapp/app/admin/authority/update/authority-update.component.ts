@@ -14,12 +14,12 @@ import {ErrorModel} from '../../../shared/field-error/error.model';
 import {FieldErrorComponent} from '../../../shared/field-error/field-error.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 
 @Component({
                selector: 'app-authority-update',
                templateUrl: './authority-update.component.html',
-               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent, AlertErrorComponent, AlertComponent]
+               imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent, AlertErrorComponent]
            })
 export class AuthorityUpdateComponent implements OnInit {
     isLoading = false;

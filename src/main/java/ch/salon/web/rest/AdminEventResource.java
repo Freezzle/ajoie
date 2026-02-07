@@ -2,7 +2,8 @@ package ch.salon.web.rest;
 
 import ch.salon.repository.EventLogRepository;
 import ch.salon.security.AuthoritiesConstants;
-import org.springframework.beans.factory.annotation.Value;
+import ch.salon.utils.ResourceUtil;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,10 +17,9 @@ import java.util.UUID;
 @RequestMapping("/api/admin/events")
 @Transactional
 public class AdminEventResource {
-    private final EventLogRepository eventLogRepository;
 
-    @Value("${salon.clientApp.name}")
-    private String applicationName;
+    private static final String ENTITY_NAME = "event";
+    private final EventLogRepository eventLogRepository;
 
     public AdminEventResource(EventLogRepository eventLogRepository) {
         this.eventLogRepository = eventLogRepository;
@@ -27,8 +27,8 @@ public class AdminEventResource {
 
     @DeleteMapping("/{idEvent}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public void getAllLogs(@PathVariable(value = "idEvent", required = true) final UUID idEvent) {
-
+    public ResponseEntity<Void> deleteEvent(@PathVariable("idEvent") UUID idEvent) {
         this.eventLogRepository.deleteById(idEvent);
+        return ResourceUtil.deleted(ENTITY_NAME, idEvent).build();
     }
 }

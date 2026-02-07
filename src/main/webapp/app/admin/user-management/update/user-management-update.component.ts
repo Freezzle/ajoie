@@ -11,7 +11,7 @@ import {FieldErrorComponent} from '../../../shared/field-error/field-error.compo
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 
 const userTemplate = {} as IUser;
 
@@ -24,7 +24,7 @@ const newUser: IUser = {
                selector: 'app-user-mgmt-update',
                templateUrl: './user-management-update.component.html',
                imports: [SharedModule, FormsModule, ReactiveFormsModule, FieldErrorComponent, ButtonBoxComponent,
-                         CheckboxBoxComponent, AlertErrorComponent, AlertComponent]
+                         CheckboxBoxComponent, AlertErrorComponent]
            })
 export default class UserManagementUpdateComponent implements OnInit {
     languages = LANGUAGES;

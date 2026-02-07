@@ -7,7 +7,6 @@ import ch.salon.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ch.salon.utils.ResponseUtil;
+import ch.salon.utils.ResourceUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-
-import static org.springframework.http.ResponseEntity.created;
-import static org.springframework.http.ResponseEntity.noContent;
-import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
-import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
 
 @RestController
 @RequestMapping("/api/authorities")
@@ -38,9 +33,6 @@ public class AuthorityResource {
 
     private static final String ENTITY_NAME = "authority";
     private final AuthorityRepository authorityRepository;
-
-    @Value("${salon.clientApp.name}")
-    private String applicationName;
 
     public AuthorityResource(AuthorityRepository authorityRepository) {
         this.authorityRepository = authorityRepository;
@@ -57,8 +49,7 @@ public class AuthorityResource {
         }
 
         authority = authorityRepository.save(authority);
-        return created(new URI("/api/authorities/" + authority.getName())).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, authority.getName())).body(authority);
+        return ResourceUtil.created(ENTITY_NAME, authority.getName(), "/api/authorities").body(authority);
     }
 
     @GetMapping("")
@@ -84,6 +75,6 @@ public class AuthorityResource {
 
         authorityRepository.deleteById(idAuthority);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idAuthority)).build();
+        return ResourceUtil.deleted(ENTITY_NAME, idAuthority).build();
     }
 }

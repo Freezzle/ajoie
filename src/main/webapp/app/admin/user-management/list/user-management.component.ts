@@ -17,7 +17,7 @@ import ColorBoolPipe from '../../../shared/pipe/color-boolean.pipe';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 
 @Component({
@@ -33,8 +33,7 @@ import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog
                    ColorBoolPipe,
                    ButtonBoxComponent,
                    LinkBoxComponent,
-                   AlertErrorComponent,
-                   AlertComponent
+                   AlertErrorComponent
                ]
            })
 export default class UserManagementComponent implements OnInit {

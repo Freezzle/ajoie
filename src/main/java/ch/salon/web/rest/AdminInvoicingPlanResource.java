@@ -10,7 +10,6 @@ import ch.salon.web.rest.dto.SplitInvoicing;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +22,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ch.salon.utils.ResponseUtil;
+import ch.salon.utils.ResourceUtil;
 
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
-
-import static org.springframework.http.ResponseEntity.noContent;
-import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
 
 @RestController
 @RequestMapping("/api/admin/invoicing-plans")
@@ -38,9 +35,6 @@ public class AdminInvoicingPlanResource {
 
     private static final Logger log = LoggerFactory.getLogger(AdminInvoicingPlanResource.class);
     private final InvoicingPlanService invoicingPlanService;
-
-    @Value("${salon.clientApp.name}")
-    private String applicationName;
 
     public AdminInvoicingPlanResource(InvoicingPlanService invoicingPlanService) {
         this.invoicingPlanService = invoicingPlanService;
@@ -52,7 +46,7 @@ public class AdminInvoicingPlanResource {
             @PathVariable(value = "idInvoicingPlan", required = false) final UUID idInvoicingPlan,
             @RequestBody SplitInvoicing splitInvoicing) throws Exception {
         invoicingPlanService.splitInvoicingPlan(idInvoicingPlan, splitInvoicing.getInvoicesIds(), false, false);
-        return noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{idInvoicingPlan}/switch-arrangement")
@@ -60,7 +54,7 @@ public class AdminInvoicingPlanResource {
     public ResponseEntity<Void> switchArrangement(
             @PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan) throws Exception {
         invoicingPlanService.switchArrangement(idInvoicingPlan);
-        return noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{idInvoicingPlan}/switch-invoice-method/{method}")
@@ -69,7 +63,7 @@ public class AdminInvoicingPlanResource {
             @PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan,
             @PathVariable(value = "method")InvoiceSendingMethod method) throws Exception {
         invoicingPlanService.switchInvoiceSendingMethod(idInvoicingPlan, method);
-        return noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("{idInvoicingPlan}/invoices")
@@ -96,8 +90,7 @@ public class AdminInvoicingPlanResource {
 
         this.invoicingPlanService.deleteInvoice(idInvoicingPlan, idInvoice);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, "payment", idInvoice.toString()))
-                          .build();
+        return ResourceUtil.deleted("invoice", idInvoice).build();
     }
 
     @PostMapping("/{idInvoicingPlan}/payments")
@@ -127,8 +120,7 @@ public class AdminInvoicingPlanResource {
 
         this.invoicingPlanService.deletePayment(idInvoicingPlan, idPayment);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, "payment", idPayment.toString()))
-                          .build();
+        return ResourceUtil.deleted("payment", idPayment).build();
     }
 
     @GetMapping("/{idInvoicingPlan}/events")

@@ -19,9 +19,9 @@ import {TextBoxComponent} from '../../../shared/components/text-box/text-box.com
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {LinkBoxComponent} from '../../../shared/components/link-box/link-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 
@@ -29,7 +29,7 @@ import {CardComponent} from '../../../shared/components/card/card.component';
                selector: 'app-workshop-update',
                templateUrl: './workshop-update.component.html',
                imports: [SharedModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
-                         TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, ContentPageComponent, CardComponent]
+                         TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, LinkBoxComponent, AlertErrorComponent,  ConfirmPopup,  ContentPageComponent, CardComponent]
            })
 export class WorkshopUpdateComponent implements OnInit {
     isLoading = false;

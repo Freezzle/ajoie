@@ -5,8 +5,8 @@ import {Component, inject, model, OnInit, signal} from '@angular/core';
 import SharedModule from 'app/shared/shared.module';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
-import {Toast} from 'primeng/toast';
+
+
 import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import {ConferenceService} from '../../conference/service/conference.service';
@@ -35,8 +35,8 @@ import {TpComponent} from '../../../shared/components/talks-planning/tp.componen
                    SharedModule,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-                   AlertComponent,
-                   Toast,
+                   
+                   
                    ConfirmPopup,
                    TpComponent,
                    CardComponent,

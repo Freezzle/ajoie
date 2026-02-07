@@ -6,7 +6,6 @@ import ch.salon.service.dto.StandDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ch.salon.utils.ResponseUtil;
+import ch.salon.utils.ResourceUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,12 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static ch.salon.service.StandService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.created;
-import static org.springframework.http.ResponseEntity.noContent;
-import static org.springframework.http.ResponseEntity.ok;
-import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
-import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
-import static ch.salon.utils.HeaderUtil.createEntityUpdateAlert;
 
 @RestController
 @RequestMapping("/api/admin/stands")
@@ -42,8 +36,6 @@ public class AdminStandResource {
     private static final Logger log = LoggerFactory.getLogger(AdminStandResource.class);
     private final StandService standService;
 
-    @Value("${salon.clientApp.name}")
-    private String applicationName;
 
     public AdminStandResource(StandService standService) {
         this.standService = standService;
@@ -51,13 +43,12 @@ public class AdminStandResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<StandDTO> createStand(@Valid @RequestBody StandDTO stand) throws URISyntaxException {
+    public ResponseEntity<StandDTO> createStand(@Valid @RequestBody StandDTO stand) {
         log.debug("REST request to save Stand : {}", stand);
 
         UUID id = standService.create(stand);
 
-        return created(new URI("/api/admin/stands/" + id)).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(stand);
+        return ResourceUtil.created(ENTITY_NAME, id, "/api/admin/stands").body(stand);
     }
 
     @PutMapping("/{idStand}")
@@ -68,8 +59,7 @@ public class AdminStandResource {
 
         stand = standService.update(idStand, stand);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stand.getId().toString()))
-                   .body(stand);
+        return ResourceUtil.updated(ENTITY_NAME, stand.getId()).body(stand);
     }
 
     @GetMapping("")
@@ -96,7 +86,6 @@ public class AdminStandResource {
 
         standService.delete(idStand);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idStand.toString()))
-                          .build();
+        return ResourceUtil.deleted(ENTITY_NAME, idStand).build();
     }
 }

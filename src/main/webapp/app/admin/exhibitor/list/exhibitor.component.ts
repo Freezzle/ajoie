@@ -11,11 +11,11 @@ import {ExhibitorService} from '../service/exhibitor.service';
 import {finalize} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {Toast} from 'primeng/toast';
+
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {TableModule} from 'primeng/table';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {IconField} from 'primeng/iconfield';
@@ -36,10 +36,10 @@ import {TranslateService} from '@ngx-translate/core';
                    ReactiveFormsModule,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-                   Toast,
+                   
                    ConfirmPopup,
                    TableModule,
-                   AlertComponent,
+                   
                    ContentPageComponent,
                    CardComponent,
                    IconField,

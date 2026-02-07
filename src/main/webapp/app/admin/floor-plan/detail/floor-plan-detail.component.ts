@@ -42,7 +42,7 @@ import {Status} from '../../enumerations/status.model';
 import {v4} from 'uuid';
 
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {ContextMenu} from 'primeng/contextmenu';
 import {MenuItem, PrimeIcons} from 'primeng/api';
 import {Tag} from 'primeng/tag';
@@ -52,7 +52,7 @@ import {IftaLabel} from 'primeng/iftalabel';
 import {TabsModule} from 'primeng/tabs';
 
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {FloorPlanDimensionTileComponent} from './floor-plan-dimension-tile/floor-plan-dimension-tile.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
@@ -84,10 +84,10 @@ import {NumberBoxComponent} from '../../../shared/components/number-box/number-b
                    FormsModule,
                    ReactiveFormsModule,
                    ButtonBoxComponent,
-                   AlertComponent,
+                   
                    AlertErrorComponent,
                    ConfirmPopup,
-                   Toast,
+                   
                    ContextMenu,
                    Tag,
                    FloorPlanDimensionTileComponent,

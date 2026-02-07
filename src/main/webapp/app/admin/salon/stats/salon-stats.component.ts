@@ -11,10 +11,10 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {ISalonStats} from '../model/salon-stats.interface';
-import {Toast, ToastModule} from 'primeng/toast';
+import { ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import {formatDate} from '@angular/common';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {CardComponent} from '../../../shared/components/card/card.component';
@@ -32,8 +32,8 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    ReactiveFormsModule,
                    ToastModule,
                    ButtonBoxComponent,
-                   Toast,
-                   AlertComponent,
+                   
+                   
                    AlertErrorComponent,
                    ConfirmPopup,
                    CardComponent,

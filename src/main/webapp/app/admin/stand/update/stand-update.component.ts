@@ -28,10 +28,10 @@ import {
     selectFilterDimension,
     sortPriceStandSalon
 } from '../../salon/model/price-stand-salon.interface';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {ChipsBoxComponent} from '../../../shared/components/chips-box/chips-box.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
@@ -50,10 +50,10 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
                    SelectBoxComponent,
                    CheckboxBoxComponent,
                    LinkBoxComponent,
-                   AlertComponent,
+                   
                    AlertErrorComponent,
                    ConfirmPopup,
-                   Toast,
+                   
                    ChipsBoxComponent,
                    CardComponent,
                    ContentPageComponent

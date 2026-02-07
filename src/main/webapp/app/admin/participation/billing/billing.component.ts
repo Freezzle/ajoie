@@ -25,10 +25,10 @@ import {ActionsService} from '../../common/actions.service';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
 import {formatterInvoiceMethod, InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 import {AccordionModule, AccordionTabCloseEvent, AccordionTabOpenEvent} from 'primeng/accordion';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {Badge} from 'primeng/badge';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
@@ -47,10 +47,10 @@ import {TranslateService} from '@ngx-translate/core';
                    ReactiveFormsModule,
                    ButtonBoxComponent,
                    AccordionModule,
-                   AlertComponent,
+                   
                    AlertErrorComponent,
                    ConfirmPopup,
-                   Toast,
+                   
                    Badge,
                    ContentPageComponent,
                    CardComponent,

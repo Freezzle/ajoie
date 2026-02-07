@@ -13,13 +13,13 @@ import ch.salon.service.dto.ParticipationDTO;
 import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
 import ch.salon.utils.ResponseUtil;
+import ch.salon.utils.ResourceUtil;
 import ch.salon.web.rest.dto.InfoInvoice;
 import ch.salon.web.rest.dto.SalonStatistiques;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +34,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static ch.salon.service.SalonService.ENTITY_NAME;
-import static ch.salon.utils.HeaderUtil.*;
-import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("/api/admin/salons")
@@ -47,8 +45,6 @@ public class AdminSalonResource {
     private final Importation2026Service importation2026Service;
     private final ParticipationService participationService;
 
-    @Value("${salon.clientApp.name}")
-    private String applicationName;
 
     public AdminSalonResource(SalonService salonService, Importation2026Service importation2026Service,
                               ParticipationService participationService) {
@@ -59,13 +55,12 @@ public class AdminSalonResource {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<SalonDTO> createSalon(@Valid @RequestBody SalonDTO salon) throws URISyntaxException {
+    public ResponseEntity<SalonDTO> createSalon(@Valid @RequestBody SalonDTO salon) {
         log.debug("REST request to save Salon : {}", salon);
 
         UUID id = salonService.create(salon);
 
-        return created(new URI("/api/admin/salons/" + id)).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(salon);
+        return ResourceUtil.created(ENTITY_NAME, id, "/api/admin/salons").body(salon);
     }
 
     @PutMapping("/{idSalon}")
@@ -76,8 +71,7 @@ public class AdminSalonResource {
 
         salon = salonService.update(idSalon, salon);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, idSalon.toString()))
-                .body(salon);
+        return ResourceUtil.updated(ENTITY_NAME, idSalon).body(salon);
     }
 
     @GetMapping("/{idSalon}/participations/info-invoices")
@@ -108,8 +102,7 @@ public class AdminSalonResource {
 
         salonService.delete(idSalon);
 
-        return noContent().headers(createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idSalon.toString()))
-                .build();
+        return ResourceUtil.deleted(ENTITY_NAME, idSalon).build();
     }
 
     @GetMapping("{idSalon}/participations")
@@ -150,21 +143,21 @@ public class AdminSalonResource {
                 statuses == null || statuses.isEmpty() ? List.of(Status.CLOSED, Status.VALIDATED, Status.ACCEPTED) :
                         statuses);
 
-        return ok().body(stats);
+        return ResponseEntity.ok().body(stats);
     }
 
     @GetMapping("/{idSalon}/floor-plan")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<List<FloorPlanSalonDTO>> getFloorPlanSalon(
             @PathVariable(value = "idSalon", required = false) final UUID idSalon) {
-        return ok(salonService.getFloorPlanSalon(idSalon));
+        return ResponseEntity.ok(salonService.getFloorPlanSalon(idSalon));
     }
 
     @PostMapping("/{idSalon}/floor-plan")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<FloorPlanSalonDTO> createFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
                                                                   @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
-        return ok(salonService.createFloorPlanSalon(idSalon, floorPlanSalonDTO));
+        return ResponseEntity.ok(salonService.createFloorPlanSalon(idSalon, floorPlanSalonDTO));
     }
 
     @DeleteMapping("/{idSalon}/floor-plan/{idFloorPlan}")
@@ -172,7 +165,7 @@ public class AdminSalonResource {
     public ResponseEntity<FloorPlanSalonDTO> deleteFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
                                                                   @PathVariable(value = "idFloorPlan") final UUID idFloorPlan) {
         this.salonService.deleteFloorPlanSalon(idSalon, idFloorPlan);
-        return noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{idSalon}/floor-plan/{idFloorPlan}")
@@ -180,7 +173,7 @@ public class AdminSalonResource {
     public ResponseEntity<FloorPlanSalonDTO> updateFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
                                                                   @PathVariable(value = "idFloorPlan") final UUID idFloorPlan,
                                                                   @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
-        return ok(salonService.updateFloorPlanSalon(idSalon, idFloorPlan, floorPlanSalonDTO));
+        return ResponseEntity.ok(salonService.updateFloorPlanSalon(idSalon, idFloorPlan, floorPlanSalonDTO));
     }
 
     @PutMapping("/{idSalon}/planning-talks")
@@ -188,14 +181,14 @@ public class AdminSalonResource {
     public ResponseEntity<PlanningTalksSalon> updatePlanningTalks(
             @PathVariable(value = "idSalon", required = false) final UUID idSalon,
             @RequestBody PlanningTalksSalon planningTalksSalon) {
-        return ok(salonService.updatePlanningTalks(idSalon, planningTalksSalon));
+        return ResponseEntity.ok(salonService.updatePlanningTalks(idSalon, planningTalksSalon));
     }
 
     @GetMapping("/{idSalon}/planning-talks")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<PlanningTalksSalon> getPlanningTalks(
             @PathVariable(value = "idSalon", required = false) final UUID idSalon) {
-        return ok(salonService.getPlanningTalks(idSalon));
+        return ResponseEntity.ok(salonService.getPlanningTalks(idSalon));
     }
 
     @PutMapping("/{idSalon}/planning-volunteers")
@@ -203,14 +196,14 @@ public class AdminSalonResource {
     public ResponseEntity<PlanningVolunteerSalon> updatePlanningVolunteers(
             @PathVariable(value = "idSalon", required = false) final UUID idSalon,
             @RequestBody PlanningVolunteerSalon planningVolunteerSalon) {
-        return ok(salonService.updatePlanningVolunteers(idSalon, planningVolunteerSalon));
+        return ResponseEntity.ok(salonService.updatePlanningVolunteers(idSalon, planningVolunteerSalon));
     }
 
     @GetMapping("/{idSalon}/planning-volunteers")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<PlanningVolunteerSalon> getPlanningVolunteers(
             @PathVariable(value = "idSalon", required = false) final UUID idSalon) {
-        return ok(salonService.getPlanningVolunteers(idSalon));
+        return ResponseEntity.ok(salonService.getPlanningVolunteers(idSalon));
     }
 
     @GetMapping("/{idSalon}/dimension-stands")

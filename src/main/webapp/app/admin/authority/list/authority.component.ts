@@ -10,10 +10,10 @@ import {IAuthority} from '../authority.model';
 import {AuthorityService, EntityArrayResponseType} from '../service/authority.service';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {ConfirmDialog} from 'primeng/confirmdialog';
-import {Toast} from 'primeng/toast';
+
 
 @Component({
                selector: 'app-authority',
@@ -26,9 +26,7 @@ import {Toast} from 'primeng/toast';
                    SortByDirective,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-                   AlertComponent,
-                   ConfirmDialog,
-                   Toast
+                   ConfirmDialog
                ]
            })
 export class AuthorityComponent implements OnInit {

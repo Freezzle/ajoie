@@ -39,11 +39,11 @@ import {WorkshopService} from '../../workshop/service/workshop.service';
 import {formatterModePaymentMeals, ModePaymentMeals} from '../../enumerations/mode-payment-meals.model';
 import {formatterInvoiceMethod, InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {Badge} from 'primeng/badge';
 import {Tag} from 'primeng/tag';
@@ -61,7 +61,7 @@ import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.componen
                templateUrl: './participation-update.component.html',
                imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
                          ButtonBoxComponent, LinkBoxComponent, SelectBoxComponent, DateBoxComponent,
-                         NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent, AlertComponent, ConfirmPopup, Toast, Tab, TabList, Tabs, TabPanels, TabPanel, Badge, Tag, CardComponent, ContentPageComponent, MenuBoxComponent, TableModule, RatingBoxComponent]
+                         NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent,  ConfirmPopup,  Tab, TabList, Tabs, TabPanels, TabPanel, Badge, Tag, CardComponent, ContentPageComponent, MenuBoxComponent, TableModule, RatingBoxComponent]
            })
 export class ParticipationUpdateComponent implements OnInit {
     tabActive = '0';

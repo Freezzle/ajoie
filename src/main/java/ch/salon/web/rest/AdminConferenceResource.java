@@ -2,11 +2,11 @@ package ch.salon.web.rest;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ConferenceService;
+import ch.salon.service.ParticipationService;
 import ch.salon.service.dto.ConferenceDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ch.salon.utils.ResponseUtil;
+import ch.salon.utils.ResourceUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,12 +28,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static ch.salon.service.ConferenceService.ENTITY_NAME;
-import static org.springframework.http.ResponseEntity.created;
-import static org.springframework.http.ResponseEntity.noContent;
-import static org.springframework.http.ResponseEntity.ok;
-import static ch.salon.utils.HeaderUtil.createEntityCreationAlert;
-import static ch.salon.utils.HeaderUtil.createEntityDeletionAlert;
-import static ch.salon.utils.HeaderUtil.createEntityUpdateAlert;
 
 @RestController
 @RequestMapping("/api/admin/conferences")
@@ -42,23 +37,18 @@ public class AdminConferenceResource {
     private static final Logger log = LoggerFactory.getLogger(AdminConferenceResource.class);
     private final ConferenceService conferenceService;
 
-    @Value("${salon.clientApp.name}")
-    private String applicationName;
-
     public AdminConferenceResource(ConferenceService conferenceService) {
         this.conferenceService = conferenceService;
     }
 
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<ConferenceDTO> createConference(@Valid @RequestBody ConferenceDTO conference)
-            throws URISyntaxException {
+    public ResponseEntity<ConferenceDTO> createConference(@Valid @RequestBody ConferenceDTO conference) {
         log.debug("REST request to save Conference : {}", conference);
 
         UUID id = conferenceService.create(conference);
 
-        return created(new URI("/api/admin/conferences/" + id)).headers(
-                createEntityCreationAlert(applicationName, true, ENTITY_NAME, id.toString())).body(conference);
+        return ResourceUtil.created(ENTITY_NAME, id, "/api/admin/conferences").body(conference);
     }
 
     @PutMapping("/{idConference}")
@@ -70,8 +60,7 @@ public class AdminConferenceResource {
 
         conference = conferenceService.update(idConference, conference);
 
-        return ok().headers(createEntityUpdateAlert(applicationName, true, ENTITY_NAME, conference.getId().toString()))
-                   .body(conference);
+        return ResourceUtil.updated(ENTITY_NAME, conference.getId()).body(conference);
     }
 
     @GetMapping("")
@@ -98,7 +87,6 @@ public class AdminConferenceResource {
 
         conferenceService.delete(idConference);
 
-        return noContent().headers(
-                createEntityDeletionAlert(applicationName, true, ENTITY_NAME, idConference.toString())).build();
+        return ResourceUtil.deleted(ENTITY_NAME, idConference).build();
     }
 }

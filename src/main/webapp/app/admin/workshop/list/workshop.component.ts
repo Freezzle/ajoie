@@ -14,9 +14,9 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {TableModule} from 'primeng/table';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
@@ -41,8 +41,8 @@ import {TranslateService} from '@ngx-translate/core';
                    ButtonBoxComponent,
                    AlertErrorComponent,
                    ConfirmPopup,
-                   Toast,
-                   AlertComponent,
+                   
+                   
                    TableModule,
                    ContentPageComponent,
                    CardComponent,

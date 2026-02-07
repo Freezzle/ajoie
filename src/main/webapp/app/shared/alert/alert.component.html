@@ -1,11 +1,6 @@
-<div class="alerts" role="alert">
-    @for (alert of alerts(); track $index) {
-        <div [ngClass]="setClasses(alert)">
-            @if (alert.message) {
-                <ngb-alert (closed)="close(alert)" [type]="alert.type">
-                    <pre [innerHTML]="alert.message"></pre>
-                </ngb-alert>
-            }
-        </div>
-    }
-</div>
+<p-toast key="top-right" position="top-right"/>
+<p-toast key="top-left" position="top-left"/>
+<p-toast key="top-center" position="top-center"/>
+<p-toast key="bottom-right" position="bottom-right"/>
+<p-toast key="bottom-left" position="bottom-left"/>
+<p-toast key="bottom-center" position="bottom-center"/>

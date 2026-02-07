@@ -10,11 +10,11 @@ import {DatePickerModule} from 'primeng/datepicker';
 import {SelectModule} from 'primeng/select';
 import {DialogModule} from 'primeng/dialog';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {TranslateModule} from '@ngx-translate/core';
@@ -50,11 +50,11 @@ import {finalize, map} from 'rxjs';
                    SelectModule,
                    DialogModule,
                    ConfirmPopup,
-                   Toast,
+                   
                    ContentPageComponent,
                    TranslateModule,
                    ButtonBoxComponent,
-                   AlertComponent,
+                   
                    AlertErrorComponent,
                    CardComponent,
                    TabPanels,

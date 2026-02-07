@@ -1,6 +1,7 @@
 import {inject, Injectable, SecurityContext} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
+import {Subject, Observable} from 'rxjs';
 
 import {translationNotFoundMessage} from 'app/config/translation.config';
 
@@ -30,6 +31,9 @@ export class AlertService {
     private alertId = 0;
     private alerts: Alert[] = [];
 
+    // Subject pour notifier les nouvelles alertes
+    private alertSubject = new Subject<Alert>();
+
     private sanitizer = inject(DomSanitizer);
     private translateService = inject(TranslateService);
 
@@ -39,6 +43,13 @@ export class AlertService {
 
     get(): Alert[] {
         return this.alerts;
+    }
+
+    /**
+     * Observable pour écouter les nouvelles alertes ajoutées
+     */
+    onAlert(): Observable<Alert> {
+        return this.alertSubject.asObservable();
     }
 
     /**
@@ -70,6 +81,11 @@ export class AlertService {
         alert.close = (alertsArray: Alert[]) => this.closeAlert(alert.id!, alertsArray);
 
         (extAlerts ?? this.alerts).push(alert);
+
+        // Notifier les observateurs de la nouvelle alerte
+        if (!extAlerts) {
+            this.alertSubject.next(alert);
+        }
 
         if (alert.timeout > 0) {
             setTimeout(() => {

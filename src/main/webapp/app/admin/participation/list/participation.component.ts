@@ -13,9 +13,9 @@ import {Status} from '../../enumerations/status.model';
 import {finalize} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {TableModule} from 'primeng/table';
 import {DateTimelinePoint, TimelineDotComponent} from '../../../shared/components/timeline-dot/timeline-dot.component';
@@ -44,8 +44,8 @@ import {MenuItem} from 'primeng/api';
                    ReactiveFormsModule,
                    ButtonBoxComponent,
                    ConfirmPopup,
-                   Toast,
-                   AlertComponent,
+                   
+                   
                    AlertErrorComponent,
                    TableModule,
                    TimelineDotComponent,

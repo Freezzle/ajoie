@@ -10,10 +10,10 @@ import {SalonService} from '../service/salon.service';
 import {finalize} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {AlertComponent} from '../../../shared/alert/alert.component';
+
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Toast} from 'primeng/toast';
+
 import {TableModule} from 'primeng/table';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
@@ -34,9 +34,9 @@ import {MenuItem} from 'primeng/api';
                    FormatMediumDatePipe,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-                   AlertComponent,
+                   
                    ConfirmPopup,
-                   Toast,
+                   
                    TableModule,
                    ContentPageComponent,
                    CardComponent,
