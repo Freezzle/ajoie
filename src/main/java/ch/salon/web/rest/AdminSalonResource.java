@@ -181,7 +181,8 @@ public class AdminSalonResource {
     public ResponseEntity<PlanningTalksSalon> updatePlanningTalks(
             @PathVariable(value = "idSalon", required = false) final UUID idSalon,
             @RequestBody PlanningTalksSalon planningTalksSalon) {
-        return ResponseEntity.ok(salonService.updatePlanningTalks(idSalon, planningTalksSalon));
+        PlanningTalksSalon planning = salonService.updatePlanningTalks(idSalon, planningTalksSalon);
+        return ResourceUtil.updated("planningTalksSalon", idSalon).body(planning);
     }
 
     @GetMapping("/{idSalon}/planning-talks")
@@ -196,7 +197,9 @@ public class AdminSalonResource {
     public ResponseEntity<PlanningVolunteerSalon> updatePlanningVolunteers(
             @PathVariable(value = "idSalon", required = false) final UUID idSalon,
             @RequestBody PlanningVolunteerSalon planningVolunteerSalon) {
-        return ResponseEntity.ok(salonService.updatePlanningVolunteers(idSalon, planningVolunteerSalon));
+
+        PlanningVolunteerSalon planning = salonService.updatePlanningVolunteers(idSalon, planningVolunteerSalon);
+        return ResourceUtil.updated("planningVolunteerSalon", idSalon).body(planning);
     }
 
     @GetMapping("/{idSalon}/planning-volunteers")

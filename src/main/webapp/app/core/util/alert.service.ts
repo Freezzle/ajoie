@@ -23,7 +23,7 @@ export interface Alert {
                 providedIn: 'root'
             })
 export class AlertService {
-    timeout = 5000;
+    timeout = 1500;
     toast = false;
     position = 'top right';
 
@@ -63,7 +63,7 @@ export class AlertService {
     addAlert(alert: Alert, extAlerts?: Alert[]): Alert {
         alert.id = this.alertId++;
 
-        if (alert.translationKey) {
+        if ((!alert.message && alert.translationKey) || (alert.translationKey && alert.message === alert.translationKey)) {
             const translatedMessage = this.translateService.instant(alert.translationKey, alert.translationParams);
 
             // if translation key exists
@@ -74,7 +74,7 @@ export class AlertService {
             }
         }
 
-        alert.message = this.sanitizer.sanitize(SecurityContext.HTML, alert.message ?? '') ?? '';
+        alert.message = this.sanitizer.sanitize(SecurityContext.NONE, alert.message ?? '') ?? '';
         alert.timeout = alert.timeout ?? this.timeout;
         alert.toast = alert.toast ?? this.toast;
         alert.position = alert.position ?? this.position;

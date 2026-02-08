@@ -20,15 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -47,8 +39,8 @@ public class AccountResource {
     private final PasswordResetEmailCreator passwordResetEmailCreator;
 
     public AccountResource(UserRepository userRepository, UserService userService,
-            PersistentTokenRepository persistentTokenRepository, ActivationEmailCreator activationEmailCreator,
-            PasswordResetEmailCreator passwordResetEmailCreator) {
+                           PersistentTokenRepository persistentTokenRepository, ActivationEmailCreator activationEmailCreator,
+                           PasswordResetEmailCreator passwordResetEmailCreator) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.persistentTokenRepository = persistentTokenRepository;
@@ -92,7 +84,7 @@ public class AccountResource {
     @GetMapping("/account")
     public AdminUserDTO getAccount() {
         return userService.getUserWithAuthorities().map(AdminUserDTO::new)
-                          .orElseThrow(() -> new AccountResourceException("User could not be found"));
+                .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
 
     @PostMapping("/account")
@@ -126,21 +118,21 @@ public class AccountResource {
     @GetMapping("/account/sessions")
     public List<PersistentToken> getCurrentSessions() {
         return persistentTokenRepository.findByUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()
-                                                                                               .orElseThrow(
-                                                                                                       () -> new AccountResourceException(
-                                                                                                               "Current user login not found")))
-                                                                  .orElseThrow(() -> new AccountResourceException(
-                                                                          "User could not be found")));
+                        .orElseThrow(
+                                () -> new AccountResourceException(
+                                        "Current user login not found")))
+                .orElseThrow(() -> new AccountResourceException(
+                        "User could not be found")));
     }
 
     @DeleteMapping("/account/sessions/{series}")
     public void invalidateSession(@PathVariable("series") String series) {
         String decodedSeries = URLDecoder.decode(series, StandardCharsets.UTF_8);
         SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneByLogin).flatMap(
-                             u -> persistentTokenRepository.findByUser(u).stream()
-                                                           .filter(persistentToken -> StringUtils.equals(persistentToken.getSeries(),
-                                                                   decodedSeries)).findAny())
-                     .ifPresent(t -> persistentTokenRepository.deleteById(decodedSeries));
+                        u -> persistentTokenRepository.findByUser(u).stream()
+                                .filter(persistentToken -> StringUtils.equals(persistentToken.getSeries(),
+                                        decodedSeries)).findAny())
+                .ifPresent(t -> persistentTokenRepository.deleteById(decodedSeries));
     }
 
     @PostMapping(path = "/account/reset-password/init")

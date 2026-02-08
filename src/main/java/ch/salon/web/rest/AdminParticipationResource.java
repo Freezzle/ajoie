@@ -7,24 +7,15 @@ import ch.salon.service.ParticipationService;
 import ch.salon.service.RefreshInvoicingPlansService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
+import ch.salon.utils.ResourceUtil;
+import ch.salon.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ch.salon.utils.ResponseUtil;
-import ch.salon.utils.ResourceUtil;
+import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +33,7 @@ public class AdminParticipationResource {
     private final RefreshInvoicingPlansService refreshInvoicingPlansService;
 
     public AdminParticipationResource(ParticipationService participationService,
-            InvoicingPlanService invoicingPlanService, RefreshInvoicingPlansService refreshInvoicingPlansService) {
+                                      InvoicingPlanService invoicingPlanService, RefreshInvoicingPlansService refreshInvoicingPlansService) {
         this.participationService = participationService;
         this.invoicingPlanService = invoicingPlanService;
         this.refreshInvoicingPlansService = refreshInvoicingPlansService;

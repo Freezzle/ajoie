@@ -67,7 +67,7 @@ salon:
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
     allowed-headers: '*'
-    exposed-headers: 'Link,X-Total-Count,X-${salon.clientApp.name}-alert,X-${salon.clientApp.name}-error,X-${salon.clientApp.name}-params'
+    exposed-headers: 'Link,X-Total-Count,X-${salon.clientApp.name}-alert,X-${salon.clientApp.name}-alert-key,X-${salon.clientApp.name}-error,X-${salon.clientApp.name}-params'
     allow-credentials: true
     max-age: 1800
   security:

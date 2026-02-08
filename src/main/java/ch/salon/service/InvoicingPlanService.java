@@ -4,11 +4,7 @@ import ch.salon.domain.Invoice;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Payment;
-import ch.salon.domain.enumeration.EntityType;
-import ch.salon.domain.enumeration.EventType;
-import ch.salon.domain.enumeration.InvoiceSendingMethod;
-import ch.salon.domain.enumeration.State;
-import ch.salon.domain.enumeration.Status;
+import ch.salon.domain.enumeration.*;
 import ch.salon.repository.InvoiceRepository;
 import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.ParticipationRepository;
@@ -28,13 +24,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ch.salon.domain.enumeration.EntityType.INVOICE_PLAN;
@@ -60,7 +50,7 @@ public class InvoicingPlanService {
 
     private final MessageSource messageSource;
 
-    public Optional<InvoiceDTO> createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {
+    public InvoiceDTO createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {
         if (idInvoicingPlan == null || invoiceDTO == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -77,10 +67,10 @@ public class InvoicingPlanService {
         invoicingPlan = repository.save(invoicingPlan);
         this.eventLogService.eventFromSystem("Ligne de facture ajoutée", EventType.ACTION, INVOICE_PLAN,
                 invoicingPlan.getId(), null);
-        return Optional.of(invoiceMapper.toDto(invoiceToCreate));
+        return invoiceMapper.toDto(invoiceToCreate);
     }
 
-    public Optional<InvoiceDTO> updateInvoice(UUID idInvoicingPlan, UUID idInvoice, InvoiceDTO invoiceDTO) {
+    public InvoiceDTO updateInvoice(UUID idInvoicingPlan, UUID idInvoice, InvoiceDTO invoiceDTO) {
         if (idInvoicingPlan == null || invoiceDTO == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -90,7 +80,7 @@ public class InvoicingPlanService {
 
         Invoice invoiceFound =
                 invoicingPlan.getInvoices().stream().filter(invoice -> invoice.getId().equals(idInvoice)).findFirst()
-                             .orElseThrow();
+                        .orElseThrow();
 
         if (!Objects.equals(invoiceFound.getCustomAmount(), invoiceDTO.getCustomAmount())) {
             this.eventLogService.eventFromSystem("Ligne de facture modifiée", EventType.ACTION, INVOICE_PLAN,
@@ -107,7 +97,7 @@ public class InvoicingPlanService {
 
         repository.save(invoicingPlan);
 
-        return Optional.of(invoiceMapper.toDto(invoiceFound));
+        return invoiceMapper.toDto(invoiceFound);
     }
 
     public void deleteInvoice(UUID idInvoicingPlan, UUID idInvoice) {
@@ -115,7 +105,7 @@ public class InvoicingPlanService {
 
         Invoice invoiceFound =
                 invoicingPlan.getInvoices().stream().filter(invoice -> invoice.getId().equals(idInvoice)).findFirst()
-                             .orElseThrow();
+                        .orElseThrow();
 
         invoicingPlan.getInvoices().remove(invoiceFound);
 
@@ -125,7 +115,7 @@ public class InvoicingPlanService {
                 invoicingPlan.getId(), null);
     }
 
-    public Optional<PaymentDTO> createPayment(UUID idInvoicingPlan, PaymentDTO paymentDTO) {
+    public PaymentDTO createPayment(UUID idInvoicingPlan, PaymentDTO paymentDTO) {
         if (paymentDTO.getId() != null) {
             throw new BadRequestAlertException("A new payment cannot already have an ID", ENTITY_NAME, "id.exists");
         }
@@ -139,10 +129,10 @@ public class InvoicingPlanService {
 
         this.eventLogService.eventFromSystem("Paiement ajouté", EventType.PAYMENT, INVOICE_PLAN,
                 invoicingPlan.getId(), null);
-        return Optional.of(paymentMapper.toDto(payment));
+        return paymentMapper.toDto(payment);
     }
 
-    public Optional<PaymentDTO> updatePayment(final UUID idInvoicingPlan, final UUID idPayment, PaymentDTO paymentDTO) {
+    public PaymentDTO updatePayment(final UUID idInvoicingPlan, final UUID idPayment, PaymentDTO paymentDTO) {
         if (idPayment == null || paymentDTO == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -152,7 +142,7 @@ public class InvoicingPlanService {
 
         Payment paymentFound =
                 invoicingPlan.getPayments().stream().filter(payment -> payment.getId().equals(idPayment)).findFirst()
-                             .orElseThrow();
+                        .orElseThrow();
 
         if (!Objects.equals(paymentDTO.getAmount(), paymentFound.getAmount())) {
             this.eventLogService.eventFromSystem("Paiement modifié", EventType.PAYMENT, INVOICE_PLAN,
@@ -166,7 +156,7 @@ public class InvoicingPlanService {
 
         repository.save(invoicingPlan);
 
-        return Optional.of(paymentMapper.toDto(paymentFound));
+        return paymentMapper.toDto(paymentFound);
     }
 
     public void deletePayment(UUID idInvoicingPlan, UUID idPayment) {
@@ -174,7 +164,7 @@ public class InvoicingPlanService {
 
         Payment paymentFound =
                 invoicingPlan.getPayments().stream().filter(payment -> payment.getId().equals(idPayment)).findFirst()
-                             .orElseThrow();
+                        .orElseThrow();
 
         invoicingPlan.getPayments().remove(paymentFound);
         this.repository.save(invoicingPlan);
@@ -189,7 +179,7 @@ public class InvoicingPlanService {
         }
 
         return this.eventLogService.findAllEventLog(INVOICE_PLAN, idInvoicingPlan).stream()
-                                   .map(eventLogMapper::toDto).toList();
+                .map(eventLogMapper::toDto).toList();
     }
 
     public List<InvoicingPlanDTO> findAll(String idParticipation) {
@@ -202,7 +192,7 @@ public class InvoicingPlanService {
         throw new IllegalStateException("No filter given");
     }
 
-    public void switchArrangement(UUID idInvoicingPlan) {
+    public boolean switchArrangement(UUID idInvoicingPlan) {
         InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
 
         if (invoicingPlan.getState() != State.DRAFT && invoicingPlan.getState() != State.ISOLATED) {
@@ -220,9 +210,11 @@ public class InvoicingPlanService {
         }
 
         repository.save(invoicingPlan);
+
+        return invoicingPlan.getNeedArrangement();
     }
 
-    public void switchInvoiceSendingMethod(UUID idInvoicingPlan, InvoiceSendingMethod invoiceSendingMethod) {
+    public String switchInvoiceSendingMethod(UUID idInvoicingPlan, InvoiceSendingMethod invoiceSendingMethod) {
         InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
 
         if (invoicingPlan.getState() != State.DRAFT && invoicingPlan.getState() != State.ISOLATED) {
@@ -244,6 +236,8 @@ public class InvoicingPlanService {
         }
 
         repository.save(invoicingPlan);
+
+        return invoicingPlan.getInvoiceSendingMethod().name().toLowerCase();
     }
 
     public void manageInvoiceSendingMethod(InvoicingPlan plan) {
@@ -268,7 +262,7 @@ public class InvoicingPlanService {
     }
 
     public void splitInvoicingPlan(UUID idInvoicingPlan, List<UUID> invoicesIds, boolean forceWithArrangment,
-            boolean forceWithEmailMethod) {
+                                   boolean forceWithEmailMethod) {
         InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
 
         if (!invoicingPlan.getState().isDraft()) {
@@ -277,7 +271,7 @@ public class InvoicingPlanService {
 
         final InvoicingPlan lastPlan =
                 repository.findByParticipationIdOrderByBillingNumberDesc(invoicingPlan.getParticipation().getId())
-                          .stream().max(Comparator.comparing(InvoicingPlan::getBillingNumber)).orElse(null);
+                        .stream().max(Comparator.comparing(InvoicingPlan::getBillingNumber)).orElse(null);
 
         Participation participation =
                 participationRepository.findById(invoicingPlan.getParticipation().getId()).orElseThrow();
@@ -298,7 +292,7 @@ public class InvoicingPlanService {
         // Récupérer les factures à déplacer
         Set<Invoice> invoicesToMove =
                 invoicingPlan.getInvoices().stream().filter(invoice -> invoicesIds.contains(invoice.getId()))
-                             .collect(Collectors.toSet());
+                        .collect(Collectors.toSet());
 
         if (invoicesToMove.isEmpty()) {
             throw new IllegalStateException("No invoices found to move.");

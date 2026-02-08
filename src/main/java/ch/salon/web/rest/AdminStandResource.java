@@ -3,26 +3,16 @@ package ch.salon.web.rest;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.StandService;
 import ch.salon.service.dto.StandDTO;
+import ch.salon.utils.ResourceUtil;
+import ch.salon.utils.ResponseUtil;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import ch.salon.utils.ResponseUtil;
-import ch.salon.utils.ResourceUtil;
+import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,7 +44,7 @@ public class AdminStandResource {
     @PutMapping("/{idStand}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<StandDTO> updateStand(@PathVariable(value = "idStand", required = false) final UUID idStand,
-            @Valid @RequestBody StandDTO stand) {
+                                                @Valid @RequestBody StandDTO stand) {
         log.debug("REST request to update Stand : {}, {}", idStand, stand);
 
         stand = standService.update(idStand, stand);
@@ -65,7 +55,7 @@ public class AdminStandResource {
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<StandDTO> getAllStands(@RequestParam(name = "idSalon", required = false) UUID idSalon,
-            @RequestParam(name = "idParticipation", required = false) UUID idParticipation) {
+                                       @RequestParam(name = "idParticipation", required = false) UUID idParticipation) {
         log.debug("REST request to get all Stands");
 
         return standService.findAll(idSalon, idParticipation);

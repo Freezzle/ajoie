@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
@@ -32,8 +31,8 @@ public class ResourceUtil {
      * Builds the URI from the provided base path + id.
      *
      * @param entityName the name of the entity type
-     * @param id the identifier of the created resource
-     * @param basePath the base path for the resource (e.g., "/api/admin/exhibitors")
+     * @param id         the identifier of the created resource
+     * @param basePath   the base path for the resource (e.g., "/api/admin/exhibitors")
      * @return a ResponseEntity.BodyBuilder with 201 Created status and headers
      */
     public static ResponseEntity.BodyBuilder created(String entityName, Object id, String basePath) {
@@ -54,19 +53,45 @@ public class ResourceUtil {
         return ResponseEntity.created(location).headers(headers);
     }
 
+    public static ResponseEntity.BodyBuilder createdWithMessageKey(String messageKey, Object id, String basePath) {
+        URI location;
+        try {
+            location = new URI(basePath + "/" + id);
+        } catch (Exception e) {
+            log.error("Error creating URI from basePath: {} and id: {}", basePath, id, e);
+            location = URI.create("");
+        }
+
+        HttpHeaders headers = HeaderUtil.createEntityCreationAlert(
+                applicationName,
+                messageKey,
+                id.toString()
+        );
+        return ResponseEntity.created(location).headers(headers);
+    }
+
     /**
      * Creates a ResponseEntity builder for an updated resource with appropriate headers.
      *
      * @param entityName the name of the entity type
-     * @param id the identifier of the updated resource
+     * @param id         the identifier of the updated resource
      * @return a ResponseEntity.BodyBuilder with 200 OK status and headers
      */
     public static ResponseEntity.BodyBuilder updated(String entityName, Object id) {
         HttpHeaders headers = HeaderUtil.createEntityUpdateAlert(
-            applicationName,
-            true,
-            entityName,
-            id.toString()
+                applicationName,
+                true,
+                entityName,
+                id.toString()
+        );
+        return ResponseEntity.ok().headers(headers);
+    }
+
+    public static ResponseEntity.BodyBuilder updatedWithMessageKey(String messageKey, Object id) {
+        HttpHeaders headers = HeaderUtil.createEntityUpdateAlert(
+                applicationName,
+                messageKey,
+                id.toString()
         );
         return ResponseEntity.ok().headers(headers);
     }
@@ -75,23 +100,25 @@ public class ResourceUtil {
      * Creates a ResponseEntity builder for a deleted resource with appropriate headers.
      *
      * @param entityName the name of the entity type
-     * @param id the identifier of the deleted resource
+     * @param id         the identifier of the deleted resource
      * @return a ResponseEntity.HeadersBuilder with 204 No Content status and headers
      */
     public static ResponseEntity.HeadersBuilder<?> deleted(String entityName, Object id) {
         HttpHeaders headers = HeaderUtil.createEntityDeletionAlert(
-            applicationName,
-            true,
-            entityName,
-            id.toString()
+                applicationName,
+                true,
+                entityName,
+                id.toString()
         );
         return ResponseEntity.noContent().headers(headers);
     }
 
-
-    // TO REMOVE LATER
-    public static ResponseEntity.BodyBuilder updatedWithAlert(String message, String param) {
-        HttpHeaders headers = HeaderUtil.createAlert(applicationName, message, param);
-        return ResponseEntity.ok().headers(headers);
+    public static ResponseEntity.HeadersBuilder<?> deletedWithMessageKey(String messageKey, Object id) {
+        HttpHeaders headers = HeaderUtil.createEntityDeletionAlert(
+                applicationName,
+                messageKey,
+                id.toString()
+        );
+        return ResponseEntity.noContent().headers(headers);
     }
 }
