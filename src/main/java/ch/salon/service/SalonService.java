@@ -7,6 +7,8 @@ import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.*;
 import ch.salon.service.dto.FloorPlanSalonDTO;
+import ch.salon.service.dto.FloorPlanBatchRequestDTO;
+import ch.salon.service.dto.FloorPlanBatchResponseDTO;
 import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
 import ch.salon.service.mapper.FloorPlanSalonMapper;
@@ -141,50 +143,6 @@ public class SalonService {
         return salon.getPriceStandSalons().stream().map(priceStandMapper::toDto).toList();
     }
 
-    public FloorPlanSalonDTO createFloorPlanSalon(UUID idSalon, FloorPlanSalonDTO floorPlanDto) {
-        if (idSalon == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-
-        FloorPlanSalon floorPlanSalon = new FloorPlanSalon();
-        floorPlanSalon.setPosition(floorPlanDto.getPosition());
-        floorPlanSalon.setName(floorPlanDto.getName());
-        floorPlanSalon.setSalon(this.salonRepository.getReferenceById(idSalon));
-        floorPlanSalon.setData(floorPlanDto.getData());
-
-        return floorPlanSalonMapper.toDto(this.floorPlanSalonRepository.save(floorPlanSalon));
-    }
-
-    public void deleteFloorPlanSalon(UUID idSalon, UUID idFloorPlan) {
-        if (idSalon == null || idFloorPlan == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-
-        FloorPlanSalon floorPlan = this.floorPlanSalonRepository.findById(idFloorPlan).orElseThrow();
-
-        if (!floorPlan.getSalon().getId().equals(idSalon)) {
-            throw new BadRequestAlertException("Invalid idSalon", ENTITY_NAME, "doesntMatchs");
-        }
-
-        this.floorPlanSalonRepository.delete(floorPlan);
-    }
-
-    public FloorPlanSalonDTO updateFloorPlanSalon(UUID idSalon, UUID idFloorPlan, FloorPlanSalonDTO floorPlanSalonDTO) {
-        if (idSalon == null || idFloorPlan == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-
-        FloorPlanSalon floorPlan = this.floorPlanSalonRepository.findById(idFloorPlan).orElseThrow();
-
-        if (!floorPlan.getSalon().getId().equals(idSalon)) {
-            throw new BadRequestAlertException("Invalid idSalon", ENTITY_NAME, "doesntMatchs");
-        }
-
-        this.floorPlanSalonMapper.updateEntityFromDto(floorPlanSalonDTO, floorPlan);
-
-        return floorPlanSalonMapper.toDto(floorPlan);
-    }
-
     public List<FloorPlanSalonDTO> getFloorPlanSalon(UUID idSalon) {
         if (idSalon == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -192,6 +150,62 @@ public class SalonService {
 
         return this.floorPlanSalonRepository.findBySalonIdOrderByPosition(idSalon).stream()
                 .map(floorPlanSalonMapper::toDto).toList();
+    }
+
+    public FloorPlanBatchResponseDTO batchUpdateFloorPlans(UUID idSalon, FloorPlanBatchRequestDTO request) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        // Valider que le salon existe
+        Salon salon = this.salonRepository.findById(idSalon)
+                .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        // 1. Supprimer d'abord les FloorPlans à supprimer
+        if (request.getIdsToDelete() != null && !request.getIdsToDelete().isEmpty()) {
+            for (UUID idFloorPlan : request.getIdsToDelete()) {
+                FloorPlanSalon floorPlan = this.floorPlanSalonRepository.findById(idFloorPlan).orElseThrow(
+                        () -> new BadRequestAlertException("FloorPlan not found", ENTITY_NAME, "floorplannotfound"));
+
+                // Valider que le FloorPlan appartient bien au salon
+                if (!floorPlan.getSalon().getId().equals(idSalon)) {
+                    throw new BadRequestAlertException("FloorPlan does not belong to this salon", ENTITY_NAME, "floorplaninvalid");
+                }
+
+                this.floorPlanSalonRepository.delete(floorPlan);
+            }
+        }
+
+        // 2. Créer ou mettre à jour les FloorPlans
+        if (request.getFloorPlans() != null && !request.getFloorPlans().isEmpty()) {
+            for (FloorPlanSalonDTO dto : request.getFloorPlans()) {
+                if (dto.getId() == null) {
+                    // Création
+                    FloorPlanSalon newFloorPlan = new FloorPlanSalon();
+                    newFloorPlan.setPosition(dto.getPosition());
+                    newFloorPlan.setName(dto.getName());
+                    newFloorPlan.setSalon(salon);
+                    newFloorPlan.setData(dto.getData());
+                    this.floorPlanSalonRepository.save(newFloorPlan);
+                } else {
+                    // Mise à jour
+                    FloorPlanSalon existingFloorPlan = this.floorPlanSalonRepository.findById(dto.getId()).orElseThrow(
+                            () -> new BadRequestAlertException("FloorPlan not found", ENTITY_NAME, "floorplannotfound"));
+
+                    // Valider que le FloorPlan appartient bien au salon
+                    if (!existingFloorPlan.getSalon().getId().equals(idSalon)) {
+                        throw new BadRequestAlertException("FloorPlan does not belong to this salon", ENTITY_NAME, "floorplaninvalid");
+                    }
+
+                    this.floorPlanSalonMapper.updateEntityFromDto(dto, existingFloorPlan);
+                }
+            }
+        }
+
+        // 3. Recharger et retourner la liste complète
+        FloorPlanBatchResponseDTO response = new FloorPlanBatchResponseDTO();
+        response.setFloorPlans(this.getFloorPlanSalon(idSalon));
+        return response;
     }
 
     public PlanningTalksSalon getPlanningTalks(UUID idSalon) {

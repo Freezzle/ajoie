@@ -14,7 +14,7 @@ import {CdkDragDrop, CdkDragMove, CdkDropList} from '@angular/cdk/drag-drop';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {distinctUntilChanged, finalize, map, startWith} from 'rxjs/operators';
-import {combineLatest, forkJoin, fromEvent, Observable} from 'rxjs';
+import {combineLatest, fromEvent, Observable} from 'rxjs';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 
 import SharedModule from '../../../shared/shared.module';
@@ -698,28 +698,40 @@ export class FloorPlanDetailComponent {
             return;
         }
 
-        this.isLoading.set(true);
+        const floorPlansToSave = this.floorPlans().map(fp => mapFloorPlan(fp));
+        const idsToDelete = this.floorPlansToRemove();
 
-        const ops: Observable<any>[] = [
-            ...this.floorPlans()
-                   .map(fp => {
-                       const toSave = mapFloorPlan(fp);
-                       return toSave.id
-                              ? this.floorPlanService.save(salonId, toSave.id, toSave)
-                              : this.floorPlanService.create(salonId, toSave);
-                   }),
-            ...this.floorPlansToRemove().map(id => this.floorPlanService.delete(salonId, id))
-        ];
-
-        if (!ops.length) {
-            this.isLoading.set(false);
+        // Si aucune modification, passer en mode lecture seule directement
+        if (floorPlansToSave.length === 0 && idsToDelete.length === 0) {
             this.activateReadOnlyMode();
             return;
         }
 
-        forkJoin(ops)
-            .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => this.activateReadOnlyMode());
+        this.isLoading.set(true);
+
+        this.floorPlanService.batchSave(salonId, floorPlansToSave, idsToDelete)
+            .pipe(
+                finalize(() => this.isLoading.set(false)),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe({
+                next: (updatedFloorPlans) => {
+                    // Mettre à jour les floorPlans avec la réponse du backend
+                    this.floorPlans.set(updatedFloorPlans.map(floor => mapFloorPlanLight(floor, this.availableDimensions(), this.stands())));
+                    // Vider la liste des suppressions
+                    this.floorPlansToRemove.set([]);
+                    // Réinitialiser l'index actif si nécessaire
+                    if (this.activeIndex() >= updatedFloorPlans.length && updatedFloorPlans.length > 0) {
+                        this.activeIndex.set(updatedFloorPlans.length - 1);
+                    } else if (updatedFloorPlans.length === 0) {
+                        this.activeIndex.set(0);
+                    }
+                    this.activateReadOnlyMode();
+                },
+                error: () => {
+                    // Le toast d'erreur sera géré par l'intercepteur HTTP
+                }
+            });
     }
 
     // ---------------------------------------------------------------------------

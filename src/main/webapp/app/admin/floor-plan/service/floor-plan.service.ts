@@ -11,18 +11,16 @@ export class FloorPlanService {
     protected applicationConfigService = inject(ApplicationConfigService);
     protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
 
-    create(idSalon: string, floorPlan: IFloorPlanLight): Observable<IFloorPlanLight> {
-        return this.http.post<IFloorPlanLight>(`${this.resourceUrl}/${idSalon}/floor-plan`,
-                                               this.mapFloorPlanToBackend(floorPlan));
-    }
+    batchSave(idSalon: string, floorPlans: IFloorPlanLight[], idsToDelete: string[]): Observable<IFloorPlanLight[]> {
+        const payload = {
+            floorPlans: floorPlans.map(fp => this.mapFloorPlanToBackend(fp)),
+            idsToDelete: idsToDelete
+        };
 
-    save(idSalon: string, idFloorPlan: string, floorPlan: IFloorPlanLight): Observable<IFloorPlanLight> {
-        return this.http.put<IFloorPlanLight>(
-            `${this.resourceUrl}/${idSalon}/floor-plan/${idFloorPlan}`, this.mapFloorPlanToBackend(floorPlan));
-    }
-
-    delete(idSalon: string, idFloorPlan: string): Observable<void> {
-        return this.http.delete<void>(`${this.resourceUrl}/${idSalon}/floor-plan/${idFloorPlan}`);
+        return this.http.put<{ floorPlans: any[] }>(`${this.resourceUrl}/${idSalon}/floor-plans`, payload)
+                   .pipe(
+                       map(response => response.floorPlans.map(fp => this.mapFloorPlanFromBackend(fp)))
+                   );
     }
 
     load(idSalon: string): Observable<IFloorPlanLight[]> {

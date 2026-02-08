@@ -9,6 +9,8 @@ import ch.salon.service.Importation2026Service;
 import ch.salon.service.ParticipationService;
 import ch.salon.service.SalonService;
 import ch.salon.service.dto.FloorPlanSalonDTO;
+import ch.salon.service.dto.FloorPlanBatchRequestDTO;
+import ch.salon.service.dto.FloorPlanBatchResponseDTO;
 import ch.salon.service.dto.ParticipationDTO;
 import ch.salon.service.dto.PriceStandDTO;
 import ch.salon.service.dto.SalonDTO;
@@ -153,27 +155,13 @@ public class AdminSalonResource {
         return ResponseEntity.ok(salonService.getFloorPlanSalon(idSalon));
     }
 
-    @PostMapping("/{idSalon}/floor-plan")
+    @PutMapping("/{idSalon}/floor-plans")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<FloorPlanSalonDTO> createFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
-                                                                  @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
-        return ResponseEntity.ok(salonService.createFloorPlanSalon(idSalon, floorPlanSalonDTO));
-    }
-
-    @DeleteMapping("/{idSalon}/floor-plan/{idFloorPlan}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<FloorPlanSalonDTO> deleteFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
-                                                                  @PathVariable(value = "idFloorPlan") final UUID idFloorPlan) {
-        this.salonService.deleteFloorPlanSalon(idSalon, idFloorPlan);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{idSalon}/floor-plan/{idFloorPlan}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<FloorPlanSalonDTO> updateFloorPlanSalon(@PathVariable(value = "idSalon") final UUID idSalon,
-                                                                  @PathVariable(value = "idFloorPlan") final UUID idFloorPlan,
-                                                                  @RequestBody FloorPlanSalonDTO floorPlanSalonDTO) {
-        return ResponseEntity.ok(salonService.updateFloorPlanSalon(idSalon, idFloorPlan, floorPlanSalonDTO));
+    public ResponseEntity<FloorPlanBatchResponseDTO> batchUpdateFloorPlans(
+            @PathVariable(value = "idSalon") final UUID idSalon,
+            @RequestBody FloorPlanBatchRequestDTO request) {
+        FloorPlanBatchResponseDTO response = salonService.batchUpdateFloorPlans(idSalon, request);
+        return ResourceUtil.updated("floorPlans", idSalon).body(response);
     }
 
     @PutMapping("/{idSalon}/planning-talks")
