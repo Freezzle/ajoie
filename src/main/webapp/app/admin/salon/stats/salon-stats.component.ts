@@ -20,6 +20,7 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
+import {AlertComponent} from '../../../shared/alert/alert.component';
 
 @Component({
                selector: 'app-salon-stats',
@@ -32,12 +33,13 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    ReactiveFormsModule,
                    ToastModule,
                    ButtonBoxComponent,
-                   
-                   
+
+
                    AlertErrorComponent,
                    ConfirmPopup,
                    CardComponent,
-                   ContentPageComponent
+                   ContentPageComponent,
+                   AlertComponent
                ]
            })
 export class SalonStatsComponent implements OnInit {
