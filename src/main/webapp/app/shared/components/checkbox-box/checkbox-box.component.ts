@@ -9,13 +9,13 @@ import {
     Validators
 } from '@angular/forms';
 import SharedModule from '../../shared.module';
-import {ToggleButton} from 'primeng/togglebutton';
-import {PrimeIcons} from 'primeng/api';
+import {ToggleSwitch} from 'primeng/toggleswitch';
 
 @Component({
-               imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule, ToggleButton],
+               imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule, ToggleSwitch],
                selector: 'checkbox-box',
-               templateUrl: './checkbox-box.component.html'
+               templateUrl: './checkbox-box.component.html',
+               styleUrl: './checkbox-box.component.scss'
            })
 export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
     @Input() translateKey?: string;
@@ -26,7 +26,6 @@ export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
     isFormControlUsed: boolean = false; // Détecter l'utilisation du formControl
     disabled: boolean = false;
     protected readonly Validators = Validators;
-    protected readonly PrimeIcons = PrimeIcons;
 
     constructor(@Self() @Optional() public controlDir: NgControl) {
         if (this.controlDir) {

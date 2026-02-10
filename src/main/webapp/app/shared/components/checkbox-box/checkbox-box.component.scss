@@ -1,0 +1,13 @@
+.checkbox-box {
+  border: 1px solid var(--p-inputtext-border-color);
+  border-radius: var(--p-inputtext-border-radius);
+  height: 3.65rem;
+  background: var(--app-surface) !important;
+  color: var(--p-inputtext-color) !important;
+
+  &.disabled {
+    border: 1px dashed var(--p-inputtext-border-color) !important;
+    background: var(--app-surface) !important;
+    color: var(--p-inputtext-color) !important;
+  }
+}

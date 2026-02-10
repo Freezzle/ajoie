@@ -364,6 +364,10 @@ p-iftalabel label {
   border: 1px solid var(--app-primary) !important;
 }
 
+.p-toggleswitch-checked.p-disabled .p-toggleswitch-slider {
+  background-color: var(--p-toggleswitch-checked-background) !important;
+}
+
 .p-badge-xs .p-badge {
   font-size: 0.75rem;
   min-width: 1rem;
