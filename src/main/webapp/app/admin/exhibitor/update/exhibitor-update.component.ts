@@ -27,6 +27,8 @@ import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {Rating} from 'primeng/rating';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
+import {AddressFormComponent} from '../../../shared/components/address-form/address-form.component';
+import {IAddress} from '../../common/address.model';
 
 @Component({
                selector: 'app-exhibitor-update',
@@ -44,13 +46,14 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    SelectBoxComponent,
                    CheckboxBoxComponent,
                    AlertErrorComponent,
-                   
+
                    TableModule,
                    ConfirmPopup,
-                   
+
                    CardComponent,
                    ContentPageComponent,
-                   Rating
+                   Rating,
+                   AddressFormComponent
                ]
            })
 export class ExhibitorUpdateComponent implements OnInit {
@@ -59,6 +62,7 @@ export class ExhibitorUpdateComponent implements OnInit {
     initialExhibitor: IExhibitor | null = null;
     languageValues = LANGUAGES;
     participations$: Observable<IParticipation[]> = of([]);
+    private cachedBillingAddress: IAddress | null = null;
     protected exhibitorService = inject(ExhibitorService);
     protected countryService = inject(CountryService);
     stateService = inject(NavigationStateService);
@@ -82,6 +86,16 @@ export class ExhibitorUpdateComponent implements OnInit {
         }
 
         this.loadRelationships(this.editForm.controls.id.value);
+
+        // Initialiser le cache si billingAddress existe déjà
+        if (this.editForm.controls.billingAddress.value) {
+            this.cachedBillingAddress = this.editForm.controls.billingAddress.value;
+        }
+
+        // Souscrire aux changements du switch differentBillingAddress
+        this.editForm.controls.differentBillingAddress.valueChanges.subscribe((enabled) => {
+            this.onBillingAddressToggle(enabled ?? false);
+        });
     }
 
     edit(): void {
@@ -97,6 +111,7 @@ export class ExhibitorUpdateComponent implements OnInit {
         this.isReadOnly = true;
         this.editForm = this.exhibitorFormService.createExhibitorFormGroup(this.initialExhibitor);
         this.editForm.disable();
+        this.cachedBillingAddress = this.initialExhibitor?.billingAddress ?? null;
     }
 
     save(): void {
@@ -119,5 +134,35 @@ export class ExhibitorUpdateComponent implements OnInit {
             return;
         }
         this.participations$ = this.exhibitorService.findParticipations(idExhibitor);
+    }
+
+    onBillingAddressToggle(enabled: boolean): void {
+        if (enabled) {
+            // Si activé, restaurer le cache ou créer une adresse par défaut
+            const addressToRestore = this.cachedBillingAddress ?? this.getDefaultAddress();
+            this.editForm.controls.billingAddress.setValue(addressToRestore);
+        } else {
+            // Si désactivé, sauvegarder en cache et mettre à null
+            const currentValue = this.editForm.controls.billingAddress.value;
+            if (currentValue) {
+                this.cachedBillingAddress = currentValue;
+            }
+            this.editForm.controls.billingAddress.setValue(null);
+        }
+    }
+
+    private getDefaultAddress(): IAddress {
+        return {
+            id: null,
+            formalLine: null,
+            fullName: null,
+            postalCase: null,
+            street: null,
+            houseNumber: null,
+            postalCode: null,
+            city: null,
+            isoCountry: 'CH',
+            extraLine: null
+        };
     }
 }

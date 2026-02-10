@@ -8,13 +8,12 @@ type ExhibitorFormGroupContent = {
     fullName: FormControl<IExhibitor['fullName'] | null>;
     email: FormControl<IExhibitor['email'] | null>;
     phoneNumber: FormControl<IExhibitor['phoneNumber'] | null>;
-    address: FormControl<IExhibitor['address'] | null>;
-    npaLocalite: FormControl<IExhibitor['npaLocalite'] | null>;
-    isoCountry: FormControl<IExhibitor['isoCountry'] | null>;
+    homeAddress: FormControl<IExhibitor['homeAddress'] | null>;
     extraInformation: FormControl<IExhibitor['extraInformation'] | null>;
     language: FormControl<IExhibitor['language'] | null>;
     differentBillingAddress: FormControl<IExhibitor['differentBillingAddress'] | null>;
     billingAddress: FormControl<IExhibitor['billingAddress'] | null>;
+    bankAccount: FormControl<IExhibitor['bankAccount'] | null>;
     newsletter: FormControl<IExhibitor['newsletter'] | null>;
     redFlag: FormControl<IExhibitor['redFlag'] | null>;
     duplicateDetected: FormControl<IExhibitor['duplicateDetected'] | null>;
@@ -35,13 +34,12 @@ export class ExhibitorFormService {
                                                             fullName: new FormControl(raw.fullName, Validators.required),
                                                             email: new FormControl(raw.email, {validators: [Validators.required, Validators.email]}),
                                                             phoneNumber: new FormControl(raw.phoneNumber, {validators: [this.phoneValidator()]}),
-                                                            address: new FormControl(raw.address, Validators.required),
-                                                            npaLocalite: new FormControl(raw.npaLocalite, Validators.required),
-                                                            isoCountry: new FormControl(raw.isoCountry, Validators.required),
+                                                            homeAddress: new FormControl(raw.homeAddress),
                                                             extraInformation: new FormControl(raw.extraInformation),
                                                             language: new FormControl(raw.language, Validators.required),
                                                             differentBillingAddress: new FormControl(raw.differentBillingAddress, Validators.required),
                                                             billingAddress: new FormControl(raw.billingAddress),
+                                                            bankAccount: new FormControl(raw.bankAccount),
                                                             newsletter: new FormControl(raw.newsletter, Validators.required),
                                                             redFlag: new FormControl(raw.redFlag, Validators.required),
                                                             duplicateDetected: new FormControl(raw.duplicateDetected, Validators.required)
@@ -73,11 +71,21 @@ export class ExhibitorFormService {
     }
 
     private getDefaultExhibitorFormValue(): Pick<IExhibitor,
-        'language' | 'differentBillingAddress' | 'isoCountry' | 'newsletter'
-        | 'redFlag' | 'duplicateDetected'> {
+        'language' | 'differentBillingAddress' | 'newsletter' | 'homeAddress' | 'redFlag' | 'duplicateDetected'> {
         return {
             language: 'fr',
-            isoCountry: 'CH',
+            homeAddress: {
+                id: null,
+                formalLine: null,
+                fullName: null,
+                postalCase: null,
+                street: null,
+                houseNumber: null,
+                postalCode: null,
+                city: null,
+                isoCountry: 'CH',
+                extraLine: null
+            },
             differentBillingAddress: false,
             newsletter: true,
             redFlag: false,

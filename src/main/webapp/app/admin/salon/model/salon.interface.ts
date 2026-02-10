@@ -1,4 +1,6 @@
 import {IPriceStandSalon} from './price-stand-salon.interface';
+import {IAddress} from '../../common/address.model';
+import {IBankAccount} from '../../common/bank-account.model';
 
 export interface ISalon {
     id: string;
@@ -13,6 +15,9 @@ export interface ISalon {
     priceWorkshop: number;
     priceSharingStand: number;
     extraInformation: string | null;
+    headquartersAddress: IAddress | null;
+    eventAddress: IAddress | null;
+    bankAccount: IBankAccount;
     priceStandSalons: IPriceStandSalon[];
 }
 

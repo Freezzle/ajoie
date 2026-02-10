@@ -13,12 +13,11 @@ public class ExhibitorDTO implements Serializable {
     private String fullName;
     private String email;
     private String phoneNumber;
-    private String address;
-    private String npaLocalite;
-    private String isoCountry;
+    private AddressDTO homeAddress;
     private String extraInformation;
     private Boolean differentBillingAddress;
     private AddressDTO billingAddress;
+    private BankAccountDTO bankAccount;
     private boolean newsletter;
     private boolean redFlag = false;
     private boolean duplicateDetected = false;

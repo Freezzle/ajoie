@@ -5,7 +5,7 @@ import ch.salon.service.dto.SalonDTO;
 import ch.salon.service.dto.SalonLightDTO;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring",uses = {PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring",uses = {AddressMapper.class, BankAccountMapper.class, PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SalonMapper {
 
     SalonDTO toDto(Salon salon);

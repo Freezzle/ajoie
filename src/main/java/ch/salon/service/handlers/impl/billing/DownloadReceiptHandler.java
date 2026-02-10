@@ -52,7 +52,7 @@ public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPl
         thymeleafCtxt.setVariable("invoiceDate", DateUtils.instantToIso(payload.getIssuedDate()));
 
         thymeleafCtxt.setVariable("contact", "Claude Pascal / Claude Charlène / Claude Dylan");
-        thymeleafCtxt.setVariable("phone", "+41797686084 / +33783246337 / +41799647875");
+        thymeleafCtxt.setVariable("phone", "+41797686084 / +41768395523 / +41799647875");
 
         thymeleafCtxt.setVariable("invoices", payload.getInvoices());
         thymeleafCtxt.setVariable("payments", payload.getPayments());

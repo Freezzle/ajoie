@@ -1,8 +1,10 @@
 {
   "exhibitor": {
     "address": "Rue et n°",
+    "billingAddress": "Adresse de facturation",
     "copyNewsletter": "Emails (newsletter)",
     "country": "Pays",
+    "differentBillingAddress": "Utiliser une adresse différente",
     "create": "Nouveau client",
     "delete": {
       "question": "Voulez-vous supprimer \"{{ id }}\" ?"
@@ -17,7 +19,7 @@
       "therapistName": "Nom de thérapeute"
     },
     "fullName": "Nom complet",
-    "homeAddress": "Address de domicile",
+    "homeAddress": "Adresse de domicile",
     "language": {
       "list": {
         "de": "Allemand",

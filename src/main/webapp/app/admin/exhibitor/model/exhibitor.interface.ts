@@ -1,4 +1,5 @@
 import {IAddress} from '../../common/address.model';
+import {IBankAccount} from '../../common/bank-account.model';
 
 export interface IExhibitor {
     id: string;
@@ -12,11 +13,10 @@ export interface IExhibitor {
     duplicateDetected: boolean;
 
     phoneNumber: string | null;
-    address: string | null;
-    npaLocalite: string | null;
-    isoCountry: string | null;
+    homeAddress: IAddress | null;
     extraInformation: string | null;
     billingAddress: IAddress | null;
+    bankAccount: IBankAccount | null;
 }
 
 export function containsExhibitorName(exhibitor: IExhibitor | undefined | null, filterText: string): boolean {

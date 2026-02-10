@@ -1,5 +1,7 @@
 package ch.salon.service.handlers.impl.billing;
 
+import ch.salon.domain.Address;
+import ch.salon.domain.BankAccount;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.service.GenerateQRCode;
 import ch.salon.service.document.DocumentCreator;
@@ -65,7 +67,7 @@ public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPl
 
         thymeleafCtxt.setVariable("reference", payload.getBillingNumber());
         thymeleafCtxt.setVariable("contact", "Claude Pascal / Claude Charlène / Claude Dylan");
-        thymeleafCtxt.setVariable("phone", "+41797686084 / +33783246337 / +41799647875");
+        thymeleafCtxt.setVariable("phone", "+41797686084 / +41768395523 / +41799647875");
         thymeleafCtxt.setVariable("arrangement", payload.getNeedArrangement());
 
         thymeleafCtxt.setVariable("invoices", payload.getInvoices());
@@ -73,20 +75,35 @@ public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPl
         thymeleafCtxt.setVariable("hasPaidSomething", !payload.getPayments().isEmpty());
         thymeleafCtxt.setVariable("total", payload.getTotal());
 
-        thymeleafCtxt.setVariable("iban", "CH07 8080 8002 0290 1493 8");
+        // Use Salon bank account IBAN
+        String iban = payload.getParticipation().getSalon().getBankAccount() != null
+                ? payload.getParticipation().getSalon().getBankAccount().getIban()
+                : "CH0780808002029014938";
+        thymeleafCtxt.setVariable("iban", BankAccount.formatIban(iban));
 
         try {
-            Bill bill = generateQRCode.buildBill("CH0780808002029014938", Math.max(0d, payload.getTotal()), null,
-                    "Facture " + payload.getBillingNumber(), sender.getEnterpriseName(), "Sous les chênes", "109A",
-                    sender.getCity().split(" ")[0], sender.getCity().split(" ")[1], "CH", recipient.getFullName(),
-                    recipient.getStreet(), null, recipient.getCity().split(" ")[0],
-                    recipient.getCity().split(" ", 2)[1], recipient.getCountry());
+            Bill bill = generateQRCode.buildBill(
+                    iban.replaceAll("\\s+", ""),
+                    Math.max(0d, payload.getTotal()),
+                    null,
+                    "Facture " + payload.getBillingNumber(),
+                    sender.getEnterpriseName(),
+                    Address.extractStreetName(sender.getStreet()),
+                    Address.extractHouseNumber(sender.getStreet()),
+                    Address.extractPostalCode(sender.getCity()),
+                    Address.extractCityName(sender.getCity()),
+                    "CH",
+                    recipient.getFullName(),
+                    Address.extractStreetName(recipient.getStreet()),
+                    Address.extractHouseNumber(recipient.getStreet()),
+                    Address.extractPostalCode(recipient.getCity()),
+                    Address.extractCityName(recipient.getCity()),
+                    recipient.getCountry());
 
             String dataUri = generateQRCode.toDataUri(bill);
             thymeleafCtxt.setVariable("qrBillDataUri", dataUri);
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
-            // en cas d’erreur, on masque l’image côté template
             thymeleafCtxt.setVariable("qrBillDataUri", null);
         }
 

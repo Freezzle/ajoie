@@ -75,24 +75,24 @@
             <h4>{{ 'exhibitor.homeAddress' | translate }}</h4>
         </div>
         <div appCardBody>
+            <app-address-form [required]="true" [showFormalFields]="false" formControlName="homeAddress"/>
+        </div>
+    </app-card>
+    <app-card>
+        <div appCardHeader>
+            <h4>{{ 'exhibitor.billingAddress' | translate }}</h4>
+        </div>
+        <div appCardBody>
             <div class="row">
-                <div class="mt-4 col-sm-12">
-                    <text-box fieldName="address" formControlName="address" translateKey="exhibitor.address"/>
-                </div>
-                <div class="mt-4 col-sm-6">
-                    <text-box fieldName="npaLocalite"
-                              formControlName="npaLocalite"
-                              translateKey="exhibitor.npaLocalite"/>
-                </div>
-                <div class="mt-4 col-sm-6">
-                    <select-box [formatterFunction]="formatterCountry"
-                                [needTranslation]="true"
-                                [options]="countryService.getAll()"
-                                fieldName="name"
-                                formControlName="isoCountry"
-                                translateKey="exhibitor.country"/>
+                <div class="mt-4 col-12">
+                    <checkbox-box fieldName="differentBillingAddress"
+                                  formControlName="differentBillingAddress"
+                                  translateKey="exhibitor.differentBillingAddress"/>
                 </div>
             </div>
+            @if (editForm.controls.differentBillingAddress.value) {
+                <app-address-form [required]="true" [showFormalFields]="true" formControlName="billingAddress"/>
+            }
         </div>
     </app-card>
     <app-card>

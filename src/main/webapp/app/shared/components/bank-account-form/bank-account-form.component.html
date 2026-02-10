@@ -1,0 +1,15 @@
+<div [formGroup]="bankAccountForm">
+    <div class="row">
+        <div class="col-md-12 mt-4">
+            <text-box fieldName="iban" formControlName="iban" translateKey="bankAccount.iban"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mt-4">
+            <text-box fieldName="accountHolder" formControlName="accountHolder" translateKey="bankAccount.accountHolder"/>
+        </div>
+        <div class="col-md-4 mt-4">
+            <text-box fieldName="bic" formControlName="bic" translateKey="bankAccount.bic"/>
+    </div>
+</div>

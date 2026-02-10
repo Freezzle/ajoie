@@ -5,13 +5,16 @@ import ch.salon.service.dto.ExhibitorDTO;
 import ch.salon.service.dto.ExhibitorLightDTO;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring",uses = {AddressMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring",uses = {AddressMapper.class, BankAccountMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface ExhibitorMapper {
 
     ExhibitorDTO toDto(Exhibitor exhibitor);
 
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "registrationDate", ignore = true)
+    @Mapping(target = "address", ignore = true)
+    @Mapping(target = "npaLocalite", ignore = true)
+    @Mapping(target = "isoCountry", ignore = true)
     Exhibitor toEntity(ExhibitorDTO exhibitor);
 
     ExhibitorLightDTO toLightDto(Exhibitor exhibitor);
@@ -19,6 +22,9 @@ public interface ExhibitorMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "registrationDate", ignore = true)
+    @Mapping(target = "address", ignore = true)
+    @Mapping(target = "npaLocalite", ignore = true)
+    @Mapping(target = "isoCountry", ignore = true)
     void updateEntityFromDto(ExhibitorDTO exhibitorDTO, @MappingTarget Exhibitor exhibitor);
 
     @BeanMapping(ignoreByDefault = true)

@@ -1,12 +1,6 @@
 package ch.salon.service;
 
-import ch.salon.domain.Conference;
-import ch.salon.domain.Exhibitor;
-import ch.salon.domain.Participation;
-import ch.salon.domain.PriceStandSalon;
-import ch.salon.domain.Salon;
-import ch.salon.domain.Stand;
-import ch.salon.domain.Workshop;
+import ch.salon.domain.*;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
@@ -291,13 +285,19 @@ public class Importation2026Service {
             current.setEmail(sub100(email));
             current.setLanguage(LANG_FR);
             current.setRegistrationDate(now);
-            current.setIsoCountry("CH");
         }
 
         current.setFullName(sub100(String.format("%s %s", StringUtils.defaultString(firstName).trim(),
                 StringUtils.defaultString(lastName).trim()).trim()));
-        current.setAddress(sub100(address));
-        current.setNpaLocalite(sub100(npaLocalite));
+
+        Address homeAddress = new Address();
+        homeAddress.setIsoCountry("CH");
+        homeAddress.setPostalCode(Address.extractPostalCode(npaLocalite));
+        homeAddress.setCity(Address.extractCityName(npaLocalite));
+        homeAddress.setStreet(Address.extractStreetName(address));
+        homeAddress.setHouseNumber(Address.extractHouseNumber(address));
+
+        current.setHomeAddress(homeAddress);
         current.setPhoneNumber(phone);
         current.setNewsletter(wantsNewsletter);
 

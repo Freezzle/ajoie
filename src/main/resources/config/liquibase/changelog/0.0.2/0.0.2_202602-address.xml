@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="0.0.2_20260209-create-bank-account-table" author="claudedy">
+        <createTable tableName="bank_account">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="iban" type="VARCHAR(34)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_holder" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bic" type="VARCHAR(11)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Step 1: Add new columns -->
+    <changeSet id="0.0.2_20260209-add-address-new-columns" author="claudedy">
+        <addColumn tableName="address">
+            <column name="street" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="house_number" type="VARCHAR(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="postal_code" type="VARCHAR(10)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="city" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Step 2: Migrate data from old columns to new columns -->
+    <changeSet id="0.0.2_20260209-migrate-address-data" author="claudedy">
+        <!-- For PostgreSQL -->
+        <sql dbms="postgresql">
+            -- Parse address: split into street and house_number
+            -- Pattern: "Rue de la Paix 12B" -> street="Rue de la Paix", house_number="12B"
+            UPDATE address
+            SET street = CASE
+                             WHEN address IS NOT NULL AND address ~ '\s+\d+[A-Za-z]*$' THEN
+                                 TRIM(REGEXP_REPLACE(address, '\s+\d+[A-Za-z]*$', ''))
+                             ELSE
+                                 address
+                END,
+                house_number = CASE
+                                   WHEN address IS NOT NULL AND address ~ '\s+\d+[A-Za-z]*$' THEN
+                                       TRIM(REGEXP_REPLACE(address, '^.*\s+(\d+[A-Za-z]*)$', '\1'))
+                                   ELSE
+                                       NULL
+                    END
+            WHERE address IS NOT NULL;
+
+            -- Parse npa_localite: split into postal_code and city
+            -- Pattern: "2944 Bonfol" -> postal_code="2944", city="Bonfol"
+            UPDATE address
+            SET postal_code = CASE
+                                  WHEN npa_localite IS NOT NULL AND npa_localite ~ '^\d+\s+' THEN
+                                      TRIM(SPLIT_PART(npa_localite, ' ', 1))
+                                  ELSE
+                                      NULL
+                END,
+                city = CASE
+                           WHEN npa_localite IS NOT NULL AND npa_localite ~ '^\d+\s+' THEN
+                               TRIM(SUBSTRING(npa_localite FROM POSITION(' ' IN npa_localite) + 1))
+                           ELSE
+                               npa_localite
+                    END
+            WHERE npa_localite IS NOT NULL;
+        </sql>
+
+        <!-- For H2 (tests) -->
+        <sql dbms="h2">
+            -- Parse address: split into street and house_number
+            UPDATE address
+            SET street = CASE
+                             WHEN address IS NOT NULL AND address REGEXP '.*\s+\d+[A-Za-z]*$' THEN
+                                 TRIM(REGEXP_REPLACE(address, '\s+\d+[A-Za-z]*$', ''))
+                             ELSE
+                                 address
+                END,
+                house_number = CASE
+                                   WHEN address IS NOT NULL AND address REGEXP '.*\s+\d+[A-Za-z]*$' THEN
+                                       TRIM(REGEXP_REPLACE(address, '^.*\s+(\d+[A-Za-z]*)$', '$1'))
+                                   ELSE
+                                       NULL
+                    END
+            WHERE address IS NOT NULL;
+
+            -- Parse npa_localite: split into postal_code and city
+            UPDATE address
+            SET postal_code = CASE
+                                  WHEN npa_localite IS NOT NULL AND npa_localite REGEXP '^\d+\s+.*' THEN
+                                      TRIM(SUBSTRING(npa_localite, 1, LOCATE(' ', npa_localite) - 1))
+                                  ELSE
+                                      NULL
+                END,
+                city = CASE
+                           WHEN npa_localite IS NOT NULL AND npa_localite REGEXP '^\d+\s+.*' THEN
+                               TRIM(SUBSTRING(npa_localite, LOCATE(' ', npa_localite) + 1))
+                           ELSE
+                               npa_localite
+                    END
+            WHERE npa_localite IS NOT NULL;
+        </sql>
+    </changeSet>
+
+    <!-- Step 3: Drop old columns -->
+    <changeSet id="0.0.2_20260209-drop-address-old-columns" author="claudedy">
+        <dropColumn tableName="address" columnName="address"/>
+        <dropColumn tableName="address" columnName="npa_localite"/>
+    </changeSet>
+
+    <!-- Step 1: Add foreign key columns to salon table -->
+    <changeSet id="0.0.2_20260209-add-salon-address-bankaccount-columns" author="claudedy">
+        <addColumn tableName="salon">
+            <column name="headquarters_address_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="event_address_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="bank_account_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Step 2: Create default address and bank account, then populate all salons -->
+    <changeSet id="0.0.2_20260209-populate-salon-default-data" author="claudedy">
+        <sql dbms="postgresql">
+            -- Create default headquarters address
+            INSERT INTO address (id, tenant_id, street, house_number, postal_code, city, iso_country)
+            SELECT
+                gen_random_uuid(),
+                tenant_id,
+                'Sous les chênes',
+                '109A',
+                '2944',
+                'Bonfol',
+                'CH'
+            FROM salon
+            WHERE NOT EXISTS (
+                SELECT 1 FROM address
+                WHERE street = 'Sous les chênes'
+                  AND house_number = '109A'
+                  AND postal_code = '2944'
+            )
+            GROUP BY tenant_id;
+
+            -- Create default bank account per tenant
+            INSERT INTO bank_account (id, tenant_id, iban, account_holder)
+            SELECT
+                gen_random_uuid(),
+                tenant_id,
+                'CH0780808002029014938',
+                'L''Ajoie de mieux vivre'
+            FROM salon
+            WHERE NOT EXISTS (
+                SELECT 1 FROM bank_account
+                WHERE iban = 'CH0780808002029014938'
+            )
+            GROUP BY tenant_id;
+
+            -- Update salon with default address and bank account
+            UPDATE salon s
+            SET
+                headquarters_address_id = (
+                    SELECT a.id FROM address a
+                    WHERE a.street = 'Sous les chênes'
+                      AND a.house_number = '109A'
+                      AND a.tenant_id = s.tenant_id
+                LIMIT 1
+                ),
+                event_address_id = (
+            SELECT a.id FROM address a
+            WHERE a.street = 'Sous les chênes'
+              AND a.house_number = '109A'
+              AND a.tenant_id = s.tenant_id
+                LIMIT 1
+                ),
+                bank_account_id = (
+            SELECT ba.id FROM bank_account ba
+            WHERE ba.iban = 'CH0780808002029014938'
+              AND ba.tenant_id = s.tenant_id
+                LIMIT 1
+                );
+        </sql>
+
+        <sql dbms="h2">
+            -- For H2, use RANDOM_UUID() instead
+            -- Create default headquarters address
+            INSERT INTO address (id, tenant_id, street, house_number, postal_code, city, iso_country)
+            SELECT DISTINCT
+                RANDOM_UUID(),
+                tenant_id,
+                'Sous les chênes',
+                '109A',
+                '2944',
+                'Bonfol',
+                'CH'
+            FROM salon
+            WHERE NOT EXISTS (
+                SELECT 1 FROM address
+                WHERE street = 'Sous les chênes'
+                  AND house_number = '109A'
+                  AND postal_code = '2944'
+            );
+
+            -- Create default bank account per tenant
+            INSERT INTO bank_account (id, tenant_id, iban, account_holder)
+            SELECT DISTINCT
+                RANDOM_UUID(),
+                tenant_id,
+                'CH0780808002029014938',
+                'L''Ajoie de mieux vivre'
+            FROM salon
+            WHERE NOT EXISTS (
+                SELECT 1 FROM bank_account
+                WHERE iban = 'CH0780808002029014938'
+            );
+
+            -- Update salon with default address and bank account
+            UPDATE salon s
+            SET
+                headquarters_address_id = (
+                    SELECT a.id FROM address a
+                    WHERE a.street = 'Sous les chênes'
+                      AND a.house_number = '109A'
+                      AND a.tenant_id = s.tenant_id
+                LIMIT 1
+                ),
+                event_address_id = (
+            SELECT a.id FROM address a
+            WHERE a.street = 'Sous les chênes'
+              AND a.house_number = '109A'
+              AND a.tenant_id = s.tenant_id
+                LIMIT 1
+                ),
+                bank_account_id = (
+            SELECT ba.id FROM bank_account ba
+            WHERE ba.iban = 'CH0780808002029014938'
+              AND ba.tenant_id = s.tenant_id
+                LIMIT 1
+                );
+        </sql>
+    </changeSet>
+
+    <!-- Step 3: Add foreign key constraints -->
+    <changeSet id="0.0.2_20260209-add-salon-foreign-key-constraints" author="claudedy">
+        <addForeignKeyConstraint baseTableName="salon"
+                                 baseColumnNames="headquarters_address_id"
+                                 constraintName="fk_salon_headquarters_address"
+                                 referencedTableName="address"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="salon"
+                                 baseColumnNames="event_address_id"
+                                 constraintName="fk_salon_event_address"
+                                 referencedTableName="address"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="salon"
+                                 baseColumnNames="bank_account_id"
+                                 constraintName="fk_salon_bank_account"
+                                 referencedTableName="bank_account"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Step 4: Make bank_account_id NOT NULL -->
+    <changeSet id="0.0.2_20260209-make-salon-bank-account-not-null" author="claudedy">
+        <addNotNullConstraint tableName="salon"
+                              columnName="bank_account_id"
+                              columnDataType="${uuidType}"/>
+    </changeSet>
+
+    <!-- Step 1: Add new foreign key columns to exhibitor table -->
+    <changeSet id="0.0.2_20260209-add-exhibitor-address-bankaccount-columns" author="claudedy">
+        <addColumn tableName="exhibitor">
+            <column name="home_address_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="bank_account_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Step 2: Migrate exhibitor data - create Address records from existing columns -->
+    <changeSet id="0.0.2_20260209-migrate-exhibitor-create-addresses" author="claudedy">
+        <sql dbms="postgresql">
+            -- Create Address records for each exhibitor with address data
+            INSERT INTO address (id, tenant_id, street, house_number, postal_code, city, iso_country)
+            SELECT
+                gen_random_uuid(),
+                e.tenant_id,
+                -- Parse street and house_number from address
+                CASE
+                    WHEN e.address IS NOT NULL AND e.address ~ '\s+\d+[A-Za-z]*$' THEN
+                        TRIM(REGEXP_REPLACE(e.address, '\s+\d+[A-Za-z]*$', ''))
+                    ELSE
+                        e.address
+                    END as street,
+                CASE
+                    WHEN e.address IS NOT NULL AND e.address ~ '\s+\d+[A-Za-z]*$' THEN
+                        TRIM(REGEXP_REPLACE(e.address, '^.*\s+(\d+[A-Za-z]*)$', '\1'))
+                    ELSE
+                        NULL
+                    END as house_number,
+                -- Parse postal_code and city from npa_localite
+                CASE
+                    WHEN e.npa_localite IS NOT NULL AND e.npa_localite ~ '^\d+\s+' THEN
+                        TRIM(SPLIT_PART(e.npa_localite, ' ', 1))
+                    ELSE
+                        NULL
+                    END as postal_code,
+                CASE
+                    WHEN e.npa_localite IS NOT NULL AND e.npa_localite ~ '^\d+\s+' THEN
+                        TRIM(SUBSTRING(e.npa_localite FROM POSITION(' ' IN e.npa_localite) + 1))
+                    ELSE
+                        e.npa_localite
+                    END as city,
+                COALESCE(e.iso_country, 'CH') as iso_country
+            FROM exhibitor e
+            WHERE e.address IS NOT NULL OR e.npa_localite IS NOT NULL;
+
+            -- Update exhibitor with new home_address_id
+            UPDATE exhibitor e
+            SET home_address_id = a.id
+                FROM address a
+            WHERE a.tenant_id = e.tenant_id
+              AND (
+                (e.address IS NOT NULL AND a.street = CASE
+                WHEN e.address ~ '\s+\d+[A-Za-z]*$' THEN
+                TRIM(REGEXP_REPLACE(e.address, '\s+\d+[A-Za-z]*$', ''))
+                ELSE
+                e.address
+                END)
+               OR
+                (e.npa_localite IS NOT NULL AND a.city = CASE
+                WHEN e.npa_localite ~ '^\d+\s+' THEN
+                TRIM(SUBSTRING(e.npa_localite FROM POSITION(' ' IN e.npa_localite) + 1))
+                ELSE
+                e.npa_localite
+                END)
+                )
+              AND a.id NOT IN (SELECT DISTINCT billing_address_id FROM exhibitor WHERE billing_address_id IS NOT NULL)
+              AND NOT EXISTS (SELECT 1 FROM exhibitor e2 WHERE e2.home_address_id = a.id AND e2.id != e.id);
+        </sql>
+
+        <sql dbms="h2">
+            -- Create Address records for each exhibitor with address data
+            INSERT INTO address (id, tenant_id, street, house_number, postal_code, city, iso_country)
+            SELECT
+                RANDOM_UUID(),
+                e.tenant_id,
+                -- Parse street and house_number from address
+                CASE
+                    WHEN e.address IS NOT NULL AND e.address REGEXP '.*\s+\d+[A-Za-z]*$' THEN
+                        TRIM(REGEXP_REPLACE(e.address, '\s+\d+[A-Za-z]*$', ''))
+                    ELSE
+                        e.address
+                    END as street,
+                CASE
+                    WHEN e.address IS NOT NULL AND e.address REGEXP '.*\s+\d+[A-Za-z]*$' THEN
+                        TRIM(REGEXP_REPLACE(e.address, '^.*\s+(\d+[A-Za-z]*)$', '$1'))
+                    ELSE
+                        NULL
+                    END as house_number,
+                -- Parse postal_code and city from npa_localite
+                CASE
+                    WHEN e.npa_localite IS NOT NULL AND e.npa_localite REGEXP '^\d+\s+.*' THEN
+                        TRIM(SUBSTRING(e.npa_localite, 1, LOCATE(' ', e.npa_localite) - 1))
+                    ELSE
+                        NULL
+                    END as postal_code,
+                CASE
+                    WHEN e.npa_localite IS NOT NULL AND e.npa_localite REGEXP '^\d+\s+.*' THEN
+                        TRIM(SUBSTRING(e.npa_localite, LOCATE(' ', e.npa_localite) + 1))
+                    ELSE
+                        e.npa_localite
+                    END as city,
+                COALESCE(e.iso_country, 'CH') as iso_country
+            FROM exhibitor e
+            WHERE e.address IS NOT NULL OR e.npa_localite IS NOT NULL;
+
+            -- Update exhibitor with new home_address_id
+            -- Note: H2 has limitations with complex UPDATE FROM, so we use a simpler approach
+            UPDATE exhibitor e
+            SET home_address_id = (
+                SELECT a.id FROM address a
+                WHERE a.tenant_id = e.tenant_id
+                  AND a.id NOT IN (SELECT DISTINCT billing_address_id FROM exhibitor WHERE billing_address_id IS NOT NULL)
+                  AND NOT EXISTS (SELECT 1 FROM exhibitor e2 WHERE e2.home_address_id = a.id AND e2.id != e.id)
+                ORDER BY a.id DESC
+                LIMIT 1
+                )
+            WHERE e.address IS NOT NULL OR e.npa_localite IS NOT NULL;
+        </sql>
+    </changeSet>
+
+    <!-- Step 3: Add foreign key constraints -->
+    <changeSet id="0.0.2_20260209-add-exhibitor-foreign-key-constraints" author="claudedy">
+        <addForeignKeyConstraint baseTableName="exhibitor"
+                                 baseColumnNames="home_address_id"
+                                 constraintName="fk_exhibitor_home_address"
+                                 referencedTableName="address"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="exhibitor"
+                                 baseColumnNames="bank_account_id"
+                                 constraintName="fk_exhibitor_bank_account"
+                                 referencedTableName="bank_account"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Step 4: Drop old columns -->
+    <changeSet id="0.0.2_20260209-drop-exhibitor-old-address-columns" author="claudedy">
+        <dropColumn tableName="exhibitor" columnName="address"/>
+        <dropColumn tableName="exhibitor" columnName="npa_localite"/>
+        <dropColumn tableName="exhibitor" columnName="iso_country"/>
+    </changeSet>
+
+</databaseChangeLog>

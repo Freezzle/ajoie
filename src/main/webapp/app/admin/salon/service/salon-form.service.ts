@@ -17,6 +17,9 @@ export type SalonFormGroup = {
     place: FormControl<ISalon['place'] | null>;
     startingDate: FormControl<ISalon['startingDate'] | string | null>;
     endingDate: FormControl<ISalon['endingDate'] | string | null>;
+    headquartersAddress: FormControl<ISalon['headquartersAddress'] | null>;
+    eventAddress: FormControl<ISalon['eventAddress'] | null>;
+    bankAccount: FormControl<ISalon['bankAccount'] | null>;
     priceMeal1: FormControl<ISalon['priceMeal1'] | null>;
     priceMeal2: FormControl<ISalon['priceMeal2'] | null>;
     priceMeal3: FormControl<ISalon['priceMeal3'] | null>;
@@ -49,6 +52,9 @@ export class SalonFormService {
                                                  endingDate: new FormControl(raw.endingDate,
                                                                              {validators: [Validators.required]}
                                                  ),
+                                                 headquartersAddress: new FormControl(raw.headquartersAddress ?? null),
+                                                 eventAddress: new FormControl(raw.eventAddress ?? null),
+                                                 bankAccount: new FormControl(raw.bankAccount ?? null),
                                                  priceMeal1: new FormControl(raw.priceMeal1, Validators.required),
                                                  priceMeal2: new FormControl(raw.priceMeal2, Validators.required),
                                                  priceMeal3: new FormControl(raw.priceMeal3, Validators.required),

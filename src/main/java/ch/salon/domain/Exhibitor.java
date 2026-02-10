@@ -1,13 +1,6 @@
 package ch.salon.domain;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.TenantId;
@@ -46,12 +39,22 @@ public class Exhibitor implements Serializable, TenantOwned {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "home_address_id")
+    private Address homeAddress;
+
+    @Deprecated
+    @Transient
     @Column(name = "address")
     private String address;
 
+    @Deprecated
+    @Transient
     @Column(name = "npa_localite")
     private String npaLocalite;
 
+    @Deprecated
+    @Transient
     @Column(name = "iso_country")
     private String isoCountry = "CH";
 
@@ -63,6 +66,10 @@ public class Exhibitor implements Serializable, TenantOwned {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Address billingAddress;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bank_account_id")
+    private BankAccount bankAccount;
 
     @Column(name = "registration_date")
     private Instant registrationDate;

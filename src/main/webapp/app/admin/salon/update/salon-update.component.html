@@ -85,6 +85,33 @@
 
         <app-card>
             <div appCardHeader>
+                <h4>{{ 'salon.headquartersAddress' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <app-address-form [required]="true" [showFormalFields]="false" formControlName="headquartersAddress"/>
+            </div>
+        </app-card>
+
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'salon.eventAddress' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <app-address-form [required]="true" [showFormalFields]="false" formControlName="eventAddress"/>
+            </div>
+        </app-card>
+
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'salon.bankAccount' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <app-bank-account-form [required]="true" formControlName="bankAccount"/>
+            </div>
+        </app-card>
+
+        <app-card>
+            <div appCardHeader>
                 <h4>{{ 'salon.prices' | translate }}</h4>
             </div>
             <div appCardBody>

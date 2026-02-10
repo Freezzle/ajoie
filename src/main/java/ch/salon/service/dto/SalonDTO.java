@@ -23,5 +23,8 @@ public class SalonDTO implements Serializable {
     private Double priceWorkshop;
     private Double priceSharingStand;
     private String extraInformation;
+    private AddressDTO headquartersAddress;
+    private AddressDTO eventAddress;
+    private BankAccountDTO bankAccount;
     private Set<PriceStandDTO> priceStandSalons = new HashSet<>();
 }

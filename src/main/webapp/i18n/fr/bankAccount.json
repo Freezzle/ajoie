@@ -1,0 +1,8 @@
+{
+  "bankAccount": {
+    "iban": "IBAN",
+    "ibanHelp": "Format IBAN suisse : CH## #### #### #### #### #",
+    "accountHolder": "Titulaire du compte",
+    "bic": "BIC/SWIFT"
+  }
+}

@@ -1,5 +1,6 @@
 {
   "salon": {
+    "bankAccount": "Coordonnées bancaires",
     "conferences": "Les conférences",
     "create": "Nouveau salon",
     "delete": {
@@ -10,6 +11,8 @@
     "endingDate": "Date de fin",
     "extraInformation": "Commentaire",
     "floorPlan": "Gestion de la salle",
+    "headquartersAddress": "Adresse du siège social",
+    "eventAddress": "Adresse de l'évènement",
     "notFound": "Aucun salon",
     "participations": "Les participations",
     "place": "Nom du salon",

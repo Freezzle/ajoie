@@ -1,5 +1,6 @@
 package ch.salon.service.document;
 
+import ch.salon.domain.Address;
 import ch.salon.domain.Salon;
 import lombok.Data;
 
@@ -15,8 +16,16 @@ public class Sender implements Serializable {
 
     public Sender(Salon salon) {
         this.enterpriseName = "L'Ajoie de mieux vivre";
-        this.street = "Sous les chênes 109A";
-        this.city = "2944 Bonfol";
         this.website = "www.lajoiedemieuxvivre-alle.com";
+
+        if (salon.getHeadquartersAddress() != null) {
+            Address address = salon.getHeadquartersAddress();
+            this.street = Address.buildStreet(address);
+            this.city = Address.buildCity(address);
+        } else {
+            // Fallback to hardcoded values
+            this.street = "Sous les chênes 109A";
+            this.city = "2944 Bonfol";
+        }
     }
 }

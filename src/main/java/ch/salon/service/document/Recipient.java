@@ -1,5 +1,6 @@
 package ch.salon.service.document;
 
+import ch.salon.domain.Address;
 import ch.salon.domain.Exhibitor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -21,14 +22,19 @@ public class Recipient implements Serializable {
         if (exhibitor.getDifferentBillingAddress() && exhibitor.getBillingAddress() != null) {
             this.enterpriseName = exhibitor.getBillingAddress().getFormalLine();
             this.fullName = exhibitor.getBillingAddress().getFullName();
-            this.street = exhibitor.getBillingAddress().getAddress();
-            this.city = exhibitor.getBillingAddress().getNpaLocalite();
+            this.street = Address.buildStreet(exhibitor.getBillingAddress());
+            this.city = Address.buildCity(exhibitor.getBillingAddress());
             this.country = exhibitor.getBillingAddress().getIsoCountry();
+        } else if (exhibitor.getHomeAddress() != null) {
+            this.fullName = exhibitor.getFullName();
+            this.street = Address.buildStreet(exhibitor.getHomeAddress());
+            this.city = Address.buildCity(exhibitor.getHomeAddress());
+            this.country = exhibitor.getHomeAddress().getIsoCountry();
         } else {
             this.fullName = exhibitor.getFullName();
-            this.street = exhibitor.getAddress();
-            this.city = exhibitor.getNpaLocalite();
-            this.country = exhibitor.getIsoCountry();
+            this.street = "";
+            this.city = "";
+            this.country = "CH";
         }
 
         this.language =

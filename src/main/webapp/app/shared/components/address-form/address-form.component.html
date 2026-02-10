@@ -1,0 +1,52 @@
+<div [formGroup]="addressForm">
+    @if (showFormalFields) {
+        <div class="row">
+            <div class="col-md-6 mt-4">
+                <text-box fieldName="formalLine" formControlName="formalLine" translateKey="address.formalLine"/>
+            </div>
+            <div class="col-md-6 mt-4">
+                <text-box fieldName="fullName" formControlName="fullName" translateKey="address.fullName"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mt-4">
+                <text-box fieldName="postalCase" formControlName="postalCase" translateKey="address.postalCase"/>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-sm-10 mt-4">
+            <text-box fieldName="street" formControlName="street" translateKey="address.street"/>
+        </div>
+        <div class="col-sm-2 mt-4">
+            <text-box fieldName="houseNumber" formControlName="houseNumber" translateKey="address.houseNumber"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4 col-md-2 mt-4">
+            <text-box fieldName="postalCode" formControlName="postalCode" translateKey="address.postalCode"/>
+        </div>
+        <div class="col-sm-8 col-md-6 mt-4">
+            <text-box fieldName="city" formControlName="city" translateKey="address.city"/>
+        </div>
+        <div class="col-12 col-md-4 mt-4">
+            <select-box [formatterFunction]="formatterCountry"
+                        [needTranslation]="true"
+                        [options]="countryService.getAll()"
+                        fieldName="isoCountry"
+                        formControlName="isoCountry"
+                        translateKey="address.country"/>
+        </div>
+    </div>
+
+    @if (showFormalFields) {
+        <div class="row">
+            <div class="col-md-12 mt-4">
+                <text-box fieldName="extraLine" formControlName="extraLine" translateKey="address.extraLine"/>
+            </div>
+        </div>
+    }
+</div>

@@ -24,6 +24,8 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {AddressFormComponent} from '../../../shared/components/address-form/address-form.component';
+import {BankAccountFormComponent} from '../../../shared/components/bank-account-form/bank-account-form.component';
 
 @Component({
                selector: 'app-salon-update',
@@ -36,15 +38,17 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
                    TextBoxComponent,
                    TextareaBoxComponent,
                    DateBoxComponent,
-                   
+
                    AlertErrorComponent,
                    CurrencyBoxComponent,
                    NumberBoxComponent,
                    TableModule,
                    ConfirmPopup,
-                   
+
                    CardComponent,
-                   ContentPageComponent
+                   ContentPageComponent,
+                   AddressFormComponent,
+                   BankAccountFormComponent
                ]
            })
 export class SalonUpdateComponent implements OnInit {

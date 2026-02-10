@@ -12,8 +12,10 @@ public class AddressDTO implements Serializable {
     private String formalLine;
     private String fullName;
     private String postalCase;
-    private String address;
-    private String npaLocalite;
+    private String street;
+    private String houseNumber;
+    private String postalCode;
+    private String city;
     private String isoCountry;
     private String extraLine;
 }

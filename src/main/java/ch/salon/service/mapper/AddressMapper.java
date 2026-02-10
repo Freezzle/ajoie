@@ -11,6 +11,9 @@ public interface AddressMapper {
 
     AddressDTO toDto(Address domain);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "address", ignore = true)
+    @Mapping(target = "npaLocalite", ignore = true)
     Address toEntity(AddressDTO dto);
 }

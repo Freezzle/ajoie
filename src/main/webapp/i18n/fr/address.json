@@ -1,0 +1,13 @@
+{
+  "address": {
+    "formalLine": "Ligne formelle",
+    "fullName": "Nom complet",
+    "postalCase": "Case postale",
+    "street": "Rue",
+    "houseNumber": "N°",
+    "postalCode": "Npa",
+    "city": "Ville",
+    "country": "Pays",
+    "extraLine": "Ligne supp."
+  }
+}
