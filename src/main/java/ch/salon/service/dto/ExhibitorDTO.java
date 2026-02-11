@@ -10,7 +10,8 @@ public class ExhibitorDTO implements Serializable {
 
     private UUID id;
     private String language;
-    private String fullName;
+    private String firstName;
+    private String lastName;
     private String email;
     private String phoneNumber;
     private AddressDTO homeAddress;

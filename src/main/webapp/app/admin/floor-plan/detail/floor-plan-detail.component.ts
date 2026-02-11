@@ -14,7 +14,7 @@ import {CdkDragDrop, CdkDragMove, CdkDropList} from '@angular/cdk/drag-drop';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {distinctUntilChanged, finalize, map, startWith} from 'rxjs/operators';
-import {combineLatest, fromEvent, Observable} from 'rxjs';
+import {combineLatest, fromEvent} from 'rxjs';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 
 import SharedModule from '../../../shared/shared.module';
@@ -40,6 +40,7 @@ import {SalonService} from '../../salon/service/salon.service';
 import {ISalon} from '../../salon/model/salon.interface';
 import {Status} from '../../enumerations/status.model';
 import {v4} from 'uuid';
+import {getExhibitorFullName, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
 
 import {ConfirmPopup} from 'primeng/confirmpopup';
 
@@ -66,7 +67,6 @@ import {TextBoxComponent} from '../../../shared/components/text-box/text-box.com
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
 import {Category, formatterCategory} from '../../enumerations/category.model';
 import {removeAccents} from '../../../shared/utils/string.util';
-import {selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
@@ -232,6 +232,7 @@ export class FloorPlanDetailComponent {
 
     // exposed helpers
     protected readonly getFormattedParticipationName = getFormattedParticipationName;
+    protected readonly getExhibitorFullName = getExhibitorFullName;
     protected readonly formatterCategory = formatterCategory;
     protected readonly Category = Category;
     protected readonly Validators = Validators;

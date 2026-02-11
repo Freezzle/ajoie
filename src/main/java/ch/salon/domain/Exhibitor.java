@@ -29,8 +29,12 @@ public class Exhibitor implements Serializable, TenantOwned {
     private String language = Locale.FRENCH.getLanguage();
 
     @NotNull
-    @Column(name = "full_name", nullable = false)
-    private String fullName;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @NotNull
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
     @NotNull
     @Column(name = "email", nullable = false)
@@ -82,4 +86,8 @@ public class Exhibitor implements Serializable, TenantOwned {
 
     @Column(name = "duplicate_detected")
     private boolean duplicateDetected = false;
+
+    public String getFullname() {
+        return lastName + " " + firstName;
+    }
 }

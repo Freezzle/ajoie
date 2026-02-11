@@ -10,6 +10,7 @@ public class ExhibitorLightDTO implements Serializable {
 
     private UUID id;
     private String email;
-    private String fullName;
+    private String firstName;
+    private String lastName;
     private boolean redFlag;
 }

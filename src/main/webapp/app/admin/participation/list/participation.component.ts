@@ -7,6 +7,7 @@ import {FormatMediumDatePipe} from 'app/shared/date';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {getFormattedParticipationName, IInfoInvoice, IParticipation} from '../model/participation.interface';
 import {ParticipationService} from '../service/participation.service';
+import {getExhibitorFullName, IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
 import StatusPipe from '../../../shared/pipe/status.pipe';
 import {Status} from '../../enumerations/status.model';
@@ -176,6 +177,10 @@ export class ParticipationComponent implements OnInit {
 
     getInfoInvoice(idParticipation: string): IInfoInvoice {
         return this.infoInvoicesMap[idParticipation];
+    }
+
+    getExhibitorFullName(exhibitor: IExhibitor | null | undefined): string {
+        return getExhibitorFullName(exhibitor);
     }
 
     refresh(): void {

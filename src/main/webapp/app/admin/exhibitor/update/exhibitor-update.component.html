@@ -49,17 +49,20 @@
         <div appCardBody>
             <div class="row">
                 <div class="mt-4 col-lg-6">
-                    <text-box fieldName="fullName" formControlName="fullName" translateKey="exhibitor.fullName"/>
+                    <text-box fieldName="firstName" formControlName="firstName" translateKey="exhibitor.firstName"/>
+                </div>
+                <div class="mt-4 col-lg-6">
+                    <text-box fieldName="lastName" formControlName="lastName" translateKey="exhibitor.lastName"/>
                 </div>
                 <div class="mt-4 col-lg-6">
                     <text-box fieldName="email" formControlName="email" translateKey="exhibitor.email"/>
                 </div>
-                <div class="mt-4 col-lg-6">
+                <div class="mt-4 col-lg-3">
                     <text-box fieldName="phoneNumber"
                               formControlName="phoneNumber"
                               translateKey="exhibitor.phoneNumber"/>
                 </div>
-                <div class="mt-4 col-lg-6">
+                <div class="mt-4 col-lg-3">
                     <select-box [formatterFunction]="formatterLanguage"
                                 [needTranslation]="true"
                                 [options]="languageValues"

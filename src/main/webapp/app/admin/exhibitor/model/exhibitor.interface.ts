@@ -4,7 +4,8 @@ import {IBankAccount} from '../../common/bank-account.model';
 export interface IExhibitor {
     id: string;
 
-    fullName: string;
+    firstName: string;
+    lastName: string;
     email: string;
     language: string;
     differentBillingAddress: boolean;
@@ -19,20 +20,17 @@ export interface IExhibitor {
     bankAccount: IBankAccount | null;
 }
 
-export function containsExhibitorName(exhibitor: IExhibitor | undefined | null, filterText: string): boolean {
-    if (!exhibitor || !filterText) {
-        return false;
+export function getExhibitorFullName(exhibitor: IExhibitor | null | undefined): string {
+    if (!exhibitor) {
+        return '';
     }
-
-    filterText = filterText.trim()?.toLocaleLowerCase();
-
-    return exhibitor.fullName?.toLocaleLowerCase().includes(filterText) ?? false;
+    return `${exhibitor.firstName} ${exhibitor.lastName}`;
 }
 
 export function getFirstExhibitorName(exhibitor: IExhibitor | null | undefined): string {
-    return exhibitor?.fullName ?? '';
+    return getExhibitorFullName(exhibitor);
 }
 
 export function selectFilterExhibitor(): string {
-    return 'fullName,email';
+    return 'firstName,lastName,email';
 }

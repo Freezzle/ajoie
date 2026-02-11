@@ -19,7 +19,7 @@
         <div appCardBody>
             <div class="row">
                 <p-table #dt2
-                         [globalFilterFields]="['exhibitor.fullName', 'therapistName']"
+                         [globalFilterFields]="['exhibitor.firstName', 'exhibitor.lastName', 'therapistName']"
                          [loading]="isLoading"
                          [paginator]="true"
                          [rowsPerPageOptions]="[10, 25, 50]"
@@ -43,8 +43,8 @@
                     </ng-template>
                     <ng-template #header>
                         <tr>
-                            <th pSortableColumn="exhibitor.fullName">{{ 'exhibitor.fullName' | translate }}
-                                <p-sortIcon field="exhibitor.fullName"/>
+                            <th pSortableColumn="exhibitor.lastName">{{ 'exhibitor.fullName' | translate }}
+                                <p-sortIcon field="exhibitor.lastName"/>
                             </th>
                             <th pSortableColumn="therapistName">{{ 'exhibitor.therapistName' | translate }}
                                 <p-sortIcon field="therapistName"/>
@@ -88,7 +88,7 @@
                                     <div class="d-flex gap-1">
                                         <a (click)="$event.stopPropagation()"
                                            [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']">
-                                            {{ participation.exhibitor.fullName }}
+                                            {{ getExhibitorFullName(participation.exhibitor) }}
                                         </a>
                                         @if (participation.exhibitor.redFlag) {
                                             <fa-icon [title]="'exhibitor.redFlag' | translate"

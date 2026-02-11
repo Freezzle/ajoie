@@ -20,7 +20,7 @@
         <div appCardBody>
             <div class="row">
                 <p-table #dt2
-                         [globalFilterFields]="['participation.exhibitor.fullName', 'participation.therapistName']"
+                         [globalFilterFields]="['participation.exhibitor.firstName', 'participation.exhibitor.lastName', 'participation.therapistName']"
                          [loading]="isLoading"
                          [paginator]="true"
                          [rowsPerPageOptions]="[10, 25, 50]"

@@ -219,7 +219,8 @@ public class Importation2026Service {
 
         p.setSalon(salon);
         p.setExhibitor(exhibitor);
-        p.setTherapistName(therapistName != null ? sub100(therapistName) : exhibitor.getFullName());
+        p.setTherapistName(therapistName != null ? sub100(therapistName) :
+                sub100(exhibitor.getLastName() + " " + exhibitor.getFirstName()));
         p.setNbMeal1(meal1);
         p.setNbMeal2(meal2);
         p.setNbMeal3(meal3);
@@ -287,8 +288,8 @@ public class Importation2026Service {
             current.setRegistrationDate(now);
         }
 
-        current.setFullName(sub100(String.format("%s %s", StringUtils.defaultString(firstName).trim(),
-                StringUtils.defaultString(lastName).trim()).trim()));
+        current.setFirstName(sub100(StringUtils.defaultString(firstName).trim()));
+        current.setLastName(sub100(StringUtils.defaultString(lastName).trim()));
 
         Address homeAddress = new Address();
         homeAddress.setIsoCountry("CH");
@@ -326,7 +327,7 @@ public class Importation2026Service {
         // 2) Match prénom + nom si pas déjà détecté
         if (!duplicateDetected && StringUtils.isNotBlank(firstName) && StringUtils.isNotBlank(lastName)) {
             List<Exhibitor> nameMatches = Optional.ofNullable(
-                    exhibitorRepository.findAllByFullNameContainingIgnoreCaseAndFullNameContainingIgnoreCase(firstName,
+                    exhibitorRepository.findAllByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(firstName,
                             lastName)).orElseGet(ArrayList::new);
 
             if (!nameMatches.isEmpty()) {

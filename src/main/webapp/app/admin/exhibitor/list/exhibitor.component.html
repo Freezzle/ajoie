@@ -19,7 +19,7 @@
         <div appCardBody>
             <div class="row">
                 <p-table #dt2
-                         [globalFilterFields]="['fullName', 'email', 'phoneNumber']"
+                         [globalFilterFields]="['firstName', 'lastName', 'email', 'phoneNumber']"
                          [loading]="isLoading"
                          [paginator]="true"
                          [rowsPerPageOptions]="[10, 25, 50]"
@@ -27,7 +27,7 @@
                          [tableStyle]="{ 'min-width': '60rem' }"
                          [value]="exhibitors"
                          dataKey="id"
-                         sortField="fullName">
+                         sortField="lastName">
                     <ng-template #caption>
                         <div class="flex">
                             <p-iconfield class="ml-auto" iconPosition="left">
@@ -42,10 +42,10 @@
                     </ng-template>
                     <ng-template #header>
                         <tr>
-                            <th pSortableColumn="fullName">{{ 'exhibitor.fullName' | translate }}
-                                <p-sortIcon field="fullName"/>
+                            <th pSortableColumn="lastName">{{ 'exhibitor.fullName' | translate }}
+                                <p-sortIcon field="lastName"/>
                                 <p-columnFilter display="menu"
-                                                field="fullName"
+                                                field="lastName"
                                                 matchMode="contains"
                                                 size="small"
                                                 type="text"></p-columnFilter>
@@ -69,7 +69,7 @@
                     <ng-template #body let-exhibitor>
                         <tr>
                             <td [routerLink]="['./', exhibitor.id, 'view']"
-                                class="clickable truncate-medium">{{ exhibitor.fullName }}
+                                class="clickable truncate-medium">{{ getExhibitorFullName(exhibitor) }}
                             </td>
                             <td [routerLink]="['./', exhibitor.id, 'view']"
                                 class="clickable truncate-medium">{{ exhibitor.email }}

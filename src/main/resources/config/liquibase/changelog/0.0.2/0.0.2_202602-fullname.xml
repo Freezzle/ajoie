@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Step 1: Add new columns first_name and last_name -->
+    <changeSet id="0.0.2_20260211-add-firstname-lastname-columns" author="claudedy">
+        <addColumn tableName="exhibitor">
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Step 2: Migrate data from full_name to first_name and last_name -->
+    <changeSet id="0.0.2_20260211-migrate-fullname-data" author="claudedy">
+        <!-- For PostgreSQL -->
+        <sql dbms="postgresql">
+            -- Split full_name on first space: first word -> first_name, rest -> last_name
+            -- If no space exists, duplicate value in both fields
+            UPDATE exhibitor
+            SET first_name = CASE
+                WHEN POSITION(' ' IN TRIM(full_name)) > 0
+                THEN TRIM(SUBSTRING(TRIM(full_name) FROM 1 FOR POSITION(' ' IN TRIM(full_name)) - 1))
+                ELSE TRIM(full_name)
+            END,
+            last_name = CASE
+                WHEN POSITION(' ' IN TRIM(full_name)) > 0
+                THEN TRIM(SUBSTRING(TRIM(full_name) FROM POSITION(' ' IN TRIM(full_name)) + 1))
+                ELSE TRIM(full_name)
+            END
+            WHERE full_name IS NOT NULL;
+        </sql>
+
+        <!-- For H2 (test database) -->
+        <sql dbms="h2">
+            -- Split full_name on first space: first word -> first_name, rest -> last_name
+            -- If no space exists, duplicate value in both fields
+            UPDATE exhibitor
+            SET first_name = CASE
+                WHEN LOCATE(' ', TRIM(full_name)) > 0
+                THEN TRIM(SUBSTRING(TRIM(full_name), 1, LOCATE(' ', TRIM(full_name)) - 1))
+                ELSE TRIM(full_name)
+            END,
+            last_name = CASE
+                WHEN LOCATE(' ', TRIM(full_name)) > 0
+                THEN TRIM(SUBSTRING(TRIM(full_name), LOCATE(' ', TRIM(full_name)) + 1))
+                ELSE TRIM(full_name)
+            END
+            WHERE full_name IS NOT NULL;
+        </sql>
+    </changeSet>
+
+    <!-- Step 3: Make first_name and last_name not nullable -->
+    <changeSet id="0.0.2_20260211-make-firstname-lastname-notnull" author="claudedy">
+        <addNotNullConstraint tableName="exhibitor" columnName="first_name" columnDataType="VARCHAR(100)"/>
+        <addNotNullConstraint tableName="exhibitor" columnName="last_name" columnDataType="VARCHAR(100)"/>
+    </changeSet>
+
+    <!-- Step 4: Drop old full_name column -->
+    <changeSet id="0.0.2_20260211-drop-fullname-column" author="claudedy">
+        <dropColumn tableName="exhibitor" columnName="full_name"/>
+    </changeSet>
+
+</databaseChangeLog>

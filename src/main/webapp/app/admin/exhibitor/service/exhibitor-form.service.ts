@@ -5,7 +5,8 @@ import {IExhibitor} from '../model/exhibitor.interface';
 
 type ExhibitorFormGroupContent = {
     id: FormControl<IExhibitor['id'] | null>;
-    fullName: FormControl<IExhibitor['fullName'] | null>;
+    firstName: FormControl<IExhibitor['firstName'] | null>;
+    lastName: FormControl<IExhibitor['lastName'] | null>;
     email: FormControl<IExhibitor['email'] | null>;
     phoneNumber: FormControl<IExhibitor['phoneNumber'] | null>;
     homeAddress: FormControl<IExhibitor['homeAddress'] | null>;
@@ -31,7 +32,8 @@ export class ExhibitorFormService {
 
         return new FormGroup<ExhibitorFormGroupContent>({
                                                             id: new FormControl({value: raw.id, disabled: true}),
-                                                            fullName: new FormControl(raw.fullName, Validators.required),
+                                                            firstName: new FormControl(raw.firstName, Validators.required),
+                                                            lastName: new FormControl(raw.lastName, Validators.required),
                                                             email: new FormControl(raw.email, {validators: [Validators.required, Validators.email]}),
                                                             phoneNumber: new FormControl(raw.phoneNumber, {validators: [this.phoneValidator()]}),
                                                             homeAddress: new FormControl(raw.homeAddress),

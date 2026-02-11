@@ -6,7 +6,7 @@ import SharedModule from 'app/shared/shared.module';
 import {SortService, sortStateSignal} from 'app/shared/sort';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DEFAULT_SORT_DATA, SORT} from 'app/config/navigation.constants';
-import {getFirstExhibitorName, IExhibitor} from '../model/exhibitor.interface';
+import {getExhibitorFullName, IExhibitor} from '../model/exhibitor.interface';
 import {ExhibitorService} from '../service/exhibitor.service';
 import {finalize} from 'rxjs/operators';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
@@ -114,7 +114,7 @@ export class ExhibitorComponent implements OnInit {
 
     delete(htmlElement: HTMLElement, exhibitor: IExhibitor): void {
         this.confirmDialogService.delete(htmlElement, 'exhibitor.delete.question',
-                                         {id: getFirstExhibitorName(exhibitor)}
+                                         {id: getExhibitorFullName(exhibitor)}
         ).pipe(
             filter(confirmed => confirmed),
             switchMap(() => this.exhibitorService.delete(exhibitor.id)),
@@ -130,6 +130,10 @@ export class ExhibitorComponent implements OnInit {
             .subscribe(exhibitors => {
                 copyToClipboard(exhibitors.map(exhibitor => exhibitor.email).join(','));
             });
+    }
+
+    getExhibitorFullName(exhibitor: IExhibitor): string {
+        return getExhibitorFullName(exhibitor);
     }
 
     previousState(): void {

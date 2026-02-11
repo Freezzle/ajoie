@@ -26,12 +26,12 @@ public class Recipient implements Serializable {
             this.city = Address.buildCity(exhibitor.getBillingAddress());
             this.country = exhibitor.getBillingAddress().getIsoCountry();
         } else if (exhibitor.getHomeAddress() != null) {
-            this.fullName = exhibitor.getFullName();
+            this.fullName = exhibitor.getFullname();
             this.street = Address.buildStreet(exhibitor.getHomeAddress());
             this.city = Address.buildCity(exhibitor.getHomeAddress());
             this.country = exhibitor.getHomeAddress().getIsoCountry();
         } else {
-            this.fullName = exhibitor.getFullName();
+            this.fullName = exhibitor.getFullname();
             this.street = "";
             this.city = "";
             this.country = "CH";

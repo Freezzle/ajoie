@@ -1,6 +1,6 @@
 import {ISalon} from '../../salon/model/salon.interface';
 import {Status} from '../../enumerations/status.model';
-import {IExhibitor, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {IExhibitor, selectFilterExhibitor, getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
 import {ModePaymentMeals} from '../../enumerations/mode-payment-meals.model';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 
@@ -46,8 +46,10 @@ export function containsParticipationName(participation: IParticipation | null,
 
     filterText = filterText.trim()?.toLocaleLowerCase();
 
+    const exhibitorName = getExhibitorFullName(participation.exhibitor).toLocaleLowerCase();
+
     return (
-        (participation.exhibitor?.fullName?.toLocaleLowerCase().includes(filterText) ||
+        (exhibitorName.includes(filterText) ||
          participation.therapistName?.toLocaleLowerCase().includes(filterText)) ??
         false
     );
@@ -58,10 +60,12 @@ export function getFormattedParticipationName(participation: IParticipation | nu
         return '-';
     }
 
+    const exhibitorName = getExhibitorFullName(participation.exhibitor);
+
     if (participation?.therapistName) {
-        return `${participation?.therapistName} (${participation.exhibitor?.fullName})`;
+        return `${participation?.therapistName} (${exhibitorName})`;
     }
-    return `- (${participation.exhibitor?.fullName})`;
+    return `- (${exhibitorName})`;
 }
 
 export function selectFilterParticipation(): string {

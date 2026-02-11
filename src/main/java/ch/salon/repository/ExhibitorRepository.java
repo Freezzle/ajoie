@@ -16,7 +16,7 @@ public interface ExhibitorRepository extends JpaRepository<Exhibitor, UUID> {
 
     List<Exhibitor> findAllByPhoneNumberIsEndingWithIgnoreCase(String phoneNumber);
 
-    List<Exhibitor> findAllByFullNameContainingIgnoreCaseAndFullNameContainingIgnoreCase(String firstName,
+    List<Exhibitor> findAllByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(String firstName,
             String lastName);
 
     Exhibitor findByEmail(String email);

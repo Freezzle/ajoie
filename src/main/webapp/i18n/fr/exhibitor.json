@@ -18,6 +18,8 @@
       "fullName": "Nom de l'exposant",
       "therapistName": "Nom de thérapeute"
     },
+    "firstName": "Prénom",
+    "lastName": "Nom de famille",
     "fullName": "Nom complet",
     "homeAddress": "Adresse de domicile",
     "language": {
