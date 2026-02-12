@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {State} from '../../enumerations/state.model';
+import dayjs from 'dayjs/esm';
 
 @Injectable({providedIn: 'root'})
 export class InvoicingPlanHelperService {
@@ -23,5 +24,12 @@ export class InvoicingPlanHelperService {
             default:
                 return 'bg-warning';
         }
+    }
+
+    isExpired(expirationDate: dayjs.Dayjs | null | undefined, state: State | null | undefined): boolean {
+        if (!expirationDate || state !== State.ISSUED) {
+            return false;
+        }
+        return dayjs().isAfter(expirationDate);
     }
 }

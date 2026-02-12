@@ -81,6 +81,11 @@
                         <tr class="clickable">
                             <td class="truncate-small">
                                 {{ invoicingPlan.billingNumber }}
+                                @if (isExpired(invoicingPlan.expirationDate, invoicingPlan.state)) {
+                                    <fa-icon title="{{ ('invoicingPlan.expirations' | translate) + ' - ' + (invoicingPlan.expirationDate | formatMediumDate) }}"
+                                             class="text-danger ms-2"
+                                             icon="clock"></fa-icon>
+                                }
                             </td>
                             <td class="truncate-medium">
                                 @if (invoicingPlan.participation?.exhibitor) {

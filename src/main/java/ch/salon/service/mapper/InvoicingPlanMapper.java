@@ -29,5 +29,6 @@ public interface InvoicingPlanMapper {
     @Mapping(target = "totalAmount", expression = "java(invoicingPlan.getInvoicesTotal())")
     @Mapping(target = "paidAmount", expression = "java(invoicingPlan.getPaymentsTotal())")
     @Mapping(target = "balance", expression = "java(invoicingPlan.getInvoicesTotal() - invoicingPlan.getPaymentsTotal())")
+    @Mapping(target = "expirationDate", source = "expirationDate")
     InvoicingPlanListDTO toListDto(InvoicingPlan invoicingPlan);
 }

@@ -25,29 +25,32 @@ import {MenuItem} from 'primeng/api';
 import {InvoicingPlanHelperService} from '../../participation/service/invoicing-plan-helper.service';
 import {getExhibitorFullName, IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 import {Badge} from 'primeng/badge';
+import dayjs from 'dayjs/esm';
+import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 
 @Component({
     selector: 'app-invoicing-plan-list',
     templateUrl: './invoicing-plan-list.component.html',
-    imports: [
-        RouterModule,
-        FormsModule,
-        SharedModule,
-        ReactiveFormsModule,
-        ButtonBoxComponent,
-        ConfirmPopup,
-        AlertErrorComponent,
-        TableModule,
-        ContentPageComponent,
-        CardComponent,
-        IconField,
-        InputIcon,
-        InputText,
-        MultiSelect,
-        SplitMenuBoxComponent,
-        Badge
-    ]
-})
+               imports: [
+                   RouterModule,
+                   FormsModule,
+                   SharedModule,
+                   ReactiveFormsModule,
+                   ButtonBoxComponent,
+                   ConfirmPopup,
+                   AlertErrorComponent,
+                   TableModule,
+                   ContentPageComponent,
+                   CardComponent,
+                   IconField,
+                   InputIcon,
+                   InputText,
+                   MultiSelect,
+                   SplitMenuBoxComponent,
+                   Badge,
+                   FormatMediumDatePipe
+               ]
+           })
 export class InvoicingPlanListComponent implements OnInit {
     invoicingPlans: IInvoicingPlanList[] = [];
     isLoading = false;
@@ -97,6 +100,10 @@ export class InvoicingPlanListComponent implements OnInit {
 
     getStateBadgeClass(state: State | null | undefined): string {
         return this.invoicingPlanHelperService.getStateBadgeClass(state);
+    }
+
+    isExpired(expirationDate: dayjs.Dayjs | null | undefined, state: State | null | undefined): boolean {
+        return this.invoicingPlanHelperService.isExpired(expirationDate, state);
     }
 
     refresh(): void {

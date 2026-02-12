@@ -26,6 +26,7 @@
       "nbLines": "Nb lignes",
       "totalAmount": "Montant total",
       "balance": "Solde",
+      "expirationDate": "Date d'expiration",
       "state": "Statut"
     },
     "needArrangement": {

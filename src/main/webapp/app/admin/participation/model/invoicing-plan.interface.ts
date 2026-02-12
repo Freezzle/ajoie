@@ -24,6 +24,7 @@ export interface IInvoicingPlanList {
     id: string;
     billingNumber?: string | null;
     state?: State | null;
+    expirationDate?: dayjs.Dayjs | null;
     participation?: IParticipationLight | null;
     nbInvoiceLines?: number | null;
     totalAmount?: number | null;
