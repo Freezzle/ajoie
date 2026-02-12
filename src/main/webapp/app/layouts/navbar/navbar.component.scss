@@ -33,6 +33,10 @@
           padding: 0 0.5rem;
           text-decoration: none;
           color: var(--app-surface) !important;
+
+          i.pi {
+            margin-right: 0.5rem;
+          }
         }
 
         &:hover {

@@ -14,7 +14,7 @@
                     <li [routerLinkActiveOptions]="{ exact: true }"
                         routerLink="/"
                         routerLinkActive="active">
-                        <a>Accueil</a>
+                        <a><i class="pi pi-home"></i> Accueil</a>
                     </li>
                 </ul>
                 <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="true" class="dropdown-list">
@@ -22,13 +22,13 @@
                         [routerLinkActiveOptions]="{ exact: true }"
                         routerLink="/admin/exhibitors"
                         routerLinkActive="active">
-                        <a>L'annuaire client</a>
+                        <a><i class="pi pi-book"></i> L'annuaire client</a>
                     </li>
                     <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                         [routerLinkActiveOptions]="{ exact: true }"
                         routerLink="/admin/salons"
                         routerLinkActive="active">
-                        <a>Les salons</a>
+                        <a><i class="pi pi-calendar"></i> Les salons</a>
                     </li>
                 </ul>
                 @if (navigationService.salon(); as salon) {
@@ -40,70 +40,70 @@
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/view"
                             routerLinkActive="active">
-                            <a>{{ 'salon.edit' | translate }}</a>
+                            <a><i class="pi pi-pencil"></i> {{ 'salon.edit' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/stats"
                             routerLinkActive="active">
-                            <a>{{ 'salon.stats.title' | translate }}</a>
+                            <a><i class="pi pi-chart-bar"></i> {{ 'salon.stats.title' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/floor-plan"
                             routerLinkActive="active">
-                            <a>{{ 'salon.floorPlan' | translate }}</a>
+                            <a><i class="pi pi-map"></i> {{ 'salon.floorPlan' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/talks-planning"
                             routerLinkActive="active">
-                            <a>{{ 'salon.talksPlanning' | translate }}</a>
+                            <a><i class="pi pi-calendar-clock"></i> {{ 'salon.talksPlanning' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/volunteers-planning"
                             routerLinkActive="active">
-                            <a>{{ 'salon.volunteersPlanning' | translate }}</a>
+                            <a><i class="pi pi-users"></i> {{ 'salon.volunteersPlanning' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/participations"
                             routerLinkActive="active">
-                            <a>{{ 'salon.participations' | translate }}</a>
+                            <a><i class="pi pi-id-card"></i> {{ 'salon.participations' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/invoicing-plans"
                             routerLinkActive="active">
-                            <a>{{ 'salon.invoicingPlans' | translate }}</a>
+                            <a><i class="pi pi-file"></i> {{ 'salon.invoicingPlans' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/stands"
                             routerLinkActive="active">
-                            <a>{{ 'salon.stands' | translate }}</a>
+                            <a><i class="pi pi-th-large"></i> {{ 'salon.stands' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/conferences"
                             routerLinkActive="active">
-                            <a>{{ 'salon.conferences' | translate }}</a>
+                            <a><i class="pi pi-microphone"></i> {{ 'salon.conferences' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/workshops"
                             routerLinkActive="active">
-                            <a>{{ 'salon.workshops' | translate }}</a>
+                            <a><i class="pi pi-wrench"></i> {{ 'salon.workshops' | translate }}</a>
                         </li>
                         <hr class="hr-navbar"/>
                     </ul>
@@ -113,7 +113,7 @@
                     [class.show]="true"
                     class="dropdown-list">
                     <li>
-                        <a>Gestion technique</a> &nbsp;<fa-icon icon="sort-down"></fa-icon>
+                        <a><i class="pi pi-cog"></i> Gestion technique</a> &nbsp;<fa-icon icon="sort-down"></fa-icon>
                     </li>
                 </ul>
                 <ul *jhiHasAnyAuthority="['ROLE_ADMIN']" [class.show]="dropdowns().admin"
@@ -122,13 +122,13 @@
                         [routerLinkActiveOptions]="{ exact: true }"
                         routerLink="/admin/authorities"
                         routerLinkActive="active">
-                        <a>Authority</a>
+                        <a><i class="pi pi-shield"></i> Authority</a>
                     </li>
                     <li *jhiHasAnyAuthority="['ROLE_ADMIN']"
                         [routerLinkActiveOptions]="{ exact: true }"
                         routerLink="/admin/user-management"
                         routerLinkActive="active">
-                        <a>Utilisateurs</a>
+                        <a><i class="pi pi-users"></i> Utilisateurs</a>
                     </li>
                 </ul>
             </li>
