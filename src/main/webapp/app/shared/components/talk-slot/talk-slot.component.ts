@@ -1,5 +1,6 @@
 import {Component, computed, input, model} from '@angular/core';
 import {Badge} from 'primeng/badge';
+import {Status} from '../../../admin/enumerations/status.model';
 
 @Component({
                selector: 'talk-slot',
@@ -26,4 +27,10 @@ export interface Talk {
     roomId: string | null;
     dayId: string | null,
     startSlot: number;
+    status: Status;
+    extraInformation: string | null;
+    participation: {
+        therapistName: string;
+        fullName: string | null;
+    };
 }

@@ -25,6 +25,7 @@ import {TimelineRoom} from '../../../shared/components/talks-planning/model/time
 import {TimelineData} from '../../../shared/components/talks-planning/model/timeline-data';
 import {IntervalMinutes} from '../../../shared/components/talks-planning/model/interval-minutes';
 import {TpComponent} from '../../../shared/components/talks-planning/tp.component';
+import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
 
 @Component({
                selector: 'talks-planning',
@@ -35,8 +36,8 @@ import {TpComponent} from '../../../shared/components/talks-planning/tp.componen
                    SharedModule,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-                   
-                   
+
+
                    ConfirmPopup,
                    TpComponent,
                    CardComponent,
@@ -171,7 +172,13 @@ export class TalksPlanningComponent implements OnInit {
             description: talk.description,
             roomId: null,
             dayId: null,
-            startSlot: 0
+            startSlot: 0,
+            status: talk.status,
+            extraInformation: talk.extraInformation,
+            participation: {
+                therapistName: talk.participation.therapistName,
+                fullName: getExhibitorFullName(talk.participation.exhibitor)
+            }
         };
     }
 

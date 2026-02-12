@@ -90,8 +90,9 @@
                                         @for (assignedTalk of (talksByRoom().get(roomData.roomId) ?? []); track assignedTalk.id) {
                                             <talk-slot (cdkDragEnded)="onTalkDragEnded($event, assignedTalk, day)"
                                                        (cdkDragMoved)="onTalkDragMoved($event, assignedTalk)"
+                                                       (click)="!editionMode() && onTalkClick(assignedTalk)"
                                                        [cdkDragDisabled]="!editionMode()"
-                                                       [style.cursor]="editionMode() ? 'move' : 'default'"
+                                                       [style.cursor]="editionMode() ? 'move' : 'pointer'"
                                                        [style.left.px]="(assignedTalk.startSlot * slotW)"
                                                        [talk]="assignedTalk"
                                                        [widthInPx]="getTalkNbPeriods(assignedTalk) * slotW"
@@ -114,8 +115,9 @@
                                     @for (currentUnassigned of unassigned; track currentUnassigned.id) {
                                         <talk-slot (cdkDragEnded)="onTalkDragEnded($event, currentUnassigned, day)"
                                                    (cdkDragMoved)="onTalkDragMoved($event, currentUnassigned)"
+                                                   (click)="!editionMode() && onTalkClick(currentUnassigned)"
                                                    [cdkDragDisabled]="!editionMode()"
-                                                   [style.cursor]="editionMode() ? 'move' : 'default'"
+                                                   [style.cursor]="editionMode() ? 'move' : 'pointer'"
                                                    [talk]="currentUnassigned"
                                                    [widthInPx]="getTalkNbPeriods(currentUnassigned) * slotW"
                                                    cdkDrag
@@ -217,5 +219,52 @@
                 [header]="'Supprimer le jour'"
                 [mode]="'edit'">
         <div [innerHTML]="'planningTalks.removeDay' | translate: {day: selectedDay()?.label}"></div>
+    </dialog-box>
+}
+
+<!-- DIALOG : Talk Details -->
+@if (showTalkDetailsDialog()) {
+    <dialog-box (closed)="showTalkDetailsDialog.set(false)"
+                [(visible)]="showTalkDetailsDialog"
+                [dismissableMask]="true"
+                [header]="'planningTalks.details.header' | translate"
+                [mode]="'view'">
+        @if (selectedTalkForDialog(); as talk) {
+            <div style="display:grid; grid-template-columns: 1fr 2fr; row-gap: 1em; column-gap: 1em">
+                <b>{{ 'planningTalks.details.type' | translate }}</b>
+                <div>
+                    <p-badge [severity]="talk.type === 'CONFERENCE' ? 'info' : 'warn'"
+                             [value]="talk.type === 'CONFERENCE' ? ('planningTalks.details.conference' | translate) : ('planningTalks.details.workshop' | translate)"/>
+                </div>
+
+                <b>{{ 'planningTalks.details.title' | translate }}</b>
+                <span>{{ talk.title }}</span>
+
+                <b>{{ 'planningTalks.details.description' | translate }}</b>
+                <span>{{ talk.description || '-' }}</span>
+
+                <b>{{ 'planningTalks.details.therapistName' | translate }}</b>
+                <span>{{ talk.participation.therapistName }}</span>
+
+                <b>{{ 'planningTalks.details.fullName' | translate }}</b>
+                <span>{{ talk.participation.fullName }}</span>
+
+                <b>{{ 'planningTalks.details.status' | translate }}</b>
+                <span>
+                    <fa-icon [class]="talk.status | colorStatus"
+                             [icon]="talk.status | status"
+                             [title]="'participation.status.list.' + talk.status | translate"/>
+                </span>
+
+                <b>{{ 'planningTalks.details.durationTalk' | translate }}</b>
+                <span>{{ talk.durationTalkMinutes }} {{ 'planningTalks.details.minutes' | translate }}</span>
+
+                <b>{{ 'planningTalks.details.durationTotal' | translate }}</b>
+                <span>{{ talk.durationTotalMinutes }} {{ 'planningTalks.details.minutes' | translate }}</span>
+
+                <b>{{ 'planningTalks.details.extraInformation' | translate }}</b>
+                <span>{{ talk.extraInformation ?? '-' }}</span>
+            </div>
+        }
     </dialog-box>
 }

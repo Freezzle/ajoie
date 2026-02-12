@@ -11,6 +11,22 @@
     "manageRooms": "Gestion des salles",
     "noSelectedDay": "Aucun jour sélectionné",
     "noUnassignedTalks": "Toutes les animations sont déjà assignées",
-    "removeDay": "Voulez-vous supprimer le jour <strong>{{day}}</strong> ?"
+    "removeDay": "Voulez-vous supprimer le jour <strong>{{day}}</strong> ?",
+    "details": {
+      "header": "Détail de l'animation",
+      "title": "Titre de l'animation",
+      "type": "Type",
+      "conference": "Conférence",
+      "workshop": "Atelier",
+      "therapistName": "Nom thérapeute",
+      "fullName": "Exposant",
+      "email": "Email",
+      "durationTalk": "Durée animation",
+      "durationTotal": "Durée totale",
+      "minutes": "minutes",
+      "status": "Statut",
+      "extraInformation": "Informations supplémentaires",
+      "description": "Description"
+    }
   }
 }

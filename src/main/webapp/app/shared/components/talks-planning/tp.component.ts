@@ -18,12 +18,15 @@ import {BadgeModule} from 'primeng/badge';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {MenuItem} from 'primeng/api';
 import {TranslateModule} from '@ngx-translate/core';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 import {Talk, TalkSlotComponent} from '../talk-slot/talk-slot.component';
 import {CardComponent} from '../card/card.component';
 import {DialogBoxComponent} from '../dialog-box/dialog-box.component';
 import {MenuBoxComponent} from '../menu-box/menu-box.component';
 import {ButtonBoxComponent} from '../button-box/button-box.component';
+import StatusPipe from '../../pipe/status.pipe';
+import ColorStatusPipe from '../../pipe/color-status.pipe';
 
 import {TimelineDay} from './model/timeline-day';
 import {TimelineRoom} from './model/timeline-room';
@@ -52,7 +55,10 @@ type HoverRange = { roomId: string; start: number; end: number };
                    TpConfigRoomsComponent,
                    TpConfigDayComponent,
                    MenuBoxComponent,
-                   ButtonBoxComponent
+                   ButtonBoxComponent,
+                   FontAwesomeModule,
+                   StatusPipe,
+                   ColorStatusPipe
                ],
                templateUrl: './tp.component.html',
                styleUrl: './tp.component.scss'
@@ -150,6 +156,8 @@ export class TpComponent {
     hoveredTalk = signal<Talk | null>(null);
     hoveredRoomId = signal<string | null>(null);
     hoveredStartSlot = signal<number | null>(null);
+    showTalkDetailsDialog = signal(false);
+    selectedTalkForDialog = signal<Talk | null>(null);
     readonly hoverRange = computed<HoverRange | null>(() => {
         const roomId = this.hoveredRoomId();
         const start = this.hoveredStartSlot();
@@ -297,6 +305,14 @@ export class TpComponent {
         this.talks.update(ts => ts.map(t => (t.dayId === dayId ? this.unassignTalk(t) : t)));
 
         this.showConfirmDeleteDay.set(false);
+    }
+
+    onTalkClick(talk: Talk): void {
+        if (this.editionMode()) {
+            return;
+        }
+        this.selectedTalkForDialog.set(talk);
+        this.showTalkDetailsDialog.set(true);
     }
 
     private ensureSelectedDayId(): void {
