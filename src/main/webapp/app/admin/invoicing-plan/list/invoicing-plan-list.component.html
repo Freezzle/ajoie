@@ -1,0 +1,111 @@
+<app-content-page>
+    <div appMenuBarStart>
+        <h3 jhiTranslate="invoicingPlan.list.title">Plans de facturation</h3>
+    </div>
+    <div appMenuBarEnd>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    [showText]="false"
+                    primeIcon="pi-arrow-left"
+                    translateKey="common.back"/>
+        <split-menu-box [items]="actionMenuItems"
+                        [buttonDisabled]="isLoading"/>
+    </div>
+    <app-alert-error></app-alert-error>
+
+    <p-confirmpopup/>
+    <app-card [showHeader]="false">
+        <div appCardBody>
+            <div class="row">
+                <p-table #dt2
+                         [globalFilterFields]="['billingNumber', 'participation.exhibitor.firstName', 'participation.exhibitor.lastName', 'participation.therapistName']"
+                         [loading]="isLoading"
+                         [paginator]="true"
+                         [rowsPerPageOptions]="[10, 25, 50]"
+                         [rows]="10"
+                         [sortOrder]="-1"
+                         [tableStyle]="{ 'min-width': '75rem' }"
+                         [value]="invoicingPlans"
+                         dataKey="id"
+                         sortField="billingNumber">
+                    <ng-template #caption>
+                        <div class="flex">
+                            <p-iconfield class="ml-auto" iconPosition="left">
+                                <p-inputicon>
+                                    <i class="pi pi-search"></i>
+                                </p-inputicon>
+                                <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
+                                       placeholder="Recherche"
+                                       type="text"/>
+                            </p-iconfield>
+                        </div>
+                    </ng-template>
+                    <ng-template #header>
+                        <tr>
+                            <th pSortableColumn="billingNumber">{{ 'invoicingPlan.list.billingNumber' | translate }}
+                                <p-sortIcon field="billingNumber"/>
+                            </th>
+                            <th pSortableColumn="participation.exhibitor.lastName">{{ 'invoicingPlan.list.client' | translate }}
+                                <p-sortIcon field="participation.exhibitor.lastName"/>
+                            </th>
+                            <th pSortableColumn="nbInvoiceLines">{{ 'invoicingPlan.list.nbLines' | translate }}
+                                <p-sortIcon field="nbInvoiceLines"/>
+                            </th>
+                            <th pSortableColumn="totalAmount">{{ 'invoicingPlan.list.totalAmount' | translate }}
+                                <p-sortIcon field="totalAmount"/>
+                            </th>
+                            <th pSortableColumn="balance">{{ 'invoicingPlan.list.balance' | translate }}
+                                <p-sortIcon field="balance"/>
+                            </th>
+                            <th pSortableColumn="state">{{ 'invoicingPlan.list.state' | translate }}
+                                <p-sortIcon field="state"/>
+                                <p-columnFilter [showAddButton]="false" [showMatchModes]="false" [showOperator]="false" display="menu"
+                                                field="state" matchMode="in">
+                                    <ng-template #filter let-filter="filterCallback" let-value>
+                                        <p-multiselect (ngModelChange)="filter($event)" [ngModel]="value"
+                                                       [options]="stateValues" [panelStyle]="{ minWidth: '16rem' }"
+                                                       style="min-width: 14rem">
+                                            <ng-template #item let-option>
+                                                <div class="flex items-center gap-2">
+                                                    <p-badge [ngClass]="getStateBadgeClass(option)"
+                                                             [value]="'invoicingPlan.state.' + option | translate | uppercase"/>
+                                                </div>
+                                            </ng-template>
+                                        </p-multiselect>
+                                    </ng-template>
+                                </p-columnFilter>
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-invoicingPlan>
+                        <tr class="clickable">
+                            <td class="truncate-small">
+                                {{ invoicingPlan.billingNumber }}
+                            </td>
+                            <td class="truncate-medium">
+                                @if (invoicingPlan.participation?.exhibitor) {
+                                    {{ getExhibitorFullName(invoicingPlan.participation.exhibitor) }}
+                                } @else {
+                                    {{ invoicingPlan.participation?.therapistName }}
+                                }
+                            </td>
+                            <td>
+                                {{ invoicingPlan.nbInvoiceLines }}
+                            </td>
+                            <td>
+                                {{ invoicingPlan.totalAmount | currency: 'CHF' }}
+                            </td>
+                            <td>
+                                {{ invoicingPlan.balance | currency: 'CHF' }}
+                            </td>
+                            <td>
+                                <p-badge [ngClass]="getStateBadgeClass(invoicingPlan.state)"
+                                         [value]="'invoicingPlan.state.' + invoicingPlan.state | translate | uppercase"/>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </app-card>
+</app-content-page>

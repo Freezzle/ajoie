@@ -6,14 +6,10 @@ import ch.salon.domain.PlanningVolunteerSalon;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.Importation2026Service;
+import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.ParticipationService;
 import ch.salon.service.SalonService;
-import ch.salon.service.dto.FloorPlanSalonDTO;
-import ch.salon.service.dto.FloorPlanBatchRequestDTO;
-import ch.salon.service.dto.FloorPlanBatchResponseDTO;
-import ch.salon.service.dto.ParticipationDTO;
-import ch.salon.service.dto.PriceStandDTO;
-import ch.salon.service.dto.SalonDTO;
+import ch.salon.service.dto.*;
 import ch.salon.utils.ResponseUtil;
 import ch.salon.utils.ResourceUtil;
 import ch.salon.web.rest.dto.InfoInvoice;
@@ -46,13 +42,15 @@ public class AdminSalonResource {
     private final SalonService salonService;
     private final Importation2026Service importation2026Service;
     private final ParticipationService participationService;
-
+    private final InvoicingPlanService invoicingPlanService;
 
     public AdminSalonResource(SalonService salonService, Importation2026Service importation2026Service,
-                              ParticipationService participationService) {
+                              ParticipationService participationService,
+                              InvoicingPlanService invoicingPlanService) {
         this.salonService = salonService;
         this.importation2026Service = importation2026Service;
         this.participationService = participationService;
+        this.invoicingPlanService = invoicingPlanService;
     }
 
     @PostMapping("")
@@ -202,5 +200,15 @@ public class AdminSalonResource {
     public ResponseEntity<List<PriceStandDTO>> getDimensionStandsFromSalon(
             @PathVariable(value = "idSalon") final UUID idSalon) {
         return ResponseUtil.wrapOrNotFound(Optional.of(salonService.getDimensionStands(idSalon)));
+    }
+
+    @GetMapping("/{idSalon}/invoicing-plans")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<List<InvoicingPlanListDTO>> getAllInvoicingPlansBySalon(
+            @PathVariable(value = "idSalon") final UUID idSalon) {
+        log.debug("REST request to get all InvoicingPlans for Salon : {}", idSalon);
+
+        List<InvoicingPlanListDTO> invoicingPlans = invoicingPlanService.findAllBySalonId(idSalon);
+        return ResponseEntity.ok().body(invoicingPlans);
     }
 }

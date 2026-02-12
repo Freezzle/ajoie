@@ -12,6 +12,7 @@ import ch.salon.repository.PaymentRepository;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
+import ch.salon.service.dto.InvoicingPlanListDTO;
 import ch.salon.service.dto.PaymentDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.InvoiceMapper;
@@ -49,6 +50,13 @@ public class InvoicingPlanService {
     private final EventLogMapper eventLogMapper;
 
     private final MessageSource messageSource;
+
+    public List<InvoicingPlanListDTO> findAllBySalonId(UUID idSalon) {
+        List<InvoicingPlan> invoicingPlans = repository.findByParticipation_Salon_Id(idSalon);
+        return invoicingPlans.stream()
+                .map(invoicingPlanMapper::toListDto)
+                .toList();
+    }
 
     public InvoiceDTO createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {
         if (idInvoicingPlan == null || invoiceDTO == null) {

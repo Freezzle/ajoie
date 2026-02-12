@@ -19,6 +19,15 @@
     },
     "invoicings": "Les lignes de facture",
     "invoicingPlans": "Les factures",
+    "list": {
+      "title": "Les factures",
+      "billingNumber": "N° de facture",
+      "client": "Client",
+      "nbLines": "Nb lignes",
+      "totalAmount": "Montant total",
+      "balance": "Solde",
+      "state": "Statut"
+    },
     "needArrangement": {
       "checked": "Plan avec arrangement",
       "unchecked": "Plan sans arrangement"

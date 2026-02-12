@@ -31,8 +31,8 @@ export class AlertComponent implements OnInit, OnDestroy {
         this.messageService.add({
                                     severity: this.mapAlertTypeToSeverity(alert.type),
                                     summary: this.getAlertSummary(alert.type),
-                                    detail: alert.message || '',
-                                    life: alert.timeout || 5000,
+                                    detail: alert.message ?? '',
+                                    life: alert.timeout ?? 5000,
                                     key: this.normalizePosition('top center')
                                 });
     }
@@ -44,7 +44,7 @@ export class AlertComponent implements OnInit, OnDestroy {
             'warning': 'warn',
             'info': 'info'
         };
-        return mapping[type] || 'info';
+        return mapping[type] ?? 'info';
     }
 
     private getAlertSummary(type: string): string {

@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
-import {IInvoice, IPayment} from '../model/invoicing-plan.interface';
+import {IInvoice, IInvoicingPlanList, IPayment} from '../model/invoicing-plan.interface';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 
 @Injectable({providedIn: 'root'})
@@ -10,6 +10,12 @@ export class InvoicingPlanService {
     protected http = inject(HttpClient);
     protected applicationConfigService = inject(ApplicationConfigService);
     protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/invoicing-plans');
+    protected salonResourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
+
+    queryBySalon(idSalon: string): Observable<HttpResponse<IInvoicingPlanList[]>> {
+        return this.http.get<IInvoicingPlanList[]>(`${this.salonResourceUrl}/${idSalon}/invoicing-plans`,
+                                                    {observe: 'response'});
+    }
 
     createInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
         return this.http.post<IInvoice>(`${this.resourceUrl}/${idInvoicingPlan}/invoices`, invoice,

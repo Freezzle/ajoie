@@ -12,6 +12,7 @@ import floorPlanRoutes from '../floor-plan/floor-plan.routes';
 import workshopRoutes from '../workshop/workshop.routes';
 import talksPlanningRoute from '../talks-planning/talks-planning.routes';
 import volunteersPlanningRoute from '../volunteer-planning/volunteer-planning.routes';
+import invoicingPlanRoutes from '../invoicing-plan/invoicing-plan.routes';
 
 const salonRoute: Routes = [
     {
@@ -76,6 +77,10 @@ const salonRoute: Routes = [
     {
         path: ':idSalon/participations',
         children: participationRoutes
+    },
+    {
+        path: ':idSalon/invoicing-plans',
+        children: invoicingPlanRoutes
     },
     {
         path: ':idSalon/talks-planning',

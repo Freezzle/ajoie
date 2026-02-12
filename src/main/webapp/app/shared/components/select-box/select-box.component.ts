@@ -1,5 +1,5 @@
-import { Component, Input, Self } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {Component, Input, Self} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {
     ControlValueAccessor,
@@ -9,10 +9,10 @@ import {
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
-import { ErrorBoxComponent } from '../../error-box/error-box.component';
-import { IftaLabel } from 'primeng/iftalabel';
-import { Select } from 'primeng/select';
-import { PrimeTemplate } from 'primeng/api';
+import {ErrorBoxComponent} from '../../error-box/error-box.component';
+import {IftaLabel} from 'primeng/iftalabel';
+import {Select} from 'primeng/select';
+import {PrimeTemplate} from 'primeng/api';
 
 @Component({
                imports: [
@@ -62,13 +62,17 @@ export class SelectBoxComponent implements ControlValueAccessor {
     }
 
     get filterByToUse(): string | undefined {
-        if (this.stringOptions) return undefined;
+        if (this.stringOptions) {
+            return undefined;
+        }
         return this.filterFields ?? 'label,name,id';
     }
 
     // CVA
-    onChange = (_: any) => {};
-    onTouched = () => {};
+    onChange = (_: any) => {
+    };
+    onTouched = () => {
+    };
 
     writeValue(value: any): void {
         this.value = value;

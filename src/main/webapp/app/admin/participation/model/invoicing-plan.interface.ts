@@ -4,6 +4,7 @@ import {Type} from '../../enumerations/type.model';
 import {Mode} from '../../enumerations/mode.model';
 import {AvailableAction} from '../../../shared/model/available-action';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
+import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 
 export interface IInvoicingPlan {
     id: string;
@@ -17,6 +18,23 @@ export interface IInvoicingPlan {
     invoices?: IInvoice[];
     payments?: IPayment[];
     availableActions: AvailableAction[];
+}
+
+export interface IInvoicingPlanList {
+    id: string;
+    billingNumber?: string | null;
+    state?: State | null;
+    participation?: IParticipationLight | null;
+    nbInvoiceLines?: number | null;
+    totalAmount?: number | null;
+    paidAmount?: number | null;
+    balance?: number | null;
+}
+
+export interface IParticipationLight {
+    id: string;
+    exhibitor?: IExhibitor | null;
+    therapistName?: string | null;
 }
 
 export interface IInvoice {

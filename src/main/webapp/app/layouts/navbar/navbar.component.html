@@ -80,6 +80,13 @@
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
+                            routerLink="/admin/salons/{{salon.id}}/invoicing-plans"
+                            routerLinkActive="active">
+                            <a>{{ 'salon.invoicingPlans' | translate }}</a>
+                        </li>
+                        <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/stands"
                             routerLinkActive="active">
                             <a>{{ 'salon.stands' | translate }}</a>
