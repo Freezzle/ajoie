@@ -105,4 +105,10 @@ public class AdminParticipationResource {
 
         return participationService.findAllEventLogs(idParticipation);
     }
+
+    @GetMapping("/active-exhibitor-emails")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public List<String> getExhibitorEmailsWithActiveParticipations() {
+        return participationService.getExhibitorEmailsWithActiveParticipations();
+    }
 }

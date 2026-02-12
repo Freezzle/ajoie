@@ -29,4 +29,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
 
     @EntityGraph(attributePaths = {"exhibitor", "exhibitor.billingAddress"})
     List<Participation> findBySalonIdAndStatusIn(UUID idSalon, List<Status> statuses);
+
+    @EntityGraph(attributePaths = {"exhibitor"})
+    List<Participation> findByStatusIn(List<Status> statuses);
 }

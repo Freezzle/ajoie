@@ -206,6 +206,15 @@ public class ParticipationService {
                 .map(eventLogMapper::toDto).toList();
     }
 
+    public List<String> getExhibitorEmailsWithActiveParticipations() {
+        List<Status> activeStatuses = Arrays.asList(Status.ACCEPTED, Status.VALIDATED, Status.CLOSED);
+        return participationRepository.findByStatusIn(activeStatuses).stream()
+                .map(participation -> participation.getExhibitor().getEmail())
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
     private boolean isAllOf(Set<Status> stands, Set<Status> conferences, Status status) {
         return (stands.stream().allMatch(statusStand -> statusStand == status) &&
                 conferences.stream().allMatch(statusConf -> statusConf == status));

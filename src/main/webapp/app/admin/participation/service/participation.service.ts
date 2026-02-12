@@ -68,6 +68,10 @@ export class ParticipationService {
         return this.http.get<any[]>(`${this.resourceUrl}/${idParticipation}/events`, {observe: 'response'});
     }
 
+    getExhibitorEmailsWithActiveParticipations(): Observable<string[]> {
+        return this.http.get<string[]>(`${this.resourceUrl}/active-exhibitor-emails`);
+    }
+
     protected convertDateFromClient<T extends IParticipation>(participation: T): T {
         return {
             ...participation,

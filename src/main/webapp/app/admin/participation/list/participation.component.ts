@@ -31,6 +31,7 @@ import {MultiSelect} from 'primeng/multiselect';
 import {SplitMenuBoxComponent} from '../../../shared/components/split-menu-box/split-menu-box.component';
 import {TranslateService} from '@ngx-translate/core';
 import {MenuItem} from 'primeng/api';
+import {copyToClipboard} from '../../../core/util/utils';
 
 @Component({
                selector: 'app-participation',
@@ -110,8 +111,23 @@ export class ParticipationComponent implements OnInit {
             label: this.translateService.instant('common.create') as string,
             icon: 'pi pi-plus',
             command: () => this.router.navigate(['./new'], {relativeTo: this.activatedRoute})
+        },
+        {
+            label: this.translateService.instant('participation.copyActiveExhibitorEmails') as string,
+            icon: 'pi pi-copy',
+            command: () => this.clipboardActiveExhibitorEmails()
         }
     ];
+
+    clipboardActiveExhibitorEmails(): void {
+        this.isLoading = true;
+
+        this.participationService.getExhibitorEmailsWithActiveParticipations()
+            .pipe(finalize(() => this.isLoading = false))
+            .subscribe(emails => {
+                copyToClipboard(emails.join(','));
+            });
+    }
 
     load(): void {
         this.isLoading = true;
