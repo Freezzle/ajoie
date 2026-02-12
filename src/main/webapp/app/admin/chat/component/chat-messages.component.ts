@@ -118,7 +118,16 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
                                                 class="bubble px-3 py-2 rounded">
                                                {{ msg.content }}
                                            </div>
-                                           <small class="text-muted">{{ msg.timestamp | timeSince }}</small>
+                                           <div class="d-flex align-items-center gap-1">
+                                               <small class="text-muted">{{ msg.timestamp | timeSince }}</small>
+                                               @if (msg.senderId === currentUserLogin() || msg.senderId === '') {
+                                                   @if (msg.isRead) {
+                                                       <i class="pi pi-check-circle text-muted" style="font-size: 0.75rem" title="Message lu"></i>
+                                                   } @else {
+                                                       <i class="pi pi-circle text-muted" style="font-size: 0.75rem" title="Message envoyé"></i>
+                                                   }
+                                               }
+                                           </div>
                                        </div>
                                    }
                                </div>
