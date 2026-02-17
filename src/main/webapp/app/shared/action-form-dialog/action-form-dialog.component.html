@@ -1,0 +1,48 @@
+<form (ngSubmit)="submit()" [formGroup]="form">
+    <div class="modal-header">
+        <h4 class="modal-title" jhiTranslate="{{ actionLabelKey }}">Action</h4>
+    </div>
+
+    <div class="modal-body">
+        <app-alert-error></app-alert-error>
+
+        <div class="row">
+            @for (field of requiredFields; track field.name) {
+                <div class="mt-4 col-12">
+                    @if (field.type === FieldType.TEXT) {
+                        <text-box
+                            [fieldName]="field.name"
+                            [formControlName]="field.name"
+                            [translateKey]="field.labelKey"/>
+                    }
+                    @if (field.type === FieldType.DATE) {
+                        <date-box
+                            [fieldName]="field.name"
+                            [formControlName]="field.name"
+                            [translateKey]="field.labelKey"/>
+                    }
+                    @if (field.type === FieldType.NUMBER) {
+                        <number-box
+                            [fieldName]="field.name"
+                            [formControlName]="field.name"
+                            [translateKey]="field.labelKey"/>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button-box
+            (clickedEvent)="cancel()"
+            [isDisabled]="isLoading()"
+            [showText]="true"
+            translateKey="common.cancel"/>
+
+        <button-box
+            [isDisabled]="!form.valid || isLoading()"
+            (clickedEvent)="submit()"
+            [showText]="true"
+            translateKey="common.confirm"/>
+    </div>
+</form>

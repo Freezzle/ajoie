@@ -5,10 +5,12 @@ import ch.salon.service.actions.DocumentActionService;
 import ch.salon.service.actions.EmailActionService;
 import ch.salon.service.actions.PermissionActionService;
 import ch.salon.service.handlers.ActionAvailable;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailMessage;
+import ch.salon.service.handlers.RequiredField;
 import ch.salon.service.handlers.enums.ActionType;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
@@ -33,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -85,8 +88,19 @@ public class AvailabilityActionController {
 
                     if (supportType != SupportType.REJECTED &&
                             permissionService.isAllowed(context.code(), payload, authentication)) {
+
+                        boolean needsConfirmation = false;
+                        List<RequiredField> requiredFields = Collections.emptyList();
+
+                        // Extract metadata for BusinessActionHandler
+                        if (handler instanceof BusinessActionHandler && handler instanceof ActionMetadataProvider) {
+                            ActionMetadataProvider metadataProvider = (ActionMetadataProvider) handler;
+                            needsConfirmation = metadataProvider.needsConfirmation();
+                            requiredFields = metadataProvider.getRequiredFields();
+                        }
+
                         actions.add(new ActionAvailable(context.code(), type, supportType == SupportType.DISABLED,
-                                "action." + context.code()));
+                                "action." + context.code(), needsConfirmation, requiredFields));
                     }
                 }
             });

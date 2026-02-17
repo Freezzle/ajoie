@@ -34,6 +34,7 @@ import {AvailableAction} from '../../../shared/model/available-action';
 import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.component';
 import {EmailMessage} from '../../../shared/email-dialog/email-message';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
+import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
 import {IWorkshop} from '../../workshop/model/workshop.interface';
 import {WorkshopService} from '../../workshop/service/workshop.service';
 import {formatterModePaymentMeals, ModePaymentMeals} from '../../enumerations/mode-payment-meals.model';
@@ -208,7 +209,7 @@ export class ParticipationUpdateComponent implements OnInit {
             .subscribe((participation) => this.load(participation.body, this.isReadOnly));
     }
 
-    clickAction(action: AvailableAction): void {
+    clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
         const participationId = this.initialParticipation?.id;
         if (!participationId) {
             return;
@@ -228,21 +229,55 @@ export class ParticipationUpdateComponent implements OnInit {
 
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = filename;   // ✅ c’est ça qui impose le nom
+                a.download = filename;
                 a.click();
 
                 window.URL.revokeObjectURL(url);
             });
         } else if (action.type === 'BUSINESS') {
-            this.isLoading = true;
-            this.actionsService.businessAction(action.contextCode, participationId)
-                .pipe(
-                    finalize(() => this.isLoading = false),
-                    switchMap(() => this.participationService.find(participationId)))
-                .subscribe((participation) => this.load(participation.body, this.isReadOnly));
+            this.handleBusinessAction(action, participationId, htmlElement);
         } else {
             console.warn('Action type unknown : ' + action.type);
         }
+    }
+
+    private handleBusinessAction(action: AvailableAction, participationId: string, htmlElement?: HTMLElement): void {
+        // Si des champs sont requis, ouvrir la modale de formulaire
+        if (action.requiredFields && action.requiredFields.length > 0) {
+            const modalRef = this.modalService.open(ActionFormDialogComponent, {size: 'lg'});
+            modalRef.componentInstance.requiredFields = action.requiredFields;
+            modalRef.componentInstance.actionLabelKey = action.labelKey;
+
+            modalRef.result.then((payload: Map<string, any>) => {
+                if (payload) {
+                    this.executeBusinessAction(action.contextCode, participationId, payload);
+                }
+            }).catch(() => {
+                // Modal dismissed
+            });
+        } else if (action.needsConfirmation) {
+            // Si confirmation requise, afficher le dialog de confirmation
+            // Utiliser l'élément passé ou le document.activeElement comme fallback
+            const targetElement = htmlElement || document.activeElement as HTMLElement;
+            const confirmMessageKey = `${action.labelKey}.confirm`;
+            this.confirmDialogService.confirmAction(targetElement, confirmMessageKey)
+                .pipe(filter(confirmed => confirmed))
+                .subscribe(() => {
+                    this.executeBusinessAction(action.contextCode, participationId);
+                });
+        } else {
+            // Exécution directe
+            this.executeBusinessAction(action.contextCode, participationId);
+        }
+    }
+
+    private executeBusinessAction(context: string, participationId: string, payload?: Map<string, any>): void {
+        this.isLoading = true;
+        this.actionsService.businessAction(context, participationId, payload)
+            .pipe(
+                finalize(() => this.isLoading = false),
+                switchMap(() => this.participationService.find(participationId)))
+            .subscribe((participation) => this.load(participation.body, this.isReadOnly));
     }
 
     openEmailPopup(action: AvailableAction, id: string) {
@@ -282,7 +317,7 @@ export class ParticipationUpdateComponent implements OnInit {
             items.push({
                            label: this.translateService.instant(action.labelKey) as string,
                            disabled: action.disabled,
-                           command: () => this.clickAction(action),
+                           command: (event) => this.clickAction(action, event.originalEvent?.target as HTMLElement),
                            data: {type: action.type},
                            icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
                                                          : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF

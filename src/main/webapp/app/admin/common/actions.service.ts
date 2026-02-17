@@ -20,8 +20,10 @@ export class ActionsService {
         return this.http.get<EmailMessage>(`${this.resourceActionsUrl}/email/${context}/${idEntity}/template`);
     }
 
-    businessAction(context: string, idEntity: string, payload?: [string, unknown]): Observable<unknown> {
-        return this.http.post<unknown>(`${this.resourceActionsUrl}/business/${context}/${idEntity}`, {payload});
+    businessAction(context: string, idEntity: string, payload?: Map<string, any>): Observable<unknown> {
+        // Convertir Map en objet pour la sérialisation JSON
+        const body = payload ? Object.fromEntries(payload) : {};
+        return this.http.post<unknown>(`${this.resourceActionsUrl}/business/${context}/${idEntity}`, body);
     }
 
     emailAction(context: string, idEntity: string, emailMessage: EmailMessage): Observable<unknown> {

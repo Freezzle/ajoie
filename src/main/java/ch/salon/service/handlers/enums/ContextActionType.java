@@ -11,6 +11,7 @@ public enum ContextActionType {
     INVOICE_DOWNLOAD("billing", "invoice-download"),
     INVOICE_MARK_AS_ISSUED("billing", "invoice-marked-as-issued"),
     INVOICE_MARK_AS_PAID("billing", "invoice-marked-as-paid"),
+    INVOICE_PAY_ALL_CASH("billing", "invoice-pay-all-cash"),
     INVOICE_EXTEND_EXPIRY_DATE("billing", "invoice-extend-expiry-date"),
     INVOICE_CANCELLATION_SEND("billing", "invoice-cancellation-send"),
     INVOICE_DELETE("billing", "invoice-delete"),

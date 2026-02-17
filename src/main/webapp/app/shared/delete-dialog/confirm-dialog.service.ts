@@ -43,4 +43,34 @@ export class ConfirmDialogService {
 
         return subject.asObservable();
     }
+
+    public confirmAction(target: HTMLElement, messageKey: string, interpolateParams?: object): Observable<boolean> {
+        const subject = new Subject<boolean>();
+
+        this.confirmationService.confirm({
+                                             target,
+                                             message: this.translateService.instant(messageKey, interpolateParams) as string,
+                                             header: this.translateService.instant('common.confirmation') as string,
+                                             icon: 'pi pi-question-circle',
+                                             rejectLabel: this.translateService.instant('common.cancel'),
+                                             acceptLabel: this.translateService.instant('common.confirm'),
+                                             rejectButtonProps: {
+                                                 severity: 'secondary',
+                                                 outlined: true
+                                             },
+                                             acceptButtonProps: {
+                                                 severity: 'primary'
+                                             },
+                                             accept: () => {
+                                                 subject.next(true);
+                                                 subject.complete();
+                                             },
+                                             reject() {
+                                                 subject.next(false);
+                                                 subject.complete();
+                                             }
+                                         });
+
+        return subject.asObservable();
+    }
 }

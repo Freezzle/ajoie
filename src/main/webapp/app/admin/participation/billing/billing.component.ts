@@ -7,7 +7,7 @@ import {getFormattedParticipationName, IParticipation} from '../model/participat
 import {IInvoice, IInvoicingPlan, IPayment} from '../model/invoicing-plan.interface';
 import {formatterParticipation, ParticipationService} from '../service/participation.service';
 import {EMPTY, Observable, of} from 'rxjs';
-import {finalize, mergeMap} from 'rxjs/operators';
+import {finalize, mergeMap, filter} from 'rxjs/operators';
 import {HttpResponse} from '@angular/common/http';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Type} from '../../enumerations/type.model';
@@ -23,11 +23,13 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.component';
 import {ActionsService} from '../../common/actions.service';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
+import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
 import {formatterInvoiceMethod, InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 import {AccordionModule, AccordionTabCloseEvent, AccordionTabOpenEvent} from 'primeng/accordion';
 
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 
 import {Badge} from 'primeng/badge';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
@@ -76,6 +78,7 @@ export class BillingComponent implements OnInit {
     protected actionsService = inject(ActionsService);
     protected modalService = inject(NgbModal);
     protected translateService = inject(TranslateService);
+    protected confirmDialogService = inject(ConfirmDialogService);
     protected readonly Status = Status;
     protected readonly dayjs = dayjs;
     protected readonly getFormattedParticipationName = getFormattedParticipationName;
@@ -344,7 +347,7 @@ export class BillingComponent implements OnInit {
         });
     }
 
-    clickAction(action: AvailableAction, invoicingPlan: IInvoicingPlan) {
+    clickAction(action: AvailableAction, invoicingPlan: IInvoicingPlan, htmlElement?: HTMLElement) {
         if (action.type === 'EMAIL') {
             this.openEmailPopup(action, invoicingPlan.id);
         } else if (action.type === 'DOWNLOAD') {
@@ -359,20 +362,56 @@ export class BillingComponent implements OnInit {
 
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = filename;   // ✅ c’est ça qui impose le nom
+                a.download = filename;
                 a.click();
 
                 window.URL.revokeObjectURL(url);
             });
         } else if (action.type === 'BUSINESS') {
-            this.isLoading = true;
-            this.actionsService.businessAction(action.contextCode, invoicingPlan.id)
-                .pipe(finalize(() => this.isLoading = false)).subscribe(() => {
-                this.loadInvoicePlans();
-            });
+            this.handleBusinessAction(action, invoicingPlan.id, htmlElement);
         } else {
             console.warn('Action type unknown : ' + action.type);
         }
+    }
+
+    private handleBusinessAction(action: AvailableAction, invoicingPlanId: string, htmlElement?: HTMLElement): void {
+        // Si des champs sont requis, ouvrir la modale de formulaire
+        if (action.requiredFields && action.requiredFields.length > 0) {
+            const modalRef = this.modalService.open(ActionFormDialogComponent, {size: 'lg'});
+            modalRef.componentInstance.requiredFields = action.requiredFields;
+            modalRef.componentInstance.actionLabelKey = action.labelKey;
+
+            modalRef.result.then((payload: Map<string, any>) => {
+                if (payload) {
+                    console.log(payload);
+                    this.executeBusinessAction(action.contextCode, invoicingPlanId, payload);
+                }
+            }).catch(() => {
+                // Modal dismissed
+            });
+        } else if (action.needsConfirmation) {
+            // Si confirmation requise, afficher le dialog de confirmation
+            // Utiliser l'élément passé ou le document.activeElement comme fallback
+            const targetElement = htmlElement || document.activeElement as HTMLElement;
+            const confirmMessageKey = `${action.labelKey}.confirm`;
+            this.confirmDialogService.confirmAction(targetElement, confirmMessageKey)
+                .pipe(filter(confirmed => confirmed))
+                .subscribe(() => {
+                    this.executeBusinessAction(action.contextCode, invoicingPlanId);
+                });
+        } else {
+            // Exécution directe
+            this.executeBusinessAction(action.contextCode, invoicingPlanId);
+        }
+    }
+
+    private executeBusinessAction(context: string, invoicingPlanId: string, payload?: Map<string, any>): void {
+        this.isLoading = true;
+        this.actionsService.businessAction(context, invoicingPlanId, payload)
+            .pipe(finalize(() => this.isLoading = false))
+            .subscribe(() => {
+                this.loadInvoicePlans();
+            });
     }
 
     generate(): void {
@@ -556,7 +595,7 @@ export class BillingComponent implements OnInit {
             items.push({
                            label: this.translateService.instant(action.labelKey) as string,
                            disabled: !!action.disabled || this.disableActionButton(invoicingPlan),
-                           command: () => this.clickAction(action, invoicingPlan),
+                           command: (event) => this.clickAction(action, invoicingPlan, event.originalEvent?.target as HTMLElement),
                            data: {type: action.type},
                            icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
                                                          : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF

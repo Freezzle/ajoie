@@ -2,6 +2,7 @@ package ch.salon.service.handlers.impl.billing;
 
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.repository.InvoicingPlanRepository;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @Component("deleteInvoicingPlan")
 @RequiredArgsConstructor
-public class ActionDeleteHandler implements BusinessActionHandler<InvoicingPlan> {
+public class ActionDeleteHandler implements BusinessActionHandler<InvoicingPlan>, ActionMetadataProvider {
 
     private final InvoicingPlanRepository repository;
 
@@ -29,5 +30,10 @@ public class ActionDeleteHandler implements BusinessActionHandler<InvoicingPlan>
     @Override
     public ContextActionType getActionType() {
         return ContextActionType.INVOICE_DELETE;
+    }
+
+    @Override
+    public boolean needsConfirmation() {
+        return true;
     }
 }

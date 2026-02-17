@@ -1,23 +1,32 @@
 {
   "action": {
     "invoice-delete": "Supprimer brouillon",
+    "invoice-delete.confirm": "Êtes-vous sûr de vouloir supprimer ce brouillon de facture ?",
     "invoice-download": "Télécharger la facture",
-    "invoice-extend-expiry-date": "Prolonger date d'expiration (+30j)",
+    "invoice-extend-expiry-date": "Changer la date d'expiration",
     "invoice-marked-as-cancelled": "Annuler la facture",
+    "invoice-marked-as-cancelled.confirm": "Êtes-vous sûr de vouloir annulé cette facture ?",
     "invoice-marked-as-issued": "Marquer comme transmise",
     "invoice-marked-as-paid": "Clôturer la facture",
+    "invoice-marked-as-paid.confirm": "Êtes-vous sûr de vouloir clôturer cette facture ?",
+    "invoice-pay-all-cash": "Encaisser le tout",
+    "invoice-pay-all-cash.confirm": "Êtes-vous sûr de vouloir encaisser le solde restant en cash et clôturer la facture ?",
     "invoice-send": "Envoyer la facture",
     "invoice-send-again": "Renvoyer la facture",
     "invoice-reminder": "Envoyer un rappel",
     "participation-marked-as-accepted": "Accepter la participation",
     "participation-marked-as-cancelled": "Annuler la participation",
     "participation-marked-as-closed": "Clôturer la participation",
+    "participation-marked-as-closed.confirm": "Êtes-vous sûr de vouloir clôturer cette participation ?",
     "participation-marked-as-validated": "Valider la participation",
     "participation-marked-as-verification": "Mettre la participation « en cours »",
     "participation-acceptation-email": "Envoyer l'acceptation",
     "participation-validation-email": "Envoyer la validation",
     "participation-closing-email": "Envoyer la clôture",
     "receipt-download": "Télécharger la quittance",
-    "receipt-send": "Envoyer la quittance"
+    "receipt-send": "Envoyer la quittance",
+    "field": {
+      "date_expiration": "Date d'expiration"
+    }
   }
 }
