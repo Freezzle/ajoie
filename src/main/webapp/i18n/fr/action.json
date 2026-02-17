@@ -9,7 +9,7 @@
     "invoice-marked-as-issued": "Marquer comme transmise",
     "invoice-marked-as-paid": "Clôturer la facture",
     "invoice-marked-as-paid.confirm": "Êtes-vous sûr de vouloir clôturer cette facture ?",
-    "invoice-pay-all-cash": "Encaisser le tout",
+    "invoice-pay-all-cash": "Encaisser tout en cash",
     "invoice-pay-all-cash.confirm": "Êtes-vous sûr de vouloir encaisser le solde restant en cash et clôturer la facture ?",
     "invoice-send": "Envoyer la facture",
     "invoice-send-again": "Renvoyer la facture",
