@@ -56,6 +56,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {TableModule} from 'primeng/table';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.component';
+import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 
 @Component({
                selector: 'app-participation-update',
@@ -75,7 +76,7 @@ export class ParticipationUpdateComponent implements OnInit {
     modePaymentMealsValues = Object.keys(ModePaymentMeals);
     invoiceSendingMethodValues = Object.keys(InvoiceSendingMethod);
     exhibitorsOptions: IExhibitor[] = [];
-    menuCache: MenuItem[] = [];
+    menuCache: AppMenuItem[] = [];
     conferences$: Observable<IConference[]> | undefined;
     workshops$: Observable<IWorkshop[]> | undefined;
     stands$: Observable<IStand[]> | undefined;
@@ -310,10 +311,15 @@ export class ParticipationUpdateComponent implements OnInit {
         });
     }
 
-    buildInvoicingPlanMenuItems(availableActions: AvailableAction[]): MenuItem[] {
-        const items: MenuItem[] = [];
+    buildInvoicingPlanMenuItems(availableActions: AvailableAction[]): AppMenuItem[] {
+        const items: AppMenuItem[] = [];
 
         for (const action of availableActions ?? []) {
+            // Traduire la clé d'aide si elle existe
+            const helpText = action.helpKey ?
+                             this.translateService.instant(action.helpKey) as string :
+                             undefined;
+
             items.push({
                            label: this.translateService.instant(action.labelKey) as string,
                            disabled: action.disabled,
@@ -321,7 +327,8 @@ export class ParticipationUpdateComponent implements OnInit {
                            data: {type: action.type},
                            icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
                                                          : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF
-                                                                                      : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined
+                                                                                      : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined,
+                           helpText: helpText // Texte d'aide traduit
                        });
         }
         return items;

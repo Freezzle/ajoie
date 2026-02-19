@@ -7,6 +7,7 @@ import ch.salon.service.GenerateQRCode;
 import ch.salon.service.document.DocumentCreator;
 import ch.salon.service.document.Recipient;
 import ch.salon.service.document.Sender;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
@@ -26,7 +27,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPlan> {
+public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPlan>, ActionMetadataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadInvoiceHandler.class.getName());
 
     private final MessageSource messageSource;

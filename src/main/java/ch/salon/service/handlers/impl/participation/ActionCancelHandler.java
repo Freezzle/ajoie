@@ -14,6 +14,7 @@ import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
@@ -25,7 +26,7 @@ import java.util.Map;
 
 @Component("cancelParticipation")
 @RequiredArgsConstructor
-public class ActionCancelHandler implements BusinessActionHandler<Participation> {
+public class ActionCancelHandler implements BusinessActionHandler<Participation>, ActionMetadataProvider {
 
     private final ConferenceRepository conferenceRepository;
     private final WorkshopRepository workshopRepository;

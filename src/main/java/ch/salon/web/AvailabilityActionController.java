@@ -91,16 +91,18 @@ public class AvailabilityActionController {
 
                         boolean needsConfirmation = false;
                         List<RequiredField> requiredFields = Collections.emptyList();
+                        String helpKey = null;
 
                         // Extract metadata for BusinessActionHandler
                         if (handler instanceof BusinessActionHandler && handler instanceof ActionMetadataProvider) {
                             ActionMetadataProvider metadataProvider = (ActionMetadataProvider) handler;
                             needsConfirmation = metadataProvider.needsConfirmation();
                             requiredFields = metadataProvider.getRequiredFields();
+                            helpKey = metadataProvider.getHelpKey();
                         }
 
                         actions.add(new ActionAvailable(context.code(), type, supportType == SupportType.DISABLED,
-                                "action." + context.code(), needsConfirmation, requiredFields));
+                                "action." + context.code(), helpKey, needsConfirmation, requiredFields));
                     }
                 }
             });

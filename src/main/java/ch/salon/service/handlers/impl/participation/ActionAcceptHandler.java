@@ -11,6 +11,7 @@ import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 @Component("acceptParticipation")
 @RequiredArgsConstructor
-public class ActionAcceptHandler implements BusinessActionHandler<Participation> {
+public class ActionAcceptHandler implements BusinessActionHandler<Participation>, ActionMetadataProvider {
 
     private final ConferenceRepository conferenceRepository;
     private final WorkshopRepository workshopRepository;
@@ -86,4 +87,9 @@ public class ActionAcceptHandler implements BusinessActionHandler<Participation>
     public ContextActionType getActionType() {
         return ContextActionType.PARTICIPATION_MARK_AS_ACCEPTED;
     }
+    @Override
+    public String getHelpKey() {
+        return "participation.action.accept.help";
+    }
+
 }

@@ -8,6 +8,7 @@ import ch.salon.repository.ParticipationRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
@@ -33,7 +34,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class EmailClosingHandler implements EmailActionHandler<Participation> {
+public class EmailClosingHandler implements EmailActionHandler<Participation>, ActionMetadataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailClosingHandler.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();

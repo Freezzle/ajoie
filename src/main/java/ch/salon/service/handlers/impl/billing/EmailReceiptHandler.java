@@ -7,6 +7,7 @@ import ch.salon.domain.enumeration.State;
 import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class EmailReceiptHandler implements EmailActionHandler<InvoicingPlan> {
+public class EmailReceiptHandler implements EmailActionHandler<InvoicingPlan>, ActionMetadataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailReceiptHandler.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

@@ -9,6 +9,7 @@ import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
@@ -38,7 +39,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class EmailInvoiceReminderHandler implements EmailActionHandler<InvoicingPlan> {
+public class EmailInvoiceReminderHandler implements EmailActionHandler<InvoicingPlan>, ActionMetadataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailInvoiceReminderHandler.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

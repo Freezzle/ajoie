@@ -5,6 +5,7 @@ import ch.salon.domain.enumeration.State;
 import ch.salon.service.document.DocumentCreator;
 import ch.salon.service.document.Recipient;
 import ch.salon.service.document.Sender;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPlan> {
+public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPlan>, ActionMetadataProvider {
 
     private final MessageSource messageSource;
     private final DocumentCreator documentCreator;

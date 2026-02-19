@@ -69,4 +69,9 @@ public class ActionPayAllCashHandler implements BusinessActionHandler<InvoicingP
     public boolean needsConfirmation() {
         return true;
     }
+
+    @Override
+    public String getHelpKey() {
+        return "billing.action.pay_all_cash.help";
+    }
 }

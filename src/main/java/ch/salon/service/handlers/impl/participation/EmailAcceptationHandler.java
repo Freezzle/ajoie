@@ -8,6 +8,7 @@ import ch.salon.repository.ParticipationRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
@@ -33,8 +34,8 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class EmailAcceptionHandler implements EmailActionHandler<Participation> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmailAcceptionHandler.class);
+public class EmailAcceptationHandler implements EmailActionHandler<Participation>, ActionMetadataProvider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailAcceptationHandler.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final EmailCreator emailCreator;
@@ -47,7 +48,7 @@ public class EmailAcceptionHandler implements EmailActionHandler<Participation> 
 
     @Autowired
     @Lazy
-    private EmailAcceptionHandler self;
+    private EmailAcceptationHandler self;
 
     @Override
     public SupportType supports(Participation payload, Map<String, Object> context) {

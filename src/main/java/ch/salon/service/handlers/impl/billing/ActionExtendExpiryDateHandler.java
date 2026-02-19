@@ -65,4 +65,9 @@ public class ActionExtendExpiryDateHandler implements BusinessActionHandler<Invo
     public List<RequiredField> getRequiredFields() {
         return List.of(new RequiredField("date_expiration", FieldType.DATE, "action.field.date_expiration"));
     }
+
+    @Override
+    public String getHelpKey() {
+        return "billing.action.extend_expiry_date.help";
+    }
 }

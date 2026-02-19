@@ -5,6 +5,7 @@ import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
 import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.SupportType;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class ActionMarkAsIssuedHandler implements BusinessActionHandler<InvoicingPlan> {
+public class ActionMarkAsIssuedHandler implements BusinessActionHandler<InvoicingPlan>, ActionMetadataProvider {
 
     private final EventLogService eventLogService;
 
