@@ -1,7 +1,32 @@
 <p-menu #menu
         [appendTo]="appendTo"
         [model]="items"
-        [popup]="true"/>
+        [popup]="true">
+    <ng-template let-item pTemplate="item">
+        <div class="menu-item-container">
+            <div class="menu-item-left" (click)="onItemClick($event, item)">
+                @if (item.icon) {
+                    <i [class]="item.icon"></i>
+                }
+                <span class="p-menu-item-label">{{ item.label }}</span>
+            </div>
+            @if (item.helpText) {
+                <i class="pi pi-question-circle menu-item-help-icon"
+                   [pTooltip]="item.helpText"
+                   [tooltipDisabled]="isMobile()"
+                   tooltipPosition="top"
+                   [showDelay]="300"
+                   (click)="showHelp($event, item.helpText)"></i>
+            }
+        </div>
+    </ng-template>
+</p-menu>
+
+<p-popover #helpPopover [baseZIndex]="9999">
+    <div class="help-popover-content">
+        {{ currentHelpText }}
+    </div>
+</p-popover>
 
 <button-box (click)="menu.toggle($event)"
             [translateKey]="buttonTranslateKey ?? ''"

@@ -1,0 +1,51 @@
+::ng-deep .p-menu .p-disabled {
+  .menu-item-help-icon {
+    opacity: 1 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+  }
+}
+
+.menu-item-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: var(--p-menu-item-padding);
+  cursor: pointer;
+  color: var(--app-primary);
+
+  &:hover {
+    color: var(--app-secondary);
+  }
+}
+
+.menu-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.menu-item-help-icon {
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: color 0.2s;
+  flex-shrink: 0;
+  // S'assurer que l'icône d'aide reste toujours interactive
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  z-index: 1;
+
+  &:hover {
+    color: var(--primary-color);
+  }
+}
+
+.help-popover-content {
+  padding: 0.75rem;
+  max-width: 300px;
+  word-wrap: break-word;
+  line-height: 1.5;
+}

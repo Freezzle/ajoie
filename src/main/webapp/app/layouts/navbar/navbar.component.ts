@@ -10,6 +10,7 @@ import {filter} from 'rxjs';
 import {SalonService} from '../../admin/salon/service/salon.service';
 import {map} from 'rxjs/operators';
 import {NavigationStateService} from './navigation-state.service';
+import {isMobile} from '../../shared/utils/device.util';
 
 @Component({
                selector: 'app-navbar',
@@ -62,18 +63,18 @@ export default class NavbarComponent implements OnInit {
     }
 
     isMobile(): boolean {
-        return window.innerWidth <= 768;
+        return isMobile();
     }
 
     closeMobile(): void {
-        if (this.isMobile() && !this.navigationService.sidebarCollapsed()) {
+        if (isMobile() && !this.navigationService.sidebarCollapsed()) {
             this.navigationService.toggleSidebar();
         }
     }
 
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: MouseEvent): void {
-        if (!this.isMobile() || this.navigationService.sidebarCollapsed()) {
+        if (!isMobile() || this.navigationService.sidebarCollapsed()) {
             return;
         }
 
