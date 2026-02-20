@@ -6,13 +6,11 @@ import {TranslateModule} from '@ngx-translate/core';
 import {ButtonBoxComponent} from '../button-box/button-box.component';
 import {SEVERITY} from '../../utils/severity';
 import {AppMenuItem} from '../../utils/app-menu-item.model';
-import {Tooltip} from 'primeng/tooltip';
 import {Popover} from 'primeng/popover';
-import {isMobile as checkIsMobile} from '../../utils/device.util';
 
 @Component({
                selector: 'menu-box',
-               imports: [CommonModule, MenuModule, ButtonModule, TranslateModule, ButtonBoxComponent, Tooltip, Popover],
+               imports: [CommonModule, MenuModule, ButtonModule, TranslateModule, ButtonBoxComponent, Popover],
                templateUrl: './menu-box.component.html',
                styleUrl: './menu-box.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush
@@ -30,24 +28,16 @@ export class MenuBoxComponent {
 
     currentHelpText = '';
 
-    isMobile(): boolean {
-        return checkIsMobile();
-    }
-
     onItemClick(event: Event, item: AppMenuItem): void {
         if (item.command && !item.disabled) {
             item.command({originalEvent: event, item: item});
-            // Fermer le menu après l'action
             this.menu.hide();
         }
     }
 
     showHelp(event: Event, helpText: string): void {
         event.stopPropagation();
-        if (checkIsMobile()) {
-            this.currentHelpText = helpText;
-            this.helpPopover.toggle(event);
-        }
-        // Sur desktop, le tooltip s'affiche automatiquement via pTooltip
+        this.currentHelpText = helpText;
+        this.helpPopover.toggle(event);
     }
 }

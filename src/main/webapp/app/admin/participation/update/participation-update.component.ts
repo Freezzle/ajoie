@@ -51,12 +51,12 @@ import {Tag} from 'primeng/tag';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
-import {MenuItem, PrimeIcons} from 'primeng/api';
 import {TranslateService} from '@ngx-translate/core';
 import {TableModule} from 'primeng/table';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.component';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 
 @Component({
                selector: 'app-participation-update',
@@ -94,6 +94,7 @@ export class ParticipationUpdateComponent implements OnInit {
     protected modalService = inject(NgbModal);
     protected actionsService = inject(ActionsService);
     protected translateService = inject(TranslateService);
+    protected menuItemBuilderService = inject(MenuItemBuilderService);
     protected router = inject(Router);
     protected readonly formatterStatus = formatterStatus;
     protected readonly formatterExhibitor = formatterExhibitor;
@@ -312,26 +313,10 @@ export class ParticipationUpdateComponent implements OnInit {
     }
 
     buildInvoicingPlanMenuItems(availableActions: AvailableAction[]): AppMenuItem[] {
-        const items: AppMenuItem[] = [];
-
-        for (const action of availableActions ?? []) {
-            // Traduire la clé d'aide si elle existe
-            const helpText = action.helpKey ?
-                             this.translateService.instant(action.helpKey) as string :
-                             undefined;
-
-            items.push({
-                           label: this.translateService.instant(action.labelKey) as string,
-                           disabled: action.disabled,
-                           command: (event) => this.clickAction(action, event.originalEvent?.target as HTMLElement),
-                           data: {type: action.type},
-                           icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
-                                                         : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF
-                                                                                      : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined,
-                           helpText: helpText // Texte d'aide traduit
-                       });
-        }
-        return items;
+        return this.menuItemBuilderService.buildMenuItemsFromActions(
+            availableActions,
+            (action, htmlElement) => this.clickAction(action, htmlElement)
+        );
     }
 
     protected loadRelationshipsOptions(participation: IParticipation | null): void {

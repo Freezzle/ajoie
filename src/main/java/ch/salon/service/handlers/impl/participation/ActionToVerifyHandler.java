@@ -38,4 +38,9 @@ public class ActionToVerifyHandler implements BusinessActionHandler<Participatio
     public ContextActionType getActionType() {
         return ContextActionType.PARTICIPATION_MARK_AS_VERIFICATION;
     }
+
+    @Override
+    public String getHelpKey() {
+        return "participation.action.toverify.help";
+    }
 }

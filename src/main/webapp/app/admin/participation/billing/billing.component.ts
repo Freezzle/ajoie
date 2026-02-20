@@ -37,6 +37,8 @@ import {CardComponent} from '../../../shared/components/card/card.component';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {MenuItem, PrimeIcons} from 'primeng/api';
 import {TranslateService} from '@ngx-translate/core';
+import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
+import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 
 @Component({
                selector: 'app-participation-stats',
@@ -68,7 +70,7 @@ export class BillingComponent implements OnInit {
     selectedInvoices: string[] = [];
     invoicePlanOnSplitMode: string | null = null;
     openPlanId: string | null = null;
-    menuCachePlans = new Map<string, MenuItem[]>();
+    menuCachePlans = new Map<string, AppMenuItem[]>();
     billingInfoForm!: FormGroup<BillingInfoGroup>;
 
     protected readonly Type = Type;
@@ -78,6 +80,7 @@ export class BillingComponent implements OnInit {
     protected actionsService = inject(ActionsService);
     protected modalService = inject(NgbModal);
     protected translateService = inject(TranslateService);
+    protected menuItemBuilderService = inject(MenuItemBuilderService);
     protected confirmDialogService = inject(ConfirmDialogService);
     protected readonly Status = Status;
     protected readonly dayjs = dayjs;
@@ -548,8 +551,8 @@ export class BillingComponent implements OnInit {
         });
     }
 
-    buildInvoicingPlanMenuItems(invoicingPlan: any): MenuItem[] {
-        const items: MenuItem[] = [];
+    buildInvoicingPlanMenuItems(invoicingPlan: any): AppMenuItem[] {
+        const items: AppMenuItem[] = [];
 
         if (this.showDeactivateArrangement(invoicingPlan)) {
             items.push({
@@ -591,17 +594,15 @@ export class BillingComponent implements OnInit {
                        });
         }
 
-        for (const action of invoicingPlan.availableActions ?? []) {
-            items.push({
-                           label: this.translateService.instant(action.labelKey) as string,
-                           disabled: !!action.disabled || this.disableActionButton(invoicingPlan),
-                           command: (event) => this.clickAction(action, invoicingPlan, event.originalEvent?.target as HTMLElement),
-                           data: {type: action.type},
-                           icon: action.type === 'EMAIL' ? PrimeIcons.ENVELOPE
-                                                         : action.type === 'DOWNLOAD' ? PrimeIcons.FILE_PDF
-                                                                                      : action.type === 'BUSINESS' ? PrimeIcons.BOLT : undefined
-                       });
-        }
+        // Utilisation du service centralisé pour construire les items à partir des actions disponibles
+        const actionItems = this.menuItemBuilderService.buildMenuItemsFromActions(
+            invoicingPlan.availableActions ?? [],
+            (action, htmlElement) => this.clickAction(action, invoicingPlan, htmlElement),
+            (action) => this.disableActionButton(invoicingPlan)
+        );
+
+        items.push(...actionItems);
+
         return items;
     }
 

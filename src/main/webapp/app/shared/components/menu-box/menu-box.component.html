@@ -12,10 +12,6 @@
             </div>
             @if (item.helpText) {
                 <i class="pi pi-question-circle menu-item-help-icon"
-                   [pTooltip]="item.helpText"
-                   [tooltipDisabled]="isMobile()"
-                   tooltipPosition="top"
-                   [showDelay]="300"
                    (click)="showHelp($event, item.helpText)"></i>
             }
         </div>

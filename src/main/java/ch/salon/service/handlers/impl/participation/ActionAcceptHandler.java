@@ -87,6 +87,7 @@ public class ActionAcceptHandler implements BusinessActionHandler<Participation>
     public ContextActionType getActionType() {
         return ContextActionType.PARTICIPATION_MARK_AS_ACCEPTED;
     }
+
     @Override
     public String getHelpKey() {
         return "participation.action.accept.help";

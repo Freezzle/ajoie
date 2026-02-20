@@ -27,6 +27,14 @@
     "receipt-send": "Envoyer la quittance",
     "field": {
       "date_expiration": "Date d'expiration"
+    },
+    "help": {
+      "participation.action.toverify.help": "Met la participation en cours de vérification. Certains élements sont manquants ou en attente d'information pour être refusé ou accepté.",
+      "participation.action.accept.help": "Accepte la participation et tous les éléments associés (stands, conférences, ateliers) qui sont en cours de vérification. Cette étape confirme que la participation est approuvée.",
+      "participation.action.validate.help": "Valide la participation et tous les éléments associés (stands, conférences, ateliers) qui sont acceptés. Cette étape confirme que la participation pourra assister à l'évènement.",
+      "participation.action.close.help": "Clôture la participation et tous les éléments associés (stands, conférences, ateliers) qui sont validés. Cette étape confirme que la participation à payer ses prestations et plus rien est à signaler.",
+      "billing.action.pay_all_cash.help": "Crée un paiement avec le solde restant de la facture en espèces (cash) et clôture automatiquement la facture.",
+      "billing.action.extend_expiry_date.help": "Prolonge la date d'échéance de la facture. Une pop-up s'affichera pour vous permettre de choisir la nouvelle date d'échéance."
     }
   }
 }
