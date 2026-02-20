@@ -35,7 +35,6 @@ import {Badge} from 'primeng/badge';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
-import {MenuItem, PrimeIcons} from 'primeng/api';
 import {TranslateService} from '@ngx-translate/core';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
@@ -392,19 +391,18 @@ export class BillingComponent implements OnInit {
             }).catch(() => {
                 // Modal dismissed
             });
-        } else if (action.needsConfirmation) {
-            // Si confirmation requise, afficher le dialog de confirmation
-            // Utiliser l'élément passé ou le document.activeElement comme fallback
+        } else {
             const targetElement = htmlElement || document.activeElement as HTMLElement;
-            const confirmMessageKey = `${action.labelKey}.confirm`;
-            this.confirmDialogService.confirmAction(targetElement, confirmMessageKey)
+
+            const confirmMessageKey = action.confirmationKey || 'common.confirmAction.default';
+
+            this.confirmDialogService.confirmAction(targetElement, confirmMessageKey, {
+                actionLabel: this.translateService.instant(action.labelKey)
+            })
                 .pipe(filter(confirmed => confirmed))
                 .subscribe(() => {
                     this.executeBusinessAction(action.contextCode, invoicingPlanId);
                 });
-        } else {
-            // Exécution directe
-            this.executeBusinessAction(action.contextCode, invoicingPlanId);
         }
     }
 

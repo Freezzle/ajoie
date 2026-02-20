@@ -89,20 +89,20 @@ public class AvailabilityActionController {
                     if (supportType != SupportType.REJECTED &&
                             permissionService.isAllowed(context.code(), payload, authentication)) {
 
-                        boolean needsConfirmation = false;
+                        String confirmationKey = null;
                         List<RequiredField> requiredFields = Collections.emptyList();
                         String helpKey = null;
 
                         // Extract metadata for BusinessActionHandler
                         if (handler instanceof BusinessActionHandler && handler instanceof ActionMetadataProvider) {
                             ActionMetadataProvider metadataProvider = (ActionMetadataProvider) handler;
-                            needsConfirmation = metadataProvider.needsConfirmation();
+                            confirmationKey = metadataProvider.getConfirmationKey();
                             requiredFields = metadataProvider.getRequiredFields();
                             helpKey = metadataProvider.getHelpKey();
                         }
 
                         actions.add(new ActionAvailable(context.code(), type, supportType == SupportType.DISABLED,
-                                "action." + context.code(), helpKey, needsConfirmation, requiredFields));
+                                "action." + context.code(), helpKey, confirmationKey, requiredFields));
                     }
                 }
             });

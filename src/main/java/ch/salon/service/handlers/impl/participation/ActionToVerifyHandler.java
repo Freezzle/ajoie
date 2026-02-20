@@ -41,6 +41,6 @@ public class ActionToVerifyHandler implements BusinessActionHandler<Participatio
 
     @Override
     public String getHelpKey() {
-        return "participation.action.toverify.help";
+        return "action.participation-marked-as-verification.help";
     }
 }

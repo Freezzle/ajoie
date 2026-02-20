@@ -33,7 +33,7 @@ public class ActionDeleteHandler implements BusinessActionHandler<InvoicingPlan>
     }
 
     @Override
-    public boolean needsConfirmation() {
-        return true;
+    public String getConfirmationKey() {
+        return "action.invoice-delete.confirm";
     }
 }

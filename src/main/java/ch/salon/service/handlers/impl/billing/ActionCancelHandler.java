@@ -42,7 +42,7 @@ public class ActionCancelHandler implements BusinessActionHandler<InvoicingPlan>
     }
 
     @Override
-    public boolean needsConfirmation() {
-        return true;
+    public String getConfirmationKey() {
+        return "action.invoice-marked-as-cancelled.confirm";
     }
 }

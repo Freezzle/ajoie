@@ -257,19 +257,18 @@ export class ParticipationUpdateComponent implements OnInit {
             }).catch(() => {
                 // Modal dismissed
             });
-        } else if (action.needsConfirmation) {
-            // Si confirmation requise, afficher le dialog de confirmation
-            // Utiliser l'élément passé ou le document.activeElement comme fallback
+        } else {
             const targetElement = htmlElement || document.activeElement as HTMLElement;
-            const confirmMessageKey = `${action.labelKey}.confirm`;
-            this.confirmDialogService.confirmAction(targetElement, confirmMessageKey)
+
+            const confirmMessageKey = action.confirmationKey || 'common.confirmAction.default';
+
+            this.confirmDialogService.confirmAction(targetElement, confirmMessageKey, {
+                actionLabel: this.translateService.instant(action.labelKey)
+            })
                 .pipe(filter(confirmed => confirmed))
                 .subscribe(() => {
                     this.executeBusinessAction(action.contextCode, participationId);
                 });
-        } else {
-            // Exécution directe
-            this.executeBusinessAction(action.contextCode, participationId);
         }
     }
 

@@ -4,6 +4,7 @@
     "invoice-delete.confirm": "Êtes-vous sûr de vouloir supprimer ce brouillon de facture ?",
     "invoice-download": "Télécharger la facture",
     "invoice-extend-expiry-date": "Changer la date d'expiration",
+    "invoice-extend-expiry-date.help": "Prolonge la date d'échéance de la facture. Une pop-up s'affichera pour vous permettre de choisir la nouvelle date d'échéance.",
     "invoice-marked-as-cancelled": "Annuler la facture",
     "invoice-marked-as-cancelled.confirm": "Êtes-vous sûr de vouloir annulé cette facture ?",
     "invoice-marked-as-issued": "Marquer comme transmise",
@@ -11,15 +12,20 @@
     "invoice-marked-as-paid.confirm": "Êtes-vous sûr de vouloir clôturer cette facture ?",
     "invoice-pay-all-cash": "Encaisser tout en cash",
     "invoice-pay-all-cash.confirm": "Êtes-vous sûr de vouloir encaisser le solde restant en cash et clôturer la facture ?",
+    "invoice-pay-all-cash.help": "Crée un paiement avec le solde restant de la facture en espèces (cash) et clôture automatiquement la facture.",
     "invoice-send": "Envoyer la facture",
     "invoice-send-again": "Renvoyer la facture",
     "invoice-reminder": "Envoyer un rappel",
     "participation-marked-as-accepted": "Accepter la participation",
+    "participation-marked-as-accepted.help": "Accepte la participation et tous les éléments associés (stands, conférences, ateliers) qui sont en cours de vérification. Cette étape confirme que la participation est approuvée.",
     "participation-marked-as-cancelled": "Annuler la participation",
     "participation-marked-as-closed": "Clôturer la participation",
     "participation-marked-as-closed.confirm": "Êtes-vous sûr de vouloir clôturer cette participation ?",
+    "participation-marked-as-closed.help": "Clôture la participation et tous les éléments associés (stands, conférences, ateliers) qui sont validés. Cette étape confirme que la participation à payer ses prestations et plus rien est à signaler.",
     "participation-marked-as-validated": "Valider la participation",
+    "participation-marked-as-validated.help": "Valide la participation et tous les éléments associés (stands, conférences, ateliers) qui sont acceptés. Cette étape confirme que la participation pourra assister à l'évènement.",
     "participation-marked-as-verification": "Mettre la participation « en cours »",
+    "participation-marked-as-verification.help": "Met la participation en cours de vérification. Certains élements sont manquants ou en attente d'information pour être refusé ou accepté.",
     "participation-acceptation-email": "Envoyer l'acceptation",
     "participation-validation-email": "Envoyer la validation",
     "participation-closing-email": "Envoyer la clôture",
@@ -27,14 +33,6 @@
     "receipt-send": "Envoyer la quittance",
     "field": {
       "date_expiration": "Date d'expiration"
-    },
-    "help": {
-      "participation.action.toverify.help": "Met la participation en cours de vérification. Certains élements sont manquants ou en attente d'information pour être refusé ou accepté.",
-      "participation.action.accept.help": "Accepte la participation et tous les éléments associés (stands, conférences, ateliers) qui sont en cours de vérification. Cette étape confirme que la participation est approuvée.",
-      "participation.action.validate.help": "Valide la participation et tous les éléments associés (stands, conférences, ateliers) qui sont acceptés. Cette étape confirme que la participation pourra assister à l'évènement.",
-      "participation.action.close.help": "Clôture la participation et tous les éléments associés (stands, conférences, ateliers) qui sont validés. Cette étape confirme que la participation à payer ses prestations et plus rien est à signaler.",
-      "billing.action.pay_all_cash.help": "Crée un paiement avec le solde restant de la facture en espèces (cash) et clôture automatiquement la facture.",
-      "billing.action.extend_expiry_date.help": "Prolonge la date d'échéance de la facture. Une pop-up s'affichera pour vous permettre de choisir la nouvelle date d'échéance."
     }
   }
 }

@@ -10,6 +10,9 @@
     "close": "Fermer",
     "confirm": "Confirmer",
     "confirmation": "Confirmation",
+    "confirmAction": {
+      "default": "Voulez-vous vraiment lancer l'action « {{actionLabel}} » ?"
+    },
     "country": {
       "AL": "Albanie",
       "DE": "Allemagne",

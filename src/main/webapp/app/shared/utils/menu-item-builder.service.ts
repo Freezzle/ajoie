@@ -25,9 +25,7 @@ export class MenuItemBuilderService {
         const items: AppMenuItem[] = [];
 
         for (const action of availableActions ?? []) {
-            const helpText = action.helpKey ?
-                this.translateService.instant('action.help.' + action.helpKey) as string :
-                undefined;
+            const helpText = action.helpKey ? this.translateService.instant(action.helpKey) as string : undefined;
 
             const isDisabled = disabledCallback ?
                 (action.disabled || disabledCallback(action)) :

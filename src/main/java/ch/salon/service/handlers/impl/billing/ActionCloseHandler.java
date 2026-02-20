@@ -50,7 +50,7 @@ public class ActionCloseHandler implements BusinessActionHandler<InvoicingPlan>,
     }
 
     @Override
-    public boolean needsConfirmation() {
-        return true;
+    public String getConfirmationKey() {
+        return "action.invoice-marked-as-paid.confirm";
     }
 }

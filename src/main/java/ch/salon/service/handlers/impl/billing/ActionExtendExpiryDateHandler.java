@@ -68,6 +68,6 @@ public class ActionExtendExpiryDateHandler implements BusinessActionHandler<Invo
 
     @Override
     public String getHelpKey() {
-        return "billing.action.extend_expiry_date.help";
+        return "action.invoice-extend-expiry-date.help";
     }
 }

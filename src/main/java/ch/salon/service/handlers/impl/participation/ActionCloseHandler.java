@@ -116,12 +116,12 @@ public class ActionCloseHandler implements BusinessActionHandler<Participation>,
     }
 
     @Override
-    public boolean needsConfirmation() {
-        return true;
+    public String getConfirmationKey() {
+        return "action.participation-marked-as-closed.confirm";
     }
 
     @Override
     public String getHelpKey() {
-        return "participation.action.close.help";
+        return "action.participation-marked-as-closed.help";
     }
 }

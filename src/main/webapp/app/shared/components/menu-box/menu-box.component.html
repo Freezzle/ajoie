@@ -18,7 +18,7 @@
     </ng-template>
 </p-menu>
 
-<p-popover #helpPopover [baseZIndex]="9999">
+<p-popover #helpPopover appendTo="body" [baseZIndex]="9999">
     <div class="help-popover-content">
         {{ currentHelpText }}
     </div>

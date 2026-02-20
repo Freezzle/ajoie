@@ -90,7 +90,7 @@ public class ActionAcceptHandler implements BusinessActionHandler<Participation>
 
     @Override
     public String getHelpKey() {
-        return "participation.action.accept.help";
+        return "action.participation-marked-as-accepted.help";
     }
 
 }

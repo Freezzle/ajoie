@@ -110,6 +110,6 @@ public class ActionValidateHandler implements BusinessActionHandler<Participatio
 
     @Override
     public String getHelpKey() {
-        return "participation.action.validate.help";
+        return "action.participation-marked-as-validated.help";
     }
 }
