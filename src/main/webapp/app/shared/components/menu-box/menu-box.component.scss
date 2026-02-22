@@ -29,18 +29,17 @@
 }
 
 .menu-item-help-icon {
-  color: var(--text-color-secondary);
+  color: var(--app-primary) !important;
   cursor: pointer;
   margin-left: 0.5rem;
   transition: color 0.2s;
   flex-shrink: 0;
-  // S'assurer que l'icône d'aide reste toujours interactive
   pointer-events: auto !important;
   opacity: 1 !important;
   z-index: 1;
 
   &:hover {
-    color: var(--primary-color);
+    color: var(--app-secondary) !important;
   }
 }
 

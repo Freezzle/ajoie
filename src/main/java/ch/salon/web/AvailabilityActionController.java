@@ -36,6 +36,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -107,6 +108,10 @@ public class AvailabilityActionController {
                 }
             });
         });
+
+        // Trier les actions par priorité : BUSINESS > EMAIL > DOWNLOAD, puis par priorité spécifique
+        // Les actions de suppression et d'annulation sont automatiquement placées à la fin
+        actions.sort(Comparator.comparingInt(ActionAvailable::getSortingKey));
 
         return ResponseEntity.ok(actions);
     }
