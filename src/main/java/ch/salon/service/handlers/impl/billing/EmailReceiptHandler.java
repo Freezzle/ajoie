@@ -8,11 +8,11 @@ import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.service.mail.EmailCreator;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -42,8 +42,11 @@ public class EmailReceiptHandler implements EmailActionHandler<InvoicingPlan>, A
     private String senderEmail;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState() == State.PAID ? SupportType.ALLOWED : SupportType.REJECTED;
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload != null && payload.getState() == State.PAID) {
+            return ActionSupport.allowed();
+        }
+        return ActionSupport.rejected();
     }
 
     @Override

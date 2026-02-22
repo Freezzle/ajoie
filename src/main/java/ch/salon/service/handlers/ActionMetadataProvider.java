@@ -12,8 +12,4 @@ public interface ActionMetadataProvider {
     default List<RequiredField> getRequiredFields() {
         return Collections.emptyList();
     }
-
-    default String getHelpKey() {
-        return null;
-    }
 }

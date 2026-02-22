@@ -12,9 +12,9 @@ import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,9 +31,11 @@ public class ActionAcceptHandler implements BusinessActionHandler<Participation>
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(Participation payload, Map<String, Object> context) {
-        return payload != null && payload.getStatus() == Status.IN_VERIFICATION ? SupportType.ALLOWED :
-                SupportType.REJECTED;
+    public ActionSupport supports(Participation payload, Map<String, Object> context) {
+        if (payload != null && payload.getStatus() == Status.IN_VERIFICATION) {
+            return ActionSupport.allowed("action.participation-marked-as-accepted.help");
+        }
+        return ActionSupport.rejected();
     }
 
     @Override
@@ -87,10 +89,4 @@ public class ActionAcceptHandler implements BusinessActionHandler<Participation>
     public ContextActionType getActionType() {
         return ContextActionType.PARTICIPATION_MARK_AS_ACCEPTED;
     }
-
-    @Override
-    public String getHelpKey() {
-        return "action.participation-marked-as-accepted.help";
-    }
-
 }

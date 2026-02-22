@@ -6,9 +6,9 @@ import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,16 +22,16 @@ public class ActionCloseHandler implements BusinessActionHandler<InvoicingPlan>,
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        if (payload != null && payload.getState() == State.ISSUED) {
-            if (BigDecimal.valueOf(payload.getTotal()).compareTo(BigDecimal.ZERO) == 0) {
-                return SupportType.ALLOWED;
-            } else {
-                return SupportType.DISABLED;
-            }
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload == null || payload.getState() != State.ISSUED) {
+            return ActionSupport.rejected();
         }
 
-        return SupportType.REJECTED;
+        if (BigDecimal.valueOf(payload.getTotal()).compareTo(BigDecimal.ZERO) != 0) {
+            return ActionSupport.disabled("action.invoice-marked-as-paid.disabled.balance-remaining");
+        }
+
+        return ActionSupport.allowed();
     }
 
     @Override

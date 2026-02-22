@@ -10,6 +10,7 @@ import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
@@ -57,10 +58,12 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan>, A
     private EmailInvoiceHandler self;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState().isDraft() &&
-                payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL ? SupportType.ALLOWED :
-                SupportType.REJECTED;
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload != null && payload.getState().isDraft() &&
+                payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
+            return ActionSupport.allowed();
+        }
+        return ActionSupport.rejected();
     }
 
     @Override

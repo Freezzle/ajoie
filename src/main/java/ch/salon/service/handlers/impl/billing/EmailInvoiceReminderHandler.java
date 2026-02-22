@@ -10,6 +10,7 @@ import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
@@ -57,20 +58,20 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
     private EmailInvoiceReminderHandler self;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
         if (payload == null) {
-            return SupportType.REJECTED;
+            return ActionSupport.rejected();
         }
 
         if (payload.getState() == State.ISSUED && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
             if (Instant.now().isAfter(payload.getExpirationDate())) {
-                return SupportType.ALLOWED;
+                return ActionSupport.allowed();
             } else {
-                return SupportType.DISABLED;
+                return ActionSupport.disabled("action.invoice-reminder.disabled.not-expired");
             }
         }
 
-        return SupportType.REJECTED;
+        return ActionSupport.rejected();
     }
 
     @Override

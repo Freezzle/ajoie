@@ -1,5 +1,6 @@
 package ch.salon.service.handlers.enums;
 
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.EmailActionHandler;
@@ -22,7 +23,7 @@ public enum ActionType {
         throw new IllegalArgumentException("Unknown handler type: " + handler.getClass());
     }
 
-    public SupportType supports(Object handler, Object payload, Map<String, Object> ctx) {
+    public ActionSupport supports(Object handler, Object payload, Map<String, Object> ctx) {
         return switch (this) {
             case EMAIL -> ((EmailActionHandler<Object>) handler).supports(payload, ctx);
             case DOWNLOAD -> ((DocumentActionHandler<Object>) handler).supports(payload, ctx);

@@ -12,9 +12,9 @@ import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,28 +31,28 @@ public class ActionValidateHandler implements BusinessActionHandler<Participatio
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(Participation payload, Map<String, Object> context) {
+    public ActionSupport supports(Participation payload, Map<String, Object> context) {
         if (payload == null || payload.getStatus() != Status.ACCEPTED) {
-            return SupportType.REJECTED;
+            return ActionSupport.rejected();
         }
 
         if (this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-validated.disabled.stands-in-verification");
         }
 
         if (this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(),
                 Status.IN_VERIFICATION)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-validated.disabled.conferences-in-verification");
         }
 
         if (this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(),
                 Status.IN_VERIFICATION)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-validated.disabled.workshops-in-verification");
         }
 
         //TODO: Later, we can only validate if (accepted && arrangement) or (accepted && !arrangement && invoicing plan paid)
 
-        return SupportType.ALLOWED;
+        return ActionSupport.allowed("action.participation-marked-as-validated.help");
     }
 
     @Override
@@ -106,10 +106,5 @@ public class ActionValidateHandler implements BusinessActionHandler<Participatio
     @Override
     public ContextActionType getActionType() {
         return ContextActionType.PARTICIPATION_MARK_AS_VALIDATED;
-    }
-
-    @Override
-    public String getHelpKey() {
-        return "action.participation-marked-as-validated.help";
     }
 }

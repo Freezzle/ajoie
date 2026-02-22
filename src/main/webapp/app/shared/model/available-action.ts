@@ -8,4 +8,5 @@ export interface AvailableAction {
     helpKey?: string;
     confirmationKey?: string;
     requiredFields: RequiredField[];
+    disabledReasonKey?: string;
 }

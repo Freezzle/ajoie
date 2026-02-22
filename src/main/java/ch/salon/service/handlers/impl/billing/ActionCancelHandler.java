@@ -6,9 +6,9 @@ import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +21,11 @@ public class ActionCancelHandler implements BusinessActionHandler<InvoicingPlan>
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && (payload.getState() == State.ISSUED || payload.getState() == State.PAID) ?
-                SupportType.ALLOWED : SupportType.REJECTED;
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload != null && (payload.getState() == State.ISSUED || payload.getState() == State.PAID)) {
+            return ActionSupport.allowed();
+        }
+        return ActionSupport.rejected();
     }
 
     @Override

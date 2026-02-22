@@ -6,11 +6,11 @@ import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.RequiredField;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.FieldType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +27,11 @@ public class ActionExtendExpiryDateHandler implements BusinessActionHandler<Invo
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState() == State.ISSUED ? SupportType.ALLOWED : SupportType.REJECTED;
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload == null || payload.getState() != State.ISSUED) {
+            return ActionSupport.rejected();
+        }
+        return ActionSupport.allowed("action.invoice-extend-expiry-date.help");
     }
 
     @Override
@@ -64,10 +67,5 @@ public class ActionExtendExpiryDateHandler implements BusinessActionHandler<Invo
     @Override
     public List<RequiredField> getRequiredFields() {
         return List.of(new RequiredField("date_expiration", FieldType.DATE, "action.field.date_expiration"));
-    }
-
-    @Override
-    public String getHelpKey() {
-        return "action.invoice-extend-expiry-date.help";
     }
 }

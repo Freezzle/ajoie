@@ -25,11 +25,20 @@ export class MenuItemBuilderService {
         const items: AppMenuItem[] = [];
 
         for (const action of availableActions ?? []) {
-            const helpText = action.helpKey ? this.translateService.instant(action.helpKey) as string : undefined;
+            // Priorité : disabledReasonKey si désactivé, sinon helpKey si disponible
+            let helpText: string | undefined;
 
             const isDisabled = disabledCallback ?
                 (action.disabled || disabledCallback(action)) :
                 action.disabled;
+
+            if (isDisabled && action.disabledReasonKey) {
+                // Si l'action est désactivée et a une raison, afficher la raison
+                helpText = this.translateService.instant(action.disabledReasonKey) as string;
+            } else if (action.helpKey) {
+                // Sinon, afficher l'aide normale si disponible
+                helpText = this.translateService.instant(action.helpKey) as string;
+            }
 
             items.push({
                 label: this.translateService.instant(action.labelKey) as string,

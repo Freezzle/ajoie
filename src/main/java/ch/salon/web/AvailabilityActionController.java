@@ -6,6 +6,7 @@ import ch.salon.service.actions.EmailActionService;
 import ch.salon.service.actions.PermissionActionService;
 import ch.salon.service.handlers.ActionAvailable;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.EmailActionHandler;
@@ -13,7 +14,6 @@ import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.RequiredField;
 import ch.salon.service.handlers.enums.ActionType;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -85,25 +85,31 @@ public class AvailabilityActionController {
                     Object handler = entry.getValue();
                     ActionType type = ActionType.fromHandler(handler);
 
-                    SupportType supportType = type.supports(handler, payload, new HashMap<>());
+                    ActionSupport actionSupport = type.supports(handler, payload, new HashMap<>());
 
-                    if (supportType != SupportType.REJECTED &&
+                    if (!actionSupport.isRejected() &&
                             permissionService.isAllowed(context.code(), payload, authentication)) {
 
                         String confirmationKey = null;
                         List<RequiredField> requiredFields = Collections.emptyList();
-                        String helpKey = null;
 
                         // Extract metadata for BusinessActionHandler
                         if (handler instanceof BusinessActionHandler && handler instanceof ActionMetadataProvider) {
                             ActionMetadataProvider metadataProvider = (ActionMetadataProvider) handler;
                             confirmationKey = metadataProvider.getConfirmationKey();
                             requiredFields = metadataProvider.getRequiredFields();
-                            helpKey = metadataProvider.getHelpKey();
                         }
 
-                        actions.add(new ActionAvailable(context.code(), type, supportType == SupportType.DISABLED,
-                                "action." + context.code(), helpKey, confirmationKey, requiredFields));
+                        actions.add(new ActionAvailable(
+                            context.code(),
+                            type,
+                            actionSupport.isDisabled(),
+                            "action." + context.code(),
+                            actionSupport.getHelpKey(),
+                            confirmationKey,
+                            requiredFields,
+                            actionSupport.getDisabledReasonKey()
+                        ));
                     }
                 }
             });
@@ -124,7 +130,7 @@ public class AvailabilityActionController {
         var handler = (EmailActionHandler<Object>) emailService.getHandlers().get(context);
         Object entity = getEntityFromContext(context, id);
 
-        if (handler.supports(entity, payload) == SupportType.ALLOWED &&
+        if (handler.supports(entity, payload).isAllowed() &&
                 permissionService.isAllowed(context, entity, authentication)) {
             handler.handle(entity, payload);
             return ResponseEntity.ok().build();
@@ -151,7 +157,7 @@ public class AvailabilityActionController {
         var handler = (BusinessActionHandler<Object>) businessService.getHandlers().get(context);
         Object entity = getEntityFromContext(context, id);
 
-        if (handler.supports(entity, payload) == SupportType.ALLOWED &&
+        if (handler.supports(entity, payload).isAllowed() &&
                 permissionService.isAllowed(context, entity, authentication)) {
             handler.execute(entity, payload);
             return ResponseEntity.ok().build();
@@ -167,7 +173,7 @@ public class AvailabilityActionController {
         var handler = (DocumentActionHandler<Object>) documentService.getHandlers().get(context);
         Object entity = getEntityFromContext(context, id);
 
-        if (handler.supports(entity, payload) == SupportType.ALLOWED &&
+        if (handler.supports(entity, payload).isAllowed() &&
                 permissionService.isAllowed(context, entity, authentication)) {
             InputStreamSource file = handler.download(entity, new HashMap<>(payload));
             String fileName = handler.getFilename(entity, new HashMap<>(payload));

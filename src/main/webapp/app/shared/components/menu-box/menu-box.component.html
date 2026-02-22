@@ -12,6 +12,9 @@
             </div>
             @if (item.helpText) {
                 <i class="pi pi-question-circle menu-item-help-icon"
+                   [class.pi-question-circle]="!item.disabled"
+                   [class.pi-exclamation-circle]="item.disabled"
+                   [class.disabled-help]="item.disabled"
                    (click)="showHelp($event, item.helpText)"></i>
             }
         </div>

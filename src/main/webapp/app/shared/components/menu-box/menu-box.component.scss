@@ -1,4 +1,14 @@
 ::ng-deep .p-menu .p-disabled {
+  opacity: 1 !important;
+
+  .p-menu-item-label {
+    opacity: 0.5;
+  }
+
+  .menu-item-left > i {
+    opacity: 1;
+  }
+
   .menu-item-help-icon {
     opacity: 1 !important;
     cursor: pointer !important;
@@ -26,6 +36,11 @@
   &:hover {
     color: var(--app-secondary);
   }
+
+  > i {
+    opacity: 1;
+    transition: opacity 0.2s;
+  }
 }
 
 .menu-item-help-icon {
@@ -40,6 +55,15 @@
 
   &:hover {
     color: var(--app-secondary) !important;
+  }
+}
+
+.menu-item-help-icon.disabled-help {
+  color: var(--app-warning) !important;
+
+  &:hover {
+    color: var(--app-warning-hover, var(--app-warning)) !important;
+    opacity: 0.8 !important;
   }
 }
 

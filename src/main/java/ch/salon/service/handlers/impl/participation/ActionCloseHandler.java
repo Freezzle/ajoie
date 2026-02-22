@@ -15,9 +15,9 @@ import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -35,32 +35,32 @@ public class ActionCloseHandler implements BusinessActionHandler<Participation>,
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(Participation payload, Map<String, Object> context) {
+    public ActionSupport supports(Participation payload, Map<String, Object> context) {
         if (payload == null || (payload.getStatus() != Status.VALIDATED && payload.getStatus() != Status.ACCEPTED)) {
-            return SupportType.REJECTED;
+            return ActionSupport.rejected();
         }
 
         if (this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.stands-in-verification");
         }
 
         if (this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(),
                 Status.IN_VERIFICATION)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.conferences-in-verification");
         }
 
         if (this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(),
                 Status.IN_VERIFICATION)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.workshops-in-verification");
         }
 
         List<InvoicingPlan> plans = this.planRepository.findByParticipationIdOrderByBillingNumberDesc(payload.getId());
         if (plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED ||
                 plan.getState() == State.IS_ISSUING)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.unpaid-invoices");
         }
 
-        return SupportType.ALLOWED;
+        return ActionSupport.allowed("action.participation-marked-as-closed.help");
     }
 
     @Override
@@ -118,10 +118,5 @@ public class ActionCloseHandler implements BusinessActionHandler<Participation>,
     @Override
     public String getConfirmationKey() {
         return "action.participation-marked-as-closed.confirm";
-    }
-
-    @Override
-    public String getHelpKey() {
-        return "action.participation-marked-as-closed.help";
     }
 }

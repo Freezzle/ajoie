@@ -15,9 +15,9 @@ import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -35,18 +35,18 @@ public class ActionCancelHandler implements BusinessActionHandler<Participation>
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(Participation payload, Map<String, Object> context) {
+    public ActionSupport supports(Participation payload, Map<String, Object> context) {
         if (payload == null || payload.getStatus() == Status.CANCELED || payload.getStatus() == Status.REFUSED) {
-            return SupportType.REJECTED;
+            return ActionSupport.rejected();
         }
 
         List<InvoicingPlan> plans = this.planRepository.findByParticipationIdOrderByBillingNumberDesc(payload.getId());
         if (plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED ||
                 plan.getState() == State.IS_ISSUING)) {
-            return SupportType.DISABLED;
+            return ActionSupport.disabled("action.participation-marked-as-cancelled.disabled.pending-invoices");
         }
 
-        return SupportType.ALLOWED;
+        return ActionSupport.allowed();
     }
 
     @Override
@@ -103,5 +103,10 @@ public class ActionCancelHandler implements BusinessActionHandler<Participation>
     @Override
     public ContextActionType getActionType() {
         return ContextActionType.PARTICIPATION_MARK_AS_CANCELLED;
+    }
+
+    @Override
+    public String getConfirmationKey() {
+        return "action.participation-marked-as-cancelled.confirm";
     }
 }

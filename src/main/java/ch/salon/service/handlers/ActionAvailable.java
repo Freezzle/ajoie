@@ -6,7 +6,8 @@ import ch.salon.service.handlers.enums.ContextActionType;
 import java.util.List;
 
 public record ActionAvailable(String contextCode, ActionType type, boolean disabled, String labelKey,
-                               String helpKey, String confirmationKey, List<RequiredField> requiredFields) {
+                               String helpKey, String confirmationKey, List<RequiredField> requiredFields,
+                               String disabledReasonKey) {
 
     /**
      * Retourne la clé de tri pour ordonner les actions.

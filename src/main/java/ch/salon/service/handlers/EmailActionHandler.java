@@ -1,12 +1,11 @@
 package ch.salon.service.handlers;
 
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 
 import java.util.Map;
 
 public interface EmailActionHandler<T> {
-    SupportType supports(T payload, Map<String, Object> context);
+    ActionSupport supports(T payload, Map<String, Object> context);
 
     EmailMessage buildTemplate(T payload, Map<String, Object> context);
 

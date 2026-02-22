@@ -6,9 +6,9 @@ import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +21,11 @@ public class ActionToVerifyHandler implements BusinessActionHandler<Participatio
     private final EventLogService eventLogService;
 
     @Override
-    public SupportType supports(Participation payload, Map<String, Object> context) {
-        return payload != null && payload.getStatus() != Status.IN_VERIFICATION ? SupportType.ALLOWED :
-                SupportType.REJECTED;
+    public ActionSupport supports(Participation payload, Map<String, Object> context) {
+        if (payload != null && payload.getStatus() != Status.IN_VERIFICATION) {
+            return ActionSupport.allowed("action.participation-marked-as-verification.help");
+        }
+        return ActionSupport.rejected();
     }
 
     @Override
@@ -37,10 +39,5 @@ public class ActionToVerifyHandler implements BusinessActionHandler<Participatio
     @Override
     public ContextActionType getActionType() {
         return ContextActionType.PARTICIPATION_MARK_AS_VERIFICATION;
-    }
-
-    @Override
-    public String getHelpKey() {
-        return "action.participation-marked-as-verification.help";
     }
 }

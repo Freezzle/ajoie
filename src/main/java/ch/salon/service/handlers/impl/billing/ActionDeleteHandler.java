@@ -3,9 +3,9 @@ package ch.salon.service.handlers.impl.billing;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +18,11 @@ public class ActionDeleteHandler implements BusinessActionHandler<InvoicingPlan>
     private final InvoicingPlanRepository repository;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState().isDraft() ? SupportType.ALLOWED : SupportType.REJECTED;
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload != null && payload.getState().isDraft()) {
+            return ActionSupport.allowed();
+        }
+        return ActionSupport.rejected();
     }
 
     @Override

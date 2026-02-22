@@ -8,9 +8,9 @@ import ch.salon.service.document.DocumentCreator;
 import ch.salon.service.document.Recipient;
 import ch.salon.service.document.Sender;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import net.codecrete.qrbill.generator.Bill;
@@ -35,8 +35,11 @@ public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPl
     private final GenerateQRCode generateQRCode;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null ? SupportType.ALLOWED : SupportType.REJECTED;
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload != null) {
+            return ActionSupport.allowed();
+        }
+        return ActionSupport.rejected();
     }
 
     @Override

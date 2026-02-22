@@ -8,9 +8,9 @@ import ch.salon.domain.enumeration.Mode;
 import ch.salon.domain.enumeration.State;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,15 +26,15 @@ public class ActionPayAllCashHandler implements BusinessActionHandler<InvoicingP
     private final ActionCloseHandler actionCloseHandler;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
         if (payload != null && payload.getState() == State.ISSUED) {
             // Vérifier qu'il reste un solde à payer
             BigDecimal remaining = BigDecimal.valueOf(payload.getTotal());
             if (remaining.compareTo(BigDecimal.ZERO) > 0) {
-                return SupportType.ALLOWED;
+                return ActionSupport.allowed("action.invoice-pay-all-cash.help");
             }
         }
-        return SupportType.REJECTED;
+        return ActionSupport.rejected();
     }
 
     @Override
@@ -68,10 +68,5 @@ public class ActionPayAllCashHandler implements BusinessActionHandler<InvoicingP
     @Override
     public String getConfirmationKey() {
         return "action.invoice-pay-all-cash.confirm";
-    }
-
-    @Override
-    public String getHelpKey() {
-        return "action.invoice-pay-all-cash.help";
     }
 }

@@ -6,9 +6,9 @@ import ch.salon.service.document.DocumentCreator;
 import ch.salon.service.document.Recipient;
 import ch.salon.service.document.Sender;
 import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -29,9 +29,11 @@ public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPl
     private final DocumentCreator documentCreator;
 
     @Override
-    public SupportType supports(InvoicingPlan payload, Map<String, Object> context) {
-        return payload != null && payload.getState().isNotDraft() && payload.getState() != State.CANCELLED ?
-                SupportType.ALLOWED : SupportType.REJECTED;
+    public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
+        if (payload != null && payload.getState().isNotDraft() && payload.getState() != State.CANCELLED) {
+            return ActionSupport.allowed();
+        }
+        return ActionSupport.rejected();
     }
 
     @Override
