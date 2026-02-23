@@ -7,7 +7,6 @@
     "invoice-extend-expiry-date.help": "Prolonge la date d'échéance de la facture. Une pop-up s'affichera pour vous permettre de choisir la nouvelle date d'échéance.",
     "invoice-split": "Fractionner la facture",
     "invoice-split.help": "Permet de séparer certaines lignes de facture dans une nouvelle facture isolée. Sélectionnez les lignes à déplacer.",
-    "invoice-split.confirm": "Êtes-vous sûr de vouloir fractionner cette facture ? Les lignes sélectionnées seront déplacées vers une nouvelle facture.",
     "invoice-split.disabled": {
       "not-enough-invoices": "La facture doit contenir au moins 2 lignes pour être fractionnée"
     },
