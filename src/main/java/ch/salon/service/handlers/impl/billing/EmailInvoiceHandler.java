@@ -9,16 +9,10 @@ import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
-import ch.salon.service.handlers.ActionMetadataProvider;
-import ch.salon.service.handlers.ActionSupport;
-import ch.salon.service.handlers.EmailActionHandler;
-import ch.salon.service.handlers.EmailAttachment;
-import ch.salon.service.handlers.EmailMessage;
+import ch.salon.service.handlers.*;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.service.mail.EmailCreator;
 import ch.salon.utils.DateUtils;
-import tools.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.List;
@@ -63,6 +58,11 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan>, A
                 payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
             return ActionSupport.allowed();
         }
+
+        if (payload != null && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {
+            return ActionSupport.disabled("action.invoice-send.disabled.postal");
+        }
+
         return ActionSupport.rejected();
     }
 

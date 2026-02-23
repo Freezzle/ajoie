@@ -3,7 +3,6 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
 import {IInvoice, IInvoicingPlanList, IPayment} from '../model/invoicing-plan.interface';
-import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 
 @Injectable({providedIn: 'root'})
 export class InvoicingPlanService {
@@ -37,13 +36,6 @@ export class InvoicingPlanService {
                                        {observe: 'response'});
     }
 
-    switchArrangement(idInvoicingPlan: string): Observable<unknown> {
-        return this.http.put<unknown>(`${this.resourceUrl}/${idInvoicingPlan}/switch-arrangement`, {});
-    }
-
-    switchInvoiceSendingMethod(idInvoicingPlan: string, method: InvoiceSendingMethod): Observable<unknown> {
-        return this.http.put<unknown>(`${this.resourceUrl}/${idInvoicingPlan}/switch-invoice-method/${method}`, {});
-    }
 
     deleteInvoice(idInvoicingPlan: string, idInvoice: string): Observable<HttpResponse<void>> {
         return this.http.delete<void>(`${this.resourceUrl}/${idInvoicingPlan}/invoices/${idInvoice}`,

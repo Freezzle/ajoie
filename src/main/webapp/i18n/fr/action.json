@@ -10,6 +10,10 @@
     "invoice-split.disabled": {
       "not-enough-invoices": "La facture doit contenir au moins 2 lignes pour être fractionnée"
     },
+    "invoice-activate-arrangement": "Activer arrangement",
+    "invoice-deactivate-arrangement": "Désactiver arrangement",
+    "invoice-switch-to-email": "Activer envoi par email",
+    "invoice-switch-to-postal": "Activer envoi postal",
     "invoice-marked-as-cancelled": "Annuler la facture",
     "invoice-marked-as-cancelled.confirm": "Êtes-vous sûr de vouloir annulé cette facture ?",
     "invoice-marked-as-issued": "Marquer comme transmise",
@@ -22,9 +26,16 @@
     "invoice-pay-all-cash.confirm": "Êtes-vous sûr de vouloir encaisser le solde restant en cash et clôturer la facture ?",
     "invoice-pay-all-cash.help": "Crée un paiement avec le solde restant de la facture en espèces (cash) et clôture automatiquement la facture.",
     "invoice-send": "Envoyer la facture",
+    "invoice-send.disabled": {
+      "postal" : "La facture est configurée pour être envoyée par courrier postal"
+    },
     "invoice-send-again": "Renvoyer la facture",
+    "invoice-send-again.disabled": {
+      "postal": "La facture est configurée pour être envoyée par courrier postal"
+    },
     "invoice-reminder": "Envoyer un rappel",
     "invoice-reminder.disabled": {
+      "postal": "La facture est configurée pour être envoyée par courrier postal",
       "not-expired": "Le rappel ne peut être envoyé car la facture n'est pas encore échue"
     },
     "participation-marked-as-accepted": "Accepter la participation",

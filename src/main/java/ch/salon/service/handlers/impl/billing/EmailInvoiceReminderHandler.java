@@ -63,9 +63,11 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
             return ActionSupport.rejected();
         }
 
-        if (payload.getState() == State.ISSUED && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
-            if (Instant.now().isAfter(payload.getExpirationDate())) {
+        if (payload.getState() == State.ISSUED) {
+            if (payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL && Instant.now().isAfter(payload.getExpirationDate())) {
                 return ActionSupport.allowed();
+            } else if (payload.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {
+                return ActionSupport.disabled("action.invoice-reminder.disabled.postal");
             } else {
                 return ActionSupport.disabled("action.invoice-reminder.disabled.not-expired");
             }

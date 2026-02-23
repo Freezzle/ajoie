@@ -1,6 +1,5 @@
 package ch.salon.web.rest;
 
-import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.dto.EventLogDTO;
@@ -44,27 +43,6 @@ public class AdminInvoicingPlanResource {
         return ResourceUtil.updatedWithMessageKey(ENTITY_NAME + ".splitting.updated", idInvoicingPlan).body(null);
     }
 
-    @PutMapping("{idInvoicingPlan}/switch-arrangement")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Void> switchArrangement(
-            @PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan) throws Exception {
-        boolean withArrangement = invoicingPlanService.switchArrangement(idInvoicingPlan);
-
-        if (withArrangement) {
-            return ResourceUtil.updatedWithMessageKey(ENTITY_NAME + ".arrangement.activated", idInvoicingPlan).body(null);
-        }
-        return ResourceUtil.updatedWithMessageKey(ENTITY_NAME + ".arrangement.deactivated", idInvoicingPlan).body(null);
-    }
-
-    @PutMapping("{idInvoicingPlan}/switch-invoice-method/{method}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<Void> switchInvoiceSendingMethod(
-            @PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan,
-            @PathVariable(value = "method") InvoiceSendingMethod method) {
-        String newMethod = invoicingPlanService.switchInvoiceSendingMethod(idInvoicingPlan, method);
-
-        return ResourceUtil.updatedWithMessageKey(ENTITY_NAME + ".invoiceSendingMethod." + newMethod + ".updated", idInvoicingPlan).body(null);
-    }
 
     @PostMapping("{idInvoicingPlan}/invoices")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")

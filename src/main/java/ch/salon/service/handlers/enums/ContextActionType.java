@@ -14,6 +14,10 @@ public enum ContextActionType {
     INVOICE_PAY_ALL_CASH("billing", "invoice-pay-all-cash"),
     INVOICE_EXTEND_EXPIRY_DATE("billing", "invoice-extend-expiry-date"),
     INVOICE_SPLIT("billing", "invoice-split"),
+    INVOICE_ACTIVATE_ARRANGEMENT("billing", "invoice-activate-arrangement"),
+    INVOICE_DEACTIVATE_ARRANGEMENT("billing", "invoice-deactivate-arrangement"),
+    INVOICE_SWITCH_TO_EMAIL("billing", "invoice-switch-to-email"),
+    INVOICE_SWITCH_TO_POSTAL("billing", "invoice-switch-to-postal"),
     INVOICE_CANCELLATION_SEND("billing", "invoice-cancellation-send"),
     INVOICE_DELETE("billing", "invoice-delete"),
     INVOICE_MARK_AS_CANCELLED("billing", "invoice-marked-as-cancelled"),
@@ -80,6 +84,10 @@ public enum ContextActionType {
             // === BILLING - Actions d'extension/modification ===
             case INVOICE_EXTEND_EXPIRY_DATE -> 30;           // Prolonger la date d'expiration
             case INVOICE_SPLIT -> 31;                        // Fractionner la facture
+            case INVOICE_ACTIVATE_ARRANGEMENT -> 32;         // Activer l'arrangement de paiement
+            case INVOICE_DEACTIVATE_ARRANGEMENT -> 33;       // Désactiver l'arrangement de paiement
+            case INVOICE_SWITCH_TO_EMAIL -> 34;              // Changer pour envoyer par email
+            case INVOICE_SWITCH_TO_POSTAL -> 35;             // Changer pour envoyer par la poste
 
             // === PARTICIPATION - Emails principaux liés au workflow ===
             case PARTICIPATION_ACCEPTATION_EMAIL -> 40;      // Email d'acceptation

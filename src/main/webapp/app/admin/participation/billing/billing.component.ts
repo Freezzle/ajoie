@@ -401,31 +401,6 @@ export class BillingComponent implements OnInit {
         });
     }
 
-    activateArrangement(invoicingPlan: IInvoicingPlan): void {
-        this.invoicingPlanService.switchArrangement(invoicingPlan.id).subscribe(() => {
-            invoicingPlan.needArrangement = true;
-        });
-    }
-
-    deactivateArrangement(invoicingPlan: IInvoicingPlan): void {
-        this.invoicingPlanService.switchArrangement(invoicingPlan.id).subscribe(() => {
-            invoicingPlan.needArrangement = false;
-        });
-    }
-
-    switchSendingToEmail(invoicingPlan: IInvoicingPlan): void {
-        this.invoicingPlanService.switchInvoiceSendingMethod(invoicingPlan.id, InvoiceSendingMethod.EMAIL).subscribe(() => {
-            invoicingPlan.invoiceSendingMethod = InvoiceSendingMethod.EMAIL;
-            this.loadInvoicePlans();
-        });
-    }
-
-    switchSendingToPostal(invoicingPlan: IInvoicingPlan): void {
-        this.invoicingPlanService.switchInvoiceSendingMethod(invoicingPlan.id, InvoiceSendingMethod.POSTAL).subscribe(() => {
-            invoicingPlan.invoiceSendingMethod = InvoiceSendingMethod.POSTAL;
-            this.loadInvoicePlans();
-        });
-    }
 
     showCreateInvoice(plan: IInvoicingPlan): boolean {
         return this.isDraftState(plan) && this.canMutatePlan(plan);
@@ -443,21 +418,6 @@ export class BillingComponent implements OnInit {
         return (this.isDraftState(plan) || this.isIssuedState(plan)) && this.canMutatePlan(plan);
     }
 
-    showDeactivateArrangement(invoicingPlan: IInvoicingPlan): boolean {
-        return this.isDraftState(invoicingPlan) && invoicingPlan.needArrangement;
-    }
-
-    showActivateArrangement(invoicingPlan: IInvoicingPlan): boolean {
-        return this.isDraftState(invoicingPlan) && !invoicingPlan.needArrangement;
-    }
-
-    showSwitchToEmail(invoicingPlan: IInvoicingPlan): boolean {
-        return this.isDraftState(invoicingPlan) && invoicingPlan.invoiceSendingMethod === InvoiceSendingMethod.POSTAL;
-    }
-
-    showSwitchToPostal(invoicingPlan: IInvoicingPlan): boolean {
-        return this.isDraftState(invoicingPlan) && invoicingPlan.invoiceSendingMethod === InvoiceSendingMethod.EMAIL;
-    }
 
     isDraftState(invoicingPlan: IInvoicingPlan): boolean {
         return invoicingPlan.state === State.DRAFT || invoicingPlan.state === State.ISOLATED;
@@ -504,38 +464,6 @@ export class BillingComponent implements OnInit {
 
     buildInvoicingPlanMenuItems(invoicingPlan: any): AppMenuItem[] {
         const items: AppMenuItem[] = [];
-
-        if (this.showDeactivateArrangement(invoicingPlan)) {
-            items.push({
-                           label: 'Annuler arrangement',
-                           disabled: this.mustDisableSendButton(invoicingPlan),
-                           command: () => this.deactivateArrangement(invoicingPlan)
-                       });
-        }
-
-        if (this.showActivateArrangement(invoicingPlan)) {
-            items.push({
-                           label: 'Activer arrangement',
-                           disabled: this.mustDisableSendButton(invoicingPlan),
-                           command: () => this.activateArrangement(invoicingPlan)
-                       });
-        }
-
-        if (this.showSwitchToEmail(invoicingPlan)) {
-            items.push({
-                           label: 'Changer pour envoyer par email',
-                           disabled: this.mustDisableSendButton(invoicingPlan),
-                           command: () => this.switchSendingToEmail(invoicingPlan)
-                       });
-        }
-
-        if (this.showSwitchToPostal(invoicingPlan)) {
-            items.push({
-                           label: 'Changer pour envoyer par la poste',
-                           disabled: this.mustDisableSendButton(invoicingPlan),
-                           command: () => this.switchSendingToPostal(invoicingPlan)
-                       });
-        }
 
 
         // Utilisation du service centralisé pour construire les items à partir des actions disponibles
