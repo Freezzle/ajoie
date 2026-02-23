@@ -21,7 +21,6 @@ export class ActionsService {
     }
 
     businessAction(context: string, idEntity: string, payload?: Map<string, any>): Observable<unknown> {
-        // Convertir Map en objet pour la sérialisation JSON
         const body = payload ? Object.fromEntries(payload) : {};
         return this.http.post<unknown>(`${this.resourceActionsUrl}/business/${context}/${idEntity}`, body);
     }

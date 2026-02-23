@@ -13,6 +13,7 @@ public enum ContextActionType {
     INVOICE_MARK_AS_PAID("billing", "invoice-marked-as-paid"),
     INVOICE_PAY_ALL_CASH("billing", "invoice-pay-all-cash"),
     INVOICE_EXTEND_EXPIRY_DATE("billing", "invoice-extend-expiry-date"),
+    INVOICE_SPLIT("billing", "invoice-split"),
     INVOICE_CANCELLATION_SEND("billing", "invoice-cancellation-send"),
     INVOICE_DELETE("billing", "invoice-delete"),
     INVOICE_MARK_AS_CANCELLED("billing", "invoice-marked-as-cancelled"),
@@ -78,6 +79,7 @@ public enum ContextActionType {
 
             // === BILLING - Actions d'extension/modification ===
             case INVOICE_EXTEND_EXPIRY_DATE -> 30;           // Prolonger la date d'expiration
+            case INVOICE_SPLIT -> 31;                        // Fractionner la facture
 
             // === PARTICIPATION - Emails principaux liés au workflow ===
             case PARTICIPATION_ACCEPTATION_EMAIL -> 40;      // Email d'acceptation

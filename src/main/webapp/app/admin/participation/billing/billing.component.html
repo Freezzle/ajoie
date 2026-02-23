@@ -83,18 +83,6 @@
                                 <p-accordion-content>
                                     <div class="row">
                                         <div class="col-12 text-end">
-                                            @if (isPlanOnSplitMode(invoicingPlan)) {
-                                                <div class="mt-4">
-                                                    <button-box (clickedEvent)="cancelSplit(invoicingPlan)"
-                                                                [isDisabled]="mustDisableSendButton(invoicingPlan)"
-                                                                translateKey="common.cancel"
-                                                                type="secondary"/>
-                                                    <button-box (clickedEvent)="validateSplit(invoicingPlan)"
-                                                                [isDisabled]="mustDisableSendButton(invoicingPlan) || selectedInvoices.length == 0"
-                                                                translateKey="invoicingPlan.split"
-                                                                type="warning"/>
-                                                </div>
-                                            }
                                             @if (showInvoicingAction(invoicingPlan)) {
                                                 <div class="d-flex justify-content-end align-items-center mt-4 gap-2">
                                                     <fa-icon (click)="openHistoryModalForInvoicingPlan(invoicingPlan)"
@@ -206,14 +194,6 @@
                                                                                value="{{ invoice.extraInformation }}"/>
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        @if (!isInvoiceEditable(invoice) && isPlanOnSplitMode(invoicingPlan)) {
-                                                                            <div>
-                                                                                <input (change)="onSelectInvoice(invoice)"
-                                                                                       [value]="invoice.selected"
-                                                                                       type="checkbox"/>
-
-                                                                            </div>
-                                                                        }
                                                                         @if (showInvoiceActions(invoicingPlan)) {
                                                                             <span>
                                                                                 @if (invoice.readMode) {

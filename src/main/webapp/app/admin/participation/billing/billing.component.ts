@@ -66,8 +66,6 @@ export class BillingComponent implements OnInit {
     invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
     isLoading = false;
     modeValues = Object.keys(Mode);
-    selectedInvoices: string[] = [];
-    invoicePlanOnSplitMode: string | null = null;
     openPlanId: string | null = null;
     menuCachePlans = new Map<string, AppMenuItem[]>();
     billingInfoForm!: FormGroup<BillingInfoGroup>;
@@ -158,20 +156,9 @@ export class BillingComponent implements OnInit {
         return Number(invoice.customAmount ?? 0) !== Number(invoice.defaultAmount ?? 0);
     }
 
-    onSelectInvoice(invoice: IInvoice) {
-        if (invoice.selected) {
-            invoice.selected = false;
-            this.selectedInvoices = this.selectedInvoices.filter(inv => inv !== invoice.id);
-        } else {
-            invoice.selected = true;
-            this.selectedInvoices.push(invoice.id);
-        }
-    }
-
     onClickLock(invoice: IInvoice): void {
         invoice.lock = !invoice.lock;
     }
-
     onCustomAmountChange(event: any, invoice: IInvoice): void {
         invoice.customAmount = Number(event.target.value);
     }
@@ -314,19 +301,15 @@ export class BillingComponent implements OnInit {
     }
 
     disableActionButton(invoicingPlan: IInvoicingPlan): boolean {
-        return this.isLoading || this.isPlanOnSplitMode(invoicingPlan) || this.hasPendingEdition(invoicingPlan);
+        return this.isLoading || this.hasPendingEdition(invoicingPlan);
     }
 
     mustDisableSendButton(invoicingPlan: IInvoicingPlan): boolean {
         return this.isLoading || this.hasPendingEdition(invoicingPlan) || this.isInvoicingPlanBlocked(invoicingPlan);
     }
 
-    showSplit(plan: IInvoicingPlan): boolean {
-        return this.isDraftState(plan);
-    }
-
     showInvoicingAction(plan: IInvoicingPlan): boolean {
-        return !this.isPlanOnSplitMode(plan);
+        return true;
     }
 
     openEmailPopup(action: AvailableAction, id: string) {
@@ -385,11 +368,8 @@ export class BillingComponent implements OnInit {
 
             modalRef.result.then((payload: Map<string, any>) => {
                 if (payload) {
-                    console.log(payload);
                     this.executeBusinessAction(action.contextCode, invoicingPlanId, payload);
                 }
-            }).catch(() => {
-                // Modal dismissed
             });
         } else {
             const targetElement = htmlElement || document.activeElement as HTMLElement;
@@ -419,33 +399,6 @@ export class BillingComponent implements OnInit {
         this.participationService.generateInvoices(this.participation()!.id).subscribe(() => {
             this.loadInvoicePlans();
         });
-    }
-
-    startSplit(invoicingPlan: IInvoicingPlan): void {
-        this.selectedInvoices = [];
-        this.invoicePlanOnSplitMode = invoicingPlan.id;
-    }
-
-    cancelSplit(invoicingPlan: IInvoicingPlan): void {
-        if (invoicingPlan) {
-            this.selectedInvoices = [];
-            this.invoicePlanOnSplitMode = null;
-        }
-    }
-
-    isPlanOnSplitMode(invoicingPlan: IInvoicingPlan): boolean {
-        return invoicingPlan.id === this.invoicePlanOnSplitMode;
-    }
-
-    validateSplit(invoicingPlan: IInvoicingPlan): void {
-        if (invoicingPlan) {
-            this.invoicingPlanService.splitInvoicingPlan(invoicingPlan?.id, this.selectedInvoices)
-                .subscribe(() => {
-                    this.selectedInvoices = [];
-                    this.invoicePlanOnSplitMode = null;
-                    this.loadInvoicePlans();
-                });
-        }
     }
 
     activateArrangement(invoicingPlan: IInvoicingPlan): void {
@@ -584,13 +537,6 @@ export class BillingComponent implements OnInit {
                        });
         }
 
-        if (this.showSplit(invoicingPlan) && !this.isPlanOnSplitMode(invoicingPlan)) {
-            items.push({
-                           label: 'Fractionner la facture',
-                           disabled: this.mustDisableSendButton(invoicingPlan),
-                           command: () => this.startSplit(invoicingPlan)
-                       });
-        }
 
         // Utilisation du service centralisé pour construire les items à partir des actions disponibles
         const actionItems = this.menuItemBuilderService.buildMenuItemsFromActions(
@@ -688,7 +634,7 @@ export class BillingComponent implements OnInit {
     }
 
     private canMutatePlan(plan: IInvoicingPlan): boolean {
-        return !this.isInvoicingPlanBlocked(plan) && !this.isPlanOnSplitMode(plan);
+        return !this.isInvoicingPlanBlocked(plan);
     }
 }
 

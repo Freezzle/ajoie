@@ -204,7 +204,7 @@ public class InvoicingPlanService {
         InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
 
         if (invoicingPlan.getState() != State.DRAFT && invoicingPlan.getState() != State.ISOLATED) {
-            throw new IllegalStateException("Invoicing plan must be in state Draft or Isolated to split invoices");
+            throw new IllegalStateException("Invoicing plan must be in state Draft or Isolated to switch arrangment");
         }
 
         invoicingPlan.setNeedArrangement(!invoicingPlan.getNeedArrangement());
@@ -226,7 +226,7 @@ public class InvoicingPlanService {
         InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
 
         if (invoicingPlan.getState() != State.DRAFT && invoicingPlan.getState() != State.ISOLATED) {
-            throw new IllegalStateException("Invoicing plan must be in state Draft or Isolated to split invoices");
+            throw new IllegalStateException("Invoicing plan must be in state Draft or Isolated to switch sending method");
         }
 
         if (invoicingPlan.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL &&

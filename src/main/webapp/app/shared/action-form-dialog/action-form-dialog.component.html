@@ -27,6 +27,13 @@
                             [formControlName]="field.name"
                             [translateKey]="field.labelKey"/>
                     }
+                    @if (field.type === FieldType.PICKLIST) {
+                        <picklist-box
+                            [fieldName]="field.name"
+                            [formControlName]="field.name"
+                            [translateKey]="field.labelKey"
+                            [options]="field.options || []"/>
+                    }
                 </div>
             }
         </div>

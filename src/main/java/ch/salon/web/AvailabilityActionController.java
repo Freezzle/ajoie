@@ -97,7 +97,7 @@ public class AvailabilityActionController {
                         if (handler instanceof BusinessActionHandler && handler instanceof ActionMetadataProvider) {
                             ActionMetadataProvider metadataProvider = (ActionMetadataProvider) handler;
                             confirmationKey = metadataProvider.getConfirmationKey();
-                            requiredFields = metadataProvider.getRequiredFields();
+                            requiredFields = metadataProvider.getRequiredFields(payload);
                         }
 
                         actions.add(new ActionAvailable(

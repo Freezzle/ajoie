@@ -12,4 +12,8 @@ public interface ActionMetadataProvider {
     default List<RequiredField> getRequiredFields() {
         return Collections.emptyList();
     }
+
+    default List<RequiredField> getRequiredFields(Object payload) {
+        return getRequiredFields();
+    }
 }
