@@ -38,37 +38,18 @@ public class ActionValidateHandler implements BusinessActionHandler<Participatio
             return ActionSupport.rejected();
         }
 
-        boolean hasStandsInVerification = this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
-        boolean hasConferencesInVerification = this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
-        boolean hasWorkshopsInVerification = this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
-
-        List<ConditionalKey> conditions = new ArrayList<>();
-
-        if (hasStandsInVerification) {
-            conditions.add(ConditionalKey.nok("action.participation-marked-as-validated.condition.stands-verified"));
-        } else {
-            conditions.add(ConditionalKey.ok("action.participation-marked-as-validated.condition.stands-verified"));
-        }
-
-        if (hasConferencesInVerification) {
-            conditions.add(ConditionalKey.nok("action.participation-marked-as-validated.condition.conferences-verified"));
-        } else {
-            conditions.add(ConditionalKey.ok("action.participation-marked-as-validated.condition.conferences-verified"));
-        }
-
-        if (hasWorkshopsInVerification) {
-            conditions.add(ConditionalKey.nok("action.participation-marked-as-validated.condition.workshops-verified"));
-        } else {
-            conditions.add(ConditionalKey.ok("action.participation-marked-as-validated.condition.workshops-verified"));
-        }
+        boolean standsOk = !this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean conferencesOk = !this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean workshopsOk = !this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
 
         //TODO: Later, we can only validate if (accepted && arrangement) or (accepted && !arrangement && invoicing plan paid)
 
-        if (hasStandsInVerification || hasConferencesInVerification || hasWorkshopsInVerification) {
-            return ActionSupport.disabled("action.participation-marked-as-validated.help", conditions.toArray(new ConditionalKey[0]));
-        }
-
-        return ActionSupport.allowed("action.participation-marked-as-validated.help", conditions.toArray(new ConditionalKey[0]));
+        // Nouvelle API simplifiée avec fromConditions
+        return ActionSupport.fromConditions("action.participation-marked-as-validated.help",
+            ConditionalKey.of(standsOk, "action.participation-marked-as-validated.condition.stands-verified"),
+            ConditionalKey.of(conferencesOk, "action.participation-marked-as-validated.condition.conferences-verified"),
+            ConditionalKey.of(workshopsOk, "action.participation-marked-as-validated.condition.workshops-verified")
+        );
     }
 
     @Override

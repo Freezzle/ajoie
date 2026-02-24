@@ -24,6 +24,19 @@ public class ConditionalKey {
     }
 
     /**
+     * Factory method pour créer une condition basée sur un booléen.
+     * Si la condition est true, crée un OK, sinon un NOK.
+     * Évite la duplication de code avec if/else.
+     *
+     * @param condition Le résultat de la condition (true = OK, false = NOK)
+     * @param key Clé de traduction
+     * @return ConditionalKey avec état OK si condition=true, NOK sinon
+     */
+    public static ConditionalKey of(boolean condition, String key) {
+        return new ConditionalKey(key, condition ? ConditionalState.OK : ConditionalState.NOK);
+    }
+
+    /**
      * Factory method pour créer une condition remplie (OK)
      */
     public static ConditionalKey ok(String key) {

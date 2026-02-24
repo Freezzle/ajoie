@@ -42,15 +42,13 @@ public class ActionCancelHandler implements BusinessActionHandler<Participation>
         }
 
         List<InvoicingPlan> plans = this.planRepository.findByParticipationIdOrderByBillingNumberDesc(payload.getId());
-        boolean hasPendingInvoices = plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED || plan.getState() == State.IS_ISSUING);
+        boolean invoicesOk = plans.stream().noneMatch(plan ->
+            plan.getState().isDraft() || plan.getState() == State.ISSUED || plan.getState() == State.IS_ISSUING
+        );
 
-        if (hasPendingInvoices) {
-            return ActionSupport.disabled("action.participation-marked-as-cancelled.help",
-                ConditionalKey.nok("action.participation-marked-as-cancelled.condition.invoices-settled"));
-        }
-
-        return ActionSupport.allowed("action.participation-marked-as-cancelled.help",
-            ConditionalKey.ok("action.participation-marked-as-cancelled.condition.invoices-settled"));
+        return ActionSupport.fromConditions("action.participation-marked-as-cancelled.help",
+            ConditionalKey.of(invoicesOk, "action.participation-marked-as-cancelled.condition.invoices-settled")
+        );
     }
 
     @Override

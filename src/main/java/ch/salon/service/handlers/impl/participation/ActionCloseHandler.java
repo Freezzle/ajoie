@@ -22,7 +22,6 @@ import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,44 +41,21 @@ public class ActionCloseHandler implements BusinessActionHandler<Participation>,
             return ActionSupport.rejected();
         }
 
-        boolean hasStandsInVerification = this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
-        boolean hasConferencesInVerification = this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
-        boolean hasWorkshopsInVerification = this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean standsOk = !this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean conferencesOk = !this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean workshopsOk = !this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
 
         List<InvoicingPlan> plans = this.planRepository.findByParticipationIdOrderByBillingNumberDesc(payload.getId());
-        boolean hasUnpaidInvoices = plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED || plan.getState() == State.IS_ISSUING);
+        boolean invoicesOk = plans.stream().noneMatch(plan ->
+            plan.getState().isDraft() || plan.getState() == State.ISSUED || plan.getState() == State.IS_ISSUING
+        );
 
-        List<ConditionalKey> conditions = new ArrayList<>();
-
-        if (hasStandsInVerification) {
-            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.stands-verified"));
-        } else {
-            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.stands-verified"));
-        }
-
-        if (hasConferencesInVerification) {
-            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.conferences-verified"));
-        } else {
-            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.conferences-verified"));
-        }
-
-        if (hasWorkshopsInVerification) {
-            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.workshops-verified"));
-        } else {
-            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.workshops-verified"));
-        }
-
-        if (hasUnpaidInvoices) {
-            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.invoices-paid"));
-        } else {
-            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.invoices-paid"));
-        }
-
-        if (hasStandsInVerification || hasConferencesInVerification || hasWorkshopsInVerification || hasUnpaidInvoices) {
-            return ActionSupport.disabled("action.participation-marked-as-closed.help", conditions.toArray(new ConditionalKey[0]));
-        }
-
-        return ActionSupport.allowed("action.participation-marked-as-closed.help", conditions.toArray(new ConditionalKey[0]));
+        return ActionSupport.fromConditions("action.participation-marked-as-closed.help",
+            ConditionalKey.of(standsOk, "action.participation-marked-as-closed.condition.stands-verified"),
+            ConditionalKey.of(conferencesOk, "action.participation-marked-as-closed.condition.conferences-verified"),
+            ConditionalKey.of(workshopsOk, "action.participation-marked-as-closed.condition.workshops-verified"),
+            ConditionalKey.of(invoicesOk, "action.participation-marked-as-closed.condition.invoices-paid")
+        );
     }
 
     @Override

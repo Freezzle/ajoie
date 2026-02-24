@@ -33,7 +33,6 @@ import org.thymeleaf.context.Context;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -68,25 +67,10 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
             boolean isEmail = payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL;
             boolean isExpired = Instant.now().isAfter(payload.getExpirationDate());
 
-            List<ConditionalKey> conditions = new ArrayList<>();
-
-            if (isEmail) {
-                conditions.add(ConditionalKey.ok("action.invoice-reminder.condition.email-method"));
-            } else {
-                conditions.add(ConditionalKey.nok("action.invoice-reminder.condition.email-method"));
-            }
-
-            if (isExpired) {
-                conditions.add(ConditionalKey.ok("action.invoice-reminder.condition.is-expired"));
-            } else {
-                conditions.add(ConditionalKey.nok("action.invoice-reminder.condition.is-expired"));
-            }
-
-            if (isEmail && isExpired) {
-                return ActionSupport.allowed("action.invoice-reminder.help", conditions.toArray(new ConditionalKey[0]));
-            } else {
-                return ActionSupport.disabled("action.invoice-reminder.help", conditions.toArray(new ConditionalKey[0]));
-            }
+            return ActionSupport.fromConditions("action.invoice-reminder.help",
+                ConditionalKey.of(isEmail, "action.invoice-reminder.condition.email-method"),
+                ConditionalKey.of(isExpired, "action.invoice-reminder.condition.is-expired")
+            );
         }
 
         return ActionSupport.rejected();

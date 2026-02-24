@@ -31,13 +31,9 @@ public class ActionSplitInvoicesHandler implements BusinessActionHandler<Invoici
 
         boolean hasEnoughInvoices = payload.getInvoices() != null && payload.getInvoices().size() >= 2;
 
-        if (!hasEnoughInvoices) {
-            return ActionSupport.disabled("action.invoice-split.help",
-                ConditionalKey.nok("action.invoice-split.condition.enough-invoices"));
-        }
-
-        return ActionSupport.allowed("action.invoice-split.help",
-            ConditionalKey.ok("action.invoice-split.condition.enough-invoices"));
+        return ActionSupport.fromConditions("action.invoice-split.help",
+            ConditionalKey.of(hasEnoughInvoices, "action.invoice-split.condition.enough-invoices")
+        );
     }
 
     @Override

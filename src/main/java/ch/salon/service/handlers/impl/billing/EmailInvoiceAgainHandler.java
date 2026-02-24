@@ -54,13 +54,11 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
     @Override
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
         if (payload != null && payload.getState() == State.ISSUED) {
-            if (payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
-                return ActionSupport.allowed("action.invoice-send-again.help",
-                    ConditionalKey.ok("action.invoice-send-again.condition.email-method"));
-            } else {
-                return ActionSupport.disabled("action.invoice-send-again.help",
-                    ConditionalKey.nok("action.invoice-send-again.condition.email-method"));
-            }
+            boolean isEmail = payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL;
+
+            return ActionSupport.fromConditions("action.invoice-send-again.help",
+                ConditionalKey.of(isEmail, "action.invoice-send-again.condition.email-method")
+            );
         }
         return ActionSupport.rejected();
     }

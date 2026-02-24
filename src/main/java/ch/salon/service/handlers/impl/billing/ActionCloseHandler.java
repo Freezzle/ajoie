@@ -30,13 +30,9 @@ public class ActionCloseHandler implements BusinessActionHandler<InvoicingPlan>,
 
         boolean hasBalance = BigDecimal.valueOf(payload.getTotal()).compareTo(BigDecimal.ZERO) != 0;
 
-        if (hasBalance) {
-            return ActionSupport.disabled("action.invoice-marked-as-paid.help",
-                ConditionalKey.nok("action.invoice-marked-as-paid.condition.balance-zero"));
-        }
-
-        return ActionSupport.allowed("action.invoice-marked-as-paid.help",
-            ConditionalKey.ok("action.invoice-marked-as-paid.condition.balance-zero"));
+        return ActionSupport.fromConditions("action.invoice-marked-as-paid.help",
+            ConditionalKey.of(!hasBalance, "action.invoice-marked-as-paid.condition.balance-zero")
+        );
     }
 
     @Override

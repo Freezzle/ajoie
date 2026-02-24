@@ -64,6 +64,26 @@ public class ActionSupport {
         return new ActionSupport(SupportType.REJECTED, null, Collections.emptyList());
     }
 
+    /**
+     * Builder pour construire facilement un ActionSupport selon les conditions.
+     * Si toutes les conditions sont OK, retourne ALLOWED, sinon DISABLED.
+     * Utiliser avec ConditionalKey.of(boolean, String) pour éviter les duplications.
+     *
+     * @param helpKey Clé de traduction pour le texte d'aide
+     * @param conditionalKeys Conditions à évaluer
+     * @return ActionSupport ALLOWED si toutes OK, DISABLED sinon
+     */
+    public static ActionSupport fromConditions(String helpKey, ConditionalKey... conditionalKeys) {
+        boolean allOk = Arrays.stream(conditionalKeys)
+            .allMatch(ck -> ck.getState() == ConditionalState.OK);
+
+        if (allOk) {
+            return new ActionSupport(SupportType.ALLOWED, helpKey, Arrays.asList(conditionalKeys));
+        } else {
+            return new ActionSupport(SupportType.DISABLED, helpKey, Arrays.asList(conditionalKeys));
+        }
+    }
+
     public SupportType getType() {
         return type;
     }
