@@ -9,6 +9,7 @@ import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
@@ -44,7 +45,7 @@ public class EmailReceiptHandler implements EmailActionHandler<InvoicingPlan>, A
     @Override
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
         if (payload != null && payload.getState() == State.PAID) {
-            return ActionSupport.allowed();
+            return ActionSupport.allowed("action.receipt-send.help");
         }
         return ActionSupport.rejected();
     }

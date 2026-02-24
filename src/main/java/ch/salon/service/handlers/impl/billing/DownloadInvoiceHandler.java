@@ -9,6 +9,7 @@ import ch.salon.service.document.Recipient;
 import ch.salon.service.document.Sender;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.utils.DateUtils;
@@ -37,7 +38,7 @@ public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPl
     @Override
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
         if (payload != null) {
-            return ActionSupport.allowed();
+            return ActionSupport.allowed("action.invoice-download.help");
         }
         return ActionSupport.rejected();
     }

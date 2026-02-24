@@ -6,6 +6,7 @@ import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,8 @@ public class ActionSwitchToEmailHandler implements BusinessActionHandler<Invoici
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
         if (payload != null && payload.getState().isDraft()
                 && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {
-            return ActionSupport.allowed();
+            return ActionSupport.allowed("action.invoice-switch-to-email.help",
+                ConditionalKey.ok("action.invoice-switch-to-email.condition.is-postal"));
         }
         return ActionSupport.rejected();
     }

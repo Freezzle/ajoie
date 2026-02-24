@@ -17,6 +17,7 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -41,12 +42,15 @@ public class ActionCancelHandler implements BusinessActionHandler<Participation>
         }
 
         List<InvoicingPlan> plans = this.planRepository.findByParticipationIdOrderByBillingNumberDesc(payload.getId());
-        if (plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED ||
-                plan.getState() == State.IS_ISSUING)) {
-            return ActionSupport.disabled("action.participation-marked-as-cancelled.disabled.pending-invoices");
+        boolean hasPendingInvoices = plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED || plan.getState() == State.IS_ISSUING);
+
+        if (hasPendingInvoices) {
+            return ActionSupport.disabled("action.participation-marked-as-cancelled.help",
+                ConditionalKey.nok("action.participation-marked-as-cancelled.condition.invoices-settled"));
         }
 
-        return ActionSupport.allowed();
+        return ActionSupport.allowed("action.participation-marked-as-cancelled.help",
+            ConditionalKey.ok("action.participation-marked-as-cancelled.condition.invoices-settled"));
     }
 
     @Override

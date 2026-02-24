@@ -17,10 +17,12 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,27 +42,44 @@ public class ActionCloseHandler implements BusinessActionHandler<Participation>,
             return ActionSupport.rejected();
         }
 
-        if (this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION)) {
-            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.stands-in-verification");
-        }
-
-        if (this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(),
-                Status.IN_VERIFICATION)) {
-            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.conferences-in-verification");
-        }
-
-        if (this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(),
-                Status.IN_VERIFICATION)) {
-            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.workshops-in-verification");
-        }
+        boolean hasStandsInVerification = this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean hasConferencesInVerification = this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean hasWorkshopsInVerification = this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
 
         List<InvoicingPlan> plans = this.planRepository.findByParticipationIdOrderByBillingNumberDesc(payload.getId());
-        if (plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED ||
-                plan.getState() == State.IS_ISSUING)) {
-            return ActionSupport.disabled("action.participation-marked-as-closed.disabled.unpaid-invoices");
+        boolean hasUnpaidInvoices = plans.stream().anyMatch(plan -> plan.getState().isDraft() || plan.getState() == State.ISSUED || plan.getState() == State.IS_ISSUING);
+
+        List<ConditionalKey> conditions = new ArrayList<>();
+
+        if (hasStandsInVerification) {
+            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.stands-verified"));
+        } else {
+            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.stands-verified"));
         }
 
-        return ActionSupport.allowed("action.participation-marked-as-closed.help");
+        if (hasConferencesInVerification) {
+            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.conferences-verified"));
+        } else {
+            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.conferences-verified"));
+        }
+
+        if (hasWorkshopsInVerification) {
+            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.workshops-verified"));
+        } else {
+            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.workshops-verified"));
+        }
+
+        if (hasUnpaidInvoices) {
+            conditions.add(ConditionalKey.nok("action.participation-marked-as-closed.condition.invoices-paid"));
+        } else {
+            conditions.add(ConditionalKey.ok("action.participation-marked-as-closed.condition.invoices-paid"));
+        }
+
+        if (hasStandsInVerification || hasConferencesInVerification || hasWorkshopsInVerification || hasUnpaidInvoices) {
+            return ActionSupport.disabled("action.participation-marked-as-closed.help", conditions.toArray(new ConditionalKey[0]));
+        }
+
+        return ActionSupport.allowed("action.participation-marked-as-closed.help", conditions.toArray(new ConditionalKey[0]));
     }
 
     @Override

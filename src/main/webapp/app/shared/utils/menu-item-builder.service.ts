@@ -25,18 +25,14 @@ export class MenuItemBuilderService {
         const items: AppMenuItem[] = [];
 
         for (const action of availableActions ?? []) {
-            // Priorité : disabledReasonKey si désactivé, sinon helpKey si disponible
             let helpText: string | undefined;
 
             const isDisabled = disabledCallback ?
                 (action.disabled || disabledCallback(action)) :
                 action.disabled;
 
-            if (isDisabled && action.disabledReasonKey) {
-                // Si l'action est désactivée et a une raison, afficher la raison
-                helpText = this.translateService.instant(action.disabledReasonKey) as string;
-            } else if (action.helpKey) {
-                // Sinon, afficher l'aide normale si disponible
+            // Afficher le helpKey si disponible
+            if (action.helpKey) {
                 helpText = this.translateService.instant(action.helpKey) as string;
             }
 
@@ -46,7 +42,8 @@ export class MenuItemBuilderService {
                 command: (event) => commandCallback(action, event.originalEvent?.target as HTMLElement),
                 data: {type: action.type},
                 icon: this.getIconForActionType(action.type),
-                helpText: helpText
+                helpText: helpText,
+                conditionalKeys: action.conditionalKeys || []
             });
         }
         return items;

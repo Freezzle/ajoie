@@ -11,11 +11,11 @@ import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
-import ch.salon.service.handlers.enums.SupportType;
 import ch.salon.service.mail.EmailCreator;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +33,7 @@ import org.thymeleaf.context.Context;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,12 +65,27 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
         }
 
         if (payload.getState() == State.ISSUED) {
-            if (payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL && Instant.now().isAfter(payload.getExpirationDate())) {
-                return ActionSupport.allowed();
-            } else if (payload.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {
-                return ActionSupport.disabled("action.invoice-reminder.disabled.postal");
+            boolean isEmail = payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL;
+            boolean isExpired = Instant.now().isAfter(payload.getExpirationDate());
+
+            List<ConditionalKey> conditions = new ArrayList<>();
+
+            if (isEmail) {
+                conditions.add(ConditionalKey.ok("action.invoice-reminder.condition.email-method"));
             } else {
-                return ActionSupport.disabled("action.invoice-reminder.disabled.not-expired");
+                conditions.add(ConditionalKey.nok("action.invoice-reminder.condition.email-method"));
+            }
+
+            if (isExpired) {
+                conditions.add(ConditionalKey.ok("action.invoice-reminder.condition.is-expired"));
+            } else {
+                conditions.add(ConditionalKey.nok("action.invoice-reminder.condition.is-expired"));
+            }
+
+            if (isEmail && isExpired) {
+                return ActionSupport.allowed("action.invoice-reminder.help", conditions.toArray(new ConditionalKey[0]));
+            } else {
+                return ActionSupport.disabled("action.invoice-reminder.help", conditions.toArray(new ConditionalKey[0]));
             }
         }
 

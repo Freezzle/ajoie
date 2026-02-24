@@ -6,6 +6,7 @@ import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.RequiredField;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.FieldType;
@@ -27,10 +28,16 @@ public class ActionSplitInvoicesHandler implements BusinessActionHandler<Invoici
         if (payload == null || !payload.getState().isDraft()) {
             return ActionSupport.rejected();
         }
-        if (payload.getInvoices() == null || payload.getInvoices().size() < 2) {
-            return ActionSupport.disabled("action.invoice-split.disabled.not-enough-invoices");
+
+        boolean hasEnoughInvoices = payload.getInvoices() != null && payload.getInvoices().size() >= 2;
+
+        if (!hasEnoughInvoices) {
+            return ActionSupport.disabled("action.invoice-split.help",
+                ConditionalKey.nok("action.invoice-split.condition.enough-invoices"));
         }
-        return ActionSupport.allowed("action.invoice-split.help");
+
+        return ActionSupport.allowed("action.invoice-split.help",
+            ConditionalKey.ok("action.invoice-split.condition.enough-invoices"));
     }
 
     @Override

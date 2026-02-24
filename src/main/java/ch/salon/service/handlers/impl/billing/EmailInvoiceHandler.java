@@ -54,13 +54,18 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan>, A
 
     @Override
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
-        if (payload != null && payload.getState().isDraft() &&
-                payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
-            return ActionSupport.allowed();
+        if (payload == null) {
+            return ActionSupport.rejected();
         }
 
-        if (payload != null && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {
-            return ActionSupport.disabled("action.invoice-send.disabled.postal");
+        if (payload.getState().isDraft() && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
+            return ActionSupport.allowed("action.invoice-send.help",
+                ConditionalKey.ok("action.invoice-send.condition.email-method"));
+        }
+
+        if (payload.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {
+            return ActionSupport.disabled("action.invoice-send.help",
+                ConditionalKey.nok("action.invoice-send.condition.email-method"));
         }
 
         return ActionSupport.rejected();

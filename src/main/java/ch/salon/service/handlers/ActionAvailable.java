@@ -7,7 +7,7 @@ import java.util.List;
 
 public record ActionAvailable(String contextCode, ActionType type, boolean disabled, String labelKey,
                                String helpKey, String confirmationKey, List<RequiredField> requiredFields,
-                               String disabledReasonKey) {
+                               List<ConditionalKey> conditionalKeys) {
 
     /**
      * Retourne la clé de tri pour ordonner les actions.

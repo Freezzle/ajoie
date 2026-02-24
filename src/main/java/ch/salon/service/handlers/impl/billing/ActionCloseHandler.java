@@ -8,6 +8,7 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,11 +28,15 @@ public class ActionCloseHandler implements BusinessActionHandler<InvoicingPlan>,
             return ActionSupport.rejected();
         }
 
-        if (BigDecimal.valueOf(payload.getTotal()).compareTo(BigDecimal.ZERO) != 0) {
-            return ActionSupport.disabled("action.invoice-marked-as-paid.disabled.balance-remaining");
+        boolean hasBalance = BigDecimal.valueOf(payload.getTotal()).compareTo(BigDecimal.ZERO) != 0;
+
+        if (hasBalance) {
+            return ActionSupport.disabled("action.invoice-marked-as-paid.help",
+                ConditionalKey.nok("action.invoice-marked-as-paid.condition.balance-zero"));
         }
 
-        return ActionSupport.allowed();
+        return ActionSupport.allowed("action.invoice-marked-as-paid.help",
+            ConditionalKey.ok("action.invoice-marked-as-paid.condition.balance-zero"));
     }
 
     @Override

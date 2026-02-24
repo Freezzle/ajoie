@@ -8,6 +8,7 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.RequiredField;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.FieldType;
@@ -31,7 +32,8 @@ public class ActionExtendExpiryDateHandler implements BusinessActionHandler<Invo
         if (payload == null || payload.getState() != State.ISSUED) {
             return ActionSupport.rejected();
         }
-        return ActionSupport.allowed("action.invoice-extend-expiry-date.help");
+        return ActionSupport.allowed("action.invoice-extend-expiry-date.help",
+            ConditionalKey.ok("action.invoice-extend-expiry-date.condition.is-issued"));
     }
 
     @Override

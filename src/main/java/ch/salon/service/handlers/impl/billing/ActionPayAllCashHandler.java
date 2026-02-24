@@ -10,6 +10,7 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,8 @@ public class ActionPayAllCashHandler implements BusinessActionHandler<InvoicingP
             // Vérifier qu'il reste un solde à payer
             BigDecimal remaining = BigDecimal.valueOf(payload.getTotal());
             if (remaining.compareTo(BigDecimal.ZERO) > 0) {
-                return ActionSupport.allowed("action.invoice-pay-all-cash.help");
+                return ActionSupport.allowed("action.invoice-pay-all-cash.help",
+                    ConditionalKey.ok("action.invoice-pay-all-cash.condition.has-balance"));
             }
         }
         return ActionSupport.rejected();

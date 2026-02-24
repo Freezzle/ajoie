@@ -10,12 +10,12 @@
                 }
                 <span class="p-menu-item-label">{{ item.label }}</span>
             </div>
-            @if (item.helpText) {
+            @if (item.helpText || (item.conditionalKeys && item.conditionalKeys.length > 0)) {
                 <i class="pi pi-question-circle menu-item-help-icon"
                    [class.pi-question-circle]="!item.disabled"
                    [class.pi-exclamation-circle]="item.disabled"
                    [class.disabled-help]="item.disabled"
-                   (click)="showHelp($event, item.helpText)"></i>
+                   (click)="showHelp($event, item.helpText ?? '', item.conditionalKeys ?? [])"></i>
             }
         </div>
     </ng-template>
@@ -23,7 +23,22 @@
 
 <p-popover #helpPopover appendTo="body" [baseZIndex]="9999">
     <div class="help-popover-content">
-        {{ currentHelpText }}
+        @if (currentHelpText) {
+            <div class="help-text">{{ currentHelpText }}</div>
+        }
+        @if (currentConditionalKeys && currentConditionalKeys.length > 0) {
+            <ul class="conditional-keys-list">
+                @for (condition of currentConditionalKeys; track condition.key) {
+                    <li [class.condition-ok]="condition.state === 'OK'"
+                        [class.condition-nok]="condition.state === 'NOK'">
+                        <i class="pi"
+                           [class.pi-check]="condition.state === 'OK'"
+                           [class.pi-times]="condition.state === 'NOK'"></i>
+                        <span>{{ getTranslatedCondition(condition.key) }}</span>
+                    </li>
+                }
+            </ul>
+        }
     </div>
 </p-popover>
 

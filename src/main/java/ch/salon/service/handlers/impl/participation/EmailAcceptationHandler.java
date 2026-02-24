@@ -10,6 +10,7 @@ import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
@@ -53,7 +54,7 @@ public class EmailAcceptationHandler implements EmailActionHandler<Participation
     @Override
     public ActionSupport supports(Participation payload, Map<String, Object> context) {
         if (payload != null && payload.getStatus() == Status.ACCEPTED) {
-            return ActionSupport.allowed();
+            return ActionSupport.allowed("action.participation-acceptation-email.help");
         }
         return ActionSupport.rejected();
     }

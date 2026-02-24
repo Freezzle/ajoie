@@ -14,10 +14,12 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,23 +38,37 @@ public class ActionValidateHandler implements BusinessActionHandler<Participatio
             return ActionSupport.rejected();
         }
 
-        if (this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION)) {
-            return ActionSupport.disabled("action.participation-marked-as-validated.disabled.stands-in-verification");
+        boolean hasStandsInVerification = this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean hasConferencesInVerification = this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean hasWorkshopsInVerification = this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+
+        List<ConditionalKey> conditions = new ArrayList<>();
+
+        if (hasStandsInVerification) {
+            conditions.add(ConditionalKey.nok("action.participation-marked-as-validated.condition.stands-verified"));
+        } else {
+            conditions.add(ConditionalKey.ok("action.participation-marked-as-validated.condition.stands-verified"));
         }
 
-        if (this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(),
-                Status.IN_VERIFICATION)) {
-            return ActionSupport.disabled("action.participation-marked-as-validated.disabled.conferences-in-verification");
+        if (hasConferencesInVerification) {
+            conditions.add(ConditionalKey.nok("action.participation-marked-as-validated.condition.conferences-verified"));
+        } else {
+            conditions.add(ConditionalKey.ok("action.participation-marked-as-validated.condition.conferences-verified"));
         }
 
-        if (this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(),
-                Status.IN_VERIFICATION)) {
-            return ActionSupport.disabled("action.participation-marked-as-validated.disabled.workshops-in-verification");
+        if (hasWorkshopsInVerification) {
+            conditions.add(ConditionalKey.nok("action.participation-marked-as-validated.condition.workshops-verified"));
+        } else {
+            conditions.add(ConditionalKey.ok("action.participation-marked-as-validated.condition.workshops-verified"));
         }
 
         //TODO: Later, we can only validate if (accepted && arrangement) or (accepted && !arrangement && invoicing plan paid)
 
-        return ActionSupport.allowed("action.participation-marked-as-validated.help");
+        if (hasStandsInVerification || hasConferencesInVerification || hasWorkshopsInVerification) {
+            return ActionSupport.disabled("action.participation-marked-as-validated.help", conditions.toArray(new ConditionalKey[0]));
+        }
+
+        return ActionSupport.allowed("action.participation-marked-as-validated.help", conditions.toArray(new ConditionalKey[0]));
     }
 
     @Override

@@ -1,50 +1,58 @@
 package ch.salon.service.handlers;
 
+import ch.salon.service.handlers.enums.ConditionalState;
 import ch.salon.service.handlers.enums.SupportType;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Représente le résultat enrichi de la méthode supports() d'un ActionHandler.
- * Encapsule le type de support et des métadonnées contextuelles (aide, raison de désactivation).
+ * Encapsule le type de support et des métadonnées contextuelles (aide, conditions d'exécution).
  */
 public class ActionSupport {
 
     private final SupportType type;
     private final String helpKey;
-    private final String disabledReasonKey;
+    private final List<ConditionalKey> conditionalKeys;
 
-    private ActionSupport(SupportType type, String helpKey, String disabledReasonKey) {
+    private ActionSupport(SupportType type, String helpKey, List<ConditionalKey> conditionalKeys) {
         this.type = type;
         this.helpKey = helpKey;
-        this.disabledReasonKey = disabledReasonKey;
+        this.conditionalKeys = conditionalKeys != null ? new ArrayList<>(conditionalKeys) : new ArrayList<>();
     }
 
     /**
-     * Crée un ActionSupport pour une action autorisée avec un texte d'aide.
+     * Crée un ActionSupport pour une action autorisée avec un texte d'aide et des conditions.
      *
      * @param helpKey Clé de traduction pour le texte d'aide
+     * @param conditionalKeys Conditions (toutes à OK) qui permettent l'action
      * @return ActionSupport avec type ALLOWED
      */
-    public static ActionSupport allowed(String helpKey) {
-        return new ActionSupport(SupportType.ALLOWED, helpKey, null);
+    public static ActionSupport allowed(String helpKey, ConditionalKey... conditionalKeys) {
+        return new ActionSupport(SupportType.ALLOWED, helpKey, Arrays.asList(conditionalKeys));
     }
 
     /**
-     * Crée un ActionSupport pour une action autorisée sans aide.
+     * Crée un ActionSupport pour une action autorisée sans aide (backward compatibility).
      *
      * @return ActionSupport avec type ALLOWED
      */
     public static ActionSupport allowed() {
-        return new ActionSupport(SupportType.ALLOWED, null, null);
+        return new ActionSupport(SupportType.ALLOWED, null, Collections.emptyList());
     }
 
     /**
-     * Crée un ActionSupport pour une action désactivée.
+     * Crée un ActionSupport pour une action désactivée avec une ou plusieurs conditions non remplies.
      *
-     * @param disabledReasonKey Clé de traduction expliquant pourquoi l'action est désactivée
+     * @param helpKey Clé de traduction pour le texte d'aide de l'action
+     * @param conditionalKeys Conditions (au moins une à NOK) qui bloquent l'action
      * @return ActionSupport avec type DISABLED
      */
-    public static ActionSupport disabled(String disabledReasonKey) {
-        return new ActionSupport(SupportType.DISABLED, null, disabledReasonKey);
+    public static ActionSupport disabled(String helpKey, ConditionalKey... conditionalKeys) {
+        return new ActionSupport(SupportType.DISABLED, helpKey, Arrays.asList(conditionalKeys));
     }
 
     /**
@@ -53,7 +61,7 @@ public class ActionSupport {
      * @return ActionSupport avec type REJECTED
      */
     public static ActionSupport rejected() {
-        return new ActionSupport(SupportType.REJECTED, null, null);
+        return new ActionSupport(SupportType.REJECTED, null, Collections.emptyList());
     }
 
     public SupportType getType() {
@@ -64,8 +72,8 @@ public class ActionSupport {
         return helpKey;
     }
 
-    public String getDisabledReasonKey() {
-        return disabledReasonKey;
+    public List<ConditionalKey> getConditionalKeys() {
+        return Collections.unmodifiableList(conditionalKeys);
     }
 
     /**

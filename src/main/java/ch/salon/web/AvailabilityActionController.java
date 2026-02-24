@@ -108,7 +108,7 @@ public class AvailabilityActionController {
                             actionSupport.getHelpKey(),
                             confirmationKey,
                             requiredFields,
-                            actionSupport.getDisabledReasonKey()
+                            actionSupport.getConditionalKeys()
                         ));
                     }
                 }

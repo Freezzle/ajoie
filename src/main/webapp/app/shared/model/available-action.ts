@@ -1,4 +1,5 @@
 import {RequiredField} from './required-field';
+import {ConditionalKey} from './conditional-key';
 
 export interface AvailableAction {
     contextCode: string;
@@ -8,5 +9,5 @@ export interface AvailableAction {
     helpKey?: string;
     confirmationKey?: string;
     requiredFields: RequiredField[];
-    disabledReasonKey?: string;
+    conditionalKeys: ConditionalKey[];
 }

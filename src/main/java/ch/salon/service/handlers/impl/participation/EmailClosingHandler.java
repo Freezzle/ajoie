@@ -10,6 +10,7 @@ import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.EmailActionHandler;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
@@ -54,7 +55,7 @@ public class EmailClosingHandler implements EmailActionHandler<Participation>, A
     @Override
     public ActionSupport supports(Participation payload, Map<String, Object> context) {
         if (payload != null && payload.getStatus() == Status.CLOSED) {
-            return ActionSupport.allowed();
+            return ActionSupport.allowed("action.participation-closing-email.help");
         }
         return ActionSupport.rejected();
     }
