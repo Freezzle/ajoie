@@ -29,6 +29,7 @@ public enum ContextActionType {
     PARTICIPATION_ACCEPTATION_EMAIL("participation", "participation-acceptation-email"),
     PARTICIPATION_VALIDATION_EMAIL("participation", "participation-validation-email"),
     PARTICIPATION_CLOSING_EMAIL("participation", "participation-closing-email"),
+    PARTICIPATION_NEUTRAL_EMAIL("participation", "participation-neutral-email"),
     PARTICIPATION_MARK_AS_VALIDATED("participation", "participation-marked-as-validated"),
     PARTICIPATION_MARK_AS_CLOSED("participation", "participation-marked-as-closed");
 
@@ -97,6 +98,9 @@ public enum ContextActionType {
             // === BILLING - Emails principaux ===
             case INVOICE_SEND -> 43;                         // Envoyer la facture (première fois)
             case RECEIPT_SEND -> 44;                         // Envoyer le reçu
+
+            // === PARTICIPATION - Email libre/spontané ===
+            case PARTICIPATION_NEUTRAL_EMAIL -> 49;          // Email libre sans contexte métier
 
             // === BILLING - Emails secondaires (rappels) ===
             case INVOICE_SEND_AGAIN -> 50;                   // Renvoyer la facture

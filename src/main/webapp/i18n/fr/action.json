@@ -72,6 +72,8 @@
     "participation-validation-email.help": "Envoie un email de validation au participant.",
     "participation-closing-email": "Envoyer la clôture",
     "participation-closing-email.help": "Envoie un email de clôture au participant.",
+    "participation-neutral-email": "Envoyer un email",
+    "participation-neutral-email.help": "Envoie un email libre au participant.",
     "receipt-download": "Télécharger la quittance",
     "receipt-download.help": "Télécharge la quittance de paiement au format PDF.",
     "receipt-send": "Envoyer la quittance",
