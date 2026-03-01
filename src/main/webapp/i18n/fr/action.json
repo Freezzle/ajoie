@@ -78,6 +78,9 @@
     "receipt-download.help": "Télécharge la quittance de paiement au format PDF.",
     "receipt-send": "Envoyer la quittance",
     "receipt-send.help": "Envoie la quittance de paiement par email au client.",
+    "talks-planning-download": "Télécharger le planning",
+    "talks-planning-download.help": "Télécharge le planning des conférences et ateliers au format PDF.",
+    "talks-planning-download.condition.configuration-filled": "Configuration existante avec au moins un jour et une salle définis",
     "field": {
       "date_expiration": "Date d'expiration",
       "invoices": "Lignes de facture à déplacer"

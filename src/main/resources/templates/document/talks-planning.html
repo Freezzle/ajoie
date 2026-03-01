@@ -1,0 +1,129 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .page {
+            page-break-after: always;
+            position: relative;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 15px;
+        }
+
+        .page-title {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0 0 5px 0;
+        }
+
+        .page-subtitle {
+            font-size: 14pt;
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .talk-item {
+            margin-bottom: 25px;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .talk-header {
+            display: table;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .talk-time {
+            display: table-cell;
+            width: 80px;
+            font-weight: bold;
+            font-size: 13pt;
+            color: #2c3e50;
+            vertical-align: top;
+            padding-right: 15px;
+        }
+
+        .talk-title {
+            display: table-cell;
+            font-size: 13pt;
+            font-weight: bold;
+            color: #2c3e50;
+            vertical-align: top;
+        }
+
+        .talk-info {
+            margin-left: 95px;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 10pt;
+        }
+
+        .talk-description {
+            margin-left: 95px;
+            color: #666;
+            font-size: 10pt;
+            line-height: 1.5;
+            text-align: justify;
+        }
+
+        .empty-room {
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            margin-top: 50px;
+            font-size: 12pt;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loop through each page (day/room combination) -->
+    <div th:each="page, iterStat : ${pages}" class="page">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${page.roomLabel}">Salle</h1>
+            <p class="page-subtitle" th:text="${page.dayLabel}">Jour</p>
+        </div>
+
+        <!-- Check if there are talks for this room/day -->
+        <div th:if="${page.talks.isEmpty()}" class="empty-room">
+            Aucune animation prévue pour cette salle ce jour-là.
+        </div>
+
+        <!-- Loop through talks for this page -->
+        <div th:each="talk : ${page.talks}" class="talk-item">
+            <div class="talk-header">
+                <div class="talk-time" th:text="${talk.startTime}">08:00</div>
+                <div class="talk-title" th:text="${talk.title}">Titre de l'animation</div>
+            </div>
+            <div class="talk-info">
+                <span th:text="${talk.therapistName}">Thérapeute</span>
+                (<span th:text="${talk.exhibitorFullName}">Nom complet</span>)
+            </div>
+            <div class="talk-description" th:text="${talk.description}">
+                Description de l'animation...
+            </div>
+        </div>
+    </div>
+</body>
+</html>

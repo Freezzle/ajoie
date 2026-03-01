@@ -5,7 +5,7 @@ import {Component, inject, model, OnInit, signal} from '@angular/core';
 import SharedModule from 'app/shared/shared.module';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 
 import {ConfirmPopup} from 'primeng/confirmpopup';
 
@@ -26,6 +26,10 @@ import {TimelineData} from '../../../shared/components/talks-planning/model/time
 import {IntervalMinutes} from '../../../shared/components/talks-planning/model/interval-minutes';
 import {TpComponent} from '../../../shared/components/talks-planning/tp.component';
 import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
+import {ActionsService} from '../../common/actions.service';
+import {AvailableAction} from '../../../shared/model/available-action';
+import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 
 @Component({
                selector: 'talks-planning',
@@ -36,7 +40,7 @@ import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
                    SharedModule,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-
+                   MenuBoxComponent,
 
                    ConfirmPopup,
                    TpComponent,
@@ -50,10 +54,13 @@ export class TalksPlanningComponent implements OnInit {
     readonly isReadOnly = signal<boolean>(true);
     readonly talks = model<Talk[]>([]);
     configuration: TimelineData | undefined;
+    menuCache: AppMenuItem[] = [];
     private readonly salonService = inject(SalonService);
     private readonly conferenceService = inject(ConferenceService);
     private readonly workshopService = inject(WorkshopService);
     private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly actionsService = inject(ActionsService);
+    private readonly menuItemBuilderService = inject(MenuItemBuilderService);
     private idSalon!: string;
 
     get hasConfiguration(): boolean {
@@ -114,7 +121,59 @@ export class TalksPlanningComponent implements OnInit {
             .subscribe(({configuration, mergedTalks}) => {
                 this.configuration = configuration;
                 this.talks.set(mergedTalks);
+
+                // Load available actions
+                this.loadAvailableActions();
             });
+    }
+
+    private loadAvailableActions(): void {
+        this.actionsService.getAvailableActions('salon', this.idSalon).subscribe(availableActions => {
+            this.menuCache = this.buildActionsMenu(availableActions);
+        });
+    }
+
+    private buildActionsMenu(availableActions: AvailableAction[]): AppMenuItem[] {
+        return this.menuItemBuilderService.buildMenuItemsFromActions(
+            availableActions,
+            (action, htmlElement) => this.clickAction(action, htmlElement)
+        );
+    }
+
+    clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
+        if (action.type === 'DOWNLOAD') {
+            this.isLoading.set(true);
+            this.actionsService.downloadAction(action.contextCode, this.idSalon)
+                .pipe(finalize(() => this.isLoading.set(false)))
+                .subscribe(res => {
+                    const cd = res.headers.get('content-disposition') ?? '';
+                    const filename = this.getFilenameFromContentDisposition(cd) ?? 'planning.pdf';
+
+                    const blob = res.body!;
+                    const url = window.URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+
+                    window.URL.revokeObjectURL(url);
+                });
+        } else {
+            console.warn('Action type unknown : ' + action.type);
+        }
+    }
+
+    private getFilenameFromContentDisposition(cd: string): string | null {
+        if (!cd) {
+            return null;
+        }
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(cd);
+        if (matches != null && matches[1]) {
+            return matches[1].replace(/['"]/g, '');
+        }
+        return null;
     }
 
     activateReadOnlyMode(): void {
