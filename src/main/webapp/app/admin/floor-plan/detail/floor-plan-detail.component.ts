@@ -84,10 +84,10 @@ import {NumberBoxComponent} from '../../../shared/components/number-box/number-b
                    FormsModule,
                    ReactiveFormsModule,
                    ButtonBoxComponent,
-                   
+
                    AlertErrorComponent,
                    ConfirmPopup,
-                   
+
                    ContextMenu,
                    Tag,
                    FloorPlanDimensionTileComponent,
@@ -360,7 +360,7 @@ export class FloorPlanDetailComponent {
 
                 // available stands dims = stands not already assigned
                 const availableStandDims = validStands
-                    .filter(s => !assignedStandIds.has(s.id!))
+                    .filter(s => !assignedStandIds.has(s.id!) && s.dimension != null)
                     .map(s => convertAvailableDimensionCell(s.dimension, s));
 
                 this.unassignedStandDimensions.set(availableStandDims);
@@ -716,23 +716,23 @@ export class FloorPlanDetailComponent {
                 takeUntilDestroyed(this.destroyRef)
             )
             .subscribe({
-                next: (updatedFloorPlans) => {
-                    // Mettre à jour les floorPlans avec la réponse du backend
-                    this.floorPlans.set(updatedFloorPlans.map(floor => mapFloorPlanLight(floor, this.availableDimensions(), this.stands())));
-                    // Vider la liste des suppressions
-                    this.floorPlansToRemove.set([]);
-                    // Réinitialiser l'index actif si nécessaire
-                    if (this.activeIndex() >= updatedFloorPlans.length && updatedFloorPlans.length > 0) {
-                        this.activeIndex.set(updatedFloorPlans.length - 1);
-                    } else if (updatedFloorPlans.length === 0) {
-                        this.activeIndex.set(0);
-                    }
-                    this.activateReadOnlyMode();
-                },
-                error: () => {
-                    // Le toast d'erreur sera géré par l'intercepteur HTTP
-                }
-            });
+                           next: (updatedFloorPlans) => {
+                               // Mettre à jour les floorPlans avec la réponse du backend
+                               this.floorPlans.set(updatedFloorPlans.map(floor => mapFloorPlanLight(floor, this.availableDimensions(), this.stands())));
+                               // Vider la liste des suppressions
+                               this.floorPlansToRemove.set([]);
+                               // Réinitialiser l'index actif si nécessaire
+                               if (this.activeIndex() >= updatedFloorPlans.length && updatedFloorPlans.length > 0) {
+                                   this.activeIndex.set(updatedFloorPlans.length - 1);
+                               } else if (updatedFloorPlans.length === 0) {
+                                   this.activeIndex.set(0);
+                               }
+                               this.activateReadOnlyMode();
+                           },
+                           error: () => {
+                               // Le toast d'erreur sera géré par l'intercepteur HTTP
+                           }
+                       });
     }
 
     // ---------------------------------------------------------------------------
