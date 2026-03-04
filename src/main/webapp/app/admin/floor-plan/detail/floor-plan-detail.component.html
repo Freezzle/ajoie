@@ -20,6 +20,13 @@
                         translateKey="common.edit"/>
         }
 
+        @if (isReadOnly() && menuCache().length > 0) {
+            <menu-box [items]="menuCache()"
+                      [buttonDisabled]="isLoading()"
+                      buttonIcon="pi-list"
+                      buttonTranslateKey="common.actions"/>
+        }
+
         @if (!isReadOnly()) {
             <button-box (clickedEvent)="activateReadOnlyMode()"
                         [isDisabled]="isLoading()"

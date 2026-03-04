@@ -32,7 +32,8 @@ public enum ContextActionType {
     PARTICIPATION_NEUTRAL_EMAIL("participation", "participation-neutral-email"),
     PARTICIPATION_MARK_AS_VALIDATED("participation", "participation-marked-as-validated"),
     PARTICIPATION_MARK_AS_CLOSED("participation", "participation-marked-as-closed"),
-    TALKS_PLANNING_DOWNLOAD("salon", "talks-planning-download");
+    TALKS_PLANNING_DOWNLOAD("salon", "talks-planning-download"),
+    STANDS_DETAIL_DOWNLOAD("salon", "stands-detail-download");
 
     private static final List<ContextActionType> VALUES = Arrays.asList(ContextActionType.values());
 
@@ -112,6 +113,7 @@ public enum ContextActionType {
             case INVOICE_DOWNLOAD -> 60;                     // Télécharger la facture
             case RECEIPT_DOWNLOAD -> 61;                     // Télécharger le reçu
             case TALKS_PLANNING_DOWNLOAD -> 62;              // Télécharger le planning des talks
+            case STANDS_DETAIL_DOWNLOAD -> 63;               // Télécharger les détails des stands
 
             // === Actions d'annulation (destructives mais réversibles) ===
             case PARTICIPATION_MARK_AS_CANCELLED -> 90;      // Annuler la participation

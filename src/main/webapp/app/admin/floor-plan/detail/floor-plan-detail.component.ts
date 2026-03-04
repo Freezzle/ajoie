@@ -70,6 +70,10 @@ import {removeAccents} from '../../../shared/utils/string.util';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
+import {ActionsService} from '../../common/actions.service';
+import {AvailableAction} from '../../../shared/model/available-action';
+import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 
 @Component({
                selector: 'floor-plan',
@@ -120,6 +124,8 @@ export class FloorPlanDetailComponent {
     private readonly floorPlanService = inject(FloorPlanService);
     readonly navigationService = inject(NavigationStateService);
     private readonly route = inject(ActivatedRoute);
+    private readonly actionsService = inject(ActionsService);
+    private readonly menuItemBuilderService = inject(MenuItemBuilderService);
 
     // ---- route salon (signal)
     private readonly salonFromRoute = toSignal(
@@ -144,6 +150,7 @@ export class FloorPlanDetailComponent {
     private draggingCell: GridCell | null = null;
 
     readonly idDisplaySensibleInformation = signal<string | null>(null);
+    readonly menuCache = signal<AppMenuItem[]>([]);
 
     // dialogs (model = 2-way friendly)
     readonly standDialogVisible = model(false);
@@ -368,6 +375,9 @@ export class FloorPlanDetailComponent {
 
                 // nextPosition = max(position)+1
                 this.nextPosition.setValue(this.computeNextPosition(mappedPlans));
+
+                // Load available actions
+                this.loadAvailableActions();
             });
     }
 
@@ -733,6 +743,66 @@ export class FloorPlanDetailComponent {
                                // Le toast d'erreur sera géré par l'intercepteur HTTP
                            }
                        });
+    }
+
+    // ---------------------------------------------------------------------------
+    // actions menu
+    private loadAvailableActions(): void {
+        const salonId = this.salon()?.id;
+        if (!salonId) {
+            return;
+        }
+        this.actionsService.getAvailableActions('salon', salonId).subscribe(availableActions => {
+            this.menuCache.set(this.buildActionsMenu(availableActions));
+        });
+    }
+
+    private buildActionsMenu(availableActions: AvailableAction[]): AppMenuItem[] {
+        return this.menuItemBuilderService.buildMenuItemsFromActions(
+            availableActions,
+            (action, htmlElement) => this.clickAction(action, htmlElement)
+        );
+    }
+
+    clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
+        if (action.type === 'DOWNLOAD') {
+            this.isLoading.set(true);
+            const salonId = this.salon()?.id;
+            if (!salonId) {
+                this.isLoading.set(false);
+                return;
+            }
+            this.actionsService.downloadAction(action.contextCode, salonId)
+                .pipe(finalize(() => this.isLoading.set(false)))
+                .subscribe(res => {
+                    const cd = res.headers.get('content-disposition') ?? '';
+                    const filename = this.getFilenameFromContentDisposition(cd) ?? 'document.pdf';
+
+                    const blob = res.body!;
+                    const url = window.URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+
+                    window.URL.revokeObjectURL(url);
+                });
+        } else {
+            console.warn('Action type unknown : ' + action.type);
+        }
+    }
+
+    private getFilenameFromContentDisposition(cd: string): string | null {
+        if (!cd) {
+            return null;
+        }
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(cd);
+        if (matches != null && matches[1]) {
+            return matches[1].replace(/['"]/g, '');
+        }
+        return null;
     }
 
     // ---------------------------------------------------------------------------

@@ -1,0 +1,217 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .page {
+            page-break-after: always;
+            position: relative;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 15px;
+        }
+
+        .exhibitor-name {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0 0 5px 0;
+        }
+
+        .therapist-name {
+            font-size: 14pt;
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #bdc3c7;
+        }
+
+        .info-row {
+            margin-bottom: 8px;
+            display: table;
+            width: 100%;
+        }
+
+        .info-label {
+            display: table-cell;
+            width: 40%;
+            font-weight: bold;
+            color: #555;
+            padding-right: 10px;
+        }
+
+        .info-value {
+            display: table-cell;
+            width: 60%;
+            color: #333;
+        }
+
+        .billing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .billing-table th {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .billing-table td {
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .billing-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .amount {
+            text-align: right;
+        }
+
+        .empty-section {
+            color: #95a5a6;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loop through each stand page -->
+    <div th:each="page, iterStat : ${pages}" class="page">
+        <!-- En-tête avec nom de l'exposant -->
+        <div class="page-header">
+            <h1 class="exhibitor-name" th:text="${page.exhibitorFullName}">Nom Prénom Exposant</h1>
+            <p class="therapist-name" th:text="${page.therapistName}">Nom du thérapeute</p>
+        </div>
+
+        <!-- Section Repas -->
+        <div class="section">
+            <div class="section-title">Repas</div>
+            <div class="info-row">
+                <div class="info-label">Samedi midi :</div>
+                <div class="info-value" th:text="${page.nbMealSaturdayNoon}">0</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Samedi soir :</div>
+                <div class="info-value" th:text="${page.nbMealSaturdayEvening}">0</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Dimanche midi :</div>
+                <div class="info-value" th:text="${page.nbMealSundayNoon}">0</div>
+            </div>
+        </div>
+
+        <!-- Section Stands (liste) -->
+        <div th:if="${!page.stands.isEmpty()}" class="section">
+            <div class="section-title">Stands</div>
+            <div th:each="stand : ${page.stands}" style="margin-bottom: 15px;">
+                <div class="info-row">
+                    <div class="info-label">N° de stand :</div>
+                    <div class="info-value" th:text="${stand.positionFormatted}">Plan - Stand n°</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Nombre de tables :</div>
+                    <div class="info-value" th:text="${stand.nbTable}">0</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Nombre de chaises :</div>
+                    <div class="info-value" th:text="${stand.nbChair}">0</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Électricité :</div>
+                    <div class="info-value" th:text="${stand.needElectricity ? 'Oui' : 'Non'}">Non</div>
+                </div>
+                <div th:if="${stand.dimensionLabel != null}" class="info-row">
+                    <div class="info-label">Dimension de la participation :</div>
+                    <div class="info-value" th:text="${stand.dimensionLabel}">Dimension participation</div>
+                </div>
+                <div th:if="${stand.dimensionFloorLabel != null}" class="info-row">
+                    <div class="info-label">Dimension sur la salle :</div>
+                    <div class="info-value" th:text="${stand.dimensionFloorLabel}">Dimension salle</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Stand partagé :</div>
+                    <div class="info-value" th:text="${stand.shared ? 'Oui' : 'Non'}">Non</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Conférences (liste) -->
+        <div th:if="${!page.conferences.isEmpty()}" class="section">
+            <div class="section-title">Conférences</div>
+            <div th:each="conference : ${page.conferences}" style="margin-bottom: 15px; padding: 10px; background-color: #f8f9fa;">
+                <div class="info-row">
+                    <div class="info-label">Titre :</div>
+                    <div class="info-value" th:text="${conference.title}">Titre de la conférence</div>
+                </div>
+                <div th:if="${conference.dayLabel != null}" class="info-row">
+                    <div class="info-label">Date et heure :</div>
+                    <div class="info-value">
+                        <span th:text="${conference.dayLabel}">Jour</span> - <span th:text="${conference.time}">10:00</span>
+                    </div>
+                </div>
+                <div th:if="${conference.roomLabel != null}" class="info-row">
+                    <div class="info-label">Salle :</div>
+                    <div class="info-value" th:text="${conference.roomLabel}">Salle</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Ateliers (liste) -->
+        <div th:if="${!page.workshops.isEmpty()}" class="section">
+            <div class="section-title">Ateliers</div>
+            <div th:each="workshop : ${page.workshops}" style="margin-bottom: 15px; padding: 10px; background-color: #f8f9fa;">
+                <div class="info-row">
+                    <div class="info-label">Titre :</div>
+                    <div class="info-value" th:text="${workshop.title}">Titre de l'atelier</div>
+                </div>
+                <div th:if="${workshop.dayLabel != null}" class="info-row">
+                    <div class="info-label">Date et heure :</div>
+                    <div class="info-value">
+                        <span th:text="${workshop.dayLabel}">Jour</span> - <span th:text="${workshop.time}">10:00</span>
+                    </div>
+                </div>
+                <div th:if="${workshop.roomLabel != null}" class="info-row">
+                    <div class="info-label">Salle :</div>
+                    <div class="info-value" th:text="${workshop.roomLabel}">Salle</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
