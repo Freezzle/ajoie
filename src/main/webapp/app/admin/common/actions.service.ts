@@ -2,7 +2,7 @@ import {Observable} from 'rxjs';
 import {AvailableAction} from '../../shared/model/available-action';
 import {EmailMessage} from '../../shared/email-dialog/email-message';
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {ApplicationConfigService} from '../../core/config/application-config.service';
 
 @Injectable({providedIn: 'root'})
@@ -11,9 +11,14 @@ export class ActionsService {
     protected applicationConfigService = inject(ApplicationConfigService);
     protected resourceActionsUrl = this.applicationConfigService.getEndpointFor('api/actions');
 
-    getAvailableActions(domain: string, idEntity: string): Observable<AvailableAction[]> {
+    getAvailableActions(domain: string, idEntity: string, subContext?: string): Observable<AvailableAction[]> {
+        let params = new HttpParams();
+        if (subContext) {
+            params = params.set('subContext', subContext);
+        }
         return this.http.get<AvailableAction[]>(
-            `${this.resourceActionsUrl}/${domain}/${idEntity}/available`);
+            `${this.resourceActionsUrl}/${domain}/${idEntity}/available`,
+            { params });
     }
 
     templateEmailAction(context: string, idEntity: string): Observable<EmailMessage> {

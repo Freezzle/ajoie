@@ -32,17 +32,23 @@ public enum ContextActionType {
     PARTICIPATION_NEUTRAL_EMAIL("participation", "participation-neutral-email"),
     PARTICIPATION_MARK_AS_VALIDATED("participation", "participation-marked-as-validated"),
     PARTICIPATION_MARK_AS_CLOSED("participation", "participation-marked-as-closed"),
-    TALKS_PLANNING_DOWNLOAD("salon", "talks-planning-download"),
-    STANDS_DETAIL_DOWNLOAD("salon", "stands-detail-download");
+    TALKS_PLANNING_DOWNLOAD("salon", "talks-planning-download", "talks-planning"),
+    STANDS_DETAIL_DOWNLOAD("salon", "stands-detail-download", "floor-plan");
 
     private static final List<ContextActionType> VALUES = Arrays.asList(ContextActionType.values());
 
     private final String repositoryActionName;
     private final String code;
+    private final String subContext;
 
     ContextActionType(String repositoryActionName, String code) {
+        this(repositoryActionName, code, null);
+    }
+
+    ContextActionType(String repositoryActionName, String code, String subContext) {
         this.repositoryActionName = repositoryActionName;
         this.code = code;
+        this.subContext = subContext;
     }
 
     public String code() {
@@ -51,6 +57,10 @@ public enum ContextActionType {
 
     public String repositoryName() {
         return repositoryActionName;
+    }
+
+    public String subContext() {
+        return subContext;
     }
 
     public static Optional<ContextActionType> fromCode(String code) {

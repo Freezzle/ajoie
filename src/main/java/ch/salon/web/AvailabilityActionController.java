@@ -72,7 +72,10 @@ public class AvailabilityActionController {
     @GetMapping("/{domain}/{id}/available")
     //@Cacheable(value = "availableActions", key = "#domain + '-' + #id + '-' + authentication.name")
     @Transactional(readOnly = true)
-    public ResponseEntity<List<ActionAvailable>> getAvailableActions(@PathVariable String domain, @PathVariable UUID id,
+    public ResponseEntity<List<ActionAvailable>> getAvailableActions(
+            @PathVariable String domain,
+            @PathVariable UUID id,
+            @RequestParam(required = false) String subContext,
             Authentication authentication) {
         Object payload = getEntity(domain, id);
 
@@ -82,6 +85,15 @@ public class AvailabilityActionController {
 
             ContextActionType.fromCode(entry.getKey()).ifPresent(context -> {
                 if (context.repositoryName().equals(domain)) {
+                    // Filtrer par sous-contexte si spécifié
+                    boolean subContextMatches = subContext == null
+                        || context.subContext() == null
+                        || context.subContext().equals(subContext);
+
+                    if (!subContextMatches) {
+                        return; // Ignorer cette action si le sous-contexte ne correspond pas
+                    }
+
                     Object handler = entry.getValue();
                     ActionType type = ActionType.fromHandler(handler);
 

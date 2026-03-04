@@ -128,7 +128,7 @@ export class TalksPlanningComponent implements OnInit {
     }
 
     private loadAvailableActions(): void {
-        this.actionsService.getAvailableActions('salon', this.idSalon).subscribe(availableActions => {
+        this.actionsService.getAvailableActions('salon', this.idSalon, 'talks-planning').subscribe(availableActions => {
             this.menuCache = this.buildActionsMenu(availableActions);
         });
     }

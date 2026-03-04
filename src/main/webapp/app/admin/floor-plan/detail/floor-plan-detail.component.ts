@@ -752,7 +752,7 @@ export class FloorPlanDetailComponent {
         if (!salonId) {
             return;
         }
-        this.actionsService.getAvailableActions('salon', salonId).subscribe(availableActions => {
+        this.actionsService.getAvailableActions('salon', salonId, 'floor-plan').subscribe(availableActions => {
             this.menuCache.set(this.buildActionsMenu(availableActions));
         });
     }
