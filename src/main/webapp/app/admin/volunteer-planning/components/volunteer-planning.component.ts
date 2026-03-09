@@ -297,6 +297,30 @@ export class VolunteerPlanningComponent implements OnInit {
 
     // ✅ map categories by id
     categoryMap = computed(() => new Map(this.planning().categories.map(c => [c.id, c])));
+    // Totaux par catégorie : Map<categoryId, number[]> indexé par slotIndex
+    categoryTotals = computed<Map<string, number[]>>(() => {
+        const day = this.selectedDay();
+        const slots = this.timeSlots();
+        const categories = this.planning().categories;
+
+        const totals = new Map<string, number[]>();
+        for (const cat of categories) {
+            totals.set(cat.id, new Array(slots.length).fill(0));
+        }
+
+        if (!day) {
+            return totals;
+        }
+
+        for (const cell of day.cells) {
+            const counts = totals.get(cell.categoryId);
+            if (counts && cell.slotIndex < counts.length) {
+                counts[cell.slotIndex]++;
+            }
+        }
+        return totals;
+    });
+
     // ✅ cellMap: key => categoryId
     cellMap = computed(() => {
         const day = this.selectedDay();
