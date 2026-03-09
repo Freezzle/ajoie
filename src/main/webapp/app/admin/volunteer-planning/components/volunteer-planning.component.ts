@@ -19,7 +19,7 @@ import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {TranslateModule} from '@ngx-translate/core';
 
-import {Category, computeTimeSlots, Day, Planning, TimeSlot, Tool, Volunteer} from './volunteer-planning-model';
+import {Category, computeTimeSlots, Day, IntervalMinutes, Planning, TimeSlot, Tool, Volunteer} from './volunteer-planning-model';
 
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
@@ -139,12 +139,12 @@ export class VolunteerPlanningComponent implements OnInit {
         if (this.manageDayCreateMode()) {
             const newDayId = this.manageDaySelectedDayId();
             return {
-                intervalMinutes: this.planning().intervalMinutes,
                 day: {
                     id: newDayId,
                     label: '',
                     startTime: this.timeAt(8, 0),
                     endTime: this.timeAt(18, 0),
+                    intervalMinutes: 60,
                     assignedVolunteerIds: [],
                     cells: []
                 }
@@ -156,12 +156,12 @@ export class VolunteerPlanningComponent implements OnInit {
         if (!day && (!days || days.length === 0)) {
             // Return empty/fallback slice
             return {
-                intervalMinutes: this.planning().intervalMinutes,
                 day: {
                     id: '',
                     label: '',
                     startTime: new Date(),
                     endTime: new Date(),
+                    intervalMinutes: 60,
                     assignedVolunteerIds: [],
                     cells: []
                 }
@@ -173,11 +173,11 @@ export class VolunteerPlanningComponent implements OnInit {
             label: '',
             startTime: new Date(),
             endTime: new Date(),
+            intervalMinutes: 60,
             assignedVolunteerIds: [],
             cells: []
         });
         return {
-            intervalMinutes: this.planning().intervalMinutes,
             day: safeDay
         };
     });
@@ -223,7 +223,7 @@ export class VolunteerPlanningComponent implements OnInit {
         if (!day) {
             return [];
         }
-        return computeTimeSlots(day.startTime, day.endTime, this.planning().intervalMinutes);
+        return computeTimeSlots(day.startTime, day.endTime, day.intervalMinutes);
     });
 
     // ----- APPLY (confirm only) -----
@@ -258,18 +258,18 @@ export class VolunteerPlanningComponent implements OnInit {
     applyDaySlice(slice: DayConfigSlice) {
         const cur = this.planning();
 
-        // maj interval
-        let next: Planning = {...cur, intervalMinutes: slice.intervalMinutes};
-
         // maj du jour (par id)
-        const idx = next.days.findIndex(d => d.id === slice.day.id);
+        const idx = cur.days.findIndex(d => d.id === slice.day.id);
         if (idx >= 0) {
-            const days = [...next.days];
-            days[idx] = structuredClone(slice.day);
-            next = {...next, days};
-        }
+            const updatedDay = structuredClone(slice.day);
+            // nettoyage silencieux des cellules dont le slotIndex dépasse le nouveau nombre de slots
+            const validSlotCount = computeTimeSlots(updatedDay.startTime, updatedDay.endTime, updatedDay.intervalMinutes).length;
+            updatedDay.cells = updatedDay.cells.filter(c => c.slotIndex < validSlotCount);
 
-        this.planning.set(next);
+            const days = [...cur.days];
+            days[idx] = updatedDay;
+            this.planning.set({...cur, days});
+        }
     }
 
     applyAssignmentsSlice(slice: AssignmentsSlice) {
@@ -459,11 +459,7 @@ export class VolunteerPlanningComponent implements OnInit {
             const newDay: Day = daySlice.day;
             const days = [...cur.days, newDay];
 
-            this.planning.set({
-                                  ...cur,
-                                  days,
-                                  intervalMinutes: daySlice.intervalMinutes
-                              });
+            this.planning.set({...cur, days});
 
             this.manageDayCreateMode.set(false);
             this.manageDaySelectedDayId.set('');
@@ -543,7 +539,6 @@ export class VolunteerPlanningComponent implements OnInit {
 
     private toPlanningConfigurationDto(planning: Planning): VolunteerPlanningConfigurationDto {
         return {
-            intervalMinutes: planning.intervalMinutes,
             categories: planning.categories.map(c => ({
                 id: c.id,
                 label: c.label,
@@ -555,6 +550,7 @@ export class VolunteerPlanningComponent implements OnInit {
                 label: d.label,
                 startTime: d.startTime.toISOString(),
                 endTime: d.endTime.toISOString(),
+                intervalMinutes: d.intervalMinutes,
                 assignedVolunteerIds: d.assignedVolunteerIds ?? [],
                 cells: d.cells.map(c => ({
                     volunteerId: c.volunteerId,
@@ -566,8 +562,8 @@ export class VolunteerPlanningComponent implements OnInit {
     }
 
     private fromPlanningVolunteersDto(dto: PlanningVolunteersDto): Planning {
+        const globalInterval = dto.configuration.intervalMinutes ?? 60;
         return {
-            intervalMinutes: dto.configuration.intervalMinutes,
             volunteers: dto.volunteers.map(v => ({id: v.id, label: v.label})),
             categories: dto.configuration.categories.map(c => ({
                 id: c.id,
@@ -580,6 +576,7 @@ export class VolunteerPlanningComponent implements OnInit {
                 label: d.label,
                 startTime: new Date(d.startTime),
                 endTime: new Date(d.endTime),
+                intervalMinutes: (d.intervalMinutes ?? globalInterval) as IntervalMinutes,
                 assignedVolunteerIds: d.assignedVolunteerIds ?? [],
                 cells: d.cells ?? []
             }))
@@ -653,7 +650,6 @@ export class VolunteerPlanningComponent implements OnInit {
 
     private getEmptyPlanning(): Planning {
         return {
-            intervalMinutes: 60,
             volunteers: [],
             categories: [],
             days: []
@@ -683,7 +679,6 @@ export class VolunteerPlanningComponent implements OnInit {
         ];
 
         return {
-            intervalMinutes: 60,
             volunteers,
             categories,
             days: [
@@ -692,6 +687,7 @@ export class VolunteerPlanningComponent implements OnInit {
                     label: 'Vendredi',
                     startTime: this.timeAt(8, 0),
                     endTime: this.timeAt(19, 0),
+                    intervalMinutes: 60,
                     assignedVolunteerIds: [],
                     cells: []
                 },
@@ -700,6 +696,7 @@ export class VolunteerPlanningComponent implements OnInit {
                     label: 'Samedi',
                     startTime: this.timeAt(8, 0),
                     endTime: this.timeAt(19, 0),
+                    intervalMinutes: 60,
                     assignedVolunteerIds: [],
                     cells: []
                 }

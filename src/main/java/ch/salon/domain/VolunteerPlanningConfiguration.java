@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class VolunteerPlanningConfiguration {
-    private int intervalMinutes;
+    private Integer intervalMinutes;
     private List<VolunteerPlanningCategory> categories = new ArrayList<>();
     private List<VolunteerPlanningDay> days = new ArrayList<>();
 }

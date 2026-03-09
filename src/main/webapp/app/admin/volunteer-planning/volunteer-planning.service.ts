@@ -3,7 +3,6 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
-import {IntervalMinutes} from '../../shared/components/talks-planning/model/interval-minutes';
 
 @Injectable({providedIn: 'root'})
 export class VolunteerPlanningService {
@@ -43,12 +42,13 @@ export interface VolunteerPlanningDayDto {
     label: string;
     startTime: string;
     endTime: string;
+    intervalMinutes?: number;
     assignedVolunteerIds: string[];
     cells: VolunteerPlanningCellDto[];
 }
 
 export interface VolunteerPlanningConfigurationDto {
-    intervalMinutes: IntervalMinutes;
+    intervalMinutes?: number;
     categories: CategoryDto[];
     days: VolunteerPlanningDayDto[];
 }

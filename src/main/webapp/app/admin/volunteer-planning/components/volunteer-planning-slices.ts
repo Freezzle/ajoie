@@ -1,8 +1,7 @@
-import {Day, IntervalMinutes, Volunteer} from './volunteer-planning-model';
+import {Day, Volunteer} from './volunteer-planning-model';
 
 export type DayConfigSlice = {
-    intervalMinutes: IntervalMinutes;
-    day: Day; // le jour sélectionné (objet complet)
+    day: Day; // le jour sélectionné (objet complet, intervalMinutes inclus)
 };
 
 export type AssignmentsSlice = {

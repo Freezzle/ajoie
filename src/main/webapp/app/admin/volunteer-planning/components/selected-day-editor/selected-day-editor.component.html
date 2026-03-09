@@ -32,4 +32,15 @@
                       appendTo="body"
                       [stepMinute]="interval()"></p-datepicker>
     </div>
+
+    <div class="mt-4 col-12">
+        <label>Intervalle</label>
+        <p-select [fluid]="true"
+                  [options]="intervalOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [ngModel]="interval()"
+                  (ngModelChange)="updateInterval($event)"
+                  appendTo="body"></p-select>
+    </div>
 </div>

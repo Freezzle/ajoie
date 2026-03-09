@@ -20,12 +20,12 @@ export type Day = {
     label: string;
     startTime: Date;    // time-only
     endTime: Date;      // time-only
+    intervalMinutes: IntervalMinutes;
     assignedVolunteerIds: string[];
     cells: DayCell[];
 };
 
 export type Planning = {
-    intervalMinutes: IntervalMinutes;
     volunteers: Volunteer[];
     days: Day[];
     categories: Category[];

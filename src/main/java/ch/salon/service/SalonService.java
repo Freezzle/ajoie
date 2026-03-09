@@ -239,7 +239,18 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return this.planningVolunteerSalonRepository.findBySalonId(idSalon);
+        PlanningVolunteerSalon planning = this.planningVolunteerSalonRepository.findBySalonId(idSalon);
+        if (planning != null && planning.getConfiguration() != null) {
+            Integer globalInterval = planning.getConfiguration().getIntervalMinutes();
+            if (globalInterval != null) {
+                planning.getConfiguration().getDays().forEach(day -> {
+                    if (day.getIntervalMinutes() == null) {
+                        day.setIntervalMinutes(globalInterval);
+                    }
+                });
+            }
+        }
+        return planning;
     }
 
     public PlanningVolunteerSalon updatePlanningVolunteers(UUID idSalon, PlanningVolunteerSalon dto) {

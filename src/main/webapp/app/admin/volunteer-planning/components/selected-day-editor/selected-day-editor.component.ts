@@ -20,9 +20,16 @@ export class SelectedDayEditorComponent implements OnInit, OnDestroy {
     private readonly TIME_REF = new Date(2000, 0, 1, 0, 0, 0, 0);
     private readonly draftService = inject(DialogDraftService);
 
+    readonly intervalOptions: { label: string; value: IntervalMinutes }[] = [
+        {label: '5 min', value: 5},
+        {label: '15 min', value: 15},
+        {label: '30 min', value: 30},
+        {label: '1h', value: 60}
+    ];
+
     _draft = signal<DayConfigSlice | null>(null);
     day = computed<Day | null>(() => this._draft()?.day ?? null);
-    interval = computed<IntervalMinutes>(() => this._draft()?.intervalMinutes ?? 60);
+    interval = computed<IntervalMinutes>(() => this._draft()?.day?.intervalMinutes ?? 60);
 
     private dayLabelDraft = signal<string | null>(null);
 
@@ -83,6 +90,12 @@ export class SelectedDayEditorComponent implements OnInit, OnDestroy {
         });
 
         this.dayLabelDraft.set(null);
+    }
+
+    updateInterval(value: IntervalMinutes) {
+        this.commit(next => {
+            next.day.intervalMinutes = value;
+        });
     }
 
     updateStartTime(start: Date) {
@@ -146,3 +159,4 @@ export class SelectedDayEditorComponent implements OnInit, OnDestroy {
         return x;
     }
 }
+
