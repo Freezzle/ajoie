@@ -39,6 +39,7 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
     private labelDraft = signal<Record<string, string>>({});
 
     iconOptions = [
+        {label: 'Aucune', value: ''},
         {label: 'Shop', value: 'pi pi-shop'},
         {label: 'Credit card', value: 'pi pi-credit-card'},
         {label: 'Sparkles', value: 'pi pi-sparkles'},
@@ -101,7 +102,7 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
 
     addCategory() {
         this.commit(next =>
-                        next.push({id: this.generateUUID(), label: 'Nouvelle catégorie', icon: 'pi pi-box', color: '#ffe8b5'})
+                        next.push({id: this.generateUUID(), label: 'Nouvelle catégorie', color: '#ffe8b5'})
         );
     }
 
@@ -109,7 +110,7 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
         this.commit(next => {
             const c = next.find(x => x.id === categoryId);
             if (c) {
-                c.icon = icon;
+                c.icon = icon || undefined;
             }
         });
     }

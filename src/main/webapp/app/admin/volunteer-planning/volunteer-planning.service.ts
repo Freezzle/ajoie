@@ -27,7 +27,7 @@ export interface VolunteerPlanningDto {
 export interface CategoryDto {
     id: string;
     label: string;
-    icon: string;
+    icon?: string;
     color: string;
 }
 

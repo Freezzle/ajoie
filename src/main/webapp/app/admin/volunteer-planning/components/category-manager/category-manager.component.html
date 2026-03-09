@@ -20,14 +20,18 @@
                 <tr>
                     <td>
                         <div class="d-flex justify-content-between align-items-center gap-2">
-                            <i [class]="c.icon"></i>
+                            @if (c.icon) {
+                                <i [class]="c.icon"></i>
+                            } @else {
+                                <span style="width:1rem"></span>
+                            }
 
                             <p-select appendTo="body"
                                       [fluid]="true"
                                       [options]="iconOptions"
                                       optionLabel="label"
                                       optionValue="value"
-                                      [ngModel]="c.icon"
+                                      [ngModel]="c.icon ?? ''"
                                       (ngModelChange)="updateIcon(c.id, $event)"></p-select>
                         </div>
                     </td>

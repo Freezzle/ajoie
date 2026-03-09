@@ -5,7 +5,7 @@ export type Volunteer = { id: string; label: string };
 export type Category = {
     id: string;         // non visible
     label: string;
-    icon: string;       // ex: "pi pi-shop"
+    icon?: string;      // ex: "pi pi-shop" — optionnel
     color: string;      // ex: "#FFDDC1"
 };
 

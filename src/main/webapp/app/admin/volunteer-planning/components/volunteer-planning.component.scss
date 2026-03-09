@@ -118,6 +118,15 @@
 .palette-grid {
   display: grid;
   gap: 0.25rem;
+
+  // Hauteur uniforme pour tous les boutons de la palette
+  ::ng-deep button.p-button {
+    min-height: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 // ── Lignes de totaux par catégorie ──────────────────────────────────────────

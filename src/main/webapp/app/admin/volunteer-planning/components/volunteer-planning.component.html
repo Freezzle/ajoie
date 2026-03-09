@@ -121,7 +121,9 @@
                                                                     <span [style.background-color]="cat.color"
                                                                           [title]="cat.label"
                                                                           class="cat-badge">
-                                                                        <i [class]="cat.icon"></i>
+                                                                        @if (cat.icon) {
+                                                                            <i [class]="cat.icon"></i>
+                                                                        }
                                                                     </span>
                                                                 }
                                                             </div>
@@ -138,7 +140,9 @@
                                                     <tr class="totals-row">
                                                         <td class="col-volunteer sticky-col row-label"
                                                             [style.background-color]="cat.color">
-                                                            <i [class]="cat.icon"></i>
+                                                            @if (cat.icon) {
+                                                                <i [class]="cat.icon"></i>
+                                                            }
                                                             <span>{{ cat.label }}</span>
                                                         </td>
                                                         @for (slot of timeSlots(); track slot.index) {
@@ -174,7 +178,7 @@
 
                                             @for (c of planning().categories; track c.id) {
                                                 <button (click)="!isReadOnly() ? selectCategory(c.id) : undefined"
-                                                        [icon]="c.icon"
+                                                        [icon]="c.icon || ''"
                                                         [style.background-color]="c.color"
                                                         [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
                                                         [style.color]="'black'"
