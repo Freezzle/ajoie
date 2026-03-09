@@ -122,6 +122,30 @@
                                                     }
                                                 </tr>
                                             </ng-template>
+
+                                            <ng-template pTemplate="footer">
+                                                <tr class="totals-separator">
+                                                    <td [attr.colspan]="timeSlots().length + 1" class="p-0"></td>
+                                                </tr>
+                                                @for (cat of planning().categories; track cat.id) {
+                                                    <tr class="totals-row">
+                                                        <td class="col-volunteer sticky-col row-label"
+                                                            [style.background-color]="cat.color">
+                                                            <i [class]="cat.icon"></i>
+                                                            <span>{{ cat.label }}</span>
+                                                        </td>
+                                                        @for (slot of timeSlots(); track slot.index) {
+                                                            @let count = (categoryTotals().get(cat.id) ?? [])[slot.index];
+                                                            <td class="slot-cell">
+                                                                <div class="paint-cell total-count-cell"
+                                                                     [class.total-count-cell--empty]="count === 0">
+                                                                    {{ count > 0 ? count : '–' }}
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </ng-template>
                                         </p-table>
                                     </div>
 

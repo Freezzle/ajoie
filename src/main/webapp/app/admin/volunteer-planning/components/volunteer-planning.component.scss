@@ -119,3 +119,39 @@
   display: grid;
   gap: 0.25rem;
 }
+
+// ── Lignes de totaux par catégorie ──────────────────────────────────────────
+
+.totals-separator td {
+  height: 4px;
+  background: var(--app-border);
+  padding: 0 !important;
+}
+
+.totals-row {
+  .totals-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: smaller;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0 6px;
+    // background-color est posé inline via [style.background-color]
+  }
+}
+
+// Cellule de total : hérite de .paint-cell, background --app-surface forcé
+.total-count-cell {
+  background: var(--app-surface) !important;
+  cursor: default !important;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--app-text);
+
+  &--empty {
+    font-weight: 400;
+    color: var(--app-text-muted, #bbb);
+  }
+}
+
