@@ -16,6 +16,13 @@
                         [showText]="false"
                         primeIcon="pi-pencil"
                         translateKey="common.edit"/>
+
+            @if (downloadMenuItems().length) {
+                <menu-box [items]="downloadMenuItems()"
+                          [appendTo]="'body'"
+                          buttonIcon="pi-cog"
+                          buttonTranslateKey="common.actions"/>
+            }
         }
 
         @if (!isReadOnly()) {

@@ -36,6 +36,10 @@ import {
     VolunteerPlanningService
 } from '../volunteer-planning.service';
 import {finalize, map} from 'rxjs';
+import {ActionsService} from '../../common/actions.service';
+import {AvailableAction} from '../../../shared/model/available-action';
+import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 
 @Component({
                selector: 'app-volunteer-planning',
@@ -79,9 +83,12 @@ export class VolunteerPlanningComponent implements OnInit {
     readonly isLoading = signal<boolean>(false);
     readonly isReadOnly = signal<boolean>(true);
     readonly dayMenus = computed(() => new Map(this.planning().days.map(d => [d.id, this.dayActionItems()])));
+    readonly downloadMenuItems = signal<AppMenuItem[]>([]);
 
     private readonly volunteerPlanningService = inject(VolunteerPlanningService);
     private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly actionsService = inject(ActionsService);
+    private readonly menuItemBuilderService = inject(MenuItemBuilderService);
     private idSalon: string = '';
 
     // ...existing code...
@@ -104,9 +111,42 @@ export class VolunteerPlanningComponent implements OnInit {
                             } else {
                                 this.planning.set(this.getEmptyPlanning());
                             }
+                            this.loadDownloadActions();
+                            this.selectedTool.set({kind: 'ERASER'});
                         }
                     );
             });
+    }
+
+    private loadDownloadActions(): void {
+        this.actionsService.getAvailableActions('salon', this.idSalon, 'volunteer-planning')
+            .subscribe(actions => {
+                this.downloadMenuItems.set(
+                    this.menuItemBuilderService.buildMenuItemsFromActions(
+                        actions,
+                        (action) => this.clickDownloadAction(action)
+                    )
+                );
+            });
+    }
+
+    clickDownloadAction(action: AvailableAction): void {
+        if (action.type === 'DOWNLOAD') {
+            this.isLoading.set(true);
+            this.actionsService.downloadAction(action.contextCode, this.idSalon)
+                .pipe(finalize(() => this.isLoading.set(false)))
+                .subscribe(res => {
+                    const cd = res.headers.get('content-disposition') ?? '';
+                    const filename = cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)?.[1]?.replace(/['"]/g, '')
+                        ?? 'planning-benevoles.pdf';
+                    const url = window.URL.createObjectURL(res.body!);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
+        }
     }
 
     // ✅ Nouveau : tool = categoryId, plus TaskCategory
@@ -728,3 +768,4 @@ export class VolunteerPlanningComponent implements OnInit {
         };
     }
 }
+

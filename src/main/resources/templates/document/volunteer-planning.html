@@ -1,0 +1,173 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 10mm 12mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            color: #222;
+        }
+
+        .page {
+            page-break-after: always;
+        }
+
+        .page-last {
+            page-break-after: avoid;
+        }
+
+        .page-header {
+            display: table;
+            width: 100%;
+            margin-bottom: 5mm;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 3mm;
+        }
+
+        .header-left {
+            display: table-cell;
+            vertical-align: middle;
+            width: 55%;
+        }
+
+        .header-right {
+            display: table-cell;
+            vertical-align: middle;
+            width: 45%;
+            text-align: right;
+        }
+
+        .day-title {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0 0 1mm 0;
+        }
+
+        .day-meta {
+            font-size: 8.5pt;
+            color: #555;
+            margin: 0;
+        }
+
+        .legend-item {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 8pt;
+            vertical-align: middle;
+        }
+
+        .legend-swatch {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            vertical-align: middle;
+            margin-right: 2px;
+            border: 0.5px solid #aaa;
+        }
+
+        table.grid {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        table.grid th,
+        table.grid td {
+            border: 0.5px solid #ccc;
+            padding: 0;
+            text-align: center;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+
+        .col-label {
+            width: 20mm;
+            font-weight: bold;
+            font-size: 7.5pt;
+            text-align: left;
+            padding: 1mm 2mm;
+            background: #f5f5f5;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        th.col-header-label {
+            background: #2c3e50;
+            color: white;
+            font-size: 7.5pt;
+            text-align: left;
+            padding: 1mm 2mm;
+            width: 20mm;
+        }
+
+        th.col-slot {
+            font-size: 7pt;
+            font-weight: bold;
+            background: #2c3e50;
+            color: white;
+            height: 7mm;
+        }
+
+        td.slot {
+            height: 7mm;
+            padding: 0;
+        }
+
+        .cell-fill {
+            width: 100%;
+            height: 7mm;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div th:each="page, pageStat : ${pages}" th:class="${pageStat.last} ? 'page page-last' : 'page'">
+
+    <div class="page-header">
+        <div class="header-left">
+            <p class="day-title" th:text="${page.dayLabel}">Samedi</p>
+            <p class="day-meta">
+                <span th:text="${page.timeRange}">08:00 - 18:00</span>
+                &#160;&#183;&#160;
+                <span th:text="${page.volunteerCount}">0</span> benevole(s)
+            </p>
+        </div>
+        <div class="header-right">
+            <span th:each="cat : ${page.categories}" class="legend-item">
+                <span class="legend-swatch" th:style="'background-color: ' + ${cat.color} + ';'">&#160;</span>
+                <span th:text="${cat.label}">Categorie</span>
+            </span>
+        </div>
+    </div>
+
+    <table class="grid">
+        <thead>
+            <tr>
+                <th class="col-header-label">&#160;</th>
+                <th th:each="slot : ${page.slotLabels}" class="col-slot" th:text="${slot}">08:00</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="row : ${page.rows}">
+                <td class="col-label" th:text="${row.label}">Benevole</td>
+                <td th:each="cell : ${row.cells}" class="slot">
+                    <span th:if="${cell.color != null}"
+                          class="cell-fill"
+                          th:style="'background-color: ' + ${cell.color} + ';'">&#160;</span>
+                    <span th:if="${cell.color == null}">&#160;</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

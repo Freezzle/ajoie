@@ -84,6 +84,9 @@
     "stands-detail-download": "Télécharger les détails des stands",
     "stands-detail-download.help": "Télécharge un document PDF avec les détails de chaque stand assigné (position, équipements, repas, facturation).",
     "stands-detail-download.condition.floor-plan-exists": "Au moins un plan de salle existe",
+    "volunteer-planning-download": "Télécharger le planning bénévoles",
+    "volunteer-planning-download.help": "Télécharge le planning des bénévoles par jour au format PDF paysage.",
+    "volunteer-planning-download.condition.configuration-filled": "Configuration existante avec au moins un jour défini",
     "field": {
       "date_expiration": "Date d'expiration",
       "invoices": "Lignes de facture à déplacer"
