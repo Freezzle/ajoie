@@ -3,6 +3,13 @@
     "manageCategories": "Catégories",
     "manageVolunteers": "Bénévoles",
     "manageDay": "Configuration",
-    "removeDay": "Voulez-vous supprimer le jour ?"
+    "removeDay": "Voulez-vous supprimer le jour ?",
+    "interval": {
+      "label": "Intervalle",
+      "5": "5 min",
+      "15": "15 min",
+      "30": "30 min",
+      "60": "1h"
+    }
   }
 }

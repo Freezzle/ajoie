@@ -5,6 +5,7 @@ import {FormsModule} from '@angular/forms';
 import {SelectModule} from 'primeng/select';
 import {InputTextModule} from 'primeng/inputtext';
 import {DatePickerModule} from 'primeng/datepicker';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 import {Day, IntervalMinutes} from '../volunteer-planning-model';
 import {DayConfigSlice} from '../volunteer-planning-slices';
@@ -13,19 +14,22 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
 @Component({
                selector: 'selected-day-editor',
                standalone: true,
-               imports: [CommonModule, FormsModule, SelectModule, InputTextModule, DatePickerModule],
+               imports: [CommonModule, FormsModule, SelectModule, InputTextModule, DatePickerModule, TranslateModule],
                templateUrl: './selected-day-editor.component.html'
            })
 export class SelectedDayEditorComponent implements OnInit, OnDestroy {
     private readonly TIME_REF = new Date(2000, 0, 1, 0, 0, 0, 0);
     private readonly draftService = inject(DialogDraftService);
+    private readonly translate = inject(TranslateService);
 
-    readonly intervalOptions: { label: string; value: IntervalMinutes }[] = [
-        {label: '5 min', value: 5},
-        {label: '15 min', value: 15},
-        {label: '30 min', value: 30},
-        {label: '1h', value: 60}
-    ];
+    readonly intervalValues: IntervalMinutes[] = [5, 15, 30, 60];
+
+    intervalOptions = computed<{ label: string; value: IntervalMinutes }[]>(() =>
+        this.intervalValues.map(v => ({
+            label: this.translate.instant(`planningVolunteers.interval.${v}`),
+            value: v
+        }))
+    );
 
     _draft = signal<DayConfigSlice | null>(null);
     day = computed<Day | null>(() => this._draft()?.day ?? null);

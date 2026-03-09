@@ -34,9 +34,9 @@
     </div>
 
     <div class="mt-4 col-12">
-        <label>Intervalle</label>
+        <label>{{ 'planningVolunteers.interval.label' | translate }}</label>
         <p-select [fluid]="true"
-                  [options]="intervalOptions"
+                  [options]="intervalOptions()"
                   optionLabel="label"
                   optionValue="value"
                   [ngModel]="interval()"
