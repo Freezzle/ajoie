@@ -19,7 +19,7 @@ import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {TranslateModule} from '@ngx-translate/core';
 
-import {Category, computeTimeSlots, Day, IntervalMinutes, Planning, TimeSlot, Tool, Volunteer} from './volunteer-planning-model';
+import {Category, computeTimeSlots, Day, IntervalMinutes, Planning, TimeSlot, Tool, UnavailableCell, Volunteer} from './volunteer-planning-model';
 
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
@@ -186,7 +186,8 @@ export class VolunteerPlanningComponent implements OnInit {
                     endTime: this.timeAt(18, 0),
                     intervalMinutes: 60,
                     assignedVolunteerIds: [],
-                    cells: []
+                    cells: [],
+                    unavailableCells: []
                 }
             };
         }
@@ -203,7 +204,8 @@ export class VolunteerPlanningComponent implements OnInit {
                     endTime: new Date(),
                     intervalMinutes: 60,
                     assignedVolunteerIds: [],
-                    cells: []
+                    cells: [],
+                    unavailableCells: []
                 }
             };
         }
@@ -215,7 +217,8 @@ export class VolunteerPlanningComponent implements OnInit {
             endTime: new Date(),
             intervalMinutes: 60,
             assignedVolunteerIds: [],
-            cells: []
+            cells: [],
+            unavailableCells: []
         });
         return {
             day: safeDay
@@ -269,14 +272,15 @@ export class VolunteerPlanningComponent implements OnInit {
     // ----- APPLY (confirm only) -----
 
     applyVolunteers(volunteers: Volunteer[]) {
-        // nettoyage: retirer volunteerId des assignations + cells dans tous les jours
+        // nettoyage: retirer volunteerId des assignations + cells + unavailableCells dans tous les jours
         const cur = this.planning();
         const keptIds = new Set(volunteers.map(v => v.id));
 
         const days = cur.days.map(d => ({
             ...d,
             assignedVolunteerIds: d.assignedVolunteerIds.filter(id => keptIds.has(id)),
-            cells: d.cells.filter(c => keptIds.has(c.volunteerId))
+            cells: d.cells.filter(c => keptIds.has(c.volunteerId)),
+            unavailableCells: (d.unavailableCells ?? []).filter(c => keptIds.has(c.volunteerId))
         }));
 
         this.planning.set({...cur, volunteers, days});
@@ -305,6 +309,7 @@ export class VolunteerPlanningComponent implements OnInit {
             // nettoyage silencieux des cellules dont le slotIndex dépasse le nouveau nombre de slots
             const validSlotCount = computeTimeSlots(updatedDay.startTime, updatedDay.endTime, updatedDay.intervalMinutes).length;
             updatedDay.cells = updatedDay.cells.filter(c => c.slotIndex < validSlotCount);
+            updatedDay.unavailableCells = (updatedDay.unavailableCells ?? []).filter(c => c.slotIndex < validSlotCount);
 
             const days = [...cur.days];
             days[idx] = updatedDay;
@@ -319,14 +324,15 @@ export class VolunteerPlanningComponent implements OnInit {
             return;
         }
 
-        // nettoyage: si un bénévole est désassigné, supprimer ses cells du jour
+        // nettoyage: si un bénévole est désassigné, supprimer ses cells ET unavailableCells du jour
         const day = cur.days[idx];
         const set = new Set(slice.assignedVolunteerIds);
 
         const nextDay: Day = {
             ...day,
             assignedVolunteerIds: [...set],
-            cells: day.cells.filter(c => set.has(c.volunteerId))
+            cells: day.cells.filter(c => set.has(c.volunteerId)),
+            unavailableCells: (day.unavailableCells ?? []).filter(c => set.has(c.volunteerId))
         };
 
         const days = [...cur.days];
@@ -373,6 +379,23 @@ export class VolunteerPlanningComponent implements OnInit {
         }
         return m;
     });
+
+    // ✅ unavailableSet: set de clés "vId::slot" pour les cellules non disponibles
+    unavailableSet = computed(() => {
+        const day = this.selectedDay();
+        const s = new Set<string>();
+        if (!day) {
+            return s;
+        }
+        for (const c of (day.unavailableCells ?? [])) {
+            s.add(this.cellKey(c.volunteerId, c.slotIndex));
+        }
+        return s;
+    });
+
+    isUnavailableCell(volunteerId: string, slotIndex: number): boolean {
+        return this.unavailableSet().has(this.cellKey(volunteerId, slotIndex));
+    }
     // ✅ volunteers visibles : si le jour a des assignations, on filtre
     visibleVolunteers = computed<Volunteer[]>(() => {
         const day = this.selectedDay();
@@ -393,6 +416,14 @@ export class VolunteerPlanningComponent implements OnInit {
     // ---------- Palette ----------
     selectEraser() {
         this.selectedTool.set({kind: 'ERASER'});
+    }
+
+    selectUnavailable() {
+        this.selectedTool.set({kind: 'UNAVAILABLE'});
+    }
+
+    selectClearUnavailable() {
+        this.selectedTool.set({kind: 'CLEAR_UNAVAILABLE'});
     }
 
     selectCategory(categoryId: string) {
@@ -501,6 +532,25 @@ export class VolunteerPlanningComponent implements OnInit {
         }
 
         const tool = this.selectedTool();
+
+        if (tool.kind === 'UNAVAILABLE') {
+            // Marquer la cellule non disponible et effacer toute catégorie dessus
+            this.setUnavailableCell(day.id, volunteerId, slotIndex, true);
+            this.setCellCategory(day.id, volunteerId, slotIndex, null);
+            return;
+        }
+
+        if (tool.kind === 'CLEAR_UNAVAILABLE') {
+            // Annuler la cellule non disponible uniquement
+            this.setUnavailableCell(day.id, volunteerId, slotIndex, false);
+            return;
+        }
+
+        // ERASER et CATEGORY : ignoré si la cellule est non disponible
+        if (this.isUnavailableCell(volunteerId, slotIndex)) {
+            return;
+        }
+
         const categoryId: string | null = tool.kind === 'CATEGORY' ? tool.categoryId : null;
 
         this.setCellCategory(day.id, volunteerId, slotIndex, categoryId);
@@ -582,6 +632,34 @@ export class VolunteerPlanningComponent implements OnInit {
         this.planning.set({...cur, days});
     }
 
+    private setUnavailableCell(dayId: string, volunteerId: string, slotIndex: number, unavailable: boolean) {
+        const cur = this.planning();
+        const dayIndex = cur.days.findIndex(d => d.id === dayId);
+        if (dayIndex < 0) {
+            return;
+        }
+
+        const day = cur.days[dayIndex];
+        const existing = (day.unavailableCells ?? []).findIndex(
+            c => c.volunteerId === volunteerId && c.slotIndex === slotIndex
+        );
+
+        // no-op
+        if (unavailable && existing >= 0) return;
+        if (!unavailable && existing < 0) return;
+
+        const unavailableCells = [...(day.unavailableCells ?? [])];
+        if (unavailable) {
+            unavailableCells.push({volunteerId, slotIndex});
+        } else {
+            unavailableCells.splice(existing, 1);
+        }
+
+        const days = [...cur.days];
+        days[dayIndex] = {...day, unavailableCells};
+        this.planning.set({...cur, days});
+    }
+
     confirmDeleteSelectedDay(): void {
         const dayId = this.selectedDay()?.id;
         if (!dayId) {
@@ -620,6 +698,10 @@ export class VolunteerPlanningComponent implements OnInit {
                     volunteerId: c.volunteerId,
                     slotIndex: c.slotIndex,
                     categoryId: c.categoryId
+                })),
+                unavailableCells: (d.unavailableCells ?? []).map(c => ({
+                    volunteerId: c.volunteerId,
+                    slotIndex: c.slotIndex
                 }))
             }))
         };
@@ -642,7 +724,8 @@ export class VolunteerPlanningComponent implements OnInit {
                 endTime: new Date(d.endTime),
                 intervalMinutes: (d.intervalMinutes ?? globalInterval) as IntervalMinutes,
                 assignedVolunteerIds: d.assignedVolunteerIds ?? [],
-                cells: d.cells ?? []
+                cells: d.cells ?? [],
+                unavailableCells: d.unavailableCells ?? []
             }))
         };
     }
@@ -753,7 +836,8 @@ export class VolunteerPlanningComponent implements OnInit {
                     endTime: this.timeAt(19, 0),
                     intervalMinutes: 60,
                     assignedVolunteerIds: [],
-                    cells: []
+                    cells: [],
+                    unavailableCells: []
                 },
                 {
                     id: 'd2',
@@ -762,7 +846,8 @@ export class VolunteerPlanningComponent implements OnInit {
                     endTime: this.timeAt(19, 0),
                     intervalMinutes: 60,
                     assignedVolunteerIds: [],
-                    cells: []
+                    cells: [],
+                    unavailableCells: []
                 }
             ]
         };

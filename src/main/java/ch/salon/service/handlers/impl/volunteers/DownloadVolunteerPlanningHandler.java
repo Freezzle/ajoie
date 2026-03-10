@@ -7,6 +7,7 @@ import ch.salon.domain.VolunteerPlanningCell;
 import ch.salon.domain.VolunteerPlanningConfiguration;
 import ch.salon.domain.VolunteerPlanningData;
 import ch.salon.domain.VolunteerPlanningDay;
+import ch.salon.domain.VolunteerPlanningUnavailableCell;
 import ch.salon.repository.PlanningVolunteerSalonRepository;
 import ch.salon.service.document.DocumentCreator;
 import ch.salon.service.handlers.ActionMetadataProvider;
@@ -121,6 +122,14 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
                 }
             }
 
+            // Build unavailable set: "volunteerId::slotIndex"
+            java.util.Set<String> unavailableKeys = new java.util.HashSet<>();
+            if (day.getUnavailableCells() != null) {
+                for (VolunteerPlanningUnavailableCell uc : day.getUnavailableCells()) {
+                    unavailableKeys.add(uc.getVolunteerId() + "::" + uc.getSlotIndex());
+                }
+            }
+
             // One row per assigned volunteer
             List<RowData> rows = new ArrayList<>();
             for (String vId : assignedIds) {
@@ -130,9 +139,16 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
                 List<CellData> cells = new ArrayList<>();
                 for (int i = 0; i < slots.size(); i++) {
                     CellData cell = new CellData();
-                    String catId = volCells.get(i);
-                    CategoryData cat = catId != null ? categoryMap.get(catId) : null;
-                    cell.setColor(cat != null ? cat.getColor() : null);
+                    boolean isUnavailable = unavailableKeys.contains(vId + "::" + i);
+                    if (isUnavailable) {
+                        cell.setUnavailable(true);
+                        cell.setColor(null);
+                    } else {
+                        String catId = volCells.get(i);
+                        CategoryData cat = catId != null ? categoryMap.get(catId) : null;
+                        cell.setColor(cat != null ? cat.getColor() : null);
+                        cell.setUnavailable(false);
+                    }
                     cells.add(cell);
                 }
                 row.setCells(cells);
@@ -231,6 +247,8 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
     public static class CellData {
         /** null = cellule vide */
         private String color;
+        /** true = cellule non disponible (gris plein, aucune catégorie) */
+        private boolean unavailable;
     }
 
     @Data

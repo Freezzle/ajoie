@@ -15,6 +15,11 @@ export type DayCell = {
     categoryId: string; // référence vers Category.id
 };
 
+export type UnavailableCell = {
+    volunteerId: string;
+    slotIndex: number;
+};
+
 export type Day = {
     id: string;         // non visible
     label: string;
@@ -23,6 +28,7 @@ export type Day = {
     intervalMinutes: IntervalMinutes;
     assignedVolunteerIds: string[];
     cells: DayCell[];
+    unavailableCells: UnavailableCell[];
 };
 
 export type Planning = {
@@ -33,7 +39,10 @@ export type Planning = {
 
 export type Tool =
     | { kind: 'CATEGORY'; categoryId: string }
-    | { kind: 'ERASER' } | {kind: 'NONE'};
+    | { kind: 'ERASER' }
+    | { kind: 'UNAVAILABLE' }
+    | { kind: 'CLEAR_UNAVAILABLE' }
+    | { kind: 'NONE' };
 
 // ---------- helpers ----------
 export function newId(prefix: 'd' | 'v' | 'c'): string {

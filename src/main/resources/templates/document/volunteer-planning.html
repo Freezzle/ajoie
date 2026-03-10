@@ -121,10 +121,20 @@
             padding: 0;
         }
 
+        /* Cellule avec catégorie : petit padding visible */
         .cell-fill {
+            margin: 1mm;
+            display: block;
+            border-radius: 1px;
+            border: 1px solid #9e9e9e;
+        }
+
+        /* Cellule non disponible : gris plein sans padding */
+        .cell-unavailable {
             width: 100%;
             height: 7mm;
             display: block;
+            background-color: #9e9e9e;
         }
     </style>
 </head>
@@ -145,6 +155,10 @@
                 <span class="legend-swatch" th:style="'background-color: ' + ${cat.color} + ';'">&#160;</span>
                 <span th:text="${cat.label}">Categorie</span>
             </span>
+            <span class="legend-item">
+                <span class="legend-swatch" style="background-color: #9e9e9e;">&#160;</span>
+                <span>Non disponible</span>
+            </span>
         </div>
     </div>
 
@@ -159,10 +173,15 @@
             <tr th:each="row : ${page.rows}">
                 <td class="col-label" th:text="${row.label}">Benevole</td>
                 <td th:each="cell : ${row.cells}" class="slot">
-                    <span th:if="${cell.color != null}"
+                    <!-- Cellule non disponible : gris plein -->
+                    <span th:if="${cell.unavailable}"
+                          class="cell-unavailable">&#160;</span>
+                    <!-- Cellule avec catégorie : badge coloré avec padding -->
+                    <span th:if="${!cell.unavailable and cell.color != null}"
                           class="cell-fill"
                           th:style="'background-color: ' + ${cell.color} + ';'">&#160;</span>
-                    <span th:if="${cell.color == null}">&#160;</span>
+                    <!-- Cellule vide -->
+                    <span th:if="${!cell.unavailable and cell.color == null}">&#160;</span>
                 </td>
             </tr>
         </tbody>

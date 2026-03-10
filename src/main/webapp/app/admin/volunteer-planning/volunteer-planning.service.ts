@@ -45,6 +45,7 @@ export interface VolunteerPlanningDayDto {
     intervalMinutes?: number;
     assignedVolunteerIds: string[];
     cells: VolunteerPlanningCellDto[];
+    unavailableCells?: { volunteerId: string; slotIndex: number }[];
 }
 
 export interface VolunteerPlanningConfigurationDto {

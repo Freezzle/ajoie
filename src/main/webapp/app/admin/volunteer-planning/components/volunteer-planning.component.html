@@ -109,15 +109,17 @@
                                                     @for (slot of timeSlots(); track slot.index) {
                                                         @let categoryId = getCategoryId(v.id, slot.index);
                                                         @let cat = uiFor(categoryId);
+                                                        @let unavailable = isUnavailableCell(v.id, slot.index);
 
                                                         <td class="slot-cell">
                                                             <div (click)="!painting() ? applyTool(v.id, slot.index) : undefined"
                                                                  (pointerdown)="startPaint(v.id, slot.index, $event)"
                                                                  [attr.data-slot-index]="slot.index"
                                                                  [attr.data-volunteer-id]="v.id"
+                                                                 [class.cell--unavailable]="unavailable"
                                                                  [style.cursor]="isReadOnly() ? 'default': 'pointer'"
                                                                  class="paint-cell">
-                                                                @if (cat) {
+                                                                @if (cat && !unavailable) {
                                                                     <span [style.background-color]="cat.color"
                                                                           [title]="cat.label"
                                                                           class="cat-badge">
@@ -168,7 +170,29 @@
                                                     [style.background-color]="'white'"
                                                     [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
                                                     [style.color]="'black'"
-                                                    [title]="'common.eraser' | translate"
+                                                    [title]="'planningVolunteers.palette.eraser' | translate"
+                                                    [style.cursor]="isReadOnly() ? 'default': 'pointer'"
+                                                    pButton
+                                                    type="button"
+                                            ></button>
+
+                                            <button (click)="!isReadOnly() ? selectUnavailable() : undefined"
+                                                    [icon]="'pi pi-ban'"
+                                                    [style.background-color]="'#9e9e9e'"
+                                                    [style.border]="selectedTool().kind === 'UNAVAILABLE' ? '2px solid black': 'none'"
+                                                    [style.color]="'white'"
+                                                    [title]="'planningVolunteers.palette.unavailable' | translate"
+                                                    [style.cursor]="isReadOnly() ? 'default': 'pointer'"
+                                                    pButton
+                                                    type="button"
+                                            ></button>
+
+                                            <button (click)="!isReadOnly() ? selectClearUnavailable() : undefined"
+                                                    [icon]="'pi pi-check'"
+                                                    [style.background-color]="'white'"
+                                                    [style.border]="selectedTool().kind === 'CLEAR_UNAVAILABLE' ? '2px solid black': 'none'"
+                                                    [style.color]="'#9e9e9e'"
+                                                    [title]="'planningVolunteers.palette.clearUnavailable' | translate"
                                                     [style.cursor]="isReadOnly() ? 'default': 'pointer'"
                                                     pButton
                                                     type="button"
