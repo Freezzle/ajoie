@@ -69,7 +69,7 @@ export function normalizeHex(v: string): string | null {
     return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(s) ? s : null;
 }
 
-export type TimeSlot = { index: number; label: string };
+export type TimeSlot = { index: number; label: string; displayLabel: string };
 
 export function computeTimeSlots(startTime: Date, endTime: Date, interval: IntervalMinutes): TimeSlot[] {
     const s = normalizeTime(startTime);
@@ -82,9 +82,22 @@ export function computeTimeSlots(startTime: Date, endTime: Date, interval: Inter
     const steps = Math.floor(diffMin / interval);
 
     const slots: TimeSlot[] = [];
+    // counter : slots écoulés depuis la 1ère heure pleine rencontrée.
+    // Afficher quand counter est pair (0, 2, 4…) → 1 sur 2 à partir de :00.
+    // Avant la 1ère heure pleine : pas affiché (sauf le tout 1er slot).
+    let counter: number | null = null;
     for (let i = 0; i < steps; i++) {
         const t = new Date(s.getTime() + i * interval * 60000);
-        slots.push({index: i, label: hhmm(t)});
+        const label = hhmm(t);
+
+        if (t.getMinutes() === 0) {
+            counter = 0;
+        } else if (counter !== null) {
+            counter++;
+        }
+
+        const show = i === 0 || (counter !== null && counter % 2 === 0);
+        slots.push({index: i, label, displayLabel: show ? label : ''});
     }
     return slots;
 }

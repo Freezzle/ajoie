@@ -193,9 +193,20 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
             Instant end = Instant.parse(endTimeIso);
             long diffSeconds = end.getEpochSecond() - start.getEpochSecond();
             int steps = (int) (diffSeconds / 60 / intervalMinutes);
+            // counter : slots écoulés depuis la 1ère heure pleine rencontrée.
+            // Afficher quand counter est pair (0, 2, 4…) → 1 sur 2 à partir de :00.
+            // Avant la 1ère heure pleine : pas affiché (sauf le tout 1er slot).
+            int counter = -1; // -1 = pas encore atteint une heure pleine
             for (int i = 0; i < steps; i++) {
                 Instant t = start.plusSeconds((long) i * intervalMinutes * 60);
-                labels.add(TIME_FORMATTER.format(t));
+                String hhmm = TIME_FORMATTER.format(t);
+                if (hhmm.endsWith(":00")) {
+                    counter = 0;
+                } else if (counter >= 0) {
+                    counter++;
+                }
+                boolean show = (i == 0) || (counter >= 0 && counter % 2 == 0);
+                labels.add(show ? hhmm : "");
             }
         } catch (Exception ignored) {
         }
