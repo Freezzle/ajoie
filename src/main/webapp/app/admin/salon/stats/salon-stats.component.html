@@ -248,12 +248,21 @@
             <h4>Importation d'un Google Forms</h4>
         </div>
         <div appCardBody>
-            <div class="row mt-4">
-                <div class="col-9"><input #fileInput (change)="onFileSelected($event)" id="fileUpload" type="file"/>
-                </div>
-                <div class="col-3 text-end">
-                    <button-box (clickedEvent)="importFile()" [isSubmit]="true" translateKey="common.import"/>
-                </div>
+            <div class="mt-4">
+                <p-fileupload
+                        #fileUploader
+                        mode="advanced"
+                        [customUpload]="true"
+                        [multiple]="false"
+                        (uploadHandler)="importFile($event)"
+                        accept=".csv,.xls,.xlsx"
+                        chooseLabel="Choisir"
+                        uploadLabel="Importer"
+                        [showCancelButton]="false">
+                    <ng-template #empty>
+                        <div>Glisse et relâche un fichier ici.</div>
+                    </ng-template>
+                </p-fileupload>
             </div>
         </div>
     </app-card>

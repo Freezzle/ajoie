@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, input, LOCALE_ID, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, input, LOCALE_ID, OnInit, ViewChild} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
@@ -7,12 +7,11 @@ import {SalonService} from '../service/salon.service';
 import {mergeMap} from 'rxjs/operators';
 import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {HttpResponse} from '@angular/common/http';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Status} from '../../enumerations/status.model';
-import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {ISalonStats} from '../model/salon-stats.interface';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
+import {FileUpload, FileUploadHandlerEvent} from 'primeng/fileupload';
 import {formatDate} from '@angular/common';
 
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
@@ -20,6 +19,7 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
+import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 
 @Component({
                selector: 'app-salon-stats',
@@ -28,22 +28,20 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                imports: [
                    SharedModule,
                    RouterModule,
-                   FormsModule,
-                   ReactiveFormsModule,
                    ToastModule,
-                   ButtonBoxComponent,
+                   FileUpload,
                    AlertErrorComponent,
                    ConfirmPopup,
                    CardComponent,
-                   ContentPageComponent
+                   ContentPageComponent,
+                   ButtonBoxComponent
                ]
            })
 export class SalonStatsComponent implements OnInit {
-    @ViewChild('fileInput') fileInput!: ElementRef;
+    @ViewChild('fileUploader') fileUploader!: FileUpload;
 
     salon = input<ISalon | null>(null);
     combinedStats$: Observable<ISalonStats[]> | undefined;
-    selectedFile: File | null = null;
     protected salonService = inject(SalonService);
     private readonly messageService = inject(MessageService);
     readonly navigationService = inject(NavigationStateService);
@@ -109,19 +107,13 @@ export class SalonStatsComponent implements OnInit {
                                             ]);
     }
 
-    onFileSelected(event: Event): void {
-        const element = event.target as HTMLInputElement;
-        if (element.files && element.files.length > 0) {
-            this.selectedFile = element.files[0];
-        }
-    }
-
-    importFile(): void {
-        if (this.selectedFile == null) {
+    importFile(event: FileUploadHandlerEvent): void {
+        const file = event.files[0];
+        if (!file) {
             return;
         }
 
-        this.salonService.generate(this.salon()!.id, this.selectedFile).subscribe((participationsNew) => {
+        this.salonService.generate(this.salon()!.id, file).subscribe((participationsNew) => {
             const detailMessage = participationsNew.map(part => {
                 const therapistName = part.therapistName?.length > 10 ? part.therapistName.slice(0, 10) + '...' : part.therapistName;
                 return '<' + therapistName + '> inscrit le ' + (part.registrationDate
@@ -137,11 +129,7 @@ export class SalonStatsComponent implements OnInit {
                                         sticky: true
                                     });
 
-            if (this.fileInput) {
-                this.fileInput.nativeElement.value = ''; // Reset the file input field
-            }
-
-            this.selectedFile = null;
+            this.fileUploader.clear();
             this.loadStats();
         });
     }
