@@ -54,15 +54,15 @@
                 <h4>{{ 'common.info-basic' | translate }}</h4>
                 @if (isReadOnly) {
                     <div class="d-flex gap-2 align-items-center">
+                        <fa-icon (click)="openHistoryModal()"
+                                 [title]="'event.buttonTitle' | translate"
+                                 class="clickable"
+                                 icon="clock-rotate-left"></fa-icon>
                         <button-box [isDisabled]="isLoading"
                                     [links]="['../billing']"
                                     [modeLink]="true"
                                     translateKey="participation.billing.title"
                                     type="warning"/>
-                        <fa-icon (click)="openHistoryModal()"
-                                 [title]="'event.buttonTitle' | translate"
-                                 class="clickable"
-                                 icon="clock-rotate-left"></fa-icon>
                     </div>
                 }
             </div>
