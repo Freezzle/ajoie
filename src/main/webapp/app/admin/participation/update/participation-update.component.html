@@ -37,6 +37,12 @@
                         primeIcon="pi-save"
                         translateKey="common.save"/>
         }
+
+        @if (isReadOnly) {
+            <menu-box [items]="menuCache"
+                      buttonIcon="pi-list"
+                      buttonTranslateKey="common.actions"/>
+        }
     </div>
     <app-alert-error></app-alert-error>
 
@@ -57,9 +63,6 @@
                                  [title]="'event.buttonTitle' | translate"
                                  class="clickable"
                                  icon="clock-rotate-left"></fa-icon>
-                        <menu-box [items]="menuCache"
-                                  buttonIcon="pi-cog"
-                                  buttonTranslateKey="common.actions"/>
                     </div>
                 }
             </div>

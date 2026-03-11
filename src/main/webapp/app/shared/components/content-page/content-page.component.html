@@ -1,7 +1,12 @@
-<div class="bg-transparent p-0 pt-4 p-2 p-sm-4">
-    <div class="d-flex justify-content-between align-items-center">
+<div class="page-header">
+    <div class="page-header-start">
         <ng-content select="[appMenuBarStart]"></ng-content>
+    </div>
+    <div class="page-header-end">
         <ng-content select="[appMenuBarEnd]"></ng-content>
     </div>
+</div>
+
+<div class="page-body">
     <ng-content></ng-content>
 </div>
