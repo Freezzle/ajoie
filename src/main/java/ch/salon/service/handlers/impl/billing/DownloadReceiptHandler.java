@@ -40,7 +40,6 @@ public class DownloadReceiptHandler implements DocumentActionHandler<InvoicingPl
     @Override
     public InputStreamSource download(InvoicingPlan payload, Map<String, Object> context) throws IOException {
         Recipient recipient = new Recipient(payload.getParticipation().getExhibitor());
-        recipient.setEnterpriseName(payload.getParticipation().getTherapistName());
         Sender sender = new Sender(payload.getParticipation().getSalon()); // FIXME + logo
 
         Context thymeleafCtxt = new Context(recipient.getLanguage());

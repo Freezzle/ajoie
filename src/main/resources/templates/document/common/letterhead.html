@@ -3,10 +3,12 @@
     <tr>
       <td class="width-70">&nbsp;</td>
       <td class="width-30">
-        [[${recipient.getEnterpriseName()}]]<br />
-        [[${recipient.getFullName()}]]<br />
-        [[${recipient.getStreet()}]]<br />
-        [[${recipient.getCountry()}]] - [[${recipient.getCity()}]]<br />
+        <span th:if="${recipient.getEnterpriseName() != null and !#strings.isEmpty(recipient.getEnterpriseName())}">[[${recipient.getEnterpriseName()}]]<br /></span>
+        <span th:if="${recipient.getFullName() != null and !#strings.isEmpty(recipient.getFullName())}">[[${recipient.getFullName()}]]<br /></span>
+        <span th:if="${recipient.getStreet() != null and !#strings.isEmpty(recipient.getStreet())}">[[${recipient.getStreet()}]]<br /></span>
+        <span th:if="${(recipient.getCountry() != null and !#strings.isEmpty(recipient.getCountry())) or (recipient.getCity() != null and !#strings.isEmpty(recipient.getCity()))}">
+          <span th:if="${recipient.getCountry() != null and !#strings.isEmpty(recipient.getCountry())}">[[${recipient.getCountry()}]]</span><span th:if="${(recipient.getCountry() != null and !#strings.isEmpty(recipient.getCountry())) and (recipient.getCity() != null and !#strings.isEmpty(recipient.getCity()))}"> - </span><span th:if="${recipient.getCity() != null and !#strings.isEmpty(recipient.getCity())}">[[${recipient.getCity()}]]</span><br />
+        </span>
       </td>
     </tr>
   </table>
