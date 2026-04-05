@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        dueDate sur task_instance est désormais calculé (min des sous-tâches actives),
+        jamais stocké directement.
+        offset_days sur task_template est désormais calculé (min des offset_days des sous-tâches).
+
+        On supprime les colonnes qui ne sont plus utilisées par le modèle Java.
+    -->
+
+    <!-- Supprimer offset_days de task_template (calculé depuis les sous-tâches) -->
+    <changeSet id="0.0.2_202604-tasks-drop-offset-days" author="system">
+        <dropColumn tableName="task_template" columnName="offset_days"/>
+    </changeSet>
+
+    <!-- Supprimer due_date de task_instance (calculé depuis les sous-tâches actives) -->
+    <changeSet id="0.0.2_202604-tasks-drop-task-instance-due-date" author="system">
+        <dropColumn tableName="task_instance" columnName="due_date"/>
+    </changeSet>
+
+    <!-- description sur subtask_instance -->
+    <changeSet id="0.0.2_202604-tasks-subtask-description" author="system">
+        <addColumn tableName="subtask_instance">
+            <column name="description" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- snoozed_until sur subtask_instance (pas task_instance) -->
+    <changeSet id="0.0.2_202604-tasks-snooze" author="system">
+        <addColumn tableName="subtask_instance">
+            <column name="snoozed_until" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,127 @@
+<app-content-page>
+    <div appMenuBarStart>
+        <h3 jhiTranslate="task.focusView.title">Tâches</h3>
+    </div>
+    <div appMenuBarEnd>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    [showText]="false"
+                    primeIcon="pi-arrow-left"
+                    translateKey="common.back"/>
+        <button-box (clickedEvent)="openAddTaskDialog()"
+                    [isDisabled]="isLoading"
+                    [showText]="true"
+                    primeIcon="pi-plus"
+                    translateKey="task.focusView.addTask"/>
+        <button-box (clickedEvent)="load()"
+                    [isDisabled]="isLoading"
+                    [showText]="false"
+                    primeIcon="pi-sync"
+                    translateKey="common.refresh"/>
+    </div>
+
+    <!-- ── Bandeau progression globale ── -->
+    @if (!isLoading && totalTasks > 0) {
+        <div class="tfl-progress">
+            <div class="tfl-progress__bar-wrap">
+                <div class="tfl-progress__bar"
+                     [style.width.%]="globalProgress"
+                     [class.tfl-progress__bar--complete]="globalProgress === 100"></div>
+            </div>
+            <span class="tfl-progress__label">
+                {{ doneTasks }}/{{ totalTasks }} terminées
+            </span>
+            @if (countLate > 0) {
+                <span class="tfl-progress__badge tfl-progress__badge--late">
+                    <i class="pi pi-exclamation-triangle"></i> {{ countLate }} en retard
+                </span>
+            }
+            @if (countInProgress > 0) {
+                <span class="tfl-progress__badge tfl-progress__badge--progress">
+                    <i class="pi pi-play-circle"></i> {{ countInProgress }} en cours
+                </span>
+            }
+            @if (countSnoozed > 0) {
+                <span class="tfl-progress__badge tfl-progress__badge--snooze">
+                    <i class="pi pi-bell-slash"></i> {{ countSnoozed }} snoozées
+                </span>
+            }
+        </div>
+
+        <!-- ── Pills de filtre ── -->
+        <div class="tfl-filters">
+            <button class="tfl-filter-pill" [class.active]="activeFilter === 'all'"
+                    (click)="activeFilter = 'all'">
+                Toutes <span class="tfl-filter-count">{{ tasks.length }}</span>
+            </button>
+            @if (countLate > 0) {
+                <button class="tfl-filter-pill tfl-filter-pill--late" [class.active]="activeFilter === 'late'"
+                        (click)="activeFilter = 'late'">
+                    <i class="pi pi-exclamation-triangle"></i> En retard <span class="tfl-filter-count">{{ countLate }}</span>
+                </button>
+            }
+            @if (countToday > 0) {
+                <button class="tfl-filter-pill tfl-filter-pill--today" [class.active]="activeFilter === 'today'"
+                        (click)="activeFilter = 'today'">
+                    <i class="pi pi-clock"></i> Aujourd'hui <span class="tfl-filter-count">{{ countToday }}</span>
+                </button>
+            }
+            @if (countInProgress > 0) {
+                <button class="tfl-filter-pill tfl-filter-pill--progress" [class.active]="activeFilter === 'in_progress'"
+                        (click)="activeFilter = 'in_progress'">
+                    <i class="pi pi-play-circle"></i> En cours <span class="tfl-filter-count">{{ countInProgress }}</span>
+                </button>
+            }
+            <button class="tfl-filter-pill tfl-filter-pill--done" [class.active]="activeFilter === 'done'"
+                    (click)="activeFilter = 'done'">
+                <i class="pi pi-check-circle"></i> Terminées <span class="tfl-filter-count">{{ countDone }}</span>
+            </button>
+            @if (countSnoozed > 0) {
+                <button class="tfl-filter-pill tfl-filter-pill--snooze" [class.active]="activeFilter === 'snoozed'"
+                        (click)="activeFilter = 'snoozed'">
+                    <i class="pi pi-bell-slash"></i> Snoozées <span class="tfl-filter-count">{{ countSnoozed }}</span>
+                </button>
+            }
+        </div>
+    }
+
+    @if (isLoading) {
+        <div class="text-center py-5">
+            <i class="pi pi-spinner pi-spin" style="font-size: 2rem"></i>
+        </div>
+    }
+
+    @if (!isLoading && tasks.length === 0) {
+        <app-card [showHeader]="false">
+            <div appCardBody>
+                <p class="text-muted text-center my-4" jhiTranslate="task.focusView.empty">
+                    Aucune tâche pour ce salon.
+                </p>
+            </div>
+        </app-card>
+    }
+
+    @if (!isLoading && filteredTasks.length === 0 && tasks.length > 0) {
+        <p class="text-muted text-center my-4 small">Aucune tâche dans ce filtre.</p>
+    }
+
+    @if (!isLoading && filteredTasks.length > 0) {
+        <div class="d-flex flex-column gap-2">
+            @for (task of filteredTasks; track task.id) {
+                <app-task-card [task]="task" (statusChanged)="load()" (editRequested)="openEditTaskDialog(task)"/>
+            }
+        </div>
+    }
+</app-content-page>
+
+<!-- ── Dialog : Créer / Modifier une tâche ── -->
+@if (showTaskDialog()) {
+    <dialog-box (cancel)="onTaskDialogCancel()"
+                (confirm)="onTaskDialogConfirm($event)"
+                [(visible)]="showTaskDialog"
+                [header]="editingTask ? ('task.dialog.editTask' | translate) : ('task.dialog.addTask' | translate)"
+                [mode]="'edit'"
+                [confirmLabel]="'common.save'">
+        <app-task-instance-form [task]="editingTask"/>
+    </dialog-box>
+}

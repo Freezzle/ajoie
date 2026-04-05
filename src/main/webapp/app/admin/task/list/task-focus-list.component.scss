@@ -1,0 +1,112 @@
+// Styles des cartes gérés dans task-card.component.scss
+
+// ── Bandeau progression ─────────────────────────────────────────────────────
+.tfl-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+
+    &__bar-wrap {
+        flex: 1;
+        min-width: 100px;
+        max-width: 200px;
+        height: 7px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    &__bar {
+        height: 100%;
+        background: #94a3b8;
+        border-radius: 4px;
+        transition: width 0.4s ease;
+
+        &--complete { background: #639922; }
+    }
+
+    &__label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #475569;
+        white-space: nowrap;
+    }
+
+    &__badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 2px 9px;
+        border-radius: 20px;
+        white-space: nowrap;
+
+        i { font-size: 0.65rem; }
+
+        &--late     { background: #fee2e2; color: #dc2626; }
+        &--progress { background: #fef9c3; color: #854d0e; }
+        &--snooze   { background: #fff7ed; color: #c2410c; }
+    }
+}
+
+// ── Pills de filtre ─────────────────────────────────────────────────────────
+.tfl-filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.tfl-filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.12s;
+
+    i { font-size: 0.65rem; }
+
+    &:hover { border-color: #94a3b8; color: #334155; }
+
+    &.active {
+        background: #1e40af;
+        border-color: #1e40af;
+        color: #fff;
+
+        .tfl-filter-count { background: rgba(255,255,255,0.25); color: #fff; }
+    }
+
+    &--late.active     { background: #dc2626; border-color: #dc2626; }
+    &--today.active    { background: #d97706; border-color: #d97706; }
+    &--progress.active { background: #854d0e; border-color: #854d0e; }
+    &--done.active     { background: #639922; border-color: #639922; }
+    &--snooze.active   { background: #c2410c; border-color: #c2410c; }
+}
+
+.tfl-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #475569;
+}

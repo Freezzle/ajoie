@@ -11,4 +11,9 @@
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202601-volunteer.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202602-address.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202602-fullname.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-computed-duedate.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-drop-templates.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-offset.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-subtask-responsible.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

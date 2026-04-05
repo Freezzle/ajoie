@@ -1,0 +1,153 @@
+<div class="tc" [class.tc--done]="isDone" [class.tc--cancelled]="isCancelled" [ngClass]="accentClass">
+
+    <!-- ── Corps principal ── -->
+    <div class="tc__body">
+
+        <!-- MAIN ROW -->
+        <div class="tc__row">
+
+            <div class="tc__info">
+                <span class="tc__title" [class.tc__title--done]="isDone">{{ task.title }}</span>
+
+                <!-- Chips : p-tag PrimeNG -->
+                <div class="tc__chips">
+                    @if (task.responsible && !editingResponsible) {
+                        <p-tag icon="pi pi-user" [value]="task.responsible" severity="info" [rounded]="true"
+                               styleClass="tc-tag tc-tag--clickable" title="Cliquer pour modifier"
+                               (click)="editResponsibleValue = task.responsible!; editingResponsible = true"/>
+                    }
+                    @if (task.status === 'IN_PROGRESS') {
+                        <p-tag icon="pi pi-play-circle" value="En cours" severity="warn" [rounded]="true" styleClass="tc-tag"/>
+                    }
+                    @if (isCancelled) {
+                        <p-tag icon="pi pi-ban" value="Annulée" severity="secondary" [rounded]="true" styleClass="tc-tag"/>
+                    }
+                    @if (task.supplierInfo) {
+                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" styleClass="tc-tag"/>
+                    }
+                    @if (task.comments.length > 0) {
+                        <p-tag icon="pi pi-comment" [value]="task.comments.length.toString()" severity="contrast"
+                               [rounded]="true" styleClass="tc-tag tc-tag--clickable"
+                               [title]="showComments ? 'Masquer les commentaires' : 'Voir les commentaires'"
+                               (click)="toggleComments()"/>
+                    }
+                </div>
+
+                <!-- completedAt quand DONE -->
+                @if (isDone && task.completedAt) {
+                    <span class="tc__completed-at">
+                        <i class="pi pi-check-circle"></i>
+                        Terminée {{ task.completedAt | timeSince }}
+                    </span>
+                }
+            </div>
+
+            <div class="tc__aside">
+
+                <!-- Progression : p-progressbar PrimeNG -->
+                @if (task.subtasks.length > 0) {
+                    <div class="tc__prog">
+                        <span class="tc__prog-label">{{ doneSubtaskCount }}/{{ task.subtasks.length }}</span>
+                        <p-progressbar [value]="subtaskProgress"
+                                       [showValue]="false"
+                                       styleClass="tc__progressbar"/>
+                    </div>
+                }
+
+                <!-- Date : p-tag PrimeNG -->
+                @if (task.dueDate && !isDone && !isCancelled) {
+                    <p-tag [severity]="dueDateSeverity"
+                           [value]="task.dueDate | daysRemaining : task.status"
+                           [rounded]="true"
+                           styleClass="tc-tag tc-tag--date"/>
+                }
+
+                <div class="tc__menu">
+                    <menu-box [items]="menuItems" buttonIcon="pi-ellipsis-v"
+                              [buttonTranslateKey]="''" type="secondary" appendTo="body"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- INLINE FORM : changer responsable -->
+        @if (editingResponsible) {
+            <div class="tc__form">
+                <i class="pi pi-user" style="color:#0369a1; font-size:0.8rem; flex-shrink:0"></i>
+                <input type="text" class="form-control form-control-sm flex-grow-1"
+                       [(ngModel)]="editResponsibleValue"
+                       (keydown.enter)="saveResponsible()" (keydown.escape)="cancelResponsible()"
+                       placeholder="Nom du responsable…" autofocus/>
+                <button-box type="primary" primeIcon="pi-check" [showText]="false"
+                            translateKey="common.save" (clickedEvent)="saveResponsible()"/>
+                <button-box type="secondary" primeIcon="pi-times" [showText]="false"
+                            translateKey="common.cancel" (clickedEvent)="cancelResponsible()"/>
+            </div>
+        }
+
+        <!-- INLINE FORM : add comment -->
+        @if (showCommentInput) {
+            <div class="tc__form tc__form--col">
+                <input type="text" class="form-control form-control-sm"
+                       [(ngModel)]="commentAuthor" placeholder="Votre nom…"/>
+                <div class="tc__form">
+                    <textarea class="form-control form-control-sm flex-grow-1" [(ngModel)]="commentBody"
+                              rows="2" placeholder="Commentaire…"></textarea>
+                    <div class="d-flex flex-column gap-1">
+                        <button-box type="primary" primeIcon="pi-send" [showText]="false"
+                                    translateKey="common.save" (clickedEvent)="addComment()"/>
+                        <button-box type="secondary" primeIcon="pi-times" [showText]="false"
+                                    translateKey="common.cancel" (clickedEvent)="showCommentInput = false"/>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- SOUS-TÂCHES -->
+        @if (task.subtasks.length > 0) {
+            <div class="tc__subtasks">
+                @for (subtask of sortedSubtasks; track subtask.id) {
+                    <app-subtask-row [subtask]="subtask"
+                                     (changed)="onSubtaskChanged($event.id, $event.status)"
+                                     (editRequested)="openEditSubtaskDialog(subtask)"/>
+                }
+            </div>
+        }
+
+        <!-- COMMENTAIRES (expandable) -->
+        @if (showComments && task.comments.length > 0) {
+            <div class="tc__comments">
+                <div class="tc__comments-header">
+                    <i class="pi pi-comment"></i>
+                    <span>Commentaires ({{ task.comments.length }})</span>
+                    <button class="tc__comments-close" (click)="showComments = false" type="button">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+                <div class="tc__comments-list">
+                    @for (comment of sortedComments; track comment.id) {
+                        <div class="tc__comment-item">
+                            <div class="tc__comment-meta">
+                                <span class="tc__comment-author"><i class="pi pi-user"></i>{{ comment.authorName }}</span>
+                                <span class="tc__comment-time">{{ comment.createdAt | timeSince }}</span>
+                            </div>
+                            <p class="tc__comment-body">{{ comment.body }}</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+<!-- ── Dialog : Créer / Modifier une sous-tâche ── -->
+@if (showSubtaskDialog()) {
+    <dialog-box (cancel)="onSubtaskDialogCancel()"
+                (confirm)="onSubtaskDialogConfirm($event)"
+                [(visible)]="showSubtaskDialog"
+                [header]="editingSubtask ? ('task.dialog.editSubtask' | translate) : ('task.dialog.addSubtask' | translate)"
+                [mode]="'edit'"
+                [confirmLabel]="'common.save'">
+        <app-subtask-instance-form [subtask]="editingSubtask"/>
+    </dialog-box>
+}

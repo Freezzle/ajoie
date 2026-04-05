@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Suppression complète de la notion de task template.
+        Seules les instances (task_instance, subtask_instance, task_comment) sont conservées.
+    -->
+
+    <!-- 1. Supprimer les FK de task_instance vers les tables template -->
+    <changeSet id="0.0.2_202604-drop-templates-1" author="system">
+        <dropForeignKeyConstraint baseTableName="task_instance" constraintName="fk_task_instance_template"/>
+        <dropForeignKeyConstraint baseTableName="task_instance" constraintName="fk_task_instance_template_list"/>
+        <dropColumn tableName="task_instance" columnName="template_id"/>
+        <dropColumn tableName="task_instance" columnName="template_list_id"/>
+    </changeSet>
+
+    <!-- 2. Supprimer subtask_template (dépend de task_template) -->
+    <changeSet id="0.0.2_202604-drop-templates-2" author="system">
+        <dropTable tableName="subtask_template" cascadeConstraints="true"/>
+    </changeSet>
+
+    <!-- 3. Supprimer task_template (dépend de task_template_list) -->
+    <changeSet id="0.0.2_202604-drop-templates-3" author="system">
+        <dropTable tableName="task_template" cascadeConstraints="true"/>
+    </changeSet>
+
+    <!-- 4. Supprimer task_template_list -->
+    <changeSet id="0.0.2_202604-drop-templates-4" author="system">
+        <dropTable tableName="task_template_list" cascadeConstraints="true"/>
+    </changeSet>
+
+</databaseChangeLog>

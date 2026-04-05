@@ -1,0 +1,105 @@
+<div class="row" [formGroup]="form">
+
+    <!-- Titre -->
+    <div class="col-12 mt-3">
+        <text-box fieldName="title"
+                  formControlName="title"
+                  translateKey="task.dialog.title"/>
+    </div>
+
+    <!-- Description -->
+    <div class="col-12 mt-3">
+        <textarea-box fieldName="description"
+                      formControlName="description"
+                      translateKey="task.dialog.description"
+                      [rows]="3"/>
+    </div>
+
+    <!-- Responsable -->
+    <div class="col-12 col-sm-6 mt-3">
+        <text-box fieldName="responsible"
+                  formControlName="responsible"
+                  translateKey="task.dialog.responsible"/>
+    </div>
+
+    <!-- Informations fournisseur -->
+    <div class="col-12 col-sm-6 mt-3">
+        <text-box fieldName="supplierInfo"
+                  formControlName="supplierInfo"
+                  translateKey="task.dialog.supplierInfo"/>
+    </div>
+
+    <!-- ── Date d'échéance ────────────────────────────────────────────── -->
+    <div class="col-12 mt-3">
+        <label class="form-label fw-semibold">Date d'échéance</label>
+
+        <div class="mb-2">
+            <p-select-button formControlName="dueDateType"
+                            [options]="dueDateTypeOptions"
+                            optionLabel="label"
+                            optionValue="value"/>
+        </div>
+
+        @if (dueDateType === 'FIXED') {
+            <date-box fieldName="dueDateFixed"
+                      formControlName="dueDateFixed"
+                      translateKey="task.dialog.dueDate"/>
+        }
+        @if (dueDateType === 'OFFSET') {
+            <number-box fieldName="dueDateOffset"
+                        formControlName="dueDateOffset"
+                        translateKey="task.dialog.dueDateOffset"
+                        [minValue]="-365"
+                        [maxValue]="365"/>
+            @if (form.get('dueDateOffset')?.value !== null && form.get('dueDateOffset')?.value !== '') {
+                <div class="mt-1 small text-secondary">
+                    @if ((form.get('dueDateOffset')?.value ?? 0) < 0) {
+                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('dueDateOffset')?.value ?? 0) * -1 }} jours avant le salon
+                    } @else if ((form.get('dueDateOffset')?.value ?? 0) > 0) {
+                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('dueDateOffset')?.value }} jours après le salon
+                    } @else {
+                        <i class="pi pi-calendar me-1"></i>Le jour J (date de début du salon)
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <!-- ── Snooze ─────────────────────────────────────────────────────── -->
+    <div class="col-12 mt-3">
+        <label class="form-label fw-semibold">Reporter (snooze)</label>
+        <p class="text-muted small mb-2">Masquer cette sous-tâche jusqu'à une certaine date.</p>
+
+        <div class="mb-2">
+            <p-select-button formControlName="snoozeUntilType"
+                            [options]="snoozeTypeOptions"
+                            optionLabel="label"
+                            optionValue="value"/>
+        </div>
+
+        @if (snoozeUntilType === 'FIXED') {
+            <date-box fieldName="snoozeFixed"
+                      formControlName="snoozeFixed"
+                      translateKey="task.dialog.snoozedUntil"/>
+        }
+        @if (snoozeUntilType === 'OFFSET') {
+            <number-box fieldName="snoozeOffset"
+                        formControlName="snoozeOffset"
+                        translateKey="task.dialog.snoozeOffset"
+                        [minValue]="-365"
+                        [maxValue]="365"/>
+            @if (form.get('snoozeOffset')?.value !== null && form.get('snoozeOffset')?.value !== '') {
+                <div class="mt-1 small text-secondary">
+                    @if ((form.get('snoozeOffset')?.value ?? 0) < 0) {
+                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('snoozeOffset')?.value ?? 0) * -1 }} jours avant le salon
+                    } @else if ((form.get('snoozeOffset')?.value ?? 0) > 0) {
+                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('snoozeOffset')?.value }} jours après le salon
+                    } @else {
+                        Le jour J
+                    }
+                </div>
+            }
+        }
+    </div>
+
+</div>

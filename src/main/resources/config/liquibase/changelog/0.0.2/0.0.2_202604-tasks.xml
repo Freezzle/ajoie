@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- =============================================================== -->
+    <!-- TABLE 1 : task_template_list                                    -->
+    <!-- =============================================================== -->
+    <changeSet id="0.0.2_202604-tasks-1" author="system">
+        <createTable tableName="task_template_list">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salon_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="task_template_list"
+                                 baseColumnNames="salon_id"
+                                 constraintName="fk_task_template_list_salon"
+                                 referencedTableName="salon"
+                                 referencedColumnNames="id"/>
+
+        <createIndex tableName="task_template_list" indexName="idx_task_template_list_salon">
+            <column name="salon_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- =============================================================== -->
+    <!-- TABLE 2 : task_template                                         -->
+    <!-- =============================================================== -->
+    <changeSet id="0.0.2_202604-tasks-2" author="system">
+        <createTable tableName="task_template">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="template_list_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="offset_days" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="responsible" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="supplier_info" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="sort_order" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="task_template"
+                                 baseColumnNames="template_list_id"
+                                 constraintName="fk_task_template_list"
+                                 referencedTableName="task_template_list"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createIndex tableName="task_template" indexName="idx_task_template_list">
+            <column name="template_list_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- =============================================================== -->
+    <!-- TABLE 3 : subtask_template                                      -->
+    <!-- =============================================================== -->
+    <changeSet id="0.0.2_202604-tasks-3" author="system">
+        <createTable tableName="subtask_template">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_template_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="offset_days" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="subtask_template"
+                                 baseColumnNames="task_template_id"
+                                 constraintName="fk_subtask_template_task"
+                                 referencedTableName="task_template"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createIndex tableName="subtask_template" indexName="idx_subtask_template_task">
+            <column name="task_template_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- =============================================================== -->
+    <!-- TABLE 4 : task_instance                                         -->
+    <!-- =============================================================== -->
+    <changeSet id="0.0.2_202604-tasks-4" author="system">
+        <createTable tableName="task_instance">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salon_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="template_id" type="${uuidType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="template_list_id" type="${uuidType}" remarks="Tracks which template list was instantiated, for 409 duplicate check">
+                <constraints nullable="true"/>
+            </column>
+            <column name="title" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="varchar(50)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="due_date" type="date">
+                <constraints nullable="true"/>
+            </column>
+            <column name="responsible" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="supplier_info" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="completed_at" type="${datetimeType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="sort_order" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="task_instance"
+                                 baseColumnNames="salon_id"
+                                 constraintName="fk_task_instance_salon"
+                                 referencedTableName="salon"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="task_instance"
+                                 baseColumnNames="template_id"
+                                 constraintName="fk_task_instance_template"
+                                 referencedTableName="task_template"
+                                 referencedColumnNames="id"
+                                 onDelete="SET NULL"/>
+
+        <addForeignKeyConstraint baseTableName="task_instance"
+                                 baseColumnNames="template_list_id"
+                                 constraintName="fk_task_instance_template_list"
+                                 referencedTableName="task_template_list"
+                                 referencedColumnNames="id"
+                                 onDelete="SET NULL"/>
+
+        <createIndex tableName="task_instance" indexName="idx_task_instance_salon">
+            <column name="salon_id"/>
+        </createIndex>
+        <createIndex tableName="task_instance" indexName="idx_task_instance_due_date">
+            <column name="due_date"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- =============================================================== -->
+    <!-- TABLE 5 : subtask_instance                                      -->
+    <!-- =============================================================== -->
+    <changeSet id="0.0.2_202604-tasks-5" author="system">
+        <createTable tableName="subtask_instance">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_instance_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(50)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="due_date" type="date">
+                <constraints nullable="true"/>
+            </column>
+            <column name="completed_at" type="${datetimeType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="sort_order" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="subtask_instance"
+                                 baseColumnNames="task_instance_id"
+                                 constraintName="fk_subtask_instance_task"
+                                 referencedTableName="task_instance"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createIndex tableName="subtask_instance" indexName="idx_subtask_instance_task">
+            <column name="task_instance_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- =============================================================== -->
+    <!-- TABLE 6 : task_comment                                          -->
+    <!-- =============================================================== -->
+    <changeSet id="0.0.2_202604-tasks-6" author="system">
+        <createTable tableName="task_comment">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_instance_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="${datetimeType}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="task_comment"
+                                 baseColumnNames="task_instance_id"
+                                 constraintName="fk_task_comment_task_instance"
+                                 referencedTableName="task_instance"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createIndex tableName="task_comment" indexName="idx_task_comment_task_instance">
+            <column name="task_instance_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

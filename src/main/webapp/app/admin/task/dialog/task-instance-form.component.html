@@ -1,0 +1,26 @@
+<div class="row" [formGroup]="form">
+    <div class="col-12 mt-3">
+        <text-box fieldName="title"
+                  formControlName="title"
+                  translateKey="task.dialog.title"/>
+    </div>
+
+    <div class="col-12 mt-3">
+        <textarea-box fieldName="description"
+                      formControlName="description"
+                      translateKey="task.dialog.description"
+                      [rows]="3"/>
+    </div>
+
+    <div class="col-12 col-sm-6 mt-3">
+        <text-box fieldName="responsible"
+                  formControlName="responsible"
+                  translateKey="task.dialog.responsible"/>
+    </div>
+
+    <div class="col-12 col-sm-6 mt-3">
+        <text-box fieldName="supplierInfo"
+                  formControlName="supplierInfo"
+                  translateKey="task.dialog.supplierInfo"/>
+    </div>
+</div>

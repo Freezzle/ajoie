@@ -296,6 +296,11 @@ a {
   }
 }
 
+.p-togglebutton.p-togglebutton-checked {
+  background-color: var(--app-primary) !important;
+  color: var(--app-surface) !important;
+}
+
 .p-textarea:disabled {
   background-color: var(--app-surface) !important;
   border-style: dashed;

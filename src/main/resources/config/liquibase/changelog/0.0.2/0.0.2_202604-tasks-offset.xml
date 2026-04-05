@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Champs offset sur subtask_instance.
+        due_date_type / snooze_until_type : 'FIXED' | 'OFFSET'
+        due_date_offset / snooze_offset   : entier signé (J-14=-14, J+3=3)
+        La date réelle (due_date / snoozed_until) est toujours recalculée
+        côté service au moment de la sauvegarde.
+    -->
+    <changeSet id="0.0.2_202604-tasks-offset-1" author="system">
+        <addColumn tableName="subtask_instance">
+            <column name="due_date_type" type="varchar(10)" defaultValue="FIXED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="subtask_instance">
+            <column name="due_date_offset" type="integer">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="subtask_instance">
+            <column name="snooze_until_type" type="varchar(10)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="subtask_instance">
+            <column name="snooze_offset" type="integer">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

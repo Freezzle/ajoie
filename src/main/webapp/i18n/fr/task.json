@@ -1,0 +1,55 @@
+{
+    "task": {
+        "focusView": {
+            "title": "Tâches opérationnelles",
+            "empty": "Aucune tâche pour ce salon.",
+            "addTask": "Nouvelle tâche",
+            "taskTitlePlaceholder": "Titre de la tâche…",
+            "responsiblePlaceholder": "Responsable…",
+            "supplierInfoPlaceholder": "Infos fournisseur…",
+            "dueDateHint": "La date d'échéance sera calculée automatiquement depuis les sous-tâches."
+        },
+        "dialog": {
+            "addTask": "Nouvelle tâche",
+            "editTask": "Modifier la tâche",
+            "addSubtask": "Nouvelle sous-tâche",
+            "editSubtask": "Modifier la sous-tâche",
+            "title": "Titre",
+            "description": "Description",
+            "responsible": "Responsable",
+            "supplierInfo": "Informations fournisseur",
+            "dueDate": "Date d'échéance",
+            "snoozedUntil": "Snoozée jusqu'au",
+            "status": "Statut"
+        },
+        "urgency": {
+            "late": "En retard",
+            "today": "Aujourd'hui",
+            "thisWeek": "Cette semaine",
+            "later": "Plus tard"
+        },
+        "card": {
+            "moreSubtasks": "autres sous-tâches",
+            "hideSubtasks": "Masquer les sous-tâches",
+            "subtaskPlaceholder": "Titre de la sous-tâche…"
+        },
+        "menu": {
+            "editDate": "Modifier la date",
+            "editResponsible": "Modifier le responsable",
+            "editSupplier": "Modifier infos fournisseur",
+            "addSubtask": "Ajouter une sous-tâche",
+            "addComment": "Ajouter un commentaire",
+            "delete": "Supprimer"
+        },
+        "comment": {
+            "authorPlaceholder": "Votre nom…",
+            "bodyPlaceholder": "Votre commentaire…"
+        },
+        "status": {
+            "PENDING": "En attente",
+            "IN_PROGRESS": "En cours",
+            "DONE": "Terminé",
+            "CANCELLED": "Annulé"
+        }
+    }
+}

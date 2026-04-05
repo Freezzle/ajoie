@@ -105,6 +105,13 @@
                             routerLinkActive="active">
                             <a><i class="pi pi-wrench"></i> {{ 'salon.workshops' | translate }}</a>
                         </li>
+                        <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="ms-3"
+                            routerLink="/admin/salons/{{salon.id}}/tasks"
+                            routerLinkActive="active">
+                            <a><i class="pi pi-check-square"></i> {{ 'salon.tasks' | translate }}</a>
+                        </li>
                         <hr class="hr-navbar"/>
                     </ul>
                 }

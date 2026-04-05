@@ -13,6 +13,7 @@ import workshopRoutes from '../workshop/workshop.routes';
 import talksPlanningRoute from '../talks-planning/talks-planning.routes';
 import volunteersPlanningRoute from '../volunteer-planning/volunteer-planning.routes';
 import invoicingPlanRoutes from '../invoicing-plan/invoicing-plan.routes';
+import taskRoutes from '../task/task.routes';
 
 const salonRoute: Routes = [
     {
@@ -96,6 +97,10 @@ const salonRoute: Routes = [
             salon: SalonResolve
         },
         children: floorPlanRoutes
+    },
+    {
+        path: ':idSalon/tasks',
+        children: taskRoutes
     }
 ];
 
