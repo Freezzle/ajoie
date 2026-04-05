@@ -29,6 +29,13 @@
                   translateKey="task.dialog.supplierInfo"/>
     </div>
 
+    <!-- ── Récurrence ────────────────────────────────────────────────── -->
+    <div class="col-12 mt-3">
+        <checkbox-box fieldName="recurring"
+                      formControlName="recurring"
+                      translateKey="task.dialog.recurring"/>
+    </div>
+
     <!-- ── Date d'échéance ────────────────────────────────────────────── -->
     <div class="col-12 mt-3">
         <label class="form-label fw-semibold">{{ 'task.dialog.dueDateLabel' | translate }}</label>
@@ -65,6 +72,7 @@
         }
     </div>
 
+
     <!-- ── Snooze ─────────────────────────────────────────────────────── -->
     <div class="col-12 mt-3">
         <label class="form-label fw-semibold">{{ 'task.dialog.snoozeLabel' | translate }}</label>
@@ -86,20 +94,13 @@
             <number-box fieldName="snoozeOffset"
                         formControlName="snoozeOffset"
                         translateKey="task.dialog.snoozeOffset"
-                        [minValue]="-365"
+                        [minValue]="0"
                         [maxValue]="365"/>
             @if (form.get('snoozeOffset')?.value !== null && form.get('snoozeOffset')?.value !== '') {
                 <div class="mt-1 small text-secondary">
-                    @if ((form.get('snoozeOffset')?.value ?? 0) < 0) {
-                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('snoozeOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBefore' | translate }}
-                    } @else if ((form.get('snoozeOffset')?.value ?? 0) > 0) {
-                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('snoozeOffset')?.value }} {{ 'task.dialog.daysAfter' | translate }}
-                    } @else {
-                        {{ 'task.dialog.dayJ' | translate }}
-                    }
+                    <i class="pi pi-arrow-left me-1"></i>{{ (form.get('snoozeOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBeforeDueDate' | translate }}
                 </div>
             }
         }
     </div>
-
 </div>

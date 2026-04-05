@@ -24,6 +24,8 @@ export interface ISubtaskInstance {
     snoozeOffset: number | null;
     responsible: string | null;
     supplierInfo: string | null;
+    /** Indique si la sous-tâche est récurrente. Défaut true. */
+    recurring: boolean;
 }
 
 export interface ITaskComment {

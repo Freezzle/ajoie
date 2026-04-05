@@ -88,6 +88,14 @@ public class SubtaskInstance implements Serializable, TenantOwned {
     @Column(name = "snooze_offset")
     private Integer snoozeOffset;
 
+    /**
+     * Indique si cette sous-tâche est récurrente (réapparaît lors de la prochaine édition).
+     * Défaut true.
+     */
+    @NotNull
+    @Column(name = "recurring", nullable = false)
+    private Boolean recurring = true;
+
     @NotNull
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;

@@ -238,9 +238,9 @@ public class TaskInstanceService {
         if ("OFFSET".equals(snoozeType)) {
             Integer snoozeOffset = fields.containsKey("snoozeOffset")
                     ? toInt(fields.get("snoozeOffset")) : entity.getSnoozeOffset();
-            validateOffset(snoozeOffset);
+            validateSnoozeOffset(snoozeOffset);
             entity.setSnoozeOffset(snoozeOffset);
-            entity.setSnoozedUntil(resolveOffset(entity.getTaskInstance().getSalon(), snoozeOffset));
+            entity.setSnoozedUntil(resolveOffsetFromDate(entity.getDueDate(), entity.getTaskInstance().getSalon(), snoozeOffset));
         } else if ("FIXED".equals(snoozeType)) {
             entity.setSnoozeOffset(null);
             if (fields.containsKey("snoozedUntil")) {
@@ -287,9 +287,9 @@ public class TaskInstanceService {
         String snoozeType = dto.getSnoozeUntilType();
         entity.setSnoozeUntilType(snoozeType);
         if ("OFFSET".equals(snoozeType)) {
-            validateOffset(dto.getSnoozeOffset());
+            validateSnoozeOffset(dto.getSnoozeOffset());
             entity.setSnoozeOffset(dto.getSnoozeOffset());
-            entity.setSnoozedUntil(resolveOffset(task.getSalon(), dto.getSnoozeOffset()));
+            entity.setSnoozedUntil(resolveOffsetFromDate(entity.getDueDate(), task.getSalon(), dto.getSnoozeOffset()));
         } else if ("FIXED".equals(snoozeType)) {
             entity.setSnoozedUntil(dto.getSnoozedUntil());
         }
@@ -434,6 +434,16 @@ public class TaskInstanceService {
         return base.plusDays(offset);
     }
 
+    /**
+     * Résout un offset en jours par rapport à une date de base (ex : dueDate de la sous-tâche).
+     * Si la date de base est null, fallback sur salon.startingDate.
+     */
+    private LocalDate resolveOffsetFromDate(LocalDate baseDate, Salon salon, Integer offset) {
+        if (offset == null) return null;
+        if (baseDate != null) return baseDate.plusDays(offset);
+        return resolveOffset(salon, offset);
+    }
+
     /** Convertit un Object JSON (Integer ou String) en Integer. */
     private Integer toInt(Object val) {
         if (val == null) return null;
@@ -447,6 +457,14 @@ public class TaskInstanceService {
         if (offset != null && (offset < -365 || offset > 365)) {
             throw new BadRequestAlertException(
                     "Offset must be between -365 and +365", SUBTASK_ENTITY_NAME, ErrorBusinessKey.INVALID_OFFSET);
+        }
+    }
+
+    /** Valide que l'offset de snooze est strictement négatif (J-N avant la dueDate). */
+    private void validateSnoozeOffset(Integer offset) {
+        if (offset != null && (offset < 0 || offset > 365)) {
+            throw new BadRequestAlertException(
+                    "Snooze offset must be between -365 and -1", SUBTASK_ENTITY_NAME, ErrorBusinessKey.INVALID_OFFSET);
         }
     }
 }

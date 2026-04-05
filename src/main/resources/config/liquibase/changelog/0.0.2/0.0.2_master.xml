@@ -16,4 +16,5 @@
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-drop-templates.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-offset.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-subtask-responsible.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-subtask-recurring.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

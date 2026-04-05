@@ -31,7 +31,9 @@
             "daysBefore": "jours avant le salon",
             "daysAfter": "jours après le salon",
             "dayJ": "Le jour J (date de début du salon)",
-            "status": "Statut"
+            "daysBeforeDueDate": "jours avant l'échéance",
+            "status": "Statut",
+            "recurring": "Sous-tâche récurrente"
         },
         "urgency": {
             "late": "En retard",

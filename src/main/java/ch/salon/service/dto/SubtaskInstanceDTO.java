@@ -34,4 +34,6 @@ public class SubtaskInstanceDTO implements Serializable {
     private String snoozeUntilType;
     /** Décalage en jours pour le snooze si snoozeUntilType = 'OFFSET'. */
     private Integer snoozeOffset;
+    /** Indique si la sous-tâche est récurrente. Défaut true. */
+    private Boolean recurring = true;
 }
