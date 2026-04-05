@@ -57,9 +57,9 @@
                 <!-- Date : p-tag PrimeNG -->
                 @if (task.dueDate && !isDone && !isCancelled) {
                     <p-tag [severity]="dueDateSeverity"
-                           [value]="task.dueDate | daysRemaining : task.status"
+                           [value]="task.dueDate | daysRelative"
                            [rounded]="true"
-                           styleClass="tc-tag tc-tag--date"/>
+                           class="tc-tag tc-tag--date"/>
                 }
 
                 <div class="tc__menu">
@@ -151,3 +151,5 @@
         <app-subtask-instance-form [subtask]="editingSubtask"/>
     </dialog-box>
 }
+
+

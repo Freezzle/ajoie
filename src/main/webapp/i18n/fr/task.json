@@ -19,7 +19,18 @@
             "responsible": "Responsable",
             "supplierInfo": "Informations fournisseur",
             "dueDate": "Date d'échéance",
+            "dueDateOffset": "Décalage en jours (J±N)",
             "snoozedUntil": "Snoozée jusqu'au",
+            "snoozeOffset": "Décalage en jours (J±N)",
+            "dueDateLabel": "Date d'échéance",
+            "snoozeLabel": "Reporter (snooze)",
+            "snoozeHint": "Masquer cette sous-tâche jusqu'à une certaine date.",
+            "dueDateFixed": "Date fixe",
+            "dueDateJN": "J±N jours",
+            "snoozeNone": "Aucun",
+            "daysBefore": "jours avant le salon",
+            "daysAfter": "jours après le salon",
+            "dayJ": "Le jour J (date de début du salon)",
             "status": "Statut"
         },
         "urgency": {
@@ -49,7 +60,8 @@
             "PENDING": "En attente",
             "IN_PROGRESS": "En cours",
             "DONE": "Terminé",
-            "CANCELLED": "Annulé"
+            "CANCELLED": "Annulé",
+            "BLOCKED": "Bloqué"
         }
     }
 }

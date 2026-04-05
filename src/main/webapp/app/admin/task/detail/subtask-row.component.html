@@ -11,8 +11,8 @@
         <div class="d-flex align-items-center flex-wrap gap-1">
             <span class="subtask-title" [class.done]="isDone">{{ subtask.title }}</span>
             @if (subtask.status !== 'PENDING' && subtask.status !== 'DONE') {
-                <p-tag [severity]="statusSeverity" [value]="subtask.status | lowercase" [rounded]="true"
-                       styleClass="subtask-status-tag"/>
+                <p-tag [severity]="statusSeverity" [value]="('task.status.' + subtask.status) | translate" [rounded]="true"
+                       class="subtask-status-tag"/>
             }
         </div>
 
@@ -23,10 +23,10 @@
         @if (subtask.responsible || subtask.supplierInfo) {
             <div class="d-flex flex-wrap gap-1 mt-1">
                 @if (subtask.responsible) {
-                    <p-tag icon="pi pi-user" [value]="subtask.responsible" severity="info" [rounded]="true" styleClass="subtask-chip-tag"/>
+                    <p-tag icon="pi pi-user" [value]="subtask.responsible" severity="info" [rounded]="true" class="subtask-chip-tag"/>
                 }
                 @if (subtask.supplierInfo) {
-                    <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo" severity="success" [rounded]="true" styleClass="subtask-chip-tag"/>
+                    <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo" severity="success" [rounded]="true" class="subtask-chip-tag"/>
                 }
             </div>
         }
@@ -34,10 +34,9 @@
 
     <!-- Date : snooze prioritaire si actif, sinon dueDate -->
     @if (displayDate && !isDone) {
-        <p-tag
-               [severity]="isSnoozed ? 'secondary' : dateSeverity"
+        <p-tag [severity]="isSnoozed ? 'secondary' : dateSeverity"
                [rounded]="true"
-               styleClass="subtask-date-tag"
+               class="subtask-date-tag"
                (click)="dueDatePopover.toggle($event)"
                style="cursor:pointer">
             <span class="d-flex align-items-center gap-1">

@@ -14,26 +14,27 @@ import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-b
 import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
 import {Tag} from 'primeng/tag';
 import {ProgressBar} from 'primeng/progressbar';
+import DaysRelativePipe from '../../../shared/date/days-relative.pipe';
 
 @Component({
     selector: 'app-task-card',
     templateUrl: './task-card.component.html',
     styleUrls: ['./task-card.component.scss'],
-    imports: [
-        CommonModule,
-        FormsModule,
-        TranslateModule,
-        MenuBoxComponent,
-        ButtonBoxComponent,
-        SubtaskRowComponent,
-        DaysRemainingPipe,
-        TimeSincePipe,
-        DialogBoxComponent,
-        SubtaskInstanceFormComponent,
-        Tag,
-        ProgressBar
-    ]
-})
+               imports: [
+                   CommonModule,
+                   FormsModule,
+                   TranslateModule,
+                   MenuBoxComponent,
+                   ButtonBoxComponent,
+                   SubtaskRowComponent,
+                   TimeSincePipe,
+                   DialogBoxComponent,
+                   SubtaskInstanceFormComponent,
+                   Tag,
+                   ProgressBar,
+                   DaysRelativePipe
+               ]
+           })
 export class TaskCardComponent {
     @Input() task!: ITaskInstance;
     @Output() statusChanged = new EventEmitter<void>();
@@ -216,7 +217,12 @@ export class TaskCardComponent {
         const allDone = subtasks.length > 0 && subtasks.every(s => s.status === 'DONE');
 
         if (allDone && !this.isDone && !this.isCancelled) {
+            // Toutes les sous-tâches sont DONE → passer la tâche à DONE
             this.taskInstanceService.updateStatus(this.task.id, 'DONE')
+                .subscribe(() => this.statusChanged.emit());
+        } else if (!allDone && this.isDone) {
+            // Une sous-tâche décochée alors que la tâche était DONE → repasser en PENDING
+            this.taskInstanceService.updateStatus(this.task.id, 'PENDING')
                 .subscribe(() => this.statusChanged.emit());
         } else {
             this.statusChanged.emit();

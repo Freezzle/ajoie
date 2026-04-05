@@ -9,6 +9,7 @@ import {NumberBoxComponent} from '../../../shared/components/number-box/number-b
 import {DialogDraftService} from '../../../shared/services/dialog-draft.service';
 import {DateInputType, ISubtaskInstance} from '../model/task-instance.interface';
 import {SelectButton} from 'primeng/selectbutton';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-subtask-instance-form',
@@ -30,19 +31,24 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
 
     form!: FormGroup;
 
-    readonly dueDateTypeOptions = [
-        { label: 'Date fixe', value: 'FIXED' },
-        { label: 'J±N jours', value: 'OFFSET' }
-    ];
+    get dueDateTypeOptions() {
+        return [
+            { label: this.translate.instant('task.dialog.dueDateFixed'), value: 'FIXED' },
+            { label: this.translate.instant('task.dialog.dueDateJN'), value: 'OFFSET' }
+        ];
+    }
 
-    readonly snoozeTypeOptions = [
-        { label: 'Aucun', value: null },
-        { label: 'Date fixe', value: 'FIXED' },
-        { label: 'J±N jours', value: 'OFFSET' }
-    ];
+    get snoozeTypeOptions() {
+        return [
+            { label: this.translate.instant('task.dialog.snoozeNone'), value: null },
+            { label: this.translate.instant('task.dialog.dueDateFixed'), value: 'FIXED' },
+            { label: this.translate.instant('task.dialog.dueDateJN'), value: 'OFFSET' }
+        ];
+    }
 
     private readonly fb = inject(FormBuilder);
     private readonly draftService = inject(DialogDraftService);
+    private readonly translate = inject(TranslateService);
 
     get dueDateType(): DateInputType {
         return this.form?.get('dueDateType')?.value ?? 'FIXED';

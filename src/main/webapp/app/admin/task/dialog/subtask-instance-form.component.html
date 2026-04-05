@@ -31,7 +31,7 @@
 
     <!-- ── Date d'échéance ────────────────────────────────────────────── -->
     <div class="col-12 mt-3">
-        <label class="form-label fw-semibold">Date d'échéance</label>
+        <label class="form-label fw-semibold">{{ 'task.dialog.dueDateLabel' | translate }}</label>
 
         <div class="mb-2">
             <p-select-button formControlName="dueDateType"
@@ -54,11 +54,11 @@
             @if (form.get('dueDateOffset')?.value !== null && form.get('dueDateOffset')?.value !== '') {
                 <div class="mt-1 small text-secondary">
                     @if ((form.get('dueDateOffset')?.value ?? 0) < 0) {
-                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('dueDateOffset')?.value ?? 0) * -1 }} jours avant le salon
+                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('dueDateOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBefore' | translate }}
                     } @else if ((form.get('dueDateOffset')?.value ?? 0) > 0) {
-                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('dueDateOffset')?.value }} jours après le salon
+                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('dueDateOffset')?.value }} {{ 'task.dialog.daysAfter' | translate }}
                     } @else {
-                        <i class="pi pi-calendar me-1"></i>Le jour J (date de début du salon)
+                        <i class="pi pi-calendar me-1"></i>{{ 'task.dialog.dayJ' | translate }}
                     }
                 </div>
             }
@@ -67,8 +67,8 @@
 
     <!-- ── Snooze ─────────────────────────────────────────────────────── -->
     <div class="col-12 mt-3">
-        <label class="form-label fw-semibold">Reporter (snooze)</label>
-        <p class="text-muted small mb-2">Masquer cette sous-tâche jusqu'à une certaine date.</p>
+        <label class="form-label fw-semibold">{{ 'task.dialog.snoozeLabel' | translate }}</label>
+        <p class="text-muted small mb-2">{{ 'task.dialog.snoozeHint' | translate }}</p>
 
         <div class="mb-2">
             <p-select-button formControlName="snoozeUntilType"
@@ -91,11 +91,11 @@
             @if (form.get('snoozeOffset')?.value !== null && form.get('snoozeOffset')?.value !== '') {
                 <div class="mt-1 small text-secondary">
                     @if ((form.get('snoozeOffset')?.value ?? 0) < 0) {
-                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('snoozeOffset')?.value ?? 0) * -1 }} jours avant le salon
+                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('snoozeOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBefore' | translate }}
                     } @else if ((form.get('snoozeOffset')?.value ?? 0) > 0) {
-                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('snoozeOffset')?.value }} jours après le salon
+                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('snoozeOffset')?.value }} {{ 'task.dialog.daysAfter' | translate }}
                     } @else {
-                        Le jour J
+                        {{ 'task.dialog.dayJ' | translate }}
                     }
                 </div>
             }
