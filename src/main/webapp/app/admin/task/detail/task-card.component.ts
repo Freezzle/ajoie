@@ -15,6 +15,7 @@ import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.comp
 import {Tag} from 'primeng/tag';
 import {ProgressBar} from 'primeng/progressbar';
 import DaysRelativePipe from '../../../shared/date/days-relative.pipe';
+import {TaskFilter} from '../list/task-focus-list.component';
 
 @Component({
     selector: 'app-task-card',
@@ -37,6 +38,7 @@ import DaysRelativePipe from '../../../shared/date/days-relative.pipe';
            })
 export class TaskCardComponent {
     @Input() task!: ITaskInstance;
+    @Input() activeFilter: TaskFilter = 'active';
     @Output() statusChanged = new EventEmitter<void>();
     @Output() editRequested = new EventEmitter<void>();
 
@@ -75,9 +77,34 @@ export class TaskCardComponent {
         return Math.round((this.doneSubtaskCount / total) * 100);
     }
 
-    /** Sous-tâches triées par dueDate (nulls en dernier) puis sortOrder */
+    /** Sous-tâches filtrées selon le filtre actif, puis triées par dueDate (nulls en dernier) puis sortOrder */
     get sortedSubtasks() {
-        return [...(this.task.subtasks ?? [])].sort((a, b) => {
+        const today = new Date().toISOString().split('T')[0];
+        let subtasks = [...(this.task.subtasks ?? [])];
+
+        switch (this.activeFilter) {
+            case 'late':
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && !!s.dueDate && s.dueDate < today);
+                break;
+            case 'today':
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && s.dueDate === today);
+                break;
+            case 'in_progress':
+                subtasks = subtasks.filter(s => s.status === 'IN_PROGRESS');
+                break;
+            case 'done':
+                subtasks = subtasks.filter(s => s.status === 'DONE');
+                break;
+            case 'snoozed':
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && !!s.snoozedUntil && s.snoozedUntil >= today);
+                break;
+            case 'active':
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED');
+                break;
+            // 'all' et 'active' : toutes les sous-tâches
+        }
+
+        return subtasks.sort((a, b) => {
             if (!a.dueDate && !b.dueDate) return a.sortOrder - b.sortOrder;
             if (!a.dueDate) return 1;
             if (!b.dueDate) return -1;

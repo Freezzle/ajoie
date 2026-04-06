@@ -179,7 +179,7 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
                                                        <p-tag
                                                                [severity]="isUserOnline(getOtherUser(conv)) ? 'success' : 'danger'"
                                                                [value]="isUserOnline(getOtherUser(conv)) ? 'En ligne' : 'Hors ligne'"
-                                                               [styleClass]="'text-xs'">
+                                                               [class]="'text-xs'">
                                                        </p-tag>
                                                    }
                                                </div>

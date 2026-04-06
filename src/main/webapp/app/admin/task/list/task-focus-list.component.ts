@@ -12,7 +12,7 @@ import {TaskInstanceFormComponent} from '../dialog/task-instance-form.component'
 import {finalize} from 'rxjs/operators';
 import {TaskCardComponent} from '../detail/task-card.component';
 
-export type TaskFilter = 'all' | 'late' | 'today' | 'in_progress' | 'done' | 'snoozed';
+export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | 'done' | 'snoozed';
 
 @Component({
     selector: 'app-task-focus-list',
@@ -131,6 +131,7 @@ export class TaskFocusListComponent implements OnInit {
     // ── Filtre appliqué ─────────────────────────────────────────────────────
     get filteredTasks(): ITaskInstance[] {
         switch (this.activeFilter) {
+            case 'active':      return this.tasks.filter(t => t.status !== 'DONE' && t.status !== 'CANCELLED');
             case 'late':        return this.tasks.filter(t => this.isLate(t));
             case 'today':       return this.tasks.filter(t => this.isToday(t));
             case 'in_progress': return this.tasks.filter(t => t.status === 'IN_PROGRESS');

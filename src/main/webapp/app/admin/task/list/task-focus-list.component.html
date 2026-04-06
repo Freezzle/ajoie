@@ -54,6 +54,12 @@
                     (click)="activeFilter = 'all'">
                 Toutes <span class="tfl-filter-count">{{ tasks.length }}</span>
             </button>
+            @if (countActive > 0) {
+                <button class="tfl-filter-pill tfl-filter-pill--active" [class.active]="activeFilter === 'active'"
+                        (click)="activeFilter = 'active'">
+                    <i class="pi pi-list-check"></i> Actives <span class="tfl-filter-count">{{ countActive }}</span>
+                </button>
+            }
             @if (countLate > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--late" [class.active]="activeFilter === 'late'"
                         (click)="activeFilter = 'late'">
@@ -108,7 +114,7 @@
     @if (!isLoading && filteredTasks.length > 0) {
         <div class="d-flex flex-column gap-2">
             @for (task of filteredTasks; track task.id) {
-                <app-task-card [task]="task" (statusChanged)="load()" (editRequested)="openEditTaskDialog(task)"/>
+                <app-task-card [task]="task" [activeFilter]="activeFilter" (statusChanged)="load()" (editRequested)="openEditTaskDialog(task)"/>
             }
         </div>
     }
