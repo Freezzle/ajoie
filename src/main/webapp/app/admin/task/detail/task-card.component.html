@@ -7,27 +7,33 @@
         <div class="tc__row">
 
             <div class="tc__info">
-                <span class="tc__title" [class.tc__title--done]="isDone">{{ task.title }}</span>
+                <span class="tc__title">
+                    {{ task.title }}
+                    @if (task.status === 'IN_PROGRESS') {
+                        <p-tag value="En cours" severity="warn" [rounded]="true" class="tc-tag"/>
+                    }
+                    @if (isCancelled) {
+                        <p-tag value="Annulée" severity="secondary" [rounded]="true" class="tc-tag"/>
+                    }
+                </span>
+
+                @if (task.description) {
+                    <span class="tc__desc">{{ task.description }}</span>
+                }
 
                 <!-- Chips : p-tag PrimeNG -->
                 <div class="tc__chips">
                     @if (task.responsible && !editingResponsible) {
                         <p-tag icon="pi pi-user" [value]="task.responsible" severity="info" [rounded]="true"
-                               styleClass="tc-tag tc-tag--clickable" title="Cliquer pour modifier"
+                               class="tc-tag tc-tag--clickable" title="Cliquer pour modifier"
                                (click)="editResponsibleValue = task.responsible!; editingResponsible = true"/>
                     }
-                    @if (task.status === 'IN_PROGRESS') {
-                        <p-tag icon="pi pi-play-circle" value="En cours" severity="warn" [rounded]="true" styleClass="tc-tag"/>
-                    }
-                    @if (isCancelled) {
-                        <p-tag icon="pi pi-ban" value="Annulée" severity="secondary" [rounded]="true" styleClass="tc-tag"/>
-                    }
                     @if (task.supplierInfo) {
-                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" styleClass="tc-tag"/>
+                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" class="tc-tag"/>
                     }
                     @if (task.comments.length > 0) {
                         <p-tag icon="pi pi-comment" [value]="task.comments.length.toString()" severity="contrast"
-                               [rounded]="true" styleClass="tc-tag tc-tag--clickable"
+                               [rounded]="true" class="tc-tag tc-tag--clickable"
                                [title]="showComments ? 'Masquer les commentaires' : 'Voir les commentaires'"
                                (click)="toggleComments()"/>
                     }
@@ -48,9 +54,9 @@
                 @if (task.subtasks.length > 0) {
                     <div class="tc__prog">
                         <span class="tc__prog-label">{{ doneSubtaskCount }}/{{ task.subtasks.length }}</span>
-                        <p-progressbar [value]="subtaskProgress"
+                        <p-progress-bar [value]="subtaskProgress"
                                        [showValue]="false"
-                                       styleClass="tc__progressbar"/>
+                                        class="tc__progressbar"/>
                     </div>
                 }
 

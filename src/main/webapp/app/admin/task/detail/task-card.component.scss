@@ -16,7 +16,7 @@
     &.tc--today   { border-left-color: #f97316; background: linear-gradient(90deg,#fff8f3 0%,#fff 60px); }
     &.tc--soon    { border-left-color: #3b82f6; background: linear-gradient(90deg,#f0f6ff 0%,#fff 60px); }
     &.tc--neutral { border-left-color: #e8eaed; }
-    &.tc--done, &.tc--cancelled { opacity: .55; background: #fafafa; border-left-color: #d1d5db; box-shadow: none; }
+    &.tc--done, &.tc--cancelled { opacity: .7; background: #fafafa; border-left-color: #d1d5db; box-shadow: none; }
 }
 
 .tc__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -25,7 +25,10 @@
 
 .tc__title {
     font-size: .875rem; font-weight: 600; color: #111827; line-height: 1.4;
-    &--done { text-decoration: line-through; color: #9ca3af; }
+}
+
+.tc__desc {
+    font-size: 0.72rem; color: #9ca3af; font-style: italic; line-height: 1.3;
 }
 
 .tc__chips { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }

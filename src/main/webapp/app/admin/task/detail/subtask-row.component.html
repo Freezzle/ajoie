@@ -9,7 +9,7 @@
     <!-- Corps principal -->
     <div class="subtask-body">
         <div class="d-flex align-items-center flex-wrap gap-1">
-            <span class="subtask-title" [class.done]="isDone">{{ subtask.title }}</span>
+            <span class="subtask-title">{{ subtask.title }}</span>
             @if (subtask.status !== 'PENDING' && subtask.status !== 'DONE') {
                 <p-tag [severity]="statusSeverity" [value]="('task.status.' + subtask.status) | translate" [rounded]="true"
                        class="subtask-status-tag"/>
