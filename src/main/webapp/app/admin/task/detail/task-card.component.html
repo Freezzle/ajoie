@@ -9,8 +9,11 @@
             <div class="tc__info">
                 <span class="tc__title">
                     {{ task.title }}
-                    @if (task.status === 'IN_PROGRESS') {
+                    @if (hasInProgressSubtask) {
                         <p-tag value="En cours" severity="warn" [rounded]="true" class="tc-tag"/>
+                    }
+                    @if (hasBlockedSubtask) {
+                        <p-tag value="Bloquée" severity="danger" [rounded]="true" class="tc-tag"/>
                     }
                     @if (isCancelled) {
                         <p-tag value="Annulée" severity="secondary" [rounded]="true" class="tc-tag"/>
@@ -58,14 +61,6 @@
                                        [showValue]="false"
                                         class="tc__progressbar"/>
                     </div>
-                }
-
-                <!-- Date : p-tag PrimeNG -->
-                @if (task.dueDate && !isDone && !isCancelled) {
-                    <p-tag [severity]="dueDateSeverity"
-                           [value]="task.dueDate | daysRelative"
-                           [rounded]="true"
-                           class="tc-tag tc-tag--date"/>
                 }
 
                 <div class="tc__menu">

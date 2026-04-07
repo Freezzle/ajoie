@@ -67,6 +67,16 @@ export class TaskCardComponent {
         return this.task.status === 'CANCELLED';
     }
 
+    /** Au moins une sous-tâche est IN_PROGRESS */
+    get hasInProgressSubtask(): boolean {
+        return (this.task.subtasks ?? []).some(s => s.status === 'IN_PROGRESS');
+    }
+
+    /** Au moins une sous-tâche est BLOCKED */
+    get hasBlockedSubtask(): boolean {
+        return (this.task.subtasks ?? []).some(s => s.status === 'BLOCKED');
+    }
+
     get doneSubtaskCount(): number {
         return (this.task.subtasks ?? []).filter(s => s.status === 'DONE').length;
     }
@@ -180,21 +190,6 @@ export class TaskCardComponent {
             },
             {separator: true},
             {
-                label: 'Marquer en cours',
-                icon: 'pi pi-play',
-                disabled: this.task.status === 'IN_PROGRESS',
-                command: () => this.taskInstanceService.updateStatus(this.task.id, 'IN_PROGRESS')
-                    .subscribe(() => this.statusChanged.emit())
-            },
-            {
-                label: 'Marquer en attente',
-                icon: 'pi pi-pause',
-                disabled: this.task.status === 'PENDING',
-                command: () => this.taskInstanceService.updateStatus(this.task.id, 'PENDING')
-                    .subscribe(() => this.statusChanged.emit())
-            },
-            {separator: true},
-            {
                 label: 'Ajouter une sous-tâche',
                 icon: 'pi pi-plus',
                 command: () => this.openAddSubtaskDialog()
@@ -219,6 +214,13 @@ export class TaskCardComponent {
                 styleClass: 'danger-item',
                 disabled: this.isCancelled,
                 command: () => this.taskInstanceService.updateStatus(this.task.id, 'CANCELLED')
+                    .subscribe(() => this.statusChanged.emit())
+            },
+            {
+                label: 'Réactiver la tâche',
+                icon: 'pi pi-refresh',
+                disabled: !this.isCancelled,
+                command: () => this.taskInstanceService.updateStatus(this.task.id, 'PENDING')
                     .subscribe(() => this.statusChanged.emit())
             },
             {

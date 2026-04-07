@@ -11,7 +11,8 @@
         <div class="d-flex align-items-center flex-wrap gap-1">
             <span class="subtask-title">{{ subtask.title }}</span>
             @if (subtask.status !== 'PENDING' && subtask.status !== 'DONE') {
-                <p-tag [severity]="statusSeverity" [value]="('task.status.' + subtask.status) | translate" [rounded]="true"
+                <p-tag [severity]="statusSeverity" [value]="('task.status.' + subtask.status) | translate"
+                       [rounded]="true"
                        class="subtask-status-tag"/>
             }
         </div>
@@ -23,35 +24,39 @@
         @if (subtask.responsible || subtask.supplierInfo) {
             <div class="d-flex flex-wrap gap-1 mt-1">
                 @if (subtask.responsible) {
-                    <p-tag icon="pi pi-user" [value]="subtask.responsible" severity="info" [rounded]="true" class="subtask-chip-tag"/>
+                    <p-tag icon="pi pi-user" [value]="subtask.responsible" severity="info" [rounded]="true"
+                           class="subtask-chip-tag"/>
                 }
                 @if (subtask.supplierInfo) {
-                    <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo" severity="success" [rounded]="true" class="subtask-chip-tag"/>
+                    <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo" severity="success" [rounded]="true"
+                           class="subtask-chip-tag"/>
                 }
             </div>
         }
     </div>
 
-    <!-- Date : snooze prioritaire si actif, sinon dueDate -->
+    <!-- Date : toujours la dueDate avec sa vraie sévérité + icône snooze si actif -->
     @if (displayDate && !isDone) {
-        <p-tag [severity]="isSnoozed ? 'secondary' : dateSeverity"
+        <p-tag [severity]="dateSeverity"
                [rounded]="true"
                class="subtask-date-tag"
                (click)="dueDatePopover.toggle($event)"
                style="cursor:pointer">
             <span class="d-flex align-items-center gap-1">
-                <i [class]="isSnoozed ? 'pi pi-bell-slash' : ''" style="font-size:0.7rem"></i>
+                @if (isSnoozed) {
+                    <i class="pi pi-bell-slash" style="font-size:0.7rem"></i>
+                }
                 {{ displayDate | daysRelative }}
             </span>
         </p-tag>
         <p-popover #dueDatePopover appendTo="body">
             <div class="due-date-popover">
+                <i class="pi pi-calendar me-2" style="color:#6b7280"></i>
+                <span>Échéance au {{ subtask.dueDate | formatMediumDate }}</span>
                 @if (isSnoozed) {
-                    <i class="pi pi-clock me-2" style="color:#6b7280"></i>
+                    <br/>
+                    <i class="pi pi-bell-slash me-2 mt-1" style="color:#6b7280"></i>
                     <span>Reporté au {{ subtask.snoozedUntil | formatMediumDate }}</span>
-                } @else {
-                    <i class="pi pi-calendar me-2" style="color:#6b7280"></i>
-                    <span>Échéance : {{ subtask.dueDate | formatMediumDate }}</span>
                 }
             </div>
         </p-popover>

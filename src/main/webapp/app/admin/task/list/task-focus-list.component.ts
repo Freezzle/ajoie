@@ -3,7 +3,7 @@ import {ActivatedRoute, RouterModule} from '@angular/router';
 import SharedModule from 'app/shared/shared.module';
 import {FormsModule} from '@angular/forms';
 import {TaskInstanceService} from '../service/task-instance.service';
-import {ITaskInstance} from '../model/task-instance.interface';
+import {ISubtaskInstance, ITaskInstance} from '../model/task-instance.interface';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
@@ -112,13 +112,36 @@ export class TaskFocusListComponent implements OnInit {
         return new Date().toISOString().split('T')[0];
     }
 
+    // ── Sous-tâches à plat (hors tâches annulées) ──────────────────────────
+    private get allSubtasks(): ISubtaskInstance[] {
+        return this.tasks
+            .filter(t => t.status !== 'CANCELLED')
+            .flatMap(t => t.subtasks ?? []);
+    }
+
+    private isSubtaskLate(s: ISubtaskInstance): boolean {
+        if (!s.dueDate || s.status === 'DONE' || s.status === 'CANCELLED' || this.isSubtaskSnoozed(s)) return false;
+        return s.dueDate < this.todayStr();
+    }
+
+    private isSubtaskToday(s: ISubtaskInstance): boolean {
+        if (!s.dueDate || s.status === 'DONE' || s.status === 'CANCELLED') return false;
+        return s.dueDate === this.todayStr();
+    }
+
+    private isSubtaskSnoozed(s: ISubtaskInstance): boolean {
+        const today = this.todayStr();
+        return !!s.snoozedUntil && s.snoozedUntil >= today;
+    }
+
     // ── Compteurs pour les badges de filtre ─────────────────────────────────
-    get countActive(): number   { return this.tasks.filter(t => t.status !== 'DONE' && t.status !== 'CANCELLED').length; }
-    get countLate(): number     { return this.tasks.filter(t => this.isLate(t)).length; }
-    get countToday(): number    { return this.tasks.filter(t => this.isToday(t)).length; }
-    get countInProgress(): number { return this.tasks.filter(t => t.status === 'IN_PROGRESS').length; }
-    get countDone(): number     { return this.tasks.filter(t => t.status === 'DONE').length; }
-    get countSnoozed(): number  { return this.tasks.filter(t => this.isSnoozed(t)).length; }
+    get countAll(): number       { return this.allSubtasks.length; }
+    get countActive(): number     { return this.allSubtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED').length; }
+    get countLate(): number       { return this.allSubtasks.filter(s => this.isSubtaskLate(s)).length; }
+    get countToday(): number      { return this.allSubtasks.filter(s => this.isSubtaskToday(s)).length; }
+    get countInProgress(): number { return this.allSubtasks.filter(s => s.status === 'IN_PROGRESS').length; }
+    get countDone(): number       { return this.allSubtasks.filter(s => s.status === 'DONE').length; }
+    get countSnoozed(): number    { return this.allSubtasks.filter(s => this.isSubtaskSnoozed(s)).length; }
 
     // ── Progression globale ─────────────────────────────────────────────────
     get totalTasks(): number  { return this.tasks.length; }

@@ -43,11 +43,8 @@ export class SubtaskRowComponent {
 
     /** Vrai si la sous-tâche est snoozée (date de snooze dans le futur) et non terminée. */
     get isSnoozed(): boolean {
-        if (this.isDone || !this.subtask.snoozedUntil) return false;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const snooze = new Date(this.subtask.snoozedUntil + 'T00:00:00');
-        return snooze >= today;
+        return !(this.isDone || !this.subtask.snoozedUntil);
+
     }
 
     /** Date à afficher : snooze si actif, sinon dueDate. */
@@ -56,7 +53,7 @@ export class SubtaskRowComponent {
     }
 
     get dateStatus(): 'late' | 'soon' | 'today' | 'ok' | null {
-        const dueDate = this.subtask.dueDate;
+        const dueDate = this.displayDate;
         const status = this.subtask.status;
         if (!dueDate || status === 'DONE' || status === 'CANCELLED' || status === 'BLOCKED') return null;
         const today = new Date();

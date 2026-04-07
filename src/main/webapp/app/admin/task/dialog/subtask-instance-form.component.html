@@ -38,7 +38,15 @@
 
     <!-- ── Date d'échéance ────────────────────────────────────────────── -->
     <div class="col-12 mt-3">
-        <label class="form-label fw-semibold">{{ 'task.dialog.dueDateLabel' | translate }}</label>
+        <label class="form-label fw-semibold">
+            {{ 'task.dialog.dueDateLabel' | translate }}
+            <i class="pi pi-info-circle ms-1 text-muted"
+               style="cursor:pointer; font-size:0.85rem;"
+               (click)="dueDatePopover.toggle($event)"></i>
+        </label>
+        <p-popover #dueDatePopover>
+            <div style="max-width:280px; font-size:0.85rem;">{{ 'task.dialog.dueDateHint' | translate }}</div>
+        </p-popover>
 
         <div class="mb-2">
             <p-select-button formControlName="dueDateType"
@@ -75,8 +83,15 @@
 
     <!-- ── Snooze ─────────────────────────────────────────────────────── -->
     <div class="col-12 mt-3">
-        <label class="form-label fw-semibold">{{ 'task.dialog.snoozeLabel' | translate }}</label>
-        <p class="text-muted small mb-2">{{ 'task.dialog.snoozeHint' | translate }}</p>
+        <label class="form-label fw-semibold">
+            {{ 'task.dialog.snoozeLabel' | translate }}
+            <i class="pi pi-info-circle ms-1 text-muted"
+               style="cursor:pointer; font-size:0.85rem;"
+               (click)="snoozePopover.toggle($event)"></i>
+        </label>
+        <p-popover #snoozePopover>
+            <div style="max-width:280px; font-size:0.85rem;">{{ 'task.dialog.snoozeHint' | translate }}</div>
+        </p-popover>
 
         <div class="mb-2">
             <p-select-button formControlName="snoozeUntilType"
@@ -98,7 +113,7 @@
                         [maxValue]="365"/>
             @if (form.get('snoozeOffset')?.value !== null && form.get('snoozeOffset')?.value !== '') {
                 <div class="mt-1 small text-secondary">
-                    <i class="pi pi-arrow-left me-1"></i>{{ (form.get('snoozeOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBeforeDueDate' | translate }}
+                    <i class="pi pi-bell-slash me-1"></i>{{ 'task.dialog.snoozeOffsetHint' | translate : { n: form.get('snoozeOffset')?.value ?? 0 } }}
                 </div>
             }
         }

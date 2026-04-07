@@ -10,6 +10,7 @@ import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/chec
 import {DialogDraftService} from '../../../shared/services/dialog-draft.service';
 import {DateInputType, ISubtaskInstance} from '../model/task-instance.interface';
 import {SelectButton} from 'primeng/selectbutton';
+import {Popover} from 'primeng/popover';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({
@@ -24,7 +25,8 @@ import {TranslateService} from '@ngx-translate/core';
         DateBoxComponent,
         NumberBoxComponent,
         CheckboxBoxComponent,
-        SelectButton
+        SelectButton,
+        Popover
     ]
 })
 export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {

@@ -50,8 +50,7 @@
 .tc__prog { display: flex; align-items: center; gap: 5px; }
 .tc__prog-label { font-size: .7rem; color: #9ca3af; white-space: nowrap; min-width: 28px; text-align: right; }
 ::ng-deep .tc__progressbar {
-    width: 52px !important; height: 5px !important; border-radius: 3px !important;
-    .p-progressbar-value { border-radius: 3px !important; }
+    width: 10rem !important; height: 0.5rem !important;
 }
 
 .tc__menu {

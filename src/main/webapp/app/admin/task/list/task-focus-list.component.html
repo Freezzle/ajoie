@@ -52,7 +52,7 @@
         <div class="tfl-filters">
             <button class="tfl-filter-pill" [class.active]="activeFilter === 'all'"
                     (click)="activeFilter = 'all'">
-                Toutes <span class="tfl-filter-count">{{ tasks.length }}</span>
+                Toutes <span class="tfl-filter-count">{{ countAll }}</span>
             </button>
             @if (countActive > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--active" [class.active]="activeFilter === 'active'"
@@ -78,10 +78,12 @@
                     <i class="pi pi-play-circle"></i> En cours <span class="tfl-filter-count">{{ countInProgress }}</span>
                 </button>
             }
-            <button class="tfl-filter-pill tfl-filter-pill--done" [class.active]="activeFilter === 'done'"
-                    (click)="activeFilter = 'done'">
-                <i class="pi pi-check-circle"></i> Terminées <span class="tfl-filter-count">{{ countDone }}</span>
-            </button>
+            @if (countDone > 0) {
+                <button class="tfl-filter-pill tfl-filter-pill--done" [class.active]="activeFilter === 'done'"
+                        (click)="activeFilter = 'done'">
+                    <i class="pi pi-check-circle"></i> Terminées <span class="tfl-filter-count">{{ countDone }}</span>
+                </button>
+            }
             @if (countSnoozed > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--snooze" [class.active]="activeFilter === 'snoozed'"
                         (click)="activeFilter = 'snoozed'">
