@@ -8,13 +8,11 @@ import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.com
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 import {SubtaskRowComponent} from './subtask-row.component';
-import DaysRemainingPipe from '../../../shared/date/days-remaining.pipe';
 import {TimeSincePipe} from '../../../shared/pipe/time-since.pipe';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
 import {Tag} from 'primeng/tag';
 import {ProgressBar} from 'primeng/progressbar';
-import DaysRelativePipe from '../../../shared/date/days-relative.pipe';
 import {TaskFilter} from '../list/task-focus-list.component';
 
 @Component({
@@ -32,8 +30,7 @@ import {TaskFilter} from '../list/task-focus-list.component';
                    DialogBoxComponent,
                    SubtaskInstanceFormComponent,
                    Tag,
-                   ProgressBar,
-                   DaysRelativePipe
+                   ProgressBar
                ]
            })
 export class TaskCardComponent {
