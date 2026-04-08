@@ -12,25 +12,6 @@
     margin-bottom: 10px;
     flex-wrap: wrap;
 
-    &__bar-wrap {
-        flex: 1;
-        min-width: 100px;
-        max-width: 200px;
-        height: 7px;
-        background: #e2e8f0;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    &__bar {
-        height: 100%;
-        background: #94a3b8;
-        border-radius: 4px;
-        transition: width 0.4s ease;
-
-        &--complete { background: #639922; }
-    }
-
     &__label {
         font-size: 0.78rem;
         font-weight: 600;

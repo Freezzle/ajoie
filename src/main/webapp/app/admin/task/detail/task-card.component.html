@@ -10,13 +10,13 @@
                 <span class="tc__title">
                     {{ task.title }}
                     @if (hasInProgressSubtask) {
-                        <p-tag value="En cours" severity="warn" [rounded]="true" class="tc-tag"/>
+                        <p-tag value="En cours" severity="warn" [rounded]="true" class="tag-sm"/>
                     }
                     @if (hasBlockedSubtask) {
-                        <p-tag value="Bloquée" severity="danger" [rounded]="true" class="tc-tag"/>
+                        <p-tag value="Bloquée" severity="danger" [rounded]="true" class="tag-sm"/>
                     }
                     @if (isCancelled) {
-                        <p-tag value="Annulée" severity="secondary" [rounded]="true" class="tc-tag"/>
+                        <p-tag value="Annulée" severity="secondary" [rounded]="true" class="tag-sm"/>
                     }
                 </span>
 
@@ -28,15 +28,15 @@
                 <div class="tc__chips">
                     @if (task.responsible && !editingResponsible) {
                         <p-tag icon="pi pi-user" [value]="task.responsible" severity="info" [rounded]="true"
-                               class="tc-tag tc-tag--clickable" title="Cliquer pour modifier"
+                               class="tag-sm clickable" title="Cliquer pour modifier"
                                (click)="editResponsibleValue = task.responsible!; editingResponsible = true"/>
                     }
                     @if (task.supplierInfo) {
-                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" class="tc-tag"/>
+                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" class="tag-sm"/>
                     }
                     @if (task.comments.length > 0) {
                         <p-tag icon="pi pi-comment" [value]="task.comments.length.toString()" severity="contrast"
-                               [rounded]="true" class="tc-tag tc-tag--clickable"
+                               [rounded]="true" class="tag-sm clickable"
                                [title]="showComments ? 'Masquer les commentaires' : 'Voir les commentaires'"
                                (click)="toggleComments()"/>
                     }
@@ -57,13 +57,10 @@
                 @if (task.subtasks.length > 0) {
                     <div class="tc__prog">
                         <span class="tc__prog-label">{{ doneSubtaskCount }}/{{ task.subtasks.length }}</span>
-                        <p-progress-bar [value]="subtaskProgress"
-                                       [showValue]="false"
-                                        class="tc__progressbar"/>
                     </div>
                 }
 
-                <div class="tc__menu">
+                <div class="tc__menu menu-btn-ghost">
                     <menu-box [items]="menuItems" buttonIcon="pi-ellipsis-v"
                               [buttonTranslateKey]="''" type="secondary" appendTo="body"/>
                 </div>
@@ -73,7 +70,7 @@
         <!-- INLINE FORM : changer responsable -->
         @if (editingResponsible) {
             <div class="tc__form">
-                <i class="pi pi-user" style="color:#0369a1; font-size:0.8rem; flex-shrink:0"></i>
+                <i class="pi pi-user" style="color:var(--p-primary-color); font-size:0.8rem; flex-shrink:0"></i>
                 <input type="text" class="form-control form-control-sm flex-grow-1"
                        [(ngModel)]="editResponsibleValue"
                        (keydown.enter)="saveResponsible()" (keydown.escape)="cancelResponsible()"

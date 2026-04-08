@@ -430,3 +430,86 @@ p-iftalabel label {
     padding-right: 0 !important;
   }
 }
+
+/* ── Utility: small tags ── */
+
+.tag-xs {
+  font-size: 0.65rem !important;
+  padding: 0.07rem 0.43rem !important;
+
+  .p-tag-label { font-size: 0.65rem !important; }
+  .p-tag-icon  { font-size: 0.6rem !important; }
+}
+
+.tag-sm {
+  font-size: 0.68rem !important;
+  padding: 0.14rem 0.5rem !important;
+
+  .p-tag-label { font-size: 0.68rem !important; }
+  .p-tag-icon  { font-size: 0.62rem !important; }
+}
+
+/* ── Utility: ghost menu button ── */
+
+.menu-btn-ghost {
+  --p-button-sm-padding-x: 0;
+  --p-button-sm-padding-y: 0;
+  --p-button-padding-x: 0;
+  --p-button-padding-y: 0;
+
+  ::ng-deep .p-button {
+    width: 2rem !important;
+    height: 2rem !important;
+    padding: 0 !important;
+    min-width: unset !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--p-surface-400) !important;
+    box-shadow: none !important;
+
+    .p-button-icon {
+      margin: 0 !important;
+    }
+
+    &:hover {
+      background: var(--p-surface-100) !important;
+      color: var(--app-text) !important;
+      border-radius: 0.43rem !important;
+    }
+  }
+}
+
+.menu-btn-ghost--sm {
+  --p-button-sm-padding-x: 0;
+  --p-button-sm-padding-y: 0;
+  --p-button-padding-x: 0;
+  --p-button-padding-y: 0;
+
+  ::ng-deep .p-button {
+    width: 1.57rem !important;
+    height: 1.57rem !important;
+    padding: 0 !important;
+    min-width: unset !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--p-surface-400) !important;
+    box-shadow: none !important;
+
+    .p-button-icon {
+      margin: 0 !important;
+    }
+
+    &:hover {
+      background: var(--p-surface-100) !important;
+      color: var(--app-text) !important;
+      border-radius: 0.29rem !important;
+    }
+  }
+}
+
+/* ── Utility: danger menu item ── */
+
+.danger-item .p-menu-item-link {
+  color: var(--app-danger) !important;
+}
+

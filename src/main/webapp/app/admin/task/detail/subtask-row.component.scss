@@ -1,60 +1,62 @@
 .subtask-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 7px;
-    padding: 3px 4px;
-    border-radius: 5px;
-    min-height: 28px;
-    transition: background 0.1s;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding-bottom: 0.2rem;
 
-    &:hover { background: rgba(0,0,0,.025); .subtask-menu { opacity: 1; } }
-    &.subtask-done { opacity: 0.8; }
+  &:hover {
+    background: rgba(0, 0, 0, 0.025);
+
+    .subtask-menu { opacity: 1; }
+  }
+
+  &.subtask-done { opacity: 0.8; }
 }
 
 .subtask-check {
-    flex-shrink: 0;
-    ::ng-deep .p-checkbox-box { width: 16px !important; height: 16px !important; }
+  flex-shrink: 0;
 }
 
 .subtask-body {
-    flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.14rem;
 }
 
 .subtask-title {
-    font-size: 0.8rem; color: #4b5563; line-height: 1.4;
+  font-size: 0.8rem;
+  color: var(--p-surface-600);
+  line-height: 1.4;
 }
 
 .subtask-desc {
-    font-size: 0.72rem; color: #9ca3af; font-style: italic; line-height: 1.3;
+  font-size: 0.72rem;
+  color: var(--p-surface-400);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.subtask-aside {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .subtask-completed-at {
-    font-size: 0.67rem; color: #9ca3af; flex-shrink: 0; white-space: nowrap;
+  font-size: 0.67rem;
+  color: var(--p-surface-400);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .subtask-menu {
-    flex-shrink: 0; opacity: 0; transition: opacity 0.12s;
-    ::ng-deep .p-button {
-        width: 22px !important; height: 22px !important; padding: 0 !important;
-        min-width: unset !important; background: transparent !important;
-        border: none !important; color: #9ca3af !important; box-shadow: none !important;
-        &:hover { background: #f1f5f9 !important; color: #374151 !important; border-radius: 4px !important; }
-    }
+  flex-shrink: 0;
+  opacity: 0;
 }
-
-/* Taille réduite pour les p-tag inline */
-::ng-deep .subtask-status-tag,
-::ng-deep .subtask-chip-tag,
-::ng-deep .subtask-date-tag {
-    font-size: 0.65rem !important;
-    padding: 1px 6px !important;
-    .p-tag-label { font-size: 0.65rem !important; }
-    .p-tag-icon  { font-size: 0.6rem !important; }
-}
-
-::ng-deep .danger-item .p-menu-item-link { color: #dc2626 !important; }
 
 .due-date-popover {
-    font-size: .82rem;
+  font-size: 0.82rem;
 }
-

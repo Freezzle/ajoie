@@ -13,7 +13,7 @@
             @if (subtask.status !== 'PENDING' && subtask.status !== 'DONE') {
                 <p-tag [severity]="statusSeverity" [value]="('task.status.' + subtask.status) | translate"
                        [rounded]="true"
-                       class="subtask-status-tag"/>
+                       class="tag-xs"/>
             }
         </div>
 
@@ -22,54 +22,57 @@
         }
 
         @if (subtask.responsible || subtask.supplierInfo) {
-            <div class="d-flex flex-wrap gap-1 mt-1">
+            <div class="d-flex flex-wrap gap-1">
                 @if (subtask.responsible) {
                     <p-tag icon="pi pi-user" [value]="subtask.responsible" severity="info" [rounded]="true"
-                           class="subtask-chip-tag"/>
+                           class="tag-xs"/>
                 }
                 @if (subtask.supplierInfo) {
                     <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo" severity="success" [rounded]="true"
-                           class="subtask-chip-tag"/>
+                           class="tag-xs"/>
                 }
             </div>
         }
     </div>
 
-    <!-- Date : toujours la dueDate avec sa vraie sévérité + icône snooze si actif -->
-    @if (displayDate && !isDone) {
-        <p-tag [severity]="dateSeverity"
-               [rounded]="true"
-               class="subtask-date-tag"
-               (click)="dueDatePopover.toggle($event)"
-               style="cursor:pointer">
-            <span class="d-flex align-items-center gap-1">
-                @if (isSnoozed) {
-                    <i class="pi pi-bell-slash" style="font-size:0.7rem"></i>
-                }
-                {{ displayDate | daysRelative }}
-            </span>
-        </p-tag>
-        <p-popover #dueDatePopover appendTo="body">
-            <div class="due-date-popover">
-                <i class="pi pi-calendar me-2" style="color:#6b7280"></i>
-                <span>Échéance au {{ subtask.dueDate | formatMediumDate }}</span>
-                @if (isSnoozed) {
-                    <br/>
-                    <i class="pi pi-bell-slash me-2 mt-1" style="color:#6b7280"></i>
-                    <span>Reporté au {{ subtask.snoozedUntil | formatMediumDate }}</span>
-                }
-            </div>
-        </p-popover>
-    }
+    <!-- Partie droite : date/completedAt + menu -->
+    <div class="subtask-aside">
+        <!-- Date : toujours la dueDate avec sa vraie sévérité + icône snooze si actif -->
+        @if (displayDate && !isDone) {
+            <p-tag [severity]="dateSeverity"
+                   [rounded]="true"
+                   class="tag-xs"
+                   (click)="dueDatePopover.toggle($event)"
+                   style="cursor:pointer">
+                <span class="d-flex align-items-center gap-1">
+                    @if (isSnoozed) {
+                        <i class="pi pi-bell-slash" style="font-size:0.7rem"></i>
+                    }
+                    {{ displayDate | daysRelative }}
+                </span>
+            </p-tag>
+            <p-popover #dueDatePopover appendTo="body">
+                <div class="due-date-popover">
+                    <i class="pi pi-calendar me-2" style="color:var(--p-surface-500)"></i>
+                    <span>Échéance au {{ subtask.dueDate | formatMediumDate }}</span>
+                    @if (isSnoozed) {
+                        <br/>
+                        <i class="pi pi-bell-slash me-2 mt-1" style="color:var(--p-surface-500)"></i>
+                        <span>Reporté au {{ subtask.snoozedUntil | formatMediumDate }}</span>
+                    }
+                </div>
+            </p-popover>
+        }
 
-    <!-- completedAt -->
-    @if (isDone && subtask.completedAt) {
-        <span class="subtask-completed-at">{{ subtask.completedAt | timeSince }}</span>
-    }
+        <!-- completedAt -->
+        @if (isDone && subtask.completedAt) {
+            <span class="subtask-completed-at">{{ subtask.completedAt | timeSince }}</span>
+        }
 
-    <!-- Context menu -->
-    <div class="subtask-menu">
-        <menu-box [items]="menuItems" buttonIcon="pi-ellipsis-v"
-                  [buttonTranslateKey]="''" type="secondary" [appendTo]="'body'"/>
+        <!-- Context menu -->
+        <div class="subtask-menu menu-btn-ghost--sm">
+            <menu-box [items]="menuItems" buttonIcon="pi-ellipsis-v"
+                      [buttonTranslateKey]="''" type="secondary" [appendTo]="'body'"/>
+        </div>
     </div>
 </div>

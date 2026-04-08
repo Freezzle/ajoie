@@ -11,6 +11,7 @@ import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-b
 import {TaskInstanceFormComponent} from '../dialog/task-instance-form.component';
 import {finalize} from 'rxjs/operators';
 import {TaskCardComponent} from '../detail/task-card.component';
+import {ProgressBar} from 'primeng/progressbar';
 
 export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | 'done' | 'snoozed';
 
@@ -27,7 +28,8 @@ export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | '
         ButtonBoxComponent,
         DialogBoxComponent,
         TaskInstanceFormComponent,
-        TaskCardComponent
+        TaskCardComponent,
+        ProgressBar
     ]
 })
 export class TaskFocusListComponent implements OnInit {
@@ -144,11 +146,9 @@ export class TaskFocusListComponent implements OnInit {
     get countSnoozed(): number    { return this.allSubtasks.filter(s => this.isSubtaskSnoozed(s)).length; }
 
     // ── Progression globale ─────────────────────────────────────────────────
-    get totalTasks(): number  { return this.tasks.length; }
-    get doneTasks(): number   { return this.tasks.filter(t => t.status === 'DONE').length; }
     get globalProgress(): number {
-        if (this.totalTasks === 0) return 0;
-        return Math.round((this.doneTasks / this.totalTasks) * 100);
+        if (this.countAll === 0) return 0;
+        return Math.round((this.countDone / this.countAll) * 100);
     }
 
     // ── Filtre appliqué ─────────────────────────────────────────────────────

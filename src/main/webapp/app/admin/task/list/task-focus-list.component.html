@@ -21,15 +21,14 @@
     </div>
 
     <!-- ── Bandeau progression globale ── -->
-    @if (!isLoading && totalTasks > 0) {
+    @if (!isLoading && countAll > 0) {
         <div class="tfl-progress">
-            <div class="tfl-progress__bar-wrap">
-                <div class="tfl-progress__bar"
-                     [style.width.%]="globalProgress"
-                     [class.tfl-progress__bar--complete]="globalProgress === 100"></div>
-            </div>
+            <p-progressBar [value]="globalProgress"
+                           [showValue]="false"
+                           [style]="{'flex': '1', 'min-width': '100px', 'max-width': '200px', 'height': '7px'}">
+            </p-progressBar>
             <span class="tfl-progress__label">
-                {{ doneTasks }}/{{ totalTasks }} terminées
+                {{ countDone }}/{{ countAll }} terminées
             </span>
             @if (countLate > 0) {
                 <span class="tfl-progress__badge tfl-progress__badge--late">
