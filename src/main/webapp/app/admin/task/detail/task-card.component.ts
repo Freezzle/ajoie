@@ -14,6 +14,7 @@ import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.comp
 import {Tag} from 'primeng/tag';
 import {ProgressBar} from 'primeng/progressbar';
 import {TaskFilter} from '../list/task-focus-list.component';
+import {AccountService} from '../../../core/auth/account.service';
 
 @Component({
     selector: 'app-task-card',
@@ -40,6 +41,7 @@ export class TaskCardComponent {
     @Output() editRequested = new EventEmitter<void>();
 
     protected taskInstanceService = inject(TaskInstanceService);
+    private accountService = inject(AccountService);
 
     showSubtasks = false;
     showCommentInput = false;
@@ -54,6 +56,9 @@ export class TaskCardComponent {
     // Dialog sous-tâche (ajout / édition)
     showSubtaskDialog = signal(false);
     editingSubtask: ISubtaskInstance | null = null;
+
+    // Dialog commentaire
+    showCommentDialog = signal(false);
 
 
     get isDone(): boolean {
@@ -160,24 +165,6 @@ export class TaskCardComponent {
         }
     }
 
-    get dueDateSeverity(): 'danger' | 'warn' | 'info' | 'secondary' {
-        switch (this.dueDateStatus) {
-            case 'late':  return 'danger';
-            case 'today': return 'warn';
-            case 'soon':  return 'info';
-            default:      return 'secondary';
-        }
-    }
-
-    get taskStatusSeverity(): 'success' | 'warn' | 'secondary' | 'contrast' {
-        switch (this.task.status) {
-            case 'DONE':        return 'success';
-            case 'IN_PROGRESS': return 'warn';
-            case 'CANCELLED':   return 'secondary';
-            default:            return 'contrast';
-        }
-    }
-
     get menuItems(): AppMenuItem[] {
         return [
             {
@@ -194,7 +181,10 @@ export class TaskCardComponent {
             {
                 label: 'Ajouter un commentaire',
                 icon: 'pi pi-comment',
-                command: () => { this.showCommentInput = true; }
+                command: () => {
+                    this.commentAuthor = this.accountService.trackCurrentAccount()()?.login ?? '';
+                    this.showCommentDialog.set(true);
+                }
             },
             {
                 label: (this.task.comments ?? []).length > 0
@@ -305,7 +295,6 @@ export class TaskCardComponent {
         this.taskInstanceService.delete(this.task.id)
             .subscribe(() => this.statusChanged.emit());
     }
-
     addComment(): void {
         if (!this.commentBody.trim() || !this.commentAuthor.trim()) return;
         this.taskInstanceService.addComment(this.task.id, {
@@ -314,11 +303,17 @@ export class TaskCardComponent {
         }).subscribe(newComment => {
             this.commentBody = '';
             this.commentAuthor = '';
-            this.showCommentInput = false;
+            this.showCommentDialog.set(false);
             // Ajouter le commentaire localement sans rechargement complet
             if (!this.task.comments) this.task.comments = [];
             this.task.comments = [newComment, ...this.task.comments];
             this.showComments = true;
+        });
+    }
+
+    deleteComment(commentId: string): void {
+        this.taskInstanceService.deleteComment(commentId).subscribe(() => {
+            this.task.comments = this.task.comments.filter(c => c.id !== commentId);
         });
     }
 

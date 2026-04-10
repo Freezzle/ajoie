@@ -10,13 +10,13 @@
                 <span class="tc__title">
                     {{ task.title }}
                     @if (hasInProgressSubtask) {
-                        <p-tag value="En cours" severity="warn" [rounded]="true" class="tag-sm"/>
+                        <p-tag value="En cours" severity="warn" [rounded]="true" class="tag-xs"/>
                     }
                     @if (hasBlockedSubtask) {
-                        <p-tag value="Bloquée" severity="danger" [rounded]="true" class="tag-sm"/>
+                        <p-tag value="Bloquée" severity="danger" [rounded]="true" class="tag-xs"/>
                     }
                     @if (isCancelled) {
-                        <p-tag value="Annulée" severity="secondary" [rounded]="true" class="tag-sm"/>
+                        <p-tag value="Annulée" severity="secondary" [rounded]="true" class="tag-xs"/>
                     }
                 </span>
 
@@ -28,27 +28,13 @@
                 <div class="tc__chips">
                     @if (task.responsible && !editingResponsible) {
                         <p-tag icon="pi pi-user" [value]="task.responsible" severity="info" [rounded]="true"
-                               class="tag-sm clickable" title="Cliquer pour modifier"
+                               class="tag-xs clickable" title="Cliquer pour modifier"
                                (click)="editResponsibleValue = task.responsible!; editingResponsible = true"/>
                     }
                     @if (task.supplierInfo) {
-                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" class="tag-sm"/>
-                    }
-                    @if (task.comments.length > 0) {
-                        <p-tag icon="pi pi-comment" [value]="task.comments.length.toString()" severity="contrast"
-                               [rounded]="true" class="tag-sm clickable"
-                               [title]="showComments ? 'Masquer les commentaires' : 'Voir les commentaires'"
-                               (click)="toggleComments()"/>
+                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" class="tag-xs"/>
                     }
                 </div>
-
-                <!-- completedAt quand DONE -->
-                @if (isDone && task.completedAt) {
-                    <span class="tc__completed-at">
-                        <i class="pi pi-check-circle"></i>
-                        Terminée {{ task.completedAt | timeSince }}
-                    </span>
-                }
             </div>
 
             <div class="tc__aside">
@@ -70,7 +56,7 @@
         <!-- INLINE FORM : changer responsable -->
         @if (editingResponsible) {
             <div class="tc__form">
-                <i class="pi pi-user" style="color:var(--p-primary-color); font-size:0.8rem; flex-shrink:0"></i>
+                <i class="pi pi-user" style="color:var(--app-primary); font-size:0.8rem; flex-shrink:0"></i>
                 <input type="text" class="form-control form-control-sm flex-grow-1"
                        [(ngModel)]="editResponsibleValue"
                        (keydown.enter)="saveResponsible()" (keydown.escape)="cancelResponsible()"
@@ -82,23 +68,7 @@
             </div>
         }
 
-        <!-- INLINE FORM : add comment -->
-        @if (showCommentInput) {
-            <div class="tc__form tc__form--col">
-                <input type="text" class="form-control form-control-sm"
-                       [(ngModel)]="commentAuthor" placeholder="Votre nom…"/>
-                <div class="tc__form">
-                    <textarea class="form-control form-control-sm flex-grow-1" [(ngModel)]="commentBody"
-                              rows="2" placeholder="Commentaire…"></textarea>
-                    <div class="d-flex flex-column gap-1">
-                        <button-box type="primary" primeIcon="pi-send" [showText]="false"
-                                    translateKey="common.save" (clickedEvent)="addComment()"/>
-                        <button-box type="secondary" primeIcon="pi-times" [showText]="false"
-                                    translateKey="common.cancel" (clickedEvent)="showCommentInput = false"/>
-                    </div>
-                </div>
-            </div>
-        }
+        <!-- INLINE FORM : add comment — remplacé par dialog-box -->
 
         <!-- SOUS-TÂCHES -->
         @if (task.subtasks.length > 0) {
@@ -111,34 +81,65 @@
             </div>
         }
 
-        <!-- COMMENTAIRES (expandable) -->
-        @if (showComments && task.comments.length > 0) {
-            <div class="tc__comments">
-                <div class="tc__comments-header">
+        <!-- COMMENTAIRES (collapse) -->
+        @if (task.comments.length > 0) {
+            <div class="tc__comments" [class.tc__comments--open]="showComments">
+                <button class="tc__comments-header" (click)="toggleComments()" type="button">
                     <i class="pi pi-comment"></i>
                     <span>Commentaires ({{ task.comments.length }})</span>
-                    <button class="tc__comments-close" (click)="showComments = false" type="button">
-                        <i class="pi pi-times"></i>
-                    </button>
-                </div>
-                <div class="tc__comments-list">
-                    @for (comment of sortedComments; track comment.id) {
-                        <div class="tc__comment-item">
-                            <div class="tc__comment-meta">
-                                <span class="tc__comment-author"><i class="pi pi-user"></i>{{ comment.authorName }}</span>
-                                <span class="tc__comment-time">{{ comment.createdAt | timeSince }}</span>
+                    <i class="pi" [class.pi-chevron-down]="!showComments" [class.pi-chevron-up]="showComments"></i>
+                </button>
+                @if (showComments) {
+                    <div class="tc__comments-list">
+                        @for (comment of sortedComments; track comment.id) {
+                            <div class="tc__comment-item">
+                                <div class="tc__comment-meta">
+                                    <span class="tc__comment-author"><i class="pi pi-user"></i>{{ comment.authorName }}</span>
+                                    <span class="tc__comment-time">{{ comment.createdAt | timeSince }}</span>
+                                    <button class="tc__comment-delete" type="button"
+                                            title="Supprimer ce commentaire"
+                                            (click)="deleteComment(comment.id)">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </div>
+                                <p class="tc__comment-body">{{ comment.body }}</p>
                             </div>
-                            <p class="tc__comment-body">{{ comment.body }}</p>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                }
             </div>
         }
 
     </div>
 </div>
 
-<!-- ── Dialog : Créer / Modifier une sous-tâche ── -->
+<!-- ── Dialog : Ajouter un commentaire ── -->
+@if (showCommentDialog()) {
+    <dialog-box (cancel)="commentAuthor = ''; commentBody = ''; showCommentDialog.set(false)"
+                (confirm)="addComment()"
+                [(visible)]="showCommentDialog"
+                [header]="'Ajouter un commentaire'"
+                [mode]="'edit'"
+                [confirmLabel]="'common.save'"
+                [confirmDisabled]="!commentBody.trim() || !commentAuthor.trim()">
+        <div class="d-flex flex-column gap-3">
+            <div>
+                <label class="form-label fw-semibold" style="font-size:0.85rem">
+                    <i class="pi pi-user me-1"></i>Votre nom
+                </label>
+                <input type="text" class="form-control" [(ngModel)]="commentAuthor" placeholder="Votre nom…" autofocus/>
+            </div>
+            <div>
+                <label class="form-label fw-semibold" style="font-size:0.85rem">
+                    <i class="pi pi-comment me-1"></i>Commentaire
+                </label>
+                <textarea class="form-control" [(ngModel)]="commentBody" rows="4" placeholder="Votre commentaire…"></textarea>
+            </div>
+        </div>
+    </dialog-box>
+}
+
+
 @if (showSubtaskDialog()) {
     <dialog-box (cancel)="onSubtaskDialogCancel()"
                 (confirm)="onSubtaskDialogConfirm($event)"

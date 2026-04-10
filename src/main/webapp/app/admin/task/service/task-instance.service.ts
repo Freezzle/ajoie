@@ -11,6 +11,7 @@ export class TaskInstanceService {
     protected salonUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
     protected instanceUrl = this.applicationConfigService.getEndpointFor('api/admin/task-instances');
     protected subtaskUrl = this.applicationConfigService.getEndpointFor('api/admin/subtask-instances');
+    protected commentUrl = this.applicationConfigService.getEndpointFor('api/admin/task-comments');
 
     findAllBySalon(salonId: string): Observable<ITaskInstance[]> {
         return this.http.get<ITaskInstance[]>(`${this.salonUrl}/${salonId}/tasks`);
@@ -55,5 +56,9 @@ export class TaskInstanceService {
 
     addComment(taskInstanceId: string, comment: Partial<ITaskComment>): Observable<ITaskComment> {
         return this.http.post<ITaskComment>(`${this.instanceUrl}/${taskInstanceId}/comments`, comment);
+    }
+
+    deleteComment(commentId: string): Observable<void> {
+        return this.http.delete<void>(`${this.commentUrl}/${commentId}`);
     }
 }

@@ -356,8 +356,13 @@ public class TaskInstanceService {
         return taskCommentMapper.toDto(entity);
     }
 
-    // =========================================================================
-    // Helpers
+    @Transactional
+    public void deleteComment(UUID commentId) {
+        if (commentId == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, ErrorBusinessKey.ID_NULL);
+        }
+        taskCommentRepository.deleteById(commentId);
+    }
     // =========================================================================
 
     /**

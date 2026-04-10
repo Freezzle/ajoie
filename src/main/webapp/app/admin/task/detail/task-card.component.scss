@@ -26,8 +26,8 @@
   }
 
   &.tc--soon {
-    border-left-color: var(--p-primary-color);
-    background: linear-gradient(90deg, color-mix(in srgb, var(--p-primary-color) 5%, var(--app-surface)) 0%, var(--app-surface) 4.29rem);
+    border-left-color: var(--app-primary);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--app-primary) 5%, var(--app-surface)) 0%, var(--app-surface) 4.29rem);
   }
 
   &.tc--neutral {
@@ -36,8 +36,8 @@
 
   &.tc--done, &.tc--cancelled {
     opacity: 0.7;
-    background: var(--p-surface-50);
-    border-left-color: var(--p-surface-300);
+    background: color-mix(in srgb, var(--app-secondary) 8%, var(--app-surface));
+    border-left-color: var(--app-secondary);
   }
 }
 
@@ -54,6 +54,9 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.57rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--app-border);
+  margin-bottom: 1rem;
 }
 
 .tc__info {
@@ -66,13 +69,13 @@
 .tc__title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--p-surface-900);
+  color: var(--app-text);
   line-height: 1.4;
 }
 
 .tc__desc {
   font-size: 0.72rem;
-  color: var(--p-surface-400);
+  color: var(--app-secondary);
   font-style: italic;
   line-height: 1.3;
 }
@@ -82,6 +85,7 @@
   flex-wrap: wrap;
   gap: 0.29rem;
   align-items: center;
+  padding: 0.25rem 0;
 }
 
 .tc__aside {
@@ -99,7 +103,7 @@
 
 .tc__prog-label {
   font-size: 0.7rem;
-  color: var(--p-surface-400);
+  color: var(--app-secondary);
   white-space: nowrap;
   min-width: 2rem;
   text-align: right;
@@ -121,9 +125,7 @@
 }
 
 .tc__subtasks {
-  border-left: 2px solid var(--app-border);
-  margin-left: 0.29rem;
-  padding-left: 0.86rem;
+  padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.14rem;
@@ -147,7 +149,7 @@
   border: 1px solid var(--app-border);
   border-radius: 0.43rem;
   overflow: hidden;
-  background: var(--p-surface-50);
+  background: color-mix(in srgb, var(--app-secondary) 8%, var(--app-surface));
 }
 
 .tc__comments-header {
@@ -155,11 +157,22 @@
   align-items: center;
   gap: 0.43rem;
   padding: 0.43rem 0.71rem;
-  background: var(--p-purple-50);
+  background: color-mix(in srgb, var(--app-primary) 6%, var(--app-surface));
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--p-purple-600);
-  border-bottom: 1px solid var(--p-purple-200);
+  color: var(--app-primary);
+  width: 100%;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--app-primary) 14%, var(--app-surface));
+  }
 
   i {
     font-size: 0.7rem;
@@ -170,22 +183,8 @@
   }
 }
 
-.tc__comments-close {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--p-purple-600);
-  padding: 0;
-  line-height: 1;
-  opacity: 0.6;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  i {
-    font-size: 0.7rem;
-  }
+.tc__comments--open > .tc__comments-header {
+  border-bottom-color: color-mix(in srgb, var(--app-primary) 25%, var(--app-surface));
 }
 
 .tc__comments-list {
@@ -195,7 +194,7 @@
 
 .tc__comment-item {
   padding: 0.57rem 0.86rem;
-  border-bottom: 1px solid var(--p-surface-100);
+  border-bottom: 1px solid var(--app-border);
 
   &:last-child {
     border-bottom: none;
@@ -209,6 +208,30 @@
   margin-bottom: 0.21rem;
 }
 
+.tc__comment-delete {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--app-danger);
+  padding: 0;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s;
+
+  i {
+    font-size: 0.65rem;
+  }
+
+  &:hover {
+    color: color-mix(in srgb, var(--app-danger) 70%, #000);
+  }
+}
+
+.tc__comment-item:hover .tc__comment-delete {
+  opacity: 1;
+}
+
 .tc__comment-author {
   display: inline-flex;
   align-items: center;
@@ -219,7 +242,7 @@
 
   i {
     font-size: 0.65rem;
-    color: var(--p-surface-400);
+    color: var(--app-secondary);
   }
 }
 
@@ -232,7 +255,7 @@
 .tc__comment-body {
   margin: 0;
   font-size: 0.78rem;
-  color: var(--p-surface-600);
+  color: var(--app-text);
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;

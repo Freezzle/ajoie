@@ -145,4 +145,12 @@ public class AdminTaskInstanceResource {
         TaskCommentDTO result = taskInstanceService.addComment(taskInstanceId, dto);
         return ResourceUtil.created("taskComment", result.getId(), "/api/admin/task-comments").body(result);
     }
+
+    @DeleteMapping("/task-comments/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<Void> deleteComment(@PathVariable("id") UUID id) {
+        log.debug("REST request to delete TaskComment : {}", id);
+        taskInstanceService.deleteComment(id);
+        return ResponseEntity.noContent().build();
+    }
 }

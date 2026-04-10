@@ -23,28 +23,14 @@
     <!-- ── Bandeau progression globale ── -->
     @if (!isLoading && countAll > 0) {
         <div class="tfl-progress">
-            <p-progressBar [value]="globalProgress"
+            <p-progress-bar [value]="globalProgress"
                            [showValue]="false"
-                           [style]="{'flex': '1', 'min-width': '100px', 'max-width': '200px', 'height': '7px'}">
-            </p-progressBar>
+                            fluid
+                            [style]="{'flex': '1'}">
+            </p-progress-bar>
             <span class="tfl-progress__label">
                 {{ countDone }}/{{ countAll }} terminées
             </span>
-            @if (countLate > 0) {
-                <span class="tfl-progress__badge tfl-progress__badge--late">
-                    <i class="pi pi-exclamation-triangle"></i> {{ countLate }} en retard
-                </span>
-            }
-            @if (countInProgress > 0) {
-                <span class="tfl-progress__badge tfl-progress__badge--progress">
-                    <i class="pi pi-play-circle"></i> {{ countInProgress }} en cours
-                </span>
-            }
-            @if (countSnoozed > 0) {
-                <span class="tfl-progress__badge tfl-progress__badge--snooze">
-                    <i class="pi pi-bell-slash"></i> {{ countSnoozed }} snoozées
-                </span>
-            }
         </div>
 
         <!-- ── Pills de filtre ── -->

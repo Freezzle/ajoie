@@ -6,8 +6,8 @@
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
     border-radius: 10px;
     margin-bottom: 10px;
     flex-wrap: wrap;
@@ -15,7 +15,7 @@
     &__label {
         font-size: 0.78rem;
         font-weight: 600;
-        color: #475569;
+        color: var(--app-text);
         white-space: nowrap;
     }
 
@@ -31,9 +31,11 @@
 
         i { font-size: 0.65rem; }
 
-        &--late     { background: #fee2e2; color: #dc2626; }
-        &--progress { background: #fef9c3; color: #854d0e; }
-        &--snooze   { background: #fff7ed; color: #c2410c; }
+        &--late     { background: color-mix(in srgb, var(--app-danger) 15%, var(--app-surface));    color: var(--app-danger); }
+        &--today    { background: color-mix(in srgb, var(--app-warning) 15%, var(--app-surface));   color: var(--app-warning); }
+        &--progress { background: color-mix(in srgb, var(--app-primary) 15%, var(--app-surface));   color: var(--app-primary); }
+        &--done     { background: color-mix(in srgb, var(--app-sucess) 15%, var(--app-surface));    color: var(--app-sucess); }
+        &--snooze   { background: color-mix(in srgb, var(--app-secondary) 15%, var(--app-surface)); color: var(--app-secondary); }
     }
 }
 
@@ -51,32 +53,32 @@
     gap: 5px;
     padding: 4px 12px;
     border-radius: 20px;
-    border: 1.5px solid #e2e8f0;
-    background: #fff;
+    border: 1.5px solid var(--app-border);
+    background: var(--app-surface);
     font-size: 0.76rem;
     font-weight: 500;
-    color: #64748b;
+    color: var(--app-text);
     cursor: pointer;
     transition: all 0.12s;
 
     i { font-size: 0.65rem; }
 
-    &:hover { border-color: #94a3b8; color: #334155; }
+    &:hover { border-color: var(--app-secondary); color: var(--app-contrast); }
 
     &.active {
-        background: #1e40af;
-        border-color: #1e40af;
-        color: #fff;
+        background: var(--app-primary);
+        border-color: var(--app-primary);
+        color: var(--app-surface);
 
-        .tfl-filter-count { background: rgba(255,255,255,0.25); color: #fff; }
+        .tfl-filter-count { background: rgba(255,255,255,0.25); color: var(--app-surface); }
     }
 
-    &--late.active     { background: #dc2626; border-color: #dc2626; }
-    &--today.active    { background: #d97706; border-color: #d97706; }
-    &--progress.active { background: #854d0e; border-color: #854d0e; }
-    &--done.active     { background: #639922; border-color: #639922; }
-    &--snooze.active   { background: #c2410c; border-color: #c2410c; }
-    &--active.active   { background: #2563eb; border-color: #2563eb; }
+    &--late.active     { background: var(--app-danger);    border-color: var(--app-danger); }
+    &--today.active    { background: var(--app-warning);   border-color: var(--app-warning); }
+    &--progress.active { background: var(--app-primary);   border-color: var(--app-primary); }
+    &--done.active     { background: var(--app-sucess);    border-color: var(--app-sucess); }
+    &--snooze.active   { background: var(--app-secondary); border-color: var(--app-secondary); }
+    &--active.active   { background: var(--app-primary);   border-color: var(--app-primary); }
 }
 
 .tfl-filter-count {
@@ -89,6 +91,6 @@
     border-radius: 20px;
     font-size: 0.65rem;
     font-weight: 700;
-    background: #f1f5f9;
-    color: #475569;
+    background: color-mix(in srgb, var(--app-secondary) 15%, var(--app-surface));
+    color: var(--app-text);
 }
