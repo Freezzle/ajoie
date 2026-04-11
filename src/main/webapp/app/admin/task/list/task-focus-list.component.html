@@ -35,6 +35,13 @@
 
         <!-- ── Pills de filtre ── -->
         <div class="tfl-filters">
+            <!-- Toggle vue cards / vue sous-tâches à plat -->
+            <div class="tfl-view-toggle" title="{{ flatView() ? 'Vue sous-tâches' : 'Vue tâches' }}">
+                <i class="pi pi-th-large tfl-view-toggle__icon" [class.tfl-view-toggle__icon--active]="!flatView()"></i>
+                <p-toggleswitch [(ngModel)]="flatViewBool" (ngModelChange)="flatView.set($event)"/>
+                <i class="pi pi-list tfl-view-toggle__icon" [class.tfl-view-toggle__icon--active]="flatView()"></i>
+            </div>
+
             <button class="tfl-filter-pill" [class.active]="activeFilter === 'all'"
                     (click)="activeFilter = 'all'">
                 Toutes <span class="tfl-filter-count">{{ countAll }}</span>
@@ -98,7 +105,23 @@
         <p class="text-muted text-center my-4 small">Aucune tâche dans ce filtre.</p>
     }
 
-    @if (!isLoading && filteredTasks.length > 0) {
+    @if (!isLoading && flatView()) {
+        <!-- ── Vue sous-tâches à plat ── -->
+        @if (flatSubtasks.length === 0) {
+            <p class="text-muted text-center my-4 small">Aucune sous-tâche dans ce filtre.</p>
+        } @else {
+            <div class="tfl-flat-list">
+                @for (flat of flatSubtasks; track flat.id) {
+                    <app-subtask-flat-row
+                        [subtask]="flat"
+                        [parentTask]="flat.parentTask"
+                        (changed)="load()"
+                        (editRequested)="load()"/>
+                }
+            </div>
+        }
+    } @else if (!isLoading && filteredTasks.length > 0) {
+        <!-- ── Vue cards par tâche ── -->
         <div class="d-flex flex-column gap-2">
             @for (task of filteredTasks; track task.id) {
                 <app-task-card [task]="task" [activeFilter]="activeFilter" (statusChanged)="load()" (editRequested)="openEditTaskDialog(task)"/>

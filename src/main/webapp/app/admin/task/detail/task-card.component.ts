@@ -93,13 +93,17 @@ export class TaskCardComponent {
     get sortedSubtasks() {
         const today = new Date().toISOString().split('T')[0];
         let subtasks = [...(this.task.subtasks ?? [])];
+        const isSnoozed = (s: ISubtaskInstance) => !!s.snoozedUntil && s.snoozedUntil >= today;
 
         switch (this.activeFilter) {
+            case 'active':
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED');
+                break;
             case 'late':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && !!s.dueDate && s.dueDate < today);
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && !!s.dueDate && s.dueDate < today && !isSnoozed(s));
                 break;
             case 'today':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && s.dueDate === today);
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && s.dueDate === today && !isSnoozed(s));
                 break;
             case 'in_progress':
                 subtasks = subtasks.filter(s => s.status === 'IN_PROGRESS');
@@ -108,12 +112,9 @@ export class TaskCardComponent {
                 subtasks = subtasks.filter(s => s.status === 'DONE');
                 break;
             case 'snoozed':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && !!s.snoozedUntil && s.snoozedUntil >= today);
+                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && isSnoozed(s));
                 break;
-            case 'active':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED');
-                break;
-            // 'all' et 'active' : toutes les sous-tâches
+            // 'all' : toutes les sous-tâches sans filtre
         }
 
         return subtasks.sort((a, b) => {

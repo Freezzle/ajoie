@@ -1,0 +1,74 @@
+<div class="subtask-flat-row" [class.subtask-done]="isDone">
+
+    <!-- 1. Checkbox -->
+    <p-checkbox [ngModel]="isDone"
+                [binary]="true"
+                (onChange)="toggleDone()"
+                class="subtask-check"/>
+
+    <!-- 2. Nom de la tâche parente -->
+    <span class="sfr-task-name">{{ parentTask.title }}</span>
+
+    <!-- Séparateur -->
+    <i class="pi pi-chevron-right sfr-chevron"></i>
+
+    <!-- 3. Nom de la sous-tâche -->
+    <span class="sfr-subtask-name" [class.sfr-subtask-name--done]="isDone">{{ subtask.title }}</span>
+
+    <!-- 4. Chips : statut + responsible + supplier -->
+    <div class="sfr-chips">
+        @if (subtask.status !== 'PENDING' && subtask.status !== 'DONE') {
+            <p-tag [severity]="statusSeverity"
+                   [value]="('task.status.' + subtask.status) | translate"
+                   [rounded]="true" class="tag-xs"/>
+        }
+        @if (subtask.responsible) {
+            <p-tag icon="pi pi-user" [value]="subtask.responsible"
+                   severity="secondary" [rounded]="true" class="tag-xs tag-outlined-info"/>
+        }
+        @if (subtask.supplierInfo) {
+            <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo"
+                   severity="secondary" [rounded]="true" class="tag-xs tag-outlined-success"/>
+        }
+    </div>
+
+    <!-- Spacer -->
+    <span class="sfr-spacer"></span>
+
+    <!-- 5. Temps restant (à droite) -->
+    <div class="sfr-date">
+        @if (displayDate && !isDone) {
+            <p-tag severity="secondary"
+                   [rounded]="true"
+                   class="tag-xs"
+                   [ngClass]="'tag-outlined-' + dateSeverity"
+                   (click)="dueDatePopover.toggle($event)"
+                   style="cursor:pointer">
+                <span class="d-flex align-items-center gap-1">
+                    @if (isSnoozed) { <i class="pi pi-bell-slash" style="font-size:0.7rem"></i> }
+                    {{ displayDate | daysRelative }}
+                </span>
+            </p-tag>
+            <p-popover #dueDatePopover appendTo="body">
+                <div class="due-date-popover">
+                    <i class="pi pi-calendar me-2" style="color:var(--p-surface-500)"></i>
+                    <span>Échéance au {{ subtask.dueDate | formatMediumDate }}</span>
+                    @if (isSnoozed) {
+                        <br/>
+                        <i class="pi pi-bell-slash me-2 mt-1" style="color:var(--p-surface-500)"></i>
+                        <span>Reporté au {{ subtask.snoozedUntil | formatMediumDate }}</span>
+                    }
+                </div>
+            </p-popover>
+        }
+        @if (isDone && subtask.completedAt) {
+            <span class="subtask-completed-at">{{ subtask.completedAt | timeSince }}</span>
+        }
+    </div>
+
+    <!-- 6. Bouton d'actions -->
+    <div class="sfr-menu menu-btn-ghost--sm">
+        <menu-box [items]="menuItems" buttonIcon="pi-ellipsis-v"
+                  [buttonTranslateKey]="''" type="secondary" [appendTo]="'body'"/>
+    </div>
+</div>

@@ -3,7 +3,7 @@ import {ActivatedRoute, RouterModule} from '@angular/router';
 import SharedModule from 'app/shared/shared.module';
 import {FormsModule} from '@angular/forms';
 import {TaskInstanceService} from '../service/task-instance.service';
-import {ISubtaskInstance, ITaskInstance} from '../model/task-instance.interface';
+import {IFlatSubtask, ISubtaskInstance, ITaskInstance} from '../model/task-instance.interface';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
@@ -11,7 +11,9 @@ import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-b
 import {TaskInstanceFormComponent} from '../dialog/task-instance-form.component';
 import {finalize} from 'rxjs/operators';
 import {TaskCardComponent} from '../detail/task-card.component';
+import {SubtaskFlatRowComponent} from '../detail/subtask-flat-row.component';
 import {ProgressBar} from 'primeng/progressbar';
+import {ToggleSwitch} from 'primeng/toggleswitch';
 
 export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | 'done' | 'snoozed';
 
@@ -29,7 +31,9 @@ export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | '
         DialogBoxComponent,
         TaskInstanceFormComponent,
         TaskCardComponent,
-        ProgressBar
+        SubtaskFlatRowComponent,
+        ProgressBar,
+        ToggleSwitch
     ]
 })
 export class TaskFocusListComponent implements OnInit {
@@ -39,7 +43,13 @@ export class TaskFocusListComponent implements OnInit {
     salonId: string = '';
     isLoading = false;
     tasks: ITaskInstance[] = [];
-    activeFilter: TaskFilter = 'all';
+    activeFilter: TaskFilter = 'active';
+
+    /** Bascule entre la vue cards (false) et la vue sous-tâches à plat (true) */
+    flatView = signal(false);
+    /** Proxy booléen pour [(ngModel)] du p-toggleswitch */
+    get flatViewBool(): boolean { return this.flatView(); }
+    set flatViewBool(v: boolean) { this.flatView.set(v); }
 
     // Dialog ajout/édition tâche
     showTaskDialog = signal(false);
@@ -95,19 +105,21 @@ export class TaskFocusListComponent implements OnInit {
     }
 
     // ── Helpers date ────────────────────────────────────────────────────────
-    private isLate(t: ITaskInstance): boolean {
-        if (!t.dueDate || t.status === 'DONE' || t.status === 'CANCELLED') return false;
-        return t.dueDate < this.todayStr();
-    }
-
-    private isToday(t: ITaskInstance): boolean {
-        if (!t.dueDate || t.status === 'DONE' || t.status === 'CANCELLED') return false;
-        return t.dueDate === this.todayStr();
-    }
-
     private isSnoozed(t: ITaskInstance): boolean {
         const today = this.todayStr();
         return (t.subtasks ?? []).some(s => !!s.snoozedUntil && s.snoozedUntil >= today);
+    }
+
+    private hasActiveSubtask(t: ITaskInstance): boolean {
+        return (t.subtasks ?? []).some(s => s.status !== 'DONE' && s.status !== 'CANCELLED');
+    }
+
+    private hasInProgressSubtask(t: ITaskInstance): boolean {
+        return (t.subtasks ?? []).some(s => s.status === 'IN_PROGRESS');
+    }
+
+    private hasDoneSubtask(t: ITaskInstance): boolean {
+        return (t.subtasks ?? []).some(s => s.status === 'DONE');
     }
 
     private todayStr(): string {
@@ -154,13 +166,54 @@ export class TaskFocusListComponent implements OnInit {
     // ── Filtre appliqué ─────────────────────────────────────────────────────
     get filteredTasks(): ITaskInstance[] {
         switch (this.activeFilter) {
-            case 'active':      return this.tasks.filter(t => t.status !== 'DONE' && t.status !== 'CANCELLED');
-            case 'late':        return this.tasks.filter(t => this.isLate(t));
-            case 'today':       return this.tasks.filter(t => this.isToday(t));
-            case 'in_progress': return this.tasks.filter(t => t.status === 'IN_PROGRESS');
-            case 'done':        return this.tasks.filter(t => t.status === 'DONE');
+            case 'active':      return this.tasks.filter(t => t.status !== 'CANCELLED' && this.hasActiveSubtask(t));
+            case 'late':        return this.tasks.filter(t => (t.subtasks ?? []).some(s => this.isSubtaskLate(s)));
+            case 'today':       return this.tasks.filter(t => (t.subtasks ?? []).some(s => this.isSubtaskToday(s)));
+            case 'in_progress': return this.tasks.filter(t => this.hasInProgressSubtask(t));
+            case 'done':        return this.tasks.filter(t => this.hasDoneSubtask(t));
             case 'snoozed':     return this.tasks.filter(t => this.isSnoozed(t));
             default:            return this.tasks;
+        }
+    }
+
+    // ── Sous-tâches à plat triées par date (vue flat) ───────────────────────
+    get flatSubtasks(): IFlatSubtask[] {
+        const enriched: IFlatSubtask[] = this.tasks
+            .filter(t => t.status !== 'CANCELLED')
+            .flatMap(t =>
+                (t.subtasks ?? []).map(s => ({...s, parentTask: t}))
+            );
+
+        const filtered = this.applySubtaskFilter(enriched);
+
+        // Tri : ordre croissant — date la plus proche en premier, la plus lointaine en dernier
+        // Les sous-tâches sans date vont tout en bas
+        return filtered.sort((a, b) => {
+            const da = a.dueDate;
+            const db = b.dueDate;
+            if (!da && !db) return 0;
+            if (!da) return 1;   // sans date → fin
+            if (!db) return -1;  // sans date → fin
+            return da.localeCompare(db); // croissant : plus proche d'abord
+        });
+    }
+
+    private applySubtaskFilter(subtasks: IFlatSubtask[]): IFlatSubtask[] {
+        switch (this.activeFilter) {
+            case 'active':
+                return subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED');
+            case 'late':
+                return subtasks.filter(s => this.isSubtaskLate(s));
+            case 'today':
+                return subtasks.filter(s => this.isSubtaskToday(s));
+            case 'in_progress':
+                return subtasks.filter(s => s.status === 'IN_PROGRESS');
+            case 'done':
+                return subtasks.filter(s => s.status === 'DONE');
+            case 'snoozed':
+                return subtasks.filter(s => this.isSubtaskSnoozed(s));
+            default:
+                return subtasks;
         }
     }
 

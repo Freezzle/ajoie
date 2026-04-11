@@ -27,12 +27,12 @@
                 <!-- Chips : p-tag PrimeNG -->
                 <div class="tc__chips">
                     @if (task.responsible && !editingResponsible) {
-                        <p-tag icon="pi pi-user" [value]="task.responsible" severity="info" [rounded]="true"
-                               class="tag-xs clickable" title="Cliquer pour modifier"
+                        <p-tag icon="pi pi-user" [value]="task.responsible" severity="secondary" [rounded]="true"
+                               class="tag-xs tag-outlined-info clickable" title="Cliquer pour modifier"
                                (click)="editResponsibleValue = task.responsible!; editingResponsible = true"/>
                     }
                     @if (task.supplierInfo) {
-                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="success" [rounded]="true" class="tag-xs"/>
+                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="secondary" [rounded]="true" class="tag-xs tag-outlined-success"/>
                     }
                 </div>
             </div>

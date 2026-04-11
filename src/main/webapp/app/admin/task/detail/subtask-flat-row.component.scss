@@ -1,0 +1,111 @@
+// Hérite des styles de subtask-row via les classes partagées
+:host {
+  display: block;
+}
+
+.subtask-flat-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem 0.3rem 0.45rem;
+  border-radius: 0.4rem;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  transition: background 0.1s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--app-primary) 3%, var(--app-surface));
+
+    .sfr-menu { opacity: 1; }
+  }
+
+  &.subtask-done {
+    opacity: 0.6;
+    background: color-mix(in srgb, var(--app-secondary) 6%, var(--app-surface));
+  }
+}
+
+// Checkbox
+.subtask-check {
+  flex-shrink: 0;
+}
+
+// Nom de la tâche parente — discret, tronqué
+.sfr-task-name {
+  flex-shrink: 0;
+  max-width: 20ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.73rem;
+  color: var(--p-surface-400);
+  font-weight: 400;
+}
+
+// Séparateur chevron
+.sfr-chevron {
+  flex-shrink: 0;
+  font-size: 0.55rem;
+  color: var(--p-surface-300);
+}
+
+// Nom de la sous-tâche — plus visible, prend l'espace disponible
+.sfr-subtask-name {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--p-surface-700);
+
+  &--done {
+    text-decoration: line-through;
+    color: var(--p-surface-400);
+  }
+}
+
+// Zone chips : ne grandit pas, s'affiche en ligne, rétrécit avant le nom
+.sfr-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+// Spacer flexible qui pousse la date + menu à droite
+.sfr-spacer {
+  flex: 1 0 0.5rem;
+}
+
+// Zone date
+.sfr-date {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+// Bouton menu — masqué jusqu'au hover de la row
+.sfr-menu {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+// Toujours visible si le menu est ouvert (évite la disparition au clic)
+.subtask-flat-row:focus-within .sfr-menu {
+  opacity: 1;
+}
+
+.subtask-completed-at {
+  font-size: 0.67rem;
+  color: var(--p-surface-400);
+  white-space: nowrap;
+}
+
+.due-date-popover {
+  font-size: 0.82rem;
+}

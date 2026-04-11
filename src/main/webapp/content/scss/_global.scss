@@ -449,6 +449,36 @@ p-iftalabel label {
   .p-tag-icon  { font-size: 0.62rem !important; }
 }
 
+/* ── Utility: outlined tags (fond neutre, texte coloré) ── */
+
+.tag-outlined-info {
+  background: var(--app-surface) !important;
+  color: var(--app-primary) !important;
+
+  .p-tag-label, .p-tag-icon { color: var(--app-primary) !important; }
+}
+
+.tag-outlined-success {
+  background: var(--app-surface) !important;
+  color: var(--app-sucess) !important;
+
+  .p-tag-label, .p-tag-icon { color: var(--app-sucess) !important; }
+}
+
+.tag-outlined-danger {
+  background: var(--app-surface) !important;
+  color: var(--app-danger) !important;
+
+  .p-tag-label, .p-tag-icon { color: var(--app-danger) !important; }
+}
+
+.tag-outlined-warn {
+  background: var(--app-surface) !important;
+  color: var(--app-warning) !important;
+
+  .p-tag-label, .p-tag-icon { color: var(--app-warning) !important; }
+}
+
 /* ── Utility: ghost menu button ── */
 
 .menu-btn-ghost {

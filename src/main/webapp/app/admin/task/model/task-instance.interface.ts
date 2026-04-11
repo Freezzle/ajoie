@@ -57,6 +57,10 @@ export interface INextSubtask {
     dueDate: string | null;
 }
 
+export interface IFlatSubtask extends ISubtaskInstance {
+    parentTask: ITaskInstance;
+}
+
 export interface ITaskFocusView {
     id: string;
     title: string;

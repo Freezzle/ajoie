@@ -94,3 +94,29 @@
     background: color-mix(in srgb, var(--app-secondary) 15%, var(--app-surface));
     color: var(--app-text);
 }
+
+// ── Toggle vue cards / vue flat ─────────────────────────────────────────────
+.tfl-view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 6px;
+
+    &__icon {
+        font-size: 0.85rem;
+        color: var(--p-surface-400);
+        transition: color 0.15s;
+
+        &--active {
+            color: var(--app-primary);
+        }
+    }
+}
+
+// ── Liste flat sous-tâches ──────────────────────────────────────────────────
+.tfl-flat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+

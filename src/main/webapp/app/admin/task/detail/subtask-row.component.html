@@ -24,12 +24,12 @@
         @if (subtask.responsible || subtask.supplierInfo) {
             <div class="d-flex flex-wrap gap-1">
                 @if (subtask.responsible) {
-                    <p-tag icon="pi pi-user" [value]="subtask.responsible" severity="info" [rounded]="true"
-                           class="tag-xs"/>
+                    <p-tag icon="pi pi-user" [value]="subtask.responsible" severity="secondary" [rounded]="true"
+                           class="tag-xs tag-outlined-info"/>
                 }
                 @if (subtask.supplierInfo) {
-                    <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo" severity="success" [rounded]="true"
-                           class="tag-xs"/>
+                    <p-tag icon="pi pi-truck" [value]="subtask.supplierInfo" severity="secondary" [rounded]="true"
+                           class="tag-xs tag-outlined-success"/>
                 }
             </div>
         }
@@ -39,9 +39,10 @@
     <div class="subtask-aside">
         <!-- Date : toujours la dueDate avec sa vraie sévérité + icône snooze si actif -->
         @if (displayDate && !isDone) {
-            <p-tag [severity]="dateSeverity"
+            <p-tag severity="secondary"
                    [rounded]="true"
                    class="tag-xs"
+                   [ngClass]="'tag-outlined-' + dateSeverity"
                    (click)="dueDatePopover.toggle($event)"
                    style="cursor:pointer">
                 <span class="d-flex align-items-center gap-1">
