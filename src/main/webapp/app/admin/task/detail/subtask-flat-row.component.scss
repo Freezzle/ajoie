@@ -52,7 +52,6 @@
 
 // Nom de la sous-tâche — plus visible, prend l'espace disponible
 .sfr-subtask-name {
-  flex: 1 1 0;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -73,6 +72,12 @@
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
+  border-left: 1px solid var(--app-border);
+  padding-left: 0.25rem !important;
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 }
 
 // Spacer flexible qui pousse la date + menu à droite

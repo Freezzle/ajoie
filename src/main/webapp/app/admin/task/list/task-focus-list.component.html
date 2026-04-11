@@ -116,7 +116,7 @@
                         [subtask]="flat"
                         [parentTask]="flat.parentTask"
                         (changed)="load()"
-                        (editRequested)="load()"/>
+                        (editRequested)="openEditSubtaskDialog(flat)"/>
                 }
             </div>
         }
@@ -141,3 +141,16 @@
         <app-task-instance-form [task]="editingTask"/>
     </dialog-box>
 }
+
+<!-- ── Dialog : Modifier une sous-tâche (vue flat) ── -->
+@if (showSubtaskDialog()) {
+    <dialog-box (cancel)="onSubtaskDialogCancel()"
+                (confirm)="onSubtaskDialogConfirm($event)"
+                [(visible)]="showSubtaskDialog"
+                [header]="'task.dialog.editSubtask' | translate"
+                [mode]="'edit'"
+                [confirmLabel]="'common.save'">
+        <app-subtask-instance-form [subtask]="editingSubtask"/>
+    </dialog-box>
+}
+

@@ -12,6 +12,7 @@ import {TaskInstanceFormComponent} from '../dialog/task-instance-form.component'
 import {finalize} from 'rxjs/operators';
 import {TaskCardComponent} from '../detail/task-card.component';
 import {SubtaskFlatRowComponent} from '../detail/subtask-flat-row.component';
+import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
 import {ProgressBar} from 'primeng/progressbar';
 import {ToggleSwitch} from 'primeng/toggleswitch';
 
@@ -32,6 +33,7 @@ export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | '
         TaskInstanceFormComponent,
         TaskCardComponent,
         SubtaskFlatRowComponent,
+        SubtaskInstanceFormComponent,
         ProgressBar,
         ToggleSwitch
     ]
@@ -54,6 +56,10 @@ export class TaskFocusListComponent implements OnInit {
     // Dialog ajout/édition tâche
     showTaskDialog = signal(false);
     editingTask: ITaskInstance | null = null;
+
+    // Dialog édition sous-tâche (vue flat)
+    showSubtaskDialog = signal(false);
+    editingSubtask: ISubtaskInstance | null = null;
 
     ngOnInit(): void {
         this.salonId = this.activatedRoute.snapshot.paramMap.get('idSalon') ?? '';
@@ -86,6 +92,25 @@ export class TaskFocusListComponent implements OnInit {
     openEditTaskDialog(task: ITaskInstance): void {
         this.editingTask = task;
         this.showTaskDialog.set(true);
+    }
+
+    // ── Dialog sous-tâche (vue flat) ────────────────────────────────────────
+    openEditSubtaskDialog(subtask: ISubtaskInstance): void {
+        this.editingSubtask = subtask;
+        this.showSubtaskDialog.set(true);
+    }
+
+    onSubtaskDialogConfirm(draft: any): void {
+        if (!draft || !this.editingSubtask) return;
+        this.taskInstanceService.patchSubtask(this.editingSubtask.id, draft)
+            .subscribe(() => {
+                this.editingSubtask = null;
+                this.load();
+            });
+    }
+
+    onSubtaskDialogCancel(): void {
+        this.editingSubtask = null;
     }
 
     // ── Dialog : confirmer ──────────────────────────────────────────────────
