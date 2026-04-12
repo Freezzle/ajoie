@@ -42,7 +42,6 @@ export class TaskCardComponent {
     private accountService = inject(AccountService);
 
     showSubtasks = false;
-    showCommentInput = false;
     commentAuthor = '';
     commentBody = '';
     showComments = false;
@@ -58,15 +57,6 @@ export class TaskCardComponent {
     // Dialog commentaire
     showCommentDialog = signal(false);
 
-
-    get isDone(): boolean {
-        return this.task.status === 'DONE';
-    }
-
-    get isCancelled(): boolean {
-        return this.task.status === 'CANCELLED';
-    }
-
     /** Au moins une sous-tâche est IN_PROGRESS */
     get hasInProgressSubtask(): boolean {
         return (this.task.subtasks ?? []).some(s => s.status === 'IN_PROGRESS');
@@ -79,12 +69,6 @@ export class TaskCardComponent {
 
     get doneSubtaskCount(): number {
         return (this.task.subtasks ?? []).filter(s => s.status === 'DONE').length;
-    }
-
-    get subtaskProgress(): number {
-        const total = (this.task.subtasks ?? []).length;
-        if (total === 0) return 0;
-        return Math.round((this.doneSubtaskCount / total) * 100);
     }
 
     /** Sous-tâches filtrées selon le filtre actif, puis triées par dueDate (nulls en dernier) puis sortOrder */
@@ -112,7 +96,6 @@ export class TaskCardComponent {
             case 'snoozed':
                 subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && isSnoozed(s));
                 break;
-            // 'all' : toutes les sous-tâches sans filtre
         }
 
         return subtasks.sort((a, b) => {
@@ -133,8 +116,7 @@ export class TaskCardComponent {
 
     get dueDateStatus(): 'late' | 'soon' | 'today' | 'ok' | null {
         const dueDate = this.task.dueDate;
-        const status = this.task.status;
-        if (!dueDate || status === 'DONE' || status === 'CANCELLED') return null;
+        if (!dueDate) return null;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const due = new Date(dueDate + 'T00:00:00');
@@ -145,17 +127,7 @@ export class TaskCardComponent {
         return 'ok';
     }
 
-    get dueDateClass(): string {
-        switch (this.dueDateStatus) {
-            case 'late':  return 'due-late';
-            case 'today': return 'due-today';
-            case 'soon':  return 'due-soon';
-            default:      return 'due-ok';
-        }
-    }
-
     get accentClass(): string {
-        if (this.isDone || this.isCancelled) return 'tc--neutral';
         switch (this.dueDateStatus) {
             case 'late':  return 'tc--late';
             case 'today': return 'tc--today';
@@ -195,21 +167,6 @@ export class TaskCardComponent {
             },
             {separator: true},
             {
-                label: 'Annuler la tâche',
-                icon: 'pi pi-ban',
-                styleClass: 'danger-item',
-                disabled: this.isCancelled,
-                command: () => this.taskInstanceService.updateStatus(this.task.id, 'CANCELLED')
-                    .subscribe(() => this.statusChanged.emit())
-            },
-            {
-                label: 'Réactiver la tâche',
-                icon: 'pi pi-refresh',
-                disabled: !this.isCancelled,
-                command: () => this.taskInstanceService.updateStatus(this.task.id, 'PENDING')
-                    .subscribe(() => this.statusChanged.emit())
-            },
-            {
                 label: 'Supprimer la tâche',
                 icon: 'pi pi-trash',
                 styleClass: 'danger-item',
@@ -218,30 +175,11 @@ export class TaskCardComponent {
         ];
     }
 
-    /**
-     * Appelé quand une sous-tâche change de statut.
-     * Met à jour localement la sous-tâche, puis auto-complète la tâche
-     * parente si toutes les sous-tâches passent à DONE.
-     */
+    /** Appelé quand une sous-tâche change de statut. */
     onSubtaskChanged(subtaskId: string, newStatus: string): void {
-        // Mise à jour optimiste locale pour que every() reflète le nouvel état
         const subtask = (this.task.subtasks ?? []).find(s => s.id === subtaskId);
         if (subtask) subtask.status = newStatus as any;
-
-        const subtasks = this.task.subtasks ?? [];
-        const allDone = subtasks.length > 0 && subtasks.every(s => s.status === 'DONE');
-
-        if (allDone && !this.isDone && !this.isCancelled) {
-            // Toutes les sous-tâches sont DONE → passer la tâche à DONE
-            this.taskInstanceService.updateStatus(this.task.id, 'DONE')
-                .subscribe(() => this.statusChanged.emit());
-        } else if (!allDone && this.isDone) {
-            // Une sous-tâche décochée alors que la tâche était DONE → repasser en PENDING
-            this.taskInstanceService.updateStatus(this.task.id, 'PENDING')
-                .subscribe(() => this.statusChanged.emit());
-        } else {
-            this.statusChanged.emit();
-        }
+        this.statusChanged.emit();
     }
 
     // ── Dialog sous-tâche ───────────────────────────────────────────────────

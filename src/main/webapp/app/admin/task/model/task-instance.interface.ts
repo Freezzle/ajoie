@@ -41,11 +41,9 @@ export interface ITaskInstance {
     salonId: string;
     title: string;
     description: string | null;
-    status: TaskStatus;
     dueDate: string | null;
     responsible: string | null;
     supplierInfo: string | null;
-    completedAt: string | null;
     sortOrder: number;
     subtasks: ISubtaskInstance[];
     comments: ITaskComment[];
@@ -61,17 +59,3 @@ export interface IFlatSubtask extends ISubtaskInstance {
     parentTask: ITaskInstance;
 }
 
-export interface ITaskFocusView {
-    id: string;
-    title: string;
-    status: TaskStatus;
-    dueDate: string | null;
-    urgencyGroup: UrgencyGroup;
-    responsible: string | null;
-    supplierInfo: string | null;
-    subtaskCount: number;
-    subtaskDoneCount: number;
-    nextSubtask: INextSubtask | null;
-    completedAt: string | null;
-    sortOrder: number;
-}

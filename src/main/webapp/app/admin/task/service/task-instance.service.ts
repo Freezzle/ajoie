@@ -25,9 +25,6 @@ export class TaskInstanceService {
         return this.http.get<ITaskInstance>(`${this.instanceUrl}/${id}`);
     }
 
-    updateStatus(id: string, status: TaskStatus): Observable<ITaskInstance> {
-        return this.http.patch<ITaskInstance>(`${this.instanceUrl}/${id}/status`, {status});
-    }
 
     patch(id: string, data: Partial<ITaskInstance>): Observable<ITaskInstance> {
         return this.http.patch<ITaskInstance>(`${this.instanceUrl}/${id}`, data);

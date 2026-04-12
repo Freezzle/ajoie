@@ -1,4 +1,4 @@
-<div class="tc" [class.tc--done]="isDone" [class.tc--cancelled]="isCancelled" [ngClass]="accentClass">
+<div class="tc" [ngClass]="accentClass">
 
     <!-- ── Corps principal ── -->
     <div class="tc__body">
@@ -14,9 +14,6 @@
                     }
                     @if (hasBlockedSubtask) {
                         <p-tag value="Bloquée" severity="danger" [rounded]="true" class="tag-xs"/>
-                    }
-                    @if (isCancelled) {
-                        <p-tag value="Annulée" severity="secondary" [rounded]="true" class="tag-xs"/>
                     }
                 </span>
 

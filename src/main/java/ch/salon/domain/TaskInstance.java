@@ -1,13 +1,11 @@
 package ch.salon.domain;
 
-import ch.salon.domain.enumeration.TaskStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +37,6 @@ public class TaskInstance implements Serializable, TenantOwned {
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 50)
-    private TaskStatus status = TaskStatus.PENDING;
 
     @Transient
     private LocalDate dueDate;
@@ -53,8 +47,6 @@ public class TaskInstance implements Serializable, TenantOwned {
     @Column(name = "supplier_info", columnDefinition = "text")
     private String supplierInfo;
 
-    @Column(name = "completed_at")
-    private Instant completedAt;
 
 
     @NotNull

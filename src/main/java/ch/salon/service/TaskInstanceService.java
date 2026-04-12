@@ -52,7 +52,6 @@ public class TaskInstanceService {
 
         TaskInstance entity = taskInstanceMapper.toEntity(dto);
         entity.setSalon(salon);
-        entity.setStatus(TaskStatus.PENDING);
 
         // Auto sort_order: max + 1
         int nextSort = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(salonId).stream()
@@ -91,16 +90,14 @@ public class TaskInstanceService {
             TaskFocusViewDTO dto = new TaskFocusViewDTO();
             dto.setId(task.getId());
             dto.setTitle(task.getTitle());
-            dto.setStatus(task.getStatus());
             LocalDate taskDueDate = computeTaskDueDate(task);
             dto.setDueDate(taskDueDate);
             dto.setResponsible(task.getResponsible());
             dto.setSupplierInfo(task.getSupplierInfo());
-            dto.setCompletedAt(task.getCompletedAt());
             dto.setSortOrder(task.getSortOrder());
 
             // Urgency group
-            dto.setUrgencyGroup(computeUrgencyGroup(taskDueDate, task.getStatus(), today));
+            dto.setUrgencyGroup(computeUrgencyGroup(taskDueDate, today));
 
             // Subtask counts (RÈGLE 3 — calculated, not stored)
             List<SubtaskInstance> subtasks = task.getSubtasks();
@@ -150,22 +147,8 @@ public class TaskInstanceService {
     }
 
     // =========================================================================
-    // RÈGLE 2 — Status update
+    // Patch
     // =========================================================================
-    @Transactional
-    public TaskInstanceDTO updateStatus(UUID id, TaskStatus newStatus) {
-        TaskInstance entity = taskInstanceRepository.findWithSubtasksById(id).orElseThrow(
-                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND));
-
-        entity.setStatus(newStatus);
-        if (newStatus == TaskStatus.DONE) {
-            entity.setCompletedAt(Instant.now());
-        } else {
-            entity.setCompletedAt(null);
-        }
-
-        return enrichDto(taskInstanceMapper.toDto(entity), entity);
-    }
 
     @Transactional
     public TaskInstanceDTO patch(UUID id, Map<String, Object> fields) {
@@ -396,11 +379,8 @@ public class TaskInstanceService {
         return dto;
     }
 
-    private String computeUrgencyGroup(LocalDate dueDate, TaskStatus status, LocalDate today) {
+    private String computeUrgencyGroup(LocalDate dueDate, LocalDate today) {
         if (dueDate == null) {
-            return "LATER";
-        }
-        if (status == TaskStatus.DONE || status == TaskStatus.CANCELLED) {
             return "LATER";
         }
         if (dueDate.isBefore(today)) {

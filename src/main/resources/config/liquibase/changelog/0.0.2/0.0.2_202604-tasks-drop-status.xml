@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- =============================================================== -->
+    <!-- Supprime status et completed_at de task_instance                -->
+    <!-- (le statut d'une tâche est désormais déduit de ses sous-tâches) -->
+    <!-- =============================================================== -->
+    <changeSet id="0.0.2_202604-tasks-drop-status-1" author="system">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="task_instance" columnName="status"/>
+        </preConditions>
+
+        <dropColumn tableName="task_instance" columnName="status"/>
+
+        <rollback>
+            <addColumn tableName="task_instance">
+                <column name="status" type="varchar(50)" defaultValue="PENDING">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="0.0.2_202604-tasks-drop-status-2" author="system">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="task_instance" columnName="completed_at"/>
+        </preConditions>
+
+        <dropColumn tableName="task_instance" columnName="completed_at"/>
+
+        <rollback>
+            <addColumn tableName="task_instance">
+                <column name="completed_at" type="datetime">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

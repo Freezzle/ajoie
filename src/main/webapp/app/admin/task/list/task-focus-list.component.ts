@@ -156,11 +156,9 @@ export class TaskFocusListComponent implements OnInit {
         return new Date().toISOString().split('T')[0];
     }
 
-    // ── Sous-tâches à plat (hors tâches annulées) ──────────────────────────
+    // ── Sous-tâches à plat (toutes tâches) ────────────────────────────────
     private get allSubtasks(): ISubtaskInstance[] {
-        return this.tasks
-            .filter(t => t.status !== 'CANCELLED')
-            .flatMap(t => t.subtasks ?? []);
+        return this.tasks.flatMap(t => t.subtasks ?? []);
     }
 
     private isSubtaskLate(s: ISubtaskInstance): boolean {
@@ -196,7 +194,7 @@ export class TaskFocusListComponent implements OnInit {
     // ── Filtre appliqué ─────────────────────────────────────────────────────
     get filteredTasks(): ITaskInstance[] {
         switch (this.activeFilter) {
-            case 'active':      return this.tasks.filter(t => t.status !== 'CANCELLED' && this.hasActiveSubtask(t));
+            case 'active':      return this.tasks.filter(t => this.hasActiveSubtask(t));
             case 'late':        return this.tasks.filter(t => (t.subtasks ?? []).some(s => this.isSubtaskLate(s)));
             case 'today':       return this.tasks.filter(t => (t.subtasks ?? []).some(s => this.isSubtaskToday(s)));
             case 'in_progress': return this.tasks.filter(t => this.hasInProgressSubtask(t));
@@ -209,10 +207,7 @@ export class TaskFocusListComponent implements OnInit {
     // ── Sous-tâches à plat triées par date (vue flat) ───────────────────────
     get flatSubtasks(): IFlatSubtask[] {
         const enriched: IFlatSubtask[] = this.tasks
-            .filter(t => t.status !== 'CANCELLED')
-            .flatMap(t =>
-                (t.subtasks ?? []).map(s => ({...s, parentTask: t}))
-            );
+            .flatMap(t => (t.subtasks ?? []).map(s => ({...s, parentTask: t})));
 
         const filtered = this.applySubtaskFilter(enriched);
 

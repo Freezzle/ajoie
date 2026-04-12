@@ -1,6 +1,5 @@
 package ch.salon.service.dto;
 
-import ch.salon.domain.enumeration.TaskStatus;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,7 +15,6 @@ public class TaskFocusViewDTO implements Serializable {
 
     private UUID id;
     private String title;
-    private TaskStatus status;
     private LocalDate dueDate;
     private String urgencyGroup; // "LATE" | "TODAY" | "THIS_WEEK" | "LATER"
     private String responsible;

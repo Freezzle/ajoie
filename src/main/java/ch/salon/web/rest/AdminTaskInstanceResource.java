@@ -66,15 +66,6 @@ public class AdminTaskInstanceResource {
         return ResponseUtil.wrapOrNotFound(taskInstanceService.get(id));
     }
 
-    @PatchMapping("/task-instances/{id}/status")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<TaskInstanceDTO> updateTaskStatus(@PathVariable("id") UUID id,
-                                                             @RequestBody Map<String, String> body) {
-        log.debug("REST request to update status of TaskInstance : {}", id);
-        TaskStatus newStatus = TaskStatus.valueOf(body.get("status"));
-        TaskInstanceDTO result = taskInstanceService.updateStatus(id, newStatus);
-        return ResponseEntity.ok(result);
-    }
 
     @PatchMapping("/task-instances/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")

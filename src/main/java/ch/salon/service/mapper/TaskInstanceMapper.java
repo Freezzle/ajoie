@@ -21,7 +21,5 @@ public interface TaskInstanceMapper {
     @Mapping(target = "salon", ignore = true)
     @Mapping(target = "subtasks", ignore = true)
     @Mapping(target = "comments", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "completedAt", ignore = true)
     void updateEntityFromDto(TaskInstanceDTO dto, @MappingTarget TaskInstance entity);
 }
