@@ -79,6 +79,11 @@ export class TaskFocusListComponent implements OnInit {
                     const cmp = a.dueDate.localeCompare(b.dueDate);
                     return cmp !== 0 ? cmp : a.sortOrder - b.sortOrder;
                 });
+                // Si toutes les sous-tâches sont terminées, basculer le filtre sur 'all'
+                const allDone = this.countActive === 0 && this.countAll > 0;
+                if (allDone && this.activeFilter === 'active') {
+                    this.activeFilter = 'all';
+                }
             });
     }
 

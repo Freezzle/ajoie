@@ -5,15 +5,11 @@
 .tc {
   display: flex;
   gap: 0.71rem;
-  padding: 0.71rem 0.86rem 0.71rem 0.71rem;
+  padding: 0.25rem;
   background: var(--app-surface);
   border: 1px solid var(--app-border);
   border-left: 3px solid var(--app-border);
   border-radius: 0.57rem;
-
-  &:hover {
-    .tc__menu { opacity: 1; }
-  }
 
   &.tc--late {
     border-left-color: var(--app-danger);
@@ -109,10 +105,6 @@
   text-align: right;
 }
 
-.tc__menu {
-  opacity: 0;
-}
-
 .tc__form {
   display: flex;
   align-items: center;
@@ -128,7 +120,6 @@
   padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.14rem;
 }
 
 .tc__completed-at {

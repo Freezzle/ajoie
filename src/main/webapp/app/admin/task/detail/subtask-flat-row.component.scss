@@ -8,17 +8,11 @@
   flex-direction: row;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.5rem 0.3rem 0.45rem;
+  padding: 0.5rem;
   border-radius: 0.4rem;
   background: var(--app-surface);
   border: 1px solid var(--app-border);
   transition: background 0.1s;
-
-  &:hover {
-    background: color-mix(in srgb, var(--app-primary) 3%, var(--app-surface));
-
-    .sfr-menu { opacity: 1; }
-  }
 
   &.subtask-done {
     opacity: 0.6;
@@ -91,18 +85,6 @@
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
-}
-
-// Bouton menu — masqué jusqu'au hover de la row
-.sfr-menu {
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.1s;
-}
-
-// Toujours visible si le menu est ouvert (évite la disparition au clic)
-.subtask-flat-row:focus-within .sfr-menu {
-  opacity: 1;
 }
 
 .subtask-completed-at {

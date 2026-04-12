@@ -5,12 +5,6 @@
   min-height: 2rem;
   padding-bottom: 0.2rem;
 
-  &:hover {
-    background: rgba(0, 0, 0, 0.025);
-
-    .subtask-menu { opacity: 1; }
-  }
-
   &.subtask-done { opacity: 0.8; }
 }
 
@@ -50,11 +44,6 @@
   color: var(--p-surface-400);
   flex-shrink: 0;
   white-space: nowrap;
-}
-
-.subtask-menu {
-  flex-shrink: 0;
-  opacity: 0;
 }
 
 .due-date-popover {
