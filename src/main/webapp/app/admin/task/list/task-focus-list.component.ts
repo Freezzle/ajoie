@@ -15,6 +15,17 @@ import {SubtaskFlatRowComponent} from '../detail/subtask-flat-row.component';
 import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
 import {ProgressBar} from 'primeng/progressbar';
 import {ToggleSwitch} from 'primeng/toggleswitch';
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
+import {ActionsService} from '../../common/actions.service';
+import {AvailableAction} from '../../../shared/model/available-action';
+import {TranslateService} from '@ngx-translate/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {filter} from 'rxjs';
 
 export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | 'done' | 'snoozed';
 
@@ -35,17 +46,25 @@ export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | '
         SubtaskFlatRowComponent,
         SubtaskInstanceFormComponent,
         ProgressBar,
-        ToggleSwitch
+        ToggleSwitch,
+        MenuBoxComponent,
+        ConfirmPopup
     ]
 })
 export class TaskFocusListComponent implements OnInit {
     protected activatedRoute = inject(ActivatedRoute);
     protected taskInstanceService = inject(TaskInstanceService);
+    private readonly actionsService = inject(ActionsService);
+    private readonly menuItemBuilderService = inject(MenuItemBuilderService);
+    private readonly translateService = inject(TranslateService);
+    private readonly modalService = inject(NgbModal);
+    private readonly confirmDialogService = inject(ConfirmDialogService);
 
     salonId: string = '';
     isLoading = false;
     tasks: ITaskInstance[] = [];
     activeFilter: TaskFilter = 'active';
+    menuItems: AppMenuItem[] = [];
 
     /** Bascule entre la vue cards (false) et la vue sous-tâches à plat (true) */
     flatView = signal(false);
@@ -63,7 +82,77 @@ export class TaskFocusListComponent implements OnInit {
 
     ngOnInit(): void {
         this.salonId = this.activatedRoute.snapshot.paramMap.get('idSalon') ?? '';
+        this.menuItems = this.buildMenuItems([]); // items statiques disponibles immédiatement
         this.load();
+        this.loadActions();
+    }
+
+    loadActions(): void {
+        if (!this.salonId) return;
+        this.actionsService.getAvailableActions('salon', this.salonId, 'task-list').subscribe(actions => {
+            this.menuItems = this.buildMenuItems(actions);
+        });
+    }
+
+    buildMenuItems(availableActions: AvailableAction[]): AppMenuItem[] {
+        const staticItems: AppMenuItem[] = [
+            {
+                label: this.translateService.instant('task.focusView.addTask') as string,
+                icon: 'pi pi-plus',
+                command: () => this.openAddTaskDialog()
+            },
+            {
+                label: this.translateService.instant('common.refresh') as string,
+                icon: 'pi pi-sync',
+                command: () => this.load()
+            }
+        ];
+
+        const dynamicItems = this.menuItemBuilderService.buildMenuItemsFromActions(
+            availableActions,
+            (action, htmlElement) => this.clickAction(action, htmlElement)
+        );
+
+        return [...staticItems, ...(dynamicItems.length > 0 ? [{separator: true}, ...dynamicItems] : [])];
+    }
+
+    clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
+        if (action.type === 'BUSINESS') {
+            this.handleBusinessAction(action, this.salonId, htmlElement);
+        }
+    }
+
+    private handleBusinessAction(action: AvailableAction, salonId: string, htmlElement?: HTMLElement): void {
+        if (action.requiredFields && action.requiredFields.length > 0) {
+            const modalRef = this.modalService.open(ActionFormDialogComponent, {size: 'lg'});
+            modalRef.componentInstance.requiredFields = action.requiredFields;
+            modalRef.componentInstance.actionLabelKey = action.labelKey;
+
+            modalRef.result.then((payload: Map<string, any>) => {
+                if (payload) {
+                    this.executeBusinessAction(action.contextCode, salonId, payload);
+                }
+            }).catch(() => { /* dismissed */ });
+        } else {
+            const targetElement = htmlElement || document.activeElement as HTMLElement;
+            const confirmMessageKey = action.confirmationKey || 'common.confirmAction.default';
+
+            this.confirmDialogService.confirmAction(targetElement, confirmMessageKey, {
+                actionLabel: this.translateService.instant(action.labelKey)
+            })
+                .pipe(filter(confirmed => confirmed))
+                .subscribe(() => this.executeBusinessAction(action.contextCode, salonId));
+        }
+    }
+
+    private executeBusinessAction(context: string, salonId: string, payload?: Map<string, any>): void {
+        this.isLoading = true;
+        this.actionsService.businessAction(context, salonId, payload)
+            .pipe(finalize(() => this.isLoading = false))
+            .subscribe(() => {
+                this.load();
+                this.loadActions(); // Rafraîchir le menu après l'action
+            });
     }
 
     load(): void {
@@ -241,6 +330,7 @@ export class TaskFocusListComponent implements OnInit {
                 return subtasks;
         }
     }
+
 
     previousState(): void {
         window.history.back();

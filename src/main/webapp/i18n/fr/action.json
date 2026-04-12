@@ -87,9 +87,14 @@
     "volunteer-planning-download": "Télécharger le planning bénévoles",
     "volunteer-planning-download.help": "Télécharge le planning des bénévoles par jour au format PDF paysage.",
     "volunteer-planning-download.condition.configuration-filled": "Configuration existante avec au moins un jour défini",
+    "salon-copy-tasks": "Copier les tâches récurrentes",
+    "salon-copy-tasks.help": "Duplique toutes les tâches récurrentes depuis un autre salon. Les dates avec un type \"offset\" sont recalculées selon la date du salon actuel et les dates fixes conservent leur jour et mois en adaptant l'année.",
+    "salon-copy-tasks.condition.has-starting-date": "Le salon a une date de début configurée",
+    "salon-copy-tasks.condition.starting-date-in-future": "La date de début du salon est dans le futur",
     "field": {
       "date_expiration": "Date d'expiration",
-      "invoices": "Lignes de facture à déplacer"
+      "invoices": "Lignes de facture à déplacer",
+      "sourceSalonId": "Salon source"
     }
   }
 }

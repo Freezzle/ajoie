@@ -34,7 +34,8 @@ public enum ContextActionType {
     PARTICIPATION_MARK_AS_CLOSED("participation", "participation-marked-as-closed"),
     TALKS_PLANNING_DOWNLOAD("salon", "talks-planning-download", "talks-planning"),
     STANDS_DETAIL_DOWNLOAD("salon", "stands-detail-download", "floor-plan"),
-    VOLUNTEER_PLANNING_DOWNLOAD("salon", "volunteer-planning-download", "volunteer-planning");
+    VOLUNTEER_PLANNING_DOWNLOAD("salon", "volunteer-planning-download", "volunteer-planning"),
+    SALON_COPY_TASKS("salon", "salon-copy-tasks", "task-list");
 
     private static final List<ContextActionType> VALUES = Arrays.asList(ContextActionType.values());
 
@@ -126,6 +127,8 @@ public enum ContextActionType {
             case TALKS_PLANNING_DOWNLOAD -> 62;              // Télécharger le planning des talks
             case STANDS_DETAIL_DOWNLOAD -> 63;               // Télécharger les détails des stands
             case VOLUNTEER_PLANNING_DOWNLOAD -> 64;          // Télécharger le planning bénévoles
+            // === SALON - Actions métier ===
+            case SALON_COPY_TASKS -> 20;                     // Copier les tâches récurrentes depuis un autre salon
 
             // === Actions d'annulation (destructives mais réversibles) ===
             case PARTICIPATION_MARK_AS_CANCELLED -> 90;      // Annuler la participation

@@ -452,4 +452,111 @@ public class TaskInstanceService {
                     "Snooze offset must be between -365 and -1", SUBTASK_ENTITY_NAME, ErrorBusinessKey.INVALID_OFFSET);
         }
     }
+
+    // =========================================================================
+    // Copy recurring tasks from another salon
+    // =========================================================================
+
+    /**
+     * Copie les tâches récurrentes d'un salon source vers un salon cible.
+     * Seules les tâches contenant au moins une sous-tâche récurrente sont dupliquées.
+     * Seules les sous-tâches récurrentes sont copiées.
+     * Reset : status → PENDING, completedAt → null, responsible → null,
+     *         snoozedUntil/snoozeUntilType/snoozeOffset → null, pas de commentaires.
+     * Dates OFFSET : recalculées par rapport au salon cible.
+     * Dates FIXED  : on conserve jour+mois, on remplace l'année par celle du salon cible.
+     */
+    @Transactional
+    public List<TaskInstanceDTO> copyRecurringTasksFromSalon(UUID targetSalonId, UUID sourceSalonId) {
+        Salon targetSalon = salonRepository.findById(targetSalonId).orElseThrow(
+                () -> new BadRequestAlertException("Target salon not found", ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND));
+        salonRepository.findById(sourceSalonId).orElseThrow(
+                () -> new BadRequestAlertException("Source salon not found", ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND));
+
+        int targetYear = targetSalon.getStartingDate()
+                .atZone(ZoneId.systemDefault()).toLocalDate().getYear();
+
+        List<TaskInstance> sourceTasks = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(sourceSalonId);
+
+        // Calcul du prochain sortOrder pour le salon cible
+        int nextSort = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(targetSalonId).stream()
+                .mapToInt(TaskInstance::getSortOrder)
+                .max().orElse(-1) + 1;
+
+        List<TaskInstanceDTO> createdTasks = new ArrayList<>();
+
+        for (TaskInstance sourceTask : sourceTasks) {
+            List<SubtaskInstance> recurringSubtasks = sourceTask.getSubtasks().stream()
+                    .filter(s -> Boolean.TRUE.equals(s.getRecurring()))
+                    .toList();
+
+            if (recurringSubtasks.isEmpty()) {
+                continue; // Skip tasks without recurring subtasks
+            }
+
+            // Clone the task
+            TaskInstance newTask = new TaskInstance();
+            newTask.setSalon(targetSalon);
+            newTask.setTitle(sourceTask.getTitle());
+            newTask.setDescription(sourceTask.getDescription());
+            newTask.setSupplierInfo(sourceTask.getSupplierInfo());
+            newTask.setResponsible(null); // Reset responsible
+            newTask.setSortOrder(nextSort++);
+
+            newTask = taskInstanceRepository.save(newTask);
+
+            // Clone recurring subtasks
+            int subtaskSort = 0;
+            for (SubtaskInstance sourceSub : recurringSubtasks) {
+                SubtaskInstance newSub = new SubtaskInstance();
+                newSub.setTaskInstance(newTask);
+                newSub.setTitle(sourceSub.getTitle());
+                newSub.setDescription(sourceSub.getDescription());
+                newSub.setSupplierInfo(sourceSub.getSupplierInfo());
+                newSub.setRecurring(true);
+                newSub.setDueDateType(sourceSub.getDueDateType());
+                newSub.setDueDateOffset(sourceSub.getDueDateOffset());
+                newSub.setSortOrder(subtaskSort++);
+
+                // Reset fields
+                newSub.setStatus(TaskStatus.PENDING);
+                newSub.setCompletedAt(null);
+                newSub.setResponsible(null);
+                newSub.setSnoozedUntil(null);
+                newSub.setSnoozeUntilType(null);
+                newSub.setSnoozeOffset(null);
+
+                // Recalculate dueDate
+                if ("OFFSET".equals(sourceSub.getDueDateType()) && sourceSub.getDueDateOffset() != null) {
+                    newSub.setDueDate(resolveOffset(targetSalon, sourceSub.getDueDateOffset()));
+                } else if (sourceSub.getDueDate() != null) {
+                    // FIXED date: keep day+month, replace year with target salon year
+                    newSub.setDueDate(adjustYear(sourceSub.getDueDate(), targetYear));
+                } else {
+                    newSub.setDueDate(null);
+                }
+
+                subtaskInstanceRepository.save(newSub);
+            }
+
+            // Reload with subtasks for DTO enrichment
+            TaskInstance saved = taskInstanceRepository.findWithSubtasksById(newTask.getId()).orElse(newTask);
+            createdTasks.add(enrichDto(taskInstanceMapper.toDto(saved), saved));
+        }
+
+        return createdTasks;
+    }
+
+    /**
+     * Ajuste l'année d'une date en conservant jour et mois.
+     * Gère le cas du 29 février en revenant au 28.
+     */
+    private LocalDate adjustYear(LocalDate original, int targetYear) {
+        try {
+            return original.withYear(targetYear);
+        } catch (java.time.DateTimeException e) {
+            // Ex: 29 février dans une année non-bissextile → 28 février
+            return LocalDate.of(targetYear, original.getMonth(), original.getMonth().length(java.time.Year.isLeap(targetYear)));
+        }
+    }
 }

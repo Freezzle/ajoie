@@ -9,6 +9,9 @@
             "supplierInfoPlaceholder": "Infos fournisseur…",
             "dueDateHint": "La date d'échéance sera calculée automatiquement depuis les sous-tâches."
         },
+        "actions": {
+        },
+
         "dialog": {
             "addTask": "Nouvelle tâche",
             "editTask": "Modifier la tâche",

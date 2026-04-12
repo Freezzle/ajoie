@@ -8,17 +8,13 @@
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
-        <button-box (clickedEvent)="openAddTaskDialog()"
-                    [isDisabled]="isLoading"
-                    [showText]="true"
-                    primeIcon="pi-plus"
-                    translateKey="task.focusView.addTask"/>
-        <button-box (clickedEvent)="load()"
-                    [isDisabled]="isLoading"
-                    [showText]="false"
-                    primeIcon="pi-sync"
-                    translateKey="common.refresh"/>
+        <menu-box [items]="menuItems"
+                  [buttonDisabled]="isLoading"
+                  buttonTranslateKey="common.actions"
+                  buttonIcon="pi pi-ellipsis-v"/>
     </div>
+
+    <p-confirmpopup/>
 
     <!-- ── Bandeau progression globale ── -->
     @if (!isLoading && countAll > 0) {
