@@ -160,15 +160,10 @@
                                                         } @else if (invoices.length) {
                                                             @for (invoice of invoices; track $index) {
                                                                 <tr>
-                                                                    <td>{{ invoice.generationDate | formatMediumDate }}</td>
-                                                                    <td>
-                                                                        <input (blur)="onLabelChange($event, invoice)"
-                                                                               [disabled]="mustInvoiceBeDisabled(invoice, invoicingPlan)"
-                                                                               type="text"
-                                                                               value="{{ invoice.label }}"/>
-                                                                    </td>
+                                                                    <td class="align-middle">{{ invoice.generationDate | formatMediumDate }}</td>
+                                                                    <td class="align-middle">{{ invoice.label }}</td>
 
-                                                                    <td class="text-center">
+                                                                    <td class="text-center align-middle">
                                                                         @if (hasDiffCustomAndDefault(invoice) && invoice.id) {
                                                                             <fa-icon [title]="'invoicingPlan.amount.different' | translate: { defaultPrice: invoice.defaultAmount }"
                                                                                      class="text-warning"
@@ -176,41 +171,25 @@
                                                                         }
                                                                         &nbsp;
                                                                     </td>
-                                                                    <td class="text-center">
-                                                                        <input (blur)="onCustomAmountChange($event, invoice)"
-                                                                               [disabled]="mustInvoiceBeDisabled(invoice, invoicingPlan)"
-                                                                               class="text-center"
-                                                                               type="number"
-                                                                               value="{{ invoice.customAmount }}"/>
+                                                                    <td class="text-center align-middle">
+                                                                        {{ invoice.customAmount | currency: 'CHF' }}
                                                                     </td>
-                                                                    <td class="text-center">{{ invoice.quantity }}</td>
-                                                                    <td class="text-center">
+                                                                    <td class="text-center align-middle">{{ invoice.quantity }}</td>
+                                                                    <td class="text-center align-middle">
                                                                         {{ (invoice.quantity ?? 1) * (invoice.customAmount ?? 0) | currency: 'CHF' }}
                                                                     </td>
-                                                                    <td>
-                                                                        <input (blur)="onExtraInformationChange($event, invoice)"
-                                                                               [disabled]="mustInvoiceBeDisabled(invoice, invoicingPlan)"
-                                                                               type="text"
-                                                                               value="{{ invoice.extraInformation }}"/>
+                                                                    <td class="align-middle">
+                                                                        <span class="text-muted fst-italic">{{ invoice.extraInformation }}</span>
                                                                     </td>
-                                                                    <td class="text-end">
+                                                                    <td class="text-end align-middle">
                                                                         @if (showInvoiceActions(invoicingPlan)) {
                                                                             <span>
-                                                                                @if (invoice.readMode) {
-                                                                                    <button-box
-                                                                                            (clickedEvent)="editInvoice(invoice)"
-                                                                                            [showText]="false"
-                                                                                            primeIcon="pi-pencil"
-                                                                                            translateKey="common.edit"/>
-                                                                                }
-                                                                                @if (!invoice.readMode) {
-                                                                                    <button-box
-                                                                                            (clickedEvent)="updateInvoice(invoicingPlan, invoice)"
-                                                                                            [showText]="false"
-                                                                                            primeIcon="pi-save"
-                                                                                            translateKey="common.save"/>
-                                                                                }
-                                                                                @if (invoice.readMode && (!invoice.type || invoice.type === 'OTHERS')) {
+                                                                                <button-box
+                                                                                        (clickedEvent)="editInvoice(invoicingPlan, invoice)"
+                                                                                        [showText]="false"
+                                                                                        primeIcon="pi-pencil"
+                                                                                        translateKey="common.edit"/>
+                                                                                @if (!invoice.type || invoice.type === 'OTHERS') {
                                                                                     <button-box
                                                                                             (clickedEvent)="deleteInvoice(invoicingPlan, invoice)"
                                                                                             [showText]="false"
@@ -255,67 +234,33 @@
                                                             @if (payments.length) {
                                                                 @for (payment of payments; track $index) {
                                                                     <tr>
-                                                                        <td>{{ payment.billingDate | formatMediumDate }}</td>
-                                                                        <td>
-                                                                            <input (blur)="onExtraInformationPaymentChange($event, payment)"
-                                                                                   [disabled]="!isPaymentEditable(payment) || mustPaymentBeDisabled(payment, invoicingPlan)"
-                                                                                   type="text"
-                                                                                   value="{{ payment.extraInformation }}"/>
+                                                                        <td class="align-middle">{{ payment.billingDate | formatMediumDate }}</td>
+                                                                        <td class="align-middle">
+                                                                            <span class="text-muted fst-italic">{{ payment.extraInformation }}</span>
                                                                         </td>
-                                                                        <td>
-                                                                            <select (blur)="onPaymentModeChange($event, payment)"
-                                                                                    [disabled]="!isPaymentEditable(payment) || mustPaymentBeDisabled(payment, invoicingPlan)"
-                                                                                    [value]="payment.paymentMode"
-                                                                                    id="field_mode"
-                                                                                    name="mode">
-                                                                                @for (mode of modeValues; track $index) {
-                                                                                    <option [selected]="payment.paymentMode === mode"
-                                                                                            [value]="mode">{{
-                                                                                            'payment.type.list.' + mode | translate
-                                                                                        }}
-                                                                                    </option>
-                                                                                }
-                                                                            </select>
+                                                                        <td class="align-middle">
+                                                                            {{ 'payment.type.list.' + payment.paymentMode | translate }}
                                                                         </td>
                                                                         <td>&nbsp;</td>
                                                                         <td>&nbsp;</td>
-                                                                        <td class="text-center">
-                                                                            @if (isPaymentEditable(payment)) {
-                                                                                <input (blur)="onAmountPaymentChange($event, payment)"
-                                                                                       class="text-center"
-                                                                                       type="number"
-                                                                                       value="{{ payment.amount }}"/>
-                                                                            }
-                                                                            @if (mustPaymentBeDisabled(payment, invoicingPlan)) {
-                                                                                {{ payment.amount | currency: 'CHF' }}
-                                                                            }
+                                                                        <td class="text-center align-middle">
+                                                                            {{ payment.amount | currency: 'CHF' }}
                                                                         </td>
                                                                         <td>&nbsp;</td>
-                                                                        <td class="text-end">
+                                                                        <td class="text-end align-middle">
                                                                             @if (showPaymentActions(invoicingPlan)) {
                                                                                 <span>
-                                                                                    @if (payment.readMode) {
-                                                                                        <button-box
-                                                                                                (clickedEvent)="editPayment(payment)"
-                                                                                                [showText]="false"
-                                                                                                primeIcon="pi-pencil"
-                                                                                                translateKey="common.edit"/>
-                                                                                    }
-                                                                                    @if (!payment.readMode) {
-                                                                                        <button-box
-                                                                                                (clickedEvent)="updatePayment(invoicingPlan, payment)"
-                                                                                                [showText]="false"
-                                                                                                primeIcon="pi-save"
-                                                                                                translateKey="common.save"/>
-                                                                                    }
-                                                                                    @if (payment.readMode) {
-                                                                                        <button-box
-                                                                                                (clickedEvent)="deletePayment(invoicingPlan, payment)"
-                                                                                                [showText]="false"
-                                                                                                primeIcon="pi-times"
-                                                                                                translateKey="common.delete"
-                                                                                                type="danger"/>
-                                                                                    }
+                                                                                    <button-box
+                                                                                            (clickedEvent)="editPayment(invoicingPlan, payment)"
+                                                                                            [showText]="false"
+                                                                                            primeIcon="pi-pencil"
+                                                                                            translateKey="common.edit"/>
+                                                                                    <button-box
+                                                                                            (clickedEvent)="deletePayment(invoicingPlan, payment)"
+                                                                                            [showText]="false"
+                                                                                            primeIcon="pi-times"
+                                                                                            translateKey="common.delete"
+                                                                                            type="danger"/>
                                                                                 </span>
                                                                             }
                                                                         </td>
@@ -348,4 +293,29 @@
             </div>
         </div>
     </app-card>
+
+    <!-- ── Dialog : Ligne de facture ────────────────────────────────────── -->
+    @if (showInvoiceDialog()) {
+        <dialog-box (cancel)="onInvoiceDialogCancel()"
+                    (confirm)="onInvoiceDialogConfirm($event)"
+                    [(visible)]="showInvoiceDialog"
+                    [header]="editingInvoice ? ('invoicingPlan.invoice.dialog.edit' | translate) : ('invoicingPlan.invoice.dialog.create' | translate)"
+                    [mode]="'edit'"
+                    [confirmLabel]="'common.save'">
+            <app-invoice-form [invoice]="editingInvoice"/>
+        </dialog-box>
+    }
+
+    <!-- ── Dialog : Paiement ────────────────────────────────────────────── -->
+    @if (showPaymentDialog()) {
+        <dialog-box (cancel)="onPaymentDialogCancel()"
+                    (confirm)="onPaymentDialogConfirm($event)"
+                    [(visible)]="showPaymentDialog"
+                    [header]="editingPayment ? ('invoicingPlan.payment.dialog.edit' | translate) : ('invoicingPlan.payment.dialog.create' | translate)"
+                    [mode]="'edit'"
+                    [confirmLabel]="'common.save'">
+            <app-payment-form [payment]="editingPayment"/>
+        </dialog-box>
+    }
+
 </app-content-page>

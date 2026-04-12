@@ -1,0 +1,33 @@
+<div class="row" [formGroup]="form">
+
+    <!-- Commentaire -->
+    <div class="col-12 mt-3">
+        <text-box fieldName="extraInformation"
+                  formControlName="extraInformation"
+                  translateKey="invoicingPlan.payment.comment"/>
+    </div>
+
+    <!-- Date de paiement -->
+    <div class="col-12 col-sm-6 mt-3">
+        <date-box fieldName="billingDate"
+                  formControlName="billingDate"
+                  translateKey="invoicingPlan.payment.date"/>
+    </div>
+
+    <!-- Mode de paiement -->
+    <div class="col-12 col-sm-6 mt-3">
+        <select-box fieldName="paymentMode"
+                    formControlName="paymentMode"
+                    translateKey="invoicingPlan.payment.mode"
+                    [options]="modeOptions"
+                    [formatterFunction]="modeFormatter"/>
+    </div>
+
+    <!-- Montant -->
+    <div class="col-12 col-sm-6 mt-3">
+        <currency-box fieldName="amount"
+                      formControlName="amount"
+                      translateKey="invoicingPlan.payment.amount"/>
+    </div>
+
+</div>

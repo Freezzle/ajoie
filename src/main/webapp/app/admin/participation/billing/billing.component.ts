@@ -1,11 +1,11 @@
-import {Component, inject, input, OnInit} from '@angular/core';
+import {Component, inject, input, OnInit, signal} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormatMediumDatePipe} from 'app/shared/date';
-import {getFormattedParticipationName, IParticipation} from '../model/participation.interface';
+import {IParticipation} from '../model/participation.interface';
 import {IInvoice, IInvoicingPlan, IPayment} from '../model/invoicing-plan.interface';
-import {formatterParticipation, ParticipationService} from '../service/participation.service';
+import {ParticipationService} from '../service/participation.service';
 import {EMPTY, Observable, of} from 'rxjs';
 import {finalize, mergeMap, filter} from 'rxjs/operators';
 import {HttpResponse} from '@angular/common/http';
@@ -14,7 +14,7 @@ import {Type} from '../../enumerations/type.model';
 import {State} from '../../enumerations/state.model';
 import {InvoicingPlanService} from '../service/invoicing-plan.service';
 import dayjs from 'dayjs/esm';
-import {Mode} from '../../enumerations/mode.model';
+
 import {formatterStatus, Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AvailableAction} from '../../../shared/model/available-action';
@@ -24,7 +24,7 @@ import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.co
 import {ActionsService} from '../../common/actions.service';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
 import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
-import {formatterInvoiceMethod, InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
+import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 import {AccordionModule, AccordionTabCloseEvent, AccordionTabOpenEvent} from 'primeng/accordion';
 
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
@@ -38,6 +38,9 @@ import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.com
 import {TranslateService} from '@ngx-translate/core';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
+import {InvoiceFormComponent} from './invoice-form.component';
+import {PaymentFormComponent} from './payment-form.component';
 
 @Component({
                selector: 'app-participation-stats',
@@ -57,7 +60,10 @@ import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
                    Badge,
                    ContentPageComponent,
                    CardComponent,
-                   MenuBoxComponent
+                   MenuBoxComponent,
+                   DialogBoxComponent,
+                   InvoiceFormComponent,
+                   PaymentFormComponent,
                ]
            })
 export class BillingComponent implements OnInit {
@@ -65,10 +71,17 @@ export class BillingComponent implements OnInit {
 
     invoicingPlans$: Observable<IInvoicingPlan[]> | undefined;
     isLoading = false;
-    modeValues = Object.keys(Mode);
     openPlanId: string | null = null;
     menuCachePlans = new Map<string, AppMenuItem[]>();
     billingInfoForm!: FormGroup<BillingInfoGroup>;
+
+    // ── Dialogs ──────────────────────────────────────────────────────────────
+    showInvoiceDialog = signal(false);
+    showPaymentDialog = signal(false);
+    editingInvoice: IInvoice | null = null;
+    editingPayment: IPayment | null = null;
+    /** Référence au plan courant lors de l'ouverture d'un dialog */
+    private activePlan: IInvoicingPlan | null = null;
 
     protected readonly Type = Type;
     protected readonly State = State;
@@ -81,9 +94,6 @@ export class BillingComponent implements OnInit {
     protected confirmDialogService = inject(ConfirmDialogService);
     protected readonly Status = Status;
     protected readonly dayjs = dayjs;
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
-    protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
-    protected readonly formatterParticipation = formatterParticipation;
     protected readonly formatterStatus = formatterStatus;
     protected readonly Object = Object;
     protected readonly InvoiceSendingMethod = InvoiceSendingMethod;
@@ -126,7 +136,7 @@ export class BillingComponent implements OnInit {
         this.openPlanId = String(event.index);
     }
 
-    onClosingCollapseChange(event: AccordionTabCloseEvent) {
+    onClosingCollapseChange(_event: AccordionTabCloseEvent) {
         this.openPlanId = null;
     }
 
@@ -156,33 +166,6 @@ export class BillingComponent implements OnInit {
         return Number(invoice.customAmount ?? 0) !== Number(invoice.defaultAmount ?? 0);
     }
 
-    onClickLock(invoice: IInvoice): void {
-        invoice.lock = !invoice.lock;
-    }
-    onCustomAmountChange(event: any, invoice: IInvoice): void {
-        invoice.customAmount = Number(event.target.value);
-    }
-
-    onLabelChange(event: any, invoice: IInvoice): void {
-        invoice.label = event.target.value;
-    }
-
-    onExtraInformationChange(event: any, invoice: IInvoice): void {
-        invoice.extraInformation = event.target.value;
-    }
-
-    onPaymentModeChange(event: any, payment: IPayment): void {
-        payment.paymentMode = event.target.value;
-    }
-
-    onAmountPaymentChange(event: any, payment: IPayment): void {
-        payment.amount = Number(event.target.value);
-    }
-
-    onExtraInformationPaymentChange(event: any, payment: IPayment): void {
-        payment.extraInformation = event.target.value;
-    }
-
     totalInvoices(invoicingPlan: IInvoicingPlan): number {
         return (invoicingPlan.invoices ?? [])
             .map(invoice => (invoice.quantity ?? 1) * (invoice.customAmount ?? 0))
@@ -198,54 +181,75 @@ export class BillingComponent implements OnInit {
         return this.totalInvoices(invoicingPlan) - this.totalPayments(invoicingPlan);
     }
 
-    updateInvoice(invoicingPlan: IInvoicingPlan, invoice: IInvoice): void {
-        invoice.readMode = true;
+    editInvoice(invoicingPlan: IInvoicingPlan, invoice: IInvoice): void {
+        this.activePlan = invoicingPlan;
+        this.editingInvoice = invoice;
+        this.showInvoiceDialog.set(true);
+    }
 
-        this.saveInvoice(invoicingPlan.id, invoice).subscribe(res => {
+    onInvoiceDialogConfirm(draft: Partial<IInvoice> | null): void {
+        if (!draft || !this.activePlan) return;
+        const invoice = this.editingInvoice ?? {} as IInvoice;
+        Object.assign(invoice, draft);
+        this.saveInvoice(this.activePlan.id, invoice).subscribe(res => {
             this.applyInvoiceResponse(invoice, res);
+            if (!this.editingInvoice) {
+                // Mode création : recharger pour que l'id soit bien renseigné
+                this.loadInvoicePlans();
+            }
         });
+        this.editingInvoice = null;
+        this.activePlan = null;
     }
 
-    editInvoice(invoice: IInvoice): void {
-        invoice.readMode = false;
+    onInvoiceDialogCancel(): void {
+        // Si c'était une création (pas encore d'id), on retire l'élément fantôme
+        if (this.editingInvoice && !this.editingInvoice.id && this.activePlan) {
+            const idx = this.activePlan.invoices?.indexOf(this.editingInvoice) ?? -1;
+            if (idx >= 0) this.activePlan.invoices?.splice(idx, 1);
+        }
+        this.editingInvoice = null;
+        this.activePlan = null;
     }
 
-    updatePayment(invoicingPlan: IInvoicingPlan, payment: IPayment): void {
-        payment.readMode = true;
+    editPayment(invoicingPlan: IInvoicingPlan, payment: IPayment): void {
+        this.activePlan = invoicingPlan;
+        this.editingPayment = payment;
+        this.showPaymentDialog.set(true);
+    }
 
-        this.savePayment(invoicingPlan.id, payment).subscribe(res => {
+    onPaymentDialogConfirm(draft: Partial<IPayment> | null): void {
+        if (!draft || !this.activePlan) return;
+        const payment = this.editingPayment ?? {} as IPayment;
+        Object.assign(payment, draft);
+        this.savePayment(this.activePlan.id, payment).subscribe(res => {
             this.applyPaymentResponse(payment, res);
             this.loadInvoicePlans();
         });
+        this.editingPayment = null;
+        this.activePlan = null;
     }
 
-    editPayment(payment: IPayment): void {
-        payment.readMode = false;
+    onPaymentDialogCancel(): void {
+        // Si c'était une création (pas encore d'id), on retire l'élément fantôme
+        if (this.editingPayment && !this.editingPayment.id && this.activePlan) {
+            const idx = this.activePlan.payments?.indexOf(this.editingPayment) ?? -1;
+            if (idx >= 0) this.activePlan.payments?.splice(idx, 1);
+        }
+        this.editingPayment = null;
+        this.activePlan = null;
     }
 
     addInvoice(invoicingPlan: IInvoicingPlan): void {
-        invoicingPlan.invoices?.push({
-                                         customAmount: null,
-                                         defaultAmount: null,
-                                         extraInformation: null,
-                                         generationDate: dayjs(),
-                                         label: null,
-                                         lock: true,
-                                         quantity: 1,
-                                         readMode: false,
-                                         type: Type.OTHERS,
-                                         selected: false
-                                     } as IInvoice);
+        this.activePlan = invoicingPlan;
+        this.editingInvoice = null;
+        this.showInvoiceDialog.set(true);
     }
 
     addPayment(invoicingPlan: IInvoicingPlan): void {
-        invoicingPlan.payments?.push({
-                                         amount: null,
-                                         paymentMode: Mode.BANK,
-                                         billingDate: dayjs(),
-                                         extraInformation: null,
-                                         readMode: false
-                                     } as IPayment);
+        this.activePlan = invoicingPlan;
+        this.editingPayment = null;
+        this.showPaymentDialog.set(true);
     }
 
     deleteInvoice(invoicingPlan: IInvoicingPlan, invoiceToRemove: IInvoice): void {
@@ -284,31 +288,11 @@ export class BillingComponent implements OnInit {
         }
     }
 
-    isPaymentEditable(payment: IPayment): boolean {
-        return !payment.readMode;
+    disableActionButton(_invoicingPlan: IInvoicingPlan): boolean {
+        return this.isLoading;
     }
 
-    mustPaymentBeDisabled(payment: IPayment, invoicingPlan: IInvoicingPlan): boolean {
-        return !this.isPaymentEditable(payment) || this.isDraftState(invoicingPlan) || this.isParticipationClosed();
-    }
-
-    isInvoiceEditable(invoice: IInvoice): boolean {
-        return !invoice.readMode;
-    }
-
-    mustInvoiceBeDisabled(invoice: IInvoice, invoicingPlan: IInvoicingPlan): boolean {
-        return !this.isInvoiceEditable(invoice) || !this.isDraftState(invoicingPlan) || this.isParticipationClosed();
-    }
-
-    disableActionButton(invoicingPlan: IInvoicingPlan): boolean {
-        return this.isLoading || this.hasPendingEdition(invoicingPlan);
-    }
-
-    mustDisableSendButton(invoicingPlan: IInvoicingPlan): boolean {
-        return this.isLoading || this.hasPendingEdition(invoicingPlan) || this.isInvoicingPlanBlocked(invoicingPlan);
-    }
-
-    showInvoicingAction(plan: IInvoicingPlan): boolean {
+    showInvoicingAction(_plan: IInvoicingPlan): boolean {
         return true;
     }
 
@@ -423,10 +407,6 @@ export class BillingComponent implements OnInit {
         return invoicingPlan.state === State.DRAFT || invoicingPlan.state === State.ISOLATED;
     }
 
-    isIssuingState(invoicingPlan: IInvoicingPlan): boolean {
-        return invoicingPlan.state === State.IS_ISSUING;
-    }
-
     isIssuedState(invoicingPlan: IInvoicingPlan): boolean {
         return invoicingPlan.state === State.ISSUED;
     }
@@ -438,21 +418,6 @@ export class BillingComponent implements OnInit {
     isInvoicingPlanBlocked(invoicingPlan: IInvoicingPlan): boolean {
         return invoicingPlan.state === State.CANCELLED || invoicingPlan.state === State.PAID
                || this.participation()?.status === Status.CLOSED;
-    }
-
-    isInvoicingPlanCancelled(invoicingPlan: IInvoicingPlan): boolean {
-        return invoicingPlan.state === State.CANCELLED;
-    }
-
-    isInvoicingPlanPaid(invoicingPlan: IInvoicingPlan): boolean {
-        return invoicingPlan.state === State.PAID;
-    }
-
-    openHistoryModal(): void {
-        this.participationService.getEventLogs(this.participation()!.id).subscribe(events => {
-            const modalRef = this.modalService.open(EventModalComponent, {size: 'lg'});
-            modalRef.componentInstance.events = events.body ?? [];
-        });
     }
 
     openHistoryModalForInvoicingPlan(invoicingPlan: IInvoicingPlan): void {
@@ -470,7 +435,7 @@ export class BillingComponent implements OnInit {
         const actionItems = this.menuItemBuilderService.buildMenuItemsFromActions(
             invoicingPlan.availableActions ?? [],
             (action, htmlElement) => this.clickAction(action, invoicingPlan, htmlElement),
-            (action) => this.disableActionButton(invoicingPlan)
+            (_action) => this.disableActionButton(invoicingPlan)
         );
 
         items.push(...actionItems);
@@ -545,21 +510,6 @@ export class BillingComponent implements OnInit {
         return ascii?.[1]?.trim() ?? null;
     }
 
-    private isParticipationClosed(): boolean {
-        return this.participation()?.status === Status.CLOSED;
-    }
-
-    private allInvoicesInReadMode(plan: IInvoicingPlan): boolean {
-        return (plan.invoices ?? []).every(inv => inv.readMode);
-    }
-
-    private allPaymentsInReadMode(plan: IInvoicingPlan): boolean {
-        return (plan.payments ?? []).every(pay => pay.readMode);
-    }
-
-    private hasPendingEdition(plan: IInvoicingPlan): boolean {
-        return !this.allInvoicesInReadMode(plan) || !this.allPaymentsInReadMode(plan);
-    }
 
     private canMutatePlan(plan: IInvoicingPlan): boolean {
         return !this.isInvoicingPlanBlocked(plan);

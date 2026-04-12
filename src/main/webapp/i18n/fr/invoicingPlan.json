@@ -13,6 +13,16 @@
       "qty": "Quantité",
       "sum": "Total"
     },
+    "invoice": {
+      "dialog": {
+        "create": "Nouvelle ligne de facture",
+        "edit": "Modifier la ligne de facture"
+      },
+      "label": "Libellé",
+      "amount": "Montant (CHF)",
+      "qty": "Quantité",
+      "comment": "Commentaire"
+    },
     "invoices": {
       "label": "Lignes de la facture",
       "notFound": "Aucune facture"
@@ -34,6 +44,16 @@
       "unchecked": "Plan sans arrangement"
     },
     "paids": "Facture payé",
+    "payment": {
+      "dialog": {
+        "create": "Nouveau paiement",
+        "edit": "Modifier le paiement"
+      },
+      "date": "Date de paiement",
+      "mode": "Mode de paiement",
+      "amount": "Montant (CHF)",
+      "comment": "Commentaire"
+    },
     "payments": {
       "label": "Paiements",
       "notFound": "Aucun paiement"

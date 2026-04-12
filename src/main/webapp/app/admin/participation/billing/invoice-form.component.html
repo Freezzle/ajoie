@@ -1,0 +1,33 @@
+<div class="row" [formGroup]="form">
+
+    <!-- Libellé -->
+    <div class="col-12 mt-3">
+        <text-box fieldName="label"
+                  formControlName="label"
+                  translateKey="invoicingPlan.invoice.label"/>
+    </div>
+
+    <!-- Montant -->
+    <div class="col-12 col-sm-6 mt-3">
+        <currency-box fieldName="customAmount"
+                      formControlName="customAmount"
+                      translateKey="invoicingPlan.invoice.amount"/>
+    </div>
+
+    <!-- Quantité -->
+    <div class="col-12 col-sm-6 mt-3">
+        <number-box fieldName="quantity"
+                    formControlName="quantity"
+                    translateKey="invoicingPlan.invoice.qty"
+                    [minValue]="1"/>
+    </div>
+
+    <!-- Commentaire -->
+    <div class="col-12 mt-3">
+        <textarea-box fieldName="extraInformation"
+                      formControlName="extraInformation"
+                      translateKey="invoicingPlan.invoice.comment"
+                      [rows]="3"/>
+    </div>
+
+</div>
