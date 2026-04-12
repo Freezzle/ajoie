@@ -12,7 +12,6 @@ import {TimeSincePipe} from '../../../shared/pipe/time-since.pipe';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
 import {Tag} from 'primeng/tag';
-import {ProgressBar} from 'primeng/progressbar';
 import {TaskFilter} from '../list/task-focus-list.component';
 import {AccountService} from '../../../core/auth/account.service';
 
@@ -30,8 +29,7 @@ import {AccountService} from '../../../core/auth/account.service';
                    TimeSincePipe,
                    DialogBoxComponent,
                    SubtaskInstanceFormComponent,
-                   Tag,
-                   ProgressBar
+                   Tag
                ]
            })
 export class TaskCardComponent {
