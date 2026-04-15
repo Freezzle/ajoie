@@ -26,6 +26,8 @@ import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/acti
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {filter} from 'rxjs';
+import {SalonService} from '../../salon/service/salon.service';
+import {ISalon} from '../../salon/model/salon.interface';
 
 export type TaskFilter = 'all' | 'active' | 'late' | 'today' | 'in_progress' | 'done' | 'snoozed';
 
@@ -59,8 +61,10 @@ export class TaskFocusListComponent implements OnInit {
     private readonly translateService = inject(TranslateService);
     private readonly modalService = inject(NgbModal);
     private readonly confirmDialogService = inject(ConfirmDialogService);
+    private readonly salonService = inject(SalonService);
 
     salonId: string = '';
+    salon: ISalon | null = null;
     isLoading = false;
     tasks: ITaskInstance[] = [];
     activeFilter: TaskFilter = 'active';
@@ -83,8 +87,16 @@ export class TaskFocusListComponent implements OnInit {
     ngOnInit(): void {
         this.salonId = this.activatedRoute.snapshot.paramMap.get('idSalon') ?? '';
         this.menuItems = this.buildMenuItems([]); // items statiques disponibles immédiatement
+        this.loadSalon();
         this.load();
         this.loadActions();
+    }
+
+    loadSalon(): void {
+        if (!this.salonId) return;
+        this.salonService.find(this.salonId).subscribe(res => {
+            this.salon = res.body;
+        });
     }
 
     loadActions(): void {
@@ -283,7 +295,7 @@ export class TaskFocusListComponent implements OnInit {
     // ── Filtre appliqué ─────────────────────────────────────────────────────
     get filteredTasks(): ITaskInstance[] {
         switch (this.activeFilter) {
-            case 'active':      return this.tasks.filter(t => this.hasActiveSubtask(t));
+            case 'active':      return this.tasks.filter(t => (t.subtasks ?? []).length === 0 || this.hasActiveSubtask(t));
             case 'late':        return this.tasks.filter(t => (t.subtasks ?? []).some(s => this.isSubtaskLate(s)));
             case 'today':       return this.tasks.filter(t => (t.subtasks ?? []).some(s => this.isSubtaskToday(s)));
             case 'in_progress': return this.tasks.filter(t => this.hasInProgressSubtask(t));
@@ -334,5 +346,41 @@ export class TaskFocusListComponent implements OnInit {
 
     previousState(): void {
         window.history.back();
+    }
+
+    // ── Bandeau date de référence ────────────────────────────────────────────
+
+    /** Date de début du salon formatée en dd.MM.yyyy */
+    get salonStartingDateFormatted(): string {
+        if (!this.salon?.startingDate) return '—';
+        return new Date(this.salon.startingDate).toLocaleDateString('fr-CH', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+    }
+
+    /**
+     * Vrai si au moins une sous-tâche OFFSET a une dueDate calculée différente
+     * de salon.startingDate + offset (détection de désynchronisation côté client).
+     */
+    get isDatesDesynchronized(): boolean {
+        if (!this.salon?.startingDate || this.tasks.length === 0) return false;
+        const base = new Date(this.salon.startingDate);
+        // Utiliser la date locale (comme le backend Java avec ZoneId.systemDefault())
+        const baseY = base.getFullYear();
+        const baseM = base.getMonth();
+        const baseD = base.getDate();
+
+        for (const task of this.tasks) {
+            for (const sub of (task.subtasks ?? [])) {
+                if (sub.dueDateType === 'OFFSET' && sub.dueDateOffset !== null && sub.dueDateOffset !== undefined) {
+                    const expected = new Date(baseY, baseM, baseD + sub.dueDateOffset);
+                    const expectedStr = `${expected.getFullYear()}-${String(expected.getMonth() + 1).padStart(2, '0')}-${String(expected.getDate()).padStart(2, '0')}`;
+                    if (sub.dueDate !== expectedStr) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

@@ -7,7 +7,10 @@
             "taskTitlePlaceholder": "Titre de la tâche…",
             "responsiblePlaceholder": "Responsable…",
             "supplierInfoPlaceholder": "Infos fournisseur…",
-            "dueDateHint": "La date d'échéance sera calculée automatiquement depuis les sous-tâches."
+            "dueDateHint": "La date d'échéance sera calculée automatiquement depuis les sous-tâches.",
+            "referenceDate": "Date de référence des sous-tâches",
+            "referenceDateWarning": "Des dates de sous-tâches (offset) ne correspondent plus à cette date de référence. Utilisez l'action « Recalculer les dates » dans le menu.",
+            "noSubtask": "Aucune sous-tâche — cliquez sur ⋮ pour en ajouter une."
         },
         "actions": {
         },

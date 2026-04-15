@@ -76,6 +76,10 @@
                                      (editRequested)="openEditSubtaskDialog(subtask)"/>
                 }
             </div>
+        } @else {
+            <div class="tc__no-subtasks">
+                <span>{{ 'task.focusView.noSubtask' | translate }}</span>
+            </div>
         }
 
         <!-- COMMENTAIRES (collapse) -->

@@ -16,6 +16,23 @@
 
     <p-confirmpopup/>
 
+    <!-- ── Bandeau date de référence du salon ── -->
+    @if (salon) {
+        <div class="tfl-ref-date" [class.tfl-ref-date--warning]="isDatesDesynchronized">
+            <span class="tfl-ref-date__label">
+                <i class="pi pi-calendar me-1"></i>
+                <span jhiTranslate="task.focusView.referenceDate">Date de référence</span>&nbsp;:
+                <strong>{{ salonStartingDateFormatted }}</strong>
+            </span>
+            @if (isDatesDesynchronized) {
+                <span class="tfl-ref-date__warning">
+                    <i class="pi pi-exclamation-triangle me-1"></i>
+                    <span jhiTranslate="task.focusView.referenceDateWarning">Des dates de sous-tâches ne correspondent plus à cette date de référence. Utilisez l'action « Recalculer les dates » dans le menu.</span>
+                </span>
+            }
+        </div>
+    }
+
     <!-- ── Bandeau progression globale ── -->
     @if (!isLoading && countAll > 0) {
         <div class="tfl-progress">

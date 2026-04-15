@@ -454,6 +454,73 @@ public class TaskInstanceService {
     }
 
     // =========================================================================
+    // Recalculate task dates based on current salon.startingDate
+    // =========================================================================
+
+    /**
+     * Vérifie si au moins une sous-tâche OFFSET du salon a une dueDate désynchronisée
+     * par rapport à la startingDate actuelle du salon.
+     */
+    @Transactional(readOnly = true)
+    public boolean hasDesynchronizedDates(UUID salonId) {
+        Salon salon = salonRepository.findById(salonId).orElse(null);
+        if (salon == null || salon.getStartingDate() == null) return false;
+
+        List<TaskInstance> tasks = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(salonId);
+        for (TaskInstance task : tasks) {
+            for (SubtaskInstance sub : task.getSubtasks()) {
+                if ("OFFSET".equals(sub.getDueDateType()) && sub.getDueDateOffset() != null) {
+                    LocalDate expected = resolveOffset(salon, sub.getDueDateOffset());
+                    if (!Objects.equals(sub.getDueDate(), expected)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Recalcule toutes les dates des sous-tâches du salon :
+     * - OFFSET : recalcule dueDate à partir de salon.startingDate + offset
+     * - FIXED  : conserve jour+mois, ajuste l'année à celle du salon cible
+     * - snoozeUntilType=OFFSET : recalcule snoozedUntil
+     */
+    @Transactional
+    public void recalculateTaskDates(UUID salonId) {
+        Salon salon = salonRepository.findById(salonId).orElseThrow(
+                () -> new BadRequestAlertException("Salon not found", ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND));
+
+        if (salon.getStartingDate() == null) {
+            throw new BadRequestAlertException("Salon has no starting date", ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND);
+        }
+
+        int targetYear = salon.getStartingDate()
+                .atZone(ZoneId.systemDefault()).toLocalDate().getYear();
+
+        List<TaskInstance> tasks = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(salonId);
+        for (TaskInstance task : tasks) {
+            for (SubtaskInstance sub : task.getSubtasks()) {
+                // ── Recalcul dueDate ─────────────────────────────────────────
+                if ("OFFSET".equals(sub.getDueDateType()) && sub.getDueDateOffset() != null) {
+                    sub.setDueDate(resolveOffset(salon, sub.getDueDateOffset()));
+                } else if ("FIXED".equals(sub.getDueDateType()) && sub.getDueDate() != null) {
+                    sub.setDueDate(adjustYear(sub.getDueDate(), targetYear));
+                }
+
+                // ── Recalcul snoozedUntil ─────────────────────────────────
+                if ("OFFSET".equals(sub.getSnoozeUntilType()) && sub.getSnoozeOffset() != null) {
+                    sub.setSnoozedUntil(resolveOffsetFromDate(sub.getDueDate(), salon, sub.getSnoozeOffset()));
+                } else if ("FIXED".equals(sub.getSnoozeUntilType()) && sub.getSnoozedUntil() != null) {
+                    sub.setSnoozedUntil(adjustYear(sub.getSnoozedUntil(), targetYear));
+                }
+
+                subtaskInstanceRepository.save(sub);
+            }
+        }
+    }
+
+    // =========================================================================
     // Copy recurring tasks from another salon
     // =========================================================================
 

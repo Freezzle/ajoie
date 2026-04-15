@@ -11,34 +11,35 @@
                 <div class="mt-4 col-12">
                     @if (field.type === FieldType.TEXT) {
                         <text-box
-                            [fieldName]="field.name"
-                            [formControlName]="field.name"
-                            [translateKey]="field.labelKey"/>
+                                [fieldName]="field.name"
+                                [formControlName]="field.name"
+                                [translateKey]="field.labelKey"/>
                     }
                     @if (field.type === FieldType.DATE) {
                         <date-box
-                            [fieldName]="field.name"
-                            [formControlName]="field.name"
-                            [translateKey]="field.labelKey"/>
+                                [appendBody]="false"
+                                [fieldName]="field.name"
+                                [formControlName]="field.name"
+                                [translateKey]="field.labelKey"/>
                     }
                     @if (field.type === FieldType.NUMBER) {
                         <number-box
-                            [fieldName]="field.name"
-                            [formControlName]="field.name"
-                            [translateKey]="field.labelKey"/>
+                                [fieldName]="field.name"
+                                [formControlName]="field.name"
+                                [translateKey]="field.labelKey"/>
                     }
                     @if (field.type === FieldType.PICKLIST) {
                         <picklist-box
-                            [fieldName]="field.name"
-                            [formControlName]="field.name"
-                            [translateKey]="field.labelKey"
-                            [options]="field.options || []"/>
+                                [fieldName]="field.name"
+                                [formControlName]="field.name"
+                                [translateKey]="field.labelKey"
+                                [options]="field.options || []"/>
                     }
                     @if (field.type === FieldType.CHECKBOX) {
                         <checkbox-box
-                            [fieldName]="field.name"
-                            [formControlName]="field.name"
-                            [translateKey]="field.labelKey"/>
+                                [fieldName]="field.name"
+                                [formControlName]="field.name"
+                                [translateKey]="field.labelKey"/>
                     }
                 </div>
             }
@@ -47,15 +48,15 @@
 
     <div class="modal-footer">
         <button-box
-            (clickedEvent)="cancel()"
-            [isDisabled]="isLoading()"
-            [showText]="true"
-            translateKey="common.cancel"/>
+                (clickedEvent)="cancel()"
+                [isDisabled]="isLoading()"
+                [showText]="true"
+                translateKey="common.cancel"/>
 
         <button-box
-            [isDisabled]="!form.valid || isLoading()"
-            (clickedEvent)="submit()"
-            [showText]="true"
-            translateKey="common.confirm"/>
+                [isDisabled]="!form.valid || isLoading()"
+                (clickedEvent)="submit()"
+                [showText]="true"
+                translateKey="common.confirm"/>
     </div>
 </form>

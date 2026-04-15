@@ -6,7 +6,7 @@
             [inputId]="'field_' + fieldName"
             [invalid]="controlDir.control?.invalid && controlDir.control?.touched"
             fluid
-            [appendTo]="'body'"
+            [appendTo]="appendBody ? 'body' : undefined"
             iconDisplay="input"
             showIcon></p-datepicker>
     @if (translateKey) {

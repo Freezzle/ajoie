@@ -14,6 +14,8 @@ import {DatePicker} from 'primeng/datepicker';
 export class DateBoxComponent implements ControlValueAccessor {
     @Input()
     translateKey: string | undefined;
+    @Input()
+    appendBody: boolean = true;
 
     @Input()
     fieldName: string = '';

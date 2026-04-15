@@ -36,6 +36,7 @@ public enum ContextActionType {
     STANDS_DETAIL_DOWNLOAD("salon", "stands-detail-download", "floor-plan"),
     VOLUNTEER_PLANNING_DOWNLOAD("salon", "volunteer-planning-download", "volunteer-planning"),
     SALON_COPY_TASKS("salon", "salon-copy-tasks", "task-list"),
+    SALON_RECALCULATE_TASK_DATES("salon", "salon-recalculate-task-dates", "task-list"),
     SALON_DUPLICATE("salon", "salon-duplicate", "salon");
 
     private static final List<ContextActionType> VALUES = Arrays.asList(ContextActionType.values());
@@ -130,6 +131,7 @@ public enum ContextActionType {
             case VOLUNTEER_PLANNING_DOWNLOAD -> 64;          // Télécharger le planning bénévoles
             // === SALON - Actions métier ===
             case SALON_COPY_TASKS -> 20;                     // Copier les tâches récurrentes depuis un autre salon
+            case SALON_RECALCULATE_TASK_DATES -> 21;         // Recalculer les dates des sous-tâches
             case SALON_DUPLICATE -> 10;                      // Dupliquer un salon
 
             // === Actions d'annulation (destructives mais réversibles) ===
