@@ -1,5 +1,44 @@
 // Styles des cartes gérés dans task-card.component.scss
 
+// ── Bandeau date de référence du salon ──────────────────────────────────────
+.tfl-ref-date {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+    color: var(--app-text);
+
+    &--warning {
+        background: color-mix(in srgb, var(--app-warning) 10%, var(--app-surface));
+        border-color: var(--app-warning);
+    }
+
+    &__label {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    &__warning {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--app-warning);
+        font-weight: 600;
+        font-size: 0.78rem;
+    }
+}
+
+
+
 // ── Bandeau progression ─────────────────────────────────────────────────────
 .tfl-progress {
     display: flex;
