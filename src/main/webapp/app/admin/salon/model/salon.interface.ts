@@ -19,6 +19,8 @@ export interface ISalon {
     eventAddress: IAddress | null;
     bankAccount: IBankAccount;
     priceStandSalons: IPriceStandSalon[];
+    archived: boolean;
+    sourceSalonId?: string | null;
 }
 
 export type NewSalon = Omit<ISalon, 'id'> & { id: null };

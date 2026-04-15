@@ -19,6 +19,8 @@ public interface SalonMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "priceStandSalons", ignore = true)
+    @Mapping(target = "archived", ignore = true)
+    @Mapping(target = "sourceSalonId", ignore = true)
     void updateEntityFromDto(SalonDTO salonDTO, @MappingTarget Salon salon);
 
     @BeanMapping(ignoreByDefault = true)

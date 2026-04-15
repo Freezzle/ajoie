@@ -18,4 +18,5 @@
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-subtask-responsible.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-subtask-recurring.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-tasks-drop-status.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202604-salon-archive-source.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -65,6 +65,12 @@ public class Salon implements Serializable, TenantOwned {
     @Column(name = "extra_information")
     private String extraInformation;
 
+    @Column(name = "archived", nullable = false)
+    private boolean archived = false;
+
+    @Column(name = "source_salon_id")
+    private UUID sourceSalonId;
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "headquarters_address_id")
     private Address headquartersAddress;

@@ -4,8 +4,9 @@
     "conferences": "Les conférences",
     "create": "Nouveau salon",
     "delete": {
-      "question": "Voulez-vous supprimer le salon \"{{id}}\" ?"
+      "question": "Voulez-vous archiver le salon \"{{id}}\" ? Il ne sera plus visible dans la liste."
     },
+    "duplicatedFrom": "Dupliqué depuis :",
     "dimensions-prices": "Configuration des dimensions de stands",
     "edit": "Détail du salon",
     "endingDate": "Date de fin",

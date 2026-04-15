@@ -34,6 +34,12 @@
                             [translateKey]="field.labelKey"
                             [options]="field.options || []"/>
                     }
+                    @if (field.type === FieldType.CHECKBOX) {
+                        <checkbox-box
+                            [fieldName]="field.name"
+                            [formControlName]="field.name"
+                            [translateKey]="field.labelKey"/>
+                    }
                 </div>
             }
         </div>

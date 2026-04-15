@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Ajout du flag d'archivage et de la référence au salon source (duplication) -->
+    <changeSet id="0.0.2-202604-salon-archive-source" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon"/>
+        </preConditions>
+
+        <addColumn tableName="salon">
+            <column name="archived" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_salon_id" type="uuid"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="salon" columnName="archived"/>
+            <dropColumn tableName="salon" columnName="source_salon_id"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

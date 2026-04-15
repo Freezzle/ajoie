@@ -43,6 +43,7 @@ public class SalonService {
     private final PriceStandMapper priceStandMapper;
     private final PlanningTalksSalonRepository planningTalksSalonRepository;
     private final PlanningVolunteerSalonRepository planningVolunteerSalonRepository;
+    private final TaskInstanceService taskInstanceService;
 
     public UUID create(SalonDTO salon) {
         if (salon == null) {
@@ -113,7 +114,10 @@ public class SalonService {
     }
 
     public List<SalonDTO> findAll() {
-        return salonRepository.findAll().stream().map(salonMapper::toDto).toList();
+        return salonRepository.findAll().stream()
+                .filter(s -> !s.isArchived())
+                .map(salonMapper::toDto)
+                .toList();
     }
 
     public Optional<SalonDTO> get(UUID id) {
@@ -129,7 +133,10 @@ public class SalonService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        salonRepository.deleteById(id);
+        Salon salon = salonRepository.findById(id).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        salon.setArchived(true);
+        salonRepository.save(salon);
     }
 
     public List<PriceStandDTO> getDimensionStands(UUID idSalon) {
@@ -359,5 +366,183 @@ public class SalonService {
         stats.setFacturation(facturationStats);
 
         return stats;
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    @SuppressWarnings("java:S3776")
+    public void duplicateSalon(Salon source, String newPlace, String newReferenceNumber,
+                               java.time.Instant startingDate, java.time.Instant endingDate,
+                               boolean copyPrices, boolean copyTalksPlanning, boolean copyVolunteerPlanning,
+                               boolean copyTasks) {
+
+        Salon newSalon = new Salon();
+        newSalon.setPlace(newPlace);
+        newSalon.setReferenceNumber(newReferenceNumber);
+        newSalon.setStartingDate(startingDate);
+        newSalon.setEndingDate(endingDate);
+        newSalon.setSourceSalonId(source.getId());
+
+        // Toujours dupliquer les adresses et le compte bancaire
+        if (source.getHeadquartersAddress() != null) {
+            newSalon.setHeadquartersAddress(copyAddress(source.getHeadquartersAddress()));
+        }
+        if (source.getEventAddress() != null) {
+            newSalon.setEventAddress(copyAddress(source.getEventAddress()));
+        }
+        if (source.getBankAccount() != null) {
+            newSalon.setBankAccount(copyBankAccount(source.getBankAccount()));
+        }
+
+        // Dupliquer les prix si demandé
+        if (copyPrices) {
+            newSalon.setPriceMeal1(source.getPriceMeal1());
+            newSalon.setPriceMeal2(source.getPriceMeal2());
+            newSalon.setPriceMeal3(source.getPriceMeal3());
+            newSalon.setPriceConference(source.getPriceConference());
+            newSalon.setPriceWorkshop(source.getPriceWorkshop());
+            newSalon.setPriceSharingStand(source.getPriceSharingStand());
+
+            if (source.getPriceStandSalons() != null) {
+                java.util.Set<PriceStandSalon> newPrices = new java.util.HashSet<>();
+                for (PriceStandSalon pss : source.getPriceStandSalons()) {
+                    PriceStandSalon newPss = new PriceStandSalon();
+                    newPss.setPrice(pss.getPrice());
+                    newPss.setDimension(pss.getDimension());
+                    newPss.setWidthMeter(pss.getWidthMeter());
+                    newPss.setHeightMeter(pss.getHeightMeter());
+                    newPss.setNbSellingSide(pss.getNbSellingSide());
+                    newPrices.add(newPss);
+                }
+                newSalon.setPriceStandSalons(newPrices);
+            }
+        }
+
+        Salon savedSalon = salonRepository.save(newSalon);
+
+        // Dupliquer la configuration du planning des animations si demandé
+        if (copyTalksPlanning) {
+            PlanningTalksSalon sourceTalks = planningTalksSalonRepository.findBySalonId(source.getId());
+            if (sourceTalks != null && sourceTalks.getConfiguration() != null) {
+                PlanningTalksSalon newTalks = new PlanningTalksSalon();
+                newTalks.setSalon(savedSalon);
+                // Copie profonde de la configuration (jours, salles, plages horaires) mais sans les animations
+                TimelineData srcConf = sourceTalks.getConfiguration();
+                TimelineData newConf = new TimelineData();
+                newConf.setEventId(srcConf.getEventId());
+                newConf.setIntervalMinutes(srcConf.getIntervalMinutes());
+
+                List<TimelineRoom> newRooms = new java.util.ArrayList<>();
+                for (TimelineRoom room : srcConf.getRooms()) {
+                    TimelineRoom newRoom = new TimelineRoom();
+                    newRoom.setId(room.getId());
+                    newRoom.setLabel(room.getLabel());
+                    newRooms.add(newRoom);
+                }
+                newConf.setRooms(newRooms);
+
+                List<TimelineDay> newDays = new java.util.ArrayList<>();
+                for (TimelineDay day : srcConf.getDays()) {
+                    TimelineDay newDay = new TimelineDay();
+                    newDay.setId(day.getId());
+                    newDay.setLabel(day.getLabel());
+                    List<TimelineRoomData> newRoomDataList = new java.util.ArrayList<>();
+                    for (TimelineRoomData rd : day.getRooms()) {
+                        TimelineRoomData newRd = new TimelineRoomData();
+                        newRd.setRoomId(rd.getRoomId());
+                        newRd.setStartingHour(rd.getStartingHour());
+                        newRd.setEndingHour(rd.getEndingHour());
+                        newRoomDataList.add(newRd);
+                    }
+                    newDay.setRooms(newRoomDataList);
+                    newDays.add(newDay);
+                }
+                newConf.setDays(newDays);
+                newTalks.setConfiguration(newConf);
+                newTalks.setTalks(new java.util.ArrayList<>());
+                planningTalksSalonRepository.save(newTalks);
+            }
+        }
+
+        // Dupliquer la configuration du planning des bénévoles si demandé
+        if (copyVolunteerPlanning) {
+            PlanningVolunteerSalon sourceVol = planningVolunteerSalonRepository.findBySalonId(source.getId());
+            if (sourceVol != null && sourceVol.getConfiguration() != null) {
+                PlanningVolunteerSalon newVol = new PlanningVolunteerSalon();
+                newVol.setSalon(savedSalon);
+
+                VolunteerPlanningConfiguration srcConf = sourceVol.getConfiguration();
+                VolunteerPlanningConfiguration newConf = new VolunteerPlanningConfiguration();
+                newConf.setIntervalMinutes(srcConf.getIntervalMinutes());
+
+                // Copier les catégories (rôles)
+                List<VolunteerPlanningCategory> newCategories = new java.util.ArrayList<>();
+                for (VolunteerPlanningCategory cat : srcConf.getCategories()) {
+                    VolunteerPlanningCategory newCat = new VolunteerPlanningCategory();
+                    newCat.setId(cat.getId());
+                    newCat.setLabel(cat.getLabel());
+                    newCat.setIcon(cat.getIcon());
+                    newCat.setColor(cat.getColor());
+                    newCategories.add(newCat);
+                }
+                newConf.setCategories(newCategories);
+
+                // Copier les jours avec plages horaires et bénévoles assignés, mais sans les affectations
+                List<VolunteerPlanningDay> newDays = new java.util.ArrayList<>();
+                for (VolunteerPlanningDay day : srcConf.getDays()) {
+                    VolunteerPlanningDay newDay = new VolunteerPlanningDay();
+                    newDay.setId(day.getId());
+                    newDay.setLabel(day.getLabel());
+                    newDay.setStartTime(day.getStartTime());
+                    newDay.setEndTime(day.getEndTime());
+                    newDay.setIntervalMinutes(day.getIntervalMinutes());
+                    newDay.setAssignedVolunteerIds(new java.util.ArrayList<>(day.getAssignedVolunteerIds()));
+                    newDay.setCells(new java.util.ArrayList<>());
+                    newDay.setUnavailableCells(new java.util.ArrayList<>());
+                    newDays.add(newDay);
+                }
+                newConf.setDays(newDays);
+                newVol.setConfiguration(newConf);
+
+                // Copier la liste des bénévoles
+                List<VolunteerPlanningData> newVolunteers = new java.util.ArrayList<>();
+                if (sourceVol.getVolunteers() != null) {
+                    for (VolunteerPlanningData vol : sourceVol.getVolunteers()) {
+                        VolunteerPlanningData newVolData = new VolunteerPlanningData();
+                        newVolData.setId(vol.getId());
+                        newVolData.setLabel(vol.getLabel());
+                        newVolunteers.add(newVolData);
+                    }
+                }
+                newVol.setVolunteers(newVolunteers);
+                planningVolunteerSalonRepository.save(newVol);
+            }
+        }
+
+        // Copier les tâches récurrentes si demandé
+        if (copyTasks) {
+            taskInstanceService.copyRecurringTasksFromSalon(savedSalon.getId(), source.getId());
+        }
+    }
+
+    private Address copyAddress(Address source) {
+        Address copy = new Address();
+        copy.setFormalLine(source.getFormalLine());
+        copy.setFullName(source.getFullName());
+        copy.setPostalCase(source.getPostalCase());
+        copy.setStreet(source.getStreet());
+        copy.setHouseNumber(source.getHouseNumber());
+        copy.setPostalCode(source.getPostalCode());
+        copy.setCity(source.getCity());
+        copy.setIsoCountry(source.getIsoCountry());
+        copy.setExtraLine(source.getExtraLine());
+        return copy;
+    }
+
+    private BankAccount copyBankAccount(BankAccount source) {
+        BankAccount copy = new BankAccount();
+        copy.setIban(source.getIban());
+        copy.setAccountHolder(source.getAccountHolder());
+        copy.setBic(source.getBic());
+        return copy;
     }
 }

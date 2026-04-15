@@ -10,12 +10,14 @@ import {PicklistBoxComponent} from '../components/picklist-box/picklist-box.comp
 import {ButtonBoxComponent} from '../components/button-box/button-box.component';
 import {TranslateService} from '@ngx-translate/core';
 import {AlertErrorComponent} from '../alert/alert-error.component';
+import {CheckboxBoxComponent} from '../components/checkbox-box/checkbox-box.component';
 
 @Component({
                templateUrl: './action-form-dialog.component.html',
                styleUrl: './action-form-dialog.component.scss',
                imports: [SharedModule, FormsModule, ReactiveFormsModule, TextBoxComponent, DateBoxComponent,
-                         NumberBoxComponent, PicklistBoxComponent, ButtonBoxComponent, AlertErrorComponent]
+                         NumberBoxComponent, PicklistBoxComponent, ButtonBoxComponent, AlertErrorComponent,
+                         CheckboxBoxComponent]
            })
 export class ActionFormDialogComponent implements OnInit {
 
@@ -34,11 +36,19 @@ export class ActionFormDialogComponent implements OnInit {
         const formControls: { [key: string]: any } = {};
 
         for (const field of this.requiredFields) {
-            const initialValue = field.type === FieldType.PICKLIST ? [] : null;
+            let initialValue: any;
+            let validators: any;
 
-            const validators = field.type === FieldType.PICKLIST
-                               ? [(control: any) => (!control.value || control.value.length === 0 ? {required: true} : null)]
-                               : Validators.required;
+            if (field.type === FieldType.PICKLIST) {
+                initialValue = [];
+                validators = [(control: any) => (!control.value || control.value.length === 0 ? {required: true} : null)];
+            } else if (field.type === FieldType.CHECKBOX) {
+                initialValue = true;
+                validators = null;
+            } else {
+                initialValue = null;
+                validators = Validators.required;
+            }
 
             formControls[field.name] = [initialValue, validators];
         }
@@ -49,12 +59,10 @@ export class ActionFormDialogComponent implements OnInit {
     submit(): void {
         if (this.form.valid) {
             const formValue = this.form.value;
-
             const payload = new Map<string, any>();
 
             for (const field of this.requiredFields) {
                 const value = formValue[field.name];
-
                 if (field.type === FieldType.PICKLIST && Array.isArray(value)) {
                     payload.set(field.name, value.map((item: any) => item.id));
                 } else {

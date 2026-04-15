@@ -4,5 +4,6 @@ public enum FieldType {
     TEXT,
     DATE,
     NUMBER,
-    PICKLIST
+    PICKLIST,
+    CHECKBOX
 }

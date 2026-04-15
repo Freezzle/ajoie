@@ -2,7 +2,8 @@ export enum FieldType {
     TEXT = 'TEXT',
     DATE = 'DATE',
     NUMBER = 'NUMBER',
-    PICKLIST = 'PICKLIST'
+    PICKLIST = 'PICKLIST',
+    CHECKBOX = 'CHECKBOX'
 }
 
 export interface RequiredField {
