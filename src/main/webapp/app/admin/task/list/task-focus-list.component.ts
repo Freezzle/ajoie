@@ -69,6 +69,7 @@ export class TaskFocusListComponent implements OnInit {
     tasks: ITaskInstance[] = [];
     activeFilter: TaskFilter = 'active';
     menuItems: AppMenuItem[] = [];
+    availableActions: AvailableAction[] = [];
 
     /** Bascule entre la vue cards (false) et la vue sous-tâches à plat (true) */
     flatView = signal(false);
@@ -102,6 +103,7 @@ export class TaskFocusListComponent implements OnInit {
     loadActions(): void {
         if (!this.salonId) return;
         this.actionsService.getAvailableActions('salon', this.salonId, 'task-list').subscribe(actions => {
+            this.availableActions = actions;
             this.menuItems = this.buildMenuItems(actions);
         });
     }
@@ -359,28 +361,11 @@ export class TaskFocusListComponent implements OnInit {
     }
 
     /**
-     * Vrai si au moins une sous-tâche OFFSET a une dueDate calculée différente
-     * de salon.startingDate + offset (détection de désynchronisation côté client).
+     * Vrai si l'action "recalculer les dates" est présente et activée (toutes ses conditions sont OK).
+     * Délègue entièrement la logique de désynchronisation au backend.
      */
     get isDatesDesynchronized(): boolean {
-        if (!this.salon?.startingDate || this.tasks.length === 0) return false;
-        const base = new Date(this.salon.startingDate);
-        // Utiliser la date locale (comme le backend Java avec ZoneId.systemDefault())
-        const baseY = base.getFullYear();
-        const baseM = base.getMonth();
-        const baseD = base.getDate();
-
-        for (const task of this.tasks) {
-            for (const sub of (task.subtasks ?? [])) {
-                if (sub.dueDateType === 'OFFSET' && sub.dueDateOffset !== null && sub.dueDateOffset !== undefined) {
-                    const expected = new Date(baseY, baseM, baseD + sub.dueDateOffset);
-                    const expectedStr = `${expected.getFullYear()}-${String(expected.getMonth() + 1).padStart(2, '0')}-${String(expected.getDate()).padStart(2, '0')}`;
-                    if (sub.dueDate !== expectedStr) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        const action = this.availableActions.find(a => a.contextCode === 'salon-recalculate-task-dates');
+        return !!action && !action.disabled;
     }
 }
