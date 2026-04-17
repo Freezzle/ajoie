@@ -68,12 +68,22 @@
                         [maxValue]="365"/>
             @if (form.get('dueDateOffset')?.value !== null && form.get('dueDateOffset')?.value !== '') {
                 <div class="mt-1 small text-secondary">
-                    @if ((form.get('dueDateOffset')?.value ?? 0) < 0) {
-                        <i class="pi pi-arrow-left me-1"></i>{{ (form.get('dueDateOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBefore' | translate }}
-                    } @else if ((form.get('dueDateOffset')?.value ?? 0) > 0) {
-                        <i class="pi pi-arrow-right me-1"></i>{{ form.get('dueDateOffset')?.value }} {{ 'task.dialog.daysAfter' | translate }}
+                    @if (estimatedDueDate) {
+                        @if ((form.get('dueDateOffset')?.value ?? 0) < 0) {
+                            <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }} <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span> {{ 'task.dialog.estimatedParenBefore' | translate : { n: (form.get('dueDateOffset')?.value ?? 0) * -1, salonDatePart: salonStartingDateFormatted ? ' au ' + salonStartingDateFormatted : '' } }}</span>
+                        } @else if ((form.get('dueDateOffset')?.value ?? 0) > 0) {
+                            <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }} <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span> {{ 'task.dialog.estimatedParenAfter' | translate : { n: form.get('dueDateOffset')?.value, salonDatePart: salonStartingDateFormatted ? ' au ' + salonStartingDateFormatted : '' } }}</span>
+                        } @else {
+                            <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }} <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span> {{ 'task.dialog.estimatedParenSameDay' | translate }}</span>
+                        }
                     } @else {
-                        <i class="pi pi-calendar me-1"></i>{{ 'task.dialog.dayJ' | translate }}
+                        @if ((form.get('dueDateOffset')?.value ?? 0) < 0) {
+                            {{ (form.get('dueDateOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBefore' | translate }}
+                        } @else if ((form.get('dueDateOffset')?.value ?? 0) > 0) {
+                            {{ form.get('dueDateOffset')?.value }} {{ 'task.dialog.daysAfter' | translate }}
+                        } @else {
+                            {{ 'task.dialog.dayJ' | translate }}
+                        }
                     }
                 </div>
             }

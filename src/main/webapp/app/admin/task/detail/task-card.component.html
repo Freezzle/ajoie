@@ -148,7 +148,7 @@
                 [header]="editingSubtask ? ('task.dialog.editSubtask' | translate) : ('task.dialog.addSubtask' | translate)"
                 [mode]="'edit'"
                 [confirmLabel]="'common.save'">
-        <app-subtask-instance-form [subtask]="editingSubtask"/>
+        <app-subtask-instance-form [subtask]="editingSubtask" [salonStartingDate]="salonStartingDate"/>
     </dialog-box>
 }
 

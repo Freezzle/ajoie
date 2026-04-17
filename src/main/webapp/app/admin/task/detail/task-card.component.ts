@@ -35,6 +35,7 @@ import {AccountService} from '../../../core/auth/account.service';
 export class TaskCardComponent {
     @Input() task!: ITaskInstance;
     @Input() activeFilter: TaskFilter = 'active';
+    @Input() salonStartingDate: Date | null = null;
     @Output() statusChanged = new EventEmitter<void>();
     @Output() editRequested = new EventEmitter<void>();
 

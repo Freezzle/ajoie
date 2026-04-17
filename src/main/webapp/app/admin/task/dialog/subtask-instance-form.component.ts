@@ -32,8 +32,25 @@ import {TranslateService} from '@ngx-translate/core';
 export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
     /** Données existantes en mode édition, null en mode création. */
     @Input() subtask: ISubtaskInstance | null = null;
+    /** Date de début du salon (objet Date), utilisée pour prévisualiser la date estimée en mode OFFSET. */
+    @Input() salonStartingDate: Date | null = null;
 
     form!: FormGroup;
+
+    /** Date estimée calculée à partir de salonStartingDate + offset (null si données insuffisantes). */
+    get estimatedDueDate(): string | null {
+        const offset = this.form?.get('dueDateOffset')?.value;
+        if (offset === null || offset === undefined || offset === '' || !this.salonStartingDate) return null;
+        const d = new Date(this.salonStartingDate);
+        d.setDate(d.getDate() + Number(offset));
+        return d.toLocaleDateString('fr-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    /** Date de début du salon formatée en jj.mm.yyyy (null si absente). */
+    get salonStartingDateFormatted(): string | null {
+        if (!this.salonStartingDate) return null;
+        return this.salonStartingDate.toLocaleDateString('fr-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
 
     get dueDateTypeOptions() {
         return [

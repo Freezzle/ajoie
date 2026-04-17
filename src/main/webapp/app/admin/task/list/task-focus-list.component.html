@@ -137,7 +137,7 @@
         <!-- ── Vue cards par tâche ── -->
         <div class="d-flex flex-column gap-2">
             @for (task of filteredTasks; track task.id) {
-                <app-task-card [task]="task" [activeFilter]="activeFilter" (statusChanged)="load()" (editRequested)="openEditTaskDialog(task)"/>
+                <app-task-card [task]="task" [activeFilter]="activeFilter" [salonStartingDate]="salonStartingDate" (statusChanged)="load()" (editRequested)="openEditTaskDialog(task)"/>
             }
         </div>
     }
@@ -163,7 +163,7 @@
                 [header]="'task.dialog.editSubtask' | translate"
                 [mode]="'edit'"
                 [confirmLabel]="'common.save'">
-        <app-subtask-instance-form [subtask]="editingSubtask"/>
+        <app-subtask-instance-form [subtask]="editingSubtask" [salonStartingDate]="salonStartingDate"/>
     </dialog-box>
 }
 

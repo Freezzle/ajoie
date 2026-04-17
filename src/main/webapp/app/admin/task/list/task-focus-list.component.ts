@@ -360,6 +360,12 @@ export class TaskFocusListComponent implements OnInit {
         });
     }
 
+    /** Date de début du salon sous forme d'objet Date (null si absente). */
+    get salonStartingDate(): Date | null {
+        if (!this.salon?.startingDate) return null;
+        return new Date(this.salon.startingDate);
+    }
+
     /**
      * Vrai si l'action "recalculer les dates" est présente et activée (toutes ses conditions sont OK).
      * Délègue entièrement la logique de désynchronisation au backend.
