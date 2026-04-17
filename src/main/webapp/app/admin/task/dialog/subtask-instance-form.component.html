@@ -76,22 +76,15 @@
                             [formatterFunction]="formatterDirection"
                             [needTranslation]="true"/>
                 </div>
-                @if (salonStartingDateFormatted) {
-                    <span class="text-secondary">la date de référence au <span
-                            class="fw-semibold">{{ salonStartingDateFormatted }}</span></span>
-                } @else {
-                    <span class="text-secondary">la date de début du salon</span>
+                @if (estimatedDueDate) {
+                    <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }}
+                        <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span>
+                    </span>
                 }
             </div>
-            @if (form.get('dueDateOffset')?.value !== null && form.get('dueDateOffset')?.value !== '') {
-                <div class="mt-1 small text-secondary">
-                    @if (estimatedDueDate) {
-                        <span>
-                            {{ 'task.dialog.estimatedDueDatePrefix' | translate }}
-                            <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span>
-                        </span>
-                    }
-                </div>
+            @if (salonStartingDateFormatted) {
+                <span class="text-secondary">La date de début du salon est le <span
+                        class="fw-semibold">{{ salonStartingDateFormatted }}</span></span>
             }
         }
     </div>
