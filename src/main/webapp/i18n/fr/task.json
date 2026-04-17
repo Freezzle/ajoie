@@ -40,10 +40,7 @@
             "daysAfter": "jours après la date de début du salon",
             "dayJ": "Le jour J (date de début du salon)",
             "daysBeforeDueDate": "jours avant l'échéance",
-            "estimatedDueDatePrefix": "Date limite au",
-            "estimatedParenBefore": "({{ n }} jours avant le date de début du salon{{ salonDatePart }})",
-            "estimatedParenAfter": "({{ n }} jours après le date de début du salon{{ salonDatePart }})",
-            "estimatedParenSameDay": "(même jour que la date de début du salon)",
+            "estimatedDueDatePrefix": "Date d'échéance au",
             "status": "Statut",
             "recurring": "Sous-tâche récurrente"
         },

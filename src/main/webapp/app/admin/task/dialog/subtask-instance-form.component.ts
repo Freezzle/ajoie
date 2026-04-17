@@ -1,12 +1,14 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Subscription} from 'rxjs';
 import SharedModule from 'app/shared/shared.module';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {DateBoxComponent} from '../../../shared/components/date-box/date-box.component';
 import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
+import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {DialogDraftService} from '../../../shared/services/dialog-draft.service';
 import {DateInputType, ISubtaskInstance} from '../model/task-instance.interface';
 import {SelectButton} from 'primeng/selectbutton';
@@ -25,6 +27,7 @@ import {TranslateService} from '@ngx-translate/core';
         DateBoxComponent,
         NumberBoxComponent,
         CheckboxBoxComponent,
+        SelectBoxComponent,
         SelectButton,
         Popover
     ]
@@ -36,6 +39,17 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
     @Input() salonStartingDate: Date | null = null;
 
     form!: FormGroup;
+    private readonly subscriptions = new Subscription();
+
+    /** Options Avant / Après pour le select de direction d'offset. */
+    get offsetDirectionOptions() {
+        return [
+            { label: 'Avant', value: 'BEFORE' },
+            { label: 'Après', value: 'AFTER' }
+        ];
+    }
+
+    readonly formatterDirection = (opt: { label: string; value: string } | null) => opt?.label ?? '';
 
     /** Date estimée calculée à partir de salonStartingDate + offset (null si données insuffisantes). */
     get estimatedDueDate(): string | null {
@@ -88,15 +102,36 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
             supplierInfo:   [s?.supplierInfo ?? ''],
             dueDateType:    [s?.dueDateType ?? 'OFFSET'],
             dueDateFixed:   [s?.dueDateType === 'FIXED' && s?.dueDate ? new Date(s.dueDate + 'T00:00:00') : null],
-            dueDateOffset:  [s?.dueDateType === 'OFFSET' ? s.dueDateOffset : null, [Validators.min(-365), Validators.max(365)]],
+            dueDateOffset:  [s?.dueDateType === 'OFFSET' ? s.dueDateOffset : null, [Validators.min(-999), Validators.max(999)]],
+            dueDateOffsetAbs: [s?.dueDateType === 'OFFSET' && s.dueDateOffset != null ? Math.abs(s.dueDateOffset) : null, [Validators.min(0), Validators.max(999)]],
+            dueDateOffsetDir: [s?.dueDateType === 'OFFSET' && (s.dueDateOffset ?? 0) < 0 ? 'BEFORE' : 'AFTER', [Validators.required]],
             snoozeUntilType: [s?.snoozeUntilType ?? null],
             snoozeFixed:    [s?.snoozeUntilType === 'FIXED' && s?.snoozedUntil ? new Date(s.snoozedUntil + 'T00:00:00') : null],
-            snoozeOffset:   [s?.snoozeUntilType === 'OFFSET' ? s.snoozeOffset : null, [Validators.min(0), Validators.max(365)]],
+            snoozeOffset:   [s?.snoozeUntilType === 'OFFSET' ? s.snoozeOffset : null, [Validators.min(0), Validators.max(999)]],
+            snoozeOffsetAbs: [s?.snoozeUntilType === 'OFFSET' ? s.snoozeOffset : null, [Validators.min(0), Validators.max(999)]],
             recurring:      [s?.recurring ?? true]
         });
 
-        this.draftService.registerDraft(() => {
-            if (this.form.invalid) return null;
+        // Sync dueDateOffsetAbs + dueDateOffsetDir → dueDateOffset (signé)
+        const syncDueDate = () => {
+            const abs = this.form.get('dueDateOffsetAbs')?.value;
+            const dir = this.form.get('dueDateOffsetDir')?.value;
+            if (abs === null || abs === undefined || abs === '') {
+                this.form.get('dueDateOffset')?.setValue(null, { emitEvent: false });
+            } else {
+                const signed = Number(abs) * (dir === 'BEFORE' ? -1 : 1);
+                this.form.get('dueDateOffset')?.setValue(signed, { emitEvent: false });
+            }
+        };
+        this.subscriptions.add(this.form.get('dueDateOffsetAbs')!.valueChanges.subscribe(syncDueDate));
+        this.subscriptions.add(this.form.get('dueDateOffsetDir')!.valueChanges.subscribe(syncDueDate));
+
+        // Sync snoozeOffsetAbs → snoozeOffset (toujours positif)
+        this.subscriptions.add(this.form.get('snoozeOffsetAbs')!.valueChanges.subscribe(v => {
+            this.form.get('snoozeOffset')?.setValue(v === null || v === undefined || v === '' ? null : Number(v), { emitEvent: false });
+        }));
+
+        this.draftService.registerDraft(() => {            if (this.form.invalid) return null;
             const raw = this.form.getRawValue();
 
             const dueDateType: DateInputType = raw.dueDateType ?? 'FIXED';
@@ -119,6 +154,7 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
         this.draftService.unregisterDraft();
     }
 

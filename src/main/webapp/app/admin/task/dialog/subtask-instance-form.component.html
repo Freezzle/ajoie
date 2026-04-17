@@ -50,9 +50,9 @@
 
         <div class="mb-2">
             <p-select-button formControlName="dueDateType"
-                            [options]="dueDateTypeOptions"
-                            optionLabel="label"
-                            optionValue="value"/>
+                             [options]="dueDateTypeOptions"
+                             optionLabel="label"
+                             optionValue="value"/>
         </div>
 
         @if (dueDateType === 'FIXED') {
@@ -61,29 +61,34 @@
                       translateKey="task.dialog.dueDate"/>
         }
         @if (dueDateType === 'OFFSET') {
-            <number-box fieldName="dueDateOffset"
-                        formControlName="dueDateOffset"
-                        translateKey="task.dialog.dueDateOffset"
-                        [minValue]="-365"
-                        [maxValue]="365"/>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div style="width: 7rem;">
+                    <number-box fieldName="dueDateOffsetAbs"
+                                formControlName="dueDateOffsetAbs"
+                                [minValue]="0"
+                                [maxValue]="999"/>
+                </div>
+                <span class="text-secondary">jours</span>
+                <div style="width: 8rem;">
+                    <select-box fieldName="dueDateOffsetDir"
+                                formControlName="dueDateOffsetDir"
+                                [options]="offsetDirectionOptions"
+                                [formatterFunction]="formatterDirection"/>
+                </div>
+                @if (salonStartingDateFormatted) {
+                    <span class="text-secondary">la date de référence au <span
+                            class="fw-semibold">{{ salonStartingDateFormatted }}</span></span>
+                } @else {
+                    <span class="text-secondary">la date de début du salon</span>
+                }
+            </div>
             @if (form.get('dueDateOffset')?.value !== null && form.get('dueDateOffset')?.value !== '') {
                 <div class="mt-1 small text-secondary">
                     @if (estimatedDueDate) {
-                        @if ((form.get('dueDateOffset')?.value ?? 0) < 0) {
-                            <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }} <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span> {{ 'task.dialog.estimatedParenBefore' | translate : { n: (form.get('dueDateOffset')?.value ?? 0) * -1, salonDatePart: salonStartingDateFormatted ? ' au ' + salonStartingDateFormatted : '' } }}</span>
-                        } @else if ((form.get('dueDateOffset')?.value ?? 0) > 0) {
-                            <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }} <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span> {{ 'task.dialog.estimatedParenAfter' | translate : { n: form.get('dueDateOffset')?.value, salonDatePart: salonStartingDateFormatted ? ' au ' + salonStartingDateFormatted : '' } }}</span>
-                        } @else {
-                            <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }} <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span> {{ 'task.dialog.estimatedParenSameDay' | translate }}</span>
-                        }
-                    } @else {
-                        @if ((form.get('dueDateOffset')?.value ?? 0) < 0) {
-                            {{ (form.get('dueDateOffset')?.value ?? 0) * -1 }} {{ 'task.dialog.daysBefore' | translate }}
-                        } @else if ((form.get('dueDateOffset')?.value ?? 0) > 0) {
-                            {{ form.get('dueDateOffset')?.value }} {{ 'task.dialog.daysAfter' | translate }}
-                        } @else {
-                            {{ 'task.dialog.dayJ' | translate }}
-                        }
+                        <span>
+                            {{ 'task.dialog.estimatedDueDatePrefix' | translate }}
+                            <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span>
+                        </span>
                     }
                 </div>
             }
@@ -105,9 +110,9 @@
 
         <div class="mb-2">
             <p-select-button formControlName="snoozeUntilType"
-                            [options]="snoozeTypeOptions"
-                            optionLabel="label"
-                            optionValue="value"/>
+                             [options]="snoozeTypeOptions"
+                             optionLabel="label"
+                             optionValue="value"/>
         </div>
 
         @if (snoozeUntilType === 'FIXED') {
@@ -116,14 +121,18 @@
                       translateKey="task.dialog.snoozedUntil"/>
         }
         @if (snoozeUntilType === 'OFFSET') {
-            <number-box fieldName="snoozeOffset"
-                        formControlName="snoozeOffset"
-                        translateKey="task.dialog.snoozeOffset"
-                        [minValue]="0"
-                        [maxValue]="365"/>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div style="width: 7rem;">
+                    <number-box fieldName="snoozeOffsetAbs"
+                                formControlName="snoozeOffsetAbs"
+                                [minValue]="0"
+                                [maxValue]="999"/>
+                </div>
+                <span class="text-secondary">jours après l'échéance</span>
+            </div>
             @if (form.get('snoozeOffset')?.value !== null && form.get('snoozeOffset')?.value !== '') {
                 <div class="mt-1 small text-secondary">
-                    <i class="pi pi-bell-slash me-1"></i>{{ 'task.dialog.snoozeOffsetHint' | translate : { n: form.get('snoozeOffset')?.value ?? 0 } }}
+                    <i class="pi pi-bell-slash me-1"></i>{{ 'task.dialog.snoozeOffsetHint' | translate : {n: form.get('snoozeOffset')?.value ?? 0} }}
                 </div>
             }
         }

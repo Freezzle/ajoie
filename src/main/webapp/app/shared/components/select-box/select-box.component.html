@@ -1,4 +1,35 @@
-<p-iftalabel>
+@if (translateKey) {
+    <p-iftalabel>
+        <p-select [dataKey]="dataKeyToUse"
+                  [filterBy]="filterByToUse"
+                  [filter]="enableFilter"
+                  [inputId]="'field_' + fieldName"
+                  [invalid]="control.invalid && control.touched"
+                  [options]="options"
+                  [showClear]="!control.hasValidator(Validators.required)"
+                  [disabled]="disabled"
+                  [ngModel]="value"
+                  [ngModelOptions]="{ standalone: true }"
+                  (onChange)="handleChange($event)"
+                  (onClear)="handleClear()"
+                  (onBlur)="onTouched()"
+                  appendTo="body"
+                  fluid>
+            <ng-template let-item pTemplate="item">
+                {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
+            </ng-template>
+            <ng-template let-item pTemplate="selectedItem">
+                {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
+            </ng-template>
+        </p-select>
+        <label [for]="'field_' + fieldName">
+            {{ translateKey | translate }}
+            @if (control.hasValidator(Validators.required)) {
+                <span class="text-danger">*</span>
+            }
+        </label>
+    </p-iftalabel>
+} @else {
     <p-select [dataKey]="dataKeyToUse"
               [filterBy]="filterByToUse"
               [filter]="enableFilter"
@@ -17,21 +48,11 @@
         <ng-template let-item pTemplate="item">
             {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
         </ng-template>
-
         <ng-template let-item pTemplate="selectedItem">
             {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
         </ng-template>
     </p-select>
-
-    @if (translateKey) {
-        <label [for]="'field_' + fieldName">
-            {{ translateKey | translate }}
-            @if (control.hasValidator(Validators.required)) {
-                <span class="text-danger">*</span>
-            }
-        </label>
-    }
-</p-iftalabel>
+}
 
 @if (control.errors) {
     <error-box [formControlElement]="control"/>
