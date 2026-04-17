@@ -42,14 +42,9 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
     private readonly subscriptions = new Subscription();
 
     /** Options Avant / Après pour le select de direction d'offset. */
-    get offsetDirectionOptions() {
-        return [
-            { label: 'Avant', value: 'BEFORE' },
-            { label: 'Après', value: 'AFTER' }
-        ];
-    }
+    readonly offsetDirectionOptions: string[] = ['BEFORE', 'AFTER'];
 
-    readonly formatterDirection = (opt: { label: string; value: string } | null) => opt?.label ?? '';
+    readonly formatterDirection = (v: string | null) => v === 'BEFORE' ? 'task.dialog.offsetBefore' : v === 'AFTER' ? 'task.dialog.offsetAfter' : '';
 
     /** Date estimée calculée à partir de salonStartingDate + offset (null si données insuffisantes). */
     get estimatedDueDate(): string | null {

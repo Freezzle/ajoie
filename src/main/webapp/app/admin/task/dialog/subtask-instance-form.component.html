@@ -70,10 +70,11 @@
                 </div>
                 <span class="text-secondary">jours</span>
                 <div style="width: 8rem;">
-                    <select-box fieldName="dueDateOffsetDir"
-                                formControlName="dueDateOffsetDir"
-                                [options]="offsetDirectionOptions"
-                                [formatterFunction]="formatterDirection"/>
+                <select-box fieldName="dueDateOffsetDir"
+                            formControlName="dueDateOffsetDir"
+                            [options]="offsetDirectionOptions"
+                            [formatterFunction]="formatterDirection"
+                            [needTranslation]="true"/>
                 </div>
                 @if (salonStartingDateFormatted) {
                     <span class="text-secondary">la date de référence au <span

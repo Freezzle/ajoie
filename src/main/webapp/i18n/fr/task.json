@@ -38,6 +38,8 @@
             "snoozeNone": "Aucun",
             "daysBefore": "jours avant le début du salon",
             "daysAfter": "jours après la date de début du salon",
+            "offsetBefore": "Avant",
+            "offsetAfter": "Après",
             "dayJ": "Le jour J (date de début du salon)",
             "daysBeforeDueDate": "jours avant l'échéance",
             "estimatedDueDatePrefix": "Date d'échéance au",
