@@ -10,10 +10,10 @@
                 <span class="tc__title">
                     {{ task.title }}
                     @if (hasInProgressSubtask) {
-                        <p-tag value="En cours" severity="warn" [rounded]="true" class="tag-xs"/>
+                        <p-tag [value]="'task.status.IN_PROGRESS' | translate" severity="warn" [rounded]="true" class="tag-xs"/>
                     }
                     @if (hasBlockedSubtask) {
-                        <p-tag value="Bloquée" severity="danger" [rounded]="true" class="tag-xs"/>
+                        <p-tag [value]="'task.status.BLOCKED' | translate" severity="danger" [rounded]="true" class="tag-xs"/>
                     }
                 </span>
 
@@ -22,10 +22,10 @@
                 }
 
                 <!-- Chips : p-tag PrimeNG -->
-                <div class="tc__chips">
+                <div class="d-flex flex-wrap gap-1 align-items-center py-1">
                     @if (task.responsible && !editingResponsible) {
                         <p-tag icon="pi pi-user" [value]="task.responsible" severity="secondary" [rounded]="true"
-                               class="tag-xs tag-outlined-info clickable" title="Cliquer pour modifier"
+                               class="tag-xs tag-outlined-info clickable" [title]="'task.card.clickToEdit' | translate"
                                (click)="editResponsibleValue = task.responsible!; editingResponsible = true"/>
                     }
                     @if (task.supplierInfo) {
@@ -52,12 +52,12 @@
 
         <!-- INLINE FORM : changer responsable -->
         @if (editingResponsible) {
-            <div class="tc__form">
+            <div class="d-flex align-items-center gap-2 px-2">
                 <i class="pi pi-user" style="color:var(--app-primary); font-size:0.8rem; flex-shrink:0"></i>
                 <input type="text" class="form-control form-control-sm flex-grow-1"
                        [(ngModel)]="editResponsibleValue"
                        (keydown.enter)="saveResponsible()" (keydown.escape)="cancelResponsible()"
-                       placeholder="Nom du responsable…" autofocus/>
+                       [placeholder]="'task.menu.responsiblePlaceholder' | translate" autofocus/>
                 <button-box type="primary" primeIcon="pi-check" [showText]="false"
                             translateKey="common.save" (clickedEvent)="saveResponsible()"/>
                 <button-box type="secondary" primeIcon="pi-times" [showText]="false"
@@ -65,11 +65,9 @@
             </div>
         }
 
-        <!-- INLINE FORM : add comment — remplacé par dialog-box -->
-
         <!-- SOUS-TÂCHES -->
         @if (task.subtasks.length > 0) {
-            <div class="tc__subtasks">
+            <div class="d-flex flex-column px-2">
                 @for (subtask of sortedSubtasks; track subtask.id) {
                     <app-subtask-row [subtask]="subtask"
                                      (changed)="onSubtaskChanged($event.id, $event.status)"
@@ -87,7 +85,7 @@
             <div class="tc__comments" [class.tc__comments--open]="showComments">
                 <button class="tc__comments-header" (click)="toggleComments()" type="button">
                     <i class="pi pi-comment"></i>
-                    <span>Commentaires ({{ task.comments.length }})</span>
+                    <span>{{ 'task.menu.commentsWithCount' | translate: {count: task.comments.length} }}</span>
                     <i class="pi" [class.pi-chevron-down]="!showComments" [class.pi-chevron-up]="showComments"></i>
                 </button>
                 @if (showComments) {
@@ -98,7 +96,7 @@
                                     <span class="tc__comment-author"><i class="pi pi-user"></i>{{ comment.authorName }}</span>
                                     <span class="tc__comment-time">{{ comment.createdAt | timeSince }}</span>
                                     <button class="tc__comment-delete" type="button"
-                                            title="Supprimer ce commentaire"
+                                            [title]="'task.menu.deleteCommentTitle' | translate"
                                             (click)="deleteComment(comment.id)">
                                         <i class="pi pi-trash"></i>
                                     </button>
@@ -116,25 +114,24 @@
 
 <!-- ── Dialog : Ajouter un commentaire ── -->
 @if (showCommentDialog()) {
-    <dialog-box (cancel)="commentAuthor = ''; commentBody = ''; showCommentDialog.set(false)"
+    <dialog-box (cancel)="commentForm.reset(); showCommentDialog.set(false)"
                 (confirm)="addComment()"
                 [(visible)]="showCommentDialog"
-                [header]="'Ajouter un commentaire'"
+                [header]="'task.comment.addTitle' | translate"
                 [mode]="'edit'"
                 [confirmLabel]="'common.save'"
-                [confirmDisabled]="!commentBody.trim() || !commentAuthor.trim()">
-        <div class="d-flex flex-column gap-3">
-            <div>
-                <label class="form-label fw-semibold" style="font-size:0.85rem">
-                    <i class="pi pi-user me-1"></i>Votre nom
-                </label>
-                <input type="text" class="form-control" [(ngModel)]="commentAuthor" placeholder="Votre nom…" autofocus/>
+                [confirmDisabled]="commentForm.invalid">
+        <div class="row" [formGroup]="commentForm">
+            <div class="col-12 mt-3">
+                <text-box fieldName="authorName"
+                          formControlName="authorName"
+                          translateKey="task.comment.authorLabel"/>
             </div>
-            <div>
-                <label class="form-label fw-semibold" style="font-size:0.85rem">
-                    <i class="pi pi-comment me-1"></i>Commentaire
-                </label>
-                <textarea class="form-control" [(ngModel)]="commentBody" rows="4" placeholder="Votre commentaire…"></textarea>
+            <div class="col-12 mt-3">
+                <textarea-box fieldName="body"
+                              formControlName="body"
+                              translateKey="task.comment.bodyLabel"
+                              [rows]="4"/>
             </div>
         </div>
     </dialog-box>
@@ -151,5 +148,3 @@
         <app-subtask-instance-form [subtask]="editingSubtask" [salonStartingDate]="salonStartingDate"/>
     </dialog-box>
 }
-
-

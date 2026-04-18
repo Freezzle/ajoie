@@ -18,15 +18,15 @@
 
     <!-- ── Bandeau date de référence du salon ── -->
     @if (salon) {
-        <div class="tfl-ref-date" [class.tfl-ref-date--warning]="isDatesDesynchronized">
-            <span class="tfl-ref-date__label">
-                <i class="pi pi-calendar me-1"></i>
+        <div class="d-flex align-items-center flex-wrap gap-2 p-2 border rounded mb-2 small bg-light" [class.border-warning]="isDatesDesynchronized" [class.bg-warning-subtle]="isDatesDesynchronized">
+            <span class="d-flex align-items-center gap-1 fw-medium text-nowrap">
+                <i class="pi pi-calendar"></i>
                 <span jhiTranslate="task.focusView.referenceDate">Date de référence</span>&nbsp;:
                 <strong>{{ salonStartingDateFormatted }}</strong>
             </span>
             @if (isDatesDesynchronized) {
-                <span class="tfl-ref-date__warning">
-                    <i class="pi pi-exclamation-triangle me-1"></i>
+                <span class="d-flex align-items-center gap-1 text-warning fw-semibold" style="font-size:0.78rem">
+                    <i class="pi pi-exclamation-triangle"></i>
                     <span jhiTranslate="task.focusView.referenceDateWarning">Des dates de sous-tâches ne correspondent plus à cette date de référence. Utilisez l'action « Recalculer les dates » dans le menu.</span>
                 </span>
             }
@@ -35,64 +35,64 @@
 
     <!-- ── Bandeau progression globale ── -->
     @if (!isLoading && countAll > 0) {
-        <div class="tfl-progress">
+        <div class="d-flex align-items-center gap-2 p-2 border rounded mb-2 bg-light">
             <p-progress-bar [value]="globalProgress"
                            [showValue]="false"
                             fluid
                             [style]="{'flex': '1'}">
             </p-progress-bar>
-            <span class="tfl-progress__label">
-                {{ countDone }}/{{ countAll }} terminées
+            <span class="fw-semibold text-nowrap" style="font-size:0.78rem">
+                {{ countDone }}/{{ countAll }} {{ 'task.filter.completed' | translate }}
             </span>
         </div>
 
         <!-- ── Pills de filtre ── -->
-        <div class="tfl-filters">
+        <div class="d-flex flex-wrap gap-1 mb-3">
             <!-- Toggle vue cards / vue sous-tâches à plat -->
-            <div class="tfl-view-toggle" title="{{ flatView() ? 'Vue sous-tâches' : 'Vue tâches' }}">
-                <i class="pi pi-th-large tfl-view-toggle__icon" [class.tfl-view-toggle__icon--active]="!flatView()"></i>
+            <div class="d-flex align-items-center gap-1 px-1" [title]="flatView() ? ('task.filter.viewSubtasks' | translate) : ('task.filter.viewTasks' | translate)">
+                <i class="pi pi-th-large" [style.color]="!flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'" style="font-size:0.85rem"></i>
                 <p-toggleswitch [(ngModel)]="flatViewBool" (ngModelChange)="flatView.set($event)"/>
-                <i class="pi pi-list tfl-view-toggle__icon" [class.tfl-view-toggle__icon--active]="flatView()"></i>
+                <i class="pi pi-list" [style.color]="flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'" style="font-size:0.85rem"></i>
             </div>
 
             <button class="tfl-filter-pill" [class.active]="activeFilter === 'all'"
                     (click)="activeFilter = 'all'">
-                Toutes <span class="tfl-filter-count">{{ countAll }}</span>
+                {{ 'task.filter.all' | translate }} <span class="tfl-filter-count">{{ countAll }}</span>
             </button>
             @if (countActive > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--active" [class.active]="activeFilter === 'active'"
                         (click)="activeFilter = 'active'">
-                    <i class="pi pi-list-check"></i> Actives <span class="tfl-filter-count">{{ countActive }}</span>
+                    <i class="pi pi-list-check"></i> {{ 'task.filter.active' | translate }} <span class="tfl-filter-count">{{ countActive }}</span>
                 </button>
             }
             @if (countLate > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--late" [class.active]="activeFilter === 'late'"
                         (click)="activeFilter = 'late'">
-                    <i class="pi pi-exclamation-triangle"></i> En retard <span class="tfl-filter-count">{{ countLate }}</span>
+                    <i class="pi pi-exclamation-triangle"></i> {{ 'task.filter.late' | translate }} <span class="tfl-filter-count">{{ countLate }}</span>
                 </button>
             }
             @if (countToday > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--today" [class.active]="activeFilter === 'today'"
                         (click)="activeFilter = 'today'">
-                    <i class="pi pi-clock"></i> Aujourd'hui <span class="tfl-filter-count">{{ countToday }}</span>
+                    <i class="pi pi-clock"></i> {{ 'task.filter.today' | translate }} <span class="tfl-filter-count">{{ countToday }}</span>
                 </button>
             }
             @if (countInProgress > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--progress" [class.active]="activeFilter === 'in_progress'"
                         (click)="activeFilter = 'in_progress'">
-                    <i class="pi pi-play-circle"></i> En cours <span class="tfl-filter-count">{{ countInProgress }}</span>
+                    <i class="pi pi-play-circle"></i> {{ 'task.filter.inProgress' | translate }} <span class="tfl-filter-count">{{ countInProgress }}</span>
                 </button>
             }
             @if (countDone > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--done" [class.active]="activeFilter === 'done'"
                         (click)="activeFilter = 'done'">
-                    <i class="pi pi-check-circle"></i> Terminées <span class="tfl-filter-count">{{ countDone }}</span>
+                    <i class="pi pi-check-circle"></i> {{ 'task.filter.done' | translate }} <span class="tfl-filter-count">{{ countDone }}</span>
                 </button>
             }
             @if (countSnoozed > 0) {
                 <button class="tfl-filter-pill tfl-filter-pill--snooze" [class.active]="activeFilter === 'snoozed'"
                         (click)="activeFilter = 'snoozed'">
-                    <i class="pi pi-bell-slash"></i> Snoozées <span class="tfl-filter-count">{{ countSnoozed }}</span>
+                    <i class="pi pi-bell-slash"></i> {{ 'task.filter.snoozed' | translate }} <span class="tfl-filter-count">{{ countSnoozed }}</span>
                 </button>
             }
         </div>
@@ -115,15 +115,15 @@
     }
 
     @if (!isLoading && filteredTasks.length === 0 && tasks.length > 0) {
-        <p class="text-muted text-center my-4 small">Aucune tâche dans ce filtre.</p>
+        <p class="text-muted text-center my-4 small" jhiTranslate="task.filter.noTaskInFilter">Aucune tâche dans ce filtre.</p>
     }
 
     @if (!isLoading && flatView()) {
         <!-- ── Vue sous-tâches à plat ── -->
         @if (flatSubtasks.length === 0) {
-            <p class="text-muted text-center my-4 small">Aucune sous-tâche dans ce filtre.</p>
+            <p class="text-muted text-center my-4 small" jhiTranslate="task.filter.noSubtaskInFilter">Aucune sous-tâche dans ce filtre.</p>
         } @else {
-            <div class="tfl-flat-list">
+            <div class="d-flex flex-column gap-1">
                 @for (flat of flatSubtasks; track flat.id) {
                     <app-subtask-flat-row
                         [subtask]="flat"
@@ -166,4 +166,3 @@
         <app-subtask-instance-form [subtask]="editingSubtask" [salonStartingDate]="salonStartingDate"/>
     </dialog-box>
 }
-

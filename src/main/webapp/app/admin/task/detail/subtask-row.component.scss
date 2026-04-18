@@ -8,44 +8,8 @@
   &.subtask-done { opacity: 0.8; }
 }
 
-.subtask-check {
-  flex-shrink: 0;
-}
+.subtask-title { font-size: 0.8rem; color: var(--p-surface-600); line-height: 1.4; }
+.subtask-desc { font-size: 0.72rem; color: var(--p-surface-400); font-style: italic; line-height: 1.3; }
+.subtask-aside { display: flex; align-items: center; justify-content: flex-end; }
 
-.subtask-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.14rem;
-}
-
-.subtask-title {
-  font-size: 0.8rem;
-  color: var(--p-surface-600);
-  line-height: 1.4;
-}
-
-.subtask-desc {
-  font-size: 0.72rem;
-  color: var(--p-surface-400);
-  font-style: italic;
-  line-height: 1.3;
-}
-
-.subtask-aside {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.subtask-completed-at {
-  font-size: 0.67rem;
-  color: var(--p-surface-400);
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.due-date-popover {
-  font-size: 0.82rem;
-}
+.due-date-popover { font-size: 0.82rem; }

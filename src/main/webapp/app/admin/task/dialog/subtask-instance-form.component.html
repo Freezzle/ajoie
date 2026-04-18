@@ -70,7 +70,7 @@
                                 [minValue]="0"
                                 [maxValue]="999"/>
                 </div>
-                <span class="text-secondary">jours</span>
+                <span class="text-secondary">{{ 'task.dialog.days' | translate }}</span>
                 <div style="width: 8rem;">
                     <select-box fieldName="dueDateOffsetDir"
                                 formControlName="dueDateOffsetDir"
@@ -122,7 +122,7 @@
                                 [minValue]="0"
                                 [maxValue]="999"/>
                 </div>
-                <span class="text-secondary">jours</span>
+                <span class="text-secondary">{{ 'task.dialog.days' | translate }}</span>
             </div>
             @if (estimatedSnoozeDate) {
                 <div class="mt-3">

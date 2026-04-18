@@ -1,7 +1,7 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {ISubtaskInstance} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
@@ -36,6 +36,7 @@ export class SubtaskRowComponent {
     @Output() editRequested = new EventEmitter<void>();
 
     protected taskInstanceService = inject(TaskInstanceService);
+    private translateService = inject(TranslateService);
 
     get isDone(): boolean {
         return this.subtask.status === 'DONE';
@@ -94,27 +95,27 @@ export class SubtaskRowComponent {
     get menuItems(): AppMenuItem[] {
         return [
             {
-                label: 'Modifier la sous-tâche',
+                label: this.translateService.instant('task.menu.editSubtask') as string,
                 icon: 'pi pi-pencil',
                 command: () => this.editRequested.emit()
             },
             {separator: true},
             {
-                label: 'Marquer en cours',
+                label: this.translateService.instant('task.menu.markInProgress') as string,
                 icon: 'pi pi-play',
                 disabled: this.subtask.status === 'IN_PROGRESS',
                 command: () => this.taskInstanceService.updateSubtaskStatus(this.subtask.id, 'IN_PROGRESS')
                     .subscribe(() => this.changed.emit({id: this.subtask.id, status: 'IN_PROGRESS'}))
             },
             {
-                label: 'Marquer en attente',
+                label: this.translateService.instant('task.menu.markPending') as string,
                 icon: 'pi pi-pause',
                 disabled: this.subtask.status === 'PENDING',
                 command: () => this.taskInstanceService.updateSubtaskStatus(this.subtask.id, 'PENDING')
                     .subscribe(() => this.changed.emit({id: this.subtask.id, status: 'PENDING'}))
             },
             {
-                label: 'Marquer comme bloqué',
+                label: this.translateService.instant('task.menu.markBlocked') as string,
                 icon: 'pi pi-ban',
                 disabled: this.subtask.status === 'BLOCKED',
                 command: () => this.taskInstanceService.updateSubtaskStatus(this.subtask.id, 'BLOCKED')
@@ -122,7 +123,7 @@ export class SubtaskRowComponent {
             },
             {separator: true},
             {
-                label: 'Supprimer',
+                label: this.translateService.instant('task.menu.delete') as string,
                 icon: 'pi pi-trash',
                 styleClass: 'danger-item',
                 command: () => this.taskInstanceService.deleteSubtask(this.subtask.id)

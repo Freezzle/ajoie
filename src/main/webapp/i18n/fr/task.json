@@ -45,7 +45,8 @@
             "estimatedDueDatePrefix": "Date d'échéance : ",
             "estimatedDueDateSnoozedPrefix": "Date d'échéance reporté : ",
             "status": "Statut",
-            "recurring": "Sous-tâche récurrente"
+            "recurring": "Sous-tâche récurrente",
+            "days": "jours"
         },
         "urgency": {
             "late": "En retard",
@@ -56,19 +57,54 @@
         "card": {
             "moreSubtasks": "autres sous-tâches",
             "hideSubtasks": "Masquer les sous-tâches",
-            "subtaskPlaceholder": "Titre de la sous-tâche…"
+            "subtaskPlaceholder": "Titre de la sous-tâche…",
+            "clickToEdit": "Cliquer pour modifier"
         },
         "menu": {
+            "editTask": "Modifier la tâche",
             "editDate": "Modifier la date",
             "editResponsible": "Modifier le responsable",
             "editSupplier": "Modifier infos fournisseur",
             "addSubtask": "Ajouter une sous-tâche",
             "addComment": "Ajouter un commentaire",
-            "delete": "Supprimer"
+            "viewComments": "Voir les commentaires ({{count}})",
+            "comments": "Commentaires",
+            "commentsWithCount": "Commentaires ({{count}})",
+            "delete": "Supprimer",
+            "deleteTask": "Supprimer la tâche",
+            "deleteConfirm": "Supprimer définitivement cette tâche et toutes ses sous-tâches ?",
+            "editSubtask": "Modifier la sous-tâche",
+            "markInProgress": "Marquer en cours",
+            "markPending": "Marquer en attente",
+            "markBlocked": "Marquer comme bloqué",
+            "deleteSubtask": "Supprimer",
+            "deleteCommentTitle": "Supprimer ce commentaire",
+            "responsiblePlaceholder": "Nom du responsable…"
         },
         "comment": {
+            "addTitle": "Ajouter un commentaire",
+            "authorLabel": "Votre nom",
+            "bodyLabel": "Commentaire",
             "authorPlaceholder": "Votre nom…",
             "bodyPlaceholder": "Votre commentaire…"
+        },
+        "filter": {
+            "all": "Toutes",
+            "active": "Actives",
+            "late": "En retard",
+            "today": "Aujourd'hui",
+            "inProgress": "En cours",
+            "done": "Terminées",
+            "snoozed": "Snoozées",
+            "completed": "terminées",
+            "noTaskInFilter": "Aucune tâche dans ce filtre.",
+            "noSubtaskInFilter": "Aucune sous-tâche dans ce filtre.",
+            "viewSubtasks": "Vue sous-tâches",
+            "viewTasks": "Vue tâches"
+        },
+        "subtaskRow": {
+            "dueDatePrefix": "Échéance au",
+            "snoozedUntilPrefix": "Reporté au"
         },
         "status": {
             "PENDING": "En attente",

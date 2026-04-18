@@ -1,11 +1,13 @@
-import {Component, EventEmitter, inject, Input, Output, signal} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnInit, Output, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {TranslateModule} from '@ngx-translate/core';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {ISubtaskInstance, ITaskInstance} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
+import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
+import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 import {SubtaskRowComponent} from './subtask-row.component';
 import {TimeSincePipe} from '../../../shared/pipe/time-since.pipe';
@@ -19,20 +21,23 @@ import {AccountService} from '../../../core/auth/account.service';
     selector: 'app-task-card',
     templateUrl: './task-card.component.html',
     styleUrls: ['./task-card.component.scss'],
-               imports: [
-                   CommonModule,
-                   FormsModule,
-                   TranslateModule,
-                   MenuBoxComponent,
-                   ButtonBoxComponent,
-                   SubtaskRowComponent,
-                   TimeSincePipe,
-                   DialogBoxComponent,
-                   SubtaskInstanceFormComponent,
-                   Tag
-               ]
-           })
-export class TaskCardComponent {
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslateModule,
+        MenuBoxComponent,
+        ButtonBoxComponent,
+        TextBoxComponent,
+        TextareaBoxComponent,
+        SubtaskRowComponent,
+        TimeSincePipe,
+        DialogBoxComponent,
+        SubtaskInstanceFormComponent,
+        Tag
+    ]
+})
+export class TaskCardComponent implements OnInit {
     @Input() task!: ITaskInstance;
     @Input() activeFilter: TaskFilter = 'active';
     @Input() salonStartingDate: Date | null = null;
@@ -41,10 +46,9 @@ export class TaskCardComponent {
 
     protected taskInstanceService = inject(TaskInstanceService);
     private accountService = inject(AccountService);
+    private translateService = inject(TranslateService);
 
     showSubtasks = false;
-    commentAuthor = '';
-    commentBody = '';
     showComments = false;
 
     // Édition inline du responsable
@@ -57,6 +61,14 @@ export class TaskCardComponent {
 
     // Dialog commentaire
     showCommentDialog = signal(false);
+    commentForm!: FormGroup;
+
+    ngOnInit(): void {
+        this.commentForm = new FormGroup({
+            authorName: new FormControl('', [Validators.required]),
+            body: new FormControl('', [Validators.required]),
+        });
+    }
 
     /** Au moins une sous-tâche est IN_PROGRESS */
     get hasInProgressSubtask(): boolean {
@@ -138,37 +150,38 @@ export class TaskCardComponent {
     }
 
     get menuItems(): AppMenuItem[] {
+        const commentCount = (this.task.comments ?? []).length;
         return [
             {
-                label: 'Modifier la tâche',
+                label: this.translateService.instant('task.menu.editTask') as string,
                 icon: 'pi pi-pencil',
                 command: () => this.editRequested.emit()
             },
             {separator: true},
             {
-                label: 'Ajouter une sous-tâche',
+                label: this.translateService.instant('task.menu.addSubtask') as string,
                 icon: 'pi pi-plus',
                 command: () => this.openAddSubtaskDialog()
             },
             {
-                label: 'Ajouter un commentaire',
+                label: this.translateService.instant('task.menu.addComment') as string,
                 icon: 'pi pi-comment',
                 command: () => {
-                    this.commentAuthor = this.accountService.trackCurrentAccount()()?.login ?? '';
+                    this.commentForm.patchValue({authorName: this.accountService.trackCurrentAccount()()?.login ?? ''});
                     this.showCommentDialog.set(true);
                 }
             },
             {
-                label: (this.task.comments ?? []).length > 0
-                    ? `Voir les commentaires (${(this.task.comments ?? []).length})`
-                    : 'Commentaires',
+                label: commentCount > 0
+                    ? this.translateService.instant('task.menu.commentsWithCount', {count: commentCount}) as string
+                    : this.translateService.instant('task.menu.comments') as string,
                 icon: 'pi pi-inbox',
-                disabled: (this.task.comments ?? []).length === 0,
+                disabled: commentCount === 0,
                 command: () => { this.showComments = !this.showComments; }
             },
             {separator: true},
             {
-                label: 'Supprimer la tâche',
+                label: this.translateService.instant('task.menu.deleteTask') as string,
                 icon: 'pi pi-trash',
                 styleClass: 'danger-item',
                 command: () => this.deleteTask()
@@ -229,18 +242,18 @@ export class TaskCardComponent {
     }
 
     deleteTask(): void {
-        if (!confirm('Supprimer définitivement cette tâche et toutes ses sous-tâches ?')) return;
+        if (!confirm(this.translateService.instant('task.menu.deleteConfirm') as string)) return;
         this.taskInstanceService.delete(this.task.id)
             .subscribe(() => this.statusChanged.emit());
     }
     addComment(): void {
-        if (!this.commentBody.trim() || !this.commentAuthor.trim()) return;
+        if (this.commentForm.invalid) return;
+        const raw = this.commentForm.getRawValue();
         this.taskInstanceService.addComment(this.task.id, {
-            authorName: this.commentAuthor.trim(),
-            body: this.commentBody.trim()
+            authorName: raw.authorName.trim(),
+            body: raw.body.trim()
         }).subscribe(newComment => {
-            this.commentBody = '';
-            this.commentAuthor = '';
+            this.commentForm.reset();
             this.showCommentDialog.set(false);
             // Ajouter le commentaire localement sans rechargement complet
             if (!this.task.comments) this.task.comments = [];
