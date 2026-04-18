@@ -23,25 +23,33 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class DialogDraftService {
   private draftGetter = signal<(() => any) | null>(null);
+  private validateFn = signal<(() => boolean) | null>(null);
 
-  /**
-   * Enregistre une fonction qui retourne le draft courant du composant enfant.
-   * Cette fonction sera appelée quand le dialog-box clique "Valider".
-   */
   registerDraft(getter: () => any): void {
     this.draftGetter.set(getter);
   }
 
   /**
-   * Désenregistre le draft (appeler dans ngOnDestroy du composant enfant).
+   * Enregistre une fonction de validation côté enfant.
+   * Elle doit déclencher les erreurs visuelles et retourner true si valide.
    */
+  registerValidate(fn: () => boolean): void {
+    this.validateFn.set(fn);
+  }
+
   unregisterDraft(): void {
     this.draftGetter.set(null);
+    this.validateFn.set(null);
   }
 
   /**
-   * Récupère le draft courant enregistré, ou null si aucun n'est enregistré.
+   * Appelle la fonction de validation enregistrée. Retourne true si aucune n'est enregistrée.
    */
+  validate(): boolean {
+    const fn = this.validateFn();
+    return fn ? fn() : true;
+  }
+
   getDraft(): any {
     const getter = this.draftGetter();
     return getter ? getter() : null;

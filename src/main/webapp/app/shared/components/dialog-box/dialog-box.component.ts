@@ -57,6 +57,9 @@ export class DialogBoxComponent implements OnDestroy {
     }
 
     onConfirmClick() {
+        if (!this.draftService.validate()) {
+            return;
+        }
         const draft = this.draftService.getDraft();
         this.confirm.emit(draft);
 

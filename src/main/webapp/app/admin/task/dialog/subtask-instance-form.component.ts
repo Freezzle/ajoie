@@ -141,10 +141,32 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
         this.subscriptions.add(this.form.get('dueDateOffsetAbs')!.valueChanges.subscribe(syncDueDate));
         this.subscriptions.add(this.form.get('dueDateOffsetDir')!.valueChanges.subscribe(syncDueDate));
 
+        // Validators required dynamiques selon dueDateType
+        const updateDueDateValidators = (type: string) => {
+            const fixedCtrl = this.form.get('dueDateFixed')!;
+            const absCtrl = this.form.get('dueDateOffsetAbs')!;
+            if (type === 'FIXED') {
+                fixedCtrl.setValidators([Validators.required]);
+                absCtrl.setValidators([]);
+            } else {
+                fixedCtrl.setValidators([]);
+                absCtrl.setValidators([Validators.required, Validators.min(0), Validators.max(999)]);
+            }
+            fixedCtrl.updateValueAndValidity({ emitEvent: false });
+            absCtrl.updateValueAndValidity({ emitEvent: false });
+        };
+        updateDueDateValidators(this.form.get('dueDateType')!.value);
+        this.subscriptions.add(this.form.get('dueDateType')!.valueChanges.subscribe(updateDueDateValidators));
+
         // Sync snoozeOffsetAbs → snoozeOffset (toujours positif)
         this.subscriptions.add(this.form.get('snoozeOffsetAbs')!.valueChanges.subscribe(v => {
             this.form.get('snoozeOffset')?.setValue(v === null || v === undefined || v === '' ? null : Number(v), { emitEvent: false });
         }));
+
+        this.draftService.registerValidate(() => {
+            this.form.markAllAsTouched();
+            return this.form.valid;
+        });
 
         this.draftService.registerDraft(() => {            if (this.form.invalid) return null;
             const raw = this.form.getRawValue();

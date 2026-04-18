@@ -67,7 +67,14 @@
 
         <!-- completedAt -->
         @if (isDone && subtask.completedAt) {
-            <span class="subtask-completed-at">{{ subtask.completedAt | timeSince }}</span>
+            <p-tag severity="secondary"
+                   [rounded]="true"
+                   class="tag-xs tag-outlined-secondary">
+                <span class="d-flex align-items-center gap-1">
+                    <i class="pi pi-check" style="font-size:0.7rem"></i>
+                    {{ subtask.completedAt | timeSince }}
+                </span>
+            </p-tag>
         }
 
         <!-- Context menu -->

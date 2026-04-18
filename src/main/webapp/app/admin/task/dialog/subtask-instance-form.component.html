@@ -58,6 +58,7 @@
         @if (dueDateType === 'FIXED') {
             <date-box fieldName="dueDateFixed"
                       formControlName="dueDateFixed"
+                      [required]="true"
                       translateKey="task.dialog.dueDate"/>
         }
         @if (dueDateType === 'OFFSET') {
@@ -65,6 +66,7 @@
                 <div style="width: 7rem;">
                     <number-box fieldName="dueDateOffsetAbs"
                                 formControlName="dueDateOffsetAbs"
+                                [required]="true"
                                 [minValue]="0"
                                 [maxValue]="999"/>
                 </div>
