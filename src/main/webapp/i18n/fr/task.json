@@ -42,7 +42,8 @@
             "offsetAfter": "Après",
             "dayJ": "Le jour J (date de début du salon)",
             "daysBeforeDueDate": "jours avant l'échéance",
-            "estimatedDueDatePrefix": "Date d'échéance au",
+            "estimatedDueDatePrefix": "Date d'échéance : ",
+            "estimatedDueDateSnoozedPrefix": "Date d'échéance reporté : ",
             "status": "Statut",
             "recurring": "Sous-tâche récurrente"
         },

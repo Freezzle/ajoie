@@ -55,6 +55,26 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
         return d.toLocaleDateString('fr-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
+    /** Date estimée du snooze = date d'échéance calculée + snoozeOffset (null si données insuffisantes). */
+    get estimatedSnoozeDate(): string | null {
+        const snoozeOffset = this.form?.get('snoozeOffset')?.value;
+        if (snoozeOffset === null || snoozeOffset === undefined || snoozeOffset === '') return null;
+        let baseDate: Date | null = null;
+        if (this.dueDateType === 'OFFSET') {
+            const dueOffset = this.form?.get('dueDateOffset')?.value;
+            if (dueOffset !== null && dueOffset !== undefined && dueOffset !== '' && this.salonStartingDate) {
+                baseDate = new Date(this.salonStartingDate);
+                baseDate.setDate(baseDate.getDate() + Number(dueOffset));
+            }
+        } else if (this.dueDateType === 'FIXED') {
+            const fixed = this.form?.get('dueDateFixed')?.value;
+            if (fixed) baseDate = new Date(fixed);
+        }
+        if (!baseDate) return null;
+        baseDate.setDate(baseDate.getDate() + Number(snoozeOffset));
+        return baseDate.toLocaleDateString('fr-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
     /** Date de début du salon formatée en jj.mm.yyyy (null si absente). */
     get salonStartingDateFormatted(): string | null {
         if (!this.salonStartingDate) return null;

@@ -48,7 +48,7 @@
             <div style="max-width:280px; font-size:0.85rem;">{{ 'task.dialog.dueDateHint' | translate }}</div>
         </p-popover>
 
-        <div class="mb-2">
+        <div class="mb-3">
             <p-select-button formControlName="dueDateType"
                              [options]="dueDateTypeOptions"
                              optionLabel="label"
@@ -70,21 +70,19 @@
                 </div>
                 <span class="text-secondary">jours</span>
                 <div style="width: 8rem;">
-                <select-box fieldName="dueDateOffsetDir"
-                            formControlName="dueDateOffsetDir"
-                            [options]="offsetDirectionOptions"
-                            [formatterFunction]="formatterDirection"
-                            [needTranslation]="true"/>
+                    <select-box fieldName="dueDateOffsetDir"
+                                formControlName="dueDateOffsetDir"
+                                [options]="offsetDirectionOptions"
+                                [formatterFunction]="formatterDirection"
+                                [needTranslation]="true"/>
                 </div>
-                @if (estimatedDueDate) {
+            </div>
+            @if (estimatedDueDate) {
+                <div class="mt-3">
                     <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }}
                         <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span>
                     </span>
-                }
-            </div>
-            @if (salonStartingDateFormatted) {
-                <span class="text-secondary">La date de début du salon est le <span
-                        class="fw-semibold">{{ salonStartingDateFormatted }}</span></span>
+                </div>
             }
         }
     </div>
@@ -102,7 +100,7 @@
             <div style="max-width:280px; font-size:0.85rem;">{{ 'task.dialog.snoozeHint' | translate }}</div>
         </p-popover>
 
-        <div class="mb-2">
+        <div class="mb-3">
             <p-select-button formControlName="snoozeUntilType"
                              [options]="snoozeTypeOptions"
                              optionLabel="label"
@@ -122,11 +120,13 @@
                                 [minValue]="0"
                                 [maxValue]="999"/>
                 </div>
-                <span class="text-secondary">jours après l'échéance</span>
+                <span class="text-secondary">jours</span>
             </div>
-            @if (form.get('snoozeOffset')?.value !== null && form.get('snoozeOffset')?.value !== '') {
-                <div class="mt-1 small text-secondary">
-                    <i class="pi pi-bell-slash me-1"></i>{{ 'task.dialog.snoozeOffsetHint' | translate : {n: form.get('snoozeOffset')?.value ?? 0} }}
+            @if (estimatedSnoozeDate) {
+                <div class="mt-3">
+                    <span>{{ 'task.dialog.estimatedDueDateSnoozedPrefix' | translate }}
+                        <span class="fw-semibold text-primary">{{ estimatedSnoozeDate }}</span>
+                    </span>
                 </div>
             }
         }
