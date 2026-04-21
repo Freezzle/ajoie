@@ -138,9 +138,8 @@
                             <link-box
                                     [links]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']"
                                     [showText]="false"
-                                    class="align-content-center"
-                                    primeIcon="pi-link"
-                                    style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
+                                    class="align-content-center link-box-append"
+                                    primeIcon="pi-link"/>
                         }
                     </div>
 
@@ -333,8 +332,7 @@
                                         <ng-template #body let-conference>
                                             <tr>
                                                 <td [routerLink]="['../conferences', conference.id, 'view']"
-                                                    class="clickable truncate"
-                                                    style="white-space: nowrap">{{ conference.title }}
+                                                    class="clickable truncate text-nowrap">{{ conference.title }}
                                                 </td>
                                                 <td [routerLink]="['../conferences', conference.id, 'view']"
                                                     class="clickable">
@@ -393,8 +391,7 @@
                                         <ng-template #body let-workshop>
                                             <tr>
                                                 <td [routerLink]="['../workshops', workshop.id, 'view']"
-                                                    class="clickable truncate"
-                                                    style="white-space: nowrap">{{ workshop.title }}
+                                                    class="clickable truncate text-nowrap">{{ workshop.title }}
                                                 </td>
                                                 <td [routerLink]="['../workshops', workshop.id, 'view']"
                                                     class="clickable">

@@ -40,12 +40,11 @@
     <div class="col-12 mt-3">
         <label class="form-label fw-semibold">
             {{ 'task.dialog.dueDateLabel' | translate }}
-            <i class="pi pi-info-circle ms-1 text-muted"
-               style="cursor:pointer; font-size:0.85rem;"
+            <i class="pi pi-info-circle ms-1 text-muted cursor-pointer icon-sm"
                (click)="dueDatePopover.toggle($event)"></i>
         </label>
         <p-popover #dueDatePopover>
-            <div style="max-width:280px; font-size:0.85rem;">{{ 'task.dialog.dueDateHint' | translate }}</div>
+            <div class="popover-hint">{{ 'task.dialog.dueDateHint' | translate }}</div>
         </p-popover>
 
         <div class="mb-3">
@@ -63,7 +62,7 @@
         }
         @if (dueDateType === 'OFFSET') {
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div style="width: 7rem;">
+                <div class="w-7r">
                     <number-box fieldName="dueDateOffsetAbs"
                                 formControlName="dueDateOffsetAbs"
                                 [required]="true"
@@ -71,7 +70,7 @@
                                 [maxValue]="999"/>
                 </div>
                 <span class="text-secondary">{{ 'task.dialog.days' | translate }}</span>
-                <div style="width: 8rem;">
+                <div class="w-8r">
                     <select-box fieldName="dueDateOffsetDir"
                                 formControlName="dueDateOffsetDir"
                                 [options]="offsetDirectionOptions"
@@ -94,12 +93,11 @@
     <div class="col-12 mt-3">
         <label class="form-label fw-semibold">
             {{ 'task.dialog.snoozeLabel' | translate }}
-            <i class="pi pi-info-circle ms-1 text-muted"
-               style="cursor:pointer; font-size:0.85rem;"
+            <i class="pi pi-info-circle ms-1 text-muted cursor-pointer icon-sm"
                (click)="snoozePopover.toggle($event)"></i>
         </label>
         <p-popover #snoozePopover>
-            <div style="max-width:280px; font-size:0.85rem;">{{ 'task.dialog.snoozeHint' | translate }}</div>
+            <div class="popover-hint">{{ 'task.dialog.snoozeHint' | translate }}</div>
         </p-popover>
 
         <div class="mb-3">
@@ -116,7 +114,7 @@
         }
         @if (snoozeUntilType === 'OFFSET') {
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div style="width: 7rem;">
+                <div class="w-7r">
                     <number-box fieldName="snoozeOffsetAbs"
                                 formControlName="snoozeOffsetAbs"
                                 [minValue]="0"

@@ -80,9 +80,8 @@
                     @if (isReadOnly) {
                         <link-box [links]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '','view']"
                                   [showText]="false"
-                                  class="align-content-center"
-                                  primeIcon="pi-link"
-                                  style="border: 1px dashed #555555;border-radius: 0 0.25em 0.25em 0;padding: 0.25em;border-left:0"/>
+                                  class="align-content-center link-box-append"
+                                  primeIcon="pi-link"/>
                     }
                 </div>
                 <div class="mt-4 col-sm-6">

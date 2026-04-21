@@ -11,7 +11,7 @@
 .hint {
   margin-top: 8px;
   color: var(--app-text);
-  font-size: 11px;
+  font-size: var(--app-fs-xs);
 }
 
 /* Planning */
@@ -107,7 +107,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: var(--app-fs-md);
   margin-bottom: 0.25rem;
 }
 
@@ -117,7 +117,7 @@
 
 .talk-card-description {
   margin: 0.5rem 0 0;
-  font-size: 0.9rem;
+  font-size: var(--app-fs-md);
 }
 
 :host ::ng-deep .p-timeline-event-opposite {

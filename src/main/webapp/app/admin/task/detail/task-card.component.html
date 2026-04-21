@@ -18,7 +18,7 @@
                 </span>
 
                 @if (task.description) {
-                    <span class="tc__desc">{{ task.description }}</span>
+                    <span class="text-desc">{{ task.description }}</span>
                 }
 
                 <!-- Chips : p-tag PrimeNG -->
@@ -53,7 +53,7 @@
         <!-- INLINE FORM : changer responsable -->
         @if (editingResponsible) {
             <div class="d-flex align-items-center gap-2 px-2">
-                <i class="pi pi-user" style="color:var(--app-primary); font-size:0.8rem; flex-shrink:0"></i>
+                <i class="pi pi-user icon-xs text-primary flex-shrink-0"></i>
                 <input type="text" class="form-control form-control-sm flex-grow-1"
                        [(ngModel)]="editResponsibleValue"
                        (keydown.enter)="saveResponsible()" (keydown.escape)="cancelResponsible()"

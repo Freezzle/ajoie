@@ -7,13 +7,13 @@
     border-radius: 20px;
     border: 1.5px solid var(--app-border);
     background: var(--app-surface);
-    font-size: 0.76rem;
+    font-size: var(--app-fs-sm);
     font-weight: 500;
     color: var(--app-text);
     cursor: pointer;
     transition: all 0.12s;
 
-    i { font-size: 0.65rem; }
+    i { font-size: var(--app-fs-xs); }
 
     &:hover { border-color: var(--app-secondary); color: var(--app-contrast); }
 
@@ -41,7 +41,7 @@
     height: 16px;
     padding: 0 4px;
     border-radius: 20px;
-    font-size: 0.65rem;
+    font-size: var(--app-fs-xs);
     font-weight: 700;
     background: color-mix(in srgb, var(--app-secondary) 15%, var(--app-surface));
     color: var(--app-text);

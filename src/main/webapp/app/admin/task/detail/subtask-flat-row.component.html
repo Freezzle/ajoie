@@ -11,10 +11,10 @@
     <!-- Col 2 : Infos sur 2 lignes -->
     <div class="sfr-col-info">
         <!-- Ligne 1 : nom de la tâche parente -->
-        <span class="sfr-task-name">{{ parentTask.title }}</span>
+        <span class="sfr-task-name text-ellipsis">{{ parentTask.title }}</span>
         <!-- Ligne 2 : nom de la sous-tâche + chips -->
         <div class="sfr-info-row2">
-            <span class="sfr-subtask-name" [class.sfr-subtask-name--done]="isDone">{{ subtask.title }}</span>
+            <span class="sfr-subtask-name text-ellipsis" [class.sfr-subtask-name--done]="isDone">{{ subtask.title }}</span>
             <div class="sfr-chips">
                 @if (subtask.status !== 'PENDING' && subtask.status !== 'DONE') {
                     <p-tag [severity]="statusSeverity"
@@ -39,23 +39,22 @@
             @if (displayDate && !isDone) {
                 <p-tag severity="secondary"
                        [rounded]="true"
-                       class="tag-xs"
                        [ngClass]="'tag-outlined-' + dateSeverity"
                        (click)="dueDatePopover.toggle($event)"
-                       style="cursor:pointer">
+                       class="tag-xs cursor-pointer">
                     <span class="d-flex align-items-center gap-1">
-                        @if (isSnoozed) { <i class="pi pi-bell-slash" style="font-size:0.7rem"></i> }
+                        @if (isSnoozed) { <i class="pi pi-bell-slash icon-xs"></i> }
                         {{ displayDate | daysRelative }}
                     </span>
                 </p-tag>
                 <p-popover #dueDatePopover appendTo="body">
                     <div class="due-date-popover">
-                        <i class="pi pi-calendar me-2" style="color:var(--p-surface-500)"></i>
-                        <span>Échéance au {{ subtask.dueDate | formatMediumDate }}</span>
+                        <i class="pi pi-calendar me-2 text-surface-muted"></i>
+                        <span>{{ 'task.subtaskRow.dueDatePrefix' | translate }} {{ subtask.dueDate | formatMediumDate }}</span>
                         @if (isSnoozed) {
                             <br/>
-                            <i class="pi pi-bell-slash me-2 mt-1" style="color:var(--p-surface-500)"></i>
-                            <span>Reporté au {{ subtask.snoozedUntil | formatMediumDate }}</span>
+                            <i class="pi pi-bell-slash me-2 mt-1 text-surface-muted"></i>
+                            <span>{{ 'task.subtaskRow.snoozedUntilPrefix' | translate }} {{ subtask.snoozedUntil | formatMediumDate }}</span>
                         }
                     </div>
                 </p-popover>

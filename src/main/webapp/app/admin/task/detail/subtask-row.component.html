@@ -7,7 +7,7 @@
                 class="subtask-check"/>
 
     <!-- Corps principal -->
-    <div class="flex-grow-1" style="min-width:0">
+    <div class="flex-grow-1 min-w-0">
         <div class="d-flex align-items-center flex-wrap gap-1">
             <span class="subtask-title">{{ subtask.title }}</span>
             @if (subtask.status !== 'PENDING' && subtask.status !== 'DONE') {
@@ -18,7 +18,7 @@
         </div>
 
         @if (subtask.description) {
-            <span class="subtask-desc">{{ subtask.description }}</span>
+            <span class="text-desc">{{ subtask.description }}</span>
         }
 
         @if (subtask.responsible || subtask.supplierInfo) {
@@ -41,24 +41,23 @@
         @if (displayDate && !isDone) {
             <p-tag severity="secondary"
                    [rounded]="true"
-                   class="tag-xs"
                    [ngClass]="'tag-outlined-' + dateSeverity"
                    (click)="dueDatePopover.toggle($event)"
-                   style="cursor:pointer">
+                   class="tag-xs cursor-pointer">
                 <span class="d-flex align-items-center gap-1">
                     @if (isSnoozed) {
-                        <i class="pi pi-bell-slash" style="font-size:0.7rem"></i>
+                        <i class="pi pi-bell-slash icon-xs"></i>
                     }
                     {{ displayDate | daysRelative }}
                 </span>
             </p-tag>
             <p-popover #dueDatePopover appendTo="body">
                 <div class="due-date-popover">
-                    <i class="pi pi-calendar me-2" style="color:var(--p-surface-500)"></i>
+                    <i class="pi pi-calendar me-2 text-surface-muted"></i>
                     <span>{{ 'task.subtaskRow.dueDatePrefix' | translate }} {{ subtask.dueDate | formatMediumDate }}</span>
                     @if (isSnoozed) {
                         <br/>
-                        <i class="pi pi-bell-slash me-2 mt-1" style="color:var(--p-surface-500)"></i>
+                        <i class="pi pi-bell-slash me-2 mt-1 text-surface-muted"></i>
                         <span>{{ 'task.subtaskRow.snoozedUntilPrefix' | translate }} {{ subtask.snoozedUntil | formatMediumDate }}</span>
                     }
                 </div>
@@ -71,7 +70,7 @@
                    [rounded]="true"
                    class="tag-xs tag-outlined-secondary">
                 <span class="d-flex align-items-center gap-1">
-                    <i class="pi pi-check" style="font-size:0.7rem"></i>
+                    <i class="pi pi-check icon-xs"></i>
                     {{ subtask.completedAt | timeSince }}
                 </span>
             </p-tag>

@@ -25,7 +25,7 @@
                 <strong>{{ salonStartingDateFormatted }}</strong>
             </span>
             @if (isDatesDesynchronized) {
-                <span class="d-flex align-items-center gap-1 text-warning fw-semibold" style="font-size:0.78rem">
+                <span class="d-flex align-items-center gap-1 text-warning fw-semibold text-xs">
                     <i class="pi pi-exclamation-triangle"></i>
                     <span jhiTranslate="task.focusView.referenceDateWarning">Des dates de sous-tâches ne correspondent plus à cette date de référence. Utilisez l'action « Recalculer les dates » dans le menu.</span>
                 </span>
@@ -41,7 +41,7 @@
                             fluid
                             [style]="{'flex': '1'}">
             </p-progress-bar>
-            <span class="fw-semibold text-nowrap" style="font-size:0.78rem">
+            <span class="fw-semibold text-nowrap text-xs">
                 {{ countDone }}/{{ countAll }} {{ 'task.filter.completed' | translate }}
             </span>
         </div>
@@ -50,9 +50,9 @@
         <div class="d-flex flex-wrap gap-1 mb-3">
             <!-- Toggle vue cards / vue sous-tâches à plat -->
             <div class="d-flex align-items-center gap-1 px-1" [title]="flatView() ? ('task.filter.viewSubtasks' | translate) : ('task.filter.viewTasks' | translate)">
-                <i class="pi pi-th-large" [style.color]="!flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'" style="font-size:0.85rem"></i>
+                <i class="pi pi-th-large icon-sm" [style.color]="!flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'"></i>
                 <p-toggleswitch [(ngModel)]="flatViewBool" (ngModelChange)="flatView.set($event)"/>
-                <i class="pi pi-list" [style.color]="flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'" style="font-size:0.85rem"></i>
+                <i class="pi pi-list icon-sm" [style.color]="flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'"></i>
             </div>
 
             <button class="tfl-filter-pill" [class.active]="activeFilter === 'all'"
@@ -100,7 +100,7 @@
 
     @if (isLoading) {
         <div class="text-center py-5">
-            <i class="pi pi-spinner pi-spin" style="font-size: 2rem"></i>
+            <i class="pi pi-spinner pi-spin icon-loader"></i>
         </div>
     }
 

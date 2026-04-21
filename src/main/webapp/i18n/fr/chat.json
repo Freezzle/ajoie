@@ -1,0 +1,23 @@
+{
+  "chat": {
+    "title": "Messages",
+    "newChat": {
+      "title": "Sélectionner un utilisateur",
+      "placeholder": "Choisir un utilisateur",
+      "noUsers": "Aucun utilisateur disponible.",
+      "start": "Démarrer le chat",
+      "cancel": "Annuler",
+      "button": "Nouveau chat"
+    },
+    "conversations": {
+      "empty": "Aucune conversation. Cliquez sur « Nouveau chat ».",
+      "online": "En ligne",
+      "offline": "Hors ligne"
+    },
+    "message": {
+      "placeholder": "Écrivez un message...",
+      "read": "Message lu",
+      "sent": "Message envoyé"
+    }
+  }
+}

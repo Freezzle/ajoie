@@ -88,11 +88,11 @@
       align-items: baseline;
       gap: 0.5rem;
       padding: 0.25rem 0;
-      font-size: 0.9rem;
+      font-size: var(--app-fs-md);
 
       i {
         flex-shrink: 0;
-        font-size: 0.85rem;
+        font-size: var(--app-fs-md);
         font-weight: bold;
       }
 

@@ -76,7 +76,7 @@
                                         <ng-template #filter let-filter="filterCallback" let-value>
                                             <p-multiselect (ngModelChange)="filter($event)" [ngModel]="value"
                                                            [options]="statusValues" [panelStyle]="{ minWidth: '16rem' }"
-                                                           style="min-width: 14rem">
+                                                           class="w-14r">
                                                     <ng-template #item let-option>
                                                         <div class="flex items-center gap-2">
                                                             <fa-icon [class]="option.status | colorStatus"

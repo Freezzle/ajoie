@@ -38,11 +38,9 @@
 }
 
 // Ligne 1 : nom de la tâche parente
+// Ellipsis géré par la classe globale .text-ellipsis dans le HTML
 .sfr-task-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.73rem;
+  font-size: var(--app-fs-xs);
   color: var(--p-surface-400);
   font-weight: 400;
 }
@@ -57,12 +55,10 @@
 }
 
 // Nom de la sous-tâche
+// Ellipsis géré par la classe globale .text-ellipsis dans le HTML
 .sfr-subtask-name {
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.82rem;
+  font-size: var(--app-fs-sm);
   font-weight: 500;
   color: var(--p-surface-700);
 
@@ -106,11 +102,11 @@
 }
 
 .subtask-completed-at {
-  font-size: 0.67rem;
+  font-size: var(--app-fs-xs);
   color: var(--p-surface-400);
   white-space: nowrap;
 }
 
 .due-date-popover {
-  font-size: 0.82rem;
+  font-size: var(--app-fs-sm);
 }

@@ -173,7 +173,7 @@
                                                                      [class.icon-active]="showSearchStands()"
                                                                      [class.icon-inactive]="!showSearchStands()"
                                                                      icon="search"
-                                                                     style="cursor:pointer;"/>
+                                                                     class="cursor-pointer"/>
                                                             <hr/>
                                                         </div>
                                                         @if (!isReadOnly()) {
@@ -183,14 +183,14 @@
                                                                         [class.icon-active]="showAvailableStands()"
                                                                         [class.icon-inactive]="!showAvailableStands()"
                                                                         icon="person"
-                                                                        style="cursor:pointer;"/>
+                                                                        class="cursor-pointer"/>
                                                                 <div>
                                                                     <fa-icon
                                                                             (click)="showDimensions.set(!showDimensions()); showAvailableStands.set(false)"
                                                                             [class.icon-active]="showDimensions()"
                                                                             [class.icon-inactive]="!showDimensions()"
                                                                             icon="map-location-dot"
-                                                                            style="cursor:pointer;"/>
+                                                                            class="cursor-pointer"/>
                                                                 </div>
                                                                 <hr/>
                                                             </div>
@@ -202,7 +202,7 @@
                                                                          [class.icon-active]="displayHeader()"
                                                                          [class.icon-inactive]="!displayHeader()"
                                                                          icon="pager"
-                                                                         style="cursor:pointer;"/>
+                                                                         class="cursor-pointer"/>
                                                             </div>
 
                                                             <div>
@@ -213,7 +213,7 @@
                                                                          [openDelay]="500"
                                                                          icon="circle-info"
                                                                          placement="start"
-                                                                         style="cursor:pointer;"/>
+                                                                         class="cursor-pointer"/>
                                                             </div>
                                                             <hr/>
                                                         </div>
@@ -226,7 +226,7 @@
                                                                      [openDelay]="500"
                                                                      icon="signature"
                                                                      placement="start"
-                                                                     style="cursor:pointer;"/>
+                                                                     class="cursor-pointer"/>
                                                             <hr/>
                                                         </div>
 
@@ -239,14 +239,14 @@
                                                                          [openDelay]="500"
                                                                          icon="location-dot"
                                                                          placement="start"
-                                                                         style="cursor:pointer;"/>
+                                                                         class="cursor-pointer"/>
 
                                                                 @if (isNumberAttribution()) {
                                                                     <input [formControl]="nextPosition"
                                                                            [ngbTooltip]="'floorPlan.nextPosition' | translate"
                                                                            [openDelay]="500"
                                                                            placement="start"
-                                                                           style="min-width:2em;width:2em;max-width:3em; border:1px dashed grey;text-align:center;"/>
+                                                                           class="input-position"/>
                                                                 }
 
                                                                 @if (isNumberAttribution()) {
@@ -257,7 +257,7 @@
                                                                              [openDelay]="500"
                                                                              icon="wand-magic-sparkles"
                                                                              placement="start"
-                                                                             style="cursor:pointer;"/>
+                                                                             class="cursor-pointer"/>
                                                                 }
                                                                 <hr/>
                                                             </div>
@@ -332,7 +332,7 @@
                         [dismissableMask]="true"
                         [header]="'floorPlan.detail.location' | translate">
                 @if (selectStandDialog(); as pop) {
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; row-gap: 0.5em">
+                    <div class="grid-2col-equal">
                         @if (pop.dimension?.stand; as stand) {
                             <b>{{ 'floorPlan.detail.therapist' | translate }}</b>
                             <span>{{ stand.participation.therapistName }}</span>

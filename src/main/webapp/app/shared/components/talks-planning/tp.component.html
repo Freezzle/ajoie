@@ -230,7 +230,7 @@
                 [header]="'planningTalks.details.header' | translate"
                 [mode]="'view'">
         @if (selectedTalkForDialog(); as talk) {
-            <div style="display:grid; grid-template-columns: 1fr 2fr; row-gap: 1em; column-gap: 1em">
+            <div class="grid-1-2col">
                 <b>{{ 'planningTalks.details.type' | translate }}</b>
                 <div>
                     <p-badge [severity]="talk.type === 'CONFERENCE' ? 'info' : 'warn'"
