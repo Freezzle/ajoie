@@ -40,4 +40,21 @@
       ) !important;
     }
   }
+
+  // Pages publiques (stepper d'inscription) : plein écran, sans cadre ni chrome applicatif
+  &.app-layout-public {
+    max-width: none;
+    border: none !important;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+
+    > div:not(app-topbar) {
+      overflow: visible;
+    }
+
+    .app-layout-body {
+      overflow: visible;
+    }
+  }
 }

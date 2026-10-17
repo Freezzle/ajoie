@@ -1,0 +1,70 @@
+.counter-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  .counter-box-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .counter-box-label {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .counter-box-hint {
+    font-size: 0.78rem;
+    color: var(--p-text-muted-color, #6b655d);
+  }
+
+  .counter-box-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .counter-box-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--p-surface-300, #ccc);
+    background: var(--p-surface-0, #fff);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &:not(:disabled):hover {
+      border-color: var(--p-primary-color);
+      color: var(--p-primary-color);
+    }
+  }
+
+  .counter-box-value {
+    width: 56px;
+    height: 44px;
+    text-align: center;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--p-surface-300, #ccc);
+    background: var(--p-surface-0, #fff);
+
+    // masque les flèches natives
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}

@@ -96,6 +96,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/activate").permitAll()
                         .requestMatchers("/api/account/reset-password/init").permitAll()
                         .requestMatchers("/api/account/reset-password/finish").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/admin/**")
                         .hasAnyAuthority(AuthoritiesConstants.ADMIN, AuthoritiesConstants.ADMIN_BUSINESS)
                         .requestMatchers("/api/**").authenticated()

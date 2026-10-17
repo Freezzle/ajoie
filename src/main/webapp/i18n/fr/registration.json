@@ -1,0 +1,124 @@
+{
+  "registration": {
+    "title": "Inscription exposant",
+    "titleEdit": "Modifier mon inscription",
+    "loading": "Chargement en cours…",
+    "actions": {
+      "previous": "Précédent",
+      "continue": "Continuer",
+      "submit": "Envoyer ma demande"
+    },
+    "steps": {
+      "exhibitor": "Vos informations",
+      "services": "Prestations",
+      "participation": "Participation",
+      "summary": "Récapitulatif",
+      "shortExhibitor": "Vous",
+      "shortServices": "Prestations",
+      "shortParticipation": "Participation",
+      "shortSummary": "Récap"
+    },
+    "titles": {
+      "exhibitor": "Faisons connaissance",
+      "services": "Que souhaitez-vous proposer ?",
+      "participation": "Votre participation",
+      "summary": "Tout est bon ?"
+    },
+    "intros": {
+      "exhibitor": "Ces informations nous permettent de vous contacter et de préparer votre venue à {{place}}.",
+      "services": "Choisissez une ou plusieurs prestations. Vous pourrez tout modifier avant l'envoi.",
+      "participation": "Repas, facturation et dernières précisions à nous transmettre.",
+      "summary": "Relisez votre demande, acceptez la charte et les conditions, puis envoyez."
+    },
+    "step": {
+      "navLabel": "Étapes de l'inscription",
+      "counter": "Étape {{index}} sur {{total}}",
+      "aria": "Étape {{index}} sur {{total}} : {{name}}, {{state}}",
+      "state": {
+        "current": "En cours",
+        "done": "Complété",
+        "warn": "À compléter",
+        "todo": "À venir"
+      }
+    },
+    "counter": {
+      "increase": "Augmenter",
+      "decrease": "Diminuer"
+    },
+    "exhibitor": {
+      "therapistNameHelp": "Nom affiché pendant le salon",
+      "emailLocked": "L'adresse e-mail ne peut pas être modifiée : votre lien personnel y est rattaché."
+    },
+    "services": {
+      "yes": "Oui",
+      "no": "Non",
+      "standQuestion": "Souhaitez-vous un stand ?",
+      "conferenceQuestion": "Donnerez-vous une conférence ?",
+      "workshopQuestion": "Animerez-vous un atelier ?",
+      "talkTitle": "Titre",
+      "talkDescription": "Description",
+      "addConference": "Ajouter une autre conférence",
+      "addWorkshop": "Ajouter un autre atelier",
+      "remove": "Retirer"
+    },
+    "participation": {
+      "mealsTitle": "Les repas",
+      "mealsHelp": "Indiquez le nombre de repas souhaités pour votre équipe.",
+      "offerTitle": "Offre spéciale"
+    },
+    "summary": {
+      "edit": "Modifier",
+      "stand": "Stand",
+      "conferences": "Conférence(s)",
+      "conferenceItem": "Conférence {{index}}",
+      "workshops": "Atelier(s)",
+      "workshopItem": "Atelier {{index}}",
+      "consents": "Vos engagements",
+      "acceptChart": "J'ai lu et j'accepte la charte des exposants",
+      "acceptContract": "J'ai lu et j'accepte les conditions de participation"
+    },
+    "price": {
+      "included": "Inclus",
+      "perMeal": "{{price}} / repas",
+      "perUnit": "{{price}} / unité",
+      "surcharge": "+ {{price}}",
+      "estimatedCost": "Coût estimé",
+      "total": "Total",
+      "quantity": "× {{quantity}}",
+      "disclaimer": "Montant indicatif. La facture définitive vous sera envoyée par e-mail après acceptation de votre inscription.",
+      "lines": {
+        "stand": "Stand {{dimension}}",
+        "sharedStand": "Stand partagé",
+        "conference": "Conférence",
+        "workshop": "Atelier",
+        "meal1": "Repas samedi midi",
+        "meal2": "Repas samedi soir",
+        "meal3": "Repas dimanche midi",
+        "postalFee": "Envoi de la facture par courrier"
+      }
+    },
+    "done": {
+      "thanks": "Merci {{firstName}} !",
+      "message": "Une confirmation sera envoyée à {{email}} après vérification de votre demande.",
+      "editHint": "Vous recevrez également un lien personnel pour modifier votre inscription tant qu'elle est en cours de vérification."
+    },
+    "closed": {
+      "title": "Les inscriptions ne sont pas ouvertes",
+      "disabled": "Les inscriptions pour cet évènement ne sont pas encore ouvertes. Merci de revenir plus tard.",
+      "notYetOpen": "Les inscriptions ouvriront prochainement. Merci de revenir plus tard.",
+      "over": "La période d'inscription est terminée. Merci de contacter l'organisation si besoin."
+    },
+    "errors": {
+      "unavailableTitle": "Inscription indisponible",
+      "salonNotFound": "Cet évènement est introuvable. Vérifiez le lien reçu.",
+      "linkInvalid": "Ce lien de modification n'est plus valide.",
+      "answerRequired": "Merci de répondre",
+      "noService": "Choisissez au moins une prestation",
+      "mealPaymentRequired": "Choisissez comment régler vos repas",
+      "consentRequired": "Requis pour envoyer votre inscription",
+      "captchaRequired": "Merci de valider la vérification anti-robot",
+      "fieldsToComplete": "{{count}} champ(s) à compléter",
+      "submitFailed": "L'envoi a échoué. Merci de réessayer."
+    }
+  }
+}

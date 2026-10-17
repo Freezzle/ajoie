@@ -96,7 +96,12 @@ salon:
   mail:
     from: salon@localhost
   security:
-    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com data:"
+    content-security-policy: "default-src 'self'; frame-src 'self' data: https://challenges.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://challenges.cloudflare.com"
+    captcha:
+      # Cloudflare Turnstile - protège le formulaire public d'inscription
+      enabled: false
+      site-key: ''
+      secret-key: ''
 
 # application:
 app:

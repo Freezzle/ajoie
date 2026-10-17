@@ -99,7 +99,11 @@ export class SalonService {
         return {
             ...salon,
             startingDate: dayjs(salon.startingDate)?.toJSON() ?? null,
-            endingDate: dayjs(salon.endingDate)?.toJSON() ?? null
+            endingDate: dayjs(salon.endingDate)?.toJSON() ?? null,
+            registrationOpeningDate: salon.registrationOpeningDate ?
+                                     dayjs(salon.registrationOpeningDate).toJSON() : null,
+            registrationClosingDate: salon.registrationClosingDate ?
+                                     dayjs(salon.registrationClosingDate).toJSON() : null
         };
     }
 
@@ -107,7 +111,11 @@ export class SalonService {
         return {
             ...restSalon,
             startingDate: dayjs(restSalon.startingDate).toDate() ?? null,
-            endingDate: dayjs(restSalon.endingDate).toDate() ?? null
+            endingDate: dayjs(restSalon.endingDate).toDate() ?? null,
+            registrationOpeningDate: restSalon.registrationOpeningDate ?
+                                     dayjs(restSalon.registrationOpeningDate).toDate() : null,
+            registrationClosingDate: restSalon.registrationClosingDate ?
+                                     dayjs(restSalon.registrationClosingDate).toDate() : null
         };
     }
 }

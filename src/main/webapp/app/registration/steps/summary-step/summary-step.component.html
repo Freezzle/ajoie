@@ -1,0 +1,275 @@
+<section class="registration-summary">
+    <div class="summary-card">
+        <div class="summary-card-head">
+            <h3>{{ 'registration.steps.exhibitor' | translate }}</h3>
+            <button-box (clickedEvent)="onEdit(0)"
+                        primeIcon="pi-pencil"
+                        translateKey="registration.summary.edit"
+                        type="secondary"/>
+        </div>
+        <dl class="summary-list">
+            <div class="summary-row">
+                <dt>{{ 'exhibitor.fullName' | translate }}</dt>
+                <dd>{{ exhibitor.firstName }} {{ exhibitor.lastName }}</dd>
+            </div>
+            @if (exhibitor.therapistName) {
+                <div class="summary-row">
+                    <dt>{{ 'exhibitor.therapistName' | translate }}</dt>
+                    <dd>{{ exhibitor.therapistName }}</dd>
+                </div>
+            }
+            <div class="summary-row">
+                <dt>{{ 'exhibitor.email' | translate }}</dt>
+                <dd>{{ exhibitor.email }}</dd>
+            </div>
+            @if (exhibitor.phoneNumber) {
+                <div class="summary-row">
+                    <dt>{{ 'exhibitor.phoneNumber' | translate }}</dt>
+                    <dd>{{ exhibitor.phoneNumber }}</dd>
+                </div>
+            }
+            <div class="summary-row">
+                <dt>{{ 'exhibitor.homeAddress' | translate }}</dt>
+                <dd>{{ formatAddress(exhibitor.homeAddress) }}</dd>
+            </div>
+            @if (exhibitor.differentBillingAddress) {
+                <div class="summary-row">
+                    <dt>{{ 'exhibitor.billingAddress' | translate }}</dt>
+                    <dd>{{ formatAddress(exhibitor.billingAddress) }}</dd>
+                </div>
+            }
+            <div class="summary-row">
+                <dt>{{ 'exhibitor.newsletter' | translate }}</dt>
+                <dd>{{ (exhibitor.newsletter ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
+            </div>
+        </dl>
+    </div>
+
+    @if (stand; as standValue) {
+        <div class="summary-card">
+            <div class="summary-card-head">
+                <h3>{{ 'registration.summary.stand' | translate }}</h3>
+                <button-box (clickedEvent)="onEdit(1, 'card-stand')"
+                            primeIcon="pi-pencil"
+                            translateKey="registration.summary.edit"
+                            type="secondary"/>
+            </div>
+            <dl class="summary-list">
+                <div class="summary-row">
+                    <dt>{{ 'stand.description' | translate }}</dt>
+                    <dd>{{ standValue.description }}</dd>
+                </div>
+                <div class="summary-row">
+                    <dt>{{ 'stand.dimension' | translate }}</dt>
+                    <dd>{{ dimensionLabel(standValue.dimension?.id) }}</dd>
+                </div>
+                <div class="summary-row">
+                    <dt>{{ 'stand.category.label' | translate }}</dt>
+                    <dd>{{ formatterCategory(standValue.category) | translate }}</dd>
+                </div>
+                @if (standValue.subCategories?.length) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.subCategories' | translate }}</dt>
+                        <dd>{{ standValue.subCategories?.join(', ') }}</dd>
+                    </div>
+                }
+                <div class="summary-row">
+                    <dt>{{ 'stand.nbTable' | translate }}</dt>
+                    <dd>{{ standValue.nbTable }}</dd>
+                </div>
+                <div class="summary-row">
+                    <dt>{{ 'stand.nbChair' | translate }}</dt>
+                    <dd>{{ standValue.nbChair }}</dd>
+                </div>
+                <div class="summary-row">
+                    <dt>{{ 'stand.needElectricity' | translate }}</dt>
+                    <dd>{{ (standValue.needElectricity ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
+                </div>
+                <div class="summary-row">
+                    <dt>{{ 'stand.shared' | translate }}</dt>
+                    <dd>{{ (standValue.shared ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
+                </div>
+                @if (standValue.website) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.website' | translate }}</dt>
+                        <dd>{{ standValue.website }}</dd>
+                    </div>
+                }
+                @if (standValue.instagram) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.instagram' | translate }}</dt>
+                        <dd>{{ standValue.instagram }}</dd>
+                    </div>
+                }
+                @if (standValue.facebook) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.facebook' | translate }}</dt>
+                        <dd>{{ standValue.facebook }}</dd>
+                    </div>
+                }
+                @if (standValue.urlPicture) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.urlPicture' | translate }}</dt>
+                        <dd>{{ standValue.urlPicture }}</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+    }
+
+    @if (conferenceControls.length) {
+        <div class="summary-card">
+            <div class="summary-card-head">
+                <h3>{{ 'registration.summary.conferences' | translate }}</h3>
+                <button-box (clickedEvent)="onEdit(1, 'card-conference')"
+                            primeIcon="pi-pencil"
+                            translateKey="registration.summary.edit"
+                            type="secondary"/>
+            </div>
+            @for (talk of conferenceControls; track $index) {
+                <div class="summary-subitem">
+                    <p class="summary-subitem-title">
+                        {{ 'registration.summary.conferenceItem' | translate: {index: $index + 1} }}
+                    </p>
+                    <dl class="summary-list">
+                        <div class="summary-row">
+                            <dt>{{ 'registration.services.talkTitle' | translate }}</dt>
+                            <dd>{{ talk.controls.title.value }}</dd>
+                        </div>
+                        <div class="summary-row">
+                            <dt>{{ 'registration.services.talkDescription' | translate }}</dt>
+                            <dd>{{ talk.controls.description.value }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            }
+        </div>
+    }
+
+    @if (workshopControls.length) {
+        <div class="summary-card">
+            <div class="summary-card-head">
+                <h3>{{ 'registration.summary.workshops' | translate }}</h3>
+                <button-box (clickedEvent)="onEdit(1, 'card-workshop')"
+                            primeIcon="pi-pencil"
+                            translateKey="registration.summary.edit"
+                            type="secondary"/>
+            </div>
+            @for (talk of workshopControls; track $index) {
+                <div class="summary-subitem">
+                    <p class="summary-subitem-title">
+                        {{ 'registration.summary.workshopItem' | translate: {index: $index + 1} }}
+                    </p>
+                    <dl class="summary-list">
+                        <div class="summary-row">
+                            <dt>{{ 'registration.services.talkTitle' | translate }}</dt>
+                            <dd>{{ talk.controls.title.value }}</dd>
+                        </div>
+                        <div class="summary-row">
+                            <dt>{{ 'registration.services.talkDescription' | translate }}</dt>
+                            <dd>{{ talk.controls.description.value }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="summary-card">
+        <div class="summary-card-head">
+            <h3>{{ 'registration.steps.participation' | translate }}</h3>
+            <button-box (clickedEvent)="onEdit(2)"
+                        primeIcon="pi-pencil"
+                        translateKey="registration.summary.edit"
+                        type="secondary"/>
+        </div>
+        <dl class="summary-list">
+            @if (participation.nbMeal1) {
+                <div class="summary-row">
+                    <dt>{{ 'participation.nbMeal1' | translate }}</dt>
+                    <dd>{{ participation.nbMeal1 }}</dd>
+                </div>
+            }
+            @if (participation.nbMeal2) {
+                <div class="summary-row">
+                    <dt>{{ 'participation.nbMeal2' | translate }}</dt>
+                    <dd>{{ participation.nbMeal2 }}</dd>
+                </div>
+            }
+            @if (participation.nbMeal3) {
+                <div class="summary-row">
+                    <dt>{{ 'participation.nbMeal3' | translate }}</dt>
+                    <dd>{{ participation.nbMeal3 }}</dd>
+                </div>
+            }
+            @if (totalMeals > 0 && participation.modePaymentMeals) {
+                <div class="summary-row">
+                    <dt>{{ 'participation.modePaymentMeals.label' | translate }}</dt>
+                    <dd>{{ formatterModePaymentMeals(participation.modePaymentMeals) | translate }}</dd>
+                </div>
+            }
+            <div class="summary-row">
+                <dt>{{ 'participation.invoiceSendingMethod.label' | translate }}</dt>
+                <dd>{{ formatterInvoiceMethod(participation.invoiceSendingMethod) | translate }}</dd>
+            </div>
+            @if (participation.hasOffer) {
+                <div class="summary-row">
+                    <dt>{{ 'participation.offer' | translate }}</dt>
+                    <dd>{{ participation.offer }}</dd>
+                </div>
+            }
+            @if (participation.additionnalInformation) {
+                <div class="summary-row">
+                    <dt>{{ 'participation.additionnalInformation' | translate }}</dt>
+                    <dd>{{ participation.additionnalInformation }}</dd>
+                </div>
+            }
+        </dl>
+    </div>
+
+    @if (costEstimate; as cost) {
+        @if (cost.lines.length) {
+            <div class="summary-card">
+                <h3>{{ 'registration.price.estimatedCost' | translate }}</h3>
+                <div class="mt-3">
+                    @for (line of cost.lines; track line.labelKey) {
+                        <div class="summary-cost-row">
+                            <span class="summary-cost-label">
+                                <span>{{ line.labelKey | translate: line.labelParams }}</span>
+                                @if (line.quantity > 1) {
+                                    <span class="summary-cost-detail">
+                                        {{ 'registration.price.quantity' | translate: {quantity: line.quantity} }}
+                                        · {{ price(line.unitPrice) }}
+                                    </span>
+                                }
+                            </span>
+                            <span class="summary-cost-amount">{{ price(line.total) }}</span>
+                        </div>
+                    }
+                </div>
+                <div class="summary-cost-total">
+                    <span>{{ 'registration.price.total' | translate }}</span>
+                    <span class="summary-cost-amount">{{ price(cost.total) }}</span>
+                </div>
+                <p class="summary-cost-disclaimer">{{ 'registration.price.disclaimer' | translate }}</p>
+            </div>
+        }
+    }
+
+    <div class="summary-card" [formGroup]="consentsForm">
+        <h3>{{ 'registration.summary.consents' | translate }}</h3>
+        <div class="mt-3">
+            <checkbox-box fieldName="acceptedChart"
+                          formControlName="acceptedChart"
+                          translateKey="registration.summary.acceptChart"/>
+        </div>
+        <div class="mt-3">
+            <checkbox-box fieldName="acceptedContract"
+                          formControlName="acceptedContract"
+                          translateKey="registration.summary.acceptContract"/>
+        </div>
+        @if (consentsForm.invalid && consentsForm.touched) {
+            <p class="registration-error">{{ 'registration.errors.consentRequired' | translate }}</p>
+        }
+    </div>
+</section>

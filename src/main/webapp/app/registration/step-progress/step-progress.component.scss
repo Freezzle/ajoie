@@ -1,0 +1,127 @@
+.step-progress {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--p-surface-0, #fff) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--p-surface-200, #e7e0d6);
+  padding: 0.75rem 1rem 0.5rem;
+
+  .step-progress-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 660px;
+  }
+
+  .step-progress-item {
+    min-width: 0;
+  }
+
+  .step-progress-segment {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0.25rem 0;
+    text-align: left;
+    cursor: pointer;
+    color: var(--p-text-muted-color, #6b655d);
+
+    &:focus-visible {
+      outline: 2px solid var(--p-primary-color);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+
+    &.is-current {
+      color: var(--p-primary-color);
+      font-weight: 600;
+    }
+
+    &.is-done {
+      color: var(--p-text-color, #1f1d1a);
+    }
+  }
+
+  .step-progress-title {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .step-progress-check {
+    margin-right: 0.2rem;
+  }
+
+  .step-progress-rail {
+    display: block;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--p-surface-200, #e7e0d6);
+    overflow: hidden;
+  }
+
+  .step-progress-rail-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--p-primary-color);
+    transition: width 250ms ease;
+  }
+
+  .is-warn .step-progress-rail-fill {
+    background: repeating-linear-gradient(
+                    45deg,
+                    color-mix(in srgb, var(--p-primary-color) 35%, white) 0 6px,
+                    color-mix(in srgb, var(--p-primary-color) 15%, white) 6px 12px
+    );
+  }
+
+  .step-progress-state {
+    font-size: 0.72rem;
+  }
+
+  .step-progress-mobile-summary {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .step-progress {
+    padding: 0.5rem 0.75rem 0.4rem;
+
+    .step-progress-list {
+      gap: 0.4rem;
+    }
+
+    .step-progress-title {
+      font-size: 11px;
+    }
+
+    .step-progress-state {
+      display: none;
+    }
+
+    .step-progress-mobile-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--p-text-muted-color, #6b655d);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-progress .step-progress-rail-fill {
+    transition: none;
+  }
+}

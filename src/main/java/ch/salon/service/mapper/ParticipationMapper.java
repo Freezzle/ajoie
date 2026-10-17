@@ -14,6 +14,7 @@ public interface ParticipationMapper {
     ParticipationDTO toDto(Participation participation);
 
     @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "registrationToken", ignore = true)
     Participation toEntity(ParticipationDTO participation);
 
     ParticipationLightDTO toLightDto(Participation participation);

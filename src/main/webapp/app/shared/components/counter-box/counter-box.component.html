@@ -1,0 +1,36 @@
+<div class="counter-box">
+    @if (translateKey) {
+        <div class="counter-box-labels">
+            <label class="counter-box-label" [for]="'field_' + fieldName">{{ translateKey | translate }}</label>
+            @if (hint) {
+                <small class="counter-box-hint">{{ hint }}</small>
+            }
+        </div>
+    }
+    <div class="counter-box-controls">
+        <button type="button"
+                class="counter-box-button"
+                [disabled]="disabled || value <= minValue"
+                [attr.aria-label]="'registration.counter.decrease' | translate"
+                (click)="decrement()">−
+        </button>
+        <input [id]="'field_' + fieldName"
+               class="counter-box-value"
+               type="number"
+               inputmode="numeric"
+               [min]="minValue"
+               [max]="maxValue"
+               [value]="value"
+               [disabled]="disabled"
+               (input)="onInput($event)"/>
+        <button type="button"
+                class="counter-box-button"
+                [disabled]="disabled || value >= maxValue"
+                [attr.aria-label]="'registration.counter.increase' | translate"
+                (click)="increment()">+
+        </button>
+    </div>
+</div>
+@if (control && control.errors) {
+    <error-box [formControlElement]="control"/>
+}

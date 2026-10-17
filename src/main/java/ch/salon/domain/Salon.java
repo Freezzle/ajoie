@@ -68,6 +68,15 @@ public class Salon implements Serializable, TenantOwned {
     @Column(name = "archived", nullable = false)
     private boolean archived = false;
 
+    @Column(name = "registration_enabled", nullable = false)
+    private boolean registrationEnabled = false;
+
+    @Column(name = "registration_opening_date")
+    private Instant registrationOpeningDate;
+
+    @Column(name = "registration_closing_date")
+    private Instant registrationClosingDate;
+
     @Column(name = "source_salon_id")
     private UUID sourceSalonId;
 

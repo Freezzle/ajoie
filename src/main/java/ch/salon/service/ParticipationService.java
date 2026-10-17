@@ -122,6 +122,9 @@ public class ParticipationService {
         }
 
         participation.setClientNumber(existingParticipation.getClientNumber());
+        // Champs gérés uniquement par l'inscription publique : ne jamais les perdre lors d'une mise à jour admin
+        participation.setRegistrationToken(existingParticipation.getRegistrationToken());
+        participation.setPublicRegistration(existingParticipation.isPublicRegistration());
 
         if (Participation.diffArrangement(participation, existingParticipation)) {
             if (participation.getNeedArrangement()) {

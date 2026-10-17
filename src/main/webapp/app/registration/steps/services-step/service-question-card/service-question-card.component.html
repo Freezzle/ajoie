@@ -1,0 +1,28 @@
+<div class="service-card" [class.is-open]="answer === true">
+    <div class="service-card-head">
+        <div class="service-card-question" [id]="'question_' + name">
+            <i class="pi {{ icon }}" aria-hidden="true"></i>
+            <span>{{ questionKey | translate }}</span>
+        </div>
+        <div class="service-card-answers" role="radiogroup" [attr.aria-labelledby]="'question_' + name">
+            <label class="service-card-answer" [class.selected]="answer === true">
+                <input type="radio" [name]="name" [checked]="answer === true" (change)="select(true)"/>
+                <span>{{ 'registration.services.yes' | translate }}</span>
+            </label>
+            <label class="service-card-answer" [class.selected]="answer === false">
+                <input type="radio" [name]="name" [checked]="answer === false" (change)="select(false)"/>
+                <span>{{ 'registration.services.no' | translate }}</span>
+            </label>
+        </div>
+    </div>
+
+    @if (showError && answer === null) {
+        <p class="service-card-error">{{ 'registration.errors.answerRequired' | translate }}</p>
+    }
+
+    @if (answer === true) {
+        <div class="service-card-body">
+            <ng-content></ng-content>
+        </div>
+    }
+</div>

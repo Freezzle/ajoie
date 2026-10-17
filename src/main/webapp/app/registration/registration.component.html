@@ -1,0 +1,105 @@
+<div class="registration-page">
+    @if (loading()) {
+        <div class="registration-shell">
+            <p>{{ 'registration.loading' | translate }}</p>
+        </div>
+    } @else if (loadError(); as error) {
+        <div class="registration-shell">
+            <h1 class="registration-title">{{ 'registration.errors.unavailableTitle' | translate }}</h1>
+            <p>{{ error | translate }}</p>
+        </div>
+    } @else if (!registrationOpen) {
+        <div class="registration-shell">
+            <h1 class="registration-title">{{ 'registration.closed.title' | translate }}</h1>
+            <p>
+                @switch (salonInfo()?.closedReason) {
+                    @case ('NOT_YET_OPEN') {
+                        {{ 'registration.closed.notYetOpen' | translate }}
+                    }
+                    @case ('CLOSED') {
+                        {{ 'registration.closed.over' | translate }}
+                    }
+                    @default {
+                        {{ 'registration.closed.disabled' | translate }}
+                    }
+                }
+            </p>
+        </div>
+    } @else if (submitted()) {
+        <div class="registration-shell registration-done">
+            <div class="registration-done-icon" aria-hidden="true">✓</div>
+            <h1 class="registration-title">
+                {{ 'registration.done.thanks' | translate: {firstName: confirmedFirstName()} }}
+            </h1>
+            <p>{{ 'registration.done.message' | translate: {email: confirmedEmail()} }}</p>
+            <p>{{ 'registration.done.editHint' | translate }}</p>
+        </div>
+    } @else {
+        <app-step-progress [current]="currentStep()"
+                           [progress]="stepProgress()"
+                           [states]="stepStates()"
+                           [steps]="steps"
+                           (stepClick)="onStepClick($event)"/>
+
+        <form class="registration-shell" novalidate [formGroup]="form" (ngSubmit)="$event.preventDefault()">
+            <header class="registration-header">
+                <h1 class="registration-title" tabindex="-1" #stepTitle>
+                    {{ 'registration.titles.' + steps[currentStep()].key | translate }}
+                </h1>
+                <p class="registration-intro">
+                    {{ 'registration.intros.' + steps[currentStep()].key | translate: {place: salonInfo()?.place ?? ''} }}
+                </p>
+            </header>
+
+            <div class="registration-step">
+                @switch (currentStep()) {
+                    @case (0) {
+                        <app-exhibitor-step [emailReadOnly]="editMode()" [form]="form.controls.exhibitor"/>
+                    }
+                    @case (1) {
+                        <app-services-step [dimensions]="dimensions"
+                                           [form]="form.controls.services"
+                                           [prices]="prices"
+                                           [showErrors]="showStepErrors()"/>
+                    }
+                    @case (2) {
+                        <app-participation-step [form]="form.controls.participation" [prices]="prices"/>
+                    }
+                    @default {
+                        <app-summary-step [consentsForm]="form.controls.consents"
+                                          [dimensions]="dimensions"
+                                          [exhibitorForm]="form.controls.exhibitor"
+                                          [participationForm]="form.controls.participation"
+                                          [prices]="prices"
+                                          [servicesForm]="form.controls.services"
+                                          (editStep)="onEditFromSummary($event)"/>
+
+                        @if (captchaEnabled() && captchaSiteKey()) {
+                            <div class="registration-captcha">
+                                <app-turnstile-box [siteKey]="captchaSiteKey()"
+                                                   (tokenChange)="onCaptchaToken($event)"/>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+
+            <div class="registration-actions">
+                @if (currentStep() > 0) {
+                    <button-box (clickedEvent)="previous()"
+                                [isDisabled]="submitting()"
+                                [showText]="true"
+                                class="registration-actions-previous"
+                                primeIcon="pi-arrow-left"
+                                translateKey="registration.actions.previous"
+                                type="secondary"/>
+                }
+                <button-box (clickedEvent)="next()"
+                            [isDisabled]="submitting()"
+                            [loading]="submitting()"
+                            class="registration-actions-next"
+                            translateKey="{{ isLastStep() ? 'registration.actions.submit' : 'registration.actions.continue' }}"/>
+            </div>
+        </form>
+    }
+</div>

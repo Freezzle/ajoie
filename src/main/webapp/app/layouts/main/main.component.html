@@ -1,21 +1,27 @@
-<div class="app-layout">
-    <!-- Top navbar -->
-    <app-topbar></app-topbar>
+<div class="app-layout" [class.app-layout-public]="isPublicLayout()">
+    @if (!isPublicLayout()) {
+        <!-- Top navbar -->
+        <app-topbar></app-topbar>
+    }
 
     <!-- Global Alert Toast -->
     <app-alert></app-alert>
 
     <div class="app-layout-body">
-        <!-- Sidebar injected via named router-outlet -->
-        <router-outlet name="navbar"></router-outlet>
+        @if (!isPublicLayout()) {
+            <!-- Sidebar injected via named router-outlet -->
+            <router-outlet name="navbar"></router-outlet>
+        }
 
         <!-- Main content card -->
-        <div [class.inDevelopement]="inDevelopementMode()" class="main-content">
-            <div>
-                <router-outlet></router-outlet>
+        @if (isPublicLayout()) {
+            <router-outlet></router-outlet>
+        } @else {
+            <div [class.inDevelopement]="inDevelopementMode()" class="main-content">
+                <div>
+                    <router-outlet></router-outlet>
+                </div>
             </div>
-        </div>
+        }
     </div>
 </div>
-
-

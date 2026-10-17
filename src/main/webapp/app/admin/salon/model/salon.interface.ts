@@ -20,6 +20,9 @@ export interface ISalon {
     bankAccount: IBankAccount;
     priceStandSalons: IPriceStandSalon[];
     archived: boolean;
+    registrationEnabled: boolean;
+    registrationOpeningDate: Date | null;
+    registrationClosingDate: Date | null;
     sourceSalonId?: string | null;
 }
 

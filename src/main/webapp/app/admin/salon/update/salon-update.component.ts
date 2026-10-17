@@ -19,6 +19,7 @@ import {NumberBoxComponent} from '../../../shared/components/number-box/number-b
 import {TableModule} from 'primeng/table';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {AddressFormComponent} from '../../../shared/components/address-form/address-form.component';
 import {BankAccountFormComponent} from '../../../shared/components/bank-account-form/bank-account-form.component';
@@ -31,6 +32,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
+import {AlertService} from '../../../core/util/alert.service';
 @Component({
                selector: 'app-salon-update',
                templateUrl: './salon-update.component.html',
@@ -49,6 +51,7 @@ import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog
                    TableModule,
                    ConfirmPopup,
                    CardComponent,
+                   CheckboxBoxComponent,
                    ContentPageComponent,
                    AddressFormComponent,
                    BankAccountFormComponent,
@@ -73,8 +76,24 @@ export class SalonUpdateComponent implements OnInit {
     private readonly translateService = inject(TranslateService);
     private readonly modalService = inject(NgbModal);
     private readonly confirmDialogService = inject(ConfirmDialogService);
+    private readonly alertService = inject(AlertService);
     get priceStandSalons(): FormArray<FormGroup<PriceStandGroup>> {
         return this.editForm.controls.priceStandSalons;
+    }
+
+    get registrationLink(): string {
+        const salonId = this.editForm.controls.id.value;
+        return salonId ? `${window.location.origin}/inscription/${salonId}` : '';
+    }
+
+    copyRegistrationLink(): void {
+        const link = this.registrationLink;
+        if (!link) {
+            return;
+        }
+        navigator.clipboard.writeText(link).then(
+            () => this.alertService.addAlert({type: 'success', translationKey: 'salon.registration.linkCopied'}),
+            () => this.alertService.addAlert({type: 'danger', translationKey: 'salon.registration.linkCopyFailed'}));
     }
     ngOnInit(): void {
         this.activateReadOnlyMode(false);

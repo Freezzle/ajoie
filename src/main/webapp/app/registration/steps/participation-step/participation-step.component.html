@@ -1,0 +1,67 @@
+<section [formGroup]="form">
+    <div class="registration-section">
+        <h3 class="registration-subtitle">{{ 'registration.participation.mealsTitle' | translate }}</h3>
+        <p class="registration-help">{{ 'registration.participation.mealsHelp' | translate }}</p>
+
+        <div class="registration-meal">
+            <counter-box [hint]="mealHint(prices?.priceMeal1)"
+                         fieldName="nbMeal1"
+                         formControlName="nbMeal1"
+                         translateKey="participation.nbMeal1"/>
+        </div>
+        <div class="registration-meal">
+            <counter-box [hint]="mealHint(prices?.priceMeal2)"
+                         fieldName="nbMeal2"
+                         formControlName="nbMeal2"
+                         translateKey="participation.nbMeal2"/>
+        </div>
+        <div class="registration-meal">
+            <counter-box [hint]="mealHint(prices?.priceMeal3)"
+                         fieldName="nbMeal3"
+                         formControlName="nbMeal3"
+                         translateKey="participation.nbMeal3"/>
+        </div>
+
+        @if (totalMeals > 0) {
+            <div class="mt-4 registration-reveal">
+                <radio-box [formatterFunction]="formatterModePaymentMeals"
+                           [options]="modePaymentMealsValues"
+                           fieldName="modePaymentMeals"
+                           formControlName="modePaymentMeals"
+                           translateKey="participation.modePaymentMeals.label"/>
+            </div>
+        }
+    </div>
+
+    <div class="registration-section">
+        <h3 class="registration-subtitle">{{ 'participation.invoiceSendingMethod.label' | translate }}</h3>
+        <radio-box [formatterFunction]="formatterInvoiceMethod"
+                   [hintFunction]="invoiceMethodHint"
+                   [options]="invoiceSendingMethodValues"
+                   fieldName="invoiceSendingMethod"
+                   formControlName="invoiceSendingMethod"/>
+    </div>
+
+    <div class="registration-section">
+        <h3 class="registration-subtitle">{{ 'registration.participation.offerTitle' | translate }}</h3>
+        <checkbox-box fieldName="hasOffer" formControlName="hasOffer" translateKey="participation.hasOffer"/>
+
+        @if (form.controls.hasOffer.value) {
+            <div class="mt-4 registration-reveal">
+                <text-box [maxLength]="500"
+                          fieldName="offer"
+                          formControlName="offer"
+                          translateKey="participation.offer"/>
+            </div>
+        }
+    </div>
+
+    <div class="mt-4">
+        <textarea-box [maxLength]="1000"
+                      [rows]="4"
+                      [showCounter]="true"
+                      fieldName="additionnalInformation"
+                      formControlName="additionnalInformation"
+                      translateKey="participation.additionnalInformation"/>
+    </div>
+</section>

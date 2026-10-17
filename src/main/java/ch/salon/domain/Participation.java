@@ -101,6 +101,13 @@ public class Participation implements Serializable, TenantOwned {
     @Column(name = "rating_service_quality")
     private Double ratingServiceQuality;
 
+    @Column(name = "registration_token", length = 64)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private String registrationToken;
+
+    @Column(name = "public_registration", nullable = false)
+    private boolean publicRegistration = false;
+
     public static boolean diffMeal(int indexMeal, Participation part1, Participation part2) {
         if (part1 == null && part2 != null) {
             return true;

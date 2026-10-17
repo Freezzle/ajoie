@@ -24,6 +24,21 @@
     "idnotfound": "ID cannot be found",
     "idnull": "Identifiant invalide",
     "internalServerError": "Erreur interne du serveur",
+    "registration": {
+      "salon-not-found": "Cet évènement est introuvable. Vérifiez le lien reçu.",
+      "closed": "Les inscriptions ne sont pas ouvertes pour cet évènement.",
+      "already-registered": "Une inscription existe déjà pour cette adresse e-mail sur cet évènement.",
+      "not-editable": "Votre inscription est déjà en cours de traitement et ne peut plus être modifiée.",
+      "link-invalid": "Ce lien de modification n'est plus valide.",
+      "dimension-invalid": "La dimension de stand sélectionnée n'est pas disponible.",
+      "no-service": "Choisissez au moins une prestation.",
+      "too-many-stands": "Un seul stand peut être demandé.",
+      "meal-payment-required": "Choisissez comment régler vos repas.",
+      "offer-required": "Merci de décrire votre offre.",
+      "billing-address-required": "Merci de renseigner l'adresse de facturation.",
+      "captcha-invalid": "La vérification anti-robot a échoué. Merci de réessayer.",
+      "rate-limited": "Trop de tentatives. Merci de réessayer dans quelques minutes."
+    },
     "server.not.reachable": "Serveur inaccessible",
     "url.not.found": "Non trouvé",
     "userexists": "Login déjà utilisé !"

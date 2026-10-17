@@ -36,6 +36,8 @@ import static ch.salon.domain.enumeration.Type.POSTAL_FEE;
 public class InvoicingPlanService {
 
     public static final String ENTITY_NAME = "invoicingPlan";
+    /** Frais fixes facturés lorsque la facture est envoyée par la poste. */
+    public static final double POSTAL_FEE_AMOUNT = 3.00;
     private final EventLogService eventLogService;
 
     private final InvoicingPlanRepository repository;
@@ -260,8 +262,8 @@ public class InvoicingPlanService {
             postalFee.setType(POSTAL_FEE);
             postalFee.setLabel(sub(messageSource.getMessage("invoice.sending-postal.label", null, Locale.FRENCH)));
             postalFee.setQuantity(1L);
-            postalFee.setDefaultAmount(3.00);
-            postalFee.setCustomAmount(3.00);
+            postalFee.setDefaultAmount(POSTAL_FEE_AMOUNT);
+            postalFee.setCustomAmount(POSTAL_FEE_AMOUNT);
 
             plan.getInvoices().add(postalFee);
         } else if (plan.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {

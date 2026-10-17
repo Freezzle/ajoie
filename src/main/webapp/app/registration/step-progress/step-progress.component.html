@@ -1,0 +1,36 @@
+<nav class="step-progress" [attr.aria-label]="'registration.step.navLabel' | translate">
+    <ul class="step-progress-list">
+        @for (step of steps; track step.key; let i = $index) {
+            <li class="step-progress-item">
+                <button type="button"
+                        class="step-progress-segment"
+                        [class.is-current]="states[i] === 'cur'"
+                        [class.is-done]="states[i] === 'done'"
+                        [class.is-warn]="states[i] === 'warn'"
+                        [attr.aria-current]="states[i] === 'cur' ? 'step' : null"
+                        [attr.aria-label]="('registration.step.aria' | translate: {
+                            index: i + 1,
+                            total: steps.length,
+                            name: (step.labelKey | translate),
+                            state: (stateKey(i) | translate)
+                        })"
+                        (click)="onClick(i)">
+                    <span class="step-progress-title">
+                        @if (states[i] === 'done') {
+                            <span aria-hidden="true" class="step-progress-check">✓</span>
+                        }
+                        {{ step.shortLabelKey | translate }}
+                    </span>
+                    <span aria-hidden="true" class="step-progress-rail">
+                        <span class="step-progress-rail-fill" [style.width.%]="railWidth(i)"></span>
+                    </span>
+                    <span aria-hidden="true" class="step-progress-state">{{ stateKey(i) | translate }}</span>
+                </button>
+            </li>
+        }
+    </ul>
+    <div class="step-progress-mobile-summary" aria-hidden="true">
+        <span>{{ 'registration.step.counter' | translate: {index: current + 1, total: steps.length} }}</span>
+        <strong>{{ steps[current]?.labelKey ?? '' | translate }}</strong>
+    </div>
+</nav>

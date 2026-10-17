@@ -167,6 +167,18 @@ public class SalonProperties {
         private final SalonProperties.Security.Authentication authentication = new SalonProperties.Security.Authentication();
         private final SalonProperties.Security.RememberMe rememberMe = new SalonProperties.Security.RememberMe();
         private final SalonProperties.Security.OAuth2 oauth2 = new SalonProperties.Security.OAuth2();
+        private final SalonProperties.Security.Captcha captcha = new SalonProperties.Security.Captcha();
+
+        /**
+         * Configuration du captcha Cloudflare Turnstile utilisé par le formulaire public d'inscription.
+         */
+        @Data
+        public static class Captcha {
+            private boolean enabled = false;
+            private String siteKey = "";
+            private String secretKey = "";
+            private String verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+        }
 
         @Data
         public static class ClientAuthorization {

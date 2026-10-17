@@ -36,4 +36,5 @@ public class ParticipationDTO implements Serializable {
     private Double ratingFriendliness;
     private Double ratingPaymentSpeed;
     private Double ratingServiceQuality;
+    private boolean publicRegistration;
 }

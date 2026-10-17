@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const path = require('path');
+const dns = require('dns');
+const net = require('net');
 const { hashElement } = require('folder-hash');
 const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
@@ -11,6 +13,13 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 
 const environment = require('./environment');
 const proxyConfig = require('./proxy.conf');
+
+// Node >= 18 resolves `localhost` to both ::1 and 127.0.0.1 and connects with "Happy Eyeballs"
+// (autoSelectFamily). When every attempt fails, Node raises an AggregateError with an empty
+// message and no `code`, which browser-sync's port scanner mistakes for a fatal error: it then
+// kills `ng serve` printing only "AggregateError". Force IPv4-only resolution for localhost.
+dns.setDefaultResultOrder('ipv4first');
+net.setDefaultAutoSelectFamily(false);
 
 module.exports = async (config, options, targetOptions) => {
   const languagesHash = await hashElement(path.resolve(__dirname, '../src/main/webapp/i18n'), {

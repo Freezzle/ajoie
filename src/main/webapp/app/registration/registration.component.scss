@@ -1,0 +1,114 @@
+@use './registration-shared';
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.registration-page {
+  min-height: 100dvh;
+  background: var(--p-surface-50, #fbfaf7);
+  padding-bottom: 2rem;
+}
+
+.registration-shell {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 2rem 1rem 1rem;
+}
+
+.registration-header {
+  margin-bottom: 1.5rem;
+}
+
+.registration-title {
+  font-size: 1.9rem;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+}
+
+.registration-intro {
+  color: var(--p-text-muted-color, #6b655d);
+  margin: 0;
+}
+
+.registration-captcha {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.registration-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.registration-done {
+  text-align: center;
+  padding-top: 4rem;
+
+  .registration-done-icon {
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    font-size: 2rem;
+    color: var(--p-primary-contrast-color, #fff);
+    background: var(--p-primary-color);
+  }
+}
+
+// Champs : taille minimale de 16px pour éviter le zoom automatique iOS
+:host ::ng-deep input,
+:host ::ng-deep textarea,
+:host ::ng-deep .p-select-label {
+  font-size: 16px;
+}
+
+@media (max-width: 700px) {
+  .registration-shell {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .registration-title {
+    font-size: 1.5rem;
+  }
+
+  .registration-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 15;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--p-surface-0, #fff) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--p-surface-200, #e7e0d6);
+
+    .registration-actions-previous {
+      flex: 0 0 50px;
+    }
+
+    .registration-actions-next {
+      flex: 1 1 auto;
+      min-width: 0;
+
+      ::ng-deep .p-button {
+        width: 100%;
+      }
+    }
+  }
+}

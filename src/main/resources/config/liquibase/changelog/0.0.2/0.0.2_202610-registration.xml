@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Pilotage des inscriptions publiques sur un salon -->
+    <changeSet id="0.0.2-202610-salon-registration" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon"/>
+        </preConditions>
+
+        <addColumn tableName="salon">
+            <column name="registration_enabled" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_opening_date" type="timestamp"/>
+            <column name="registration_closing_date" type="timestamp"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="salon" columnName="registration_enabled"/>
+            <dropColumn tableName="salon" columnName="registration_opening_date"/>
+            <dropColumn tableName="salon" columnName="registration_closing_date"/>
+        </rollback>
+    </changeSet>
+
+    <!-- Jeton de modification d'une inscription publique -->
+    <changeSet id="0.0.2-202610-participation-registration-token" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="participation"/>
+        </preConditions>
+
+        <addColumn tableName="participation">
+            <column name="registration_token" type="varchar(64)"/>
+            <column name="public_registration" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <createIndex indexName="ux_participation_registration_token" tableName="participation" unique="true">
+            <column name="registration_token"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex indexName="ux_participation_registration_token" tableName="participation"/>
+            <dropColumn tableName="participation" columnName="registration_token"/>
+            <dropColumn tableName="participation" columnName="public_registration"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

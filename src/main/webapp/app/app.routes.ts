@@ -37,6 +37,10 @@ const routes: Routes = [
         component: LoginComponent,
         title: 'login.title'
     },
+    {
+        path: 'inscription',
+        loadChildren: () => import('./registration/registration.routes')
+    },
     ...errorRoute
 ];
 

@@ -26,6 +26,15 @@
     "priceWorkshop": "Atelier",
     "prices": "Configuration des prix",
     "referenceNumber": "N° de référence",
+    "registration": {
+      "title": "Inscriptions en ligne",
+      "enabled": "Inscriptions ouvertes",
+      "openingDate": "Ouverture des inscriptions",
+      "closingDate": "Fermeture des inscriptions",
+      "copyLink": "Copier le lien d'inscription",
+      "linkCopied": "Lien d'inscription copié",
+      "linkCopyFailed": "Impossible de copier le lien"
+    },
     "stands": "Les stands",
     "startingDate": "Date de début",
     "statistiques": "Statistiques du salon",

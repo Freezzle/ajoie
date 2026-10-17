@@ -91,6 +91,43 @@
 
         <app-card>
             <div appCardHeader>
+                <h4>{{ 'salon.registration.title' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <div class="row">
+                    <div class="mt-4 col-12 col-lg-6">
+                        <checkbox-box fieldName="registrationEnabled"
+                                      formControlName="registrationEnabled"
+                                      translateKey="salon.registration.enabled"/>
+                    </div>
+                    <div class="mt-4 col-6 col-lg-3">
+                        <date-box fieldName="registrationOpeningDate"
+                                  formControlName="registrationOpeningDate"
+                                  translateKey="salon.registration.openingDate"/>
+                    </div>
+                    <div class="mt-4 col-6 col-lg-3">
+                        <date-box fieldName="registrationClosingDate"
+                                  formControlName="registrationClosingDate"
+                                  translateKey="salon.registration.closingDate"/>
+                    </div>
+                    @if (editForm.controls.id.value) {
+                        <div class="mt-4 col-12">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <code class="flex-grow-1">{{ registrationLink }}</code>
+                                <button-box (clickedEvent)="copyRegistrationLink()"
+                                            [showText]="true"
+                                            primeIcon="pi-copy"
+                                            translateKey="salon.registration.copyLink"
+                                            type="secondary"/>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </app-card>
+
+        <app-card>
+            <div appCardHeader>
                 <h4>{{ 'salon.headquartersAddress' | translate }}</h4>
             </div>
             <div appCardBody>

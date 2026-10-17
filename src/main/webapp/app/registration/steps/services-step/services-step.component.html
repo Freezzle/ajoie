@@ -1,0 +1,177 @@
+<section [formGroup]="form">
+    <app-service-question-card [answer]="form.controls.wantStand.value"
+                               [showError]="showErrors"
+                               icon="pi-shop"
+                               id="card-stand"
+                               name="wantStand"
+                               questionKey="registration.services.standQuestion"
+                               (answerChange)="setAnswer('wantStand', $event)">
+        <div formGroupName="stand">
+            <div class="row">
+                <div class="mt-4 col-12">
+                    <textarea-box [maxLength]="500"
+                                  [rows]="5"
+                                  [showCounter]="true"
+                                  fieldName="standDescription"
+                                  formControlName="description"
+                                  translateKey="stand.description"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-6">
+                    <select-box [enableFilter]="true"
+                                [formatterFunction]="formatterDimension"
+                                [options]="dimensions"
+                                fieldName="dimension"
+                                filterFields="dimension"
+                                formControlName="dimension"
+                                translateKey="stand.dimension"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-6">
+                    <select-box [formatterFunction]="formatterCategory"
+                                [needTranslation]="true"
+                                [options]="categories"
+                                fieldName="category"
+                                formControlName="category"
+                                translateKey="stand.category.label"/>
+                </div>
+                <div class="mt-4 col-12">
+                    <chips-box fieldName="subCategories"
+                               formControlName="subCategories"
+                               translateKey="stand.subCategories"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-6">
+                    <counter-box fieldName="nbTable" formControlName="nbTable" translateKey="stand.nbTable"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-6">
+                    <counter-box fieldName="nbChair" formControlName="nbChair" translateKey="stand.nbChair"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-6">
+                    <checkbox-box fieldName="needElectricity"
+                                  formControlName="needElectricity"
+                                  translateKey="stand.needElectricity"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-6">
+                    <checkbox-box fieldName="shared" formControlName="shared" translateKey="stand.shared"/>
+                    @if (sharedStandHint) {
+                        <small class="registration-price-hint">{{ sharedStandHint }}</small>
+                    }
+                </div>
+            </div>
+
+            <h3 class="registration-subtitle">{{ 'stand.card.socialNetwork' | translate }}</h3>
+            <div class="row">
+                <div class="mt-4 col-12 col-lg-4">
+                    <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-4">
+                    <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
+                </div>
+                <div class="mt-4 col-12 col-lg-4">
+                    <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
+                </div>
+                <div class="mt-4 col-12">
+                    <text-box fieldName="urlPicture" formControlName="urlPicture" translateKey="stand.urlPicture"/>
+                </div>
+            </div>
+        </div>
+    </app-service-question-card>
+
+    <app-service-question-card [answer]="form.controls.wantConference.value"
+                               [showError]="showErrors"
+                               icon="pi-megaphone"
+                               id="card-conference"
+                               name="wantConference"
+                               questionKey="registration.services.conferenceQuestion"
+                               (answerChange)="setAnswer('wantConference', $event)">
+        <div formArrayName="conferences">
+            @if (conferenceHint) {
+                <small class="registration-price-hint">{{ conferenceHint }}</small>
+            }
+            @for (talk of form.controls.conferences.controls; track talk; let i = $index) {
+                <div [formGroupName]="i" class="registration-talk">
+                    <div class="row">
+                        <div class="mt-4 col-12">
+                            <text-box [maxLength]="500"
+                                      fieldName="conferenceTitle{{ i }}"
+                                      formControlName="title"
+                                      translateKey="registration.services.talkTitle"/>
+                        </div>
+                        <div class="mt-4 col-12">
+                            <textarea-box [maxLength]="500"
+                                          [rows]="4"
+                                          [showCounter]="true"
+                                          fieldName="conferenceDescription{{ i }}"
+                                          formControlName="description"
+                                          translateKey="registration.services.talkDescription"/>
+                        </div>
+                    </div>
+                    @if (form.controls.conferences.length > 1) {
+                        <div class="mt-3 text-end">
+                            <button-box (clickedEvent)="removeConference(i)"
+                                        primeIcon="pi-trash"
+                                        translateKey="registration.services.remove"
+                                        type="secondary"/>
+                        </div>
+                    }
+                </div>
+            }
+            <div class="mt-3">
+                <button-box (clickedEvent)="addConference()"
+                            primeIcon="pi-plus"
+                            translateKey="registration.services.addConference"
+                            type="secondary"/>
+            </div>
+        </div>
+    </app-service-question-card>
+
+    <app-service-question-card [answer]="form.controls.wantWorkshop.value"
+                               [showError]="showErrors"
+                               icon="pi-users"
+                               id="card-workshop"
+                               name="wantWorkshop"
+                               questionKey="registration.services.workshopQuestion"
+                               (answerChange)="setAnswer('wantWorkshop', $event)">
+        <div formArrayName="workshops">
+            @if (workshopHint) {
+                <small class="registration-price-hint">{{ workshopHint }}</small>
+            }
+            @for (talk of form.controls.workshops.controls; track talk; let i = $index) {
+                <div [formGroupName]="i" class="registration-talk">
+                    <div class="row">
+                        <div class="mt-4 col-12">
+                            <text-box [maxLength]="500"
+                                      fieldName="workshopTitle{{ i }}"
+                                      formControlName="title"
+                                      translateKey="registration.services.talkTitle"/>
+                        </div>
+                        <div class="mt-4 col-12">
+                            <textarea-box [maxLength]="500"
+                                          [rows]="4"
+                                          [showCounter]="true"
+                                          fieldName="workshopDescription{{ i }}"
+                                          formControlName="description"
+                                          translateKey="registration.services.talkDescription"/>
+                        </div>
+                    </div>
+                    @if (form.controls.workshops.length > 1) {
+                        <div class="mt-3 text-end">
+                            <button-box (clickedEvent)="removeWorkshop(i)"
+                                        primeIcon="pi-trash"
+                                        translateKey="registration.services.remove"
+                                        type="secondary"/>
+                        </div>
+                    }
+                </div>
+            }
+            <div class="mt-3">
+                <button-box (clickedEvent)="addWorkshop()"
+                            primeIcon="pi-plus"
+                            translateKey="registration.services.addWorkshop"
+                            type="secondary"/>
+            </div>
+        </div>
+    </app-service-question-card>
+
+    @if (showErrors && form.errors?.['noServiceChosen']) {
+        <p class="registration-error">{{ 'registration.errors.noService' | translate }}</p>
+    }
+</section>

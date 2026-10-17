@@ -1,0 +1,55 @@
+<section [formGroup]="form">
+    <div class="row">
+        <div class="mt-4 col-12 col-lg-6">
+            <text-box fieldName="firstName" formControlName="firstName" translateKey="exhibitor.firstName"/>
+        </div>
+        <div class="mt-4 col-12 col-lg-6">
+            <text-box fieldName="lastName" formControlName="lastName" translateKey="exhibitor.lastName"/>
+        </div>
+        <div class="mt-4 col-12">
+            <text-box fieldName="therapistName"
+                      formControlName="therapistName"
+                      translateKey="exhibitor.therapistName"/>
+            <small class="registration-help">{{ 'registration.exhibitor.therapistNameHelp' | translate }}</small>
+        </div>
+        <div class="mt-4 col-12 col-lg-6">
+            <text-box fieldName="email" formControlName="email" translateKey="exhibitor.email"/>
+            @if (emailReadOnly) {
+                <small class="registration-help">{{ 'registration.exhibitor.emailLocked' | translate }}</small>
+            }
+        </div>
+        <div class="mt-4 col-12 col-lg-6">
+            <text-box fieldName="phoneNumber" formControlName="phoneNumber" translateKey="exhibitor.phoneNumber"/>
+        </div>
+    </div>
+
+    <h3 class="registration-subtitle">{{ 'exhibitor.homeAddress' | translate }}</h3>
+    <app-address-form [required]="true" [showFormalFields]="false" formControlName="homeAddress"/>
+
+    <div class="mt-4">
+        <checkbox-box fieldName="differentBillingAddress"
+                      formControlName="differentBillingAddress"
+                      translateKey="exhibitor.differentBillingAddress"/>
+    </div>
+
+    @if (form.controls.differentBillingAddress.value) {
+        <div class="registration-reveal">
+            <h3 class="registration-subtitle">{{ 'exhibitor.billingAddress' | translate }}</h3>
+            <app-address-form [required]="true" [showFormalFields]="true" formControlName="billingAddress"/>
+        </div>
+    }
+
+    <div class="row">
+        <div class="mt-4 col-12 col-lg-6">
+            <select-box [formatterFunction]="formatterLanguage"
+                        [needTranslation]="true"
+                        [options]="languages"
+                        fieldName="language"
+                        formControlName="language"
+                        translateKey="exhibitor.language.list.label"/>
+        </div>
+        <div class="mt-4 col-12 col-lg-6">
+            <checkbox-box fieldName="newsletter" formControlName="newsletter" translateKey="exhibitor.newsletter"/>
+        </div>
+    </div>
+</section>

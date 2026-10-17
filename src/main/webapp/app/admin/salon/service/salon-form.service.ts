@@ -28,6 +28,9 @@ export type SalonFormGroup = {
     priceSharingStand: FormControl<ISalon['priceSharingStand'] | null>;
     priceStandSalons: FormArray<FormGroup<PriceStandGroup>>;
     extraInformation: FormControl<ISalon['extraInformation'] | null>;
+    registrationEnabled: FormControl<ISalon['registrationEnabled'] | null>;
+    registrationOpeningDate: FormControl<ISalon['registrationOpeningDate'] | string | null>;
+    registrationClosingDate: FormControl<ISalon['registrationClosingDate'] | string | null>;
 };
 
 @Injectable({providedIn: 'root'})
@@ -64,7 +67,12 @@ export class SalonFormService {
                                                  priceStandSalons: new FormArray<FormGroup<PriceStandGroup>>(
                                                      (raw.priceStandSalons).map(priceStand => this.createPriceStand(priceStand))
                                                  ),
-                                                 extraInformation: new FormControl(raw.extraInformation)
+                                                 extraInformation: new FormControl(raw.extraInformation),
+                                                 registrationEnabled: new FormControl(raw.registrationEnabled ?? false),
+                                                 registrationOpeningDate: new FormControl(
+                                                     raw.registrationOpeningDate ?? null),
+                                                 registrationClosingDate: new FormControl(
+                                                     raw.registrationClosingDate ?? null)
                                              });
     }
 

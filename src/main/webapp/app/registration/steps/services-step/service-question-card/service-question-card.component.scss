@@ -1,0 +1,106 @@
+.service-card {
+  border: 1px solid var(--p-surface-200, #e7e0d6);
+  border-radius: 20px;
+  background: var(--p-surface-0, #fff);
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+
+  &.is-open {
+    border-color: var(--p-primary-color);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--p-primary-color) 10%, transparent);
+  }
+
+  .service-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .service-card-question {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+
+    i {
+      color: var(--p-primary-color);
+    }
+  }
+
+  .service-card-answers {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .service-card-answer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-width: 92px;
+    min-height: 44px;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--p-surface-300, #ccc);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+
+    &.selected {
+      border-color: var(--p-primary-color);
+      color: var(--p-primary-color);
+      font-weight: 600;
+    }
+
+    input {
+      accent-color: var(--p-primary-color);
+    }
+  }
+
+  .service-card-error {
+    margin: 0.75rem 0 0;
+    color: var(--p-red-500, #d9534f);
+    font-size: 0.85rem;
+  }
+
+  .service-card-body {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--p-surface-200, #e7e0d6);
+    animation: service-card-reveal 240ms ease;
+  }
+}
+
+@keyframes service-card-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .service-card .service-card-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .service-card .service-card-answers {
+    width: 100%;
+
+    .service-card-answer {
+      flex: 1 1 50%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card .service-card-body {
+    animation: none;
+  }
+}
