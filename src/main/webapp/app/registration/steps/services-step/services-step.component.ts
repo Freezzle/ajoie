@@ -51,6 +51,12 @@ export class ServicesStepComponent {
 
     protected readonly formatterCategory = formatterCategory;
 
+    /**
+     * Le formulaire gère plusieurs conférences / ateliers, mais on n'en propose qu'un seul pour l'instant :
+     * passer ce drapeau à `true` réaffiche les boutons d'ajout.
+     */
+    readonly allowMultipleTalks: boolean = false;
+
     formatterDimension = (dimension: IPublicDimension): string => {
         if (!dimension) {
             return '';

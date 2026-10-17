@@ -126,23 +126,18 @@
                             translateKey="registration.summary.edit"
                             type="secondary"/>
             </div>
-            @for (talk of conferenceControls; track $index) {
-                <div class="summary-subitem">
-                    <p class="summary-subitem-title">
-                        {{ 'registration.summary.conferenceItem' | translate: {index: $index + 1} }}
-                    </p>
-                    <dl class="summary-list">
-                        <div class="summary-row">
-                            <dt>{{ 'registration.services.talkTitle' | translate }}</dt>
-                            <dd>{{ talk.controls.title.value }}</dd>
-                        </div>
-                        <div class="summary-row">
-                            <dt>{{ 'registration.services.talkDescription' | translate }}</dt>
-                            <dd>{{ talk.controls.description.value }}</dd>
-                        </div>
-                    </dl>
-                </div>
-            }
+            <dl class="summary-list">
+                @for (talk of conferenceControls; track $index) {
+                    <div class="summary-row">
+                        <dt>{{ 'registration.services.talkTitle' | translate }}</dt>
+                        <dd>{{ talk.controls.title.value }}</dd>
+                    </div>
+                    <div class="summary-row">
+                        <dt>{{ 'registration.services.talkDescription' | translate }}</dt>
+                        <dd>{{ talk.controls.description.value }}</dd>
+                    </div>
+                }
+            </dl>
         </div>
     }
 
@@ -155,23 +150,18 @@
                             translateKey="registration.summary.edit"
                             type="secondary"/>
             </div>
-            @for (talk of workshopControls; track $index) {
-                <div class="summary-subitem">
-                    <p class="summary-subitem-title">
-                        {{ 'registration.summary.workshopItem' | translate: {index: $index + 1} }}
-                    </p>
-                    <dl class="summary-list">
-                        <div class="summary-row">
-                            <dt>{{ 'registration.services.talkTitle' | translate }}</dt>
-                            <dd>{{ talk.controls.title.value }}</dd>
-                        </div>
-                        <div class="summary-row">
-                            <dt>{{ 'registration.services.talkDescription' | translate }}</dt>
-                            <dd>{{ talk.controls.description.value }}</dd>
-                        </div>
-                    </dl>
-                </div>
-            }
+            <dl class="summary-list">
+                @for (talk of workshopControls; track $index) {
+                    <div class="summary-row">
+                        <dt>{{ 'registration.services.talkTitle' | translate }}</dt>
+                        <dd>{{ talk.controls.title.value }}</dd>
+                    </div>
+                    <div class="summary-row">
+                        <dt>{{ 'registration.services.talkDescription' | translate }}</dt>
+                        <dd>{{ talk.controls.description.value }}</dd>
+                    </div>
+                }
+            </dl>
         </div>
     }
 

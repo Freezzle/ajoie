@@ -18,6 +18,7 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
            })
 export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
     @Input() translateKey?: string;
+    @Input() hint: string | null = null;
     @Input() fieldName: string = '';
     @Input() value: boolean = false;
     @Input() forceDisabled: boolean = false;

@@ -7,23 +7,10 @@
 }
 
 // Bloc logique d'une étape : évite que le contenu colle au titre de section
-.registration-section {
-  padding-bottom: 1.5rem;
-
-  &:last-of-type {
-    padding-bottom: 0;
-  }
-
+.registration-card-body {
   > .registration-subtitle:first-child {
     margin-top: 0;
   }
-}
-
-.registration-price-hint {
-  display: inline-block;
-  margin-top: 0.35rem;
-  font-size: 0.78rem;
-  color: var(--p-text-muted-color, #6b655d);
 }
 
 .registration-help {
@@ -85,23 +72,6 @@
 
   .summary-list {
     margin: 0;
-  }
-
-  .summary-subitem {
-    margin-top: 0.75rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--p-surface-200, #e7e0d6);
-    border-radius: 12px;
-    background: var(--p-surface-50, #fbfaf7);
-  }
-
-  .summary-subitem-title {
-    margin: 0 0 0.35rem;
-    font-size: 1.2rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--p-primary-color);
   }
 
   .summary-row {

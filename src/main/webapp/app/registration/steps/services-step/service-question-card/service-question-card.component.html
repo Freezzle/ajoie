@@ -3,6 +3,9 @@
         <div class="service-card-question" [id]="'question_' + name">
             <i class="pi {{ icon }}" aria-hidden="true"></i>
             <span>{{ questionKey | translate }}</span>
+            @if (priceHint) {
+                <small class="service-card-price">{{ priceHint }}</small>
+            }
         </div>
         <div class="service-card-answers" role="radiogroup" [attr.aria-labelledby]="'question_' + name">
             <label class="service-card-answer" [class.selected]="answer === true">

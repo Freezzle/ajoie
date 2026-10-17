@@ -1,0 +1,33 @@
+.registration-card {
+  border: 1px solid var(--p-surface-200, #e7e0d6);
+  border-radius: 20px;
+  background: var(--p-surface-0, #fff);
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+
+  .registration-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .registration-card-title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .registration-card-help {
+    margin: 0.5rem 0 0;
+    color: var(--p-text-muted-color, #6b655d);
+    font-size: 0.82rem;
+  }
+
+  .registration-card-body {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--p-surface-200, #e7e0d6);
+  }
+}

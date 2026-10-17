@@ -1,0 +1,15 @@
+<div class="registration-card">
+    <div class="registration-card-head">
+        <h3 class="registration-card-title">
+            <span>{{ titleKey | translate }}</span>
+        </h3>
+    </div>
+
+    @if (helpKey) {
+        <p class="registration-card-help">{{ helpKey | translate }}</p>
+    }
+
+    <div class="registration-card-body">
+        <ng-content></ng-content>
+    </div>
+</div>

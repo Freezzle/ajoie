@@ -46,6 +46,9 @@
       "decrease": "Diminuer"
     },
     "exhibitor": {
+      "contactTitle": "Vos coordonnées",
+      "addressTitle": "Vos adresses",
+      "preferencesTitle": "Langue et communication",
       "therapistNameHelp": "Nom affiché pendant le salon",
       "emailLocked": "L'adresse e-mail ne peut pas être modifiée : votre lien personnel y est rattaché."
     },
@@ -64,15 +67,15 @@
     "participation": {
       "mealsTitle": "Les repas",
       "mealsHelp": "Indiquez le nombre de repas souhaités pour votre équipe.",
-      "offerTitle": "Offre spéciale"
+      "invoiceTitle": "Mode d'envoi de la facture principale",
+      "offerTitle": "Offre spéciale",
+      "additionalTitle": "Dernières précisions"
     },
     "summary": {
       "edit": "Modifier",
       "stand": "Stand",
-      "conferences": "Conférence(s)",
-      "conferenceItem": "Conférence {{index}}",
-      "workshops": "Atelier(s)",
-      "workshopItem": "Atelier {{index}}",
+      "conferences": "Conférence",
+      "workshops": "Atelier",
       "consents": "Vos engagements",
       "acceptChart": "J'ai lu et j'accepte la charte des exposants",
       "acceptContract": "J'ai lu et j'accepte les conditions de participation"
@@ -82,7 +85,7 @@
       "perMeal": "{{price}} / repas",
       "perUnit": "{{price}} / unité",
       "surcharge": "+ {{price}}",
-      "estimatedCost": "Coût estimé",
+      "estimatedCost": "Coût estimé des prestations",
       "total": "Total",
       "quantity": "× {{quantity}}",
       "disclaimer": "Montant indicatif. La facture définitive vous sera envoyée par e-mail après acceptation de votre inscription.",

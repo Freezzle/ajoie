@@ -3,7 +3,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import SharedModule from '../../../../shared/shared.module';
 
 /**
- * Carte-question réutilisable : icône, question, boutons Oui / Non et contenu projeté.
+ * Carte-question réutilisable : icône, question, prix éventuel, boutons Oui / Non et contenu projeté.
  */
 @Component({
                selector: 'app-service-question-card',
@@ -15,6 +15,7 @@ export class ServiceQuestionCardComponent {
     @Input({required: true}) questionKey!: string;
     @Input({required: true}) name!: string;
     @Input() icon: string = 'pi-box';
+    @Input() priceHint: string | null = null;
     @Input() answer: boolean | null = null;
     @Input() showError: boolean = false;
 

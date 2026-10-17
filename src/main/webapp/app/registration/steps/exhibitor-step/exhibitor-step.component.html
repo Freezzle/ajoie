@@ -1,55 +1,61 @@
 <section [formGroup]="form">
-    <div class="row">
-        <div class="mt-4 col-12 col-lg-6">
-            <text-box fieldName="firstName" formControlName="firstName" translateKey="exhibitor.firstName"/>
+    <app-registration-card titleKey="registration.exhibitor.contactTitle">
+        <div class="row">
+            <div class="mt-4 col-12 col-lg-6">
+                <text-box fieldName="firstName" formControlName="firstName" translateKey="exhibitor.firstName"/>
+            </div>
+            <div class="mt-4 col-12 col-lg-6">
+                <text-box fieldName="lastName" formControlName="lastName" translateKey="exhibitor.lastName"/>
+            </div>
+            <div class="mt-4 col-12">
+                <text-box fieldName="therapistName"
+                          formControlName="therapistName"
+                          translateKey="exhibitor.therapistName"/>
+                <small class="registration-help">{{ 'registration.exhibitor.therapistNameHelp' | translate }}</small>
+            </div>
+            <div class="mt-4 col-12 col-lg-6">
+                <text-box fieldName="email" formControlName="email" translateKey="exhibitor.email"/>
+                @if (emailReadOnly) {
+                    <small class="registration-help">{{ 'registration.exhibitor.emailLocked' | translate }}</small>
+                }
+            </div>
+            <div class="mt-4 col-12 col-lg-6">
+                <text-box fieldName="phoneNumber" formControlName="phoneNumber" translateKey="exhibitor.phoneNumber"/>
+            </div>
         </div>
-        <div class="mt-4 col-12 col-lg-6">
-            <text-box fieldName="lastName" formControlName="lastName" translateKey="exhibitor.lastName"/>
-        </div>
-        <div class="mt-4 col-12">
-            <text-box fieldName="therapistName"
-                      formControlName="therapistName"
-                      translateKey="exhibitor.therapistName"/>
-            <small class="registration-help">{{ 'registration.exhibitor.therapistNameHelp' | translate }}</small>
-        </div>
-        <div class="mt-4 col-12 col-lg-6">
-            <text-box fieldName="email" formControlName="email" translateKey="exhibitor.email"/>
-            @if (emailReadOnly) {
-                <small class="registration-help">{{ 'registration.exhibitor.emailLocked' | translate }}</small>
-            }
-        </div>
-        <div class="mt-4 col-12 col-lg-6">
-            <text-box fieldName="phoneNumber" formControlName="phoneNumber" translateKey="exhibitor.phoneNumber"/>
-        </div>
-    </div>
+    </app-registration-card>
 
-    <h3 class="registration-subtitle">{{ 'exhibitor.homeAddress' | translate }}</h3>
-    <app-address-form [required]="true" [showFormalFields]="false" formControlName="homeAddress"/>
+    <app-registration-card titleKey="registration.exhibitor.addressTitle">
+        <h4 class="registration-subtitle">{{ 'exhibitor.homeAddress' | translate }}</h4>
+        <app-address-form [required]="true" [showFormalFields]="false" formControlName="homeAddress"/>
 
-    <div class="mt-4">
-        <checkbox-box fieldName="differentBillingAddress"
-                      formControlName="differentBillingAddress"
-                      translateKey="exhibitor.differentBillingAddress"/>
-    </div>
+        <div class="mt-4">
+            <checkbox-box fieldName="differentBillingAddress"
+                          formControlName="differentBillingAddress"
+                          translateKey="exhibitor.differentBillingAddress"/>
+        </div>
 
-    @if (form.controls.differentBillingAddress.value) {
-        <div class="registration-reveal">
-            <h3 class="registration-subtitle">{{ 'exhibitor.billingAddress' | translate }}</h3>
-            <app-address-form [required]="true" [showFormalFields]="true" formControlName="billingAddress"/>
-        </div>
-    }
+        @if (form.controls.differentBillingAddress.value) {
+            <div class="registration-reveal">
+                <h4 class="registration-subtitle">{{ 'exhibitor.billingAddress' | translate }}</h4>
+                <app-address-form [required]="true" [showFormalFields]="true" formControlName="billingAddress"/>
+            </div>
+        }
+    </app-registration-card>
 
-    <div class="row">
-        <div class="mt-4 col-12 col-lg-6">
-            <select-box [formatterFunction]="formatterLanguage"
-                        [needTranslation]="true"
-                        [options]="languages"
-                        fieldName="language"
-                        formControlName="language"
-                        translateKey="exhibitor.language.list.label"/>
+    <app-registration-card titleKey="registration.exhibitor.preferencesTitle">
+        <div class="row">
+            <div class="mt-4 col-12 col-lg-6">
+                <select-box [formatterFunction]="formatterLanguage"
+                            [needTranslation]="true"
+                            [options]="languages"
+                            fieldName="language"
+                            formControlName="language"
+                            translateKey="exhibitor.language.list.label"/>
+            </div>
+            <div class="mt-4 col-12 col-lg-6">
+                <checkbox-box fieldName="newsletter" formControlName="newsletter" translateKey="exhibitor.newsletter"/>
+            </div>
         </div>
-        <div class="mt-4 col-12 col-lg-6">
-            <checkbox-box fieldName="newsletter" formControlName="newsletter" translateKey="exhibitor.newsletter"/>
-        </div>
-    </div>
+    </app-registration-card>
 </section>

@@ -4,7 +4,7 @@
     "billingAddress": "Adresse de facturation",
     "copyNewsletter": "Emails (newsletter)",
     "country": "Pays",
-    "differentBillingAddress": "Utiliser une adresse différente",
+    "differentBillingAddress": "Utiliser une adresse de facturation différente",
     "create": "Nouveau client",
     "delete": {
       "question": "Voulez-vous supprimer \"{{ id }}\" ?"

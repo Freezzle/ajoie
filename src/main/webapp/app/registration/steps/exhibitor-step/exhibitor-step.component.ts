@@ -6,6 +6,7 @@ import {AddressFormComponent} from '../../../shared/components/address-form/addr
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
+import {RegistrationCardComponent} from '../../registration-card/registration-card.component';
 import {ExhibitorFormGroup} from '../../registration-form.service';
 
 @Component({
@@ -16,7 +17,8 @@ import {ExhibitorFormGroup} from '../../registration-form.service';
                    AddressFormComponent,
                    CheckboxBoxComponent,
                    SelectBoxComponent,
-                   TextBoxComponent
+                   TextBoxComponent,
+                   RegistrationCardComponent
                ],
                templateUrl: './exhibitor-step.component.html'
            })
