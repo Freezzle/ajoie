@@ -1,5 +1,4 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import SharedModule from 'app/shared/shared.module';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
@@ -12,7 +11,6 @@ import {TaskInstanceFormGroup, TaskInstanceFormService} from '../service/task-in
     selector: 'app-task-instance-form',
     templateUrl: './task-instance-form.component.html',
     imports: [
-        CommonModule,
         SharedModule,
         ReactiveFormsModule,
         TextBoxComponent,

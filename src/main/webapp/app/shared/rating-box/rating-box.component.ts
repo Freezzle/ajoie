@@ -1,5 +1,4 @@
 import {Component, Input, OnInit, Optional, Self} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {
     ControlValueAccessor,
     FormControl,
@@ -14,7 +13,7 @@ import {IftaLabel} from 'primeng/iftalabel';
 import SharedModule from '../shared.module';
 
 @Component({
-               imports: [CommonModule, ReactiveFormsModule, FormsModule, Rating, IftaLabel, SharedModule],
+               imports: [ReactiveFormsModule, FormsModule, Rating, IftaLabel, SharedModule],
                selector: 'rating-box',
                templateUrl: './rating-box.component.html',
                styleUrl: './rating-box.component.scss'

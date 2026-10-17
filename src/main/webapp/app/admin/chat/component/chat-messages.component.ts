@@ -9,7 +9,6 @@ import {
     signal,
     ViewChild
 } from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {InputTextModule} from 'primeng/inputtext';
 import {SelectModule} from 'primeng/select';
 import {TagModule} from 'primeng/tag';
@@ -30,7 +29,6 @@ import {TranslatePipe} from '@ngx-translate/core';
                templateUrl: './chat-messages.component.html',
                styleUrl: './chat-messages.component.scss',
                imports: [
-                   CommonModule,
                    DialogModule,
                    InputTextModule,
                    SelectModule,

@@ -1,4 +1,3 @@
-import {CommonModule} from '@angular/common';
 import {
     Component,
     computed,
@@ -30,7 +29,6 @@ type IdLabel = { id: string; label: string };
                selector: 'tp-config-day',
                standalone: true,
                imports: [
-                   CommonModule,
                    FormsModule,
                    ReactiveFormsModule,
                    TableModule,

@@ -1,5 +1,4 @@
 import {Component, Input, OnInit, Self} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {
     ControlValueAccessor,
@@ -19,7 +18,7 @@ export interface PicklistOption {
 }
 
 @Component({
-    imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, Listbox, FormsModule, PrimeTemplate],
+    imports: [SharedModule, ReactiveFormsModule, ErrorBoxComponent, Listbox, FormsModule, PrimeTemplate],
     selector: 'picklist-box',
     templateUrl: './picklist-box.component.html',
     standalone: true

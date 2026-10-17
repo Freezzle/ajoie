@@ -1,5 +1,4 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import SharedModule from 'app/shared/shared.module';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
@@ -15,7 +14,6 @@ import {TranslateService} from '@ngx-translate/core';
     selector: 'app-payment-form',
     templateUrl: './payment-form.component.html',
     imports: [
-        CommonModule,
         SharedModule,
         ReactiveFormsModule,
         TextBoxComponent,

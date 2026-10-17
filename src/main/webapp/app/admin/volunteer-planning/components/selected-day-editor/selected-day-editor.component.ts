@@ -1,4 +1,3 @@
-import {CommonModule} from '@angular/common';
 import {Component, computed, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
@@ -14,7 +13,7 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
 @Component({
                selector: 'selected-day-editor',
                standalone: true,
-               imports: [CommonModule, FormsModule, SelectModule, InputTextModule, DatePickerModule, TranslatePipe],
+               imports: [FormsModule, SelectModule, InputTextModule, DatePickerModule, TranslatePipe],
                templateUrl: './selected-day-editor.component.html'
            })
 export class SelectedDayEditorComponent implements OnInit, OnDestroy {

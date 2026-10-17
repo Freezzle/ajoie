@@ -1,4 +1,3 @@
-import {CommonModule} from '@angular/common';
 import {ChangeDetectionStrategy, Component, computed, HostListener, inject, model, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
@@ -45,7 +44,6 @@ import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.se
                selector: 'app-volunteer-planning',
                standalone: true,
                imports: [
-                   CommonModule,
                    FormsModule,
                    TableModule,
                    ButtonModule,

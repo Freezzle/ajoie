@@ -1,4 +1,3 @@
-import {CommonModule} from '@angular/common';
 import {Component, computed, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
@@ -14,7 +13,7 @@ import {DialogDraftService} from '../../../services/dialog-draft.service';
 @Component({
                selector: 'tp-config-rooms',
                standalone: true,
-               imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, ButtonBoxComponent],
+               imports: [FormsModule, ButtonModule, TableModule, InputTextModule, ButtonBoxComponent],
                templateUrl: './tp-config-rooms.component.html'
            })
 export class TpConfigRoomsComponent implements OnInit, OnDestroy {

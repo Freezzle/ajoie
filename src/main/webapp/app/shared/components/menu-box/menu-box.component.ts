@@ -1,6 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, ViewChild} from '@angular/core';
 import {Menu, MenuModule} from 'primeng/menu';
-import {CommonModule} from '@angular/common';
 import {ButtonModule} from 'primeng/button';
 import {TranslateService} from '@ngx-translate/core';
 import {ButtonBoxComponent} from '../button-box/button-box.component';
@@ -11,7 +10,7 @@ import {ConditionalKey} from '../../model/conditional-key';
 
 @Component({
                selector: 'menu-box',
-               imports: [CommonModule, MenuModule, ButtonModule, ButtonBoxComponent, Popover],
+               imports: [MenuModule, ButtonModule, ButtonBoxComponent, Popover],
                templateUrl: './menu-box.component.html',
                styleUrl: './menu-box.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush

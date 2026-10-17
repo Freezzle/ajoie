@@ -1,4 +1,3 @@
-import {CommonModule} from '@angular/common';
 import {Component, computed, effect, inject, input, OnDestroy, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
@@ -14,7 +13,7 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
 @Component({
                selector: 'selected-day-assignments',
                standalone: true,
-               imports: [CommonModule, FormsModule, TableModule, ButtonModule, MultiSelectModule, ButtonBoxComponent],
+               imports: [FormsModule, TableModule, ButtonModule, MultiSelectModule, ButtonBoxComponent],
                templateUrl: './selected-day-assignments.component.html'
            })
 export class SelectedDayAssignmentsComponent implements OnDestroy {

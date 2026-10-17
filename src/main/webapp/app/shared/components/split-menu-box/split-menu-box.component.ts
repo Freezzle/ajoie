@@ -1,14 +1,13 @@
 import {ChangeDetectionStrategy, Component, computed, Input} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {MenuModule} from 'primeng/menu';
-import {CommonModule} from '@angular/common';
 import {ButtonModule} from 'primeng/button';
 import {convertSeverity, SEVERITY} from '../../utils/severity';
 import {SplitButton} from 'primeng/splitbutton';
 
 @Component({
                selector: 'split-menu-box',
-               imports: [CommonModule, MenuModule, ButtonModule, SplitButton],
+               imports: [MenuModule, ButtonModule, SplitButton],
                templateUrl: './split-menu-box.component.html',
                styleUrl: './split-menu-box.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush

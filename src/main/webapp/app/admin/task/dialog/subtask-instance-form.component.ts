@@ -1,5 +1,4 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import SharedModule from 'app/shared/shared.module';
@@ -20,7 +19,6 @@ import {TranslateService} from '@ngx-translate/core';
     selector: 'app-subtask-instance-form',
     templateUrl: './subtask-instance-form.component.html',
     imports: [
-        CommonModule,
         SharedModule,
         ReactiveFormsModule,
         TextBoxComponent,

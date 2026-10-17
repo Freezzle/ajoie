@@ -1,4 +1,3 @@
-import {CommonModule} from '@angular/common';
 import {Component, computed, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
@@ -18,7 +17,6 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
                selector: 'category-manager',
                standalone: true,
                imports: [
-                   CommonModule,
                    FormsModule,
                    ButtonModule,
                    TableModule,

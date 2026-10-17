@@ -1,5 +1,4 @@
 import {Component, Input, Self} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ErrorBoxComponent} from '../../error-box/error-box.component';
@@ -8,7 +7,7 @@ import {InputNumber} from 'primeng/inputnumber';
 import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
-               imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, InputNumber, FloatLabel],
+               imports: [SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, InputNumber, FloatLabel],
                selector: 'number-box',
                templateUrl: './number-box.component.html'
            })

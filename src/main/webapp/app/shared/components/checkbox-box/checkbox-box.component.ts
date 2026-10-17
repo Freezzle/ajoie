@@ -1,5 +1,4 @@
 import {Component, Input, OnInit, Optional, Self} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {
     ControlValueAccessor,
     FormControl,
@@ -12,7 +11,7 @@ import SharedModule from '../../shared.module';
 import {ToggleSwitch} from 'primeng/toggleswitch';
 
 @Component({
-               imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule, ToggleSwitch],
+               imports: [ReactiveFormsModule, FormsModule, SharedModule, ToggleSwitch],
                selector: 'checkbox-box',
                templateUrl: './checkbox-box.component.html',
                styleUrl: './checkbox-box.component.scss'

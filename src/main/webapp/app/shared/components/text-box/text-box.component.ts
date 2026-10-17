@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, Optional, Output, Self} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ErrorModel} from '../../field-error/error.model';
@@ -9,7 +8,7 @@ import {IftaLabel} from 'primeng/iftalabel';
 import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
-               imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, InputText, IftaLabel, FloatLabel],
+               imports: [SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, InputText, IftaLabel, FloatLabel],
                selector: 'text-box',
                templateUrl: './text-box.component.html'
            })

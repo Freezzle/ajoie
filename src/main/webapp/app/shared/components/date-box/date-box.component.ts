@@ -1,5 +1,4 @@
 import {Component, Input, Self} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ErrorBoxComponent} from '../../error-box/error-box.component';
@@ -7,7 +6,7 @@ import {IftaLabel} from 'primeng/iftalabel';
 import {DatePicker} from 'primeng/datepicker';
 
 @Component({
-               imports: [CommonModule, SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, DatePicker],
+               imports: [SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, DatePicker],
                selector: 'date-box',
                templateUrl: './date-box.component.html'
            })

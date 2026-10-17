@@ -1,5 +1,4 @@
 import {Component, Input, Self} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import SharedModule from '../../shared.module';
 import {
     ControlValueAccessor,
@@ -16,7 +15,6 @@ import {PrimeTemplate} from 'primeng/api';
 
 @Component({
                imports: [
-                   CommonModule,
                    SharedModule,
                    ReactiveFormsModule,
                    FormsModule,              // ✅ important

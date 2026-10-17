@@ -1,4 +1,3 @@
-import {CommonModule} from '@angular/common';
 import {Component, computed, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
@@ -15,7 +14,7 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
 @Component({
                selector: 'volunteer-manager',
                standalone: true,
-               imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, ConfirmDialogModule, ButtonBoxComponent],
+               imports: [FormsModule, ButtonModule, TableModule, InputTextModule, ConfirmDialogModule, ButtonBoxComponent],
                providers: [ConfirmationService],
                templateUrl: './volunteer-manager.component.html'
            })
