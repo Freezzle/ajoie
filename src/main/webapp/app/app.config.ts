@@ -15,7 +15,6 @@ import {TranslationModule} from 'app/shared/language/translation.module';
 import {httpInterceptorProviders} from './core/interceptor';
 import routes from './app.routes';
 import {AppPageTitleStrategy} from './app-page-title-strategy';
-import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
 import Material from '@primeuix/themes/material';
 import {ConfirmationService, MessageService} from 'primeng/api';
@@ -95,7 +94,6 @@ export const appConfig: ApplicationConfig = {
         // Set this to true to enable service worker (PWA)
         importProvidersFrom(TranslationModule),
         provideHttpClient(withInterceptorsFromDi()),
-        provideAnimationsAsync(),
         providePrimeNG({
                            theme: {
                                preset: MyPreset,
