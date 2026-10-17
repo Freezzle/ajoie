@@ -18,8 +18,7 @@ import {ExhibitorFormGroup} from '../../registration-form.service';
                    SelectBoxComponent,
                    TextBoxComponent
                ],
-               templateUrl: './exhibitor-step.component.html',
-               styleUrl: './exhibitor-step.component.scss'
+               templateUrl: './exhibitor-step.component.html'
            })
 export class ExhibitorStepComponent {
     @Input({required: true}) form!: ExhibitorFormGroup;

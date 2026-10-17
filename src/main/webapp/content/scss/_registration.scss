@@ -1,5 +1,5 @@
 // Styles partagés par les étapes du stepper d'inscription.
-// Importé par chaque composant d'étape afin de rester compatible avec l'encapsulation de vue.
+// Déclarés globalement pour éviter la duplication dans chaque composant d'étape.
 
 .registration-subtitle {
   font-size: 1.05rem;

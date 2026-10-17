@@ -21,8 +21,7 @@ import {
 @Component({
                selector: 'app-summary-step',
                imports: [SharedModule, ReactiveFormsModule, ButtonBoxComponent, CheckboxBoxComponent],
-               templateUrl: './summary-step.component.html',
-               styleUrl: './summary-step.component.scss'
+               templateUrl: './summary-step.component.html'
            })
 export class SummaryStepComponent {
     @Input({required: true}) exhibitorForm!: ExhibitorFormGroup;

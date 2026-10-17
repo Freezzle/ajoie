@@ -18,7 +18,7 @@ import {
     ModePaymentMeals
 } from '../../../admin/enumerations/mode-payment-meals.model';
 import {IRegistrationPrices} from '../../registration.model';
-import {formatPrice, priceHint} from '../../registration-price.util';
+import {priceHint} from '../../registration-price.util';
 import {ParticipationFormGroup} from '../../registration-form.service';
 
 @Component({
@@ -32,8 +32,7 @@ import {ParticipationFormGroup} from '../../registration-form.service';
                    TextBoxComponent,
                    TextareaBoxComponent
                ],
-               templateUrl: './participation-step.component.html',
-               styleUrl: './participation-step.component.scss'
+               templateUrl: './participation-step.component.html'
            })
 export class ParticipationStepComponent {
     @Input({required: true}) form!: ParticipationFormGroup;

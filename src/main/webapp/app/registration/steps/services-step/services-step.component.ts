@@ -30,8 +30,7 @@ import {ServiceQuestionCardComponent} from './service-question-card/service-ques
                    TextareaBoxComponent,
                    ServiceQuestionCardComponent
                ],
-               templateUrl: './services-step.component.html',
-               styleUrl: './services-step.component.scss'
+               templateUrl: './services-step.component.html'
            })
 export class ServicesStepComponent {
     @Input({required: true}) form!: ServicesFormGroup;

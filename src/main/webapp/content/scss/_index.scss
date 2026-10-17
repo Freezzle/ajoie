@@ -1,5 +1,6 @@
 @use "content/scss/variables";
 @use "content/scss/global";
+@use "content/scss/registration";
 
 :root {
   @include variables.tokens();
