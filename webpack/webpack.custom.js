@@ -22,13 +22,7 @@ module.exports = async (config, options, targetOptions) => {
   // PLUGINS
   if (config.mode === 'development') {
     config.plugins.push(
-      new ESLintPlugin({
-        baseConfig: {
-          parserOptions: {
-            project: ['../tsconfig.app.json'],
-          },
-        },
-      }),
+      new ESLintPlugin(),
       new WebpackNotifierPlugin({
         title: 'Salon',
         contentImage: path.join(__dirname, 'logo_salon.jpg'),

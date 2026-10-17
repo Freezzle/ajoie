@@ -1,6 +1,0 @@
-node_modules/
-src/main/docker/
-webpack/
-target/
-coverage/
-target/classes/static/
