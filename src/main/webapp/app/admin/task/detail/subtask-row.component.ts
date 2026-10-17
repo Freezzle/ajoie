@@ -1,7 +1,7 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {ISubtaskInstance} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
@@ -20,7 +20,7 @@ import {Popover} from 'primeng/popover';
     imports: [
         CommonModule,
         FormsModule,
-        TranslateModule,
+        TranslatePipe,
         MenuBoxComponent,
         DaysRelativePipe,
         FormatMediumDatePipe,

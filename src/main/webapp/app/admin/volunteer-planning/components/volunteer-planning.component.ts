@@ -17,7 +17,7 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 import {Category, computeTimeSlots, Day, IntervalMinutes, Planning, TimeSlot, Tool, UnavailableCell, Volunteer} from './volunteer-planning-model';
 
@@ -56,7 +56,7 @@ import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.se
                    ConfirmPopup,
                    
                    ContentPageComponent,
-                   TranslateModule,
+                   TranslatePipe,
                    ButtonBoxComponent,
                    
                    AlertErrorComponent,

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {ISubtaskInstance, ITaskInstance} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
@@ -25,7 +25,7 @@ import {AccountService} from '../../../core/auth/account.service';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        TranslateModule,
+        TranslatePipe,
         MenuBoxComponent,
         ButtonBoxComponent,
         TextBoxComponent,

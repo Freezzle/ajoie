@@ -11,7 +11,7 @@ import {
 } from '@angular/router';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import './config/dayjs';
-import {TranslationModule} from 'app/shared/language/translation.module';
+import {provideTranslation} from 'app/shared/language/translation.providers';
 import {httpInterceptorProviders} from './core/interceptor';
 import routes from './app.routes';
 import {AppPageTitleStrategy} from './app-page-title-strategy';
@@ -91,8 +91,7 @@ export const appConfig: ApplicationConfig = {
     providers: [
         provideRouter(routes, ...routerFeatures),
         importProvidersFrom(BrowserModule),
-        // Set this to true to enable service worker (PWA)
-        importProvidersFrom(TranslationModule),
+        provideTranslation(),
         provideHttpClient(withInterceptorsFromDi()),
         providePrimeNG({
                            theme: {

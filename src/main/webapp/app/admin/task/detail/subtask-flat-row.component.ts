@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {ITaskInstance} from '../model/task-instance.interface';
 import {SubtaskRowComponent} from './subtask-row.component';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
@@ -19,7 +19,7 @@ import {Popover} from 'primeng/popover';
     imports: [
         CommonModule,
         FormsModule,
-        TranslateModule,
+        TranslatePipe,
         MenuBoxComponent,
         DaysRelativePipe,
         FormatMediumDatePipe,

@@ -22,7 +22,7 @@ import {TimeSincePipe} from 'app/shared/pipe/time-since.pipe';
 import {Badge} from 'primeng/badge';
 import {ButtonBoxComponent} from 'app/shared/components/button-box/button-box.component';
 import {DialogModule} from 'primeng/dialog';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
                selector: 'app-chat-messages',
@@ -39,7 +39,7 @@ import {TranslateModule} from '@ngx-translate/core';
                    TimeSincePipe,
                    Badge,
                    ButtonBoxComponent,
-                   TranslateModule
+                   TranslatePipe
                ]
            })
 export class ChatMessagesComponent implements OnInit, OnDestroy, AfterViewChecked {

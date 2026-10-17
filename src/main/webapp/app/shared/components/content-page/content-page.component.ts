@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
                selector: 'app-content-page',
                imports: [
-                   TranslateModule
+                   TranslatePipe
                ],
                templateUrl: './content-page.component.html',
                styleUrl: './content-page.component.scss'

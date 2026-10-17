@@ -17,7 +17,7 @@ import {TimelineModule} from 'primeng/timeline';
 import {BadgeModule} from 'primeng/badge';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {MenuItem} from 'primeng/api';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 import {Talk, TalkSlotComponent} from '../talk-slot/talk-slot.component';
@@ -50,7 +50,7 @@ type HoverRange = { roomId: string; start: number; end: number };
                    ToggleSwitchModule,
                    TalkSlotComponent,
                    CardComponent,
-                   TranslateModule,
+                   TranslatePipe,
                    DialogBoxComponent,
                    TpConfigRoomsComponent,
                    TpConfigDayComponent,

@@ -5,7 +5,7 @@ import {FormsModule} from '@angular/forms';
 import {SelectModule} from 'primeng/select';
 import {InputTextModule} from 'primeng/inputtext';
 import {DatePickerModule} from 'primeng/datepicker';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 import {Day, IntervalMinutes} from '../volunteer-planning-model';
 import {DayConfigSlice} from '../volunteer-planning-slices';
@@ -14,7 +14,7 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
 @Component({
                selector: 'selected-day-editor',
                standalone: true,
-               imports: [CommonModule, FormsModule, SelectModule, InputTextModule, DatePickerModule, TranslateModule],
+               imports: [CommonModule, FormsModule, SelectModule, InputTextModule, DatePickerModule, TranslatePipe],
                templateUrl: './selected-day-editor.component.html'
            })
 export class SelectedDayEditorComponent implements OnInit, OnDestroy {
