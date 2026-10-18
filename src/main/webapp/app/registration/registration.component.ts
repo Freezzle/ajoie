@@ -2,12 +2,14 @@ import {Component, computed, ElementRef, inject, OnInit, signal, ViewChild} from
 import {AbstractControl, FormArray, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {HttpErrorResponse} from '@angular/common/http';
+import {debounceTime} from 'rxjs/operators';
 
 import SharedModule from '../shared/shared.module';
 import {ButtonBoxComponent} from '../shared/components/button-box/button-box.component';
 import {AlertService} from '../core/util/alert.service';
 import {IPublicDimension, IPublicSalonInfo, IRegistrationPrices, IRegistrationRequest} from './registration.model';
 import {RegistrationFormGroup, RegistrationFormService} from './registration-form.service';
+import {RegistrationDraftStorageService} from './registration-draft-storage.service';
 import {RegistrationService} from './registration.service';
 import {StepDescriptor, StepProgressComponent, StepState} from './step-progress/step-progress.component';
 import {ExhibitorStepComponent} from './steps/exhibitor-step/exhibitor-step.component';
@@ -76,6 +78,7 @@ export default class RegistrationComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private registrationService = inject(RegistrationService);
     private formService = inject(RegistrationFormService);
+    private draftStorage = inject(RegistrationDraftStorageService);
     private alertService = inject(AlertService);
 
     private salonId = '';
@@ -99,6 +102,7 @@ export default class RegistrationComponent implements OnInit {
     ngOnInit(): void {
         this.form = this.formService.createForm();
         this.form.valueChanges.subscribe(() => this.refreshStates());
+        this.form.valueChanges.pipe(debounceTime(300)).subscribe(() => this.saveDraft());
 
         const params = this.route.snapshot.paramMap;
         this.salonId = params.get('salonId') ?? '';
@@ -106,6 +110,11 @@ export default class RegistrationComponent implements OnInit {
         this.token = params.get('token');
         this.editMode.set(!!this.participationId && !!this.token);
         this.started.set(this.editMode());
+
+        if (this.editMode()) {
+            // Un lien de modification prime sur tout brouillon de nouvelle inscription en cours pour ce salon.
+            this.draftStorage.clear(this.salonId);
+        }
 
         this.registrationService.getCaptchaConfig().subscribe({
             next: config => {
@@ -121,6 +130,7 @@ export default class RegistrationComponent implements OnInit {
                 if (this.editMode()) {
                     this.loadExistingRegistration();
                 } else {
+                    this.restoreDraftIfAny();
                     this.loading.set(false);
                     this.refreshStates();
                 }
@@ -201,6 +211,7 @@ export default class RegistrationComponent implements OnInit {
         this.maxReached.set(Math.max(this.maxReached(), index));
         this.showStepErrors.set(false);
         this.refreshStates();
+        this.saveDraft();
 
         setTimeout(() => {
             window.scrollTo({top: 0, behavior: 'smooth'});
@@ -294,6 +305,32 @@ export default class RegistrationComponent implements OnInit {
 
     // -------------------- CHARGEMENT / ENVOI --------------------
 
+    /** Reprend un brouillon sauvegardé en session (nouvelle inscription uniquement). */
+    private restoreDraftIfAny(): void {
+        const draft = this.draftStorage.load(this.salonId);
+        if (!draft) {
+            return;
+        }
+
+        this.formService.restoreDraft(this.form, draft.value);
+        this.currentStep.set(draft.step);
+        this.maxReached.set(draft.maxReached);
+        this.started.set(true);
+    }
+
+    /** Sauvegarde l'état courant du formulaire en session, pour ne pas tout perdre en cas de mauvaise manipulation. */
+    private saveDraft(): void {
+        if (this.editMode() || !this.started() || !this.salonId) {
+            return;
+        }
+
+        this.draftStorage.save(this.salonId, {
+            step: this.currentStep(),
+            maxReached: this.maxReached(),
+            value: this.formService.getRawValue(this.form)
+        });
+    }
+
     private loadExistingRegistration(): void {
         this.registrationService.findRegistration(this.salonId, this.participationId as string, this.token as string)
             .subscribe({
@@ -337,6 +374,7 @@ export default class RegistrationComponent implements OnInit {
         request$.subscribe({
                                next: response => {
                                    this.submitting.set(false);
+                                   this.draftStorage.clear(this.salonId);
                                    this.confirmedFirstName.set(response.firstName);
                                    this.confirmedEmail.set(response.email);
                                    this.submitted.set(true);

@@ -80,6 +80,8 @@ export type RegistrationFormGroup = FormGroup<{
     consents: ConsentsFormGroup;
 }>;
 
+export type RegistrationFormValue = ReturnType<RegistrationFormGroup['getRawValue']>;
+
 /** Une adresse est valide si la rue, le NPA et la localité sont renseignés. */
 export function requiredAddressValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -179,7 +181,7 @@ export class RegistrationFormService {
         });
     }
 
-    createTalkGroup(talk?: IRegistrationTalk): TalkFormGroup {
+    createTalkGroup(talk?: {title?: string | null; description?: string | null} | null): TalkFormGroup {
         return new FormGroup({
             title: new FormControl<string | null>(talk?.title ?? null,
                 [Validators.required, Validators.maxLength(500)]),
@@ -416,6 +418,44 @@ export class RegistrationFormService {
         (request.workshops ?? []).forEach(talk => services.controls.workshops.push(this.createTalkGroup(talk),
             {emitEvent: false}));
         services.controls.wantWorkshop.setValue((request.workshops ?? []).length > 0);
+    }
+
+    // -------------------- BROUILLON (sessionStorage) --------------------
+
+    /** Valeur brute du formulaire, sérialisable, pour la sauvegarde du brouillon en session. */
+    getRawValue(form: RegistrationFormGroup): RegistrationFormValue {
+        return form.getRawValue();
+    }
+
+    /**
+     * Restaure un brouillon précédemment sauvegardé (mode nouvelle inscription uniquement).
+     * Les tableaux (conférences/ateliers) sont reconstruits avant d'appliquer les valeurs, pour que
+     * les abonnements existants (activation/désactivation des sous-groupes) réagissent correctement.
+     */
+    restoreDraft(form: RegistrationFormGroup, draft: RegistrationFormValue): void {
+        form.controls.exhibitor.patchValue(draft.exhibitor);
+
+        const services = form.controls.services;
+        const draftServices = draft.services;
+
+        services.controls.stand.patchValue(draftServices.stand);
+
+        services.controls.conferences.clear({emitEvent: false});
+        (draftServices.conferences ?? []).forEach(talk => services.controls.conferences.push(
+            this.createTalkGroup(talk), {emitEvent: false}));
+
+        services.controls.workshops.clear({emitEvent: false});
+        (draftServices.workshops ?? []).forEach(talk => services.controls.workshops.push(
+            this.createTalkGroup(talk), {emitEvent: false}));
+
+        services.patchValue({
+                                 wantStand: draftServices.wantStand,
+                                 wantConference: draftServices.wantConference,
+                                 wantWorkshop: draftServices.wantWorkshop
+                             });
+
+        form.controls.participation.patchValue(draft.participation);
+        form.controls.consents.patchValue(draft.consents);
     }
 
     private cleanAddress(address: IAddress | null): IAddress | null {

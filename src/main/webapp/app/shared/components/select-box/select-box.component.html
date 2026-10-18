@@ -16,10 +16,20 @@
                   appendTo="body"
                   fluid>
             <ng-template let-item pTemplate="item">
-                {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
+                <span class="select-option">
+                    <span class="select-option-label">{{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}</span>
+                    @if (getHint(item); as hint) {
+                        <small class="select-option-hint">{{ hint }}</small>
+                    }
+                </span>
             </ng-template>
             <ng-template let-item pTemplate="selectedItem">
-                {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
+                <span class="select-option">
+                    <span class="select-option-label">{{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}</span>
+                    @if (getHint(item); as hint) {
+                        <small class="select-option-hint">{{ hint }}</small>
+                    }
+                </span>
             </ng-template>
         </p-select>
         <label [for]="'field_' + fieldName">
@@ -46,10 +56,20 @@
               appendTo="body"
               fluid>
         <ng-template let-item pTemplate="item">
-            {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
+            <span class="select-option">
+                <span class="select-option-label">{{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}</span>
+                @if (getHint(item); as hint) {
+                    <small class="select-option-hint">{{ hint }}</small>
+                }
+            </span>
         </ng-template>
         <ng-template let-item pTemplate="selectedItem">
-            {{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}
+            <span class="select-option">
+                <span class="select-option-label">{{ needTranslation ? (getLabel(item) | translate) : getLabel(item) }}</span>
+                @if (getHint(item); as hint) {
+                    <small class="select-option-hint">{{ hint }}</small>
+                }
+            </span>
         </ng-template>
     </p-select>
 }

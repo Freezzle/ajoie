@@ -19,6 +19,7 @@
                 <div class="mt-4 col-12 col-lg-6">
                     <select-box [enableFilter]="true"
                                 [formatterFunction]="formatterDimension"
+                                [hintFunction]="dimensionPriceHint"
                                 [options]="dimensions"
                                 fieldName="dimension"
                                 filterFields="dimension"

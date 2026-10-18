@@ -24,8 +24,9 @@ import {PrimeTemplate} from 'primeng/api';
                    PrimeTemplate
                ],
                selector: 'select-box',
-               templateUrl: './select-box.component.html'
-           })
+                          templateUrl: './select-box.component.html',
+                          styleUrl: './select-box.component.scss'
+                      })
 export class SelectBoxComponent implements ControlValueAccessor {
     @Input() translateKey: string | undefined;
     @Input() fieldName: string = '';
@@ -37,6 +38,10 @@ export class SelectBoxComponent implements ControlValueAccessor {
 
     @Input()
     formatterFunction: (a: any) => string = (a: any) => String(a ?? '');
+
+    /** Optionnel : texte additionnel affiché en petit, à part du label (ex: prix). */
+    @Input()
+    hintFunction: ((a: any) => string | null) | null = null;
 
     protected readonly Validators = Validators;
 
@@ -112,5 +117,9 @@ export class SelectBoxComponent implements ControlValueAccessor {
 
     getLabel(object: any): string {
         return this.formatterFunction(object);
+    }
+
+    getHint(object: any): string | null {
+        return this.hintFunction ? this.hintFunction(object) : null;
     }
 }

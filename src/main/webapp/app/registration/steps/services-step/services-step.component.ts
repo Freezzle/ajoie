@@ -58,11 +58,11 @@ export class ServicesStepComponent {
     readonly allowMultipleTalks: boolean = false;
 
     formatterDimension = (dimension: IPublicDimension): string => {
-        if (!dimension) {
-            return '';
-        }
-        const price = formatPrice(dimension.price);
-        return price ? `${dimension.dimension} — ${price}` : dimension.dimension;
+        return dimension ? dimension.dimension : '';
+    };
+
+    dimensionPriceHint = (dimension: IPublicDimension): string | null => {
+        return dimension ? formatPrice(dimension.price) : null;
     };
 
     get sharedStandHint(): string | null {
