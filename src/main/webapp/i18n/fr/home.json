@@ -3,10 +3,6 @@
     "logged": {
       "message": "Vous êtes connecté en tant que \"{{username}}\"."
     },
-    "title": "Salon-en-ligne",
-    "construction": {
-      "intro": "Ce site est actuellement en construction.",
-      "detail": "Il permettra prochainement la gestion des salons, des inscriptions des exposants et le suivi de leur participation lors des salons."
-    }
+    "title": "Salon-en-ligne"
   }
 }

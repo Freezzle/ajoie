@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Liste d'attente de la plateforme (page d'accueil publique) : table globale, non liée à un tenant -->
+    <changeSet id="0.0.2-202610-waitlist-entry" author="freezzle">
+        <createTable tableName="waitlist_entry">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="${datetimeType}"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="${datetimeType}"/>
+        </createTable>
+
+        <createIndex indexName="ux_waitlist_entry_email" tableName="waitlist_entry" unique="true">
+            <column name="email"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex indexName="ux_waitlist_entry_email" tableName="waitlist_entry"/>
+            <dropTable tableName="waitlist_entry"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

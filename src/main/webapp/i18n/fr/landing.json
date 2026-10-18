@@ -1,0 +1,105 @@
+{
+  "landing": {
+    "header": {
+      "subtitle": "Plateforme de gestion de salons",
+      "nav": {
+        "features": "Fonctionnalités",
+        "audiences": "Pour qui ?",
+        "opening": "Ouverture"
+      },
+      "cta": "Être prévenu",
+      "login": "Connexion"
+    },
+    "hero": {
+      "title": "Gérez votre salon et vos exposants, simplement.",
+      "text": "Inscriptions, emplacements, conférences, tâches, factures et emails : une seule plateforme pour organiser chaque édition de votre salon, sans tableurs ni échanges dispersés.",
+      "ctaPrimary": "Être prévenu de l'ouverture",
+      "ctaSecondary": "Découvrir les modules",
+      "highlights": {
+        "modulesReady": "{{count}} modules déjà prêts",
+        "allEditions": "Toutes vos éditions au même endroit",
+        "invoicesChf": "Factures en CHF",
+        "exhibitorSpace": "Espace exposant à venir"
+      }
+    },
+    "features": {
+      "title": "Tout ce qu'il faut pour gérer un salon",
+      "subtitle": "{{count}} modules déjà prêts, reliés entre eux : une information saisie une fois et réutilisée partout.",
+      "filters": {
+        "all": "Tous ({{count}})",
+        "ready": "Prêts ({{count}})",
+        "soon": "Bientôt ({{count}})"
+      },
+      "statusReady": "Prêt",
+      "statusSoon": "Bientôt"
+    },
+    "modules": {
+      "inscriptions": {
+        "title": "Inscriptions",
+        "description": "Formulaire en ligne personnalisable, validation des dossiers et nombre maximum d'exposants par activité."
+      },
+      "exhibitors": {
+        "title": "Exposants et participation",
+        "description": "La participation de chaque exposant par édition : stand, co-exposants, prestations et statut du dossier."
+      },
+      "stands": {
+        "title": "Emplacements de stands",
+        "description": "Attribuez les emplacements et les surfaces, et voyez d'un coup d'œil les stands libres et réservés."
+      },
+      "conferences": {
+        "title": "Conférences et ateliers",
+        "description": "Planifiez les créneaux, les salles et les intervenants, sans chevauchement."
+      },
+      "tasks": {
+        "title": "Tâches opérationnelles",
+        "description": "Commandes, logistique, impressions : chaque tâche avec son responsable, son échéance et ses sous-tâches."
+      },
+      "emails": {
+        "title": "Emails",
+        "description": "Modèles, envois groupés ciblés et messages automatiques selon l'étape de chaque exposant."
+      },
+      "directory": {
+        "title": "Annuaire clients",
+        "description": "Exposants, partenaires et fournisseurs réunis, avec leur historique d'une édition à l'autre."
+      },
+      "invoices": {
+        "title": "Factures",
+        "description": "Factures et acomptes générés depuis les prestations, suivi des paiements et relances."
+      },
+      "exhibitorProfile": {
+        "title": "Profil exposant",
+        "description": "Chaque exposant met à jour son profil et ses documents, et suit sa participation depuis son propre accès."
+      }
+    },
+    "audiences": {
+      "title": "Pour qui ?",
+      "subtitle": "Pour toutes celles et ceux qui organisent des salons, petits ou grands.",
+      "associations": {
+        "title": "Associations et comités",
+        "text": "Des bénévoles qui organisent un salon chaque année et veulent gagner du temps sur l'administratif."
+      },
+      "independents": {
+        "title": "Organisateurs indépendants",
+        "text": "Plusieurs salons, foires ou marchés à gérer avec la même rigueur, édition après édition."
+      },
+      "venues": {
+        "title": "Communes et lieux d'accueil",
+        "text": "Une vue claire sur les exposants, les emplacements, les prestations et les paiements."
+      }
+    },
+    "waitlist": {
+      "badge": "En construction",
+      "title": "La plateforme ouvre bientôt",
+      "text": "Nous finalisons les derniers détails. Laissez votre adresse : nous vous écrirons dès l'ouverture, avec un accès anticipé pour les premiers organisateurs inscrits.",
+      "emailLabel": "Adresse email",
+      "emailPlaceholder": "vous@exemple.ch",
+      "submit": "Me prévenir",
+      "errorEmail": "Merci d'indiquer une adresse email valide.",
+      "success": "Merci ! Nous vous écrirons à {{email}} dès l'ouverture."
+    },
+    "footer": {
+      "copyright": "© {{year}} {{product}} · Plateforme de gestion de salons en association avec lajoiedemieuxvivre-alle.ch",
+      "underConstruction": "Site en construction"
+    }
+  }
+}
