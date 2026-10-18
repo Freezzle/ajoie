@@ -10,7 +10,8 @@
     "actions": {
       "previous": "Précédent",
       "continue": "Continuer",
-      "submit": "Envoyer ma demande"
+      "submit": "Envoyer mon inscription",
+      "submitAgain": "Soumettre mes modifications"
     },
     "steps": {
       "exhibitor": "Vos informations",

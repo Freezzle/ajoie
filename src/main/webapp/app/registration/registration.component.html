@@ -129,7 +129,7 @@
                                 [isDisabled]="submitting()"
                                 [loading]="submitting()"
                                 class="registration-actions-next"
-                                translateKey="{{ isLastStep() ? 'registration.actions.submit' : 'registration.actions.continue' }}"/>
+                                translateKey="{{ (isLastStep() && registrationStatus() != null) ? 'registration.actions.submitAgain' : isLastStep() ? 'registration.actions.submit' : 'registration.actions.continue' }}"/>
                 </div>
             }
         </form>

@@ -110,7 +110,7 @@ Validation de l'étape : les 3 questions doivent avoir une réponse **et** au mo
 - Une carte par section (Vos informations, Stand, Conférence(s), Atelier(s), Participation) avec un bouton **Modifier** qui ramène à l'étape (et fait défiler jusqu'à la bonne carte pour stand/conférence/atelier).
 - N'afficher que les valeurs renseignées ; booléens en Oui/Non ; enums traduits.
 - Deux cases obligatoires : `acceptedChart` (« J'ai lu et j'accepte la charte des exposants », lien vers le document) et `acceptedContract` (« J'accepte les conditions de participation »).
-- Bouton principal : « Envoyer ma demande ».
+- Bouton principal : « Envoyer mon inscription ».
 
 ### Écran de confirmation
 Icône de validation, « Merci {prénom} ! », texte indiquant qu'une confirmation sera envoyée à {email} après vérification. Pas de bouton « recommencer » en production (c'était pour la démo).
