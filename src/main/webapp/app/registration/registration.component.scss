@@ -12,7 +12,9 @@
 .registration-shell {
   max-width: 660px;
   margin: 0 auto;
-  padding: 2rem 1rem 1rem;
+  padding: 2rem;
+  border: 1px solid var(--app-border);
+  border-top: none;
 }
 
 .registration-header {
@@ -139,7 +141,8 @@
 
 @media (max-width: 700px) {
   .registration-shell {
-    padding: 1.25rem 1rem 1rem;
+    padding: 1rem;
+    border: 0;
   }
 
   .registration-title {
