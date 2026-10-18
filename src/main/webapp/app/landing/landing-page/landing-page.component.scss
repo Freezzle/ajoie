@@ -2,7 +2,7 @@
   display: block;
   width: 100%;
 
-  /* Variables locales au composant (section 3 du brief) - ne modifient pas le thème global. */
+  // Variables locales au composant (section 3 du brief) - ne modifient pas le thème global.
   --bg: #f7f6f1;
   --surface: #ffffff;
   --line: #e4e2d9;
@@ -24,7 +24,7 @@
   overflow-x: hidden;
 }
 
-/* ---------- 4.1 Bandeau "en construction" ---------- */
+// ---------- 4.1 Bandeau "en construction" ----------
 .landing-banner {
   background: var(--warm-l);
   color: #7a4a25;
@@ -44,7 +44,7 @@
   }
 }
 
-/* ---------- 4.2 En-tête ---------- */
+// ---------- 4.2 En-tête ----------
 .landing-header {
   background: var(--surface);
   border-bottom: 1px solid var(--line);
@@ -125,7 +125,7 @@
   white-space: nowrap;
 }
 
-/* ---------- Contenu général ---------- */
+// ---------- Contenu général ----------
 main > section {
   max-width: 1100px;
   margin: 0 auto;
@@ -149,7 +149,7 @@ h2 {
   margin: 0 0 32px;
 }
 
-/* ---------- 4.3 Hero (Variante A : centré) ---------- */
+// ---------- 4.3 Hero (Variante A : centré) ----------
 .landing-hero-a {
   display: flex;
   flex-direction: column;
@@ -211,7 +211,7 @@ h2 {
   }
 }
 
-/* ---------- 4.4 Modules ---------- */
+// ---------- 4.4 Modules ----------
 .landing-filters {
   display: flex;
   justify-content: center;
@@ -236,7 +236,8 @@ h2 {
   }
 }
 
-.landing-modules-grid {
+.landing-modules-grid,
+.landing-audiences-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -294,19 +295,13 @@ h2 {
   color: var(--warm);
 }
 
-/* "Prêt" badge en bleu (couleur primaire du projet), au lieu du vert sauge par défaut. */
+// "Prêt" badge en bleu (couleur primaire du projet), au lieu du vert sauge par défaut.
 .landing-tag-ready {
   background: var(--p-primary-color) !important;
   color: #fff !important;
 }
 
-/* ---------- 4.5 Pour qui ? ---------- */
-.landing-audiences-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
+// ---------- 4.5 Pour qui ? ----------
 .landing-audience-card {
   background: var(--pri-l);
   border-radius: 12px;
@@ -324,7 +319,7 @@ h2 {
   }
 }
 
-/* ---------- 4.6 Formulaire ---------- */
+// ---------- 4.6 Formulaire ----------
 .landing-waitlist-card {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -381,7 +376,7 @@ h2 {
   }
 }
 
-/* ---------- 4.7 Pied de page ---------- */
+// ---------- 4.7 Pied de page ----------
 .landing-footer {
   border-top: 1px solid var(--line);
   max-width: 1100px;
@@ -393,7 +388,7 @@ h2 {
   color: var(--mut);
 }
 
-/* ---------- 5. Responsive ---------- */
+// ---------- 5. Responsive ----------
 @media (max-width: 860px) {
   .landing-nav {
     display: none;
