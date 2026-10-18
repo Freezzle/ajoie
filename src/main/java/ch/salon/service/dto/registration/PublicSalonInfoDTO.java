@@ -29,6 +29,12 @@ public class PublicSalonInfoDTO implements Serializable {
     private Instant registrationClosingDate;
 
     /**
+     * Titre et texte d'accueil affichés avant le début du formulaire d'inscription (première inscription uniquement).
+     */
+    private String registrationWelcomeTitle;
+    private String registrationWelcomeText;
+
+    /**
      * Raison de fermeture : {@code DISABLED}, {@code NOT_YET_OPEN} ou {@code CLOSED}. Null si ouvert.
      */
     private String closedReason;

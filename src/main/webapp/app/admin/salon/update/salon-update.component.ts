@@ -11,6 +11,7 @@ import {Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
+import {EditorBoxComponent} from '../../../shared/components/editor-box/editor-box.component';
 import {DateBoxComponent} from '../../../shared/components/date-box/date-box.component';
 import {sortPriceStandSalon} from '../model/price-stand-salon.interface';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
@@ -44,6 +45,7 @@ import {AlertService} from '../../../core/util/alert.service';
                    ButtonBoxComponent,
                    TextBoxComponent,
                    TextareaBoxComponent,
+                   EditorBoxComponent,
                    DateBoxComponent,
                    AlertErrorComponent,
                    CurrencyBoxComponent,

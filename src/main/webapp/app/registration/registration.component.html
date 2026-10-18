@@ -34,6 +34,19 @@
             <p>{{ 'registration.done.message' | translate: {email: confirmedEmail()} }}</p>
             <p>{{ 'registration.done.editHint' | translate }}</p>
         </div>
+    } @else if (!started()) {
+        <div class="registration-shell registration-welcome">
+            <app-registration-card
+                [title]="salonInfo()?.registrationWelcomeTitle || ('registration.welcome.title' | translate)">
+                <div class="registration-welcome-text" [innerHTML]="salonInfo()?.registrationWelcomeText"></div>
+                <div class="registration-welcome-actions">
+                    <button-box (clickedEvent)="startRegistration()"
+                                [showText]="true"
+                                primeIcon="pi-arrow-right"
+                                translateKey="registration.welcome.start"/>
+                </div>
+            </app-registration-card>
+        </div>
     } @else {
         <app-step-progress [current]="currentStep()"
                            [progress]="stepProgress()"
@@ -63,7 +76,9 @@
                                            [showErrors]="showStepErrors()"/>
                     }
                     @case (2) {
-                        <app-participation-step [form]="form.controls.participation" [prices]="prices"/>
+                        <app-participation-step [email]="form.controls.exhibitor.controls.email.value"
+                                                 [form]="form.controls.participation"
+                                                 [prices]="prices"/>
                     }
                     @default {
                         <app-summary-step [consentsForm]="form.controls.consents"

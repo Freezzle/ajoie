@@ -39,6 +39,7 @@ import {ParticipationFormGroup} from '../../registration-form.service';
 export class ParticipationStepComponent {
     @Input({required: true}) form!: ParticipationFormGroup;
     @Input() prices: IRegistrationPrices | null = null;
+    @Input() email: string | null = null;
 
     readonly modePaymentMealsValues: ModePaymentMeals[] = [ModePaymentMeals.MIXED, ModePaymentMeals.SEPARATE];
     readonly invoiceSendingMethodValues: InvoiceSendingMethod[] =
@@ -59,6 +60,9 @@ export class ParticipationStepComponent {
     }
 
     invoiceMethodHint = (method: InvoiceSendingMethod): string | null => {
+        if (method === InvoiceSendingMethod.EMAIL) {
+            return this.email || null;
+        }
         if (method !== InvoiceSendingMethod.POSTAL) {
             return null;
         }

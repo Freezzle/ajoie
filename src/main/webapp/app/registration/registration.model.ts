@@ -31,6 +31,8 @@ export interface IPublicSalonInfo {
     registrationOpen: boolean;
     registrationOpeningDate: string | null;
     registrationClosingDate: string | null;
+    registrationWelcomeTitle: string | null;
+    registrationWelcomeText: string | null;
     closedReason: RegistrationClosedReason | null;
     dimensions: IPublicDimension[];
     prices: IRegistrationPrices;

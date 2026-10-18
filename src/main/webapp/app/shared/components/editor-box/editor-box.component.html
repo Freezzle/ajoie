@@ -1,0 +1,19 @@
+@if (translateKey) {
+    <label class="form-label d-block mb-2" [for]="'field_' + fieldName">
+        {{ translateKey | translate }}
+        @if (control.hasValidator(Validators.required)) {
+            <span class="text-danger">*</span>
+        }
+    </label>
+}
+
+<p-editor [formControl]="control"
+          [id]="'field_' + fieldName"
+          [readonly]="control.disabled"
+          [disabled]="control.disabled"
+          [style]="{height: height}"
+          fluid/>
+
+@if (control.errors) {
+    <error-box [formControlElement]="control"/>
+}

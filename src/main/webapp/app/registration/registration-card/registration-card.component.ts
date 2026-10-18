@@ -12,6 +12,7 @@ import SharedModule from '../../shared/shared.module';
                styleUrl: './registration-card.component.scss'
            })
 export class RegistrationCardComponent {
-    @Input({required: true}) titleKey!: string;
+    @Input() titleKey: string | null = null;
+    @Input() title: string | null = null;
     @Input() helpKey: string | null = null;
 }

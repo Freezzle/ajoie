@@ -49,9 +49,13 @@
 .registration-actions {
   display: flex;
   gap: 0.75rem;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-top: 2rem;
+
+  .registration-actions-previous {
+    margin-right: auto;
+  }
 }
 
 .registration-done {
@@ -67,6 +71,43 @@
     font-size: 2rem;
     color: var(--p-primary-contrast-color, #fff);
     background: var(--p-primary-color);
+  }
+}
+
+.registration-welcome {
+  .registration-welcome-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
+}
+
+// Le contenu est injecté via [innerHTML] : ::ng-deep nécessaire pour styliser le HTML brut non compilé par Angular.
+:host ::ng-deep .registration-welcome-text {
+  color: var(--p-text-muted-color, #6b655d);
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+
+  p {
+    margin: 0 0 1rem;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
   }
 }
 

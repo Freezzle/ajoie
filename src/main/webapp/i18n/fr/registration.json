@@ -3,6 +3,10 @@
     "title": "Inscription exposant",
     "titleEdit": "Modifier mon inscription",
     "loading": "Chargement en cours…",
+    "welcome": {
+      "title": "Inscription",
+      "start": "Commencer l'inscription"
+    },
     "actions": {
       "previous": "Précédent",
       "continue": "Continuer",
@@ -19,7 +23,7 @@
       "shortSummary": "Récap"
     },
     "titles": {
-      "exhibitor": "Faisons connaissance",
+      "exhibitor": "Qui êtes-vous ?",
       "services": "Que souhaitez-vous proposer ?",
       "participation": "Votre participation",
       "summary": "Tout est bon ?"
@@ -46,10 +50,10 @@
       "decrease": "Diminuer"
     },
     "exhibitor": {
-      "contactTitle": "Vos coordonnées",
+      "contactTitle": "Vos informations personnelles",
       "addressTitle": "Vos adresses",
-      "preferencesTitle": "Langue et communication",
-      "therapistNameHelp": "Nom affiché pendant le salon",
+      "preferencesTitle": "Vos préférences",
+      "therapistNameHelp": "Nom affiché pendant le salon, si aucun, dans ce cas le nom et prénom seront utilisés",
       "emailLocked": "L'adresse e-mail ne peut pas être modifiée : votre lien personnel y est rattaché."
     },
     "services": {
@@ -68,7 +72,8 @@
       "mealsTitle": "Les repas",
       "mealsHelp": "Indiquez le nombre de repas souhaités pour votre équipe.",
       "invoiceTitle": "Mode d'envoi de la facture principale",
-      "offerTitle": "Offre spéciale",
+      "offerTitle": "Tirage au sort RFJ",
+      "offerTitleHelp": "Souhaitez-vous offrir un soin ou un cadeau pour le tirage au sort de la radio RFJ ?",
       "additionalTitle": "Dernières précisions"
     },
     "summary": {

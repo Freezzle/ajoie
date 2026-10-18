@@ -40,6 +40,9 @@
       font-size: 0.78rem;
       color: var(--p-text-muted-color, #6b655d);
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
   }
 }

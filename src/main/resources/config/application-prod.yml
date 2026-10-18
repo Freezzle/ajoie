@@ -85,7 +85,7 @@ salon:
       site-key: ${CAPTCHA_SITE_KEY:}
       secret-key: ${CAPTCHA_SECRET_KEY:}
   mail:
-    base-url: https://app-82accd07-7176-4f96-8643-46ebbbf3fa54.cleverapps.io
+    base-url: https://www.salon-en-ligne.ch
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration

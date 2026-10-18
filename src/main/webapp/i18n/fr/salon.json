@@ -33,7 +33,9 @@
       "closingDate": "Fermeture des inscriptions",
       "copyLink": "Copier le lien d'inscription",
       "linkCopied": "Lien d'inscription copié",
-      "linkCopyFailed": "Impossible de copier le lien"
+      "linkCopyFailed": "Impossible de copier le lien",
+      "welcomeTitle": "Titre de la page d'accueil",
+      "welcomeText": "Texte de la page d'accueil"
     },
     "stands": "Les stands",
     "startingDate": "Date de début",

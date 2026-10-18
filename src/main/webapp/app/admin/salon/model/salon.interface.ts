@@ -23,6 +23,8 @@ export interface ISalon {
     registrationEnabled: boolean;
     registrationOpeningDate: Date | null;
     registrationClosingDate: Date | null;
+    registrationWelcomeTitle: string | null;
+    registrationWelcomeText: string | null;
     sourceSalonId?: string | null;
 }
 

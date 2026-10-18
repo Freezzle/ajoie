@@ -13,7 +13,7 @@
                        (change)="select(option)"/>
                 <span>{{ needTranslation ? (getLabel(option) | translate) : getLabel(option) }}</span>
                 @if (getHint(option); as hint) {
-                    <small class="radio-box-hint">{{ hint }}</small>
+                    <small [title]="hint" class="radio-box-hint">{{ hint }}</small>
                 }
             </label>
         }

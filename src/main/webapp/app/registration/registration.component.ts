@@ -15,6 +15,7 @@ import {ParticipationStepComponent} from './steps/participation-step/participati
 import {ServicesStepComponent} from './steps/services-step/services-step.component';
 import {SummaryStepComponent} from './steps/summary-step/summary-step.component';
 import {TurnstileBoxComponent} from './turnstile-box.component';
+import {RegistrationCardComponent} from './registration-card/registration-card.component';
 
 const STEPS: StepDescriptor[] = [
     {key: 'exhibitor', shortLabelKey: 'registration.steps.shortExhibitor', labelKey: 'registration.steps.exhibitor'},
@@ -38,7 +39,8 @@ const STEPS: StepDescriptor[] = [
                    ServicesStepComponent,
                    ParticipationStepComponent,
                    SummaryStepComponent,
-                   TurnstileBoxComponent
+                   TurnstileBoxComponent,
+                   RegistrationCardComponent
                ],
                templateUrl: './registration.component.html',
                styleUrl: './registration.component.scss'
@@ -58,6 +60,7 @@ export default class RegistrationComponent implements OnInit {
     readonly captchaSiteKey = signal<string>('');
     readonly captchaToken = signal<string | null>(null);
     readonly editMode = signal<boolean>(false);
+    readonly started = signal<boolean>(false);
     readonly confirmedFirstName = signal<string>('');
     readonly confirmedEmail = signal<string>('');
 
@@ -102,6 +105,7 @@ export default class RegistrationComponent implements OnInit {
         this.participationId = params.get('participationId');
         this.token = params.get('token');
         this.editMode.set(!!this.participationId && !!this.token);
+        this.started.set(this.editMode());
 
         this.registrationService.getCaptchaConfig().subscribe({
             next: config => {
@@ -141,6 +145,11 @@ export default class RegistrationComponent implements OnInit {
             default:
                 return this.form.controls.consents;
         }
+    }
+
+    startRegistration(): void {
+        this.started.set(true);
+        this.goTo(0);
     }
 
     previous(): void {
@@ -291,6 +300,7 @@ export default class RegistrationComponent implements OnInit {
                            next: (request: IRegistrationRequest) => {
                                this.formService.patchFromRequest(this.form, request, this.dimensions);
                                this.form.controls.exhibitor.controls.email.disable();
+                               this.currentStep.set(STEPS.length - 1);
                                this.maxReached.set(STEPS.length - 1);
                                this.loading.set(false);
                                this.refreshStates();

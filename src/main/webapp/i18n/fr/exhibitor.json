@@ -4,7 +4,7 @@
     "billingAddress": "Adresse de facturation",
     "copyNewsletter": "Emails (newsletter)",
     "country": "Pays",
-    "differentBillingAddress": "Utiliser une adresse de facturation différente",
+    "differentBillingAddress": "Utiliser une adresse de facturation",
     "create": "Nouveau client",
     "delete": {
       "question": "Voulez-vous supprimer \"{{ id }}\" ?"
@@ -36,7 +36,7 @@
     "phoneNumber": "Téléphone",
     "preferences": "Préférences",
     "redFlag": "Exposant bloqué",
-    "therapistName": "Nom de thérapeute",
+    "therapistName": "Nom d'entreprise/thérapeute",
     "title": "L'annuaire client"
   }
 }

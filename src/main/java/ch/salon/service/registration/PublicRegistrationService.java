@@ -262,6 +262,8 @@ public class PublicRegistrationService {
         dto.setEndingDate(salon.getEndingDate());
         dto.setRegistrationOpeningDate(salon.getRegistrationOpeningDate());
         dto.setRegistrationClosingDate(salon.getRegistrationClosingDate());
+        dto.setRegistrationWelcomeTitle(salon.getRegistrationWelcomeTitle());
+        dto.setRegistrationWelcomeText(salon.getRegistrationWelcomeText());
 
         String closedReason = computeClosedReason(salon);
         dto.setClosedReason(closedReason);

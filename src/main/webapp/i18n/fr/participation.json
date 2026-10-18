@@ -19,20 +19,20 @@
     "exhibitor": "Exposant",
     "extraInformation": "Commentaire",
     "guestOfHonor": "Invité d'honneur ?",
-    "hasOffer": "Offre ?",
+    "hasOffer": "Oui, je désire offrir un cadeau ou un soin",
     "invoiceSendingMethod": {
       "label": "Envoi de facture",
       "list": {
         "EMAIL": "Par e-mail",
-        "POSTAL": "Par envoi postal",
+        "POSTAL": "A l'adresse de facturation",
         "null": " "
       }
     },
     "modePaymentMeals": {
-      "label": "Paiment des repas",
+      "label": "Paiment des bons repas",
       "list": {
         "MIXED": "Avec la facture principale",
-        "SEPARATE": "Paiement sur place au salon",
+        "SEPARATE": "Directement sur place au salon",
         "null": " "
       }
     },
@@ -44,7 +44,7 @@
     "newStand": "Nouveau stand",
     "newWorkshop": "Nouvel atelier",
     "notFound": "Aucune participation",
-    "offer": "Description de l'offre",
+    "offer": "Description",
     "rating": "Evaluation",
     "ratingFriendliness": "Aimabilité",
     "ratingPaymentSpeed": "Fiabilité de paiement",

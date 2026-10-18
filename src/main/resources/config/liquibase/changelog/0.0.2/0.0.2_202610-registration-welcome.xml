@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Titre et texte d'accueil affichés avant la première étape du formulaire d'inscription publique -->
+    <changeSet id="0.0.2-202610-salon-registration-welcome" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon"/>
+        </preConditions>
+
+        <addColumn tableName="salon">
+            <column name="registration_welcome_title" type="varchar(255)"/>
+            <column name="registration_welcome_text" type="text"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="salon" columnName="registration_welcome_title"/>
+            <dropColumn tableName="salon" columnName="registration_welcome_text"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
