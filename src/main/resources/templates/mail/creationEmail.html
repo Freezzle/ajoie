@@ -9,7 +9,7 @@
     <p th:text="#{email.activation.greeting(${user.login})}"></p>
     <p th:text="#{email.creation.text1}"></p>
     <p>
-      <a th:href="${url}" th:text="${url}" th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}|})"></a>
+      <a th:href="${url}" th:text="#{email.creation.linkText}" th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}|})"></a>
     </p>
     <p>
       <span th:text="#{email.activation.text2}"></span>
