@@ -13,7 +13,7 @@ const routes: Routes = [
         path: '',
         component: HomeComponent,
         title: 'home.title',
-        canActivate: [UserRouteAccessService]
+        data: {publicLayout: true}
     },
     {
         path: '',
@@ -33,7 +33,7 @@ const routes: Routes = [
         loadChildren: () => import('./account/account.route')
     },
     {
-        path: 'login',
+        path: 'admin/login',
         component: LoginComponent,
         title: 'login.title'
     },

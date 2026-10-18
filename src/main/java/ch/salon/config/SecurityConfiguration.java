@@ -111,7 +111,7 @@ public class SecurityConfiguration {
                         new OrRequestMatcher(PathPatternRequestMatcher.pathPattern("/api/**"))
                 ))
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/")
+                        .loginPage("/admin/login")
                         .loginProcessingUrl("/api/authentication")
                         .successHandler((request, response, authentication) -> {
                             userRepository.updateLastLoginAt(authentication.getName(), Instant.now());

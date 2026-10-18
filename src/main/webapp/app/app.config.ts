@@ -29,7 +29,7 @@ const routerFeatures: Array<RouterFeatures> = [
         } else if (e.error.status === 404) {
             router.navigate(['/404']);
         } else if (e.error.status === 401) {
-            router.navigate(['/login']);
+            router.navigate(['/admin/login']);
         } else {
             router.navigate(['/error']);
         }

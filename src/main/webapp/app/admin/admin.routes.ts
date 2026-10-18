@@ -3,6 +3,11 @@ import {Authority} from '../config/authority.constants';
 
 const routes: Routes = [
     {
+        path: '',
+        loadComponent: () => import('./home/home.component'),
+        title: 'home.title'
+    },
+    {
         path: 'user-management',
         data: {
             authorities: [Authority.ADMIN]

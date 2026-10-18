@@ -27,7 +27,7 @@ export default class TopbarComponent {
     }
 
     login(): void {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/admin/login']);
     }
 
     logout(): void {
