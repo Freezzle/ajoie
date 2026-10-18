@@ -93,7 +93,7 @@
       "estimatedCost": "Coût estimé des prestations",
       "total": "Total",
       "quantity": "× {{quantity}}",
-      "disclaimer": "Montant indicatif. La facture définitive vous sera envoyée par e-mail après acceptation de votre inscription.",
+      "disclaimer": "Montant indicatif. La facture définitive vous sera envoyée après acceptation de votre inscription.",
       "lines": {
         "stand": "Stand {{dimension}}",
         "sharedStand": "Stand partagé",
@@ -109,6 +109,17 @@
       "thanks": "Merci {{firstName}} !",
       "message": "Une confirmation sera envoyée à {{email}} après vérification de votre demande.",
       "editHint": "Vous recevrez également un lien personnel pour modifier votre inscription tant qu'elle est en cours de vérification."
+    },
+    "status": {
+      "title": "Statut de l'inscription",
+      "detail": {
+        "IN_VERIFICATION": "Votre inscription est en cours de vérification par l'organisation. Vous pouvez encore la modifier grâce à ce lien tant qu'elle n'a pas été traitée.",
+        "ACCEPTED": "Bonne nouvelle, votre inscription a été acceptée ! Vous ne pouvez plus la modifier depuis ce lien, mais vous recevrez prochainement toutes les informations utiles pour le salon.",
+        "VALIDATED": "Votre inscription est validée, votre participation au salon est confirmée. Elle n'est plus modifiable depuis ce lien.",
+        "CLOSED": "Votre inscription est terminée. Merci pour votre participation au salon !",
+        "CANCELED": "Votre inscription a été annulée. Pour toute question, merci de contacter l'organisation.",
+        "REFUSED": "Votre inscription n'a pas été retenue cette année. Pour toute question, merci de contacter l'organisation."
+      }
     },
     "closed": {
       "title": "Les inscriptions ne sont pas ouvertes",

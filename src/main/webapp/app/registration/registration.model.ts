@@ -2,6 +2,7 @@ import {Category} from '../admin/enumerations/category.model';
 import {InvoiceSendingMethod} from '../admin/enumerations/invoice-sending-method.model';
 import {ModePaymentMeals} from '../admin/enumerations/mode-payment-meals.model';
 import {IAddress} from '../admin/common/address.model';
+import {Status} from '../admin/enumerations/status.model';
 
 export interface IPublicDimension {
     id: string;
@@ -90,6 +91,8 @@ export interface IRegistrationTalk {
 }
 
 export interface IRegistrationRequest {
+    /** Renseigné uniquement en lecture (lien de modification) ; absent lors de la création. */
+    status?: Status | null;
     exhibitor: IRegistrationExhibitor;
     participation: IRegistrationParticipation;
     stands: IRegistrationStand[];

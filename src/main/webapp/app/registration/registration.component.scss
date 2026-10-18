@@ -82,6 +82,25 @@
   }
 }
 
+.registration-status-detail {
+  margin: 0;
+
+  &.registration-status-in_verification {
+    color: var(--p-text-muted-color, #6b655d);
+  }
+
+  &.registration-status-accepted,
+  &.registration-status-validated,
+  &.registration-status-closed {
+    color: var(--p-green-600, #15803d);
+  }
+
+  &.registration-status-canceled,
+  &.registration-status-refused {
+    color: var(--p-red-600, #dc2626);
+  }
+}
+
 // Le contenu est injecté via [innerHTML] : ::ng-deep nécessaire pour styliser le HTML brut non compilé par Angular.
 :host ::ng-deep .registration-welcome-text {
   color: var(--p-text-muted-color, #6b655d);

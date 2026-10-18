@@ -1,5 +1,6 @@
 package ch.salon.service.dto.registration;
 
+import ch.salon.domain.enumeration.Status;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -14,6 +15,12 @@ import java.util.List;
  */
 @Data
 public class RegistrationRequestDTO implements Serializable {
+
+    /**
+     * Statut actuel de la participation. Renseigné uniquement en lecture (GET) ; ignoré en entrée,
+     * le statut n'étant jamais modifiable depuis le formulaire public.
+     */
+    private Status status;
 
     @NotNull
     @Valid

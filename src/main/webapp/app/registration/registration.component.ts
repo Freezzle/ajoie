@@ -7,6 +7,7 @@ import {debounceTime} from 'rxjs/operators';
 import SharedModule from '../shared/shared.module';
 import {ButtonBoxComponent} from '../shared/components/button-box/button-box.component';
 import {AlertService} from '../core/util/alert.service';
+import {Status} from '../admin/enumerations/status.model';
 import {IPublicDimension, IPublicSalonInfo, IRegistrationPrices, IRegistrationRequest} from './registration.model';
 import {RegistrationFormGroup, RegistrationFormService} from './registration-form.service';
 import {RegistrationDraftStorageService} from './registration-draft-storage.service';
@@ -63,6 +64,7 @@ export default class RegistrationComponent implements OnInit {
     readonly captchaToken = signal<string | null>(null);
     readonly editMode = signal<boolean>(false);
     readonly started = signal<boolean>(false);
+    readonly registrationStatus = signal<Status | null>(null);
     readonly confirmedFirstName = signal<string>('');
     readonly confirmedEmail = signal<string>('');
 
@@ -86,6 +88,13 @@ export default class RegistrationComponent implements OnInit {
     private token: string | null = null;
 
     readonly isLastStep = computed(() => this.currentStep() === STEPS.length - 1);
+
+    /**
+     * Une inscription modifiée revenant via le lien n'est plus modifiable dès qu'elle est sortie
+     * du statut "en vérification" : elle doit être consultable en lecture seule uniquement.
+     */
+    readonly readOnly = computed(() => this.editMode() &&
+        this.registrationStatus() !== null && this.registrationStatus() !== Status.IN_VERIFICATION);
 
     get dimensions(): IPublicDimension[] {
         return this.salonInfo()?.dimensions ?? [];
@@ -163,12 +172,16 @@ export default class RegistrationComponent implements OnInit {
     }
 
     previous(): void {
-        if (this.currentStep() > 0) {
+        if (!this.readOnly() && this.currentStep() > 0) {
             this.goTo(this.currentStep() - 1);
         }
     }
 
     next(): void {
+        if (this.readOnly()) {
+            return;
+        }
+
         if (this.isLastStep()) {
             this.submit();
             return;
@@ -184,6 +197,10 @@ export default class RegistrationComponent implements OnInit {
      * et on s'arrête sur la première invalide.
      */
     onStepClick(target: number): void {
+        if (this.readOnly()) {
+            return;
+        }
+
         if (target <= this.currentStep()) {
             this.goTo(target);
             return;
@@ -200,6 +217,10 @@ export default class RegistrationComponent implements OnInit {
     }
 
     onEditFromSummary(event: {step: number; anchor?: string}): void {
+        if (this.readOnly()) {
+            return;
+        }
+
         this.goTo(event.step);
         if (event.anchor) {
             setTimeout(() => document.getElementById(event.anchor as string)?.scrollIntoView({block: 'start'}), 50);
@@ -335,8 +356,15 @@ export default class RegistrationComponent implements OnInit {
         this.registrationService.findRegistration(this.salonId, this.participationId as string, this.token as string)
             .subscribe({
                            next: (request: IRegistrationRequest) => {
+                               this.registrationStatus.set(request.status ?? null);
                                this.formService.patchFromRequest(this.form, request, this.dimensions);
-                               this.form.controls.exhibitor.controls.email.disable();
+
+                               if (this.readOnly()) {
+                                   this.form.disable({emitEvent: false});
+                               } else {
+                                   this.form.controls.exhibitor.controls.email.disable();
+                               }
+
                                this.currentStep.set(STEPS.length - 1);
                                this.maxReached.set(STEPS.length - 1);
                                this.loading.set(false);
@@ -350,6 +378,10 @@ export default class RegistrationComponent implements OnInit {
     }
 
     submit(): void {
+        if (this.readOnly()) {
+            return;
+        }
+
         for (let i = 0; i < STEPS.length; i++) {
             if (!this.validateStep(i)) {
                 this.goTo(i);

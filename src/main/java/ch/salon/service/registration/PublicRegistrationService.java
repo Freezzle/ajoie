@@ -103,7 +103,7 @@ public class PublicRegistrationService {
         UUID tenantId = resolveTenant(salonId);
 
         return TenantContextHolder.runAsTenant(tenantId, () -> transactionalOps.executeReadOnlyAndReturn(() -> {
-            Participation participation = loadEditableParticipation(salonId, participationId, token);
+            Participation participation = loadParticipationByToken(salonId, participationId, token);
             return toRequest(participation);
         }));
     }
@@ -224,7 +224,7 @@ public class PublicRegistrationService {
         }
     }
 
-    private Participation loadEditableParticipation(UUID salonId, UUID participationId, String token) {
+    private Participation loadParticipationByToken(UUID salonId, UUID participationId, String token) {
         Participation participation = participationRepository.findById(participationId).orElseThrow(
                 () -> new BadRequestAlertException("Inscription introuvable", ENTITY_NAME,
                         "registration.link-invalid"));
@@ -239,6 +239,12 @@ public class PublicRegistrationService {
             throw new BadRequestAlertException("Lien de modification invalide", ENTITY_NAME,
                     "registration.link-invalid");
         }
+
+        return participation;
+    }
+
+    private Participation loadEditableParticipation(UUID salonId, UUID participationId, String token) {
+        Participation participation = loadParticipationByToken(salonId, participationId, token);
 
         if (participation.getStatus() != Status.IN_VERIFICATION) {
             throw new BadRequestAlertException("Inscription déjà traitée", ENTITY_NAME, "registration.not-editable");
@@ -319,6 +325,7 @@ public class PublicRegistrationService {
         participationDTO.setAcceptedContract(Boolean.TRUE.equals(participation.getAcceptedContract()));
 
         RegistrationRequestDTO request = new RegistrationRequestDTO();
+        request.setStatus(participation.getStatus());
         request.setExhibitor(exhibitorDTO);
         request.setParticipation(participationDTO);
 

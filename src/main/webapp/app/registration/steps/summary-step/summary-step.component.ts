@@ -30,6 +30,7 @@ export class SummaryStepComponent {
     @Input({required: true}) consentsForm!: ConsentsFormGroup;
     @Input() dimensions: IPublicDimension[] = [];
     @Input() prices: IRegistrationPrices | null = null;
+    @Input() readOnly: boolean = false;
 
     @Output() editStep = new EventEmitter<{step: number; anchor?: string}>();
 

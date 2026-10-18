@@ -2,10 +2,12 @@
     <div class="summary-card">
         <div class="summary-card-head">
             <h3>{{ 'registration.steps.exhibitor' | translate }}</h3>
-            <button-box (clickedEvent)="onEdit(0)"
-                        primeIcon="pi-pencil"
-                        translateKey="registration.summary.edit"
-                        type="secondary"/>
+            @if (!readOnly) {
+                <button-box (clickedEvent)="onEdit(0)"
+                            primeIcon="pi-pencil"
+                            translateKey="registration.summary.edit"
+                            type="secondary"/>
+            }
         </div>
         <dl class="summary-list">
             <div class="summary-row">
@@ -49,10 +51,12 @@
         <div class="summary-card">
             <div class="summary-card-head">
                 <h3>{{ 'registration.summary.stand' | translate }}</h3>
-                <button-box (clickedEvent)="onEdit(1, 'card-stand')"
-                            primeIcon="pi-pencil"
-                            translateKey="registration.summary.edit"
-                            type="secondary"/>
+                @if (!readOnly) {
+                    <button-box (clickedEvent)="onEdit(1, 'card-stand')"
+                                primeIcon="pi-pencil"
+                                translateKey="registration.summary.edit"
+                                type="secondary"/>
+                }
             </div>
             <dl class="summary-list">
                 <div class="summary-row">
@@ -121,10 +125,12 @@
         <div class="summary-card">
             <div class="summary-card-head">
                 <h3>{{ 'registration.summary.conferences' | translate }}</h3>
-                <button-box (clickedEvent)="onEdit(1, 'card-conference')"
-                            primeIcon="pi-pencil"
-                            translateKey="registration.summary.edit"
-                            type="secondary"/>
+                @if (!readOnly) {
+                    <button-box (clickedEvent)="onEdit(1, 'card-conference')"
+                                primeIcon="pi-pencil"
+                                translateKey="registration.summary.edit"
+                                type="secondary"/>
+                }
             </div>
             <dl class="summary-list">
                 @for (talk of conferenceControls; track $index) {
@@ -145,10 +151,12 @@
         <div class="summary-card">
             <div class="summary-card-head">
                 <h3>{{ 'registration.summary.workshops' | translate }}</h3>
-                <button-box (clickedEvent)="onEdit(1, 'card-workshop')"
-                            primeIcon="pi-pencil"
-                            translateKey="registration.summary.edit"
-                            type="secondary"/>
+                @if (!readOnly) {
+                    <button-box (clickedEvent)="onEdit(1, 'card-workshop')"
+                                primeIcon="pi-pencil"
+                                translateKey="registration.summary.edit"
+                                type="secondary"/>
+                }
             </div>
             <dl class="summary-list">
                 @for (talk of workshopControls; track $index) {
@@ -168,10 +176,12 @@
     <div class="summary-card">
         <div class="summary-card-head">
             <h3>{{ 'registration.steps.participation' | translate }}</h3>
-            <button-box (clickedEvent)="onEdit(2)"
-                        primeIcon="pi-pencil"
-                        translateKey="registration.summary.edit"
-                        type="secondary"/>
+            @if (!readOnly) {
+                <button-box (clickedEvent)="onEdit(2)"
+                            primeIcon="pi-pencil"
+                            translateKey="registration.summary.edit"
+                            type="secondary"/>
+            }
         </div>
         <dl class="summary-list">
             @if (participation.nbMeal1) {
