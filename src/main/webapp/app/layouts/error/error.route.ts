@@ -20,7 +20,8 @@ export const errorRoute: Routes = [
         path: '404',
         component: ErrorComponent,
         data: {
-            errorMessage: 'error.http.404'
+            errorMessage: 'error.http.404',
+            publicLayout: true
         },
         title: 'error.title'
     },
