@@ -1,11 +1,11 @@
 :host {
     --vp-accent: var(--p-primary-color, #325d88);
-    --vp-ok: #2b8a3e;
-    --vp-ok-bg: #e7f5ea;
+    --vp-ok: var(--p-primary-color, #325d88);
+    --vp-ok-bg: #ffffff;
     --vp-under: #d6336c;
     --vp-under-bg: #fdeaf0;
-    --vp-over: #d9480f;
-    --vp-over-bg: #fff1e6;
+    --vp-over: #2b8a3e;
+    --vp-over-bg: #e7f5ea;
     --vp-unav: #a3a8b1;
     /* non défini globalement : fallback local, hérité par tous les sous-composants */
     --app-text-muted: #9aa1ad;

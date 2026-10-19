@@ -38,12 +38,10 @@
     border-radius: 6px;
     display: grid;
     grid-template-columns: repeat(2, auto);
-    justify-content: center;
     align-content: flex-start;
     gap: 2px;
     padding: 3px;
     cursor: pointer;
-    background: var(--app-surface-muted);
     touch-action: none;
     overflow: hidden;
 }
