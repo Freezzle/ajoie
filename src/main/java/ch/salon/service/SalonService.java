@@ -498,6 +498,19 @@ public class SalonService {
                     newDay.setAssignedVolunteerIds(new java.util.ArrayList<>(day.getAssignedVolunteerIds()));
                     newDay.setCells(new java.util.ArrayList<>());
                     newDay.setUnavailableCells(new java.util.ArrayList<>());
+
+                    // Les places minimum font partie de la configuration : on les conserve
+                    List<VolunteerPlanningNeed> newNeeds = new java.util.ArrayList<>();
+                    if (day.getNeeds() != null) {
+                        for (VolunteerPlanningNeed need : day.getNeeds()) {
+                            VolunteerPlanningNeed newNeed = new VolunteerPlanningNeed();
+                            newNeed.setCategoryId(need.getCategoryId());
+                            newNeed.setSlotIndex(need.getSlotIndex());
+                            newNeed.setMin(need.getMin());
+                            newNeeds.add(newNeed);
+                        }
+                    }
+                    newDay.setNeeds(newNeeds);
                     newDays.add(newDay);
                 }
                 newConf.setDays(newDays);

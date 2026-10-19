@@ -1,0 +1,37 @@
+<div class="m-screen">
+    <div class="m-seg">
+        <button type="button" [class.on]="!isZoneView()" (click)="setView('person')">
+            <i class="pi pi-user"></i>{{ 'planningVolunteers.view.byPerson' | translate }}
+        </button>
+        <button type="button" [class.on]="isZoneView()" (click)="setView('zone')">
+            <i class="pi pi-th-large"></i>{{ 'planningVolunteers.view.byZone' | translate }}
+        </button>
+    </div>
+
+    @if (isZoneView()) {
+        <mobile-zone-list (openAssign)="sheet.set('assign')"
+                          (openRoster)="sheet.set('roster')"
+                          (openPerson)="openPerson($event)"/>
+    } @else {
+        <mobile-person-grid (openPerson)="openPerson($event)"
+                            (openMinimums)="sheet.set('minimums')"/>
+    }
+
+    @if (sheet(); as kind) {
+        <bottom-sheet (closed)="closeSheet()">
+            @switch (kind) {
+                @case ('person') {
+                    <person-planning-sheet [volunteerId]="personSheetId()"
+                                           (closed)="closeSheet()"
+                                           (goToZones)="goToZones($event)"/>
+                }
+                @case ('minimums') {
+                    <minimums-sheet (closed)="closeSheet()"/>
+                }
+                @default {
+                    <zone-assign-panel (closed)="closeSheet()"/>
+                }
+            }
+        </bottom-sheet>
+    }
+</div>

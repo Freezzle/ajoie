@@ -1,0 +1,46 @@
+:host {
+    display: block;
+}
+
+.m-screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: min(78vh, 760px);
+    min-height: 420px;
+    overflow: hidden;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+}
+
+.m-seg {
+    display: flex;
+    background: var(--app-surface-muted);
+    border-radius: 10px;
+    padding: 3px;
+    margin: 8px 10px;
+    flex: none;
+}
+
+.m-seg button {
+    flex: 1;
+    border: 0;
+    background: none;
+    border-radius: 8px;
+    padding: 7px;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--app-text-muted);
+    display: flex;
+    gap: 7px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.m-seg button.on {
+    background: var(--app-surface);
+    color: var(--app-text);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
+}

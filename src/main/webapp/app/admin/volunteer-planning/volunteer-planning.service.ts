@@ -37,6 +37,12 @@ export interface VolunteerPlanningCellDto {
     categoryId: string;
 }
 
+export interface VolunteerPlanningNeedDto {
+    categoryId: string;
+    slotIndex: number;
+    min: number;
+}
+
 export interface VolunteerPlanningDayDto {
     id: string;
     label: string;
@@ -46,6 +52,7 @@ export interface VolunteerPlanningDayDto {
     assignedVolunteerIds: string[];
     cells: VolunteerPlanningCellDto[];
     unavailableCells?: { volunteerId: string; slotIndex: number }[];
+    needs?: VolunteerPlanningNeedDto[];
 }
 
 export interface VolunteerPlanningConfigurationDto {

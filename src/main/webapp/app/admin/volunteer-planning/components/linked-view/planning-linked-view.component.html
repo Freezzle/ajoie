@@ -1,0 +1,87 @@
+<div class="linked">
+    <div class="linked-card">
+        @if (showPersons() && !store.isReadOnly()) {
+            <div class="toolbar">
+                @for (c of store.categories(); track c.id; let i = $index) {
+                    <button type="button"
+                            class="tool"
+                            [class.on]="selectedToolCategoryId() === c.id"
+                            (click)="selectCategory(c.id, $event)">
+                        <span class="vp-sw" [style.background-color]="c.color">
+                            <i [class]="c.icon || 'pi pi-circle-fill'"></i>
+                        </span>
+                        {{ c.label }}
+                        @if (i < 9) {
+                            <kbd>{{ i + 1 }}</kbd>
+                        }
+                    </button>
+                }
+                <span class="sep"></span>
+                <button type="button" class="tool er" [class.on]="store.tool().kind === 'ERASER'"
+                        (click)="selectTool('ERASER')">
+                    <span class="vp-sw"><i class="pi pi-eraser"></i></span>
+                    {{ 'planningVolunteers.palette.eraser' | translate }}<kbd>E</kbd>
+                </button>
+                <button type="button" class="tool un" [class.on]="store.tool().kind === 'UNAVAILABLE'"
+                        (click)="selectTool('UNAVAILABLE')">
+                    <span class="vp-sw"><i class="pi pi-ban"></i></span>
+                    {{ 'planningVolunteers.palette.unavailable' | translate }}<kbd>X</kbd>
+                </button>
+            </div>
+        }
+
+        @if (store.zoneSelection() && showPersons()) {
+            <div class="selbanner">
+                <span class="vp-sw" [style.background-color]="selectedCategory()?.color">
+                    <i [class]="selectedCategory()?.icon || 'pi pi-circle-fill'"></i>
+                </span>
+                <span class="sp">
+                    <b>{{ selectedCategory()?.label }} · {{ selectedRangeLabel() }}</b>
+                </span>
+                <button type="button" class="btn" (click)="clearSelection()">
+                    {{ 'planningVolunteers.focus.clear' | translate }}
+                </button>
+            </div>
+        }
+
+        <div class="linked-scroller">
+            <div class="tl-in" [style.width.px]="totalWidth()">
+                <div class="tl-sticky">
+                    <div class="tl-row tl-head">
+                        <div class="tl-name">
+                            {{ (showPersons() ? 'planningVolunteers.view.persons' : 'planningVolunteers.view.zones') | translate }}
+                        </div>
+                        <div class="ticks" [style.width.px]="trackWidth()">
+                            @for (tick of ticks(); track tick.index) {
+                                <span [style.left.px]="tick.left">{{ tick.label }}</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (showPersons()) {
+                    <planning-timeline/>
+                }
+
+                @if (showZones()) {
+                    <div [class.zones-dock]="showPersons()">
+                        <div class="tl-sec">
+                            <span>
+                                <i class="pi pi-th-large"></i>
+                                {{ 'planningVolunteers.zones.title' | translate }} ·
+                                {{ 'planningVolunteers.zones.hint' | translate }}
+                            </span>
+                        </div>
+                        <planning-zones/>
+                    </div>
+                } @else {
+                    <coverage-rows/>
+                }
+            </div>
+        </div>
+    </div>
+
+    <aside class="side-panel">
+        <zone-assign-panel/>
+    </aside>
+</div>

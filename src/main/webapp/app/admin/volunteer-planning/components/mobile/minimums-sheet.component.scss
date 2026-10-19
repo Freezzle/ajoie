@@ -1,0 +1,97 @@
+@use '../planning-shared';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.ph {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.ph-txt {
+    min-width: 0;
+    flex: 1;
+}
+
+.ph-txt b {
+    display: block;
+    font-size: 14px;
+}
+
+.ph small {
+    display: block;
+    color: var(--app-text-muted);
+    font-size: 12px;
+}
+
+.ph .x {
+    border: 0;
+    background: none;
+    font-size: 20px;
+    color: var(--app-text-muted);
+    padding: 0 4px;
+    cursor: pointer;
+}
+
+.body {
+    overflow: auto;
+    padding: 6px 8px 10px;
+    min-height: 0;
+}
+
+.covwrap {
+    overflow-x: auto;
+    padding: 4px 2px;
+}
+
+.covt {
+    border-collapse: separate;
+    border-spacing: 3px;
+}
+
+.covt th {
+    position: sticky;
+    left: 0;
+    background: var(--app-surface);
+    z-index: 2;
+    font-size: 10px;
+    color: var(--app-text-muted);
+    font-weight: 600;
+    padding: 0 4px;
+}
+
+.covt th.tk {
+    position: static;
+}
+
+.covt td {
+    min-width: 38px;
+    text-align: center;
+    border-radius: 6px;
+    background: var(--app-surface-muted);
+    padding: 0;
+}
+
+.covt td button {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: none;
+    height: 22px;
+    color: inherit;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.covt td b {
+    display: block;
+    font-size: 10.5px;
+}

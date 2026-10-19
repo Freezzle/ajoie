@@ -1,0 +1,93 @@
+@if (selection(); as sel) {
+    <div class="ph">
+        <span class="vp-sw lg" [style.background-color]="selectedCategory()?.color">
+            <i [class]="selectedCategory()?.icon || 'pi pi-circle-fill'"></i>
+        </span>
+        <div class="ph-txt">
+            <b>{{ selectedCategory()?.label }}</b>
+            <small>{{ selectionRange() }} · {{ selectionLength() }} {{ 'planningVolunteers.panel.slots' | translate }}</small>
+        </div>
+        <button type="button" class="x" (click)="close()" [title]="'common.close' | translate">&times;</button>
+    </div>
+
+    <div class="needrow">
+        {{ 'planningVolunteers.coverage.minPerSlot' | translate }}
+        @if (!store.isReadOnly()) {
+            <button type="button" (click)="bumpMin(-1)">&minus;</button>
+        }
+        <b>{{ minLabel() }}</b>
+        @if (!store.isReadOnly()) {
+            <button type="button" (click)="bumpMin(1)">+</button>
+        }
+        <span class="cov"
+              [class.st-under]="selectionCoverage().state === 'under'"
+              [class.st-ok]="selectionCoverage().state === 'ok'"
+              [class.st-over]="selectionCoverage().state === 'over'">
+            {{ selectionCoverage().assigned }}/{{ selectionCoverage().min }}
+        </span>
+    </div>
+
+    <div class="body">
+        @for (group of groupedRows(); track group.group) {
+            <div class="grp">{{ groupKey(group.group) | translate }}</div>
+            @for (row of group.rows; track row.volunteer.id) {
+                <div class="vrow" [class.st-unav]="row.group === 'unavailable'">
+                    <volunteer-avatar [volunteerId]="row.volunteer.id" [label]="row.volunteer.label" [size]="30"/>
+                    <div class="vn">
+                        <b>{{ row.volunteer.label }}</b>
+                        <small>{{ row.description }} · {{ row.hours }}</small>
+                    </div>
+                    @if (!store.isReadOnly()) {
+                        @if (row.canComplete) {
+                            <button type="button" class="btn" (click)="add(row.volunteer.id)">
+                                {{ 'planningVolunteers.panel.complete' | translate }}
+                            </button>
+                        }
+                        @if (row.canRemove) {
+                            <button type="button" class="btn danger" (click)="remove(row.volunteer.id)">
+                                {{ 'planningVolunteers.panel.remove' | translate }}
+                            </button>
+                        }
+                        @if (row.canAdd) {
+                            <button type="button" class="btn pri" (click)="add(row.volunteer.id)">
+                                {{ 'planningVolunteers.panel.add' | translate }}
+                            </button>
+                        }
+                        @if (row.canForce) {
+                            <button type="button" class="btn" (click)="force(row.volunteer.id)">
+                                {{ 'planningVolunteers.panel.moveHere' | translate }}
+                            </button>
+                        }
+                    }
+                </div>
+            }
+        }
+    </div>
+} @else {
+    <div class="ph">
+        <i class="pi pi-users"></i>
+        <div class="ph-txt">
+            <b>{{ 'planningVolunteers.panel.volunteersOfDay' | translate }}</b>
+            <small>{{ store.visibleVolunteers().length }} · {{ store.selectedDay()?.label }}</small>
+        </div>
+    </div>
+    <div class="tip">{{ 'planningVolunteers.zones.hint' | translate }}</div>
+    <div class="body">
+        @for (v of store.visibleVolunteers(); track v.id) {
+            <div class="vrow rost"
+                 [class.on]="store.focusVolunteerId() === v.id"
+                 (click)="focus(v.id)">
+                <volunteer-avatar [volunteerId]="v.id" [label]="v.label" [size]="30"/>
+                <div class="vn">
+                    <b>{{ v.label }}</b>
+                    <small>{{ hoursOf(v.id) }}</small>
+                    <div class="strip">
+                        @for (cell of stripOf(v.id); track $index) {
+                            <span [class.u]="cell.unavailable" [style.background-color]="cell.color"></span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

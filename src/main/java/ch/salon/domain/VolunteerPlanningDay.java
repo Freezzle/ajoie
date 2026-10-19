@@ -15,4 +15,5 @@ public class VolunteerPlanningDay {
     private List<String> assignedVolunteerIds = new ArrayList<>();
     private List<VolunteerPlanningCell> cells = new ArrayList<>();
     private List<VolunteerPlanningUnavailableCell> unavailableCells = new ArrayList<>();
+    private List<VolunteerPlanningNeed> needs = new ArrayList<>();
 }

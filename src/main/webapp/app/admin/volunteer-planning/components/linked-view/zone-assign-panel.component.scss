@@ -1,0 +1,190 @@
+@use '../planning-shared';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.ph {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.ph-txt {
+    min-width: 0;
+}
+
+.ph-txt b {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ph small {
+    display: block;
+    color: var(--app-text-muted);
+    font-size: 12px;
+}
+
+.ph .x {
+    margin-left: auto;
+    border: 0;
+    background: none;
+    font-size: 20px;
+    color: var(--app-text-muted);
+    padding: 0 4px;
+    cursor: pointer;
+}
+
+.vp-sw.lg {
+    width: 30px;
+    height: 30px;
+}
+
+.tip {
+    padding: 10px 14px;
+    color: var(--app-text-muted);
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.needrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--app-border);
+    color: var(--app-text-muted);
+}
+
+.needrow b {
+    min-width: 34px;
+    text-align: center;
+    color: var(--app-text);
+    font-size: 15px;
+}
+
+.needrow button {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    cursor: pointer;
+}
+
+.needrow .cov {
+    margin-left: auto;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.body {
+    overflow: auto;
+    padding: 6px 8px 10px;
+    flex: 1;
+    min-height: 0;
+}
+
+.grp {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--app-text-muted);
+    padding: 10px 6px 4px;
+}
+
+.vrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 6px;
+    border-radius: 8px;
+}
+
+.vrow:hover {
+    background: var(--app-surface-muted);
+}
+
+.vrow .vn {
+    flex: 1;
+    min-width: 0;
+}
+
+.vrow .vn b {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vrow .vn small {
+    display: block;
+    color: var(--app-text-muted);
+    font-size: 11.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vrow.st-unav {
+    opacity: .5;
+    background: none;
+}
+
+.vrow.rost {
+    cursor: pointer;
+}
+
+.vrow.rost.on {
+    background: color-mix(in srgb, var(--vp-accent) 12%, var(--app-surface));
+}
+
+.strip {
+    display: flex;
+    gap: 1px;
+    margin-top: 4px;
+    height: 6px;
+}
+
+.strip span {
+    flex: 1;
+    border-radius: 1px;
+    background: var(--app-border);
+}
+
+.strip span.u {
+    background: var(--vp-unav);
+}
+
+.btn {
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    cursor: pointer;
+    color: var(--app-text);
+}
+
+.btn.pri {
+    background: var(--vp-accent);
+    border-color: var(--vp-accent);
+    color: #fff;
+}
+
+.btn.danger {
+    color: var(--vp-under);
+}

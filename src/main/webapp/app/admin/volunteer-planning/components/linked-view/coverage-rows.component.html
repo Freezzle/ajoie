@@ -1,0 +1,46 @@
+<div class="tl-sec">
+    <span>
+        <i class="pi pi-sliders-h"></i>{{ 'planningVolunteers.coverage.title' | translate }}
+    </span>
+    @if (!store.isReadOnly()) {
+        <button type="button" class="editmin-btn" [class.on]="store.editMinimums()" (click)="toggleEdit()">
+            {{ (store.editMinimums() ? 'planningVolunteers.coverage.done' : 'planningVolunteers.coverage.editMin') | translate }}
+        </button>
+    }
+</div>
+
+@for (cat of categories(); track cat.id) {
+    <div class="tl-row cov" [class.ed]="store.editMinimums() && !store.isReadOnly()">
+        <div class="tl-name">
+            <span class="vp-sw" [style.background-color]="cat.color">
+                <i [class]="cat.icon || 'pi pi-circle-fill'"></i>
+            </span>
+            <span class="lbl">{{ cat.label }}</span>
+        </div>
+
+        <div class="track ro" [style.width.px]="trackWidth()" [style.--vp-slot-w]="slotWCss()">
+            @for (cell of cellsOf(cat.id); track $index) {
+                @if (store.editMinimums() && !store.isReadOnly()) {
+                    <div class="cv ed"
+                         [class.st-under]="cell.state === 'under'"
+                         [class.st-ok]="cell.state === 'ok'"
+                         [class.st-over]="cell.state === 'over'"
+                         [style.left.px]="cellLeft($index)"
+                         [style.width.px]="cellWidth()">
+                        <button type="button" (click)="bumpNeed(cat.id, $index, 1)">+</button>
+                        <b>{{ cell.assigned }}/{{ cell.min }}</b>
+                        <button type="button" (click)="bumpNeed(cat.id, $index, -1)">&minus;</button>
+                    </div>
+                } @else if (cell.state !== 'none') {
+                    <div class="cv"
+                         [class.st-under]="cell.state === 'under'"
+                         [class.st-ok]="cell.state === 'ok'"
+                         [class.st-over]="cell.state === 'over'"
+                         [style.left.px]="cellLeft($index)"
+                         [style.width.px]="cellWidth()">{{ cell.assigned }}/{{ cell.min }}
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}

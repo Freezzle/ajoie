@@ -1,0 +1,80 @@
+<div class="m-body" [class.dim]="store.focusVolunteerId()">
+    <div class="m-tabs">
+        @for (chip of chips(); track chip.category.id) {
+            <button type="button"
+                    class="m-chip"
+                    [class.on]="chip.category.id === categoryId()"
+                    (click)="selectCategory(chip.category.id)">
+                <span class="vp-sw" [style.background-color]="chip.category.color">
+                    <i [class]="chip.category.icon || 'pi pi-circle-fill'"></i>
+                </span>
+                {{ chip.category.label }}
+                @if (chip.holes) {
+                    <em>{{ chip.holes }}</em>
+                }
+            </button>
+        }
+    </div>
+
+    <div class="m2list">
+        @for (row of rows(); track row.slot) {
+            <div class="m2row" [class.sel]="isSelected(row.slot)" (click)="tapSlot(row.slot)">
+                <div class="t">{{ row.from }}
+                    <small>{{ row.to }}</small>
+                </div>
+                <div class="seats">
+                    @for (vId of row.volunteerIds; track vId) {
+                        <volunteer-avatar [volunteerId]="vId"
+                                          [label]="volunteerLabel(vId)"
+                                          [size]="24"
+                                          [focused]="store.focusVolunteerId() === vId"
+                                          [dimmed]="!!store.focusVolunteerId() && store.focusVolunteerId() !== vId"/>
+                    }
+                    @for (seat of row.seats; track seat) {
+                        <span class="vp-seat"></span>
+                    }
+                </div>
+                <div class="rt">
+                    <span class="vp-pill"
+                          [class.st-under]="row.state === 'under'"
+                          [class.st-ok]="row.state === 'ok'"
+                          [class.st-over]="row.state === 'over'">{{ row.label }}</span>
+                    <small>{{ row.free }} {{ 'planningVolunteers.zones.free' | translate }}</small>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="m-bottom">
+    @if (selection(); as sel) {
+        <div class="m-selbar">
+            <span class="vp-sw lg" [style.background-color]="category()?.color">
+                <i [class]="category()?.icon || 'pi pi-circle-fill'"></i>
+            </span>
+            <div>
+                <b>{{ category()?.label }}</b>
+                <small>{{ selectionRange() }} · {{ selectionLength() }} {{ 'planningVolunteers.panel.slots' | translate }}</small>
+            </div>
+            <button type="button" class="btn pri" (click)="openAssign.emit()">
+                <i class="pi pi-user-plus"></i>{{ 'planningVolunteers.mobile.assign' | translate }}
+            </button>
+            <button type="button" class="x" (click)="clearSelection()">&times;</button>
+        </div>
+    } @else if (focusedVolunteer(); as fv) {
+        <div class="m-row">
+            <span class="m-hint">{{ 'planningVolunteers.focus.following' | translate: {name: fv.label} }}</span>
+            <button type="button" class="btn" (click)="openPerson.emit(fv.id)">
+                <i class="pi pi-user"></i>{{ 'planningVolunteers.mobile.hisPlanning' | translate }}
+            </button>
+            <button type="button" class="btn" (click)="clearFocus()">&times;</button>
+        </div>
+    } @else {
+        <div class="m-row">
+            <span class="m-hint">{{ 'planningVolunteers.mobile.tapSlot' | translate }}</span>
+            <button type="button" class="btn" (click)="openRoster.emit()">
+                <i class="pi pi-users"></i>{{ 'planningVolunteers.manageVolunteers' | translate }}
+            </button>
+        </div>
+    }
+</div>

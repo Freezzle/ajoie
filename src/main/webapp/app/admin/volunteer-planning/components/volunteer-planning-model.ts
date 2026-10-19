@@ -20,6 +20,12 @@ export type UnavailableCell = {
     slotIndex: number;
 };
 
+export type NeedCell = {
+    categoryId: string;
+    slotIndex: number;
+    min: number;        // >= 1 (0 = entrée supprimée)
+};
+
 export type Day = {
     id: string;         // non visible
     label: string;
@@ -29,6 +35,7 @@ export type Day = {
     assignedVolunteerIds: string[];
     cells: DayCell[];
     unavailableCells: UnavailableCell[];
+    needs: NeedCell[];
 };
 
 export type Planning = {

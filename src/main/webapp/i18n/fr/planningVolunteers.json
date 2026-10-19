@@ -15,6 +15,73 @@
       "eraser": "Effacer les affectations",
       "unavailable": "Non disponible",
       "clearUnavailable": "Disponible"
+    },
+    "view": {
+      "both": "Les deux",
+      "persons": "Bénévoles",
+      "zones": "Zones",
+      "byPerson": "Par bénévole",
+      "byZone": "Par zone"
+    },
+    "kpi": {
+      "coverage": "Minimums couverts",
+      "missing": "Places à pourvoir",
+      "hours": "Heures planifiées"
+    },
+    "zones": {
+      "title": "Équipes par zone",
+      "hint": "Glissez sur une ligne pour sélectionner une plage",
+      "free": "Libres"
+    },
+    "coverage": {
+      "title": "Couverture · affectés / minimum",
+      "editMin": "Modifier les minimums",
+      "done": "Terminer",
+      "minPerSlot": "Min / créneau"
+    },
+    "panel": {
+      "volunteersOfDay": "Bénévoles du jour",
+      "inZone": "Dans cette zone",
+      "freeAll": "Libres sur toute la plage",
+      "freePartial": "Partiellement libres",
+      "otherZone": "Dans une autre zone",
+      "unavailable": "Indisponibles",
+      "add": "Ajouter",
+      "complete": "Compléter",
+      "remove": "Retirer",
+      "moveHere": "Déplacer ici",
+      "slots": "créneau(x)",
+      "assigned": "Affecté·e",
+      "assignedCount": "Affecté·e {{n}}/{{total}}",
+      "freeCount": "libre {{n}}",
+      "freeOf": "Libre {{free}}/{{total}}",
+      "unavailableCount": "indispo {{n}}",
+      "inOther": "En {{zones}}"
+    },
+    "focus": {
+      "following": "Présences de {{name}} surlignées",
+      "clear": "Effacer"
+    },
+    "person": {
+      "title": "Planning de {{name}}",
+      "seeZones": "Voir ses équipes par zone",
+      "free": "Libre",
+      "noSlot": "Aucun créneau ce jour"
+    },
+    "mobile": {
+      "scroll": "Défiler",
+      "paint": "Peindre",
+      "minimums": "Minimums",
+      "assign": "Affecter",
+      "hisPlanning": "Son planning",
+      "hintScroll": "Touchez une case pour la colorier · un avatar pour voir son planning",
+      "hintPaint": "Mode Peindre : glissez le doigt pour peindre plusieurs cases",
+      "hintReadOnly": "Touchez un avatar pour voir son planning",
+      "tapSlot": "Touchez un créneau, puis un 2ᵉ pour une plage"
+    },
+    "toast": {
+      "reassigned": "{{zone}} réaffecté·e à {{name}}",
+      "undone": "Action annulée"
     }
   }
 }

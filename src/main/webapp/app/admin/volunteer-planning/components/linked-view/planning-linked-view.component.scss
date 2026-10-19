@@ -1,0 +1,165 @@
+@use '../planning-shared';
+
+:host {
+    display: block;
+}
+
+.linked {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 14px;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .linked {
+        grid-template-columns: 1fr;
+    }
+}
+
+.linked-card,
+.side-panel {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.side-panel {
+    position: sticky;
+    top: 12px;
+    max-height: calc(100vh - 24px);
+    display: flex;
+    flex-direction: column;
+}
+
+.linked-scroller {
+    overflow: auto;
+    max-height: 76vh;
+    user-select: none;
+}
+
+.tl-in {
+    position: relative;
+}
+
+.tl-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--app-surface);
+    box-shadow: 0 1px 0 var(--app-border);
+}
+
+.tl-head .tl-name {
+    color: var(--app-text-muted);
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.ticks {
+    position: relative;
+    height: 28px;
+    flex: none;
+}
+
+.ticks span {
+    position: absolute;
+    top: 7px;
+    font-size: 11px;
+    color: var(--app-text-muted);
+    transform: translateX(4px);
+    font-weight: 600;
+}
+
+.zones-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 11;
+    background: var(--app-surface);
+    box-shadow: 0 -1px 0 var(--app-border), 0 -8px 16px rgba(16, 24, 40, .07);
+}
+
+/* ---- palette ---- */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--app-border);
+    background: var(--app-surface);
+}
+
+.tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    border-radius: 8px;
+    padding: 5px 8px 5px 5px;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--app-text);
+    cursor: pointer;
+}
+
+.tool.on {
+    border-color: var(--app-text);
+    box-shadow: 0 0 0 1px var(--app-text);
+}
+
+.tool.un .vp-sw {
+    background: var(--vp-unav);
+    color: #fff;
+}
+
+.tool.er .vp-sw {
+    background: var(--app-surface-muted);
+    color: var(--app-text);
+}
+
+.toolbar .sep {
+    width: 1px;
+    height: 24px;
+    background: var(--app-border);
+    margin: 0 4px;
+    flex: none;
+}
+
+kbd {
+    font: 600 10px/1 inherit;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    color: var(--app-text-muted);
+}
+
+.selbanner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--vp-accent) 10%, var(--app-surface));
+    border-bottom: 1px solid var(--app-border);
+    font-size: 13px;
+}
+
+.selbanner .sp {
+    flex: 1;
+}
+
+.btn {
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    color: var(--app-text);
+}

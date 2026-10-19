@@ -1,0 +1,183 @@
+@use '../planning-shared';
+
+:host {
+    display: block;
+}
+
+.tl-rows {
+    position: relative;
+}
+
+.tl-name {
+    cursor: pointer;
+}
+
+.tl-name:hover {
+    color: var(--vp-accent);
+}
+
+.tl-name small {
+    margin-left: auto;
+    font-weight: 500;
+    color: var(--app-text-muted);
+    font-size: 11.5px;
+    white-space: nowrap;
+}
+
+.tl-name small.warn {
+    color: var(--vp-over);
+    font-weight: 700;
+}
+
+.tl-row.fx .tl-name {
+    background: color-mix(in srgb, var(--vp-accent) 12%, var(--app-surface));
+    color: var(--vp-accent);
+}
+
+.band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: color-mix(in srgb, var(--vp-accent) 9%, transparent);
+    border-left: 1px dashed var(--vp-accent);
+    border-right: 1px dashed var(--vp-accent);
+    pointer-events: none;
+}
+
+.blk {
+    position: absolute;
+    top: 6px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--c, var(--app-surface-muted));
+    color: #1c2230;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    overflow: visible;
+    white-space: nowrap;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .08);
+    transition: opacity .15s;
+}
+
+.blk .bl {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.blk small {
+    font-weight: 500;
+    opacity: .7;
+    overflow: hidden;
+}
+
+.blk.narrow .bl,
+.blk.narrow small {
+    display: none;
+}
+
+.blk.narrow {
+    padding: 0;
+    justify-content: center;
+}
+
+.blk.un {
+    background: repeating-linear-gradient(135deg, var(--vp-unav) 0 4px,
+    color-mix(in srgb, var(--vp-unav) 60%, transparent) 4px 9px);
+    color: #fff;
+}
+
+.blk.hl {
+    box-shadow: 0 0 0 2px var(--vp-accent);
+}
+
+.blk.on {
+    box-shadow: 0 0 0 2px var(--app-surface), 0 0 0 4px var(--app-text);
+    /* au-dessus de .zones-dock (z-index 11) pour que le popover reste visible sur la dernière ligne */
+    z-index: 13;
+}
+
+.blk.ghost {
+    display: none;
+    opacity: .6;
+    outline: 2px dashed var(--app-text-muted);
+    pointer-events: none;
+    z-index: 9;
+}
+
+.blk .h {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 9px;
+    cursor: ew-resize;
+}
+
+.blk .h.l {
+    left: -2px;
+}
+
+.blk .h.r {
+    right: -2px;
+}
+
+.blk .h::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 3px;
+    width: 3px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, .25);
+    opacity: 0;
+}
+
+.blk:hover .h::after {
+    opacity: 1;
+}
+
+.dimp .tl-row.pr:not(.fx) .blk:not(.hl):not(.ghost) {
+    opacity: .28;
+}
+
+.pop {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    z-index: 30;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+    padding: 6px;
+    display: flex;
+    gap: 4px;
+    cursor: default;
+}
+
+.pop button {
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: none;
+    padding: 3px;
+    cursor: pointer;
+}
+
+.pop button:hover {
+    border-color: var(--app-border);
+    background: var(--app-surface-muted);
+}
+
+.pop .vp-sw {
+    width: 26px;
+    height: 26px;
+}
+
+.pop .vp-sw.danger {
+    background: var(--vp-under-bg);
+    color: var(--vp-under);
+}

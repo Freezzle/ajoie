@@ -1,0 +1,77 @@
+<div #rows
+     class="tl-rows"
+     [class.dimp]="store.focusVolunteerId()"
+     (pointerdown)="onPointerDown($event)">
+
+    @for (v of volunteers(); track v.id) {
+        <div class="tl-row pr" [class.fx]="store.focusVolunteerId() === v.id">
+            <div class="tl-name"
+                 [title]="v.label"
+                 (click)="onNameClick(v.id)">
+                <volunteer-avatar [volunteerId]="v.id" [label]="v.label"/>
+                <span class="lbl">{{ v.label }}</span>
+                <small [class.warn]="isOvertime(v.id)">{{ hoursOf(v.id) }}</small>
+            </div>
+
+            <div class="track"
+                 [attr.data-v]="v.id"
+                 [style.width.px]="trackWidth()"
+                 [style.--vp-slot-w]="slotWCss()"
+                 [style.cursor]="store.isReadOnly() ? 'default' : 'copy'">
+
+                @if (band(); as b) {
+                    <div class="band" [style.left.px]="b.left" [style.width.px]="b.width"></div>
+                }
+
+                @for (run of runsOf(v.id); track trackRun($index, run)) {
+                    @let cat = categoryOf(run);
+                    <div class="blk"
+                         [class.un]="run.kind === 'UNAVAILABLE'"
+                         [class.narrow]="blockWidth(run) < 96"
+                         [class.on]="isSelectedRun(run)"
+                         [class.hl]="isHighlighted(run)"
+                         [attr.data-run]="runData(run)"
+                         [style.left.px]="blockLeft(run)"
+                         [style.width.px]="blockWidth(run)"
+                         [style.--c]="cat?.color"
+                         [style.cursor]="store.isReadOnly() ? 'default' : 'grab'"
+                         [title]="blockLabel(run) + ' ' + blockTime(run)">
+
+                        @if (!store.isReadOnly()) {
+                            <span class="h l"></span>
+                        }
+                        <i [class]="run.kind === 'UNAVAILABLE' ? 'pi pi-ban' : (cat?.icon || 'pi pi-circle-fill')"></i>
+                        <span class="bl">{{ blockLabel(run) }}</span>
+                        <small>{{ blockTime(run) }}</small>
+                        @if (!store.isReadOnly()) {
+                            <span class="h r"></span>
+                        }
+
+                        @if (isSelectedRun(run) && !store.isReadOnly()) {
+                            <div class="pop">
+                                @if (run.kind === 'CATEGORY') {
+                                    @for (c of store.categories(); track c.id) {
+                                        <button type="button"
+                                                [title]="c.label"
+                                                (click)="changeCategory(c.id)">
+                                            <span class="vp-sw" [style.background-color]="c.color">
+                                                <i [class]="c.icon || 'pi pi-circle-fill'"></i>
+                                            </span>
+                                        </button>
+                                    }
+                                }
+                                <button type="button"
+                                        [title]="'common.delete' | translate"
+                                        (click)="deleteSelectedBlock()">
+                                    <span class="vp-sw danger"><i class="pi pi-trash"></i></span>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div #ghost class="blk ghost"></div>
+</div>

@@ -1,0 +1,120 @@
+@use '../planning-shared';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.ph {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.ph-txt {
+    min-width: 0;
+    flex: 1;
+}
+
+.ph-txt b {
+    display: block;
+}
+
+.ph small {
+    display: block;
+    color: var(--app-text-muted);
+    font-size: 12px;
+}
+
+.ph .x {
+    border: 0;
+    background: none;
+    font-size: 20px;
+    color: var(--app-text-muted);
+    padding: 0 4px;
+    cursor: pointer;
+}
+
+.body {
+    overflow: auto;
+    padding: 6px 12px 14px;
+    min-height: 0;
+}
+
+.empty {
+    color: var(--app-text-muted);
+    padding: 10px 6px;
+}
+
+.prow {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 6px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.prow .tm {
+    width: 92px;
+    flex: none;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.prow .tm small {
+    display: block;
+    font-weight: 500;
+    color: var(--app-text-muted);
+    font-size: 11px;
+}
+
+.prow .vp-sw {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+}
+
+.prow.gap {
+    color: var(--app-text-muted);
+}
+
+.prow.gap .vp-sw {
+    background: var(--app-surface-muted);
+    color: var(--app-text-muted);
+}
+
+.prow.un .vp-sw {
+    background: var(--vp-unav);
+    color: #fff;
+}
+
+.btn {
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    cursor: pointer;
+    color: var(--app-text);
+}
+
+.btn.pri {
+    background: var(--vp-accent);
+    border-color: var(--vp-accent);
+    color: #fff;
+}
+
+.btn.full {
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+    margin-top: 12px;
+}

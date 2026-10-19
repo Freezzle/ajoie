@@ -1,0 +1,55 @@
+<div class="zones" [class.dim]="store.focusVolunteerId()" (pointerdown)="onPointerDown($event)">
+    @for (row of rows(); track row.category.id) {
+        <div class="tl-row zrow">
+            <div class="tl-name">
+                <span class="vp-sw" [style.background-color]="row.category.color">
+                    <i [class]="row.category.icon || 'pi pi-circle-fill'"></i>
+                </span>
+                <div class="zname">
+                    <span class="lbl">{{ row.category.label }}</span>
+                    <small>{{ row.assignedHours }} / {{ row.minHours }}</small>
+                </div>
+            </div>
+
+            <div class="track zt"
+                 [style.width.px]="trackWidth()"
+                 [style.height.px]="row.height"
+                 [style.--vp-slot-w]="slotWCss()">
+                @for (cell of row.cells; track cell.slot) {
+                    <div class="zcell"
+                         [class.st-under]="cell.state === 'under'"
+                         [class.st-ok]="cell.state === 'ok'"
+                         [class.st-over]="cell.state === 'over'"
+                         [class.sel]="isSelected(row.category.id, cell.slot)"
+                         [attr.data-cat]="row.category.id"
+                         [attr.data-slot]="cell.slot"
+                         [style.left.px]="cellLeft(cell.slot)"
+                         [style.width.px]="cellWidth()"
+                         [title]="cellTitle(row, cell.slot)">
+                        @for (vId of cell.volunteerIds; track vId) {
+                            <volunteer-avatar [volunteerId]="vId"
+                                              [label]="volunteerLabel(vId)"
+                                              [size]="seatSize()"
+                                              [focused]="store.focusVolunteerId() === vId"
+                                              [dimmed]="!!store.focusVolunteerId() && store.focusVolunteerId() !== vId"/>
+                        }
+                        @for (seat of cell.seats; track seat) {
+                            <span class="vp-seat"
+                                  [style.width.px]="seatSize()"
+                                  [style.height.px]="seatSize()"></span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="tl-row zfree">
+        <div class="tl-name"><span class="lbl">{{ 'planningVolunteers.zones.free' | translate }}</span></div>
+        <div class="track" [style.width.px]="trackWidth()" [style.--vp-slot-w]="slotWCss()">
+            @for (count of freeBySlot(); track $index) {
+                <div class="fc" [style.left.px]="$index * slotW()" [style.width.px]="slotW()">{{ count }}</div>
+            }
+        </div>
+    </div>
+</div>

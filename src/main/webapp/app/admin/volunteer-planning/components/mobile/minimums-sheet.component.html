@@ -1,0 +1,47 @@
+<div class="ph">
+    <i class="pi pi-sliders-h"></i>
+    <div class="ph-txt">
+        <b>{{ 'planningVolunteers.mobile.minimums' | translate }} · {{ store.selectedDay()?.label }}</b>
+        <small>{{ 'planningVolunteers.coverage.title' | translate }}</small>
+    </div>
+    <button type="button" class="x" (click)="closed.emit()">&times;</button>
+</div>
+
+<div class="body">
+    <div class="covwrap">
+        <table class="covt">
+            <thead>
+            <tr>
+                <th></th>
+                @for (label of shortLabels(); track $index) {
+                    <th class="tk">{{ label }}</th>
+                }
+            </tr>
+            </thead>
+            <tbody>
+                @for (row of rows(); track row.category.id) {
+                    <tr>
+                        <th>
+                            <span class="vp-sw" [style.background-color]="row.category.color">
+                                <i [class]="row.category.icon || 'pi pi-circle-fill'"></i>
+                            </span>
+                        </th>
+                        @for (cell of row.cells; track $index) {
+                            <td [class.st-under]="cell.state === 'under'"
+                                [class.st-ok]="cell.state === 'ok'"
+                                [class.st-over]="cell.state === 'over'">
+                                @if (!store.isReadOnly()) {
+                                    <button type="button" (click)="bumpNeed(row.category.id, $index, 1)">+</button>
+                                }
+                                <b>{{ cell.assigned }}/{{ cell.min }}</b>
+                                @if (!store.isReadOnly()) {
+                                    <button type="button" (click)="bumpNeed(row.category.id, $index, -1)">&minus;</button>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

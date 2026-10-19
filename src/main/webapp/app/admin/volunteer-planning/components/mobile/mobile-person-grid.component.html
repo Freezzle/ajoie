@@ -1,0 +1,101 @@
+<div class="m-body">
+    <table class="g1"
+           [class.paint]="paintMode() && !store.isReadOnly()"
+           [class.dimp]="store.focusVolunteerId()"
+           (pointerdown)="onPointerDown($event)">
+        <thead>
+        <tr>
+            <th class="name"></th>
+            @for (label of shortLabels(); track $index) {
+                <th>{{ label }}</th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+            @for (row of rows(); track row.volunteerId) {
+                <tr [class.fx]="store.focusVolunteerId() === row.volunteerId">
+                    <td class="name" (click)="openPerson.emit(row.volunteerId)">
+                        <volunteer-avatar [volunteerId]="row.volunteerId" [label]="row.label"/>
+                        <small [class.warn]="row.overtime">{{ row.hours }}</small>
+                    </td>
+                    @for (cell of row.cells; track cell.slot) {
+                        <td class="c"
+                            [class.f]="cell.color"
+                            [class.un]="cell.unavailable"
+                            [class.rs]="cell.runStart"
+                            [class.re]="cell.runEnd"
+                            [style.--c]="cell.color"
+                            [attr.data-v]="row.volunteerId"
+                            [attr.data-slot]="cell.slot">
+                            <div class="b">
+                                @if (cell.icon) {
+                                    <i [class]="cell.icon"></i>
+                                }
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            @for (foot of footerRows(); track foot.category.id) {
+                <tr>
+                    <td class="name">
+                        <span class="vp-sw" [style.background-color]="foot.category.color">
+                            <i [class]="foot.category.icon || 'pi pi-circle-fill'"></i>
+                        </span>
+                    </td>
+                    @for (cell of foot.cells; track $index) {
+                        <td class="cov"
+                            [class.st-under]="cell.state === 'under'"
+                            [class.st-ok]="cell.state === 'ok'"
+                            [class.st-over]="cell.state === 'over'"
+                            (click)="openMinimums.emit()">
+                            {{ cell.state === 'none' ? '–' : cell.assigned + '/' + cell.min }}
+                        </td>
+                    }
+                </tr>
+            }
+        </tfoot>
+    </table>
+</div>
+
+<div class="m-bottom">
+    <div class="m-hint">
+        {{ (store.isReadOnly()
+        ? 'planningVolunteers.mobile.hintReadOnly'
+        : (paintMode() ? 'planningVolunteers.mobile.hintPaint' : 'planningVolunteers.mobile.hintScroll')) | translate }}
+    </div>
+    <div class="m-pal">
+        @if (!store.isReadOnly()) {
+            <button type="button" class="tool mode" [class.on]="paintMode()" (click)="togglePaintMode()">
+                <span class="vp-sw"><i class="pi" [class.pi-pencil]="paintMode()" [class.pi-arrows-alt]="!paintMode()"></i></span>
+                {{ (paintMode() ? 'planningVolunteers.mobile.paint' : 'planningVolunteers.mobile.scroll') | translate }}
+            </button>
+        }
+        <button type="button" class="tool er" (click)="openMinimums.emit()">
+            <span class="vp-sw"><i class="pi pi-sliders-h"></i></span>
+            {{ 'planningVolunteers.mobile.minimums' | translate }}
+        </button>
+        @if (!store.isReadOnly()) {
+            <span class="sep"></span>
+            @for (c of store.categories(); track c.id) {
+                <button type="button" class="tool" [class.on]="isCategorySelected(c.id)" (click)="selectCategory(c.id)">
+                    <span class="vp-sw" [style.background-color]="c.color">
+                        <i [class]="c.icon || 'pi pi-circle-fill'"></i>
+                    </span>
+                    {{ c.label }}
+                </button>
+            }
+            <span class="sep"></span>
+            <button type="button" class="tool er" [class.on]="store.tool().kind === 'ERASER'" (click)="selectTool('ERASER')">
+                <span class="vp-sw"><i class="pi pi-eraser"></i></span>
+                {{ 'planningVolunteers.palette.eraser' | translate }}
+            </button>
+            <button type="button" class="tool un" [class.on]="store.tool().kind === 'UNAVAILABLE'" (click)="selectTool('UNAVAILABLE')">
+                <span class="vp-sw"><i class="pi pi-ban"></i></span>
+                {{ 'planningVolunteers.palette.unavailable' | translate }}
+            </button>
+        }
+    </div>
+</div>

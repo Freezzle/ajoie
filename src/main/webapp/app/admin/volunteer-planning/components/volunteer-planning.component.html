@@ -5,35 +5,35 @@
 
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading()"
+                    [isDisabled]="store.isLoading()"
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
 
-        @if (isReadOnly()) {
+        @if (store.isReadOnly()) {
             <button-box (clickedEvent)="activateEditMode()"
-                        [isDisabled]="isLoading()"
+                        [isDisabled]="store.isLoading()"
                         [showText]="false"
                         primeIcon="pi-pencil"
                         translateKey="common.edit"/>
 
-            @if (downloadMenuItems().length) {
-                <menu-box [items]="downloadMenuItems()"
+            @if (store.downloadMenuItems().length) {
+                <menu-box [items]="store.downloadMenuItems()"
                           [appendTo]="'body'"
                           buttonIcon="pi-cog"
                           buttonTranslateKey="common.actions"/>
             }
         }
 
-        @if (!isReadOnly()) {
-            <button-box (clickedEvent)="activateReadOnlyMode()"
-                        [isDisabled]="isLoading()"
+        @if (!store.isReadOnly()) {
+            <button-box (clickedEvent)="cancelEdition()"
+                        [isDisabled]="store.isLoading()"
                         [showText]="false"
                         primeIcon="pi-ban"
                         translateKey="common.cancel"
                         type="secondary"/>
             <button-box (clickedEvent)="save()"
-                        [isDisabled]="isLoading()"
+                        [isDisabled]="store.isLoading()"
                         [isSubmit]="true"
                         [showText]="false"
                         primeIcon="pi-save"
@@ -43,12 +43,12 @@
 
     <app-alert-error></app-alert-error>
 
-
     <p-confirmpopup/>
+    <p-toast position="bottom-center"/>
 
     <app-card [showHeader]="false">
-        <div appCardBody>
-            @if (!isReadOnly()) {
+        <div appCardBody class="vp-page">
+            @if (!store.isReadOnly()) {
                 <div class="d-flex justify-content-end gap-2 align-items-center">
                     <button-box (clickedEvent)="volunteersDialogVisible.set(true)"
                                 translateKey="planningVolunteers.manageVolunteers"/>
@@ -57,15 +57,15 @@
                 </div>
             }
 
-            @if (selectedDay() || !isReadOnly()) {
-                <p-tabs [value]="selectedDay()?.id" scrollable>
+            @if (store.selectedDay() || !store.isReadOnly()) {
+                <p-tabs [value]="store.selectedDay()?.id" scrollable>
                     <p-tablist class="justify-content-center">
-                        @for (day of dayOptions(); track day.id) {
-                            <p-tab (click)="selectedDayId.set(day.id)" [value]="day.id">
+                        @for (day of store.dayOptions(); track day.id) {
+                            <p-tab (click)="selectDay(day.id)" [value]="day.id">
                                 <div class="d-flex align-items-center justify-content-between gap-2">
                                     <span>{{ day.label }}</span>
 
-                                    @if (!isReadOnly() && day?.id === selectedDay()?.id) {
+                                    @if (!store.isReadOnly() && day.id === store.selectedDay()?.id) {
                                         <menu-box [appendTo]="'body'"
                                                   [items]="dayMenus().get(day.id)!"
                                                   buttonIcon="pi-list"
@@ -75,160 +75,71 @@
                             </p-tab>
                         }
 
-                        @if (!isReadOnly()) {
+                        @if (!store.isReadOnly()) {
                             <p-tab [value]="'__ADD__'">
                                 <button-box (clickedEvent)="addNewDay()"
-                                            [showText]="!planning().days.length"
+                                            [showText]="!store.days().length"
                                             primeIcon="pi-plus"
                                             translateKey="common.create"
                                             type="secondary"/>
                             </p-tab>
                         }
                     </p-tablist>
-
-                    <p-tabpanels>
-                        @if (selectedDay()) {
-                            <p-tabpanel [value]="selectedDay()!.id">
-                                <div class="main mt-4">
-                                    <div (pointerleave)="stopPaint()" (pointermove)="onPaintMove($event)"
-                                         class="table-wrap">
-                                        <p-table [value]="visibleVolunteers()" class="planning-table">
-                                            <ng-template pTemplate="header">
-                                                <tr>
-                                                    <th class="col-volunteer p-0 sticky-col sticky-header"></th>
-                                                    @for (slot of timeSlots(); track slot.index) {
-                                                        <th class="sticky-header">{{ slot.displayLabel }}</th>
-                                                    }
-                                                </tr>
-                                            </ng-template>
-
-                                            <ng-template let-v pTemplate="body">
-                                                <tr>
-                                                    <td class="col-volunteer sticky-col row-label">{{ v.label }}</td>
-
-                                                    @for (slot of timeSlots(); track slot.index) {
-                                                        @let categoryId = getCategoryId(v.id, slot.index);
-                                                        @let cat = uiFor(categoryId);
-                                                        @let unavailable = isUnavailableCell(v.id, slot.index);
-
-                                                        <td class="slot-cell">
-                                                            <div (click)="!painting() ? applyTool(v.id, slot.index) : undefined"
-                                                                 (pointerdown)="startPaint(v.id, slot.index, $event)"
-                                                                 [attr.data-slot-index]="slot.index"
-                                                                 [attr.data-volunteer-id]="v.id"
-                                                                 [class.cell--unavailable]="unavailable"
-                                                                 [style.cursor]="isReadOnly() ? 'default': 'pointer'"
-                                                                 class="paint-cell">
-                                                                @if (cat && !unavailable) {
-                                                                    <span [style.background-color]="cat.color"
-                                                                          [title]="cat.label"
-                                                                          class="cat-badge">
-                                                                        @if (cat.icon) {
-                                                                            <i [class]="cat.icon"></i>
-                                                                        }
-                                                                    </span>
-                                                                }
-                                                            </div>
-                                                        </td>
-                                                    }
-                                                </tr>
-                                            </ng-template>
-
-                                            <ng-template pTemplate="footer">
-                                                <tr class="totals-separator">
-                                                    <td [attr.colspan]="timeSlots().length + 1" class="p-0"></td>
-                                                </tr>
-                                                @for (cat of planning().categories; track cat.id) {
-                                                    <tr class="totals-row">
-                                                        <td class="col-volunteer sticky-col row-label"
-                                                            [style.background-color]="cat.color">
-                                                            @if (cat.icon) {
-                                                                <i [class]="cat.icon"></i>
-                                                            }
-                                                            <span>{{ cat.label }}</span>
-                                                        </td>
-                                                        @for (slot of timeSlots(); track slot.index) {
-                                                            @let count = (categoryTotals().get(cat.id) ?? [])[slot.index];
-                                                            <td class="slot-cell">
-                                                                <div class="paint-cell total-count-cell"
-                                                                     [class.total-count-cell--empty]="count === 0">
-                                                                    {{ count > 0 ? count : '–' }}
-                                                                </div>
-                                                            </td>
-                                                        }
-                                                    </tr>
-                                                }
-                                            </ng-template>
-                                        </p-table>
-                                    </div>
-
-                                    <!-- palette fixe à droite -->
-                                    <aside class="palette">
-                                        <div class="palette-grid">
-                                            <button (click)="!isReadOnly() ? selectEraser() : undefined"
-                                                    [icon]="'pi pi-eraser'"
-                                                    [style.background-color]="'white'"
-                                                    [style.border]="selectedTool().kind === 'ERASER' ? '2px solid black': 'none'"
-                                                    [style.color]="'black'"
-                                                    [title]="'planningVolunteers.palette.eraser' | translate"
-                                                    [style.cursor]="isReadOnly() ? 'default': 'pointer'"
-                                                    pButton
-                                                    type="button"
-                                            ></button>
-
-                                            <button (click)="!isReadOnly() ? selectUnavailable() : undefined"
-                                                    [icon]="'pi pi-ban'"
-                                                    [style.background-color]="'#9e9e9e'"
-                                                    [style.border]="selectedTool().kind === 'UNAVAILABLE' ? '2px solid black': 'none'"
-                                                    [style.color]="'white'"
-                                                    [title]="'planningVolunteers.palette.unavailable' | translate"
-                                                    [style.cursor]="isReadOnly() ? 'default': 'pointer'"
-                                                    pButton
-                                                    type="button"
-                                            ></button>
-
-                                            <button (click)="!isReadOnly() ? selectClearUnavailable() : undefined"
-                                                    [icon]="'pi pi-check'"
-                                                    [style.background-color]="'white'"
-                                                    [style.border]="selectedTool().kind === 'CLEAR_UNAVAILABLE' ? '2px solid black': 'none'"
-                                                    [style.color]="'#9e9e9e'"
-                                                    [title]="'planningVolunteers.palette.clearUnavailable' | translate"
-                                                    [style.cursor]="isReadOnly() ? 'default': 'pointer'"
-                                                    pButton
-                                                    type="button"
-                                            ></button>
-
-                                            <p-divider></p-divider>
-
-                                            @for (c of planning().categories; track c.id) {
-                                                <button (click)="!isReadOnly() ? selectCategory(c.id) : undefined"
-                                                        [icon]="c.icon || ''"
-                                                        [style.background-color]="c.color"
-                                                        [style.border]="isSelectedCategory(c.id) ? '2px solid black': 'none'"
-                                                        [style.color]="'black'"
-                                                        [title]="c.label"
-                                                        [style.cursor]="isReadOnly() ? 'default': 'pointer'"
-                                                        pButton
-                                                        type="button"
-                                                ></button>
-                                            }
-                                        </div>
-                                    </aside>
-                                </div>
-                            </p-tabpanel>
-                        }
-                    </p-tabpanels>
                 </p-tabs>
+            }
+
+            @if (store.selectedDay()) {
+                <div class="vp-kpis">
+                    <div class="kpi" [class.good]="store.stats().coveragePct >= 95" [class.bad]="store.stats().coveragePct < 95">
+                        <small>{{ 'planningVolunteers.kpi.coverage' | translate }}</small>
+                        <b>{{ store.stats().coveragePct }} %</b>
+                    </div>
+                    <div class="kpi" [class.good]="!store.stats().missingPlaces" [class.bad]="store.stats().missingPlaces">
+                        <small>{{ 'planningVolunteers.kpi.missing' | translate }}</small>
+                        <b>{{ store.stats().missingPlaces }}</b>
+                    </div>
+                    <div class="kpi">
+                        <small>{{ 'planningVolunteers.kpi.hours' | translate }}</small>
+                        <b>{{ plannedHoursLabel() }}</b>
+                    </div>
+                </div>
+
+                @if (!isMobile()) {
+                    <div class="vp-viewbar">
+                        <div class="vswitch">
+                            @for (opt of viewOptions; track opt.mode) {
+                                <button type="button"
+                                        [class.on]="store.viewMode() === opt.mode"
+                                        (click)="setViewMode(opt.mode)">
+                                    <i [class]="opt.icon"></i>
+                                    <span>{{ opt.key | translate }}</span>
+                                </button>
+                            }
+                        </div>
+
+                        @if (store.focusVolunteerId()) {
+                            <span class="vhint">
+                                {{ 'planningVolunteers.focus.following' | translate: {name: focusedVolunteerLabel()} }}
+                                <button type="button" class="link" (click)="clearFocus()">
+                                    {{ 'planningVolunteers.focus.clear' | translate }}
+                                </button>
+                            </span>
+                        }
+                    </div>
+
+                    <planning-linked-view/>
+                } @else {
+                    <planning-mobile/>
+                }
             }
         </div>
 
         @if (dayDialogVisible()) {
-            <dialog-box
-                    (cancel)="dayDialogVisible.set(false); manageDayCreateMode.set(false); manageDaySelectedDayId.set('')"
-                    (confirm)="onManageDayConfirm($event)"
-                    [(visible)]="dayDialogVisible"
-                    [header]="manageDayCreateMode() ? 'Créer un jour' : 'Configuration du jour'"
-                    [mode]="'edit'">
+            <dialog-box (cancel)="closeDayDialog()"
+                        (confirm)="onManageDayConfirm($event)"
+                        [(visible)]="dayDialogVisible"
+                        [header]="manageDayCreateMode() ? 'Créer un jour' : 'Configuration du jour'"
+                        [mode]="'edit'">
                 <selected-day-editor [data]="daySlice()"/>
             </dialog-box>
         }
@@ -236,33 +147,33 @@
         <!-- ================= DIALOG: BENEVOLES ================= -->
         @if (volunteersDialogVisible()) {
             <dialog-box (cancel)="volunteersDialogVisible.set(false)"
-                        (confirm)="applyVolunteers($event)"
+                        (confirm)="store.applyVolunteers($event)"
                         [(visible)]="volunteersDialogVisible"
                         [header]="'Configuration des bénévoles'"
                         [mode]="'edit'">
-                <volunteer-manager [data]="planning().volunteers"/>
+                <volunteer-manager [data]="store.planning().volunteers"/>
             </dialog-box>
         }
 
         <!-- ================= DIALOG: ASSIGNATIONS (jour selectionné) ================= -->
         @if (assignmentsDialogVisible()) {
             <dialog-box (cancel)="assignmentsDialogVisible.set(false)"
-                        (confirm)="applyAssignmentsSlice($event)"
+                        (confirm)="store.applyAssignmentsSlice($event)"
                         [(visible)]="assignmentsDialogVisible"
                         [header]="'Assignations du jour'"
                         [mode]="'edit'">
-                <selected-day-assignments [data]="assignmentsSlice()"/>
+                <selected-day-assignments [data]="store.assignmentsSlice()"/>
             </dialog-box>
         }
 
         <!-- ================= DIALOG: CATEGORIES ================= -->
         @if (categoriesDialogVisible()) {
             <dialog-box (cancel)="categoriesDialogVisible.set(false)"
-                        (confirm)="applyCategories($event)"
+                        (confirm)="store.applyCategories($event)"
                         [(visible)]="categoriesDialogVisible"
                         [header]="'Configuration des catégories'"
                         [mode]="'edit'">
-                <category-manager [data]="planning().categories"/>
+                <category-manager [data]="store.categories()"/>
             </dialog-box>
         }
 
@@ -272,7 +183,7 @@
                         [(visible)]="showConfirmDeleteDay"
                         [header]="'Supprimer le jour'"
                         [mode]="'edit'">
-                <div [innerHTML]="'planningVolunteers.removeDay' | translate: {day: selectedDay()?.label}"></div>
+                <div [innerHTML]="'planningVolunteers.removeDay' | translate: {day: store.selectedDay()?.label}"></div>
             </dialog-box>
         }
     </app-card>

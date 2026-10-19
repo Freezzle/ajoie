@@ -1,0 +1,41 @@
+<div class="ph">
+    <volunteer-avatar [volunteerId]="volunteerId()" [label]="volunteer()?.label || ''" [size]="30"/>
+    <div class="ph-txt">
+        <b>{{ 'planningVolunteers.person.title' | translate: {name: volunteer()?.label} }}</b>
+        <small>{{ store.selectedDay()?.label }} · {{ hours() }}</small>
+    </div>
+    <button type="button" class="x" (click)="closed.emit()">&times;</button>
+</div>
+
+<div class="body">
+    @if (!items().length) {
+        <p class="empty">{{ 'planningVolunteers.person.noSlot' | translate }}</p>
+    }
+    @for (item of items(); track item.start + ':' + item.kind) {
+        <div class="prow" [class.gap]="item.kind === 'FREE'" [class.un]="item.kind === 'UNAVAILABLE'">
+            <div class="tm">{{ item.from }} – {{ item.to }}
+                <small>{{ item.duration }}</small>
+            </div>
+            <span class="vp-sw" [style.background-color]="item.color"><i [class]="item.icon"></i></span>
+            <div class="vn">
+                <b>
+                    @switch (item.kind) {
+                        @case ('CATEGORY') {
+                            {{ item.label }}
+                        }
+                        @case ('UNAVAILABLE') {
+                            {{ 'planningVolunteers.palette.unavailable' | translate }}
+                        }
+                        @default {
+                            {{ 'planningVolunteers.person.free' | translate }}
+                        }
+                    }
+                </b>
+            </div>
+        </div>
+    }
+
+    <button type="button" class="btn pri full" (click)="goToZones.emit(volunteerId())">
+        <i class="pi pi-th-large"></i>{{ 'planningVolunteers.person.seeZones' | translate }}
+    </button>
+</div>

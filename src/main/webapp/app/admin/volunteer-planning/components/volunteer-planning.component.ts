@@ -1,788 +1,291 @@
 import {ChangeDetectionStrategy, Component, computed, HostListener, inject, model, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs';
 
-import {TableModule} from 'primeng/table';
-import {ButtonModule} from 'primeng/button';
-import {DividerModule} from 'primeng/divider';
-import {DatePickerModule} from 'primeng/datepicker';
-import {SelectModule} from 'primeng/select';
-import {DialogModule} from 'primeng/dialog';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-
+import {Tab, TabList, Tabs} from 'primeng/tabs';
+import {ToastModule} from 'primeng/toast';
+import {MenuItem, MessageService} from 'primeng/api';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
-import {TranslatePipe} from '@ngx-translate/core';
-
-import {Category, computeTimeSlots, Day, IntervalMinutes, Planning, TimeSlot, Tool, UnavailableCell, Volunteer} from './volunteer-planning-model';
-
-import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
-import {MenuItem} from 'primeng/api';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
+
 import {CategoryManagerComponent} from './category-manager/category-manager.component';
 import {SelectedDayAssignmentsComponent} from './selected-day-assignments/selected-day-assignments.component';
 import {VolunteerManagerComponent} from './volunteer-manager/volunteer-manager.component';
 import {SelectedDayEditorComponent} from './selected-day-editor/selected-day-editor.component';
-import {AssignmentsSlice, DayConfigSlice} from './volunteer-planning-slices';
-import {
-    PlanningVolunteersDto,
-    VolunteerPlanningConfigurationDto,
-    VolunteerPlanningService
-} from '../volunteer-planning.service';
-import {finalize, map} from 'rxjs';
-import {ActionsService} from '../../common/actions.service';
-import {AvailableAction} from '../../../shared/model/available-action';
-import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
-import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
+import {PlanningLinkedViewComponent} from './linked-view/planning-linked-view.component';
+import {PlanningMobileComponent} from './mobile/planning-mobile.component';
+
+import {DayConfigSlice} from './volunteer-planning-slices';
+import {Day} from './volunteer-planning-model';
+import {deleteRun, formatHours} from './volunteer-planning-utils';
+import {ViewMode, VolunteerPlanningStore} from './volunteer-planning.store';
 
 @Component({
                selector: 'app-volunteer-planning',
                standalone: true,
                imports: [
                    FormsModule,
-                   TableModule,
-                   ButtonModule,
-                   DividerModule,
-                   DatePickerModule,
-                   SelectModule,
-                   DialogModule,
                    ConfirmPopup,
-                   
-                   ContentPageComponent,
+                   ToastModule,
+                   Tabs,
+                   TabList,
+                   Tab,
                    TranslatePipe,
+
+                   ContentPageComponent,
                    ButtonBoxComponent,
-                   
                    AlertErrorComponent,
                    CardComponent,
-                   TabPanels,
-                   TabList,
-                   Tabs,
-                   Tab,
                    MenuBoxComponent,
                    DialogBoxComponent,
+
                    CategoryManagerComponent,
                    SelectedDayAssignmentsComponent,
                    VolunteerManagerComponent,
                    SelectedDayEditorComponent,
-                   TabPanel
+                   PlanningLinkedViewComponent,
+                   PlanningMobileComponent
                ],
+               providers: [VolunteerPlanningStore],
                templateUrl: './volunteer-planning.component.html',
                styleUrls: ['./volunteer-planning.component.scss'],
                changeDetection: ChangeDetectionStrategy.OnPush
            })
 export class VolunteerPlanningComponent implements OnInit {
-    planning = signal<Planning>(this.getEmptyPlanning());
-    selectedDayId = signal<string>(this.planning().days[0]?.id ?? '');
-    readonly isLoading = signal<boolean>(false);
-    readonly isReadOnly = signal<boolean>(true);
-    readonly dayMenus = computed(() => new Map(this.planning().days.map(d => [d.id, this.dayActionItems()])));
-    readonly downloadMenuItems = signal<AppMenuItem[]>([]);
+    readonly store = inject(VolunteerPlanningStore);
 
-    private readonly volunteerPlanningService = inject(VolunteerPlanningService);
     private readonly activatedRoute = inject(ActivatedRoute);
-    private readonly actionsService = inject(ActionsService);
-    private readonly menuItemBuilderService = inject(MenuItemBuilderService);
-    private idSalon: string = '';
+    private readonly breakpointObserver = inject(BreakpointObserver);
+    private readonly messageService = inject(MessageService);
+    private readonly translate = inject(TranslateService);
 
-    // ...existing code...
+    private idSalon = '';
+
+    readonly isMobile = toSignal(
+        this.breakpointObserver.observe('(max-width: 991.98px)').pipe(map(state => state.matches)),
+        {initialValue: false}
+    );
+
+    readonly dayDialogVisible = model(false);
+    readonly volunteersDialogVisible = model(false);
+    readonly assignmentsDialogVisible = model(false);
+    readonly categoriesDialogVisible = model(false);
+    readonly showConfirmDeleteDay = signal(false);
+    readonly manageDayCreateMode = signal(false);
+    readonly manageDaySelectedDayId = signal<string>('');
+
+    readonly viewOptions: { mode: ViewMode; icon: string; key: string }[] = [
+        {mode: 'both', icon: 'pi pi-window-maximize', key: 'planningVolunteers.view.both'},
+        {mode: 'person', icon: 'pi pi-user', key: 'planningVolunteers.view.persons'},
+        {mode: 'zone', icon: 'pi pi-th-large', key: 'planningVolunteers.view.zones'}
+    ];
+
+    readonly plannedHoursLabel = computed(() => formatHours(this.store.stats().plannedHours));
+
+    readonly focusedVolunteerLabel = computed(() => {
+        const id = this.store.focusVolunteerId();
+        return this.store.planning().volunteers.find(v => v.id === id)?.label ?? '';
+    });
+
+    readonly daySlice = computed<DayConfigSlice>(() => {
+        if (this.manageDayCreateMode()) {
+            return {day: this.store.createEmptyDay(this.manageDaySelectedDayId())};
+        }
+        return this.store.daySlice();
+    });
+
+    readonly dayMenus = computed(() => new Map(this.store.days().map(d => [d.id, this.dayActionItems()])));
 
     ngOnInit(): void {
         this.activatedRoute.paramMap
-            .pipe(
-                map(params => params.get('idSalon')!)
-            )
+            .pipe(map(params => params.get('idSalon')!))
             .subscribe(idSalon => {
                 this.idSalon = idSalon;
-                this.isLoading.set(true);
-                this.volunteerPlanningService.getPlanningVolunteers(idSalon)
-                    .pipe(finalize(() => this.isLoading.set(false)))
-                    .subscribe(
-                        (dto: PlanningVolunteersDto | null) => {
-                            if (dto) {
-                                this.planning.set(this.fromPlanningVolunteersDto(dto));
-                                this.selectedDayId.set(this.planning().days[0]?.id ?? '');
-                            } else {
-                                this.planning.set(this.getEmptyPlanning());
-                            }
-                            this.loadDownloadActions();
-                            this.selectedTool.set({kind: 'ERASER'});
-                        }
-                    );
+                this.store.load(idSalon);
             });
     }
 
-    private loadDownloadActions(): void {
-        this.actionsService.getAvailableActions('salon', this.idSalon, 'volunteer-planning')
-            .subscribe(actions => {
-                this.downloadMenuItems.set(
-                    this.menuItemBuilderService.buildMenuItemsFromActions(
-                        actions,
-                        (action) => this.clickDownloadAction(action)
-                    )
-                );
-            });
-    }
+    // ---------- en-tête ----------
 
-    clickDownloadAction(action: AvailableAction): void {
-        if (action.type === 'DOWNLOAD') {
-            this.isLoading.set(true);
-            this.actionsService.downloadAction(action.contextCode, this.idSalon)
-                .pipe(finalize(() => this.isLoading.set(false)))
-                .subscribe(res => {
-                    const cd = res.headers.get('content-disposition') ?? '';
-                    const filename = cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)?.[1]?.replace(/['"]/g, '')
-                        ?? 'planning-benevoles.pdf';
-                    const url = window.URL.createObjectURL(res.body!);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                });
-        }
-    }
-
-    // ✅ Nouveau : tool = categoryId, plus TaskCategory
-    selectedTool = signal<Tool>({kind: 'NONE'});
-    painting = signal(false);
-
-    // ✅ Dialog pour ton panel (admin)
-    dayDialogVisible = model(false);
-    volunteersDialogVisible = model(false);
-    assignmentsDialogVisible = model(false);
-    categoriesDialogVisible = model(false);
-    showConfirmDeleteDay = signal(false);
-    manageDayCreateMode = signal(false);
-    manageDaySelectedDayId = signal<string>('');
-
-    // ---------- computed ----------
-    dayOptions = computed(() => this.planning().days.map(d => ({id: d.id, label: d.label})));
-    selectedDay = computed(() => {
-        const days = this.planning().days;
-        if (!days.length) {
-            return null;
-        }
-
-        const id = this.selectedDayId();
-        return this.planning().days.find(d => d.id === id) ?? this.planning().days[0];
-    });
-
-    daySlice = computed<DayConfigSlice>(() => {
-        // Mode création - retourner un jour vide avec l'ID généré
-        if (this.manageDayCreateMode()) {
-            const newDayId = this.manageDaySelectedDayId();
-            return {
-                day: {
-                    id: newDayId,
-                    label: '',
-                    startTime: this.timeAt(8, 0),
-                    endTime: this.timeAt(18, 0),
-                    intervalMinutes: 60,
-                    assignedVolunteerIds: [],
-                    cells: [],
-                    unavailableCells: []
-                }
-            };
-        }
-
-        const day = this.selectedDay();
-        const days = this.planning().days;
-        if (!day && (!days || days.length === 0)) {
-            // Return empty/fallback slice
-            return {
-                day: {
-                    id: '',
-                    label: '',
-                    startTime: new Date(),
-                    endTime: new Date(),
-                    intervalMinutes: 60,
-                    assignedVolunteerIds: [],
-                    cells: [],
-                    unavailableCells: []
-                }
-            };
-        }
-        // fallback propre
-        const safeDay: Day = day ?? (days && days.length > 0 ? days[0] : {
-            id: '',
-            label: '',
-            startTime: new Date(),
-            endTime: new Date(),
-            intervalMinutes: 60,
-            assignedVolunteerIds: [],
-            cells: [],
-            unavailableCells: []
-        });
-        return {
-            day: safeDay
-        };
-    });
-
-    activateReadOnlyMode(): void {
-        this.isReadOnly.set(true);
-        this.ngOnInit();
+    previousState(): void {
+        window.history.back();
     }
 
     activateEditMode(): void {
-        this.isReadOnly.set(false);
+        this.store.activateEditMode();
+    }
+
+    cancelEdition(): void {
+        this.store.activateReadOnlyMode();
+        this.store.load(this.idSalon);
     }
 
     save(): void {
-        const payload: PlanningVolunteersDto = {
-            configuration: this.toPlanningConfigurationDto(this.planning()),
-            volunteers: this.planning().volunteers.map(v => ({id: v.id, label: v.label}))
-        };
-
-        this.isLoading.set(true);
-        this.volunteerPlanningService
-            .savePlanningVolunteers(this.idSalon, payload)
-            .pipe(finalize(() => this.isLoading.set(false)))
-            .subscribe(() => {
-                this.activateReadOnlyMode();
-            });
+        this.store.save(() => this.store.activateReadOnlyMode());
     }
 
-    assignmentsSlice = computed<AssignmentsSlice>(() => {
-        const day = this.selectedDay();
-        const days = this.planning().days;
-        const safeDay = day ?? (days && days.length > 0 ? days[0] : null);
-        return {
-            dayId: safeDay?.id ?? '',
-            dayLabel: safeDay?.label ?? '',
-            volunteers: this.planning().volunteers,
-            assignedVolunteerIds: safeDay?.assignedVolunteerIds ?? []
-        };
-    });
+    // ---------- jours ----------
 
-    timeSlots = computed<TimeSlot[]>(() => {
-        const day = this.selectedDay();
-        if (!day) {
-            return [];
-        }
-        return computeTimeSlots(day.startTime, day.endTime, day.intervalMinutes);
-    });
-
-    // ----- APPLY (confirm only) -----
-
-    applyVolunteers(volunteers: Volunteer[]) {
-        // nettoyage: retirer volunteerId des assignations + cells + unavailableCells dans tous les jours
-        const cur = this.planning();
-        const keptIds = new Set(volunteers.map(v => v.id));
-
-        const days = cur.days.map(d => ({
-            ...d,
-            assignedVolunteerIds: d.assignedVolunteerIds.filter(id => keptIds.has(id)),
-            cells: d.cells.filter(c => keptIds.has(c.volunteerId)),
-            unavailableCells: (d.unavailableCells ?? []).filter(c => keptIds.has(c.volunteerId))
-        }));
-
-        this.planning.set({...cur, volunteers, days});
+    selectDay(dayId: string): void {
+        this.store.selectDay(dayId);
     }
 
-    applyCategories(categories: Category[]) {
-        // nettoyage: enlever les cellules qui utilisent une catégorie supprimée
-        const cur = this.planning();
-        const kept = new Set(categories.map(c => c.id));
-
-        const days = cur.days.map(d => ({
-            ...d,
-            cells: d.cells.filter(cell => kept.has(cell.categoryId))
-        }));
-
-        this.planning.set({...cur, categories, days});
+    addNewDay(): void {
+        this.manageDayCreateMode.set(true);
+        this.manageDaySelectedDayId.set(generateUUID());
+        this.dayDialogVisible.set(true);
     }
 
-    applyDaySlice(slice: DayConfigSlice) {
-        const cur = this.planning();
-
-        // maj du jour (par id)
-        const idx = cur.days.findIndex(d => d.id === slice.day.id);
-        if (idx >= 0) {
-            const updatedDay = structuredClone(slice.day);
-            // nettoyage silencieux des cellules dont le slotIndex dépasse le nouveau nombre de slots
-            const validSlotCount = computeTimeSlots(updatedDay.startTime, updatedDay.endTime, updatedDay.intervalMinutes).length;
-            updatedDay.cells = updatedDay.cells.filter(c => c.slotIndex < validSlotCount);
-            updatedDay.unavailableCells = (updatedDay.unavailableCells ?? []).filter(c => c.slotIndex < validSlotCount);
-
-            const days = [...cur.days];
-            days[idx] = updatedDay;
-            this.planning.set({...cur, days});
+    onManageDayConfirm(slice: DayConfigSlice): void {
+        if (this.manageDayCreateMode()) {
+            const day: Day = {
+                ...slice.day,
+                cells: slice.day.cells ?? [],
+                unavailableCells: slice.day.unavailableCells ?? [],
+                needs: slice.day.needs ?? []
+            };
+            this.store.addDay(day);
+            this.manageDayCreateMode.set(false);
+            this.manageDaySelectedDayId.set('');
+        } else {
+            this.store.applyDaySlice(slice);
         }
+        this.dayDialogVisible.set(false);
     }
 
-    applyAssignmentsSlice(slice: AssignmentsSlice) {
-        const cur = this.planning();
-        const idx = cur.days.findIndex(d => d.id === slice.dayId);
-        if (idx < 0) {
-            return;
-        }
-
-        // nettoyage: si un bénévole est désassigné, supprimer ses cells ET unavailableCells du jour
-        const day = cur.days[idx];
-        const set = new Set(slice.assignedVolunteerIds);
-
-        const nextDay: Day = {
-            ...day,
-            assignedVolunteerIds: [...set],
-            cells: day.cells.filter(c => set.has(c.volunteerId)),
-            unavailableCells: (day.unavailableCells ?? []).filter(c => set.has(c.volunteerId))
-        };
-
-        const days = [...cur.days];
-        days[idx] = nextDay;
-
-        this.planning.set({...cur, days});
-    }
-
-    // ✅ map categories by id
-    categoryMap = computed(() => new Map(this.planning().categories.map(c => [c.id, c])));
-    // Totaux par catégorie : Map<categoryId, number[]> indexé par slotIndex
-    categoryTotals = computed<Map<string, number[]>>(() => {
-        const day = this.selectedDay();
-        const slots = this.timeSlots();
-        const categories = this.planning().categories;
-
-        const totals = new Map<string, number[]>();
-        for (const cat of categories) {
-            totals.set(cat.id, new Array(slots.length).fill(0));
-        }
-
-        if (!day) {
-            return totals;
-        }
-
-        for (const cell of day.cells) {
-            const counts = totals.get(cell.categoryId);
-            if (counts && cell.slotIndex < counts.length) {
-                counts[cell.slotIndex]++;
-            }
-        }
-        return totals;
-    });
-
-    // ✅ cellMap: key => categoryId
-    cellMap = computed(() => {
-        const day = this.selectedDay();
-        const m = new Map<string, string>();
-        if (!day) {
-            return m;
-        }
-        for (const c of day.cells) {
-            m.set(this.cellKey(c.volunteerId, c.slotIndex), c.categoryId);
-        }
-        return m;
-    });
-
-    // ✅ unavailableSet: set de clés "vId::slot" pour les cellules non disponibles
-    unavailableSet = computed(() => {
-        const day = this.selectedDay();
-        const s = new Set<string>();
-        if (!day) {
-            return s;
-        }
-        for (const c of (day.unavailableCells ?? [])) {
-            s.add(this.cellKey(c.volunteerId, c.slotIndex));
-        }
-        return s;
-    });
-
-    isUnavailableCell(volunteerId: string, slotIndex: number): boolean {
-        return this.unavailableSet().has(this.cellKey(volunteerId, slotIndex));
-    }
-    // ✅ volunteers visibles : si le jour a des assignations, on filtre
-    visibleVolunteers = computed<Volunteer[]>(() => {
-        const day = this.selectedDay();
-        const all = this.planning().volunteers;
-        if (!day) {
-            return [];
-        }
-
-        const assigned = day.assignedVolunteerIds ?? [];
-        const set = new Set(assigned);
-        return all.filter(v => set.has(v.id));
-    });
-    private lastKey: string | null = null;
-    // perf: rAF throttle optionnel
-    private rafId: number | null = null;
-    private pendingPaint: { vId: string; slot: number } | null = null;
-
-    // ---------- Palette ----------
-    selectEraser() {
-        this.selectedTool.set({kind: 'ERASER'});
-    }
-
-    selectUnavailable() {
-        this.selectedTool.set({kind: 'UNAVAILABLE'});
-    }
-
-    selectClearUnavailable() {
-        this.selectedTool.set({kind: 'CLEAR_UNAVAILABLE'});
-    }
-
-    selectCategory(categoryId: string) {
-        this.selectedTool.set({kind: 'CATEGORY', categoryId});
-    }
-
-    isSelectedCategory(categoryId: string) {
-        const t = this.selectedTool();
-        return t.kind === 'CATEGORY' && t.categoryId === categoryId;
-    }
-
-    // ---------- Grid paint ----------
-    getCategoryId(volunteerId: string, slotIndex: number): string | null {
-        return this.cellMap().get(this.cellKey(volunteerId, slotIndex)) ?? null;
-    }
-
-    uiFor(categoryId: string | null): Category | null {
-        if (!categoryId) {
-            return null;
-        }
-        return this.categoryMap().get(categoryId) ?? null;
-    }
-
-    startPaint(volunteerId: string, slotIndex: number, ev: PointerEvent): void {
-        if (this.isReadOnly()) {
-            return;
-        }
-
-        if (ev.pointerType === 'mouse' && ev.button !== 0) {
-            return;
-        }
-
-        this.painting.set(true);
-        this.lastKey = `${volunteerId}-${slotIndex}`;
-
-        // applique tout de suite
-        this.applyTool(volunteerId, slotIndex);
-
-        // capture seulement touch/pen
-        if (ev.pointerType !== 'mouse') {
-            const target = ev.currentTarget as HTMLElement | null;
-            if (target?.setPointerCapture) {
-                try {
-                    target.setPointerCapture(ev.pointerId);
-                } catch {
-                }
-            }
-        }
-
-        ev.preventDefault();
-    }
-
-    onPaintMove(ev: PointerEvent): void {
-        if (!this.painting()) {
-            return;
-        }
-
-        // strict: uniquement si bouton gauche appuyé
-        if (ev.pointerType === 'mouse' && (ev.buttons & 1) === 0) {
-            this.stopPaint();
-            return;
-        }
-
-        const el = document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null;
-        const cell = el?.closest('.paint-cell') as HTMLElement | null;
-        if (!cell) {
-            return;
-        }
-
-        const vIdStr = cell.dataset['volunteerId'];
-        const slotStr = cell.dataset['slotIndex'];
-        if (vIdStr == null || slotStr == null) {
-            return;
-        }
-
-        const key = `${vIdStr}-${slotStr}`;
-        if (key === this.lastKey) {
-            return;
-        }
-        this.lastKey = key;
-
-        // ✅ throttle (optionnel mais recommandé)
-        this.queuePaint(vIdStr, Number(slotStr));
-    }
-
-    stopPaint(): void {
-        this.painting.set(false);
-        this.lastKey = null;
-
-        // cancel throttle
-        this.pendingPaint = null;
-        if (this.rafId !== null) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-        }
-    }
-
-    applyTool(volunteerId: string, slotIndex: number) {
-        if (this.isReadOnly()) {
-            return;
-        }
-
-        const day = this.selectedDay();
-        if (!day) {
-            return;
-        }
-
-        const tool = this.selectedTool();
-
-        if (tool.kind === 'UNAVAILABLE') {
-            // Marquer la cellule non disponible et effacer toute catégorie dessus
-            this.setUnavailableCell(day.id, volunteerId, slotIndex, true);
-            this.setCellCategory(day.id, volunteerId, slotIndex, null);
-            return;
-        }
-
-        if (tool.kind === 'CLEAR_UNAVAILABLE') {
-            // Annuler la cellule non disponible uniquement
-            this.setUnavailableCell(day.id, volunteerId, slotIndex, false);
-            return;
-        }
-
-        // ERASER et CATEGORY : ignoré si la cellule est non disponible
-        if (this.isUnavailableCell(volunteerId, slotIndex)) {
-            return;
-        }
-
-        const categoryId: string | null = tool.kind === 'CATEGORY' ? tool.categoryId : null;
-
-        this.setCellCategory(day.id, volunteerId, slotIndex, categoryId);
+    closeDayDialog(): void {
+        this.dayDialogVisible.set(false);
+        this.manageDayCreateMode.set(false);
+        this.manageDaySelectedDayId.set('');
     }
 
     openDeleteDayConfirm(): void {
         this.showConfirmDeleteDay.set(true);
     }
 
-    addNewDay(): void {
-        this.manageDayCreateMode.set(true);
-        this.manageDaySelectedDayId.set(this.generateUUID());
-        this.dayDialogVisible.set(true);
-    }
-
-    onManageDayConfirm(daySlice: DayConfigSlice): void {
-        if (this.manageDayCreateMode()) {
-            // Mode création - ajouter le nouveau jour
-            const cur = this.planning();
-            const newDay: Day = daySlice.day;
-            const days = [...cur.days, newDay];
-
-            this.planning.set({...cur, days});
-
-            this.manageDayCreateMode.set(false);
-            this.manageDaySelectedDayId.set('');
-            this.dayDialogVisible.set(false);
-            this.selectedDayId.set(newDay.id);
-        } else {
-            // Mode édition - mise à jour du jour existant
-            this.applyDaySlice(daySlice);
-            this.dayDialogVisible.set(false);
-        }
-    }
-
-    @HostListener('window:pointerup')
-    @HostListener('window:pointercancel')
-    @HostListener('window:blur')
-    onGlobalStop(): void {
-        this.stopPaint();
-    }
-
-    // ✅ update minimal-copy (perf)
-    private setCellCategory(dayId: string, volunteerId: string, slotIndex: number, categoryId: string | null) {
-        const cur = this.planning();
-        const dayIndex = cur.days.findIndex(d => d.id === dayId);
-        if (dayIndex < 0) {
-            return;
-        }
-
-        const day = cur.days[dayIndex];
-        const i = day.cells.findIndex(c => c.volunteerId === volunteerId && c.slotIndex === slotIndex);
-
-        // no-op
-        if (categoryId === null && i < 0) {
-            return;
-        }
-        if (categoryId !== null && i >= 0 && day.cells[i].categoryId === categoryId) {
-            return;
-        }
-
-        const days = [...cur.days];
-        const nextDay: Day = {...day};
-
-        const cells = [...day.cells];
-        if (categoryId === null) {
-            cells.splice(i, 1);
-        } else {
-            if (i >= 0) {
-                cells[i] = {...cells[i], categoryId};
-            } else {
-                cells.push({volunteerId, slotIndex, categoryId});
-            }
-        }
-
-        nextDay.cells = cells;
-        days[dayIndex] = nextDay;
-
-        this.planning.set({...cur, days});
-    }
-
-    private setUnavailableCell(dayId: string, volunteerId: string, slotIndex: number, unavailable: boolean) {
-        const cur = this.planning();
-        const dayIndex = cur.days.findIndex(d => d.id === dayId);
-        if (dayIndex < 0) {
-            return;
-        }
-
-        const day = cur.days[dayIndex];
-        const existing = (day.unavailableCells ?? []).findIndex(
-            c => c.volunteerId === volunteerId && c.slotIndex === slotIndex
-        );
-
-        // no-op
-        if (unavailable && existing >= 0) return;
-        if (!unavailable && existing < 0) return;
-
-        const unavailableCells = [...(day.unavailableCells ?? [])];
-        if (unavailable) {
-            unavailableCells.push({volunteerId, slotIndex});
-        } else {
-            unavailableCells.splice(existing, 1);
-        }
-
-        const days = [...cur.days];
-        days[dayIndex] = {...day, unavailableCells};
-        this.planning.set({...cur, days});
-    }
-
     confirmDeleteSelectedDay(): void {
-        const dayId = this.selectedDay()?.id;
-        if (!dayId) {
-            return;
-        }
-
-        // Remove day
-        this.planning.update(planning => ({
-            ...planning,
-            days: (planning.days ?? []).filter(d => d.id !== dayId)
-        }));
-
+        this.store.deleteSelectedDay();
         this.showConfirmDeleteDay.set(false);
     }
 
-    previousState(): void {
-        window.history.back();
+    // ---------- vue ----------
+
+    setViewMode(mode: ViewMode): void {
+        this.store.viewMode.set(mode);
+        this.store.blockSelection.set(null);
+        if (mode === 'person') {
+            // les zones ne sont plus affichées : la plage sélectionnée n'a plus de sens
+            this.store.zoneSelection.set(null);
+        }
     }
 
-    private toPlanningConfigurationDto(planning: Planning): VolunteerPlanningConfigurationDto {
-        return {
-            categories: planning.categories.map(c => ({
-                id: c.id,
-                label: c.label,
-                icon: c.icon,
-                color: c.color
-            })),
-            days: planning.days.map(d => ({
-                id: d.id,
-                label: d.label,
-                startTime: d.startTime.toISOString(),
-                endTime: d.endTime.toISOString(),
-                intervalMinutes: d.intervalMinutes,
-                assignedVolunteerIds: d.assignedVolunteerIds ?? [],
-                cells: d.cells.map(c => ({
-                    volunteerId: c.volunteerId,
-                    slotIndex: c.slotIndex,
-                    categoryId: c.categoryId
-                })),
-                unavailableCells: (d.unavailableCells ?? []).map(c => ({
-                    volunteerId: c.volunteerId,
-                    slotIndex: c.slotIndex
-                }))
-            }))
-        };
+    clearFocus(): void {
+        this.store.focusVolunteerId.set(null);
     }
 
-    private fromPlanningVolunteersDto(dto: PlanningVolunteersDto): Planning {
-        const globalInterval = dto.configuration.intervalMinutes ?? 60;
-        return {
-            volunteers: dto.volunteers.map(v => ({id: v.id, label: v.label})),
-            categories: dto.configuration.categories.map(c => ({
-                id: c.id,
-                label: c.label,
-                icon: c.icon,
-                color: c.color
-            })),
-            days: dto.configuration.days.map(d => ({
-                id: d.id,
-                label: d.label,
-                startTime: new Date(d.startTime),
-                endTime: new Date(d.endTime),
-                intervalMinutes: (d.intervalMinutes ?? globalInterval) as IntervalMinutes,
-                assignedVolunteerIds: d.assignedVolunteerIds ?? [],
-                cells: d.cells ?? [],
-                unavailableCells: d.unavailableCells ?? []
-            }))
-        };
-    }
+    // ---------- raccourcis clavier ----------
 
-    private queuePaint(vId: string, slot: number) {
-        this.pendingPaint = {vId, slot};
-        if (this.rafId !== null) {
+    @HostListener('window:keydown', ['$event'])
+    onKeyDown(event: KeyboardEvent): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest?.('input, textarea, select, [contenteditable="true"], .p-dialog')) {
+            return;
+        }
+        if (this.dayDialogVisible() || this.volunteersDialogVisible()
+            || this.assignmentsDialogVisible() || this.categoriesDialogVisible()
+            || this.showConfirmDeleteDay()) {
             return;
         }
 
-        this.rafId = requestAnimationFrame(() => {
-            this.rafId = null;
-            const p = this.pendingPaint;
-            this.pendingPaint = null;
-            if (!p) {
-                return;
-            }
-            this.applyTool(p.vId, p.slot);
-        });
-    }
-
-    // ---------- Helpers ----------
-    private cellKey(volunteerId: string, slotIndex: number): string {
-        return `${volunteerId}::${slotIndex}`;
-    }
-
-    private timeAt(h: number, m: number): Date {
-        const d = new Date();
-        d.setHours(h, m, 0, 0);
-        return d;
-    }
-
-    private generateUUID(): string {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return crypto.randomUUID();
+        if (event.key === 'Escape') {
+            this.store.blockSelection.set(null);
+            this.store.zoneSelection.set(null);
+            this.store.focusVolunteerId.set(null);
+            return;
         }
-        // Fallback for older browsers
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = (Math.random() * 16) | 0;
-            const v = c === 'x' ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
+
+        if (this.store.isReadOnly()) {
+            return;
+        }
+
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+            event.preventDefault();
+            if (this.store.undo()) {
+                this.messageService.add({
+                                            severity: 'info',
+                                            detail: this.translate.instant('planningVolunteers.toast.undone'),
+                                            life: 1500
+                                        });
+            }
+            return;
+        }
+
+        if (event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
+
+        if (event.key === 'Delete' || event.key === 'Backspace') {
+            const run = this.store.blockSelection();
+            if (run) {
+                event.preventDefault();
+                this.store.updateDay(day => deleteRun(day, run));
+                this.store.blockSelection.set(null);
+            }
+            return;
+        }
+
+        const num = this.digitFromEvent(event);
+        if (num !== null) {
+            const category = this.store.categories()[num - 1];
+            if (category) {
+                this.store.tool.set({kind: 'CATEGORY', categoryId: category.id});
+            }
+            return;
+        }
+
+        if (event.key.toLowerCase() === 'e' || event.code === 'KeyE') {
+            this.store.tool.set({kind: 'ERASER'});
+            return;
+        }
+        if (event.key.toLowerCase() === 'x' || event.code === 'KeyX') {
+            this.store.tool.set({kind: 'UNAVAILABLE'});
+        }
+    }
+
+    /**
+     * Les chiffres sont lus via `event.code` en complément de `event.key` : sur les dispositions
+     * où la rangée de chiffres est en position secondaire (AZERTY), `event.key` renvoie `é`, `"`…
+     */
+    private digitFromEvent(event: KeyboardEvent): number | null {
+        const fromKey = Number(event.key);
+        if (Number.isInteger(fromKey) && fromKey >= 1 && fromKey <= 9) {
+            return fromKey;
+        }
+        const match = /^Digit([1-9])$/.exec(event.code);
+        return match ? Number(match[1]) : null;
     }
 
     private dayActionItems(): MenuItem[] {
         return [
             {
-                label: 'Configuration',
+                label: this.translate.instant('planningVolunteers.manageDay'),
                 icon: 'pi pi-calendar',
-                command: () => {
-                    this.dayDialogVisible.set(true);
-                }
+                command: () => this.dayDialogVisible.set(true)
             },
             {
                 label: 'Assignement des bénévoles',
                 icon: 'pi pi-user',
-                command: () => {
-                    this.assignmentsDialogVisible.set(true);
-                }
+                command: () => this.assignmentsDialogVisible.set(true)
             },
             {
                 label: 'Supprimer le jour',
@@ -792,63 +295,15 @@ export class VolunteerPlanningComponent implements OnInit {
             }
         ];
     }
-
-    private getEmptyPlanning(): Planning {
-        return {
-            volunteers: [],
-            categories: [],
-            days: []
-        };
-    }
-
-    private makeInitialPlanning(): Planning {
-        const volunteers: Volunteer[] = [
-            {id: 'v1', label: 'Charlène'},
-            {id: 'v2', label: 'Davy'},
-            {id: 'v3', label: 'Dylan'},
-            {id: 'v4', label: 'Matthias'},
-            {id: 'v5', label: 'Raphael'},
-            {id: 'v6', label: 'Kevin'},
-            {id: 'v7', label: 'Cathy'},
-            {id: 'v8', label: 'Leila'},
-            {id: 'v9', label: 'Michael'},
-            {id: 'v10', label: 'Papa'}
-        ];
-
-        const categories: Category[] = [
-            {id: 'c1', label: 'Buvette', icon: 'pi pi-credit-card', color: '#C1E1C1'},
-            {id: 'c2', label: 'Lavage', icon: 'pi pi-sparkles', color: '#C1D9E1'},
-            {id: 'c3', label: 'Cuisine', icon: 'pi pi-shop', color: '#FFDDC1'},
-            {id: 'c4', label: 'Logistique', icon: 'pi pi-box', color: '#ffe8b5'},
-            {id: 'c5', label: 'Non disponible', icon: 'pi pi-times', color: '#DDDDDD'}
-        ];
-
-        return {
-            volunteers,
-            categories,
-            days: [
-                {
-                    id: 'd1',
-                    label: 'Vendredi',
-                    startTime: this.timeAt(8, 0),
-                    endTime: this.timeAt(19, 0),
-                    intervalMinutes: 60,
-                    assignedVolunteerIds: [],
-                    cells: [],
-                    unavailableCells: []
-                },
-                {
-                    id: 'd2',
-                    label: 'Samedi',
-                    startTime: this.timeAt(8, 0),
-                    endTime: this.timeAt(19, 0),
-                    intervalMinutes: 60,
-                    assignedVolunteerIds: [],
-                    cells: [],
-                    unavailableCells: []
-                }
-            ]
-        };
-    }
 }
 
+function generateUUID(): string {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.floor(Math.random() * 16);
+        const v = c === 'x' ? r : (r % 4) + 8;
+        return v.toString(16);
+    });
+}

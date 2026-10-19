@@ -7,6 +7,7 @@ import ch.salon.domain.VolunteerPlanningCell;
 import ch.salon.domain.VolunteerPlanningConfiguration;
 import ch.salon.domain.VolunteerPlanningData;
 import ch.salon.domain.VolunteerPlanningDay;
+import ch.salon.domain.VolunteerPlanningNeed;
 import ch.salon.domain.VolunteerPlanningUnavailableCell;
 import ch.salon.repository.PlanningVolunteerSalonRepository;
 import ch.salon.service.document.DocumentCreator;
@@ -156,12 +157,21 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
             }
             page.setRows(rows);
 
-            // One total row per category
+            // One total row per category: « affectés / minimum »
+            Map<String, Map<Integer, Integer>> needMap = new HashMap<>();
+            if (day.getNeeds() != null) {
+                for (VolunteerPlanningNeed need : day.getNeeds()) {
+                    needMap.computeIfAbsent(need.getCategoryId(), k -> new HashMap<>())
+                           .put(need.getSlotIndex(), need.getMin());
+                }
+            }
+
             List<TotalRowData> totals = new ArrayList<>();
             for (CategoryData cat : categories) {
                 TotalRowData total = new TotalRowData();
                 total.setCategory(cat);
-                List<Integer> counts = new ArrayList<>();
+                Map<Integer, Integer> catNeeds = needMap.getOrDefault(cat.getId(), Map.of());
+                List<TotalCellData> counts = new ArrayList<>();
                 for (int i = 0; i < slots.size(); i++) {
                     int count = 0;
                     for (String vId : assignedIds) {
@@ -170,7 +180,13 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
                             count++;
                         }
                     }
-                    counts.add(count);
+                    int min = catNeeds.getOrDefault(i, 0);
+                    TotalCellData cell = new TotalCellData();
+                    cell.setAssigned(count);
+                    cell.setMin(min);
+                    cell.setLabel(count == 0 && min == 0 ? "\u2013" : count + "/" + min);
+                    cell.setState(coverageState(count, min));
+                    counts.add(cell);
                 }
                 total.setCounts(counts);
                 totals.add(total);
@@ -211,6 +227,16 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
         } catch (Exception ignored) {
         }
         return labels;
+    }
+
+    private String coverageState(int assigned, int min) {
+        if (assigned == 0 && min == 0) {
+            return "none";
+        }
+        if (assigned < min) {
+            return "under";
+        }
+        return assigned == min ? "ok" : "over";
     }
 
     private String formatTimeRange(String startTimeIso, String endTimeIso) {
@@ -272,6 +298,16 @@ public class DownloadVolunteerPlanningHandler implements DocumentActionHandler<S
     @Data
     public static class TotalRowData {
         private CategoryData category;
-        private List<Integer> counts;
+        private List<TotalCellData> counts;
+    }
+
+    @Data
+    public static class TotalCellData {
+        private int assigned;
+        private int min;
+        /** « a/min » ou « – » quand il n'y a ni affectation ni minimum */
+        private String label;
+        /** none | under | ok | over */
+        private String state;
     }
 }
