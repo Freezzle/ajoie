@@ -3,5 +3,10 @@
 @use "content/scss/registration";
 
 :root {
+  // PrimeNG injecte `:root,:host{color-scheme:light}` dans un <style> ajouté en fin
+  // de <head> au runtime : sans !important il écraserait cette règle. `only light`
+  // (et non `light`) est nécessaire pour désactiver l'auto-dark des navigateurs mobiles.
+  color-scheme: only light !important;
+
   @include variables.tokens();
 }
