@@ -116,7 +116,7 @@ export class ParticipationComponent implements OnInit {
                                                 .map(participation => ({
                                                     date: new Date(participation.registrationDate!),
                                                     label: null,
-                                                    isMilestone: false
+                                                    kind: 'registration' as const
                                                 }));
 
         // on normalise end pour comparaison
@@ -136,7 +136,7 @@ export class ParticipationComponent implements OnInit {
                                 month: '2-digit',
                                 year: 'numeric'
                             }),
-                            isMilestone: true
+                            kind: 'month'
                         });
 
             cursor.setMonth(cursor.getMonth() + 1);
@@ -144,7 +144,7 @@ export class ParticipationComponent implements OnInit {
 
         const today = new Date();
         if (today >= start && today <= lastMoment) {
-            points.push({date: today, label: 'Aujourd\'hui', isMilestone: true});
+            points.push({date: today, label: 'Aujourd\'hui', kind: 'today'});
         }
 
         return points.sort((a, b) => a.date.getTime() - b.date.getTime());

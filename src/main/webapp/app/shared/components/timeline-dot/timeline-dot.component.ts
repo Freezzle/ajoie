@@ -72,5 +72,7 @@ export class TimelineDotComponent implements OnChanges {
 export interface DateTimelinePoint {
     date: Date;      // la date du point
     label: string | null;   // texte à afficher sous le point
-    isMilestone: boolean;
+    kind: TimelinePointKind;
 }
+
+export type TimelinePointKind = 'registration' | 'month' | 'today';

@@ -95,11 +95,19 @@
   color: var(--app-text);
 }
 
-.timeline-point-milestone {
-  width: 14px;
-  height: 14px;
+/* Jalon "Aujourd'hui" : pastille orange, plus petite que les extrémités */
+.timeline-point-today {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
+  background: var(--app-warning);
+  border: 2px solid var(--app-warning);
+}
+
+/* Jalons mensuels : trait vertical fin */
+.timeline-point-month {
+  width: 2px;
+  height: 14px;
+  border-radius: 1px;
   background: var(--app-contrast);
-  border: 2px solid var(--app-contrast);
-  font-size: 0.7rem;
 }
