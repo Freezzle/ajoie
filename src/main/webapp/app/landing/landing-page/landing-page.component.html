@@ -50,21 +50,6 @@
       <h2>{{ 'landing.features.title' | translate }}</h2>
       <p class="landing-section-subtitle">{{ 'landing.features.subtitle' | translate: { count: readyCount() } }}</p>
 
-      <div class="landing-filters" role="group" aria-label="Filtrer les modules">
-        <button type="button" class="landing-filter" [class.active]="activeFilter() === 'all'"
-                (click)="setFilter('all')">
-          {{ 'landing.features.filters.all' | translate: { count: allCount() } }}
-        </button>
-        <button type="button" class="landing-filter" [class.active]="activeFilter() === 'ready'"
-                (click)="setFilter('ready')">
-          {{ 'landing.features.filters.ready' | translate: { count: readyCount() } }}
-        </button>
-        <button type="button" class="landing-filter" [class.active]="activeFilter() === 'soon'"
-                (click)="setFilter('soon')">
-          {{ 'landing.features.filters.soon' | translate: { count: soonCount() } }}
-        </button>
-      </div>
-
       <div class="landing-modules-grid">
         @for (module of filteredModules(); track module.id) {
           <div class="landing-module-card"
