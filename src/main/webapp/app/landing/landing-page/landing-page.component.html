@@ -1,136 +1,146 @@
 <div class="landing-page">
-    <!-- 4.2 En-tête -->
-    <header class="landing-header">
-        <div class="landing-header-inner">
-            <div class="landing-brand">
+  <!-- 4.2 En-tête -->
+  <header class="landing-header">
+    <div class="landing-header-inner">
+      <div class="landing-brand">
                 <span class="landing-logo" aria-label="Logo {{ productName }}">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
-                        <path d="M12 21c0-5 3-7 3-11a3 3 0 0 0-6 0c0 4 3 6 3 11Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 13c-2-3-5-3-7-2 1 3 4 4 7 2Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 21c0-5 3-7 3-11a3 3 0 0 0-6 0c0 4 3 6 3 11Z" stroke="currentColor"
+                              stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 13c-2-3-5-3-7-2 1 3 4 4 7 2Z" stroke="currentColor" stroke-width="1.6"
+                              stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </span>
-                <div class="landing-brand-text">
-                    <span class="landing-brand-name">{{ productName }}</span>
-                    <span class="landing-brand-subtitle">{{ 'landing.header.subtitle' | translate }}</span>
-                </div>
-            </div>
-
-            <nav class="landing-nav" aria-label="Navigation principale">
-                <button type="button" (click)="scrollTo('fonctions')">{{ 'landing.header.nav.features' | translate }}</button>
-                <button type="button" (click)="scrollTo('pourqui')">{{ 'landing.header.nav.audiences' | translate }}</button>
-                <button type="button" (click)="scrollTo('bientot')">{{ 'landing.header.nav.opening' | translate }}</button>
-            </nav>
-
-            <div class="landing-header-actions">
-              @if(false) {
-                <p-button routerLink="/admin/login" severity="secondary" [outlined]="true" [label]="'landing.header.login' | translate" size="small"/>
-              }
-                <p-button [label]="'landing.header.cta' | translate" (onClick)="scrollTo('bientot')" size="small"/>
-            </div>
+        <div class="landing-brand-text">
+          <span class="landing-brand-name">{{ productName }}</span>
+          <span class="landing-brand-subtitle">{{ 'landing.header.subtitle' | translate }}</span>
         </div>
-    </header>
+      </div>
 
-    <main>
-        <!-- 4.3 Hero - Variante A : centré -->
-        <section class="landing-hero landing-hero-a">
-            <h1>{{ 'landing.hero.title' | translate }}</h1>
+      <nav class="landing-nav" aria-label="Navigation principale">
+        <button type="button" (click)="scrollTo('fonctions')">{{ 'landing.header.nav.features' | translate }}</button>
+        <button type="button" (click)="scrollTo('pourqui')">{{ 'landing.header.nav.audiences' | translate }}</button>
+        <button type="button" (click)="scrollTo('bientot')">{{ 'landing.header.nav.opening' | translate }}</button>
+      </nav>
 
-            <div class="landing-hero-actions mt-4">
-                <p-button [label]="'landing.hero.ctaPrimary' | translate" (onClick)="scrollTo('bientot')"/>
-                <p-button severity="secondary" [outlined]="true" [label]="'landing.hero.ctaSecondary' | translate" (onClick)="scrollTo('fonctions')"/>
+      <div class="landing-header-actions">
+        @if (false) {
+          <p-button routerLink="/admin/login" severity="secondary" [outlined]="true"
+                    [label]="'landing.header.login' | translate" size="small" />
+        }
+        <p-button [label]="'landing.header.cta' | translate" (onClick)="scrollTo('bientot')" size="small" />
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 4.3 Hero - Variante A : centré -->
+    <section class="landing-hero landing-hero-a">
+      <h1>{{ 'landing.hero.title' | translate }}</h1>
+
+      <div class="landing-hero-actions mt-4">
+        <p-button [label]="'landing.hero.ctaPrimary' | translate" (onClick)="scrollTo('bientot')" />
+        <p-button severity="secondary" [outlined]="true" [label]="'landing.hero.ctaSecondary' | translate"
+                  (onClick)="scrollTo('fonctions')" />
+      </div>
+    </section>
+
+    <!-- 4.4 Tout ce qu'il faut pour gérer un salon -->
+    <section id="fonctions" class="landing-features">
+      <h2>{{ 'landing.features.title' | translate }}</h2>
+      <p class="landing-section-subtitle">{{ 'landing.features.subtitle' | translate: { count: readyCount() } }}</p>
+
+      <div class="landing-filters" role="group" aria-label="Filtrer les modules">
+        <button type="button" class="landing-filter" [class.active]="activeFilter() === 'all'"
+                (click)="setFilter('all')">
+          {{ 'landing.features.filters.all' | translate: { count: allCount() } }}
+        </button>
+        <button type="button" class="landing-filter" [class.active]="activeFilter() === 'ready'"
+                (click)="setFilter('ready')">
+          {{ 'landing.features.filters.ready' | translate: { count: readyCount() } }}
+        </button>
+        <button type="button" class="landing-filter" [class.active]="activeFilter() === 'soon'"
+                (click)="setFilter('soon')">
+          {{ 'landing.features.filters.soon' | translate: { count: soonCount() } }}
+        </button>
+      </div>
+
+      <div class="landing-modules-grid">
+        @for (module of filteredModules(); track module.id) {
+          <div class="landing-module-card"
+               [class.soon]="module.status === 'soon'"
+               [class.highlighted]="highlightedModuleId() === module.id"
+               [id]="'module-' + module.id">
+            <div class="landing-module-icon">
+              <i class="pi {{ module.icon }}" aria-hidden="true"></i>
             </div>
-        </section>
+            <h3>
+              {{ module.titleKey | translate }}
+              @if (module.status !== 'ready') {
+                <p-tag
+                  [value]="'landing.features.statusSoon' | translate"
+                  [severity]="'warn'"></p-tag>
+              }
+            </h3>
+            <p>{{ module.descriptionKey | translate }}</p>
+          </div>
+        }
+      </div>
+    </section>
 
-        <!-- 4.4 Tout ce qu'il faut pour gérer un salon -->
-        <section id="fonctions" class="landing-features">
-            <h2>{{ 'landing.features.title' | translate }}</h2>
-            <p class="landing-section-subtitle">{{ 'landing.features.subtitle' | translate: {count: readyCount()} }}</p>
+    <!-- 4.5 Pour qui ? -->
+    <section id="pourqui" class="landing-audiences">
+      <h2>{{ 'landing.audiences.title' | translate }}</h2>
+      <p class="landing-section-subtitle">{{ 'landing.audiences.subtitle' | translate }}</p>
 
-            <div class="landing-filters" role="group" aria-label="Filtrer les modules">
-                <button type="button" class="landing-filter" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
-                    {{ 'landing.features.filters.all' | translate: {count: allCount()} }}
-                </button>
-                <button type="button" class="landing-filter" [class.active]="activeFilter() === 'ready'" (click)="setFilter('ready')">
-                    {{ 'landing.features.filters.ready' | translate: {count: readyCount()} }}
-                </button>
-                <button type="button" class="landing-filter" [class.active]="activeFilter() === 'soon'" (click)="setFilter('soon')">
-                    {{ 'landing.features.filters.soon' | translate: {count: soonCount()} }}
-                </button>
-            </div>
+      <div class="landing-audiences-grid">
+        @for (audience of audiences; track audience.titleKey) {
+          <div class="landing-audience-card">
+            <h3>{{ audience.titleKey | translate }}</h3>
+            <p>{{ audience.textKey | translate }}</p>
+          </div>
+        }
+      </div>
+    </section>
 
-            <div class="landing-modules-grid">
-                @for (module of filteredModules(); track module.id) {
-                    <div class="landing-module-card"
-                         [class.soon]="module.status === 'soon'"
-                         [class.highlighted]="highlightedModuleId() === module.id"
-                         [id]="'module-' + module.id">
-                        <div class="landing-module-icon">
-                            <i class="pi {{ module.icon }}" aria-hidden="true"></i>
-                        </div>
-                        <h3>
-                            {{ module.titleKey | translate }}
-                            <p-tag [value]="(module.status === 'ready' ? 'landing.features.statusReady' : 'landing.features.statusSoon') | translate"
-                                   [severity]="module.status === 'ready' ? 'info' : 'warn'"
-                                   [styleClass]="module.status === 'ready' ? 'landing-tag-ready' : ''"></p-tag>
-                        </h3>
-                        <p>{{ module.descriptionKey | translate }}</p>
-                    </div>
-                }
-            </div>
-        </section>
+    <!-- 4.6 La plateforme ouvre bientôt -->
+    <section id="bientot" class="landing-waitlist">
+      <div class="landing-waitlist-card">
+        <div class="landing-waitlist-info">
+          <p-tag [value]="'landing.waitlist.badge' | translate" severity="warn" styleClass="landing-badge-warm"></p-tag>
+          <h2>{{ 'landing.waitlist.title' | translate }}</h2>
+          <p>{{ 'landing.waitlist.text' | translate }}</p>
+        </div>
 
-        <!-- 4.5 Pour qui ? -->
-        <section id="pourqui" class="landing-audiences">
-            <h2>{{ 'landing.audiences.title' | translate }}</h2>
-            <p class="landing-section-subtitle">{{ 'landing.audiences.subtitle' | translate }}</p>
+        <form class="landing-waitlist-form" [formGroup]="waitlistForm" (ngSubmit)="submitWaitlist()">
+          <div class="landing-form-field">
+            <label for="landing-email">{{ 'landing.waitlist.emailLabel' | translate }}</label>
+            <input pInputText
+                   id="landing-email"
+                   type="email"
+                   formControlName="email"
+                   [placeholder]="'landing.waitlist.emailPlaceholder' | translate" />
+          </div>
 
-            <div class="landing-audiences-grid">
-                @for (audience of audiences; track audience.titleKey) {
-                    <div class="landing-audience-card">
-                        <h3>{{ audience.titleKey | translate }}</h3>
-                        <p>{{ audience.textKey | translate }}</p>
-                    </div>
-                }
-            </div>
-        </section>
+          <p-button type="submit" styleClass="landing-waitlist-submit" [label]="'landing.waitlist.submit' | translate"
+                    [style]="{width: '100%'}" />
 
-        <!-- 4.6 La plateforme ouvre bientôt -->
-        <section id="bientot" class="landing-waitlist">
-            <div class="landing-waitlist-card">
-                <div class="landing-waitlist-info">
-                    <p-tag [value]="'landing.waitlist.badge' | translate" severity="warn" styleClass="landing-badge-warm"></p-tag>
-                    <h2>{{ 'landing.waitlist.title' | translate }}</h2>
-                    <p>{{ 'landing.waitlist.text' | translate }}</p>
-                </div>
+          @if (waitlistState() === 'error') {
+            <p class="landing-form-message error">{{ 'landing.waitlist.errorEmail' | translate }}</p>
+          }
+          @if (waitlistState() === 'success') {
+            <p class="landing-form-message success">
+              {{ 'landing.waitlist.success' | translate: { email: confirmedEmail() } }}
+            </p>
+          }
+        </form>
+      </div>
+    </section>
+  </main>
 
-                <form class="landing-waitlist-form" [formGroup]="waitlistForm" (ngSubmit)="submitWaitlist()">
-                    <div class="landing-form-field">
-                        <label for="landing-email">{{ 'landing.waitlist.emailLabel' | translate }}</label>
-                        <input pInputText
-                               id="landing-email"
-                               type="email"
-                               formControlName="email"
-                               [placeholder]="'landing.waitlist.emailPlaceholder' | translate"/>
-                    </div>
-
-                    <p-button type="submit" styleClass="landing-waitlist-submit" [label]="'landing.waitlist.submit' | translate" [style]="{width: '100%'}"/>
-
-                    @if (waitlistState() === 'error') {
-                        <p class="landing-form-message error">{{ 'landing.waitlist.errorEmail' | translate }}</p>
-                    }
-                    @if (waitlistState() === 'success') {
-                        <p class="landing-form-message success">
-                            {{ 'landing.waitlist.success' | translate: {email: confirmedEmail()} }}
-                        </p>
-                    }
-                </form>
-            </div>
-        </section>
-    </main>
-
-    <!-- 4.7 Pied de page -->
-    <footer class="landing-footer">
-        <span>{{ 'landing.footer.copyright' | translate: {year: currentYear, product: productName} }}</span>
-        <span>{{ 'landing.footer.underConstruction' | translate }}</span>
-    </footer>
+  <!-- 4.7 Pied de page -->
+  <footer class="landing-footer">
+    <span>{{ 'landing.footer.copyright' | translate: { year: currentYear, product: productName } }}</span>
+    <span>{{ 'landing.footer.underConstruction' | translate }}</span>
+  </footer>
 </div>
