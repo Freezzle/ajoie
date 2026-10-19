@@ -1,5 +1,5 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, ParamMap, Router, RouterModule} from '@angular/router';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {combineLatest, filter, switchMap, tap} from 'rxjs';
 
 import SharedModule from 'app/shared/shared.module';
@@ -62,32 +62,114 @@ import {copyToClipboard} from '../../../core/util/utils';
                ]
            })
 export class ParticipationComponent implements OnInit {
-    participations: IParticipation[] = [];
+    participations = signal<IParticipation[]>([]);
     isLoading = false;
     statusValues = Object.keys(Status);
-    params!: ParamMap;
     infoInvoicesMap: { [id: string]: IInfoInvoice } = {};
-    points: DateTimelinePoint[] = [];
-    start: Date | undefined;
-    end: Date | undefined;
     protected confirmDialogService = inject(ConfirmDialogService);
     protected readonly navigationStateService = inject(NavigationStateService);
     private readonly participationService = inject(ParticipationService);
     private readonly translateService = inject(TranslateService);
     private readonly activatedRoute = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly idSalon = signal<string | null>(null);
+
+    /**
+     * Le salon est chargé de manière asynchrone par la navbar : on ne l'utilise que
+     * lorsqu'il correspond réellement au salon de la route courante.
+     */
+    private readonly currentSalon = computed(() => {
+        const idSalon = this.idSalon();
+        const salon = this.navigationStateService.salon();
+
+        return idSalon && salon?.id === idSalon ? salon : null;
+    });
+
+    readonly timelineStart = computed(() => {
+        const startingDate = this.currentSalon()?.startingDate;
+        if (!startingDate) {
+            return null;
+        }
+
+        const start = new Date(startingDate);
+        start.setMonth(start.getMonth() - 7);
+
+        return start;
+    });
+
+    readonly timelineEnd = computed(() => {
+        const endingDate = this.currentSalon()?.endingDate;
+
+        return endingDate ? new Date(endingDate) : null;
+    });
+
+    readonly points = computed<DateTimelinePoint[]>(() => {
+        const start = this.timelineStart();
+        const end = this.timelineEnd();
+
+        if (!start || !end) {
+            return [];
+        }
+
+        const points: DateTimelinePoint[] = this.participations()
+                                                .filter(participation => !!participation.registrationDate)
+                                                .map(participation => ({
+                                                    date: new Date(participation.registrationDate!),
+                                                    label: null,
+                                                    isMilestone: false
+                                                }));
+
+        // on normalise end pour comparaison
+        const lastMoment = new Date(end);
+        lastMoment.setHours(23, 59, 59, 999);
+
+        // on part du 1er du mois suivant celui de start, à minuit
+        const cursor = new Date(start);
+        cursor.setDate(1);
+        cursor.setHours(0, 0, 0, 0);
+        cursor.setMonth(cursor.getMonth() + 1);
+
+        while (cursor <= lastMoment) {
+            points.push({
+                            date: new Date(cursor),
+                            label: cursor.toLocaleDateString('fr-CH', {
+                                month: '2-digit',
+                                year: 'numeric'
+                            }),
+                            isMilestone: true
+                        });
+
+            cursor.setMonth(cursor.getMonth() + 1);
+        }
+
+        const today = new Date();
+        if (today >= start && today <= lastMoment) {
+            points.push({date: today, label: 'Aujourd\'hui', isMilestone: true});
+        }
+
+        return points.sort((a, b) => a.date.getTime() - b.date.getTime());
+    });
 
     ngOnInit(): void {
         combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
             ([params]) => {
-                this.params = params;
-
-                if (!this.participations || this.participations.length === 0) {
-                    this.load();
-                    this.participationService.getInfosInvoiceForSalon(this.params.get('idSalon')!).subscribe(infoInvoicesMap => {
-                        this.infoInvoicesMap = infoInvoicesMap || {};
-                    });
+                const idSalon = params.get('idSalon')!;
+                if (this.idSalon() === idSalon) {
+                    return;
                 }
+
+                this.idSalon.set(idSalon);
+                this.participations.set([]);
+                this.infoInvoicesMap = {};
+
+                this.load();
+                this.participationService.getInfosInvoiceForSalon(idSalon).subscribe(infoInvoicesMap => {
+                    if (this.idSalon() !== idSalon) {
+                        return;
+                    }
+
+                    this.infoInvoicesMap = infoInvoicesMap || {};
+                });
             });
     }
 
@@ -130,64 +212,23 @@ export class ParticipationComponent implements OnInit {
     }
 
     load(): void {
+        const idSalon = this.idSalon();
+        if (!idSalon) {
+            return;
+        }
+
         this.isLoading = true;
-        const idSalon = this.params.get('idSalon')!;
 
         this.participationService
             .query(idSalon)
             .pipe(finalize(() => (this.isLoading = false)))
             .subscribe(result => {
-                this.participations = result.body ?? [];
-                this.points = this.participations.map(part => ({
-                    date: part.registrationDate!,
-                    label: null,
-                    isMilestone: false
-                } as DateTimelinePoint));
-
-                this.start = this.navigationStateService.salon()?.startingDate;
-                if (this.start) {
-                    const startMinus6Months = new Date(this.start);
-                    startMinus6Months.setMonth(startMinus6Months.getMonth() - 7);
-                    this.start = startMinus6Months;
+                // le salon a pu changer pendant la requête : on ignore une réponse obsolète
+                if (this.idSalon() !== idSalon) {
+                    return;
                 }
 
-                this.end = this.navigationStateService.salon()?.endingDate;
-
-                if (this.start && this.end) {
-                    const milestones: DateTimelinePoint[] = [];
-
-                    // on part du 1er du mois de start, à minuit
-                    const cursor = new Date(this.start);
-                    cursor.setDate(1);
-                    cursor.setHours(0, 0, 0, 0);
-                    cursor.setMonth(cursor.getMonth() + 1);
-
-                    // on normalise end pour comparaison
-                    const end = new Date(this.end);
-                    end.setHours(23, 59, 59, 999);
-
-                    while (cursor <= end) {
-                        milestones.push({
-                                            date: new Date(cursor),
-                                            label: cursor.toLocaleDateString('fr-CH', {
-                                                month: '2-digit',
-                                                year: 'numeric'
-                                            }),
-                                            isMilestone: true
-                                        });
-
-                        cursor.setMonth(cursor.getMonth() + 1);
-                    }
-
-                    // Jalons + "Aujourd'hui"
-                    this.points.push(...milestones);
-                }
-
-                if (new Date() <= this.end!) {
-                    this.points.push({date: new Date(), label: 'Aujourd\'hui', isMilestone: true});
-                }
-
-                this.points.sort((a, b) => a.date.getTime() - b.date.getTime());
+                this.participations.set(result.body ?? []);
             });
     }
 

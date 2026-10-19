@@ -26,7 +26,7 @@
                          [rows]="10"
                          [sortOrder]="-1"
                          [tableStyle]="{ 'min-width': '70rem' }"
-                         [value]="participations"
+                         [value]="participations()"
                          dataKey="id"
                          sortField="registrationDate">
                     <ng-template #caption>
@@ -218,8 +218,10 @@
             <h4>Ligne de temps des inscriptions</h4>
         </div>
         <div appCardBody>
-            @if (start && end) {
-                <timeline-dot [endDate]="end" [points]="points" [startDate]="start"/>
+            @if (timelineStart(); as start) {
+                @if (timelineEnd(); as end) {
+                    <timeline-dot [endDate]="end" [points]="points()" [startDate]="start"/>
+                }
             }
         </div>
     </app-card>

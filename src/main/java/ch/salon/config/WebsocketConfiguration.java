@@ -18,7 +18,7 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:4200", "http://localhost:8080", "http://localhost:9000", "https://localhost:4200", "https://localhost:8080", "https://localhost:9000", "https://app-82accd07-7176-4f96-8643-46ebbbf3fa54.cleverapps.io")
+                .setAllowedOriginPatterns("http://localhost:4200", "http://localhost:8080", "http://localhost:9000", "https://localhost:4200", "https://localhost:8080", "https://localhost:9000", "https://app-82accd07-7176-4f96-8643-46ebbbf3fa54.cleverapps.io", "https://www.salon-en-ligne.ch", "https://salon-en-ligne.ch")
                 .withSockJS();
     }
 
