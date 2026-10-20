@@ -1,0 +1,22 @@
+/* Seuls restent le filet de couleur par type et la neutralisation du défilement tactile. */
+
+.min-h-0 {
+    min-height: 0;
+}
+
+.tp-card {
+    border-left: 3px solid var(--tp-type-line, transparent);
+    text-align: left;
+}
+
+.tp-card.is-conference {
+    --tp-type-line: var(--tp-conference);
+}
+
+.tp-card.is-workshop {
+    --tp-type-line: var(--tp-workshop);
+}
+
+.tp-card.is-draggable {
+    touch-action: none;
+}

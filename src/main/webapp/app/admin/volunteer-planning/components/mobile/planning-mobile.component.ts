@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {TranslatePipe} from '@ngx-translate/core';
 
-import {BottomSheetComponent} from './bottom-sheet.component';
+import {BottomSheetComponent} from '../../../../shared/components/bottom-sheet/bottom-sheet.component';
 import {MobilePersonGridComponent} from './mobile-person-grid.component';
 import {MobileZoneListComponent} from './mobile-zone-list.component';
 import {PersonPlanningSheetComponent} from './person-planning-sheet.component';

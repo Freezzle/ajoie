@@ -1,0 +1,184 @@
+<form [formGroup]="form" class="row">
+
+    <!-- ── Pas d'affichage et pas de placement ─────────────────────────── -->
+    <div class="col-12 col-lg-6 mt-3">
+        <div class="small text-muted mb-1">{{ 'planningTalks.config.displayStep' | translate }}</div>
+        <p-selectbutton [allowEmpty]="false"
+                        [options]="displayOptions"
+                        formControlName="intervalMinutes"
+                        optionLabel="label"
+                        optionValue="value"
+                        size="small"/>
+        <div class="form-text">{{ 'planningTalks.config.displayStepHelp' | translate }}</div>
+    </div>
+
+    <div class="col-12 col-lg-6 mt-3">
+        <div class="small text-muted mb-1">{{ 'planningTalks.config.placementStep' | translate }}</div>
+        <p-selectbutton [allowEmpty]="false"
+                        [options]="placementOptions"
+                        formControlName="placementIntervalMinutes"
+                        optionLabel="label"
+                        optionValue="value"
+                        size="small"/>
+        <div class="form-text">{{ 'planningTalks.config.placementStepHelp' | translate }}</div>
+    </div>
+
+    <!-- ── Durées et battements ────────────────────────────────────────── -->
+    <div class="col-12 mt-4">
+        <div class="small text-muted mb-1">{{ 'planningTalks.config.types' | translate }}</div>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-1">
+                <thead>
+                <tr>
+                    <th scope="col">{{ 'planningTalks.details.type' | translate }}</th>
+                    <th scope="col">{{ 'planningTalks.config.preparation' | translate }}</th>
+                    <th scope="col">{{ 'planningTalks.config.duration' | translate }}</th>
+                    <th scope="col">{{ 'planningTalks.config.cleanup' | translate }}</th>
+                    <th class="text-end" scope="col">{{ 'planningTalks.config.occupied' | translate }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (type of types; track type) {
+                        <tr [formGroupName]="type">
+                            <td>{{ typeLabelKey(type) | translate }}</td>
+                            <td>
+                                <number-box [fieldName]="type + 'Preparation'"
+                                            [maxValue]="240"
+                                            [minValue]="0"
+                                            formControlName="preparationMinutes"/>
+                            </td>
+                            <td>
+                                <number-box [fieldName]="type + 'Duration'"
+                                            [maxValue]="480"
+                                            [minValue]="5"
+                                            formControlName="durationTalkMinutes"/>
+                            </td>
+                            <td>
+                                <number-box [fieldName]="type + 'Cleanup'"
+                                            [maxValue]="240"
+                                            [minValue]="0"
+                                            formControlName="cleanupMinutes"/>
+                            </td>
+                            <td class="text-end text-muted">{{ occupiedByType()[type] }} min</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-text">{{ 'planningTalks.config.typesHelp' | translate }}</div>
+    </div>
+
+    <!-- ── Salles ──────────────────────────────────────────────────────── -->
+    <div class="col-12 mt-4" formArrayName="rooms">
+        <div class="small text-muted mb-2">{{ 'planningTalks.config.rooms' | translate }}</div>
+
+        @for (room of rooms.controls; track room; let i = $index) {
+            <div [formGroupName]="i" class="d-flex align-items-center gap-2 mb-2">
+                <div class="flex-grow-1">
+                    <text-box [fieldName]="'room' + i" formControlName="label"/>
+                </div>
+                <button-box (clickedEvent)="removeRoom(i)"
+                            [showText]="false"
+                            primeIcon="pi-trash"
+                            translateKey="common.delete"
+                            type="danger"/>
+            </div>
+        }
+
+        <button-box (clickedEvent)="addRoom()"
+                    primeIcon="pi-plus"
+                    translateKey="planningTalks.config.addRoom"
+                    type="secondary"/>
+    </div>
+
+    <!-- ── Jours ───────────────────────────────────────────────────────── -->
+    <div class="col-12 mt-4" formArrayName="days">
+        <div class="small text-muted mb-2">{{ 'planningTalks.config.days' | translate }}</div>
+
+        @for (day of days.controls; track day; let d = $index) {
+            <div [formGroupName]="d" class="card mb-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-sm">
+                            <text-box [fieldName]="'dayLabel' + d"
+                                      formControlName="label"
+                                      translateKey="planningTalks.details.day"/>
+                        </div>
+                        <div class="col-12 col-sm-auto mt-3 mt-sm-0">
+                            <date-box [fieldName]="'dayDate' + d" formControlName="date"/>
+                        </div>
+                        <div class="col-auto mt-3 mt-sm-0">
+                            <button-box (clickedEvent)="requestRemoveDay(d)"
+                                        [showText]="false"
+                                        primeIcon="pi-trash"
+                                        translateKey="common.delete"
+                                        type="danger"/>
+                        </div>
+                    </div>
+
+                    @if (pendingDeleteIndex === d) {
+                        <div class="alert alert-warning d-flex align-items-center flex-wrap gap-2 mt-3 mb-0 py-2">
+                            <span class="small">
+                                {{ 'planningTalks.config.confirmRemoveDay' | translate: {count: placedCount(d)} }}
+                            </span>
+                            <div class="ms-auto d-flex gap-2">
+                                <button-box (clickedEvent)="cancelRemoveDay()"
+                                            translateKey="common.cancel"
+                                            type="secondary"/>
+                                <button-box (clickedEvent)="removeDay(d)"
+                                            translateKey="common.delete"
+                                            type="danger"/>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="table-responsive mt-3" formArrayName="slots">
+                        <table class="table table-sm align-middle mb-0">
+                            <tbody>
+                                @for (slot of slots(day).controls; track slot; let r = $index) {
+                                    <tr [formGroupName]="r">
+                                        <td class="w-25">{{ roomLabel(r) }}</td>
+                                        <td class="w-25">
+                                            <checkbox-box [fieldName]="'open' + d + '_' + r"
+                                                          formControlName="open"
+                                                          translateKey="planningTalks.config.open"/>
+                                        </td>
+                                        <td>
+                                            @if (isOpen(day, r)) {
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="small text-muted">
+                                                        {{ 'planningTalks.config.from' | translate }}
+                                                    </span>
+                                                    <p-datepicker [fluid]="true"
+                                                                  [stepMinute]="5"
+                                                                  [timeOnly]="true"
+                                                                  appendTo="body"
+                                                                  formControlName="start"
+                                                                  hourFormat="24"/>
+                                                    <span class="small text-muted">
+                                                        {{ 'planningTalks.config.to' | translate }}
+                                                    </span>
+                                                    <p-datepicker [fluid]="true"
+                                                                  [stepMinute]="5"
+                                                                  [timeOnly]="true"
+                                                                  appendTo="body"
+                                                                  formControlName="end"
+                                                                  hourFormat="24"/>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <button-box (clickedEvent)="addDay()"
+                    primeIcon="pi-plus"
+                    translateKey="planningTalks.config.addDay"
+                    type="secondary"/>
+    </div>
+</form>

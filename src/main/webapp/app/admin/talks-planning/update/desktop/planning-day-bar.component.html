@@ -1,0 +1,51 @@
+<div class="d-flex align-items-center flex-wrap gap-3 mb-2">
+    <ul class="nav nav-pills flex-nowrap overflow-auto mb-0" role="tablist">
+        @for (day of days(); track day.id) {
+            <li class="nav-item" role="presentation">
+                <button type="button"
+                        role="tab"
+                        class="nav-link d-flex align-items-center gap-2 text-nowrap"
+                        [class.active]="day.id === selectedDayId()"
+                        [attr.aria-selected]="day.id === selectedDayId()"
+                        (click)="daySelected.emit(day.id)">
+                    {{ day.label }}
+                    @if (hasConflict(day.id)) {
+                        <span class="badge rounded-pill text-bg-danger">{{ conflictsByDay().get(day.id) }}</span>
+                    }
+                </button>
+            </li>
+        }
+    </ul>
+
+    <div class="ms-auto d-flex align-items-center gap-2 small text-muted">
+        @if (unplacedCount() > 0) {
+            <span>{{ 'planningTalks.status.toPlan' | translate: {count: unplacedCount()} }}</span>
+        } @else {
+            <span>{{ 'planningTalks.status.allPlaced' | translate }}</span>
+        }
+        @if (conflictCount() > 0) {
+            <span aria-hidden="true">·</span>
+            <button type="button" class="btn btn-link btn-sm p-0 text-danger" (click)="conflictsToggled.emit()">
+                {{ 'planningTalks.status.conflicts' | translate: {count: conflictCount()} }}
+            </button>
+        }
+    </div>
+</div>
+
+@if (expanded() && conflictLines().length > 0) {
+    <div class="alert alert-danger p-2 mb-3">
+        <ul class="list-unstyled mb-0">
+            @for (line of conflictLines(); track line.key) {
+                <li>
+                    <button type="button"
+                            class="btn btn-link btn-sm text-start text-decoration-none w-100 d-flex flex-wrap gap-2 align-items-baseline"
+                            (click)="conflictSelected.emit(line.key)">
+                        <span class="fw-semibold">{{ line.title }}</span>
+                        <span class="small text-muted text-nowrap">{{ line.position }}</span>
+                        <span class="small text-danger">{{ line.reason }}</span>
+                    </button>
+                </li>
+            }
+        </ul>
+    </div>
+}

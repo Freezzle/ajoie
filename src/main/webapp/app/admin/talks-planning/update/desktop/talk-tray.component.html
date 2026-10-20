@@ -1,0 +1,54 @@
+<div class="d-flex flex-column gap-2 min-h-0">
+    <div class="btn-group btn-group-sm w-100" role="group">
+        @for (entry of filters; track entry.value) {
+            <button type="button"
+                    class="btn"
+                    [class.btn-primary]="entry.value === filter()"
+                    [class.btn-outline-secondary]="entry.value !== filter()"
+                    (click)="filterChanged.emit(entry.value)">
+                {{ entry.key | translate }}
+                <span class="badge text-bg-light ms-1">{{ countOf(entry.value) }}</span>
+            </button>
+        }
+    </div>
+
+    <input type="search"
+           class="form-control form-control-sm"
+           [ngModel]="query()"
+           [placeholder]="'planningTalks.tray.search' | translate"
+           (ngModelChange)="queryChanged.emit($event)"/>
+
+    @if (talks().length === 0) {
+        <p class="small text-muted mb-0">
+            {{ (totalCount() === 0 ? 'planningTalks.tray.empty' : 'planningTalks.tray.noResult') | translate }}
+        </p>
+    } @else {
+        <div class="list-group list-group-flush overflow-auto min-h-0">
+            @for (talk of talks(); track talkKeyOf(talk)) {
+                <button type="button"
+                        class="list-group-item list-group-item-action tp-card px-2 py-2"
+                        [class.is-conference]="talk.type === 'CONFERENCE'"
+                        [class.is-workshop]="talk.type === 'WORKSHOP'"
+                        [class.active]="talkKeyOf(talk) === inHandKey()"
+                        [class.is-draggable]="isEditing()"
+                        (pointerdown)="isEditing() && talkDragStart.emit({talk, event: $event})"
+                        (click)="talkChosen.emit(talk)">
+                    <div class="fw-semibold lh-sm">{{ talk.title }}</div>
+                    <div class="small text-muted d-flex align-items-center gap-1 text-truncate">
+                        <span class="text-truncate">
+                            {{ talk.participation.therapistName }}
+                            ·
+                            {{ (talk.type === 'CONFERENCE' ? 'planningTalks.details.conference' : 'planningTalks.details.workshop') | translate }}
+                            {{ talk.durationTalkMinutes }} {{ 'planningTalks.details.minutes' | translate }}
+                        </span>
+                        @if (showStatus(talk)) {
+                            <fa-icon [class]="talk.status | colorStatus"
+                                     [icon]="talk.status | status"
+                                     [title]="statusKey(talk) | translate"/>
+                        }
+                    </div>
+                </button>
+            }
+        </div>
+    }
+</div>

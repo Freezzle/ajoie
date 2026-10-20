@@ -1,0 +1,28 @@
+:host {
+    display: block;
+    overflow: auto;
+    min-height: 0;
+}
+
+/* Barre proportionnelle préparation / intervention / rangement : pas d'équivalent Bootstrap. */
+.tp-bar {
+    display: flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--app-surface-muted);
+}
+
+.tp-bar i {
+    display: block;
+}
+
+.tp-bar .is-prep,
+.tp-bar .is-clean {
+    background-image: repeating-linear-gradient(135deg, var(--tp-hatch) 0 3px, transparent 3px 6px);
+    background-color: var(--app-surface-muted);
+}
+
+.tp-bar .is-talk {
+    background: var(--tp-accent);
+}

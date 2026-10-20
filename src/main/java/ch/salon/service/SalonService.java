@@ -430,6 +430,19 @@ public class SalonService {
                 TimelineData newConf = new TimelineData();
                 newConf.setEventId(srcConf.getEventId());
                 newConf.setIntervalMinutes(srcConf.getIntervalMinutes());
+                newConf.setPlacementIntervalMinutes(srcConf.getPlacementIntervalMinutes());
+                if (srcConf.getTalkTypes() != null) {
+                    java.util.Map<TalkPlanning.TalkType, TalkTypeConfig> newTalkTypes =
+                            new java.util.EnumMap<>(TalkPlanning.TalkType.class);
+                    srcConf.getTalkTypes().forEach((type, config) -> {
+                        TalkTypeConfig newConfig = new TalkTypeConfig();
+                        newConfig.setDurationTalkMinutes(config.getDurationTalkMinutes());
+                        newConfig.setPreparationMinutes(config.getPreparationMinutes());
+                        newConfig.setCleanupMinutes(config.getCleanupMinutes());
+                        newTalkTypes.put(type, newConfig);
+                    });
+                    newConf.setTalkTypes(newTalkTypes);
+                }
 
                 List<TimelineRoom> newRooms = new java.util.ArrayList<>();
                 for (TimelineRoom room : srcConf.getRooms()) {

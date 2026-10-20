@@ -1,0 +1,65 @@
+:host {
+    /* Jetons locaux, repris du thème : aucun code couleur en dur dans les composants enfants. */
+    --tp-accent: var(--p-primary-color, #325d88);
+    --tp-ok: var(--p-primary-color, #325d88);
+    --tp-ok-bg: color-mix(in srgb, var(--p-primary-color, #325d88) 12%, transparent);
+    --tp-danger: var(--app-danger, #fd7658);
+    --tp-danger-bg: color-mix(in srgb, var(--app-danger, #fd7658) 14%, transparent);
+    --tp-warning: var(--app-warning, #e89d0e);
+    --tp-conference: #7c5cff;
+    --tp-conference-bg: color-mix(in srgb, #7c5cff 10%, transparent);
+    --tp-conference-border: color-mix(in srgb, #7c5cff 35%, transparent);
+    --tp-workshop: #16a3a3;
+    --tp-workshop-bg: color-mix(in srgb, #16a3a3 10%, transparent);
+    --tp-workshop-border: color-mix(in srgb, #16a3a3 35%, transparent);
+    --tp-hatch: color-mix(in srgb, var(--app-text, #575757) 18%, transparent);
+    /* non défini globalement : repli local, hérité par tous les sous-composants */
+    --app-text-muted: #9aa1ad;
+}
+
+/* Grille principale : colonne de contenu + panneau de 340 px, sans équivalent Bootstrap. */
+.tp-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 12px;
+    align-items: start;
+}
+
+.tp-layout.is-folded {
+    grid-template-columns: minmax(0, 1fr) 54px;
+}
+
+.min-h-0 {
+    min-height: 0;
+}
+
+/* ---------- mobile ---------- */
+
+.tp-page.is-mobile {
+    padding-bottom: 72px;
+}
+
+/* Barre fixe en bas, zone sûre comprise : hors périmètre Bootstrap. */
+.tp-bottombar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    background: var(--app-surface);
+    border-top: 1px solid var(--app-border);
+}
+
+.tp-bottom-card {
+    flex: 1;
+    border-left: 3px solid var(--tp-type-line, var(--tp-accent));
+}
+
+.tp-bottom-card.is-conference {
+    --tp-type-line: var(--tp-conference);
+}
+
+.tp-bottom-card.is-workshop {
+    --tp-type-line: var(--tp-workshop);
+}

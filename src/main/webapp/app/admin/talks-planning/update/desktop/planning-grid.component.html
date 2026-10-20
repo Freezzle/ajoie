@@ -1,0 +1,73 @@
+<div class="tp-scroll">
+    <div class="tp-grid" [style.grid-template-columns]="columns()">
+        <div class="tp-corner"></div>
+
+        @for (entry of rooms(); track entry.room.id) {
+            <div class="tp-head" [class.is-closed]="!entry.bounds">
+                <span class="fw-bold text-truncate">{{ entry.room.label }}</span>
+                <span class="small" [class.text-muted]="!!entry.bounds" [class.text-danger]="!entry.bounds">
+                    {{ roomHours(entry) }}
+                </span>
+            </div>
+        }
+
+        <div class="tp-axis" [style.height.px]="heightPx()">
+            @for (line of axisLines(); track line.minute) {
+                <div class="tp-axis-line small" [class.fw-bold]="line.full" [style.top.px]="line.top">
+                    {{ line.full ? line.label : '' }}
+                </div>
+            }
+        </div>
+
+        @for (entry of rooms(); track entry.room.id) {
+            <div #lane
+                 class="tp-lane"
+                 [attr.data-room]="entry.room.id"
+                 [class.is-editing]="isEditing()"
+                 [style.height.px]="heightPx()"
+                 [style.--tp-step-h]="stepHeightCss()"
+                 (pointermove)="onLaneMove($event, entry)"
+                 (pointerup)="onLanePointerUp($event, entry)"
+                 (pointerleave)="onLaneLeave()"
+                 (click)="onLaneClick($event, entry)">
+
+                @for (area of closedAreas(entry); track $index) {
+                    <div class="tp-closed" [style.height.px]="area.height" [style.top.px]="area.top"></div>
+                }
+
+                @if (isSelectedSlot(entry.room.id)) {
+                    <div class="tp-slot-marker"
+                         [style.height.px]="selectedSlotHeight()"
+                         [style.top.px]="selectedSlotTop()"></div>
+                }
+
+                @for (block of blocksOf(entry.room.id); track block.key) {
+                    <planning-talk-block [conflictTitle]="conflictTitleOf(block.key)"
+                                         [dimmed]="isDimmed(block.talk)"
+                                         [draggable]="isEditing()"
+                                         [highlighted]="isHighlighted(block.talk)"
+                                         [pxPerMinute]="pxPerMinute()"
+                                         [style.height.px]="block.height"
+                                         [style.top.px]="block.top"
+                                         [talk]="block.talk"
+                                         (click)="onBlockClick(block); $event.stopPropagation()"
+                                         (pointerdown)="onBlockPointerDown($event, block)"/>
+                }
+
+                @if (preview(); as pv) {
+                    @if (pv.roomId === entry.room.id) {
+                        <div class="tp-preview"
+                             [class.is-bad]="!pv.ok"
+                             [style.height.px]="pv.height"
+                             [style.padding-bottom.px]="pv.cleanHeight"
+                             [style.padding-top.px]="pv.prepHeight"
+                             [style.top.px]="pv.top">
+                            <b>{{ pv.label }}</b>
+                            <small class="text-muted px-1">{{ pv.hint }}</small>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -1,17 +1,89 @@
 {
   "planningTalks": {
-    "availableTalks": "Animations disponibles",
-    "grid": {
-      "headerRoomHour": "Salles / Heures",
-      "noAssignedTalks": "Aucune animation assignée",
-      "noRoom": "Aucune salle définie"
+    "status": {
+      "toPlan": "{{count}} à planifier",
+      "allPlaced": "Tout est placé",
+      "conflicts": "{{count}} conflit(s)"
     },
-    "modeGrid": "Mode grille",
-    "modeTimeline": "Prévisualiser",
-    "manageRooms": "Gestion des salles",
-    "noSelectedDay": "Aucun jour sélectionné",
-    "noUnassignedTalks": "Toutes les animations sont déjà assignées",
-    "removeDay": "Voulez-vous supprimer le jour <strong>{{day}}</strong> ?",
+    "tray": {
+      "title": "À planifier",
+      "all": "Toutes",
+      "conferences": "Conférences",
+      "workshops": "Ateliers",
+      "search": "Titre ou intervenant·e",
+      "empty": "Toutes les interventions sont placées.",
+      "noResult": "Aucun résultat pour ce filtre."
+    },
+    "block": {
+      "preparation": "Préparation",
+      "cleanup": "Rangement",
+      "closed": "Fermée ce jour"
+    },
+    "slot": {
+      "subtitle": "Ce qui peut commencer ici à {{time}}",
+      "here": "Déjà sur ce créneau",
+      "free": "À planifier",
+      "move": "Déjà placées ailleurs",
+      "off": "Ne tiennent pas ici",
+      "place": "Placer",
+      "moveHere": "Déplacer ici",
+      "remove": "Retirer",
+      "none": "Aucune intervention ne tient à {{time}} dans cette salle."
+    },
+    "inHand": {
+      "banner": "Survolez la grille puis cliquez pour placer <b>{{title}}</b> ({{durations}})",
+      "ghost": "Clic pour placer · Échap pour annuler",
+      "mobile": "touchez la grille pour placer",
+      "free": "Libre · cliquez pour placer",
+      "from": "dès {{time}}",
+      "full": "complet"
+    },
+    "conflict": {
+      "closedRoom": "La salle est fermée ce jour-là",
+      "outOfHours": "Hors des horaires de la salle ({{start}}–{{end}}), battements compris",
+      "overlap": "Chevauche « {{title}} » ({{time}}), battements compris",
+      "therapist": "{{name}} intervient déjà en {{room}} à {{time}}",
+      "placedWithConflict": "Placé avec un conflit : "
+    },
+    "durations": {
+      "short": "prép. {{prep}} · {{dur}} min · rang. {{clean}}",
+      "long": "{{prep}} min de préparation · {{dur}} min · {{clean}} min de rangement"
+    },
+    "focus": {
+      "banner": "Interventions de {{name}} surlignées",
+      "clear": "Effacer",
+      "see": "Voir ses interventions"
+    },
+    "config": {
+      "title": "Salles et horaires",
+      "displayStep": "Pas de la salle",
+      "displayStepHelp": "Lignes affichées dans la grille.",
+      "placementStep": "Pas de placement",
+      "placementStepHelp": "Heures de début possibles : avec 15 min, on peut commencer à 11:45.",
+      "types": "Durées et battements",
+      "preparation": "Préparation",
+      "duration": "Durée",
+      "cleanup": "Rangement",
+      "occupied": "Salle occupée",
+      "typesHelp": "La préparation se place avant l’heure de début, le rangement après la fin. Deux interventions d’une même salle ne peuvent pas se chevaucher, battements compris.",
+      "rooms": "Salles",
+      "addRoom": "Ajouter une salle",
+      "days": "Jours",
+      "addDay": "Ajouter un jour",
+      "open": "Ouverte",
+      "from": "De",
+      "to": "À",
+      "apply": "Appliquer",
+      "applied": "Configuration appliquée",
+      "appliedWithConflicts": "Configuration appliquée · {{count}} intervention(s) en conflit à revoir",
+      "errorHours": "{{day}} : l’heure de fin doit suivre l’heure de début",
+      "errorDuration": "{{type}} : la durée doit faire au moins 5 minutes",
+      "confirmRemoveDay": "Ce jour contient {{count}} intervention(s) placée(s). Les supprimer du planning ?"
+    },
+    "placed": "« {{title}} » placée à {{time}}",
+    "undo": "Annuler la dernière action",
+    "emptyEdit": "Ajoutez les jours et les salles du salon pour démarrer le planning.",
+    "emptyRead": "Veuillez activer le mode édition pour démarrer un nouveau planning.",
     "details": {
       "header": "Détail de l'animation",
       "title": "Titre de l'animation",
@@ -26,7 +98,15 @@
       "minutes": "minutes",
       "status": "Statut",
       "extraInformation": "Informations supplémentaires",
-      "description": "Description"
+      "description": "Description",
+      "day": "Jour",
+      "room": "Salle",
+      "start": "Début",
+      "busy": "occupé",
+      "placement": "Placement",
+      "noConflict": "Aucun conflit sur ce créneau",
+      "chooseOnGrid": "Choisir sur le planning",
+      "removeFromPlanning": "Retirer du planning"
     }
   }
 }

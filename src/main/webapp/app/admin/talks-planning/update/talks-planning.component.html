@@ -1,53 +1,274 @@
-<app-content-page>
+<app-content-page [talkInHandGhost]="store.talkInHandValue()">
     <div appMenuBarStart>
         <h3>{{ 'salon.talksPlanning' | translate }}</h3>
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading()"
+                    [isDisabled]="store.isLoading()"
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
 
-        @if (isReadOnly()) {
-            <button-box (clickedEvent)="activateEditMode()"
-                        [isDisabled]="isLoading()"
+        @if (store.isReadOnly()) {
+            <button-box (clickedEvent)="store.activateEditMode()"
+                        [isDisabled]="store.isLoading()"
                         [showText]="false"
                         primeIcon="pi-pencil"
                         translateKey="common.edit"/>
-        }
-
-        @if (!isReadOnly()) {
-            <button-box (clickedEvent)="activateReadOnlyMode()"
-                        [isDisabled]="isLoading()"
+            @if (store.menuItems().length > 0) {
+                <menu-box [items]="store.menuItems()" buttonIcon="pi-list" buttonTranslateKey="common.actions"/>
+            }
+        } @else {
+            <button-box (clickedEvent)="store.undo()"
+                        [isDisabled]="store.isLoading() || !store.canUndo()"
+                        [showText]="false"
+                        primeIcon="pi-undo"
+                        translateKey="planningTalks.undo"
+                        type="secondary"/>
+            <button-box (clickedEvent)="configDialogVisible.set(true)"
+                        [isDisabled]="store.isLoading()"
+                        [showText]="false"
+                        primeIcon="pi-sliders-h"
+                        translateKey="planningTalks.config.title"
+                        type="secondary"/>
+            <button-box (clickedEvent)="store.activateReadOnlyMode()"
+                        [isDisabled]="store.isLoading()"
                         [showText]="false"
                         primeIcon="pi-ban"
                         translateKey="common.cancel"
                         type="secondary"/>
             <button-box (clickedEvent)="save()"
-                        [isDisabled]="isLoading()"
+                        [isDisabled]="store.isLoading()"
                         [isSubmit]="true"
                         [showText]="false"
                         primeIcon="pi-save"
                         translateKey="common.save"/>
         }
-
-        @if (isReadOnly() && menuCache.length > 0) {
-            <menu-box [items]="menuCache" buttonIcon="pi-list" buttonTranslateKey="common.actions"/>
-        }
     </div>
-    <app-alert-error></app-alert-error>
 
+    <app-alert-error/>
+    <p-toast key="bottom-center" position="bottom-center"/>
 
-    <p-confirmpopup/>
     <app-card [showHeader]="false">
-        <div appCardBody>
-            @if (configuration) {
-                <tp [(configuration)]="configuration" [(talks)]="talks" [editionMode]="!isLoading() && !isReadOnly()"/>
+        <div appCardBody class="tp-page" [class.is-mobile]="isMobile()">
+
+            @if (!store.hasConfiguration()) {
+                @if (store.isReadOnly()) {
+                    @if (!store.isLoading()) {
+                        <p class="small text-muted mb-0">{{ 'planningTalks.emptyRead' | translate }}</p>
+                    }
+                } @else {
+                    <div class="d-flex flex-column align-items-start gap-3">
+                        <p class="small text-muted mb-0">{{ 'planningTalks.emptyEdit' | translate }}</p>
+                        <button-box (clickedEvent)="configDialogVisible.set(true)"
+                                    primeIcon="pi-sliders-h"
+                                    translateKey="planningTalks.config.title"/>
+                    </div>
+                }
+            } @else {
+                <planning-day-bar [conflictLines]="conflictLines()"
+                                  [conflicts]="store.conflicts()"
+                                  [conflictsByDay]="store.conflictsByDay()"
+                                  [days]="store.days()"
+                                  [expanded]="store.showConflicts()"
+                                  [selectedDayId]="store.selectedDay()?.id ?? null"
+                                  [unplacedCount]="store.unplacedCount()"
+                                  (conflictSelected)="onTalkClick($event)"
+                                  (conflictsToggled)="store.showConflicts.set(!store.showConflicts())"
+                                  (daySelected)="store.selectDay($event)"/>
+
+                @if (store.talkInHandValue()) {
+                    <div class="alert alert-secondary d-flex align-items-center flex-wrap gap-2 py-2 px-3 mb-2 small"
+                         role="status">
+                        <i class="pi pi-map-marker"></i>
+                        <span [innerHTML]="inHandBanner()"></span>
+                        <kbd>Échap</kbd>
+                        <button type="button" class="btn btn-link btn-sm p-0" (click)="store.dropInHand()">
+                            {{ 'common.cancel' | translate }}
+                        </button>
+                    </div>
+                }
+
+                @if (store.focusTherapist(); as name) {
+                    <div class="alert alert-primary d-flex align-items-center flex-wrap gap-2 py-2 px-3 mb-2 small"
+                         role="status">
+                        <span>{{ 'planningTalks.focus.banner' | translate: {name: name} }}</span>
+                        <button type="button" class="btn btn-link btn-sm p-0" (click)="store.focusTherapist.set(null)">
+                            {{ 'planningTalks.focus.clear' | translate }}
+                        </button>
+                    </div>
+                }
+
+                @if (store.selectedDay(); as day) {
+                    @if (isMobile()) {
+                        <planning-mobile [conflictTitles]="conflictTitles()"
+                                         [configuration]="store.configuration()!"
+                                         [day]="day"
+                                         [focusTherapist]="store.focusTherapist()"
+                                         [isEditing]="store.isEditing()"
+                                         [pills]="mobilePills()"
+                                         [selectedRoomId]="store.mobileRoom()?.room?.id ?? null"
+                                         [selectedSlot]="store.selectedSlot()"
+                                         [talkInHand]="store.talkInHand()"
+                                         [talks]="store.talks()"
+                                         (placeRequest)="onPlaceRequest($event)"
+                                         (roomSelected)="store.mobileRoomId.set($event)"
+                                         (slotClick)="onSlotClick($event)"
+                                         (talkClick)="onTalkClick($event)"
+                                         (unplaceRequest)="store.unplace($event)"/>
+
+                        <div class="tp-bottombar d-flex align-items-center gap-2">
+                            @if (store.talkInHandValue(); as talk) {
+                                <div class="tp-bottom-card d-flex flex-column min-w-0 ps-2 small"
+                                     [class.is-conference]="talk.type === 'CONFERENCE'"
+                                     [class.is-workshop]="talk.type === 'WORKSHOP'">
+                                    <span class="fw-bold text-truncate">{{ talk.title }}</span>
+                                    <span class="text-muted">
+                                        {{ durationsOf(talk) }} · {{ 'planningTalks.inHand.mobile' | translate }}
+                                    </span>
+                                </div>
+                                <button-box (clickedEvent)="store.dropInHand()"
+                                            translateKey="common.cancel"
+                                            type="secondary"/>
+                            } @else {
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-sm flex-grow-1 d-flex justify-content-between align-items-center"
+                                        (click)="openMobileTray()">
+                                    {{ 'planningTalks.tray.title' | translate }}
+                                    <span class="badge text-bg-secondary">{{ store.unplacedCount() }}</span>
+                                </button>
+                                @if (store.isReadOnly()) {
+                                    <button-box (clickedEvent)="store.activateEditMode()"
+                                                primeIcon="pi-pencil"
+                                                translateKey="common.edit"/>
+                                } @else {
+                                    <button-box (clickedEvent)="save()"
+                                                [isSubmit]="true"
+                                                primeIcon="pi-save"
+                                                translateKey="common.save"/>
+                                }
+                            }
+                        </div>
+                    } @else {
+                        <div class="tp-layout" [class.is-folded]="store.panelFolded()">
+                            <planning-grid [conflictTitles]="conflictTitles()"
+                                           [configuration]="store.configuration()!"
+                                           [day]="day"
+                                           [focusTherapist]="store.focusTherapist()"
+                                           [isEditing]="store.isEditing()"
+                                           [rooms]="store.gridRooms()"
+                                           [selectedSlot]="store.selectedSlot()"
+                                           [talkInHand]="store.talkInHand()"
+                                           [talks]="store.talks()"
+                                           (placeRequest)="onPlaceRequest($event)"
+                                           (slotClick)="onSlotClick($event)"
+                                           (talkClick)="onTalkClick($event)"
+                                           (unplaceRequest)="store.unplace($event)"/>
+
+                            @if (store.selectedTalk(); as talk) {
+                                <planning-side-panel [closable]="true"
+                                                     [title]="talk.title"
+                                                     (closeRequested)="store.selectTalk(null)"
+                                                     (foldToggled)="store.panelFolded.set(!store.panelFolded())">
+                                    <talk-detail-panel [configuration]="store.configuration()!"
+                                                       [isEditing]="store.isEditing()"
+                                                       [reasons]="detailReasons()"
+                                                       [startOptions]="detailStartOptions()"
+                                                       [talk]="talk"
+                                                       (chooseOnGrid)="onChooseOnGrid()"
+                                                       (closed)="store.selectTalk(null)"
+                                                       (dayChanged)="onDetailDayChanged($event)"
+                                                       (removeRequested)="onDetailRemove()"
+                                                       (roomChanged)="onDetailRoomChanged($event)"
+                                                       (startChanged)="onDetailStartChanged($event)"
+                                                       (therapistFocused)="onFocusTherapist($event)"/>
+                                </planning-side-panel>
+                            } @else if (store.slotCandidates(); as candidates) {
+                                <planning-side-panel [closable]="true"
+                                                     [subtitle]="slotSubtitle()"
+                                                     [title]="slotTitle()"
+                                                     (closeRequested)="store.selectSlot(null)"
+                                                     (foldToggled)="store.panelFolded.set(!store.panelFolded())">
+                                    <slot-candidates [candidates]="candidates"
+                                                     [isEditing]="store.isEditing()"
+                                                     [startMinute]="store.selectedSlot()!.startMinute"
+                                                     (placeRequested)="onSlotPlace($event)"
+                                                     (removeRequested)="store.unplace($event)"
+                                                     (talkOpened)="onTalkClick($event)"/>
+                                </planning-side-panel>
+                            } @else {
+                                <planning-side-panel [count]="store.unplacedCount()"
+                                                     [folded]="store.panelFolded()"
+                                                     [title]="('planningTalks.tray.title' | translate) + ' ' + store.unplacedCount()"
+                                                     (foldToggled)="store.panelFolded.set(!store.panelFolded())">
+                                    <talk-tray [counts]="store.trayCounts()"
+                                               [filter]="store.trayFilter()"
+                                               [inHandKey]="store.talkInHand()"
+                                               [isEditing]="store.isEditing()"
+                                               [query]="store.trayQuery()"
+                                               [talks]="store.trayTalks()"
+                                               [totalCount]="store.unplacedCount()"
+                                               (filterChanged)="onTrayFilterChanged($event)"
+                                               (queryChanged)="onTrayQueryChanged($event)"
+                                               (talkChosen)="onTrayTalkChosen($event)"
+                                               (talkDragStart)="onTrayDragStart($event)"/>
+                                </planning-side-panel>
+                            }
+                        </div>
+                    }
+                }
             }
 
-            @if (!isLoading() && !hasConfiguration && isReadOnly()) {
-                <div>Veuillez activer le mode édition pour démarrer un nouveau planning.</div>
+            @if (isMobile() && mobileSheet() !== 'NONE') {
+                <bottom-sheet (closed)="closeMobileSheet()">
+                    <div class="p-3 overflow-auto min-h-0">
+                        @switch (mobileSheet()) {
+                            @case ('DETAIL') {
+                                @if (store.selectedTalk(); as talk) {
+                                    <talk-detail-panel [configuration]="store.configuration()!"
+                                                       [isEditing]="store.isEditing()"
+                                                       [reasons]="detailReasons()"
+                                                       [startOptions]="detailStartOptions()"
+                                                       [talk]="talk"
+                                                       (chooseOnGrid)="onChooseOnGrid()"
+                                                       (closed)="closeMobileSheet()"
+                                                       (dayChanged)="onDetailDayChanged($event)"
+                                                       (removeRequested)="onDetailRemove()"
+                                                       (roomChanged)="onDetailRoomChanged($event)"
+                                                       (startChanged)="onDetailStartChanged($event)"
+                                                       (therapistFocused)="onFocusTherapist($event)"/>
+                                }
+                            }
+                            @default {
+                                @if (mobileSheet() === 'SLOT') {
+                                    <h5 class="mb-2">{{ slotTitle() }}</h5>
+                                }
+                                <talk-tray [counts]="store.trayCounts()"
+                                           [filter]="store.trayFilter()"
+                                           [inHandKey]="store.talkInHand()"
+                                           [isEditing]="store.isEditing()"
+                                           [query]="store.trayQuery()"
+                                           [talks]="store.trayTalks()"
+                                           [totalCount]="store.unplacedCount()"
+                                           (filterChanged)="onTrayFilterChanged($event)"
+                                           (queryChanged)="onTrayQueryChanged($event)"
+                                           (talkChosen)="onTrayTalkChosen($event)"
+                                           (talkDragStart)="onTrayDragStart($event)"/>
+                            }
+                        }
+                    </div>
+                </bottom-sheet>
+            }
+
+            @if (configDialogVisible()) {
+                <dialog-box (cancel)="configDialogVisible.set(false)"
+                            (confirm)="applyConfiguration($event)"
+                            [(visible)]="configDialogVisible"
+                            [confirmLabel]="'planningTalks.config.apply'"
+                            [header]="'planningTalks.config.title' | translate"
+                            [mode]="'edit'">
+                    <talks-config-dialog [data]="store.configuration()!" [placedByDay]="placedByDay()"/>
+                </dialog-box>
             }
         </div>
     </app-card>

@@ -11,7 +11,7 @@ import {Status} from '../../enumerations/status.model';
 import {ISalonStats} from '../model/salon-stats.interface';
 import {IPriceStandSalon} from '../model/price-stand-salon.interface';
 import {IParticipation} from '../../participation/model/participation.interface';
-import {PlanningTalksDto} from '../../talks-planning/update/talks-planning.component';
+import {PlanningTalksDto} from '../../talks-planning/update/talks-planning-model';
 
 @Injectable({providedIn: 'root'})
 export class SalonService {

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Refonte du planning des conférences.
+        Les données vivent dans les colonnes jsonb `configuration` et `talks` de salon_talk_planning :
+        pas de changement de schéma, seulement une reprise des données.
+
+        1) talks : `startSlot` (index dépendant du pas) -> `startingHour` (instant absolu) et durées réelles.
+           Convention de l'écran qui a produit ces données : le slot 0 correspond à la *première*
+           ouverture de salle du jour, pas à l'ouverture de la salle de l'intervention.
+        2) configuration : `placementIntervalMinutes` et `talkTypes`, avec des valeurs qui
+           reproduisent exactement les durées précédentes (conférence 60 min, atelier 75 min)
+           afin de ne créer aucun conflit sur les plannings existants.
+
+        L'ordre compte : la reprise des interventions utilise l'`intervalMinutes` d'origine,
+        qui n'est normalisé qu'au changeset suivant.
+    -->
+
+    <changeSet id="0.0.2-202610-talks-planning-starting-hour" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon_talk_planning"/>
+        </preConditions>
+        <sql splitStatements="false"><![CDATA[
+WITH day_start AS (
+    SELECT p.id                                                           AS planning_id,
+           d.value ->> 'id'                                               AS day_id,
+           min(CASE jsonb_typeof(r.value -> 'startingHour')
+                   WHEN 'string' THEN (r.value ->> 'startingHour')::timestamptz
+                   WHEN 'number' THEN to_timestamp((r.value ->> 'startingHour')::numeric)
+               END)                                                       AS day_start,
+           min(jsonb_typeof(r.value -> 'startingHour'))                   AS hour_format
+    FROM salon_talk_planning p
+             CROSS JOIN LATERAL jsonb_array_elements(COALESCE(p.configuration -> 'days', '[]'::jsonb)) AS d
+             CROSS JOIN LATERAL jsonb_array_elements(COALESCE(d.value -> 'rooms', '[]'::jsonb)) AS r
+    GROUP BY 1, 2
+),
+     talk_rows AS (
+         SELECT p.id                                              AS planning_id,
+                t.ordinality                                      AS ord,
+                t.value                                           AS talk,
+                COALESCE((p.configuration ->> 'intervalMinutes')::int, 30) AS interval_minutes,
+                0                                                 AS preparation_minutes,
+                CASE WHEN t.value ->> 'type' = 'WORKSHOP' THEN 60 ELSE 45 END AS duration_talk_minutes,
+                15                                                AS cleanup_minutes,
+                ds.day_start,
+                ds.hour_format
+         FROM salon_talk_planning p
+                  CROSS JOIN LATERAL jsonb_array_elements(COALESCE(p.talks, '[]'::jsonb))
+                      WITH ORDINALITY AS t(value, ordinality)
+                  LEFT JOIN day_start ds
+                            ON ds.planning_id = p.id AND ds.day_id = t.value ->> 'dayId'
+         WHERE NOT EXISTS (SELECT 1
+                           FROM jsonb_array_elements(COALESCE(p.talks, '[]'::jsonb)) AS existing
+                           WHERE jsonb_exists(existing, 'startingHour'))
+     ),
+     migrated AS (
+         SELECT planning_id,
+                ord,
+                talk
+                    || jsonb_build_object(
+                        'preparationMinutes', preparation_minutes,
+                        'durationTalkMinutes', duration_talk_minutes,
+                        'cleanupMinutes', cleanup_minutes,
+                        'durationTotalMinutes', preparation_minutes + duration_talk_minutes + cleanup_minutes)
+                    || CASE
+                           WHEN talk ->> 'dayId' IS NULL OR talk ->> 'roomId' IS NULL OR day_start IS NULL
+                               THEN jsonb_build_object('startingHour', NULL)
+                           ELSE jsonb_build_object('startingHour',
+                                                   CASE hour_format
+                                                       WHEN 'number' THEN to_jsonb(extract(epoch FROM (
+                                                           day_start + make_interval(mins => COALESCE((talk ->> 'startSlot')::int, 0) * interval_minutes))))
+                                                       ELSE to_jsonb(to_char((
+                                                           day_start + make_interval(mins => COALESCE((talk ->> 'startSlot')::int, 0) * interval_minutes))
+                                                                             AT TIME ZONE 'UTC',
+                                                                             'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))
+                                                       END)
+                       END AS talk
+         FROM talk_rows
+     )
+UPDATE salon_talk_planning p
+SET talks = m.talks
+FROM (SELECT planning_id, jsonb_agg(talk ORDER BY ord) AS talks
+      FROM migrated
+      GROUP BY planning_id) m
+WHERE p.id = m.planning_id;
+        ]]></sql>
+        <rollback>
+            <empty/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="0.0.2-202610-talks-planning-configuration" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon_talk_planning"/>
+        </preConditions>
+        <sql splitStatements="true">
+            <![CDATA[
+            -- Le pas de 5 min n'existe plus comme pas d'affichage de la grille
+            UPDATE salon_talk_planning
+            SET configuration = jsonb_set(configuration, '{intervalMinutes}', '15'::jsonb, true)
+            WHERE configuration IS NOT NULL
+              AND (configuration ->> 'intervalMinutes')::int = 5;
+
+            -- Pas de placement (heures de début possibles)
+            UPDATE salon_talk_planning
+            SET configuration = jsonb_set(configuration, '{placementIntervalMinutes}', '15'::jsonb, true)
+            WHERE configuration IS NOT NULL
+              AND NOT jsonb_exists(configuration, 'placementIntervalMinutes');
+
+            -- Durées et battements par type : reproduisent les durées précédentes (60 et 75 min)
+            UPDATE salon_talk_planning
+            SET configuration = jsonb_set(configuration, '{talkTypes}',
+                '{"CONFERENCE":{"durationTalkMinutes":45,"preparationMinutes":0,"cleanupMinutes":15},
+                  "WORKSHOP":{"durationTalkMinutes":60,"preparationMinutes":0,"cleanupMinutes":15}}'::jsonb,
+                true)
+            WHERE configuration IS NOT NULL
+              AND NOT jsonb_exists(configuration, 'talkTypes');
+            ]]>
+        </sql>
+        <rollback>
+            <empty/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

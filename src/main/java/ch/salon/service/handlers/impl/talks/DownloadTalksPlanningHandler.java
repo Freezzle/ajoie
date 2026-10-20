@@ -123,14 +123,14 @@ public class DownloadTalksPlanningHandler implements DocumentActionHandler<Salon
                 // Filter talks for this day and room
                 List<TalkPlanning> talksForRoom = planning.getTalks().stream()
                         .filter(t -> day.getId().equals(t.getDayId()) && roomId.equals(t.getRoomId()))
-                        .sorted(Comparator.comparingInt(TalkPlanning::getStartSlot))
+                        .sorted(Comparator.comparing((TalkPlanning t) -> startTimeOf(t, day, intervalMinutes)))
                         .toList();
 
                 // Build TalkData list
                 List<TalkData> talkDataList = new ArrayList<>();
                 for (TalkPlanning talk : talksForRoom) {
                     TalkData talkData = buildTalkData(talk, conferenceMap, workshopMap,
-                                                      roomData.getStartingHour(), intervalMinutes);
+                                                      startTimeOf(talk, day, intervalMinutes));
                     if (talkData != null) {
                         talkDataList.add(talkData);
                     }
@@ -148,15 +148,30 @@ public class DownloadTalksPlanningHandler implements DocumentActionHandler<Salon
         return pages;
     }
 
+    /**
+     * Heure de début d'une intervention : l'heure absolue enregistrée depuis la refonte du planning,
+     * sinon repli sur l'ancien {@code startSlot}, compté depuis la première ouverture de salle du jour
+     * (convention de l'écran qui a produit ces données).
+     */
+    private Instant startTimeOf(TalkPlanning talk, TimelineDay day, int intervalMinutes) {
+        if (talk.getStartingHour() != null) {
+            return talk.getStartingHour();
+        }
+        Instant dayStart = day.getRooms().stream()
+                .map(TimelineRoomData::getStartingHour)
+                .filter(java.util.Objects::nonNull)
+                .min(Comparator.naturalOrder())
+                .orElse(Instant.EPOCH);
+        int startSlot = talk.getStartSlot() != null ? talk.getStartSlot() : 0;
+        return dayStart.plusSeconds((long) startSlot * intervalMinutes * 60);
+    }
+
     private TalkData buildTalkData(TalkPlanning talk,
                                    Map<String, Conference> conferenceMap,
                                    Map<String, Workshop> workshopMap,
-                                   Instant roomStartTime,
-                                   int intervalMinutes) {
+                                   Instant startTime) {
         TalkData data = new TalkData();
 
-        // Calculate start time
-        Instant startTime = roomStartTime.plusSeconds((long) talk.getStartSlot() * intervalMinutes * 60);
         data.setStartTime(TIME_FORMATTER.format(startTime.atZone(ZoneId.of("Europe/Paris"))));
 
         // Get details from Conference or Workshop

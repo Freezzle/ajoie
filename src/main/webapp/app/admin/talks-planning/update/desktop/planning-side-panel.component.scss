@@ -1,0 +1,18 @@
+/* Comportement collant et libellé vertical du panneau replié : hors périmètre Bootstrap. */
+
+:host {
+    display: block;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    min-height: 180px;
+}
+
+.tp-panel {
+    max-height: 70vh;
+}
+
+.tp-folded-label {
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+}

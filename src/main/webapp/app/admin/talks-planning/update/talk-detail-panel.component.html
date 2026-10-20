@@ -1,0 +1,131 @@
+<header class="d-flex justify-content-between align-items-start gap-2 mb-2">
+    <div class="d-flex flex-wrap gap-1">
+        <span class="badge text-bg-light">{{ typeKey() | translate }}</span>
+        <span class="badge text-bg-light d-inline-flex align-items-center gap-1">
+            <fa-icon [class]="talk().status | colorStatus" [icon]="talk().status | status"/>
+            {{ statusKey() | translate }}
+        </span>
+    </div>
+    <button type="button"
+            class="btn btn-sm btn-link text-muted p-0"
+            [attr.aria-label]="'common.close' | translate"
+            (click)="closed.emit()">
+        <i class="pi pi-times"></i>
+    </button>
+</header>
+
+<h5 class="mb-3">{{ talk().title }}</h5>
+
+<div class="mb-2">
+    <div class="small text-muted">{{ 'planningTalks.details.therapistName' | translate }}</div>
+    <div class="d-flex align-items-center flex-wrap gap-2">
+        <span>{{ talk().participation.therapistName }}</span>
+        <button type="button"
+                class="btn btn-link btn-sm p-0"
+                (click)="therapistFocused.emit(talk().participation.therapistName)">
+            {{ 'planningTalks.focus.see' | translate }}
+        </button>
+    </div>
+</div>
+
+@if (talk().participation.fullName) {
+    <div class="mb-2">
+        <div class="small text-muted">{{ 'planningTalks.details.fullName' | translate }}</div>
+        <div>{{ talk().participation.fullName }}</div>
+    </div>
+}
+
+<div class="mb-2">
+    <div class="small text-muted">{{ 'planningTalks.details.placement' | translate }}</div>
+    <div>{{ placementLabel() }}</div>
+</div>
+
+<div class="mb-3">
+    <div class="small text-muted">{{ 'planningTalks.details.durationTalk' | translate }}</div>
+    <div>{{ durationLabel() }}</div>
+    <span class="tp-bar mt-1">
+        <i class="is-prep" [style.width.%]="barParts().prep"></i>
+        <i class="is-talk" [style.width.%]="barParts().talk"></i>
+        <i class="is-clean" [style.width.%]="barParts().clean"></i>
+    </span>
+</div>
+
+@if (reasons().length > 0) {
+    <div class="alert alert-danger py-2 px-3 small mb-3">
+        <ul class="list-unstyled mb-0">
+            @for (reason of reasons(); track $index) {
+                <li>{{ reason.key | translate: reason.params }}</li>
+            }
+        </ul>
+    </div>
+} @else if (placed()) {
+    <p class="small text-muted mb-3">{{ 'planningTalks.details.noConflict' | translate }}</p>
+}
+
+@if (isEditing()) {
+    <div class="row g-2 mb-3">
+        <div class="col-12">
+            <label class="form-label small text-muted mb-1">{{ 'planningTalks.details.day' | translate }}</label>
+            <p-select [fluid]="true"
+                      [ngModelOptions]="{standalone: true}"
+                      [ngModel]="talk().dayId"
+                      [options]="dayOptions()"
+                      appendTo="body"
+                      optionLabel="label"
+                      optionValue="value"
+                      size="small"
+                      (ngModelChange)="dayChanged.emit($event)"/>
+        </div>
+        <div class="col-12 col-sm-6">
+            <label class="form-label small text-muted mb-1">{{ 'planningTalks.details.room' | translate }}</label>
+            <p-select [fluid]="true"
+                      [ngModelOptions]="{standalone: true}"
+                      [ngModel]="talk().roomId"
+                      [options]="roomOptions()"
+                      appendTo="body"
+                      optionDisabled="disabled"
+                      optionLabel="label"
+                      optionValue="value"
+                      size="small"
+                      (ngModelChange)="roomChanged.emit($event)"/>
+        </div>
+        <div class="col-12 col-sm-6">
+            <label class="form-label small text-muted mb-1">{{ 'planningTalks.details.start' | translate }}</label>
+            <p-select [fluid]="true"
+                      [ngModelOptions]="{standalone: true}"
+                      [ngModel]="talk().startMinute"
+                      [options]="startOptions()"
+                      appendTo="body"
+                      optionLabel="label"
+                      optionValue="minute"
+                      size="small"
+                      (ngModelChange)="startChanged.emit($event)"/>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <button-box (clickedEvent)="chooseOnGrid.emit()"
+                    primeIcon="pi-map-marker"
+                    translateKey="planningTalks.details.chooseOnGrid"/>
+        @if (placed()) {
+            <button-box (clickedEvent)="removeRequested.emit()"
+                        primeIcon="pi-times"
+                        translateKey="planningTalks.details.removeFromPlanning"
+                        type="secondary"/>
+        }
+    </div>
+}
+
+@if (talk().extraInformation) {
+    <div class="mb-2">
+        <div class="small text-muted">{{ 'planningTalks.details.extraInformation' | translate }}</div>
+        <p class="mb-0 text-break">{{ talk().extraInformation }}</p>
+    </div>
+}
+
+@if (talk().description) {
+    <div class="mb-2">
+        <div class="small text-muted">{{ 'planningTalks.details.description' | translate }}</div>
+        <p class="mb-0 text-break">{{ talk().description }}</p>
+    </div>
+}

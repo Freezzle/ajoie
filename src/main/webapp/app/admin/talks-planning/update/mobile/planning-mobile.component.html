@@ -1,0 +1,35 @@
+<ul class="nav nav-pills flex-nowrap overflow-auto mb-2">
+    @for (pill of pills(); track pill.room.room.id) {
+        <li class="nav-item">
+            <button type="button"
+                    class="nav-link text-nowrap d-flex flex-column align-items-start py-1"
+                    [class.active]="pill.room.room.id === selectedRoomId()"
+                    [class.opacity-50]="isFull(pill)"
+                    (click)="roomSelected.emit(pill.room.room.id)">
+                {{ pill.room.room.label }}
+                @if (talkInHand()) {
+                    @if (isFull(pill)) {
+                        <small>{{ 'planningTalks.inHand.full' | translate }}</small>
+                    } @else {
+                        <small>{{ 'planningTalks.inHand.from' | translate: {time: pillLabel(pill)} }}</small>
+                    }
+                }
+            </button>
+        </li>
+    }
+</ul>
+
+<planning-grid [conflictTitles]="conflictTitles()"
+               [configuration]="configuration()"
+               [day]="day()"
+               [focusTherapist]="focusTherapist()"
+               [isEditing]="isEditing()"
+               [pxPerMinute]="1.8"
+               [rooms]="visibleRooms()"
+               [selectedSlot]="selectedSlot()"
+               [talkInHand]="talkInHand()"
+               [talks]="talks()"
+               (placeRequest)="placeRequest.emit($event)"
+               (slotClick)="slotClick.emit($event)"
+               (talkClick)="talkClick.emit($event)"
+               (unplaceRequest)="unplaceRequest.emit($event)"/>

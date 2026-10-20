@@ -1,0 +1,90 @@
+<section class="mb-3">
+    @if (candidates().here.length > 0) {
+        <div class="mb-3">
+            <div class="small text-muted mb-1">{{ 'planningTalks.slot.here' | translate }}</div>
+            @for (talk of candidates().here; track keyOf(talk)) {
+                <div class="d-flex align-items-center gap-2 py-1 border-bottom">
+                    <button type="button"
+                            class="btn btn-link btn-sm text-start text-decoration-none flex-grow-1 p-0 min-w-0"
+                            (click)="talkOpened.emit(keyOf(talk))">
+                        <span class="d-block fw-semibold text-truncate">{{ talk.title }}</span>
+                        <span class="d-block small text-muted text-truncate">{{ subtitle(talk) }}</span>
+                    </button>
+                    @if (isEditing()) {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary flex-shrink-0"
+                                (click)="removeRequested.emit(keyOf(talk))">
+                            {{ 'planningTalks.slot.remove' | translate }}
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (candidates().free.length > 0) {
+        <div class="mb-3">
+            <div class="small text-muted mb-1">{{ 'planningTalks.slot.free' | translate }}</div>
+            @for (talk of candidates().free; track keyOf(talk)) {
+                <div class="d-flex align-items-center gap-2 py-1 border-bottom">
+                    <button type="button"
+                            class="btn btn-link btn-sm text-start text-decoration-none flex-grow-1 p-0 min-w-0"
+                            (click)="talkOpened.emit(keyOf(talk))">
+                        <span class="d-block fw-semibold text-truncate">{{ talk.title }}</span>
+                        <span class="d-block small text-muted text-truncate">{{ subtitle(talk) }}</span>
+                    </button>
+                    @if (isEditing()) {
+                        <button type="button"
+                                class="btn btn-sm btn-primary flex-shrink-0"
+                                (click)="placeRequested.emit(keyOf(talk))">
+                            {{ 'planningTalks.slot.place' | translate }}
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (candidates().move.length > 0) {
+        <div class="mb-3">
+            <div class="small text-muted mb-1">{{ 'planningTalks.slot.move' | translate }}</div>
+            @for (talk of candidates().move; track keyOf(talk)) {
+                <div class="d-flex align-items-center gap-2 py-1 border-bottom">
+                    <button type="button"
+                            class="btn btn-link btn-sm text-start text-decoration-none flex-grow-1 p-0 min-w-0"
+                            (click)="talkOpened.emit(keyOf(talk))">
+                        <span class="d-block fw-semibold text-truncate">{{ talk.title }}</span>
+                        <span class="d-block small text-muted text-truncate">
+                            {{ subtitle(talk) }} · {{ position(talk) }}
+                        </span>
+                    </button>
+                    @if (isEditing()) {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary flex-shrink-0"
+                                (click)="placeRequested.emit(keyOf(talk))">
+                            {{ 'planningTalks.slot.moveHere' | translate }}
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (candidates().off.length > 0) {
+        <details>
+            <summary class="small text-muted">
+                {{ 'planningTalks.slot.off' | translate }} ({{ candidates().off.length }})
+            </summary>
+            @for (entry of candidates().off; track keyOf(entry.talk)) {
+                <div class="py-1 border-bottom">
+                    <span class="d-block fw-semibold text-truncate">{{ entry.talk.title }}</span>
+                    <span class="d-block small text-danger">{{ entry.reason.key | translate: entry.reason.params }}</span>
+                </div>
+            }
+        </details>
+    }
+
+    @if (isEmpty()) {
+        <p class="small text-muted mb-0">{{ 'planningTalks.slot.none' | translate: {time: timeLabel()} }}</p>
+    }
+</section>

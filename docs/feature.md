@@ -1,455 +1,448 @@
-# Planning des bénévoles — refonte « Vue liée »
+# Planning des conférences — refonte « Grille + panneau d'affectation »
 
 > Document de spécification destiné à GitHub Copilot.
-> Objectif : **remplacer l'écran actuel** `src/main/webapp/app/admin/volunteer-planning` par la « Vue liée » (planning par bénévole + équipes par zone sur le même axe horaire), **sans perdre aucune fonctionnalité existante**.
-> Maquette de référence : `planning-benevoles-vue-benevoles-zones.html`, proposition **B · Vue liée** (à ouvrir dans un navigateur et à joindre au contexte Copilot). La maquette contient un bandeau de périodes (Ouverture, Midi…) : **il ne doit pas être implémenté**.
+> Objectif : **remplacer l'écran actuel** `src/main/webapp/app/admin/talks-planning` (et le composant partagé `tp`) par la nouvelle version validée sur maquette, **sans perdre aucune fonctionnalité existante**.
+> Maquette de référence : `planning-conferences-maquette.html` (à ouvrir dans un navigateur et à joindre au contexte Copilot). Son JavaScript contient une implémentation de référence des règles métier (fonctions `check`, `freeStarts`, `firstStart`, `occA`, `occB`, `slotLists`, `previewBox`).
+>
+> **À ne pas implémenter** depuis la maquette :
+> - le sélecteur flottant « Aperçu Desktop / Mobile » en bas à gauche (outil de démo) ;
+> - les données d'exemple (`SEED`) ;
+> - l'entrée de menu « Voir les données enregistrées » (outil de démo) : le menu Actions reste alimenté par `ActionsService`.
 
 ---
 
 ## 1. Contexte technique
 
-- Front : Angular (composants **standalone**, **signals**, `ChangeDetectionStrategy.OnPush`), PrimeNG (`p-tabs`, `p-table`, `p-confirmpopup`…), `@ngx-translate`, PrimeIcons.
-- Composants partagés du projet à réutiliser : `app-content-page`, `app-card`, `button-box`, `menu-box`, `dialog-box`, `app-alert-error`, `DialogDraftService`, `ActionsService`, `MenuItemBuilderService`.
-- Back : Spring Boot (JHipster), entité `PlanningVolunteerSalon` avec `configuration` et `volunteers` stockés en **jsonb**. Endpoints existants :
-  - `GET  api/admin/salons/{idSalon}/planning-volunteers`
-  - `PUT  api/admin/salons/{idSalon}/planning-volunteers`
-- Vocabulaire : dans l'UI, une **catégorie** (`Category`) est appelée **zone** (Buvette, Lavage, Cuisine…). Dans le code on garde le nom `Category`.
+- Front : Angular 21 (composants **standalone**, **signals**, `ChangeDetectionStrategy.OnPush`), PrimeNG 21, `@angular/cdk`, `@ngx-translate`, PrimeIcons.
+- Composants partagés à réutiliser : `app-content-page`, `app-card`, `button-box`, `menu-box`, `dialog-box`, `app-alert-error`, `ActionsService`, `MenuItemBuilderService`.
+- À réutiliser depuis la refonte du planning bénévoles : `admin/volunteer-planning/components/mobile/bottom-sheet.component.ts` (à déplacer dans `shared/components/bottom-sheet/` et à importer depuis les deux écrans), le principe du store (`volunteer-planning.store.ts`) et la détection mobile `BreakpointObserver.observe('(max-width: 991.98px)')`.
+- Back : Spring Boot (JHipster). Entité `PlanningTalksSalon` avec `configuration` (`TimelineData`) et `talks` (`List<TalkPlanning>`) stockés en **jsonb**. Endpoints existants, inchangés :
+  - `GET  api/admin/salons/{idSalon}/planning-talks`
+  - `PUT  api/admin/salons/{idSalon}/planning-talks`
+- Vocabulaire UI : « intervention » = conférence ou atelier. « Pas de la salle » = pas d'affichage de la grille. « Pas de placement » = pas des heures de début possibles. « Préparation » = battement avant, « Rangement » = battement après.
 
-Fichiers actuels concernés :
+Fichiers concernés :
 
 ```
-src/main/webapp/app/admin/volunteer-planning/
-├── volunteer-planning.routes.ts
-├── volunteer-planning.service.ts
-└── components/
-    ├── volunteer-planning.component.{ts,html,scss}   ← à réécrire
-    ├── volunteer-planning-model.ts                    ← à étendre
-    ├── volunteer-planning-slices.ts                   ← inchangé
-    ├── category-manager/                              ← inchangé (dialog)
-    ├── volunteer-manager/                             ← inchangé (dialog)
-    ├── selected-day-editor/                           ← inchangé (dialog)
-    └── selected-day-assignments/                      ← inchangé (dialog)
-src/main/java/ch/salon/domain/VolunteerPlanningDay.java  ← ajout du champ needs
-src/main/webapp/i18n/fr/planningVolunteers.json          ← nouvelles clés
+src/main/webapp/app/
+├── admin/talks-planning/update/
+│   ├── talks-planning.component.{ts,html}        ← page : à réécrire (garder en-tête/actions/chargement/sauvegarde)
+│   └── (nouveaux fichiers, voir §8)
+├── shared/components/talks-planning/             ← composant `tp` : remplacé par les nouveaux composants
+│   ├── model/*.ts                                ← à étendre (voir §3)
+│   ├── tp-config-rooms/, tp-config-day/          ← remplacés par la popin « Salles et horaires » (§6)
+├── shared/components/talk-slot/talk-slot.component.ts  ← interface Talk à étendre
+├── admin/salon/service/salon.service.ts          ← DTO à étendre
+src/main/java/ch/salon/
+├── domain/TimelineData.java                      ← + placementIntervalMinutes, talkTypes
+├── domain/TalkPlanning.java                      ← + startingHour, preparationMinutes, cleanupMinutes
+├── domain/TalkTypeConfig.java                    ← nouveau
+├── service/SalonService.java                     ← duplication de salon (copyTalksPlanning) : copier les nouveaux champs
+├── service/handlers/impl/talks/DownloadTalksPlanningHandler.java ← heure de début et durée
+src/main/webapp/i18n/fr/planningTalks.json        ← nouvelles clés
 ```
 
 ---
 
 ## 2. Fonctionnalités existantes à conserver (checklist obligatoire)
 
-Toutes ces fonctionnalités de `volunteer-planning.component` doivent exister à l'identique dans la nouvelle version.
-
 ### En-tête (`appMenuBarStart` / `appMenuBarEnd`)
-- [ ] Titre `salon.volunteersPlanning`.
+- [ ] Titre `salon.talksPlanning`.
 - [ ] Bouton **Retour** (`pi-arrow-left`) → `window.history.back()`.
 - [ ] **Mode lecture par défaut** (`isReadOnly = true`).
-- [ ] En lecture : bouton **Modifier** (`pi-pencil`) → mode édition.
-- [ ] En lecture : menu **Actions** (`pi-cog`, `menu-box`), alimenté par `actionsService.getAvailableActions('salon', idSalon, 'volunteer-planning')` et `menuItemBuilderService.buildMenuItemsFromActions(...)`. Il n'est affiché que s'il contient des éléments.
-- [ ] Action de type `DOWNLOAD` : appel de `actionsService.downloadAction(action.contextCode, idSalon)`. Le nom du fichier vient de l'en-tête `content-disposition`, avec `planning-benevoles.pdf` par défaut. Le téléchargement passe par `URL.createObjectURL`.
-- [ ] En édition : bouton **Annuler** (`pi-ban`) qui recharge les données serveur et revient en lecture, et bouton **Enregistrer** (`pi-save`) qui fait le `PUT` puis revient en lecture.
-- [ ] Tous les boutons sont désactivés pendant `isLoading`.
-- [ ] `<app-alert-error>` et `<p-confirmpopup>` restent présents.
+- [ ] En lecture : bouton **Modifier** (`pi-pencil`) et menu **Actions** (`menu-box`) alimenté par `actionsService.getAvailableActions('salon', idSalon, 'talks-planning')` ; l'action `DOWNLOAD` télécharge le PDF (code actuel `clickAction` / `getFilenameFromContentDisposition` à garder tel quel).
+- [ ] En édition : **Annuler** (`pi-ban`, recharge les données comme `activateReadOnlyMode()`) et **Enregistrer** (`pi-save`, `salonService.savePlanningTalks`, puis retour en lecture).
+- [ ] Nouveau en édition : bouton **Annuler la dernière action** (`pi-undo`, aussi `Ctrl/Cmd + Z`) et bouton **Salles et horaires** (`pi-sliders-h`) qui ouvre la popin §6.
+- [ ] Tous les boutons désactivés pendant `isLoading()`.
 
-### Gestion (mode édition uniquement)
-- [ ] Bouton **Bénévoles** → dialog `volunteer-manager`. À la confirmation, `applyVolunteers()` retire les ids supprimés de `assignedVolunteerIds`, `cells`, `unavailableCells` **et** `needs` (nouveau champ, voir §4) de tous les jours.
-- [ ] Bouton **Catégories** → dialog `category-manager`. À la confirmation, `applyCategories()` retire les `cells` **et** les `needs` qui pointent vers une catégorie supprimée.
+### Chargement
+- [ ] `forkJoin` actuel : planning + conférences + ateliers du salon, en excluant les statuts `REFUSED` et `CANCELED`.
+- [ ] Fusion des placements sauvegardés par clé `` `${type}:${id}` ``.
+- [ ] Sans configuration enregistrée : configuration vide. En lecture : message « Veuillez activer le mode édition pour démarrer un nouveau planning. ». En édition : état vide avec un bouton qui ouvre la popin Salles et horaires.
 
-### Jours
-- [ ] Onglets de jours (`p-tabs` scrollable). Le jour sélectionné est conservé dans `selectedDayId`.
-- [ ] En édition, l'onglet actif a un menu (`menu-box`, `pi-list`) avec trois entrées :
-  - **Configuration** → dialog `selected-day-editor`. À la confirmation, `applyDaySlice()` supprime les `cells`, `unavailableCells` **et** `needs` dont `slotIndex >= nombre de créneaux`.
-  - **Assignement des bénévoles** → dialog `selected-day-assignments`. À la confirmation, `applyAssignmentsSlice()` supprime les `cells` et `unavailableCells` des bénévoles retirés.
-  - **Supprimer le jour** → dialog de confirmation (`planningVolunteers.removeDay`), puis `confirmDeleteSelectedDay()`.
-- [ ] Onglet **+ Créer** (édition) → `addNewDay()` : nouvel id (`crypto.randomUUID`), 08:00–18:00, 60 min, dialog en mode création, puis sélection du nouveau jour.
-- [ ] Seuls les bénévoles de `day.assignedVolunteerIds` sont affichés pour le jour.
+### Planning
+- [ ] Onglets de jours, ajout / configuration / suppression d'un jour (désormais dans la popin §6, avec confirmation avant de supprimer un jour qui contient des interventions placées).
+- [ ] Gestion des salles (ajout, renommage, suppression), désormais dans la popin §6.
+- [ ] Glisser-déposer d'une intervention non placée vers la grille, déplacement d'une intervention placée, dépôt hors grille = retrait du planning.
+- [ ] Nettoyage automatique (`sanitizeTalkAssignments`) : une intervention dont le jour ou la salle n'existe plus, ou dont la salle est fermée ce jour-là, revient dans « À planifier ».
+- [ ] Clic sur une intervention en lecture → détail (titre, type, intervenant·e, exposant, durée d'animation, durée totale, statut, informations supplémentaires, description).
 
-### Outils de saisie (sémantique à garder exactement)
-- [ ] `CATEGORY` : affecte la catégorie, **sauf** sur une cellule indisponible.
-- [ ] `ERASER` : retire l'affectation, **sauf** sur une cellule indisponible.
-- [ ] `UNAVAILABLE` : marque la cellule indisponible **et** retire sa catégorie.
-- [ ] `CLEAR_UNAVAILABLE` : retire uniquement l'indisponibilité.
-- [ ] Totaux par catégorie et par créneau, affichés sous forme « affectés / minimum » (§5.4).
-- [ ] Aucune saisie possible en lecture seule.
-
-### Données
-- [ ] Mapping `fromPlanningVolunteersDto` / `toPlanningConfigurationDto` conservé : dates en ISO, repli de `intervalMinutes` sur `configuration.intervalMinutes`, puis sur 60.
+### Comportements volontairement modifiés
+- **Plus de décalage automatique** (`resolveRoomCollisions`) : on peut placer une intervention sur un créneau en conflit. Elle est alors signalée (bordure rouge + icône `pi-exclamation-triangle`) et un toast indique la raison. Rien n'est déplacé sans action de l'utilisateur.
+- **Plus de retrait automatique hors horaires** (`unassignTalksOutsideBounds`) : après une modification des horaires ou des battements, les interventions qui débordent restent placées et passent en conflit (toast « Configuration appliquée · N interventions en conflit à revoir »). Seules la suppression d'un jour ou d'une salle, ou la fermeture d'une salle ce jour-là, renvoient dans « À planifier ».
+- Le mode « Prévisualiser » (`showGrid` / `p-timeline`) est supprimé : la vue en lecture est la grille elle-même.
 
 ---
 
-## 3. Expérience cible
+## 3. Modèle de données
 
-### 3.1 Desktop (≥ 992 px)
+### 3.1 Configuration (`TimelineData`)
 
-Un **sélecteur de vue à 3 positions** sous les onglets de jours :
-`[ Les deux ] [ Bénévoles ] [ Zones ]`, avec `Les deux` par défaut.
-
-```
-┌───────────────────────────────────────────────────────────────┬──────────────────────┐
-│ Palette : [Buvette 1][Lavage 2][Cuisine 3][Logist. 4] |       │  PANNEAU LATÉRAL     │
-│           [Gomme E][Indispo X][Dispo D]          (édition)    │                      │
-├────────────────┬──────────────────────────────────────────────┤  • sans sélection :  │
-│ Bénévole       │ 08:00  09:00  10:00  11:00  12:00 …          │    liste bénévoles   │  ← en-tête collant (sticky top)
-├────────────────┼──────────────────────────────────────────────┤    + heures + mini   │
-│ (Ch) Charlène 2h│      [Logistique 09–10]                     │    frise             │
-│ (Da) Davy     6h│[■ Buvette 08:00–14:00 ■■■■■■■■■]            │                      │  ← VUE BÉNÉVOLES
-│ (Dy) Dylan    6h│            [■ Buvette 12:00–17:00 ■■■■]     │  • avec sélection de │    (timeline, scroll vertical)
-│ …               │      [///// Indispo /////]                  │    plage de zone :   │
-├────────────────┴──────────────────────────────────────────────┤    panneau           │
-│ ÉQUIPES PAR ZONE · glissez sur une ligne pour sélectionner     │    d'affectation     │
-│ Buvette  19h/20h │[Da][Da][Da●][Da Mi][Da Dy][…]               │    (§5.5)            │  ← VUE ZONES
-│ Lavage    7h/7h  │[  ][  ][  ][  ][Pa][Pa][Pa]                 │                      │    ancrée en bas
-│ Cuisine  11h/9h  │[  ][  ][Ke Le][Ke Le][…]                    │                      │    (sticky bottom),
-│ Libres           │  6   6   6   5   3   3   6                  │                      │    alignée sur les colonnes
-└────────────────────────────────────────────────────────────────┴──────────────────────┘
-```
-
-- **Les deux** : la timeline des bénévoles défile et les zones restent ancrées en bas (`position: sticky; bottom: 0`) dans **le même conteneur scrollable**. Les deux parties partagent ainsi le défilement horizontal et sont alignées pixel par pixel.
-- **Bénévoles** : timeline seule, suivie des lignes de couverture « affectés / minimum » avec le bouton « Modifier les minimums » (§5.4).
-- **Zones** : uniquement les lignes de zones et la ligne « Libres ».
-- Le panneau latéral (320 px) est présent dans les 3 modes.
-
-### 3.2 Mobile (< 992 px)
-
-En haut de l'écran, sous le titre, un segment `[ Par bénévole ] [ Par zone ]`, puis les jours en chips défilants, puis une ligne d'indicateurs.
-
-**Par bénévole** : une grille compacte.
-- Colonne collante avec l'avatar et les heures du bénévole, puis des colonnes de créneaux de 38 px.
-- Les cellules consécutives d'une même catégorie sont fusionnées visuellement.
-- Pied de grille : totaux « a/min » par zone.
-- Barre du bas : interrupteur **Défiler / Peindre**, bouton **Minimums**, palette.
-  - Défiler : un tap colorie une seule case, le scroll reste libre.
-  - Peindre : on glisse le doigt (`touch-action: none`).
-- Un tap sur l'avatar ouvre la **fiche planning** du bénévole dans un *bottom sheet* :
-  - ses créneaux (heure début–fin, durée, zone) et ses plages libres ou indisponibles ;
-  - son total d'heures ;
-  - un bouton **Voir ses équipes par zone**, qui passe en vue zones avec ce bénévole surligné et la zone de son premier créneau sélectionnée.
-
-**Par zone** :
-- Chips de zones en haut, avec une pastille rouge qui donne le nombre de places manquantes.
-- Liste verticale des créneaux de la zone choisie. Chaque ligne montre l'heure, les avatars affectés, des ronds pointillés pour les places minimum non pourvues, une pastille « a/min » et le nombre de libres.
-- Un tap sur un créneau le sélectionne. Un tap sur un second créneau étend la sélection à la plage. La barre du bas affiche alors **Affecter**, qui ouvre le panneau d'affectation en *bottom sheet*.
-- Quand un bénévole est suivi, la barre du bas affiche « Présences de X surlignées », un bouton **Son planning** qui ouvre sa fiche, et un bouton pour effacer le suivi.
-- **Pas d'en-têtes de périodes** : la liste est continue.
-
-Le mode lecture seule s'applique aussi sur mobile : pas de palette, et le panneau d'affectation est consultable sans boutons d'action.
-
----
-
-## 4. Modèle de données
-
-### 4.1 Nouveau : places minimum par zone et par créneau (`needs`)
-
-Format **creux**, sur le même principe que `cells` : seuls les minimums supérieurs à 0 sont stockés.
-
-**Front — `volunteer-planning-model.ts`**
 ```ts
-export type NeedCell = {
-    categoryId: string;
-    slotIndex: number;
-    min: number;          // >= 1 (0 = entrée supprimée)
-};
+export type DisplayIntervalMinutes = 15 | 30 | 60;          // « Pas de la salle »
+export type PlacementIntervalMinutes = 5 | 10 | 15 | 30;    // « Pas de placement »
+export type TalkType = 'CONFERENCE' | 'WORKSHOP';
 
-export type Day = {
-    // … champs existants inchangés
-    needs: NeedCell[];    // NOUVEAU
-};
-```
+export interface TalkTypeConfig {
+    durationTalkMinutes: number;   // durée de l'intervention (affichée au public)
+    preparationMinutes: number;    // battement avant
+    cleanupMinutes: number;        // battement après
+}
 
-**Front — `volunteer-planning.service.ts`**
-```ts
-export interface VolunteerPlanningNeedDto { categoryId: string; slotIndex: number; min: number; }
-export interface VolunteerPlanningDayDto {
-    // … existant
-    needs?: VolunteerPlanningNeedDto[];   // optionnel : rétro-compatible
+export interface TimelineData {
+    eventId: string;
+    intervalMinutes: DisplayIntervalMinutes;            // existant = pas de la salle (affichage)
+    placementIntervalMinutes: PlacementIntervalMinutes; // nouveau
+    talkTypes: Record<TalkType, TalkTypeConfig>;        // nouveau
+    days: TimelineDay[];
+    rooms: TimelineRoom[];
 }
 ```
-Mapping : dans `fromPlanningVolunteersDto`, `needs: d.needs ?? []`. Dans `toPlanningConfigurationDto`, `needs: d.needs.filter(n => n.min > 0)`.
 
-**Back — `ch.salon.domain`**
+Valeurs par défaut :
+
+| Cas | `intervalMinutes` | `placementIntervalMinutes` | CONFERENCE (prép. / durée / rang.) | WORKSHOP (prép. / durée / rang.) |
+|---|---|---|---|---|
+| Nouvelle configuration | 30 | 15 | 0 / 45 / 15 | 15 / 60 / 15 |
+| Configuration existante sans ces champs | inchangé (si 5 → 15) | 15 | 0 / 45 / 15 | **0** / 60 / 15 |
+
+> La deuxième ligne reproduit exactement les durées actuelles (60 et 75 min) pour ne créer aucun conflit sur les plannings déjà enregistrés.
+
+Supprimer `IntervalMinutes` (`5 | 15 | 30 | 60`) au profit des deux types ci-dessus.
+
+### 3.2 Intervention
+
+Les durées ne sont plus codées en dur dans `toTalk(con, 'CONFERENCE', 60, 45)` / `toTalk(work, 'WORKSHOP', 75, 60)`. Elles viennent de `configuration.talkTypes` et sont recalculées à chaque changement de configuration.
+
+Interface `Talk` (front, `talk-slot.component.ts` ou nouveau fichier modèle) :
+
+```ts
+export interface Talk {
+    id: string;
+    type: TalkType;
+    title: string;
+    description: string;
+    status: Status;
+    extraInformation: string | null;
+    participation: { therapistName: string; fullName: string | null };
+    // placement
+    dayId: string | null;
+    roomId: string | null;
+    startMinute: number | null;   // minutes depuis minuit, heure locale du salon (ex. 11:45 → 705)
+    // durées dérivées de configuration.talkTypes[type]
+    durationTalkMinutes: number;
+    preparationMinutes: number;
+    cleanupMinutes: number;
+    durationTotalMinutes: number; // prép. + durée + rang.
+}
+```
+
+`client` n'est plus utilisé ; il peut être supprimé.
+
+### 3.3 Sauvegarde (`TalkPlanningSaveDto` / `TalkPlanning`)
+
+`startSlot` est **remplacé** par une heure absolue, pour deux raisons :
+1. un index dépend du pas : changer le pas de placement décalerait tout le planning ;
+2. il est aujourd'hui interprété différemment par l'écran (depuis la première ouverture de salle du jour) et par le PDF (depuis l'ouverture de la salle), ce qui donne des heures fausses dans le PDF quand les salles n'ouvrent pas à la même heure.
+
+```ts
+export interface TalkPlanningSaveDto {
+    id: string;
+    type: TalkType;
+    dayId: string | null;
+    roomId: string | null;
+    startingHour: string | null;      // ISO, même convention que TimelineRoomData.startingHour
+    durationTalkMinutes: number;      // aujourd'hui jamais envoyé : le PDF affiche « 0 minutes »
+    preparationMinutes: number;
+    cleanupMinutes: number;
+    durationTotalMinutes: number;
+}
+```
+
+`startingHour` = date du jour (prise sur le `startingHour` de la salle ce jour-là) + `startMinute`.
+
+**Reprise des données existantes** (au chargement, dans le mapping `fromDto`) : si `startingHour` est absent et `startSlot` présent, calculer
+`début = min(startingHour des salles du jour) + startSlot × intervalMinutes` (convention de l'écran actuel, c'est ce que l'utilisateur voyait). La prochaine sauvegarde écrit `startingHour`.
+
+### 3.4 Back (Java)
+
 ```java
 @Data
-public class VolunteerPlanningNeed {
-    private String categoryId;
-    private int slotIndex;
-    private int min;
+public class TalkTypeConfig {
+    private int durationTalkMinutes;
+    private int preparationMinutes;
+    private int cleanupMinutes;
 }
+
+// TimelineData
+private Integer placementIntervalMinutes;
+private Map<TalkPlanning.TalkType, TalkTypeConfig> talkTypes = new EnumMap<>(TalkPlanning.TalkType.class);
+
+// TalkPlanning
+private Instant startingHour;
+private int preparationMinutes;
+private int cleanupMinutes;
+@Deprecated private Integer startSlot;   // lu pour la reprise, plus écrit par le front
 ```
-```java
-// VolunteerPlanningDay.java
-private List<VolunteerPlanningNeed> needs = new ArrayList<>();
-```
-- Aucune migration Liquibase : `configuration` est un jsonb, et les anciens enregistrements sans `needs` se désérialisent en liste vide.
-- Vérifier que `ActionDuplicateSalonHandler` copie bien `needs` lors de la duplication d'un salon. C'est le cas si la configuration est copiée en entier.
-- Optionnel : afficher « a/min » dans `templates/document/volunteer-planning.html` (PDF).
 
-### 4.2 Règles de nettoyage (à ajouter aux méthodes existantes)
-
-| Méthode | Ajout |
-|---|---|
-| `applyCategories` | `needs = needs.filter(n => kept.has(n.categoryId))` |
-| `applyDaySlice` | `needs = needs.filter(n => n.slotIndex < validSlotCount)` |
-| `addNewDay` / jour vide | `needs: []` |
-| `getEmptyPlanning` / fallbacks | `needs: []` partout où un `Day` est construit |
-
-Les **périodes** (Ouverture, Midi…) de la maquette **ne sont pas implémentées** : aucun champ `periods`.
+- Pas de migration Liquibase (colonnes jsonb).
+- `SalonService` (duplication d'un salon, bloc `if (copyTalksPlanning)`) : copier `placementIntervalMinutes` et `talkTypes`.
+- `DownloadTalksPlanningHandler` :
+  - heure de début = `talk.getStartingHour()` ; si absente, ancien calcul avec `startSlot` (même formule que §3.3) ;
+  - tri des interventions d'une salle par heure de début ;
+  - durée affichée = `durationTalkMinutes` (n'imprime pas les battements).
 
 ---
 
-## 5. Comportements détaillés
+## 4. Règles métier (fonctions pures, à tester)
 
-### 5.1 Fonctions pures (nouveau fichier `volunteer-planning-utils.ts`)
-
-Toute la logique métier est regroupée en fonctions pures, testables, sans dépendance Angular.
+Toutes les heures sont en **minutes depuis minuit**. `room` = plage d'ouverture `{start, end}` de la salle ce jour-là.
 
 ```ts
-export const cellKey = (vId: string, slot: number) => `${vId}::${slot}`;
-
-/** Suites consécutives d'un bénévole : une affectation ou une indisponibilité = un bloc. */
-export type Run = { volunteerId: string; kind: 'CATEGORY' | 'UNAVAILABLE'; categoryId?: string; start: number; end: number }; // end exclusif
-export function computeRuns(day: Day, volunteerId: string, slotCount: number): Run[];
-
-export function countAssigned(day: Day, categoryId: string, slot: number): number;   // nb de bénévoles affectés
-export function getNeed(day: Day, categoryId: string, slot: number): number;          // 0 si absent
-export function setNeed(day: Day, categoryId: string, slot: number, min: number): Day; // min<=0 ⇒ supprime l'entrée
-export type CoverageState = 'none' | 'under' | 'ok' | 'over';                          // none = 0/0
-export function coverage(assigned: number, min: number): CoverageState;
-export function freeVolunteers(day: Day, slot: number): string[];                     // assignés au jour, sans cellule ni indispo
-export function volunteerHours(day: Day, volunteerId: string): number;                // nb cellules × interval / 60
-
-/** Applique un outil sur une plage [start, end[ pour un bénévole (même sémantique que applyTool existant). */
-export function applyToolRange(day: Day, volunteerId: string, start: number, end: number, tool: Tool): Day;
-/** Déplace / redimensionne / réaffecte un bloc. Les cellules indisponibles de la cible sont ignorées. */
-export function moveRun(day: Day, run: Run, targetVolunteerId: string, newStart: number, newEnd: number): Day;
-export function deleteRun(day: Day, run: Run): Day;
-export function changeRunCategory(day: Day, run: Run, categoryId: string): Day;
-
-/** Panneau d'affectation : statut d'un bénévole sur une plage d'une zone. */
-export type RangeStatus = { here: number; free: number; unavailable: number; busy: Record<string, number>; length: number };
-export function rangeStatus(day: Day, volunteerId: string, categoryId: string, start: number, endInclusive: number): RangeStatus;
-export function assignOnRange(day: Day, volunteerId: string, categoryId: string, start: number, endInclusive: number, mode: 'free-only' | 'force'): Day;
-export function unassignOnRange(day: Day, volunteerId: string, categoryId: string, start: number, endInclusive: number): Day;
-
-/** Indicateurs du jour. */
-export function dayStats(day: Day, categories: Category[]): { coveragePct: number; missingPlaces: number; plannedHours: number };
+occupiedStart(t, start) = start - t.preparationMinutes
+occupiedEnd(t, start)   = start + t.durationTalkMinutes + t.cleanupMinutes
 ```
 
-Règles :
-- Toutes les fonctions retournent un **nouveau** `Day` (immutabilité, compatible avec les signals et OnPush). Reprendre l'approche « copie minimale » de `setCellCategory` et `setUnavailableCell` pour les performances.
-- Un bénévole a **au plus une catégorie par créneau**, puisque `cells` est indexé par (bénévole, créneau).
-- `assignOnRange(..., 'free-only')` n'écrit que sur les créneaux sans cellule et non indisponibles. `'force'` écrase les autres catégories, mais jamais une indisponibilité.
+### 4.1 Heures de début possibles
+- Grille des débuts : `room.start + k × placementIntervalMinutes`.
+- Premier début : `room.start + ceil(prep / pas) × pas` (la préparation doit tenir après l'ouverture).
+- Dernier début : tel que `occupiedEnd ≤ room.end`.
+- `snapStart(rawMinute, room, step)` : arrondi au plus proche (glisser-déposer) ; `floorStart` : arrondi inférieur (clic et survol).
+- Glisser-déposer : la position verticale du **haut** du bloc déplacé correspond au début de la préparation ; l'heure de début = position du haut + préparation, puis `snapStart`.
 
-### 5.2 État de l'écran (store local au composant)
+### 4.2 Conflits (`checkPlacement(t, dayId, roomId, start): { ok, reasons[] }`)
+1. Salle fermée ce jour → « La salle est fermée ce jour-là ».
+2. `occupiedStart < room.start` ou `occupiedEnd > room.end` → « Hors des horaires de la salle (10:00–18:00), battements compris ».
+3. Même salle, même jour : chevauchement des **plages occupées** (battements compris) → « Chevauche « Titre » (11:30), battements compris ».
+4. Même intervenant·e (`participation.therapistName`), même jour, autre salle : chevauchement des **heures d'intervention seulement** (sans battements) → « Claire Monnin intervient déjà en Salle des Rangiers à 10:30 ».
+5. Les autres jours sont ignorés.
 
-Créer `volunteer-planning.store.ts`, un `@Injectable()` fourni dans `providers` du composant page, qui regroupe l'état aujourd'hui dispersé dans le composant :
+`issuesOf(t)` = `checkPlacement` sur sa position actuelle (vide si non placée).
+`freeStarts(t, dayId, roomId)` = débuts possibles (§4.1) sans conflit.
 
-```ts
-planning        = signal<Planning>(empty);
-selectedDayId   = signal<string>('');
-isReadOnly      = signal(true);
-isLoading       = signal(false);
-viewMode        = signal<'both' | 'person' | 'zone'>('both');   // desktop
-mobileView      = signal<'person' | 'zone'>('person');          // mobile
-tool            = signal<Tool>({ kind: 'CATEGORY', categoryId: … });
-focusVolunteerId= signal<string | null>(null);                  // bénévole suivi dans les deux vues
-zoneSelection   = signal<{ categoryId: string; start: number; end: number; anchor: number } | null>(null);
-blockSelection  = signal<Run | null>(null);
-editMinimums    = signal(false);
-history         = signal<Day[]>([]);                             // pile d'annulation (jour courant)
-// computed : selectedDay, timeSlots, visibleVolunteers, runsByVolunteer, coverageMatrix, dayStats…
-updateDay(fn: (d: Day) => Day, recordHistory = true): void;     // point d'entrée unique des mutations
-undo(): void;
-```
-- `history` est vidée à l'enregistrement, à l'annulation et au changement de jour.
-- `zoneSelection` et `blockSelection` sont remises à `null` au changement de jour ou de mode lecture/édition.
+### 4.3 Placement
+- `place(talkKey, dayId, roomId, start)` : refuse seulement si la salle est fermée ce jour-là. Sinon place, et si `issuesOf` n'est pas vide affiche le toast « Placé avec un conflit : <1ʳᵉ raison> ».
+- `unplace(talkKey)` : `dayId = roomId = startMinute = null`.
+- Chaque modification passe par le store et alimente l'historique d'annulation (60 étapes max).
 
-### 5.3 Vue Bénévoles (timeline) — composant `planning-timeline`
+### 4.4 Créneau choisi (`slotCandidates(dayId, roomId, start)`)
+Retourne quatre listes, utilisées par le panneau de droite (desktop) et le tiroir (mobile) :
+- `here` : interventions dont la plage occupée contient `start` ;
+- `free` : non placées, `checkPlacement(...).ok` ;
+- `move` : placées ailleurs, `checkPlacement(...).ok` ;
+- `off` : les autres, avec la première raison.
 
-**Géométrie**
-- Largeur d'un créneau selon `intervalMinutes` : `{60: 68, 30: 40, 15: 28, 5: 14}` px. Colonne des noms : 170 px, collante (`position: sticky; left: 0`).
-- Ligne de 46 px. Fond quadrillé : `repeating-linear-gradient(to right, var(--app-border) 0 1px, transparent 1px var(--slot-w))`.
-- En-tête collant en haut avec les heures, en réutilisant `computeTimeSlots().displayLabel`. **Pas de bandeau de périodes.**
-- Bloc : `left = start * W + 2`, `width = (end - start) * W - 4`, coins arrondis à 8 px.
-  - Contenu : icône, libellé, puis « HH:MM–HH:MM ». Le libellé et l'heure sont masqués si la largeur est inférieure à 96 px (icône seule).
-  - Bloc d'indisponibilité : fond hachuré gris, libellé « Indispo ».
-- Colonne des noms : avatar rond coloré (initiales, teinte dérivée de l'id), nom, total d'heures à droite. Le total passe en orange s'il dépasse 6 h.
+### 4.5 Indicateurs
+- Nombre à planifier = interventions non placées.
+- Conflits = interventions placées avec `issuesOf` non vide (total et par jour).
 
-**Interactions (édition uniquement, Pointer Events)**
+### 4.6 Tests unitaires minimum (`talks-planning-utils.spec.ts`)
+- Atelier 11:00, durée 60, rangement 15 → une conférence sans préparation peut commencer à **12:15** avec un pas de placement de 15 min, pas à 12:00.
+- Atelier 12:30, préparation 15 → un bloc qui finit à 12:15 (rangement compris) est accepté, à 12:20 il est refusé.
+- Salle ouverte à 10:30, atelier avec 15 min de préparation → premier début possible 10:45.
+- Pas de placement 5 → débuts proposés toutes les 5 min.
+- Même intervenant·e : rangement en salle A et intervention en salle B qui se touchent → pas de conflit ; heures d'intervention qui se chevauchent → conflit.
+- Reprise : `startSlot = 3`, `intervalMinutes = 30`, première salle du jour à 10:00 → `startMinute = 690`.
+- `toDto` : `startingHour` cohérent avec la date du jour, durées envoyées.
 
-| Geste | Effet |
-|---|---|
-| Glisser dans le vide d'une ligne | Fantôme pointillé, puis au relâchement `applyToolRange(start, end, tool)`. Les **4 outils** fonctionnent ainsi : catégorie, gomme, indispo, dispo. |
-| Clic sur un bloc | Sélection, plus un popover sous le bloc : pastilles de catégories (changer de zone) et corbeille. |
-| Glisser un bloc (> 5 px) | Déplacement horizontal, et vertical vers la ligne d'un autre bénévole (réaffectation) → `moveRun`. Toast « Buvette réaffecté·e à Davy ». |
-| Glisser une poignée gauche ou droite (9 px) | Redimensionnement → `moveRun` sur le même bénévole. |
-| Clic sur un nom | Suit ce bénévole (`focusVolunteerId`) : les blocs des autres lignes passent à 28 % d'opacité, sa ligne est surlignée et ses avatars sont mis en évidence côté zones. |
-| `Suppr` / `Retour arrière` | Supprime le bloc sélectionné. |
-| `Échap` | Désélectionne tout. |
+---
 
-- Pendant un glisser, utiliser `document.elementFromPoint` pour trouver la ligne cible et le throttle `requestAnimationFrame` déjà présent (`queuePaint`).
-- Écouter `pointerup`, `pointercancel` et `blur` sur `window` pour terminer le geste (comme le `@HostListener` actuel).
-- En lecture seule : aucun fantôme, aucun popover, aucune poignée, curseur par défaut. Le clic sur un nom (suivi) reste actif.
+## 5. Interface desktop (≥ 992 px)
 
-**Lien avec les zones** : si `zoneSelection` existe, dessiner une **bande** translucide (accent à 9 %, bordures pointillées) sur les colonnes `[start, end]`. Les blocs de cette catégorie qui chevauchent la plage reçoivent un contour accent de 2 px et ne sont pas atténués par le suivi.
+Mise en page : en-tête → barre des jours → bandeaux contextuels → `grille (1fr)` + `panneau (340 px, sticky)`.
 
-### 5.4 Couverture et places minimum
+### 5.1 Barre des jours
+- Onglets segmentés, un par jour (libellé seul). Point rouge sur un jour qui contient au moins un conflit.
+- À droite, une ligne de statut : « **6** à planifier · 2 conflits ». « 2 conflits » est un lien : il déplie au-dessus de la grille la liste des interventions en conflit (titre, jour + heure, raison) ; un clic ouvre le détail.
+- Pas de cartes d'indicateurs, pas d'avatars, pas de légende, pas de pourcentage d'occupation (allègement validé).
 
-- Chaque créneau de zone affiche **« affectés / minimum »**, coloré selon `coverage()` :
-  - `under` : rose, places manquantes ;
-  - `ok` : vert ;
-  - `over` : orange, sureffectif ;
-  - `none` : rien, ou « – ».
-- En mode **Bénévoles seul**, ces lignes s'affichent sous la timeline, avec le bouton **Modifier les minimums** (édition uniquement). Le bouton bascule `editMinimums`, et chaque case devient alors un mini-stepper vertical `+ / a/min / −` qui appelle `setNeed`.
-- Sur mobile, le bouton **Minimums** ouvre un *bottom sheet* avec le même tableau éditable (zones × créneaux).
-- Indicateurs du jour, à droite des onglets : **Minimums couverts** (%), **Places à pourvoir**, **Heures planifiées** (`dayStats`).
+### 5.2 Grille
+- Colonne d'heures à gauche : heures pleines en gras, lignes intermédiaires selon le **pas de la salle**.
+- Une colonne par salle : en-tête = nom + horaires du jour (« 10:00–18:00 » ou « Fermée ce jour »).
+- Plages fermées hachurées.
+- Bloc d'intervention, de haut en bas :
+  - bande hachurée **Préparation** (hauteur = préparation ; libellé si la bande fait ≥ 14 px) ;
+  - corps : `11:00 – 12:00`, titre (2 lignes max), intervenant·e ;
+  - bande hachurée **Rangement**.
+- Couleur par type : filet gauche et fond léger (conférence violet, atelier turquoise). En conflit : bordure rouge + icône avec la raison en infobulle.
+- Clic sur un bloc → panneau de détail (§5.5).
+- En édition, clic sur une case vide → le panneau de droite affiche le créneau (§5.4) et la case est entourée.
 
-### 5.5 Vue Zones (alignée) — composant `planning-zones`
+### 5.3 Panneau de droite : « À planifier »
+- Bouton pour replier le panneau (il devient une colonne étroite avec « À planifier N » vertical). Il se déplie seul quand un créneau ou une intervention est sélectionné.
+- Filtres segmentés avec compteurs : Toutes / Conférences / Ateliers.
+- Recherche sur titre et intervenant·e.
+- Carte : filet de couleur du type, titre, puis « Intervenant·e · conférence 45 min » (+ « · à confirmer » en orange si le statut est `IN_VERIFICATION`). Pas d'avatar, pas de badge de type.
+- Glisser une carte sur la grille la place ; déposer un bloc sur ce panneau le retire du planning.
 
-- Une ligne par catégorie, dans le même conteneur et avec la même largeur de créneau que la timeline.
-  - Colonne collante avec la pastille de zone (couleur et icône), le libellé et « heures affectées / heures minimum ».
-  - Une case par créneau : `left = i * W + 2`, `width = W - 4`. Le fond suit l'état de couverture.
-  - La case contient les avatars (20 px) des affectés, puis un rond pointillé rose par place minimum non pourvue.
-  - La hauteur de ligne s'adapte au nombre maximal d'avatars : `max(40, ceil(max / perLine) * 22 + 10)`.
-- Dernière ligne **Libres** : nombre de bénévoles du jour sans affectation et disponibles, par créneau.
-- **Sélection de plage** : appui sur une case puis glisser horizontalement sur la même ligne → `zoneSelection` (contour accent de 2 px). La sélection est possible aussi en lecture seule, pour consulter qui est présent.
-- Si un bénévole est suivi, les avatars des autres passent à 18 % d'opacité et le sien grossit avec un anneau.
+### 5.4 Panneau de droite : créneau choisi
+En-tête « Samedi 14 novembre — Salle Jura · 15:00 — Ce qui peut commencer ici à 15:00 », bouton fermer. Sections (masquées si vides) :
+- **Déjà sur ce créneau** → bouton « Retirer » ;
+- **À planifier** → bouton principal « Placer » ;
+- **Déjà placées ailleurs** (avec leur position actuelle) → « Déplacer ici » ;
+- **Ne tiennent pas ici** : repliée par défaut (`<details>`), chaque ligne avec sa raison, sans action.
+  Après « Placer » : toast « « Titre » placée à 15:00 » avec action « Annuler ».
 
-**Panneau latéral (composant `zone-assign-panel`)**
-- **Sans sélection** : liste des bénévoles du jour avec avatar, nom, total d'heures et une mini-frise colorée de leur journée. Un clic suit le bénévole.
-- **Avec sélection** :
-  - En-tête : zone et « HH:MM → HH:MM · n créneaux ».
-  - Ligne **Min / créneau** avec `−` et `+`, qui appliquent `setNeed` à toute la plage. Si les minimums diffèrent dans la plage, afficher « 1–2 ». Pastille « affectés/min » à côté.
-  - Bénévoles groupés et triés selon `rangeStatus` :
-    1. **Dans cette zone** → boutons `Retirer` (et `Compléter` s'il reste des créneaux libres dans la plage).
-    2. **Libres sur toute la plage** → bouton principal `Ajouter` (`assignOnRange 'free-only'`).
-    3. **Partiellement libres** (« Libre 2/3 · Buvette 1 ») → `Ajouter`, qui ne remplit que les créneaux libres.
-    4. **Dans une autre zone** (« En Cuisine 3 ») → `Déplacer ici` (`assignOnRange 'force'`).
-    5. **Indisponibles** → grisés, sans action.
-  - En lecture seule : mêmes listes, sans les boutons ni les steppers.
-  - Fermeture avec × ou `Échap`.
+### 5.5 Intervention « en main » (placement au clic)
+- Clic sur une carte (ou « Choisir sur le planning » depuis le détail) → l'intervention est en main :
+  - bandeau : « Survolez la grille puis cliquez pour placer **Titre** (prép. 15 · 60 min · rang. 15) » + `Échap` + lien « Annuler » ;
+  - une étiquette suit le curseur (titre, intervenant·e, durées, « Clic pour placer · Échap pour annuler ») ;
+  - au survol d'une colonne : **même aperçu que pendant un glisser-déposer**, cadre vert « Libre · cliquez pour placer » ou rouge avec la raison, bandes de préparation et de rangement incluses ;
+  - clic → `place(...)` ; `Échap` ou « Annuler » → abandon.
+- Pendant un glisser-déposer : même cadre d'aperçu, calculé selon §4.1.
 
-### 5.6 Raccourcis clavier (desktop, édition)
+### 5.6 Détail d'une intervention (panneau latéral)
+- Type, statut, titre, intervenant·e (bouton « Voir ses interventions » : surligne ses blocs et estompe les autres, bandeau « Interventions de X surlignées · Effacer »), exposant, placement, durée (« 15 min de préparation · 60 min · 15 min de rangement » + petite barre proportionnelle), description, informations supplémentaires.
+- Conflits listés en rouge, sinon « Aucun conflit sur ce créneau ».
+- En édition : listes Jour / Salle / Début (débuts au pas de placement, suffixe « · occupé » si conflit), boutons « Choisir sur le planning » et « Retirer du planning ».
+- Fermeture : ×, clic sur le fond, `Échap`.
+
+### 5.7 Raccourcis (édition)
 
 | Touche | Action |
 |---|---|
-| `1`…`9` | Sélectionne la catégorie n de la palette |
-| `E` | Gomme |
-| `X` | Indisponible |
-| `D` | Disponible (`CLEAR_UNAVAILABLE`) |
-| `Ctrl/Cmd + Z` | Annuler la dernière modification (`store.undo()`) |
-| `Suppr` | Supprimer le bloc sélectionné |
-| `Échap` | Fermer la sélection, le popover ou le suivi |
+| `Ctrl/Cmd + Z` | Annuler la dernière modification |
+| `Échap` | Lâcher l'intervention en main, fermer le détail, la popin ou le créneau |
 
-Ignorer les raccourcis quand le focus est dans un `input`, un `textarea` ou un dialog ouvert.
+Ignorer les raccourcis quand le focus est dans un `input`, un `select` ou une popin.
 
 ---
 
-## 6. Découpage des composants
+## 6. Popin « Salles et horaires »
+
+`dialog-box`, largeur ~760 px, pied collant « Annuler » / « Appliquer ». Elle travaille sur un **brouillon** : rien n'est appliqué avant « Appliquer ».
+
+1. **Pas de la salle** : 15 / 30 / 60 min. Aide : « Lignes affichées dans la grille. »
+2. **Pas de placement** : 5 / 10 / 15 / 30 min. Aide : « Heures de début possibles : avec 15 min, on peut commencer à 11:45. »
+3. **Durées et battements** : tableau, une ligne par type.
+
+   | Type | Préparation | Durée | Rangement | Salle occupée |
+      |---|---|---|---|---|
+   | Conférence | `[0] min` | `[45] min` | `[15] min` | 60 min (calculé en direct) |
+   | Atelier | `[15] min` | `[60] min` | `[15] min` | 90 min |
+
+   Champs numériques, pas de 5, préparation et rangement ≥ 0, durée ≥ 5. Aide : « La préparation se place avant l'heure de début, le rangement après la fin. Deux interventions d'une même salle ne peuvent pas se chevaucher, battements compris. »
+4. **Salles** : liste éditable (renommer, supprimer, « Ajouter une salle »).
+5. **Jours** : pour chaque jour, libellé, date, suppression ; tableau des salles avec case « Ouverte », heures « De » / « À ». « Ajouter un jour » crée le lendemain du dernier jour, toutes salles ouvertes 10:00–18:00.
+
+Validation à l'application : fin > début pour chaque salle ouverte, durée ≥ 5. Erreur affichée en toast, la popin reste ouverte.
+
+Application :
+- remplace la configuration ;
+- recalcule les durées de toutes les interventions (`syncTalkDurations`) ;
+- renvoie dans « À planifier » les interventions dont le jour ou la salle n'existe plus, ou dont la salle est fermée ce jour-là ;
+- toast « Configuration appliquée » ou « Configuration appliquée · N interventions en conflit à revoir » ;
+- l'opération est annulable (`Ctrl + Z`).
+
+---
+
+## 7. Interface mobile (< 992 px)
+
+- En-tête compact : titre, mode, boutons secondaires en icône seule (Retour, Actions ; en édition : Annuler la dernière action, Salles et horaires, Abandonner).
+- Barre des jours et ligne de statut identiques au desktop, défilement horizontal si besoin.
+- **Une salle à la fois** : rangée de pastilles de salles au-dessus de la grille. Quand une intervention est en main, chaque pastille affiche « dès 14:00 » ou « complet » ; si la salle affichée n'a plus de place, la vue bascule sur la première salle qui en a.
+- Grille d'une seule colonne pleine largeur (mêmes blocs qu'en desktop).
+- **Barre fixe en bas** (`safe-area-inset-bottom` compris) :
+  - normal : « À planifier `N` » (ouvre le tiroir) + bouton principal « Modifier » (lecture) ou « Enregistrer » (édition) ;
+  - intervention en main : carte compacte (filet de couleur, titre, « prép. 15 · 60 min · rang. 15 · touchez la grille pour placer ») + bouton « Annuler ».
+- Le panneau de droite n'existe pas ; il est remplacé par des tiroirs bas (`bottom-sheet`) :
+  - **À planifier** : même contenu que §5.3. Choisir une carte la met en main et ferme le tiroir.
+  - **Toucher une case vide** : ouvre le tiroir À planifier avec l'en-tête « Ce qui commence à **15:00** en Salle Jura » ; choisir une carte la place directement à cette heure.
+  - **Détail d'une intervention** : le panneau §5.6 s'affiche en tiroir bas.
+- Toucher la grille avec une intervention en main la place. Au pointeur (tablette avec souris, aperçu desktop réduit), le survol affiche le même aperçu que sur desktop.
+- Glisser-déposer : conservé (pointer events, `touch-action: none` sur les blocs en édition).
+
+---
+
+## 8. Découpage des composants
 
 ```
-components/
-├── volunteer-planning.component.{ts,html,scss}     # PAGE : en-tête/actions, onglets jours, sélecteur de vue,
-│                                                   # indicateurs, dialogs existants, load/save, responsive
-├── volunteer-planning.store.ts                     # §5.2
-├── volunteer-planning-utils.ts                     # §5.1 (+ volunteer-planning-utils.spec.ts)
-├── volunteer-planning-model.ts                     # + NeedCell, Day.needs
-├── linked-view/
-│   ├── planning-timeline.component.*              # §5.3 (lignes bénévoles, blocs, popover)
-│   ├── planning-zones.component.*                 # §5.5 (lignes zones + Libres)
-│   ├── coverage-rows.component.*                  # §5.4 (a/min + édition des minimums)
-│   ├── zone-assign-panel.component.*              # panneau latéral
-│   └── volunteer-avatar.component.ts              # avatar initiales + teinte
+admin/talks-planning/update/
+├── talks-planning.component.{ts,html,scss}   # PAGE : en-tête/actions, chargement, sauvegarde, desktop/mobile
+├── talks-planning.store.ts                   # état (signals), historique, sélection, intervention en main
+├── talks-planning-utils.ts                   # §4 : fonctions pures (+ talks-planning-utils.spec.ts)
+├── talks-planning-model.ts                   # §3 : types front + mappings DTO <-> modèle + reprise startSlot
+├── desktop/
+│   ├── planning-day-bar.component.*          # onglets de jours + statut + liste des conflits
+│   ├── planning-grid.component.*             # grille d'un jour (n salles) ; réutilisée en mobile avec une salle
+│   ├── planning-talk-block.component.*       # bloc préparation / corps / rangement
+│   ├── planning-side-panel.component.*       # repliable : À planifier (§5.3) ou créneau (§5.4)
+│   ├── talk-tray.component.*                 # filtres, recherche, cartes ; utilisé aussi dans le tiroir mobile
+│   ├── slot-candidates.component.*           # §5.4 ; utilisé aussi dans le tiroir mobile
+│   └── talk-in-hand.directive.ts             # étiquette qui suit le curseur, aperçu au survol, Échap
 ├── mobile/
-│   ├── mobile-person-grid.component.*             # grille compacte + palette + Défiler/Peindre
-│   ├── mobile-zone-list.component.*               # liste par zone
-│   ├── person-planning-sheet.component.*          # fiche planning d'un bénévole
-│   └── bottom-sheet.component.*                   # conteneur générique (backdrop + panneau animé)
-└── (dialogs existants inchangés)
+│   ├── planning-mobile.component.*           # pastilles de salles, grille 1 colonne, barre basse, tiroirs
+│   └── (bottom-sheet réutilisé depuis shared)
+├── talk-detail-panel.component.*             # §5.6 (panneau latéral en desktop, tiroir en mobile)
+└── talks-config-dialog.component.*           # §6
 ```
 
-- **Responsive** : un signal `isMobile` alimenté par `BreakpointObserver` (`(max-width: 991.98px)`) ou par `matchMedia`. Le template de la page affiche soit `linked-view`, soit `mobile`.
-- La timeline et les zones de la vue liée sont rendues **dans le même élément scrollable** (`.linked-scroller { overflow: auto; max-height: 76vh }`). Les zones sont dans un bloc `.zones-dock { position: sticky; bottom: 0; z-index: 11 }` quand le mode est `both`.
-- Le sélecteur de vue et le suivi de bénévole vivent dans le store : en changeant de vue, on garde le jour, la sélection de plage et le bénévole suivi.
+- `planning-grid` reçoit `day`, `rooms` (toutes en desktop, une seule en mobile), `pxPerMinute` (1.7 par défaut) et émet `slotClick({dayId, roomId, startMinute})` et `talkClick(key)`.
+- Glisser-déposer : `@angular/cdk/drag-drop` peut être conservé, mais le calcul de position doit suivre §4.1 (haut du bloc + préparation, `snapStart`). Le dépôt sur le panneau À planifier = retrait.
+- Le store expose au minimum : `config`, `talks`, `isEditing`, `selectedDayId`, `mobileRoomId`, `talkInHand`, `selectedSlot`, `focusTherapist`, `panelFolded`, `canUndo`, `unplacedCount`, `conflicts`, `conflictsByDay` ; actions `place`, `unplace`, `applyConfig`, `undo`, `takeInHand`, `dropInHand`, `selectSlot`.
+- En changeant de jour ou de vue (desktop ↔ mobile), garder l'intervention en main et le filtre du bac.
+- Supprimer `shared/components/talks-planning/` (et `talk-slot` s'il n'est plus utilisé ailleurs) une fois la nouvelle page en place.
 
 ---
 
-## 7. Styles
+## 9. i18n (`planningTalks.json`, fr)
 
-Réutiliser les variables CSS existantes du projet (`--app-surface`, `--app-surface-muted`, `--app-border`, `--app-text`, `--app-text-muted`, `--app-fs-xs`, `--app-fs-sm`…). Ajouter uniquement des variables locales au composant :
-
-```scss
-:host {
-  --vp-accent: var(--p-primary-color);
-  --vp-ok: #2b8a3e;     --vp-ok-bg: #e7f5ea;
-  --vp-under: #d6336c;  --vp-under-bg: #fdeaf0;
-  --vp-over: #d9480f;   --vp-over-bg: #fff1e6;
-  --vp-unav: #a3a8b1;
-}
-.block.unavailable {
-  background: repeating-linear-gradient(135deg, var(--vp-unav) 0 4px,
-              color-mix(in srgb, var(--vp-unav) 60%, transparent) 4px 9px);
-  color: #fff;
-}
-.zone-cell .seat { border: 1.5px dashed var(--vp-under); border-radius: 50%; }
-```
-- Couleur de texte sur les blocs et pastilles de catégorie : `#1c2230`, car les couleurs de catégories sont pastel.
-- Avatar : `background: hsl(<hash(id) % 360> 55% 52%)`, texte blanc, 2 lettres.
-- Toutes les zones de glisser ont `user-select: none` et `touch-action: none`. Exception : les cases de la grille mobile en mode Défiler, en `touch-action: pan-x pan-y`.
-
----
-
-## 8. i18n (`planningVolunteers.json`, fr)
-
-Ajouter (et l'équivalent dans les autres langues présentes) :
+Garder les clés `details.*` existantes et ajouter :
 
 ```json
 {
-  "planningVolunteers": {
-    "view": { "both": "Les deux", "persons": "Bénévoles", "zones": "Zones", "byPerson": "Par bénévole", "byZone": "Par zone" },
-    "kpi": { "coverage": "Minimums couverts", "missing": "Places à pourvoir", "hours": "Heures planifiées" },
-    "zones": { "title": "Équipes par zone", "hint": "Glissez sur une ligne pour sélectionner une plage", "free": "Libres" },
-    "coverage": { "title": "Couverture · affectés / minimum", "editMin": "Modifier les minimums", "done": "Terminer", "minPerSlot": "Min / créneau" },
-    "panel": {
-      "volunteersOfDay": "Bénévoles du jour",
-      "inZone": "Dans cette zone", "freeAll": "Libres sur toute la plage", "freePartial": "Partiellement libres",
-      "otherZone": "Dans une autre zone", "unavailable": "Indisponibles",
-      "add": "Ajouter", "complete": "Compléter", "remove": "Retirer", "moveHere": "Déplacer ici"
+  "planningTalks": {
+    "status": { "toPlan": "{{count}} à planifier", "allPlaced": "Tout est placé", "conflicts": "{{count}} conflit(s)" },
+    "tray": { "title": "À planifier", "all": "Toutes", "conferences": "Conférences", "workshops": "Ateliers", "search": "Titre ou intervenant·e", "pending": "à confirmer", "empty": "Toutes les interventions sont placées.", "noResult": "Aucun résultat pour ce filtre." },
+    "block": { "preparation": "Préparation", "cleanup": "Rangement", "closed": "Fermée ce jour" },
+    "slot": { "subtitle": "Ce qui peut commencer ici à {{time}}", "here": "Déjà sur ce créneau", "free": "À planifier", "move": "Déjà placées ailleurs", "off": "Ne tiennent pas ici", "place": "Placer", "moveHere": "Déplacer ici", "remove": "Retirer", "none": "Aucune intervention ne tient à {{time}} dans cette salle." },
+    "inHand": { "banner": "Survolez la grille puis cliquez pour placer <b>{{title}}</b> ({{durations}})", "ghost": "Clic pour placer · Échap pour annuler", "mobile": "touchez la grille pour placer", "free": "Libre · cliquez pour placer", "from": "dès {{time}}", "full": "complet" },
+    "conflict": { "closedRoom": "La salle est fermée ce jour-là", "outOfHours": "Hors des horaires de la salle ({{start}}–{{end}}), battements compris", "overlap": "Chevauche « {{title}} » ({{time}}), battements compris", "therapist": "{{name}} intervient déjà en {{room}} à {{time}}", "placedWithConflict": "Placé avec un conflit : {{reason}}" },
+    "durations": { "short": "prép. {{prep}} · {{dur}} min · rang. {{clean}}", "long": "{{prep}} min de préparation · {{dur}} min · {{clean}} min de rangement" },
+    "focus": { "banner": "Interventions de {{name}} surlignées", "clear": "Effacer", "see": "Voir ses interventions" },
+    "config": {
+      "title": "Salles et horaires",
+      "displayStep": "Pas de la salle", "displayStepHelp": "Lignes affichées dans la grille.",
+      "placementStep": "Pas de placement", "placementStepHelp": "Heures de début possibles : avec 15 min, on peut commencer à 11:45.",
+      "types": "Durées et battements", "preparation": "Préparation", "duration": "Durée", "cleanup": "Rangement", "occupied": "Salle occupée",
+      "typesHelp": "La préparation se place avant l’heure de début, le rangement après la fin. Deux interventions d’une même salle ne peuvent pas se chevaucher, battements compris.",
+      "rooms": "Salles", "addRoom": "Ajouter une salle", "days": "Jours", "addDay": "Ajouter un jour", "open": "Ouverte", "from": "De", "to": "À",
+      "apply": "Appliquer", "applied": "Configuration appliquée", "appliedWithConflicts": "Configuration appliquée · {{count}} intervention(s) en conflit à revoir",
+      "errorHours": "{{day}} : l’heure de fin doit suivre l’heure de début", "errorDuration": "{{type}} : la durée doit faire au moins 5 minutes"
     },
-    "focus": { "following": "Présences de {{name}} surlignées", "clear": "Effacer" },
-    "person": { "title": "Planning de {{name}}", "seeZones": "Voir ses équipes par zone", "free": "Libre", "noSlot": "Aucun créneau ce jour" },
-    "mobile": { "scroll": "Défiler", "paint": "Peindre", "minimums": "Minimums", "assign": "Affecter", "hisPlanning": "Son planning" },
-    "toast": { "reassigned": "{{zone}} réaffecté·e à {{name}}", "undone": "Action annulée" }
+    "placed": "« {{title}} » placée à {{time}}",
+    "undo": "Annuler la dernière action",
+    "emptyEdit": "Ajoutez les jours et les salles du salon pour démarrer le planning."
   }
 }
 ```
-Les clés existantes (`manageCategories`, `manageVolunteers`, `removeDay`, `palette.*`, `interval.*`) restent utilisées.
+
+Ajouter l'équivalent dans les autres langues présentes. Les clés `modeGrid`, `modeTimeline`, `manageRooms` deviennent inutiles.
 
 ---
 
-## 9. Plan d'implémentation (à suivre dans l'ordre)
+## 10. Plan d'implémentation (à suivre dans l'ordre)
 
-1. **Back** : créer `VolunteerPlanningNeed` et ajouter `needs` à `VolunteerPlanningDay`. Vérifier la duplication de salon.
-2. **Modèle et DTO front** : `NeedCell`, `Day.needs`, mappings in/out, `needs: []` dans tous les constructeurs de `Day`, règles de nettoyage (§4.2).
-3. **`volunteer-planning-utils.ts` et ses tests unitaires** : couvrir au minimum `computeRuns`, `applyToolRange` (4 outils, indispo protégée), `moveRun` (changement de ligne, cible indisponible), `rangeStatus`, `assignOnRange` (free-only / force), `setNeed`, `dayStats`.
-4. **Store** (§5.2) : y déplacer l'état et la logique load/save/download du composant actuel, sans changer leur comportement.
-5. **Page** : réécrire le template en gardant tel quel le bloc en-tête et actions, la gestion des jours et les dialogs. Remplacer le `p-table` et la palette verticale par le sélecteur de vue, les indicateurs et `linked-view` / `mobile`.
-6. **`planning-timeline`** : rendu, puis interactions (créer, sélectionner, popover, déplacer, redimensionner, suivi).
-7. **`planning-zones`, `coverage-rows`, `zone-assign-panel`** et l'ancrage sticky en mode `both`.
-8. **Mobile** : `bottom-sheet`, `mobile-person-grid` (Défiler/Peindre), `mobile-zone-list`, `person-planning-sheet` et les liens croisés.
-9. **Undo et raccourcis clavier.**
-10. **i18n** et nettoyage du SCSS de l'ancien écran.
+1. **Back** : `TalkTypeConfig`, nouveaux champs de `TimelineData` et `TalkPlanning`, duplication de salon, `DownloadTalksPlanningHandler` (heure absolue, repli `startSlot`, durée réelle). Vérifier le PDF sur un planning existant.
+2. **Modèle front** (`talks-planning-model.ts`) : types §3, valeurs par défaut, mapping `fromDto` avec reprise de `startSlot`, `toDto` avec `startingHour` et durées.
+3. **`talks-planning-utils.ts` + tests** (§4.6) avant toute UI.
+4. **Store** : y déplacer l'état et la logique load/save/download de `talks-planning.component.ts` sans changer leur comportement ; ajouter historique, intervention en main, créneau choisi.
+5. **Popin Salles et horaires** (§6), pour pouvoir créer une configuration de test.
+6. **Desktop** : barre des jours → grille + blocs → panneau À planifier → glisser-déposer → créneau choisi → intervention en main (survol, Échap) → détail → raccourcis.
+7. **Mobile** : pastilles de salles, barre basse, tiroirs (déplacer `bottom-sheet` dans `shared`).
+8. **i18n**, suppression de l'ancien composant `tp`, nettoyage.
+9. Vérification avec la checklist §2 et les critères §11.
 
 ---
 
-## 10. Critères d'acceptation
+## 11. Critères d'acceptation
 
-- [ ] Toute la checklist du §2 est vérifiée manuellement.
-- [ ] Un planning existant, enregistré sans `needs`, se charge sans erreur, avec des minimums à 0 partout.
-- [ ] Enregistrer, puis recharger, restitue à l'identique `cells`, `unavailableCells`, `assignedVolunteerIds` et `needs`.
-- [ ] Glisser un bloc sur un autre bénévole déplace les cellules. Les créneaux indisponibles de la cible ne sont jamais écrasés.
-- [ ] En mode `both`, une affectation faite depuis le panneau des zones apparaît immédiatement dans la timeline, et inversement.
-- [ ] La sélection d'une plage de zone se voit dans la timeline (bande et blocs encadrés). Le bénévole suivi se voit dans les deux vues.
-- [ ] Changer de vue (Les deux / Bénévoles / Zones, ou Par bénévole / Par zone sur mobile) conserve le jour, la sélection et le suivi.
-- [ ] En lecture seule : aucune modification possible, que ce soit à la souris, au tactile ou au clavier. Le menu **Actions** et le téléchargement PDF fonctionnent.
-- [ ] Supprimer une catégorie supprime aussi ses `cells` et ses `needs`. Raccourcir un jour supprime les `cells`, `unavailableCells` et `needs` hors limites.
-- [ ] Mobile (390 px) : aucun scroll horizontal de page. La grille défile dans son conteneur. Le mode Défiler n'empêche pas le scroll. Le mode Peindre peint au doigt.
-- [ ] Fluidité : pas de saccade avec 30 bénévoles × 132 créneaux (jour de 11 h à 5 min). Utiliser `track` dans les `@for`, des `computed` mémoïsés par jour, et le rAF pendant les glisser.
+- [ ] Toutes les cases de la checklist §2 sont cochées.
+- [ ] Pas de placement 15 min, atelier 11:00–12:00 avec 15 min de rangement : une conférence sans préparation se place à **12:15** dans la même salle, sans conflit, par glisser-déposer, par clic après sélection et depuis le créneau choisi.
+- [ ] Passer le pas de placement à 5 min propose des débuts toutes les 5 min dans le détail et dans l'aperçu ; les interventions déjà placées ne bougent pas.
+- [ ] Passer la préparation des conférences à 10 min : les blocs grandissent vers le haut, une conférence placée à l'ouverture de la salle passe en conflit « Hors des horaires… », le toast l'annonce, `Ctrl + Z` revient en arrière.
+- [ ] Le PDF affiche les bonnes heures, y compris pour une salle qui n'ouvre pas à la même heure que les autres, et la durée réelle de chaque intervention.
+- [ ] Un planning enregistré avec l'ancienne version s'ouvre aux mêmes heures qu'avant et sans nouveau conflit.
+- [ ] Mobile (390 px) : aucune barre de défilement horizontale de page ; on peut placer une intervention en trois touchers (À planifier → carte → case) ou (case → carte).
+- [ ] Mode sombre lisible (couleurs via les variables du thème PrimeNG / du projet).
+- [ ] Heures affichées et heures du PDF identiques (le PDF formate en `Europe/Paris`, même fuseau que la Suisse).

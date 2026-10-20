@@ -1,332 +1,399 @@
-import {ActivatedRoute, RouterModule} from '@angular/router';
-import {FormsModule} from '@angular/forms';
-import {Component, inject, model, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, HostListener, inject, OnInit, signal} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs';
 
-import SharedModule from 'app/shared/shared.module';
+import {ToastModule} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
-
-import {ConfirmPopup} from 'primeng/confirmpopup';
-
-import {ConferenceService} from '../../conference/service/conference.service';
-import {forkJoin, map, switchMap, tap} from 'rxjs';
-import {Talk} from '../../../shared/components/talk-slot/talk-slot.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
-import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
-import {WorkshopService} from '../../workshop/service/workshop.service';
-import {IWorkshop} from '../../workshop/model/workshop.interface';
-import {IConference} from '../../conference/model/conference.interface';
-import {Status} from '../../enumerations/status.model';
-import {finalize} from 'rxjs/operators';
-import {SalonService} from '../../salon/service/salon.service';
-import {TimelineDay} from '../../../shared/components/talks-planning/model/timeline-day';
-import {TimelineRoom} from '../../../shared/components/talks-planning/model/timeline-room';
-import {TimelineData} from '../../../shared/components/talks-planning/model/timeline-data';
-import {IntervalMinutes} from '../../../shared/components/talks-planning/model/interval-minutes';
-import {TpComponent} from '../../../shared/components/talks-planning/tp.component';
-import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
-import {ActionsService} from '../../common/actions.service';
-import {AvailableAction} from '../../../shared/model/available-action';
-import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
-import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
+import {BottomSheetComponent} from '../../../shared/components/bottom-sheet/bottom-sheet.component';
+
+import {ConflictLine, PlanningDayBarComponent} from './desktop/planning-day-bar.component';
+import {PlaceEvent, PlanningGridComponent, SlotEvent} from './desktop/planning-grid.component';
+import {PlanningSidePanelComponent} from './desktop/planning-side-panel.component';
+import {TalkTrayComponent} from './desktop/talk-tray.component';
+import {SlotCandidatesComponent} from './desktop/slot-candidates.component';
+import {TalkInHandDirective} from './desktop/talk-in-hand.directive';
+import {PlanningMobileComponent, RoomPill} from './mobile/planning-mobile.component';
+import {StartOption, TalkDetailPanelComponent} from './talk-detail-panel.component';
+import {TalksConfigDialogComponent} from './talks-config-dialog.component';
+
+import {hhmm, isPlaced, Talk, talkKey, TimelineData} from './talks-planning-model';
+import {TalksPlanningStore, TrayFilter} from './talks-planning.store';
+import {
+    checkPlacement,
+    ConflictReason,
+    findRoomLabel,
+    firstFreeStart,
+    issuesOf,
+    startCandidates
+} from './talks-planning-utils';
+
+type MobileSheet = 'NONE' | 'TRAY' | 'SLOT' | 'DETAIL';
 
 @Component({
                selector: 'talks-planning',
-               templateUrl: './talks-planning.component.html',
+               standalone: true,
                imports: [
-                   RouterModule,
-                   FormsModule,
-                   SharedModule,
+                   ToastModule,
+                   TranslatePipe,
+
+                   ContentPageComponent,
                    ButtonBoxComponent,
                    AlertErrorComponent,
-                   MenuBoxComponent,
-
-                   ConfirmPopup,
-                   TpComponent,
                    CardComponent,
-                   ContentPageComponent,
-                   TpComponent
-               ]
+                   MenuBoxComponent,
+                   DialogBoxComponent,
+                   BottomSheetComponent,
+
+                   PlanningDayBarComponent,
+                   PlanningGridComponent,
+                   PlanningSidePanelComponent,
+                   TalkTrayComponent,
+                   SlotCandidatesComponent,
+                   TalkInHandDirective,
+                   PlanningMobileComponent,
+                   TalkDetailPanelComponent,
+                   TalksConfigDialogComponent
+               ],
+               providers: [TalksPlanningStore],
+               templateUrl: './talks-planning.component.html',
+               styleUrl: './talks-planning.component.scss',
+               changeDetection: ChangeDetectionStrategy.OnPush
            })
 export class TalksPlanningComponent implements OnInit {
-    readonly isLoading = signal<boolean>(false);
-    readonly isReadOnly = signal<boolean>(true);
-    readonly talks = model<Talk[]>([]);
-    configuration: TimelineData | undefined;
-    menuCache: AppMenuItem[] = [];
-    private readonly salonService = inject(SalonService);
-    private readonly conferenceService = inject(ConferenceService);
-    private readonly workshopService = inject(WorkshopService);
-    private readonly activatedRoute = inject(ActivatedRoute);
-    private readonly actionsService = inject(ActionsService);
-    private readonly menuItemBuilderService = inject(MenuItemBuilderService);
-    private idSalon!: string;
+    readonly store = inject(TalksPlanningStore);
 
-    get hasConfiguration(): boolean {
-        return (this.configuration?.days?.length ?? 0) > 0;
+    private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly breakpointObserver = inject(BreakpointObserver);
+    private readonly messageService = inject(MessageService);
+    private readonly translate = inject(TranslateService);
+
+    readonly isMobile = toSignal(
+        this.breakpointObserver.observe('(max-width: 991.98px)').pipe(map(state => state.matches)),
+        {initialValue: false}
+    );
+
+    readonly configDialogVisible = signal(false);
+    readonly mobileSheet = signal<MobileSheet>('NONE');
+
+    constructor() {
+        // Les messages du store sont traduits ici : la logique métier reste hors de l'UI.
+        effect(() => {
+            const toast = this.store.toast();
+            if (!toast) {
+                return;
+            }
+            const base = this.translateText(toast.key, toast.params ?? {});
+            const detail = toast.reason
+                           ? `${base}${this.translateText(toast.reason.key, toast.reason.params)}`
+                           : base;
+            this.messageService.add({key: 'bottom-center', severity: 'info', detail});
+        });
+
+        // Mobile : si la salle affichée n'a plus de place pour l'intervention en main,
+        // on bascule sur la première salle qui en a.
+        effect(() => {
+            if (!this.isMobile() || !this.store.talkInHand()) {
+                return;
+            }
+            const pills = this.mobilePills();
+            const currentId = this.store.mobileRoom()?.room.id ?? null;
+            const current = pills.find(pill => pill.room.room.id === currentId);
+            if (current?.firstFree === null) {
+                const available = pills.find(pill => pill.firstFree !== null);
+                if (available) {
+                    this.store.mobileRoomId.set(available.room.room.id);
+                }
+            }
+        });
     }
 
     ngOnInit(): void {
         this.activatedRoute.paramMap
-            .pipe(
-                map(params => params.get('idSalon')!),
-                tap(idSalon => (this.idSalon = idSalon)),
-                tap(() => this.isLoading.set(true)),
-                switchMap(idSalon =>
-                              forkJoin({
-                                           // 1) load planning (config + placements)
-                                           planning: this.salonService.getPlanningTalks(idSalon),
-                                           // 2) load talks sources
-                                           conferences: this.conferenceService
-                                                            .query({idSalon})
-                                                            .pipe(map(confs => confs.filter(conf => conf.status !== Status.REFUSED && conf.status !== Status.CANCELED))),
-                                           workshops: this.workshopService
-                                                          .query({idSalon})
-                                                          .pipe(map(works => works.filter(work => work.status !== Status.REFUSED && work.status !== Status.CANCELED)))
-                                       }).pipe(finalize(() => this.isLoading.set(false)))
-                ),
-                map(({planning, conferences, workshops}) => {
-                    // --- configuration
-                    const configuration: TimelineData = planning?.configuration
-                                                        ? this.fromTimelineDto(planning.configuration)
-                                                        : this.buildConfiguration(this.idSalon);
-
-                    // --- talks complets (depuis conf + workshop)
-                    const baseTalks: Talk[] = [
-                        ...conferences.map(con => this.toTalk(con, 'CONFERENCE', 60, 45)),
-                        ...workshops.map(work => this.toTalk(work, 'WORKSHOP', 75, 60))
-                    ];
-
-                    // --- merge placements sauvegardés
-                    const savedMap = new Map<string, TalkPlanningSaveDto>(
-                        (planning?.talks ?? []).map(t => [`${t.type}:${t.id}`, t])
-                    );
-
-                    const mergedTalks = baseTalks.map(t => {
-                        const saved = savedMap.get(`${t.type}:${t.id}`);
-                        return saved
-                               ? {
-                                ...t,
-                                roomId: saved.roomId,
-                                dayId: saved.dayId,
-                                startSlot: saved.startSlot
-                            }
-                               : t;
-                    });
-
-                    return {configuration, mergedTalks};
-                })
-            )
-            .subscribe(({configuration, mergedTalks}) => {
-                this.configuration = configuration;
-                this.talks.set(mergedTalks);
-
-                // Load available actions
-                this.loadAvailableActions();
-            });
+            .pipe(map(params => params.get('idSalon')!))
+            .subscribe(idSalon => this.store.load(idSalon));
     }
 
-    private loadAvailableActions(): void {
-        this.actionsService.getAvailableActions('salon', this.idSalon, 'talks-planning').subscribe(availableActions => {
-            this.menuCache = this.buildActionsMenu(availableActions);
-        });
-    }
-
-    private buildActionsMenu(availableActions: AvailableAction[]): AppMenuItem[] {
-        return this.menuItemBuilderService.buildMenuItemsFromActions(
-            availableActions,
-            (action, htmlElement) => this.clickAction(action, htmlElement)
-        );
-    }
-
-    clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
-        if (action.type === 'DOWNLOAD') {
-            this.isLoading.set(true);
-            this.actionsService.downloadAction(action.contextCode, this.idSalon)
-                .pipe(finalize(() => this.isLoading.set(false)))
-                .subscribe(res => {
-                    const cd = res.headers.get('content-disposition') ?? '';
-                    const filename = this.getFilenameFromContentDisposition(cd) ?? 'planning.pdf';
-
-                    const blob = res.body!;
-                    const url = window.URL.createObjectURL(blob);
-
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    a.click();
-
-                    window.URL.revokeObjectURL(url);
-                });
-        } else {
-            console.warn('Action type unknown : ' + action.type);
-        }
-    }
-
-    private getFilenameFromContentDisposition(cd: string): string | null {
-        if (!cd) {
-            return null;
-        }
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = filenameRegex.exec(cd);
-        if (matches != null && matches[1]) {
-            return matches[1].replace(/['"]/g, '');
-        }
-        return null;
-    }
-
-    activateReadOnlyMode(): void {
-        this.isReadOnly.set(true);
-        this.ngOnInit();
-    }
-
-    activateEditMode(): void {
-        this.isReadOnly.set(false);
-    }
-
-    save(): void {
-        if (!this.configuration) {
-            return;
-        }
-
-        const payload: PlanningTalksDto = {
-            configuration: this.toTimelineDto(this.configuration),
-            talks: this.talks().map(t => this.toTalkSaveDto(t))
-        };
-
-        this.isLoading.set(true);
-        this.salonService
-            .savePlanningTalks(this.idSalon, payload)
-            .pipe(finalize(() => this.isLoading.set(false)))
-            .subscribe(() => {
-                this.activateReadOnlyMode();
-            });
-    }
+    // ---------- en-tête ----------
 
     previousState(): void {
         window.history.back();
     }
 
-    private buildConfiguration(eventId: string): TimelineData {
-        const rooms: TimelineRoom[] = [];
-        const days: TimelineDay[] = [];
-
-        return {
-            eventId,
-            intervalMinutes: 30,
-            days,
-            rooms
-        };
+    save(): void {
+        this.store.save(() => this.store.activateReadOnlyMode());
     }
 
-    private toTalk(talk: IWorkshop | IConference, type: TalkType, durationTotal: number, duration: number): Talk {
-        return {
-            id: talk.id,
-            type,
-            client: talk.participation.therapistName,
-            durationTotalMinutes: durationTotal,
-            durationTalkMinutes: duration,
+    // ---------- libellés ----------
+
+    readonly conflictTitles = computed<Map<string, string>>(() => {
+        const config = this.store.configuration();
+        const titles = new Map<string, string>();
+        if (!config) {
+            return titles;
+        }
+        const talks = this.store.talks();
+        for (const talk of this.store.conflicts()) {
+            const reasons = issuesOf(talk, talks, config);
+            titles.set(talkKey(talk), reasons.map(reason => this.translateReason(reason)).join(' · '));
+        }
+        return titles;
+    });
+
+    readonly conflictLines = computed<ConflictLine[]>(() => {
+        const config = this.store.configuration();
+        if (!config) {
+            return [];
+        }
+        const talks = this.store.talks();
+        return this.store.conflicts().map(talk => {
+            const day = config.days.find(entry => entry.id === talk.dayId);
+            return {
+                key: talkKey(talk),
+                title: talk.title,
+                position: `${day?.label ?? ''} · ${hhmm(talk.startMinute ?? 0)}`,
+                reason: this.translateReason(issuesOf(talk, talks, config)[0])
+            };
+        });
+    });
+
+    readonly slotTitle = computed(() => {
+        const slot = this.store.selectedSlot();
+        const config = this.store.configuration();
+        if (!slot || !config) {
+            return '';
+        }
+        const day = config.days.find(entry => entry.id === slot.dayId);
+        return `${day?.label ?? ''} — ${findRoomLabel(config, slot.roomId)} · ${hhmm(slot.startMinute)}`;
+    });
+
+    readonly slotSubtitle = computed(() => {
+        const slot = this.store.selectedSlot();
+        return slot ? this.translateText('planningTalks.slot.subtitle', {time: hhmm(slot.startMinute)}) : '';
+    });
+
+    readonly inHandBanner = computed(() => {
+        const talk = this.store.talkInHandValue();
+        if (!talk) {
+            return '';
+        }
+        return this.translateText('planningTalks.inHand.banner', {
             title: talk.title,
-            description: talk.description,
-            roomId: null,
-            dayId: null,
-            startSlot: 0,
-            status: talk.status,
-            extraInformation: talk.extraInformation,
-            participation: {
-                therapistName: talk.participation.therapistName,
-                fullName: getExhibitorFullName(talk.participation.exhibitor)
+            durations: this.durationsOf(talk)
+        });
+    });
+
+    readonly detailReasons = computed<ConflictReason[]>(() => {
+        const talk = this.store.selectedTalk();
+        return talk ? this.store.issuesOfTalk(talk) : [];
+    });
+
+    readonly detailStartOptions = computed<StartOption[]>(() => {
+        const talk = this.store.selectedTalk();
+        const config = this.store.configuration();
+        if (!talk || !config || !talk.dayId || !talk.roomId) {
+            return [];
+        }
+        const talks = this.store.talks();
+        const busy = this.translateText('planningTalks.details.busy');
+        return startCandidates(talk, config, talk.dayId, talk.roomId).map(minute => {
+            const ok = checkPlacement(talk, talks, config, talk.dayId, talk.roomId, minute).ok;
+            return {minute, label: ok ? hhmm(minute) : `${hhmm(minute)} · ${busy}`};
+        });
+    });
+
+    /** Nombre d'interventions placées par jour, pour la confirmation de suppression dans la popin. */
+    readonly placedByDay = computed<Map<string, number>>(() => {
+        const counts = new Map<string, number>();
+        for (const talk of this.store.talks()) {
+            if (isPlaced(talk)) {
+                counts.set(talk.dayId!, (counts.get(talk.dayId!) ?? 0) + 1);
             }
-        };
+        }
+        return counts;
+    });
+
+    readonly mobilePills = computed<RoomPill[]>(() => {        const config = this.store.configuration();
+        const day = this.store.selectedDay();
+        const talk = this.store.talkInHandValue();
+        if (!config || !day) {
+            return [];
+        }
+        return this.store.gridRooms().map(room => ({
+            room,
+            firstFree: talk ? firstFreeStart(talk, this.store.talks(), config, day.id, room.room.id) : null
+        }));
+    });
+
+    durationsOf(talk: Talk): string {
+        return this.translateText('planningTalks.durations.short', {
+            prep: talk.preparationMinutes,
+            dur: talk.durationTalkMinutes,
+            clean: talk.cleanupMinutes
+        });
     }
 
-    private toTalkSaveDto(t: Talk): TalkPlanningSaveDto {
-        return {
-            id: String(t.id),
-            type: t.type as TalkType,
-            roomId: t.roomId,
-            dayId: t.dayId,
-            startSlot: t.startSlot
-        };
+    // ---------- interactions ----------
+
+    onSlotClick(slot: SlotEvent): void {
+        this.store.selectSlot(slot);
+        if (this.isMobile()) {
+            this.mobileSheet.set('SLOT');
+        }
     }
 
-    private fromTimelineDto(dto: TimelineDataDto): TimelineData {
-        return {
-            eventId: dto.eventId,
-            intervalMinutes: dto.intervalMinutes,
-            days: dto.days.map(day => ({
-                id: day.id,
-                label: day.label,
-                rooms: day.rooms.map(room => ({
-                    roomId: room.roomId,
-                    startingHour: new Date(room.startingHour),
-                    endingHour: new Date(room.endingHour)
-                }))
-            })),
-            rooms: dto.rooms.map(room => ({
-                id: room.id,
-                label: room.label
-            }))
-        };
+    onTalkClick(key: string): void {
+        this.store.selectTalk(key);
+        if (this.isMobile()) {
+            this.mobileSheet.set('DETAIL');
+        }
     }
 
-    private toTimelineDto(data: TimelineData): TimelineDataDto {
-        return {
-            eventId: data.eventId,
-            intervalMinutes: data.intervalMinutes,
-            days: data.days.map(day => ({
-                id: day.id,
-                label: day.label,
-                rooms: day.rooms.map(room => ({
-                    roomId: room.roomId,
-                    startingHour: room.startingHour.toISOString(),
-                    endingHour: room.endingHour.toISOString()
-                }))
-            })),
-            rooms: data.rooms.map(room => ({
-                id: room.id,
-                label: room.label
-            }))
-        };
+    onPlaceRequest(event: PlaceEvent): void {
+        this.store.place(event.key, event.dayId, event.roomId, event.startMinute);
+        this.store.dropInHand();
+        this.mobileSheet.set('NONE');
     }
-}
 
-export type TalkType = 'WORKSHOP' | 'CONFERENCE';
+    /** Presser une carte du bac l'arme immédiatement : le glisser affiche l'aperçu dans la grille. */
+    onTrayDragStart(event: { talk: Talk; event: PointerEvent }): void {
+        if (this.store.isEditing() && !this.store.selectedSlot()) {
+            this.store.takeInHand(talkKey(event.talk));
+        }
+    }
 
-export interface TalkPlanningSaveDto {
-    id: string;
-    type: TalkType;
-    roomId: string | null;
-    dayId: string | null;
-    startSlot: number;
-}
+    onTrayTalkChosen(talk: Talk): void {        const key = talkKey(talk);
+        if (!this.store.isEditing()) {
+            this.onTalkClick(key);
+            return;
+        }
+        const slot = this.store.selectedSlot();
+        if (slot) {
+            this.store.place(key, slot.dayId, slot.roomId, slot.startMinute);
+            this.store.selectSlot(null);
+            this.mobileSheet.set('NONE');
+            return;
+        }
+        this.store.takeInHand(key);
+        this.mobileSheet.set('NONE');
+    }
 
-export interface TimelineRoomDto {
-    id: string;
-    label: string;
-}
+    onSlotPlace(key: string): void {
+        const slot = this.store.selectedSlot();
+        if (slot) {
+            this.store.place(key, slot.dayId, slot.roomId, slot.startMinute);
+            this.mobileSheet.set('NONE');
+        }
+    }
 
-export interface TimelineDayDto {
-    id: string;
-    label: string;
-    rooms: TimeLineRoomDataDto[];
-}
+    onDetailDayChanged(dayId: string): void {
+        this.moveSelected(talk => ({...talk, dayId}));
+    }
 
-export interface TimelineDataDto {
-    eventId: string;
-    intervalMinutes: IntervalMinutes;
-    days: TimelineDayDto[];
-    rooms: TimelineRoomDto[];
-}
+    onDetailRoomChanged(roomId: string): void {
+        this.moveSelected(talk => ({...talk, roomId}));
+    }
 
-export interface TimeLineRoomDataDto {
-    roomId: string;
-    startingHour: string;
-    endingHour: string;
-}
+    onDetailStartChanged(startMinute: number): void {
+        this.moveSelected(talk => ({...talk, startMinute}));
+    }
 
-export interface PlanningTalksDto {
-    configuration: TimelineDataDto;
-    talks: TalkPlanningSaveDto[];
+    onChooseOnGrid(): void {
+        const talk = this.store.selectedTalk();
+        if (talk) {
+            this.store.takeInHand(talkKey(talk));
+            this.store.selectTalk(null);
+            this.mobileSheet.set('NONE');
+        }
+    }
+
+    onDetailRemove(): void {
+        const talk = this.store.selectedTalk();
+        if (talk) {
+            this.store.unplace(talkKey(talk));
+        }
+    }
+
+    onFocusTherapist(name: string): void {
+        this.store.focusTherapist.set(this.store.focusTherapist() === name ? null : name);
+    }
+
+    onTrayFilterChanged(filter: TrayFilter): void {
+        this.store.trayFilter.set(filter);
+    }
+
+    onTrayQueryChanged(query: string): void {
+        this.store.trayQuery.set(query);
+    }
+
+    applyConfiguration(draft: TimelineData | null): void {
+        if (draft) {
+            this.store.applyConfiguration(draft);
+        }
+        this.configDialogVisible.set(false);
+    }
+
+    openMobileTray(): void {
+        this.store.selectSlot(null);
+        this.mobileSheet.set('TRAY');
+    }
+
+    closeMobileSheet(): void {
+        this.mobileSheet.set('NONE');
+    }
+
+    private moveSelected(mutate: (talk: Talk) => Talk): void {
+        const talk = this.store.selectedTalk();
+        if (!talk) {
+            return;
+        }
+        const next = mutate(talk);
+        if (next.dayId && next.roomId && next.startMinute !== null) {
+            this.store.place(talkKey(talk), next.dayId, next.roomId, next.startMinute);
+        }
+    }
+
+    // ---------- raccourcis ----------
+
+    @HostListener('document:keydown', ['$event'])
+    onKeyDown(event: KeyboardEvent): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('input, select, textarea, .p-dialog')) {
+            return;
+        }
+        if (event.key === 'Escape') {
+            if (this.store.talkInHand()) {
+                this.store.dropInHand();
+            } else if (this.store.selectedTalkKey()) {
+                this.store.selectTalk(null);
+            } else if (this.store.selectedSlot()) {
+                this.store.selectSlot(null);
+            } else if (this.store.focusTherapist()) {
+                this.store.focusTherapist.set(null);
+            }
+            this.mobileSheet.set('NONE');
+            return;
+        }
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z' && this.store.isEditing()) {
+            event.preventDefault();
+            this.store.undo();
+        }
+    }
+
+    private translateReason(reason: ConflictReason | undefined): string {
+        return reason ? this.translateText(reason.key, reason.params) : '';
+    }
+
+    private translateText(key: string, params?: Record<string, string | number>): string {
+        return String(this.translate.instant(key, params));
+    }
 }
