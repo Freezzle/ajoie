@@ -39,7 +39,7 @@ import {TranslatePipe} from '@ngx-translate/core';
                                    </button>
                                }
                            </div>
-                           <div class="card-body overflow-auto d-flex flex-column p-2">
+                           <div class="card-body overflow-auto d-flex flex-column p-2 border-0">
                                <ng-content/>
                            </div>
                        </div>
