@@ -61,8 +61,6 @@
 
 .tp-lane {
     position: relative;
-    /* Même décalage que la colonne des heures, pour rester aligné. */
-    margin-top: 10px;
     border-left: 1px solid var(--app-border);
     background-image: repeating-linear-gradient(to bottom,
             var(--app-border) 0 1px,
