@@ -18,73 +18,79 @@
                        class="form-control form-control-sm mb-2"
                        type="search"/>
 
-                @for (exhibitor of exhibitors(); track exhibitor.stand.id) {
-                    <div (cdkDragEnded)="onDragEnded($event, {kind: 'EXHIBITOR', stand: exhibitor.stand})"
-                         (cdkDragStarted)="onDragStarted()"
-                         [cdkDragDisabled]="disabled()"
-                         cdkDrag
-                         class="fp-card">
-                        <span [style.background-color]="exhibitor.color" class="fp-card-swatch"></span>
-                        <span class="fp-card-body">
-                            <span class="fp-card-title text-ellipsis">{{ exhibitor.name }}</span>
-                            <span class="fp-card-meta text-ellipsis">{{ exhibitor.person }}</span>
-                            <span class="fp-card-meta">{{ exhibitor.categoryKey | translate }}</span>
-                        </span>
-                        <span class="fp-card-end">
-                            <span [style.background-color]="exhibitor.statusColor" class="fp-card-dot"></span>
-                            <span class="fp-card-meta">{{ exhibitor.dimensionLabel }}</span>
-                        </span>
-
-                        <div *cdkDragPreview class="fp-drag-preview">
+                <div cdkDropList cdkDropListSortingDisabled class="fp-drop-source">
+                    @for (exhibitor of exhibitors(); track exhibitor.stand.id) {
+                        <div (cdkDragEnded)="onDragEnded($event, {kind: 'EXHIBITOR', stand: exhibitor.stand})"
+                             (cdkDragStarted)="onDragStarted()"
+                             [cdkDragDisabled]="disabled()"
+                             cdkDrag
+                             class="fp-card">
                             <span [style.background-color]="exhibitor.color" class="fp-card-swatch"></span>
-                            <span class="text-ellipsis">{{ exhibitor.name }}</span>
+                            <span class="fp-card-body">
+                                <span class="fp-card-title text-ellipsis">{{ exhibitor.name }}</span>
+                                <span class="fp-card-meta text-ellipsis">{{ exhibitor.person }}</span>
+                                <span class="fp-card-meta">{{ exhibitor.categoryKey | translate }}</span>
+                            </span>
+                            <span class="fp-card-end">
+                                <span [style.background-color]="exhibitor.statusColor" class="fp-card-dot"></span>
+                                <span class="fp-card-meta">{{ exhibitor.dimensionLabel }}</span>
+                            </span>
+
+                            <div *cdkDragPreview class="fp-drag-preview">
+                                <span [style.background-color]="exhibitor.color" class="fp-card-swatch"></span>
+                                <span class="text-ellipsis">{{ exhibitor.name }}</span>
+                            </div>
                         </div>
-                    </div>
-                } @empty {
-                    <p class="text-desc" jhiTranslate="floorPlan.palette.noExhibitor"></p>
-                }
+                    } @empty {
+                        <p class="text-desc" jhiTranslate="floorPlan.palette.noExhibitor"></p>
+                    }
+                </div>
             </p-tabpanel>
 
             <!-- Emplacements vides -->
             <p-tabpanel value="1">
-                @for (card of dimensionCards(); track card.dimension.id) {
-                    @let preview = previewSize(card.widthMeter, card.depthMeter);
-                    <div (cdkDragEnded)="onDragEnded($event, {kind: 'DIMENSION', dimension: card.dimension})"
-                         (cdkDragStarted)="onDragStarted()"
-                         [cdkDragDisabled]="disabled()"
-                         cdkDrag
-                         class="fp-card">
-                        <span class="fp-card-preview">
-                            <span [style.height.px]="preview.height"
-                                  [style.width.px]="preview.width"
-                                  class="fp-preview-rect"></span>
-                        </span>
-                        <span class="fp-card-body">
-                            <span class="fp-card-title">{{ card.dimension.dimension }}</span>
-                            <span class="fp-card-meta">
-                                {{ 'floorPlan.palette.placed' | translate: {n: card.placed, need: card.needed} }}
+                <div cdkDropList cdkDropListSortingDisabled class="fp-drop-source">
+                    @for (card of dimensionCards(); track card.dimension.id) {
+                        @let preview = previewSize(card.widthMeter, card.depthMeter);
+                        <div (cdkDragEnded)="onDragEnded($event, {kind: 'DIMENSION', dimension: card.dimension})"
+                             (cdkDragStarted)="onDragStarted()"
+                             [cdkDragDisabled]="disabled()"
+                             cdkDrag
+                             class="fp-card">
+                            <span class="fp-card-preview">
+                                <span [style.height.px]="preview.height"
+                                      [style.width.px]="preview.width"
+                                      class="fp-preview-rect"></span>
                             </span>
-                            <span class="fp-progress">
-                                <span [style.width.%]="card.ratio * 100" class="fp-progress-value"></span>
+                            <span class="fp-card-body">
+                                <span class="fp-card-title">{{ card.dimension.dimension }}</span>
+                                <span class="fp-card-meta">
+                                    {{ 'floorPlan.palette.placed' | translate: {n: card.placed, need: card.needed} }}
+                                </span>
+                                <span class="fp-progress">
+                                    <span [style.width.%]="card.ratio * 100" class="fp-progress-value"></span>
+                                </span>
                             </span>
-                        </span>
-                        @if (card.missing > 0) {
-                            <span class="fp-card-end"><span class="fp-badge-missing">−{{ card.missing }}</span></span>
-                        }
+                            @if (card.missing > 0) {
+                                <span class="fp-card-end">
+                                    <span class="fp-badge-missing">−{{ card.missing }}</span>
+                                </span>
+                            }
 
-                        <div *cdkDragPreview class="fp-drag-preview">
-                            <span [style.height.px]="preview.height"
-                                  [style.width.px]="preview.width"
-                                  class="fp-preview-rect"></span>
-                            <span>{{ card.dimension.dimension }}</span>
+                            <div *cdkDragPreview class="fp-drag-preview">
+                                <span [style.height.px]="preview.height"
+                                      [style.width.px]="preview.width"
+                                      class="fp-preview-rect"></span>
+                                <span>{{ card.dimension.dimension }}</span>
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </p-tabpanel>
 
             <!-- Éléments de salle -->
             <p-tabpanel value="2">
-                <div class="fp-element-grid">
+                <div cdkDropList cdkDropListSortingDisabled class="fp-element-grid fp-drop-source">
                     @for (element of elements(); track element.type) {
                         @let preview = previewSize(element.widthMeter, element.depthMeter);
                         <div (cdkDragEnded)="onDragEnded($event, {kind: 'ELEMENT', type: element.type})"

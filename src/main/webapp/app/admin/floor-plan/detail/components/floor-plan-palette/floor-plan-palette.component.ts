@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, computed, input, output, signal} from '@angular/core';
-import {CdkDrag, CdkDragEnd, CdkDragPreview} from '@angular/cdk/drag-drop';
+import {CdkDrag, CdkDragEnd, CdkDragPreview, CdkDropList} from '@angular/cdk/drag-drop';
 import SharedModule from '../../../../../shared/shared.module';
 import {ButtonBoxComponent} from '../../../../../shared/components/button-box/button-box.component';
 import {TabsModule} from 'primeng/tabs';
@@ -70,7 +70,7 @@ export interface PaletteDrop {
                templateUrl: './floor-plan-palette.component.html',
                styleUrl: './floor-plan-palette.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush,
-               imports: [SharedModule, ButtonBoxComponent, TabsModule, CdkDrag, CdkDragPreview]
+               imports: [SharedModule, ButtonBoxComponent, TabsModule, CdkDropList, CdkDrag, CdkDragPreview]
            })
 export class FloorPlanPaletteComponent {
     readonly plans = input.required<IFloorPlan[]>();
@@ -158,7 +158,6 @@ export class FloorPlanPaletteComponent {
      * à la page, qui décide si le plan est visé.
      */
     onDragEnded(event: CdkDragEnd, template: PaletteTemplate): void {
-        event.source.reset();
         this.dropped.emit({template, clientX: event.dropPoint.x, clientY: event.dropPoint.y});
     }
 
