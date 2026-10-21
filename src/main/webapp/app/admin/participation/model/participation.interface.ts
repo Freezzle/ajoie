@@ -38,21 +38,39 @@ export interface IInfoInvoice {
     nbExpired: number;
 }
 
-export function containsParticipationName(participation: IParticipation | null,
-                                          filterText: string): boolean {
-    if (!participation || !filterText) {
-        return false;
-    }
+export function containsParticipationName(
+  participation: IParticipation | null,
+  filterText: string,
+): boolean {
+  if (!participation || !filterText) {
+    return false;
+  }
 
-    filterText = filterText.trim()?.toLocaleLowerCase();
+  filterText = filterText.trim()?.toLocaleLowerCase();
 
-    const exhibitorName = getExhibitorFullName(participation.exhibitor).toLocaleLowerCase();
+  const exhibitorName = getExhibitorFullName(participation.exhibitor).toLocaleLowerCase();
 
-    return (
-        (exhibitorName.includes(filterText) ||
-         participation.therapistName?.toLocaleLowerCase().includes(filterText)) ??
-        false
-    );
+  return (
+    (exhibitorName.includes(filterText) ||
+      participation.therapistName?.toLocaleLowerCase().includes(filterText)) ??
+    false
+  );
+}
+
+export function getOnlyParticipationName(
+  participation: IParticipation | null | undefined,
+): string {
+  if (!participation) {
+    return '-';
+  }
+
+  const exhibitorName = getExhibitorFullName(participation.exhibitor);
+
+  if (participation?.therapistName) {
+    return `${participation?.therapistName}`;
+  }
+
+  return `- (${exhibitorName})`;
 }
 
 export function getFormattedParticipationName(participation: IParticipation | null | undefined): string {

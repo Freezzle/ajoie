@@ -47,7 +47,7 @@ import {
     SvgGlyph
 } from '../../../floor-plan.glyphs';
 import {IStand} from '../../../../stand/model/stand.interface';
-import {getFormattedParticipationName} from '../../../../participation/model/participation.interface';
+import {getFormattedParticipationName, getOnlyParticipationName } from '../../../../participation/model/participation.interface';
 import {getExhibitorFullName} from '../../../../exhibitor/model/exhibitor.interface';
 
 export interface CanvasBadge {
@@ -542,9 +542,11 @@ export class FloorPlanCanvasComponent {
         const length = alongWidth ? rect.w : rect.h;
 
         for (let offset = 0.28; offset < length - 0.01; offset += 0.28) {
-            steps.push(alongWidth
-                       ? {x1: offset, y1: 0, x2: offset, y2: rect.h}
-                       : {x1: 0, y1: offset, x2: rect.w, y2: offset});
+            steps.push(
+              alongWidth
+                ? { x1: offset, y1: 0, x2: offset, y2: rect.h }
+                : { x1: 0, y1: offset, x2: rect.w, y2: offset },
+            );
         }
         return steps;
     }
@@ -559,7 +561,7 @@ export class FloorPlanCanvasComponent {
 
     private secondaryName(stand: IStand): string {
         return this.displayFullname()
-               ? getFormattedParticipationName(stand.participation)
+               ? getOnlyParticipationName(stand.participation)
                : getExhibitorFullName(stand.participation?.exhibitor);
     }
 
