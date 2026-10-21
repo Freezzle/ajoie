@@ -555,8 +555,8 @@ export class FloorPlanCanvasComponent {
 
     private primaryName(stand: IStand): string {
         return this.displayFullname()
-               ? getExhibitorFullName(stand.participation?.exhibitor)
-               : getFormattedParticipationName(stand.participation);
+          ? getExhibitorFullName(stand.participation?.exhibitor)
+          : getOnlyParticipationName(stand.participation);
     }
 
     private secondaryName(stand: IStand): string {
