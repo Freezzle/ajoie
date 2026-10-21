@@ -11,4 +11,46 @@
   --app-sucess: #83ca1a;
   --app-danger: #fd7658;
   --app-contrast: #575757;
+
+  // --- Plan de la salle -----------------------------------------------------
+  // Surfaces et traits du plan.
+  --app-surface-2: #e4ebe8;
+  --app-floor: #fbfcfb;
+  --app-grid: #e6ece9;
+  --app-grid-strong: #c7d3ce;
+  --app-edge: #71817b;
+  --app-ink: #16201d;
+  --app-muted: #596863;
+  --app-line: #d2dcd8;
+
+  // Accent et variantes adoucies des statuts d'un objet du plan.
+  --app-accent: #24564a;
+  --app-accent-ink: #ffffff;
+  --app-accent-soft: #d5e7e0;
+  --app-danger-soft: #f9dedc;
+  --app-warn: #8a5d00;
+  --app-warn-soft: #fbefd0;
+  --app-exit: #1d7a46;
+  --app-exit-soft: #dcf1e4;
+  --app-amber: #9a6400;
+  --app-amber-soft: #fbefd0;
+
+  // Couleurs de catégorie des stands.
+  --app-category-therapist: #c1d9e1;
+  --app-category-artisanat: #c1e1c1;
+  --app-category-energetic: #ffddc1;
+  --app-category-mediumnity: #d4c1e1;
+  --app-category-miscellaneous: #ffe8b5;
+  --app-category-none: #dddddd;
+
+  // Couleurs des statuts de participation.
+  // Elles reprennent exactement les classes appliquées par le pipe `colorStatus` :
+  // text-primary, text-danger, text-secondary et golden-icon.
+  --app-status-gold: #efbf00;
+  --app-status-accepted: var(--bs-primary);
+  --app-status-validated: var(--bs-primary);
+  --app-status-closed: var(--app-status-gold);
+  --app-status-verification: var(--bs-secondary);
+  --app-status-refused: var(--bs-danger);
+  --app-status-canceled: var(--bs-danger);
 }

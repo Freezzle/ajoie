@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Refonte du plan de la salle : placement libre en mètres.
+
+        Les plans eux-mêmes restent dans la colonne `data` de floor_plan_salon : leur ancien
+        format (grille de cellules) est converti à la lecture par FloorPlanMigrator, et la base
+        n'est réécrite qu'au premier enregistrement de l'écran. Aucune reprise de données ici.
+
+        Seuls les réglages du plan (grille, pas de déplacement et de rotation, aimant, tailles
+        par défaut des éléments) sont nouveaux : ils sont uniques par salon.
+    -->
+
+    <changeSet id="0.0.2-202610-floor-plan-settings" author="freezzle">
+        <createTable tableName="floor_plan_settings">
+            <column name="id" type="${uuidType}">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salon_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="floor_plan_settings" indexName="idx_floor_plan_settings_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+
+        <createIndex tableName="floor_plan_settings" indexName="ux_floor_plan_settings_salon_id" unique="true">
+            <column name="salon_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="salon_id"
+                                 baseTableName="floor_plan_settings"
+                                 constraintName="fk_floor_plan_settings__salon_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="salon"/>
+
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="floor_plan_settings"
+                                 constraintName="fk_floor_plan_settings__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+
+</databaseChangeLog>

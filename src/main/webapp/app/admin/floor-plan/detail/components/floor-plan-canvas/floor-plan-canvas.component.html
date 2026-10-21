@@ -1,0 +1,266 @@
+<svg #svg
+     (contextmenu)="onContextMenu($event)"
+     (pointerdown)="onPointerDown($event)"
+     (pointermove)="onPointerMove($event)"
+     [attr.height]="svgHeight()"
+     [attr.viewBox]="viewBox()"
+     [attr.width]="svgWidth()"
+     class="floor-plan-canvas"
+     xmlns="http://www.w3.org/2000/svg">
+
+    <defs>
+        <pattern [attr.height]="gridMeter()" [attr.width]="gridMeter()" id="fp-grid" patternUnits="userSpaceOnUse">
+            <path [attr.d]="'M ' + gridMeter() + ' 0 L 0 0 0 ' + gridMeter()"
+                  [attr.stroke-width]="hairline()"
+                  class="fp-grid-line"
+                  fill="none"/>
+        </pattern>
+
+        <pattern height="5" id="fp-grid-strong" patternUnits="userSpaceOnUse" width="5">
+            <path [attr.stroke-width]="hairline() * 1.6" class="fp-grid-line-strong" d="M 5 0 L 0 0 0 5" fill="none"/>
+        </pattern>
+
+        <pattern height="0.35" id="fp-hatch-conflict" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"
+                 width="0.35">
+            <line [attr.stroke-width]="hairline() * 2" class="fp-hatch-conflict" x1="0" x2="0" y1="0" y2="0.35"/>
+        </pattern>
+
+        <pattern height="0.3" id="fp-hatch-prereserved" patternTransform="rotate(-45)" patternUnits="userSpaceOnUse"
+                 width="0.3">
+            <line [attr.stroke-width]="hairline() * 1.4" class="fp-hatch-prereserved" x1="0" x2="0" y1="0" y2="0.3"/>
+        </pattern>
+
+        <pattern height="0.4" id="fp-hatch-aisle" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"
+                 width="0.4">
+            <line [attr.stroke-width]="hairline() * 1.2" class="fp-hatch-aisle" x1="0" x2="0" y1="0" y2="0.4"/>
+        </pattern>
+    </defs>
+
+    <!-- Sol, grille -->
+    <g class="fp-floor-layer">
+        <rect [attr.height]="plan().heightMeter"
+              [attr.stroke-width]="hairline() * 3"
+              [attr.width]="plan().widthMeter"
+              class="fp-floor"
+              x="0"
+              y="0"/>
+        <rect [attr.height]="plan().heightMeter" [attr.width]="plan().widthMeter" fill="url(#fp-grid)" x="0" y="0"/>
+        <rect [attr.height]="plan().heightMeter" [attr.width]="plan().widthMeter" fill="url(#fp-grid-strong)" x="0"
+              y="0"/>
+    </g>
+
+    <!-- Règles graduées -->
+    <g class="fp-rulers">
+        @for (tick of ticksX(); track tick.position) {
+            <line [attr.stroke-width]="hairline()"
+                  [attr.x1]="tick.position"
+                  [attr.x2]="tick.position"
+                  [attr.y1]="-rulerMeter() * (tick.major ? 0.8 : 0.4)"
+                  class="fp-ruler-tick"
+                  y2="0"/>
+            @if (tick.label) {
+                <text [attr.font-size]="rulerFontSize()"
+                      [attr.x]="tick.position"
+                      [attr.y]="-rulerMeter() * 0.95"
+                      class="fp-ruler-label">{{ tick.label }}
+                </text>
+            }
+        }
+
+        @for (tick of ticksY(); track tick.position) {
+            <line [attr.stroke-width]="hairline()"
+                  [attr.x1]="-rulerMeter() * (tick.major ? 0.8 : 0.4)"
+                  [attr.y1]="tick.position"
+                  [attr.y2]="tick.position"
+                  class="fp-ruler-tick"
+                  x2="0"/>
+            @if (tick.label) {
+                <text [attr.font-size]="rulerFontSize()"
+                      [attr.x]="-rulerMeter() * 0.95"
+                      [attr.y]="tick.position"
+                      class="fp-ruler-label fp-ruler-label-y">{{ tick.label }}
+                </text>
+            }
+        }
+
+        <text [attr.font-size]="rulerFontSize()"
+              [attr.x]="plan().widthMeter"
+              [attr.y]="plan().heightMeter + rulerMeter() * 0.8"
+              class="fp-scale-label">{{ scaleLabel() }}
+        </text>
+    </g>
+
+    <!-- Objets du plan -->
+    @for (item of items(); track item.id) {
+        <g [attr.transform]="item.transform"
+           [attr.opacity]="item.opacity"
+           [class.fp-conflict]="item.conflict"
+           [class.fp-empty]="item.empty"
+           [class.fp-mismatch]="item.mismatch"
+           [class.fp-searched]="item.searched"
+           [class.fp-selected]="item.selected"
+           class="fp-item">
+
+            <title>{{ item.title }}</title>
+
+            <rect [attr.fill]="item.fill"
+                  [attr.height]="item.h"
+                  [attr.stroke-dasharray]="item.dashed ? hairline() * 5 + ' ' + hairline() * 4 : null"
+                  [attr.stroke-width]="hairline() * (item.selected ? 3 : item.conflict || item.mismatch ? 2 : 1)"
+                  [attr.width]="item.w"
+                  class="fp-shape"
+                  x="0"
+                  y="0"/>
+
+            @if (item.prereserved) {
+                <rect [attr.height]="item.h" [attr.width]="item.w" class="fp-overlay" fill="url(#fp-hatch-prereserved)"
+                      x="0" y="0"/>
+            }
+            @if (item.conflict) {
+                <rect [attr.height]="item.h" [attr.width]="item.w" class="fp-overlay" fill="url(#fp-hatch-conflict)"
+                      x="0" y="0"/>
+            }
+
+            <!-- Marches d'un escalier -->
+            @for (step of item.steps; track $index) {
+                <line [attr.stroke-width]="hairline() * 1.2"
+                      [attr.x1]="step.x1"
+                      [attr.x2]="step.x2"
+                      [attr.y1]="step.y1"
+                      [attr.y2]="step.y2"
+                      class="fp-step"/>
+            }
+
+            <!-- Ascenseur : cadre intérieur, croix et trait de porte -->
+            @if (item.crossed) {
+                <rect [attr.height]="item.h * 0.7"
+                      [attr.stroke-width]="hairline()"
+                      [attr.width]="item.w * 0.7"
+                      [attr.x]="item.w * 0.15"
+                      [attr.y]="item.h * 0.15"
+                      class="fp-step"
+                      fill="none"/>
+                <line [attr.stroke-width]="hairline()" [attr.x2]="item.w" [attr.y2]="item.h" class="fp-step" x1="0"
+                      y1="0"/>
+                <line [attr.stroke-width]="hairline()" [attr.x1]="item.w" [attr.y2]="item.h" class="fp-step" x2="0"
+                      y1="0"/>
+                <line [attr.stroke-width]="hairline() * 2"
+                      [attr.x2]="item.w"
+                      [attr.y1]="item.h"
+                      [attr.y2]="item.h"
+                      class="fp-step"
+                      x1="0"/>
+            }
+
+            <!-- Contenu, dans le cadre de lecture -->
+            <g [attr.transform]="item.frameTransform" class="fp-frame">
+                @if (item.band; as band) {
+                    <rect [attr.height]="band.h" [attr.width]="band.w" [attr.x]="band.x" [attr.y]="band.y"
+                          class="fp-band"/>
+                    <line [attr.stroke-width]="hairline()"
+                          [attr.x1]="band.x"
+                          [attr.x2]="band.x + band.w"
+                          [attr.y1]="band.y + band.h"
+                          [attr.y2]="band.y + band.h"
+                          class="fp-band-rule"/>
+
+                    @if (band.numberText) {
+                        <text [attr.font-size]="band.numberSize"
+                              [attr.x]="band.numberX"
+                              [attr.y]="band.numberY"
+                              class="fp-number">{{ band.numberText }}
+                        </text>
+                    }
+
+                    @for (badge of band.badges; track $index) {
+                        <circle [attr.cx]="badge.cx"
+                                [attr.cy]="badge.cy"
+                                [attr.fill]="badge.filled ? badge.color : 'none'"
+                                [attr.r]="badge.r"
+                                [attr.stroke-width]="hairline() * 1.4"
+                                [attr.stroke]="badge.color"/>
+                        @if (badge.glyph) {
+                            <svg [attr.height]="badge.glyphSize"
+                                 [attr.viewBox]="badge.glyph.viewBox"
+                                 [attr.width]="badge.glyphSize"
+                                 [attr.x]="badge.cx - badge.glyphSize / 2"
+                                 [attr.y]="badge.cy - badge.glyphSize / 2">
+                                <path [attr.d]="badge.glyph.path"
+                                      [attr.fill]="badge.filled ? 'var(--app-surface)' : badge.color"/>
+                            </svg>
+                        }
+                    }
+                }
+
+                @for (line of item.lines; track $index) {
+                    <text [attr.font-size]="line.size"
+                          [attr.y]="line.y"
+                          [class.fp-text-muted]="line.muted"
+                          class="fp-text"
+                          x="0">{{ line.text }}
+                    </text>
+                }
+
+                @for (chip of item.chips; track $index) {
+                    <rect [attr.height]="chip.h"
+                          [attr.rx]="chip.h / 2"
+                          [attr.stroke-dasharray]="chip.active ? null : hairline() * 3 + ' ' + hairline() * 3"
+                          [attr.stroke-width]="hairline()"
+                          [attr.width]="chip.w"
+                          [attr.x]="chip.x"
+                          [attr.y]="chip.y"
+                          [class.fp-chip-active]="chip.active"
+                          class="fp-chip"/>
+                    <svg [attr.height]="chip.glyphSize"
+                         [attr.viewBox]="chip.glyph.viewBox"
+                         [attr.width]="chip.glyphSize"
+                         [attr.x]="chip.glyphX"
+                         [attr.y]="chip.glyphY">
+                        <path [attr.d]="chip.glyph.path"
+                              [attr.class]="chip.active ? 'fp-chip-glyph-active' : 'fp-chip-glyph'"/>
+                    </svg>
+                    @if (chip.label) {
+                        <text [attr.font-size]="chip.labelSize"
+                              [attr.x]="chip.labelX"
+                              [attr.y]="chip.labelY"
+                              class="fp-chip-label">{{ chip.label }}
+                        </text>
+                    }
+                }
+            </g>
+
+            <!-- Sélection : contour, poignée de rotation et poignée de taille -->
+            @if (item.selected) {
+                <rect [attr.height]="item.h + hairline() * 6"
+                      [attr.stroke-dasharray]="hairline() * 5 + ' ' + hairline() * 4"
+                      [attr.stroke-width]="hairline() * 2"
+                      [attr.width]="item.w + hairline() * 6"
+                      [attr.x]="-hairline() * 3"
+                      [attr.y]="-hairline() * 3"
+                      class="fp-selection"/>
+
+                @if (!readOnly()) {
+                    <line [attr.stroke-width]="hairline() * 2"
+                          [attr.x1]="item.w / 2"
+                          [attr.x2]="item.w / 2"
+                          [attr.y1]="-hairline() * 3"
+                          [attr.y2]="-handleRadius() * 3"
+                          class="fp-handle-stem"/>
+                    <circle (pointerdown)="onRotationHandleDown($event)"
+                            [attr.cx]="item.w / 2"
+                            [attr.cy]="-handleRadius() * 3"
+                            [attr.r]="handleRadius()"
+                            class="fp-handle fp-handle-rotate"/>
+
+                    @if (item.kind === 'ELEMENT') {
+                        <circle (pointerdown)="onResizeHandleDown($event)"
+                                [attr.cx]="item.w"
+                                [attr.cy]="item.h"
+                                [attr.r]="handleRadius()"
+                                class="fp-handle fp-handle-resize"/>
+                    }
+                }
+            }
+        </g>
+    }
+</svg>

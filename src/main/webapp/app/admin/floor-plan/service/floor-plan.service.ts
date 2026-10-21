@@ -1,58 +1,91 @@
 import {inject, Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {IFloorPlanDataLight, IFloorPlanLight} from '../floor-plan.model';
+import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {ApplicationConfigService} from '../../../core/config/application-config.service';
-import {map} from 'rxjs/operators';
+import {IFloorElement, IFloorLocation, IFloorPlan} from '../floor-plan.model';
+
+/** Contenu de la colonne `data` d'un plan, tel qu'il circule avec le serveur. */
+interface IFloorPlanData {
+    widthMeter: number;
+    heightMeter: number;
+    locations: IFloorLocation[];
+    elements: IFloorElement[];
+}
+
+interface IFloorPlanPayload {
+    id: string | null;
+    position: number;
+    name: string;
+    data: string;
+}
 
 @Injectable({providedIn: 'root'})
 export class FloorPlanService {
-    protected http = inject(HttpClient);
-    protected applicationConfigService = inject(ApplicationConfigService);
-    protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
+    private readonly http = inject(HttpClient);
+    private readonly applicationConfigService = inject(ApplicationConfigService);
+    private readonly resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
 
-    batchSave(idSalon: string, floorPlans: IFloorPlanLight[], idsToDelete: string[]): Observable<IFloorPlanLight[]> {
+    load(idSalon: string): Observable<IFloorPlan[]> {
+        return this.http.get<IFloorPlanPayload[]>(`${this.resourceUrl}/${idSalon}/floor-plan`)
+                   .pipe(map(plans => plans.map(plan => fromPayload(plan))));
+    }
+
+    batchSave(idSalon: string, floorPlans: IFloorPlan[], idsToDelete: string[]): Observable<IFloorPlan[]> {
         const payload = {
-            floorPlans: floorPlans.map(fp => this.mapFloorPlanToBackend(fp)),
-            idsToDelete: idsToDelete
+            floorPlans: floorPlans.map(plan => toPayload(plan)),
+            idsToDelete
         };
 
-        return this.http.put<{ floorPlans: any[] }>(`${this.resourceUrl}/${idSalon}/floor-plans`, payload)
-                   .pipe(
-                       map(response => response.floorPlans.map(fp => this.mapFloorPlanFromBackend(fp)))
-                   );
+        return this.http.put<{ floorPlans: IFloorPlanPayload[] }>(
+            `${this.resourceUrl}/${idSalon}/floor-plans`, payload
+        ).pipe(map(response => response.floorPlans.map(plan => fromPayload(plan))));
     }
+}
 
-    load(idSalon: string): Observable<IFloorPlanLight[]> {
-        return this.http.get<IFloorPlanLight[]>(`${this.resourceUrl}/${idSalon}/floor-plan`)
-                   .pipe(map(floors => floors.map(this.mapFloorPlanFromBackend)));
+function fromPayload(payload: IFloorPlanPayload): IFloorPlan {
+    const data = parseData(payload.data);
+    return {
+        id: payload.id,
+        position: payload.position,
+        name: payload.name,
+        widthMeter: data.widthMeter ?? 20,
+        heightMeter: data.heightMeter ?? 10,
+        locations: (data.locations ?? []).map(location => ({
+            ...location,
+            rotationDeg: location.rotationDeg ?? 0
+        })),
+        elements: (data.elements ?? []).map(element => ({
+            ...element,
+            rotationDeg: element.rotationDeg ?? 0,
+            blockingOverride: element.blockingOverride ?? null
+        }))
+    };
+}
+
+function toPayload(plan: IFloorPlan): IFloorPlanPayload {
+    const data: IFloorPlanData = {
+        widthMeter: plan.widthMeter,
+        heightMeter: plan.heightMeter,
+        locations: plan.locations,
+        elements: plan.elements
+    };
+
+    return {
+        id: plan.id,
+        position: plan.position,
+        name: plan.name,
+        data: JSON.stringify(data)
+    };
+}
+
+function parseData(raw: string | null): Partial<IFloorPlanData> {
+    if (!raw) {
+        return {};
     }
-
-    private mapFloorPlanFromBackend(result: {
-        id: string | null,
-        position: number,
-        name: string,
-        data: any
-    }): IFloorPlanLight {
-        return {
-            id: result.id,
-            position: result.position,
-            name: result.name,
-            data: JSON.parse(result.data) as IFloorPlanDataLight
-        };
-    }
-
-    private mapFloorPlanToBackend(result: IFloorPlanLight): {
-        id: string | null,
-        position: number,
-        name: string,
-        data: any
-    } {
-        return {
-            id: result.id,
-            position: result.position,
-            name: result.name,
-            data: JSON.stringify(result.data)
-        };
+    try {
+        return JSON.parse(raw) as Partial<IFloorPlanData>;
+    } catch {
+        return {};
     }
 }

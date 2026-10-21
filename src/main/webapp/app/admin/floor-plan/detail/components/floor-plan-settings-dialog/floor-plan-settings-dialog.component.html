@@ -1,0 +1,241 @@
+<div class="row">
+
+    <!-- ── Grille et pas ───────────────────────────────────────────────── -->
+    <div class="col-12">
+        <div class="small text-muted mb-1" jhiTranslate="floorPlan.settings.gridAndSteps"></div>
+        <svg class="fp-settings-preview mb-3" viewBox="0 0 8 1.6" xmlns="http://www.w3.org/2000/svg">
+            @for (line of previewGridLines(); track line) {
+                <line [attr.x1]="line" [attr.x2]="line" class="fp-preview-grid" y1="0" y2="1.6"/>
+            }
+            @for (dot of previewDots(); track dot) {
+                <circle [attr.cx]="dot" class="fp-preview-dot" cy="1.45" r="0.035"/>
+            }
+            <rect [attr.x]="previewStandX()" class="fp-preview-stand" height="0.55" width="3" y="0.25"/>
+            <text [attr.x]="previewStandX() + 0.12" class="fp-preview-label" y="0.58">
+                x = {{ previewStandX() }} m
+            </text>
+            <g [attr.transform]="'rotate(' + draftSettings().rotationStepDeg + ' 6.9 1.1)'">
+                <rect class="fp-preview-rotated" height="0.4" width="1.2" x="6.3" y="0.9"/>
+            </g>
+        </svg>
+    </div>
+
+    <div class="col-12 col-lg-6 mb-3">
+        <div class="small text-muted mb-1" jhiTranslate="floorPlan.settings.grid"></div>
+        <p-selectbutton (ngModelChange)="setGrid($event)"
+                        [allowEmpty]="false"
+                        [ngModel]="draftSettings().gridMeter"
+                        [options]="gridOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        size="small"/>
+        <div class="form-text" jhiTranslate="floorPlan.settings.gridHelp"></div>
+    </div>
+
+    <div class="col-12 col-lg-6 mb-3">
+        <div class="small text-muted mb-1" jhiTranslate="floorPlan.settings.move"></div>
+        <p-selectbutton (ngModelChange)="setMoveStep($event)"
+                        [allowEmpty]="false"
+                        [ngModel]="draftSettings().moveStepMeter"
+                        [options]="moveOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        size="small"/>
+        <div class="form-text" jhiTranslate="floorPlan.settings.moveHelp"></div>
+    </div>
+
+    <div class="col-12 col-lg-6 mb-3">
+        <div class="small text-muted mb-1" jhiTranslate="floorPlan.settings.rotation"></div>
+        <p-selectbutton (ngModelChange)="setRotationStep($event)"
+                        [allowEmpty]="false"
+                        [ngModel]="draftSettings().rotationStepDeg"
+                        [options]="rotationOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        size="small"/>
+        <div class="form-text" jhiTranslate="floorPlan.settings.rotationHelp"></div>
+    </div>
+
+    <div class="col-12 col-lg-6 mb-3">
+        <div class="small text-muted mb-1" jhiTranslate="floorPlan.settings.magnet"></div>
+        <div class="form-check form-switch">
+            <input (change)="setMagnet(!draftSettings().magnet)"
+                   [checked]="draftSettings().magnet"
+                   class="form-check-input"
+                   id="fp-settings-magnet"
+                   role="switch"
+                   type="checkbox"/>
+            <label class="form-check-label" for="fp-settings-magnet"
+                   jhiTranslate="floorPlan.settings.magnet"></label>
+        </div>
+        <div class="form-text" jhiTranslate="floorPlan.settings.magnetHelp"></div>
+    </div>
+
+    <!-- ── Plans ──────────────────────────────────────────────────────── -->
+    <div class="col-12 mt-4">
+        <div class="small text-muted mb-2" jhiTranslate="floorPlan.settings.plans"></div>
+
+        @for (row of draftPlans(); track $index; let index = $index) {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row align-items-end g-2">
+                        <div class="col-auto">
+                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                <button (click)="movePlan(index, -1)"
+                                        [disabled]="index === 0"
+                                        class="btn btn-outline-secondary"
+                                        type="button">↑
+                                </button>
+                                <button (click)="movePlan(index, 1)"
+                                        [disabled]="index === draftPlans().length - 1"
+                                        class="btn btn-outline-secondary"
+                                        type="button">↓
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm">
+                            <label [for]="'fp-plan-name-' + index" class="form-label small text-muted mb-1"
+                                   jhiTranslate="floorPlan.name"></label>
+                            <input (input)="onPlanNameInput(row, $event)"
+                                   [id]="'fp-plan-name-' + index"
+                                   [value]="row.plan.name"
+                                   class="form-control form-control-sm"
+                                   type="text"/>
+                        </div>
+
+                        <div class="col-6 col-sm-auto">
+                            <label [for]="'fp-plan-width-' + index" class="form-label small text-muted mb-1"
+                                   jhiTranslate="floorPlan.width"></label>
+                            <input (input)="onPlanWidthInput(row, $event)"
+                                   [id]="'fp-plan-width-' + index"
+                                   [value]="row.plan.widthMeter"
+                                   class="form-control form-control-sm fp-settings-number"
+                                   min="2"
+                                   step="0.5"
+                                   type="number"/>
+                        </div>
+
+                        <div class="col-6 col-sm-auto">
+                            <label [for]="'fp-plan-height-' + index" class="form-label small text-muted mb-1"
+                                   jhiTranslate="floorPlan.depth"></label>
+                            <input (input)="onPlanHeightInput(row, $event)"
+                                   [id]="'fp-plan-height-' + index"
+                                   [value]="row.plan.heightMeter"
+                                   class="form-control form-control-sm fp-settings-number"
+                                   min="2"
+                                   step="0.5"
+                                   type="number"/>
+                        </div>
+
+                        <div class="col-auto">
+                            <span class="badge text-bg-light">{{ row.objectCount }}</span>
+                        </div>
+
+                        <div class="col-auto">
+                            <button-box (clickedEvent)="requestRemovePlan(index)"
+                                        [showText]="false"
+                                        primeIcon="pi-trash"
+                                        translateKey="common.delete"
+                                        type="danger"/>
+                        </div>
+                    </div>
+
+                    @if (pendingDeleteIndex === index) {
+                        <div class="alert alert-warning d-flex align-items-center flex-wrap gap-2 mt-3 mb-0 py-2">
+                            <span class="small">
+                                {{ 'floorPlan.settings.deleteConfirm' | translate: {n: row.standCount} }}
+                            </span>
+                            <div class="ms-auto d-flex gap-2">
+                                <button-box (clickedEvent)="cancelRemovePlan()"
+                                            translateKey="floorPlan.settings.keep"
+                                            type="secondary"/>
+                                <button-box (clickedEvent)="removePlan(index)"
+                                            translateKey="common.delete"
+                                            type="danger"/>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <button-box (clickedEvent)="addPlan()"
+                    primeIcon="pi-plus"
+                    translateKey="floorPlan.settings.addPlan"
+                    type="secondary"/>
+        <div class="form-text" jhiTranslate="floorPlan.settings.shrinkHelp"></div>
+    </div>
+
+    <!-- ── Éléments ───────────────────────────────────────────────────── -->
+    <div class="col-12 mt-4">
+        <div class="small text-muted mb-2" jhiTranslate="floorPlan.settings.elements"></div>
+
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-1">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col" jhiTranslate="floorPlan.element.type"></th>
+                    <th scope="col" jhiTranslate="floorPlan.width"></th>
+                    <th scope="col" jhiTranslate="floorPlan.depth"></th>
+                    <th class="text-end" scope="col" jhiTranslate="floorPlan.element.blocking"></th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (type of elementTypes; track type) {
+                        @let setting = elementSetting(type);
+                        @let preview = previewSize(type);
+                        <tr>
+                            <td class="fp-settings-preview-cell">
+                                <span [class.non-blocking]="!setting.blocking"
+                                      [style.height.px]="preview.height"
+                                      [style.width.px]="preview.width"
+                                      class="fp-preview-rect"></span>
+                            </td>
+                            <td>{{ elementTypeKey(type) | translate }}</td>
+                            <td>
+                                <input (input)="onElementWidthInput(type, $event)"
+                                       [value]="setting.widthMeter"
+                                       class="form-control form-control-sm fp-settings-number"
+                                       min="0.1"
+                                       step="0.1"
+                                       type="number"/>
+                            </td>
+                            <td>
+                                <input (input)="onElementDepthInput(type, $event)"
+                                       [value]="setting.depthMeter"
+                                       class="form-control form-control-sm fp-settings-number"
+                                       min="0.1"
+                                       step="0.1"
+                                       type="number"/>
+                            </td>
+                            <td class="text-end">
+                                <div class="form-check form-switch d-inline-block">
+                                    <input (change)="toggleElementBlocking(type)"
+                                           [checked]="setting.blocking"
+                                           [id]="'fp-element-blocking-' + type"
+                                           class="form-check-input"
+                                           role="switch"
+                                           type="checkbox"/>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="form-text" jhiTranslate="floorPlan.settings.elementsHelp"></div>
+    </div>
+
+    <!-- ── Erreurs de validation ──────────────────────────────────────── -->
+    @if (errors().length) {
+        <div class="col-12 mt-3">
+            <div class="alert alert-danger mb-0 py-2">
+                @for (error of errors(); track $index) {
+                    <div class="small">{{ error }}</div>
+                }
+            </div>
+        </div>
+    }
+</div>

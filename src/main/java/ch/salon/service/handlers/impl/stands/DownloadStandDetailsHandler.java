@@ -3,14 +3,14 @@ package ch.salon.service.handlers.impl.stands;
 import ch.salon.domain.*;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.*;
+import ch.salon.service.FloorPlanMigrator;
 import ch.salon.service.document.DocumentCreator;
+import ch.salon.service.dto.FloorPlanDataDTO;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.DocumentActionHandler;
 import ch.salon.service.handlers.enums.ContextActionType;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class DownloadStandDetailsHandler implements DocumentActionHandler<Salon>
     private final FloorPlanSalonRepository floorPlanSalonRepository;
     private final PlanningTalksSalonRepository planningTalksSalonRepository;
     private final PriceStandSalonRepository priceStandSalonRepository;
-    private final ObjectMapper objectMapper;
+    private final FloorPlanMigrator floorPlanMigrator;
 
     @Override
     public ActionSupport supports(Salon payload, Map<String, Object> context) {
@@ -134,40 +134,21 @@ public class DownloadStandDetailsHandler implements DocumentActionHandler<Salon>
             }
 
             try {
-                JsonNode rootNode = objectMapper.readTree(floorPlan.getData());
-                JsonNode cellsNode = rootNode.get("cells");
+                // Les anciens plans (grille de cellules) sont convertis à la volée.
+                FloorPlanDataDTO data = floorPlanMigrator.read(floorPlan.getData());
 
-                if (cellsNode != null && cellsNode.isArray()) {
-                    for (JsonNode rowNode : cellsNode) {
-                        if (rowNode.isArray()) {
-                            for (JsonNode cellNode : rowNode) {
-                                JsonNode dimensionNode = cellNode.get("dimension");
-                                if (dimensionNode != null && !dimensionNode.isNull()) {
-                                    JsonNode standNode = dimensionNode.get("stand");
-                                    if (standNode != null && !standNode.isNull()) {
-                                        JsonNode standIdNode = standNode.get("id");
-                                        JsonNode positionNode = dimensionNode.get("position");
-                                        JsonNode idDimensionNode = dimensionNode.get("idDimension");
-
-                                        if (standIdNode != null && !standIdNode.isNull()) {
-                                            UUID standId = UUID.fromString(standIdNode.asText());
-                                            Integer position = positionNode != null && !positionNode.isNull()
-                                                    ? positionNode.asInt()
-                                                    : null;
-
-                                            // Récupérer le label de dimension depuis la map
-                                            String dimensionLabel = null;
-                                            if (idDimensionNode != null && !idDimensionNode.isNull()) {
-                                                dimensionLabel = dimensionLabels.get(idDimensionNode.asText());
-                                            }
-
-                                            result.put(standId, new StandPositionInfo(floorPlan.getName(), position, dimensionLabel));
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                for (FloorPlanDataDTO.FloorLocationDTO location : data.getLocations()) {
+                    FloorPlanDataDTO.StandRefDTO stand = location.getStand();
+                    if (stand == null || stand.getId() == null) {
+                        continue;
                     }
+
+                    UUID standId = UUID.fromString(stand.getId());
+                    String dimensionLabel = location.getIdDimension() != null
+                            ? dimensionLabels.get(location.getIdDimension())
+                            : null;
+
+                    result.put(standId, new StandPositionInfo(floorPlan.getName(), location.getPosition(), dimensionLabel));
                 }
             } catch (Exception e) {
                 LOGGER.warn("Error parsing floor plan data for plan {}: {}", floorPlan.getId(), e.getMessage());

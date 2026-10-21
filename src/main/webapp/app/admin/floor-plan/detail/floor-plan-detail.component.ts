@@ -6,74 +6,117 @@ import {
     effect,
     ElementRef,
     inject,
-    model,
     signal,
-    ViewChild
+    viewChild
 } from '@angular/core';
-import {CdkDragDrop, CdkDragMove, CdkDropList} from '@angular/cdk/drag-drop';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {distinctUntilChanged, finalize, map, startWith} from 'rxjs/operators';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {combineLatest, fromEvent} from 'rxjs';
+import {finalize, map} from 'rxjs/operators';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {v4 as uuid} from 'uuid';
+
+import {MenuItem, MessageService, PrimeIcons} from 'primeng/api';
+import {TranslateService} from '@ngx-translate/core';
+import {ContextMenu} from 'primeng/contextmenu';
+import {TabsModule} from 'primeng/tabs';
+import {Textarea} from 'primeng/textarea';
+import {IftaLabel} from 'primeng/iftalabel';
+import {SelectButton} from 'primeng/selectbutton';
+import {InputNumber} from 'primeng/inputnumber';
 
 import SharedModule from '../../../shared/shared.module';
-import {CommonModule} from '@angular/common';
+import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
+import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
+import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
+import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
+
+import {FloorPlanCanvasComponent} from './components/floor-plan-canvas/floor-plan-canvas.component';
+import {
+    FloorPlanPaletteComponent,
+    PaletteDrop,
+    PaletteTemplate
+} from './components/floor-plan-palette/floor-plan-palette.component';
+import {FloorPlanInspectorComponent} from './components/floor-plan-inspector/floor-plan-inspector.component';
+import {
+    FloorPlanSettingsDialogComponent,
+    SettingsResult
+} from './components/floor-plan-settings-dialog/floor-plan-settings-dialog.component';
 
 import {
-    AddPlanInfo,
-    convertAvailableDimensionCell,
-    convertAvailableDimensionCells,
-    DimensionCell,
-    getColorStand,
-    GridCell,
+    DEFAULT_ELEMENT_TYPES,
+    defaultFloorPlanSettings,
+    dimensionSizeOf,
+    emptyFloorPlan,
+    FloorElementType,
+    formatSize,
+    IFloorElement,
+    IFloorLocation,
     IFloorPlan,
-    IFloorPlanData,
-    mapFloorPlan,
-    mapFloorPlanLight
+    IFloorPlanSettings,
+    sortedDimensions
 } from '../floor-plan.model';
+import {
+    angleTo,
+    clamp,
+    FREE_STEP,
+    inside,
+    normalizeAngle,
+    PlacementOptions,
+    placeAt,
+    Point,
+    Rect,
+    round3,
+    snapAngle
+} from '../floor-plan.geometry';
+import {
+    applyRect,
+    computeConflicts,
+    conflictsById,
+    FloorConflict,
+    FloorObject,
+    objectsOf
+} from '../floor-plan.conflicts';
 
 import {IStand} from '../../stand/model/stand.interface';
 import {StandService} from '../../stand/service/stand.service';
-import {FloorPlanService} from '../service/floor-plan.service';
 import {SalonService} from '../../salon/service/salon.service';
 import {ISalon} from '../../salon/model/salon.interface';
+import {IPriceStandSalon} from '../../salon/model/price-stand-salon.interface';
 import {Status} from '../../enumerations/status.model';
-import {v4} from 'uuid';
-import {getExhibitorFullName, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
-
-import {ConfirmPopup} from 'primeng/confirmpopup';
-
-import {ContextMenu} from 'primeng/contextmenu';
-import {MenuItem, PrimeIcons} from 'primeng/api';
-import {Tag} from 'primeng/tag';
-import {Divider} from 'primeng/divider';
-import {Textarea} from 'primeng/textarea';
-import {IftaLabel} from 'primeng/iftalabel';
-import {TabsModule} from 'primeng/tabs';
-
-import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-
-import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {FloorPlanDimensionTileComponent} from './floor-plan-dimension-tile/floor-plan-dimension-tile.component';
-import {CardComponent} from '../../../shared/components/card/card.component';
-import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
-import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
-import StatusPipe from '../../../shared/pipe/status.pipe';
-import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
-import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
-import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
-
-import {getFormattedParticipationName} from '../../participation/model/participation.interface';
-import {Category, formatterCategory} from '../../enumerations/category.model';
-import {removeAccents} from '../../../shared/utils/string.util';
+import {FloorPlanService} from '../service/floor-plan.service';
+import {FloorPlanSettingsService} from '../service/floor-plan-settings.service';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
-import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
-import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
 import {ActionsService} from '../../common/actions.service';
 import {AvailableAction} from '../../../shared/model/available-action';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
+import {getFormattedParticipationName} from '../../participation/model/participation.interface';
+import {getExhibitorFullName, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
+import {removeAccents} from '../../../shared/utils/string.util';
+
+type DragMode = 'MOVE' | 'ROTATE' | 'RESIZE';
+
+interface DragState {
+    mode: DragMode;
+    objectId: string;
+    origin: Rect;
+    start: Point;
+    moved: boolean;
+}
+
+interface HistoryEntry {
+    plans: IFloorPlan[];
+    settings: IFloorPlanSettings;
+    idsToDelete: string[];
+}
+
+const HISTORY_LIMIT = 100;
+const MIN_PPM = 6;
+const MAX_PPM = 90;
 
 @Component({
                selector: 'floor-plan',
@@ -82,679 +125,1157 @@ import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.se
                changeDetection: ChangeDetectionStrategy.OnPush,
                imports: [
                    SharedModule,
-                   CommonModule,
                    RouterModule,
-                   CdkDropList,
                    FormsModule,
                    ReactiveFormsModule,
-                   ButtonBoxComponent,
-
-                   AlertErrorComponent,
-                   ConfirmPopup,
-
+                   TabsModule,
+                   SelectButton,
+                   InputNumber,
                    ContextMenu,
-                   Tag,
-                   FloorPlanDimensionTileComponent,
-                   CardComponent,
-                   ContentPageComponent,
-                   ColorStatusPipe,
-                   StatusPipe,
                    Textarea,
                    IftaLabel,
-                   DialogBoxComponent,
-                   Divider,
-                   SelectBoxComponent,
-                   TextBoxComponent,
-                   TabsModule,
+                   ContentPageComponent,
+                   CardComponent,
+                   ButtonBoxComponent,
                    MenuBoxComponent,
-                   NumberBoxComponent
+                   DialogBoxComponent,
+                   SelectBoxComponent,
+                   AlertErrorComponent,
+                   FloorPlanCanvasComponent,
+                   FloorPlanPaletteComponent,
+                   FloorPlanInspectorComponent,
+                   FloorPlanSettingsDialogComponent
                ]
            })
 export class FloorPlanDetailComponent {
-    @ViewChild('cm', {static: true}) cm!: ContextMenu;
-    @ViewChild('gridDropList') gridContainer!: ElementRef<HTMLElement>;
-
-    readonly PIXELS = 20;
-    readonly DEFAULT_HIGHLIGHT = '#FFFFFF';
-
-    // ---- services / infra
     private readonly destroyRef = inject(DestroyRef);
+    private readonly route = inject(ActivatedRoute);
     private readonly salonService = inject(SalonService);
     private readonly standService = inject(StandService);
     private readonly floorPlanService = inject(FloorPlanService);
-    readonly navigationService = inject(NavigationStateService);
-    private readonly route = inject(ActivatedRoute);
+    private readonly floorPlanSettingsService = inject(FloorPlanSettingsService);
     private readonly actionsService = inject(ActionsService);
     private readonly menuItemBuilderService = inject(MenuItemBuilderService);
+    private readonly messageService = inject(MessageService);
+    private readonly translateService = inject(TranslateService);
+    readonly navigationService = inject(NavigationStateService);
 
-    // ---- route salon (signal)
+    readonly canvas = viewChild<FloorPlanCanvasComponent>('canvas');
+    readonly viewport = viewChild<ElementRef<HTMLElement>>('viewport');
+    readonly contextMenu = viewChild<ContextMenu>('cm');
+
+    // ------------------------------------------------------------------ état
+
     private readonly salonFromRoute = toSignal(
-        this.route.data.pipe(map(d => d['salon'] as ISalon | undefined)),
+        this.route.data.pipe(map(data => data['salon'] as ISalon | undefined)),
         {initialValue: undefined}
     );
     readonly salon = computed(() => this.salonFromRoute() ?? undefined);
 
-    // ---- UI/state (signals)
     readonly isLoading = signal(false);
     readonly isReadOnly = signal(true);
-    readonly dialogActionPending = signal(false);
 
-    readonly displayFullname = signal(false);
-    readonly displayTechnical = signal(false);
-    readonly showDimensions = signal(false);
-    readonly showAvailableStands = signal(false);
-    readonly showSearchStands = signal(false);
-    readonly displayHeader = signal(true);
-
-    readonly isDragging = signal(false);
-    private draggingCell: GridCell | null = null;
-
-    readonly idDisplaySensibleInformation = signal<string | null>(null);
-    readonly menuCache = signal<AppMenuItem[]>([]);
-
-    // dialogs (model = 2-way friendly)
-    readonly standDialogVisible = model(false);
-    readonly prereservedDialogVisible = model(false);
-    readonly renameDialogVisible = model(false);
-    readonly deleteDialogVisible = signal(false);
-    readonly addDialogVisible = signal(false);
-
-    readonly selectStandDialog = signal<GridCell | null>(null);
-
-    // ---- data (signals)
     readonly floorPlans = signal<IFloorPlan[]>([]);
+    readonly settings = signal<IFloorPlanSettings>(defaultFloorPlanSettings());
     readonly activeIndex = signal(0);
+    readonly floorPlansToRemove = signal<string[]>([]);
 
     readonly stands = signal<IStand[]>([]);
-    readonly availableDimensions = signal<DimensionCell[]>([]);
-    readonly unassignedStandDimensions = signal<DimensionCell[]>([]);
-    readonly assignedStandDimensions = signal<DimensionCell[]>([]);
+    readonly dimensions = signal<IPriceStandSalon[]>([]);
 
-    private readonly floorPlansToRemove = signal<string[]>([]);
+    readonly selectedId = signal<string | null>(null);
+    readonly searchedId = signal<string | null>(null);
+    readonly nextAngleDeg = signal(0);
 
-    // ---- forms (keep as is)
-    readonly searchDimensionCell = new FormControl<DimensionCell | null>(null);
-    readonly nextPosition = new FormControl<number | null>(1);
+    /** Repli manuel des panneaux, pour rendre de la largeur au plan. */
+    readonly leftPanelCollapsed = signal(false);
+    readonly rightPanelCollapsed = signal(false);
+
+    readonly pixelsPerMeter = signal(30);
+    readonly displayTechnical = signal(false);
+    readonly displayFullname = signal(false);
+    readonly displayHeader = signal(true);
+    readonly snapEnabled = signal(true);
     readonly isNumberAttribution = signal(false);
     readonly automaticallyIncrementNumber = signal(true);
-    readonly renamePlanName = new FormControl<string>('');
+    readonly nextPosition = new FormControl<number | null>(1);
 
-    // Add plan form controls
-    readonly addPlanName = new FormControl<string>('');
-    readonly addPlanWidth = new FormControl<number>(30);
-    readonly addPlanHeight = new FormControl<number>(15);
-    readonly addPlanSpacing = new FormControl<number>(0.5);
-
-    // ---- derived (computed)
-    readonly activePlan = computed(() => this.floorPlans()[this.activeIndex()] ?? null);
-    readonly activeData = computed(() => this.activePlan()?.data ?? null);
-    readonly activeCells = computed(() => this.activeData()?.cells ?? []);
-
-    readonly sizeRealCell = computed(() => {
-        const d = this.activeData();
-        return d ? 1 / d.spacingMeter : 0;
-    });
-
-    // context menu items per plan (fix PrimeNG 20 bug)
-    readonly planContextMenus = computed(() => {
-        const plans = this.floorPlans();
-        const menuMap = new Map<number, MenuItem[]>();
-        for (let idx = 0; idx < plans.length; idx++) {
-            menuMap.set(idx, this.buildContextMenuItemsForPlanIndex(idx));
-        }
-        return menuMap;
-    });
-
-    readonly nbWidthTiles = computed(() => {
-        const d = this.activeData();
-        return d ? d.widthMeter * this.sizeRealCell() : 0;
-    });
-
-    readonly nbHeightTiles = computed(() => {
-        const d = this.activeData();
-        return d ? d.heightMeter * this.sizeRealCell() : 0;
-    });
-
-    // context menu
+    readonly cursor = signal<Point | null>(null);
+    readonly menuCache = signal<AppMenuItem[]>([]);
     readonly contextMenuItems = signal<MenuItem[]>([]);
 
-    // prereserved
-    prereservedNote: string | null = null;
-    private prereservedTargetDimension: DimensionCell | null = null;
+    /** Sélecteur segmenté « Exposant / Technique », relocalisé au changement de langue. */
+    private readonly currentLang = toSignal(this.translateService.onLangChange, {initialValue: null});
+    readonly viewModeOptions = computed(() => {
+        this.currentLang();
+        return [
+            {label: this.translateService.instant('floorPlan.view.exhibitor') as string, value: false},
+            {label: this.translateService.instant('floorPlan.view.technical') as string, value: true}
+        ];
+    });
 
-    // single/double click
-    private clickTimer: any;
-    private readonly clickDelay = 140;
+    readonly settingsDialogVisible = signal(false);
+    readonly settingsDialogNewPlanName = signal<string | null>(null);
+    readonly standDialogVisible = signal(false);
+    readonly prereservedDialogVisible = signal(false);
+    readonly searchDialogVisible = signal(false);
+    readonly drawerOpen = signal(false);
 
-    // ---- perf: highlight only previous highlighted cells + rAF throttle
-    private highlightedCells: GridCell[] = [];
-    private highlightRaf = 0;
-    private pendingHighlightEvent: CdkDragMove<any> | null = null;
+    prereservedNote = '';
+    private prereservedTargetId: string | null = null;
+    readonly searchStandControl = new FormControl<IStand | null>(null);
 
-    // ---- perf: quick lookup for search stand -> plan/cell
-    private standIndex = new Map<string, { planIndex: number; dimension: DimensionCell }>();
+    private drag: DragState | null = null;
+    private history: HistoryEntry[] = [];
+    private future: HistoryEntry[] = [];
+    private readonly historyVersion = signal(0);
 
-    // ---- optional: shape index for quick remove/unassign (per active plan)
-    private shapeIndex = new Map<string, GridCell[]>();
+    // -------------------------------------------------------------- dérivés
 
-    // exposed helpers
-    protected readonly getFormattedParticipationName = getFormattedParticipationName;
-    protected readonly getExhibitorFullName = getExhibitorFullName;
-    protected readonly formatterCategory = formatterCategory;
-    protected readonly Category = Category;
-    protected readonly Validators = Validators;
-    protected readonly formatterStandDimension = formatterStandDimension;
-    protected readonly selectFilterStandDimension = selectFilterStandDimension;
+    readonly activePlan = computed(() => this.floorPlans()[this.activeIndex()] ?? null);
+
+    readonly standsById = computed(() => {
+        const byId = new Map<string, IStand>();
+        for (const stand of this.stands()) {
+            byId.set(stand.id, stand);
+        }
+        return byId;
+    });
+
+    readonly assignedStandIds = computed(() => {
+        const ids = new Set<string>();
+        for (const plan of this.floorPlans()) {
+            for (const location of plan.locations) {
+                if (location.stand) {
+                    ids.add(location.stand.id);
+                }
+            }
+        }
+        return ids;
+    });
+
+    /** Les stands annulés et refusés ne sont jamais proposés à la pose. */
+    readonly placeableStands = computed(() =>
+        this.stands().filter(stand => stand.status !== Status.CANCELED && stand.status !== Status.REFUSED)
+    );
+
+    readonly unassignedStands = computed(() => {
+        const assigned = this.assignedStandIds();
+        return this.placeableStands().filter(stand => !assigned.has(stand.id));
+    });
+
+    readonly assignedStands = computed(() => {
+        const assigned = this.assignedStandIds();
+        return this.placeableStands().filter(stand => assigned.has(stand.id));
+    });
+
+    readonly conflicts = computed<FloorConflict[]>(() => {
+        const plan = this.activePlan();
+        return plan ? computeConflicts(plan, this.settings()) : [];
+    });
+
+    readonly conflictsByObject = computed(() => conflictsById(this.conflicts()));
+
+    readonly conflictCountByPlan = computed(() => {
+        const settings = this.settings();
+        return this.floorPlans().map(plan =>
+            new Set(computeConflicts(plan, settings).map(conflict => conflict.objectId)).size
+        );
+    });
+
+    readonly selectedObject = computed<FloorObject | null>(() => {
+        const plan = this.activePlan();
+        const id = this.selectedId();
+        if (!plan || !id) {
+            return null;
+        }
+        return objectsOf(plan).find(object => object.id === id) ?? null;
+    });
+
+    readonly selectedStand = computed(() => {
+        const location = this.selectedObject()?.location;
+        return location?.stand ? this.standsById().get(location.stand.id) ?? null : null;
+    });
+
+    readonly locationCount = computed(() => this.activePlan()?.locations.length ?? 0);
+    readonly assignedCount = computed(() =>
+        this.activePlan()?.locations.filter(location => !!location.stand).length ?? 0
+    );
+    readonly freeCount = computed(() => this.locationCount() - this.assignedCount());
+    readonly conflictCount = computed(() => new Set(this.conflicts().map(item => item.objectId)).size);
+
+    readonly canUndo = computed(() => this.historyVersion() >= 0 && this.history.length > 0);
+    readonly canRedo = computed(() => this.historyVersion() >= 0 && this.future.length > 0);
+
+    readonly stepsLabel = computed(() => {
+        const settings = this.settings();
+        return `${settings.gridMeter} m · ${settings.moveStepMeter} m · ${settings.rotationStepDeg}°`;
+    });
+
+    readonly displaySensibleInformation = computed(() => !this.navigationService.hideSensibleInformation());
+
+    /** La palette n'a de sens qu'en édition. */
+    readonly showLeftPanel = computed(() => !this.isReadOnly() && !this.leftPanelCollapsed());
+
+    /**
+     * En lecture, le panneau de droite reste ouvert sur la vue d'ensemble.
+     * En édition, il ne s'ouvre qu'à la sélection d'un objet pour laisser la place au plan.
+     */
+    readonly showRightPanel = computed(() =>
+        !this.rightPanelCollapsed() && (this.isReadOnly() || !!this.selectedObject())
+    );
 
     constructor() {
-        // keydown (auto cleanup)
-        fromEvent<KeyboardEvent>(window, 'keydown')
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(e => this.handleKeydown(e));
-
-        // reload when salon changes
         effect(() => {
             const salon = this.salon();
-            if (!salon?.id) {
-                return;
+            if (salon?.id) {
+                this.reloadFromServer(salon.id);
             }
-            this.reloadFromServer(salon.id);
         });
 
-        // rebuild indexes when active plan changes
-        effect(() => {
-            const data = this.activeData();
-            if (!data) {
-                return;
-            }
-            this.rebuildShapeIndex(data);
-            this.clearHighlights();
-        });
+        fromEvent<KeyboardEvent>(window, 'keydown')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(event => this.onKeyDown(event));
 
-        // search => focus + mark searched (no duplicate subscribe)
-        const searchedDim = toSignal(
-            this.searchDimensionCell.valueChanges.pipe(
-                startWith(this.searchDimensionCell.value),
-                distinctUntilChanged((a, b) => (a?.stand?.id ?? null) === (b?.stand?.id ?? null))
-            ),
-            {initialValue: null}
-        );
+        fromEvent<PointerEvent>(window, 'pointermove')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(event => this.onWindowPointerMove(event));
 
-        effect(() => {
-            const dim = searchedDim();
-            this.applySearch(dim);
-        });
+        fromEvent<PointerEvent>(window, 'pointerup')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => this.endDrag());
+
+        this.searchStandControl.valueChanges
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(stand => this.applySearch(stand));
     }
 
-    // ---------------------------------------------------------------------------
-    // modes / palette
-    resetPalette(): void {
-        this.showDimensions.set(false);
-        this.showAvailableStands.set(false);
-        this.isNumberAttribution.set(false);
-        this.automaticallyIncrementNumber.set(true);
-    }
+    // ----------------------------------------------------------- chargement
 
-    activateReadOnlyMode(): void {
-        this.isReadOnly.set(true);
-        this.resetPalette();
-
-        const id = this.salon()?.id;
-        if (id) {
-            this.reloadFromServer(id);
-        }
-    }
-
-    activateEditMode(): void {
-        this.isReadOnly.set(false);
-        this.resetPalette();
-    }
-
-    // ---------------------------------------------------------------------------
-    // loading
     private reloadFromServer(salonId: string): void {
         this.isLoading.set(true);
-        this.resetDataState();
+        this.resetState();
 
         combineLatest([
-                          this.standService.query({idSalon: salonId}).pipe(map(r => r ?? [])),
+                          this.standService.query({idSalon: salonId}).pipe(map(result => result ?? [])),
                           this.floorPlanService.load(salonId),
-                          this.salonService.getDimensionStands(salonId)
+                          this.salonService.getDimensionStands(salonId),
+                          this.floorPlanSettingsService.load(salonId)
                       ])
             .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
-            .subscribe(([stands, floorPlans, dimensionStands]) => {
+            .subscribe(([stands, plans, dimensions, settings]) => {
                 this.stands.set(stands);
-
-                const availableDims = convertAvailableDimensionCells(dimensionStands);
-                this.availableDimensions.set(availableDims);
-
-                const validStands = stands.filter(s => s.status !== Status.CANCELED && s.status !== Status.REFUSED);
-
-                // map floorPlans light + compute assigned stand ids ONCE
-                const assignedStandIds = new Set<string>();
-                const assignedDims: DimensionCell[] = [];
-                const mappedPlans: IFloorPlan[] = [];
-
-                this.standIndex.clear();
-
-                if (floorPlans.length > 0) {
-                    floorPlans.forEach((fp, planIndex) => {
-                        const full = mapFloorPlanLight(fp, availableDims, stands);
-                        mappedPlans.push(full);
-
-                        // index assigned dims + stand index
-                        for (const row of full.data.cells) {
-                            for (const cell of row) {
-                                if (!cell.firstCell || !cell.dimension) {
-                                    continue;
-                                }
-                                const sid = cell.dimension.stand?.id;
-                                if (sid) {
-                                    assignedStandIds.add(sid);
-                                    assignedDims.push(cell.dimension);
-                                    this.standIndex.set(sid, {planIndex, dimension: cell.dimension});
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    // default plan
-                    mappedPlans.push(this.buildDefaultPlan());
-                }
-
-                this.floorPlans.set(mappedPlans);
+                this.dimensions.set(sortedDimensions(dimensions));
+                this.settings.set(settings);
+                this.floorPlans.set(plans.length ? plans : [emptyFloorPlan('Plan', 1)]);
                 this.activeIndex.set(0);
-
-                // available stands dims = stands not already assigned
-                const availableStandDims = validStands
-                    .filter(s => !assignedStandIds.has(s.id!) && s.dimension != null)
-                    .map(s => convertAvailableDimensionCell(s.dimension, s));
-
-                this.unassignedStandDimensions.set(availableStandDims);
-                this.assignedStandDimensions.set(assignedDims);
-
-                // nextPosition = max(position)+1
-                this.nextPosition.setValue(this.computeNextPosition(mappedPlans));
-
-                // Load available actions
+                this.nextPosition.setValue(this.computeNextPosition());
                 this.loadAvailableActions();
+                setTimeout(() => this.fitToView());
             });
     }
 
-    private resetDataState(): void {
+    private resetState(): void {
         this.floorPlans.set([]);
-        this.activeIndex.set(0);
         this.floorPlansToRemove.set([]);
-
-        this.stands.set([]);
-        this.availableDimensions.set([]);
-        this.unassignedStandDimensions.set([]);
-        this.assignedStandDimensions.set([]);
-
-        this.searchDimensionCell.setValue(null, {emitEvent: false});
-        this.selectStandDialog.set(null);
-        this.idDisplaySensibleInformation.set(null);
-
-        this.standIndex.clear();
-        this.shapeIndex.clear();
+        this.activeIndex.set(0);
+        this.selectedId.set(null);
+        this.searchedId.set(null);
+        this.history = [];
+        this.future = [];
+        this.historyVersion.update(version => version + 1);
     }
 
-    private buildDefaultPlan(): IFloorPlan {
-        return {
-            id: null,
-            position: 1,
-            name: 'default',
-            data: {
-                cells: Array.from({length: 30}, () =>
-                    Array.from({length: 60}, () => ({
-                        id: null,
-                        firstCell: false,
-                        colorHighlight: this.DEFAULT_HIGHLIGHT,
-                        dimension: null,
-                        unusable: false
-                    }) as GridCell)
-                ),
-                widthMeter: 30,
-                heightMeter: 15,
-                spacingMeter: 0.5
-            } as IFloorPlanData
-        };
-    }
-
-    private computeNextPosition(plans: IFloorPlan[]): number {
+    private computeNextPosition(): number {
         let max = 0;
-        for (const p of plans) {
-            for (const row of p.data.cells) {
-                for (const cell of row) {
-                    const pos = cell.dimension?.position;
-                    if (typeof pos === 'number' && pos > max) {
-                        max = pos;
-                    }
+        for (const plan of this.floorPlans()) {
+            for (const location of plan.locations) {
+                if (location.position != null && location.position > max) {
+                    max = location.position;
                 }
             }
         }
         return max + 1;
     }
 
-    // ---------------------------------------------------------------------------
-    // search
-    private applySearch(dimensionCell: DimensionCell | null): void {
-        // clear previous "searched" flags (only on previously searched dimension if you want)
-        // ici : on garde simple => on reset uniquement l’ancien stand si présent
-        // (sinon, tu peux laisser sans reset, et gérer ça visuellement dans le tile)
-        for (const {dimension} of this.standIndex.values()) {
-            dimension.searched = false;
-        }
+    // ------------------------------------------------------------------ modes
 
-        if (!dimensionCell?.stand?.id) {
-            return;
-        }
-
-        const hit = this.standIndex.get(dimensionCell.stand.id);
-        if (!hit) {
-            return;
-        }
-
-        this.activeIndex.set(hit.planIndex);
-        hit.dimension.searched = true;
-        this.showSearchStands.set(false);
+    activateEditMode(): void {
+        this.isReadOnly.set(false);
+        this.leftPanelCollapsed.set(false);
+        // Le plan est recadré une fois la nouvelle largeur du viewport appliquée.
+        setTimeout(() => this.fitToView());
     }
 
-    canMoveFloorPlan(mode: 'right' | 'left'): boolean {
-        const plans = this.floorPlans();
-        const active = this.activePlan();
-        if (!active) {
-            return false;
-        }
-        if (mode === 'right') {
-            return plans.length > active.position;
-        }
-        return active.position > 1;
-    }
-
-    movePositionFloorPlan(mode: 'right' | 'left'): void {
-        const plans = this.floorPlans();
-        const active = this.activePlan();
-        if (!active || !this.canMoveFloorPlan(mode)) {
-            return;
-        }
-
-        const delta = mode === 'right' ? 1 : -1;
-        const neighborPos = active.position + delta;
-        const neighbor = plans.find(fp => fp.position === neighborPos);
-        if (!neighbor) {
-            return;
-        }
-
-        const tmp = active.position;
-        active.position = neighbor.position;
-        neighbor.position = tmp;
-
-        const sorted = [...plans].sort((a, b) => a.position - b.position);
-        this.floorPlans.set(sorted);
-        this.activeIndex.set(this.activeIndex() + delta);
-    }
-
-    openAddDialog(): void {
-        this.addPlanName.reset('');
-        this.addPlanWidth.reset(30);
-        this.addPlanHeight.reset(15);
-        this.addPlanSpacing.reset(0.5);
-        this.addDialogVisible.set(true);
-    }
-
-    onAddPlanConfirm(formData: any): void {
-        if (this.dialogActionPending()) {
-            return; // Prevent multiple clicks
-        }
-
-        const name = this.addPlanName.value?.trim();
-        const width = this.addPlanWidth.value;
-        const height = this.addPlanHeight.value;
-        const spacing = this.addPlanSpacing.value;
-
-        if (!name || !width || !height || !spacing || width <= 0 || height <= 0 || spacing <= 0) {
-            return; // Validation error
-        }
-
-        this.dialogActionPending.set(true);
-
-        try {
-            const info: AddPlanInfo = {
-                name,
-                widthMeter: width,
-                heightMeter: height,
-                spacingMeter: spacing
-            };
-
-            const spacingMultiply = 1 / info.spacingMeter;
-
-            const newPlan: IFloorPlan = {
-                id: null,
-                position: this.floorPlans().length + 1,
-                name: info.name,
-                data: {
-                    cells: Array.from({length: info.heightMeter * spacingMultiply}, () =>
-                        Array.from({length: info.widthMeter * spacingMultiply}, () => ({
-                            id: null,
-                            firstCell: false,
-                            colorHighlight: this.DEFAULT_HIGHLIGHT,
-                            dimension: null,
-                            unusable: false
-                        }) as GridCell)
-                    ),
-                    widthMeter: info.widthMeter,
-                    heightMeter: info.heightMeter,
-                    spacingMeter: info.spacingMeter
-                } as IFloorPlanData
-            };
-
-            this.floorPlans.set([...this.floorPlans(), newPlan]);
-            this.activeIndex.set(this.floorPlans().length - 1);
-            this.addDialogVisible.set(false);
-        } finally {
-            this.dialogActionPending.set(false);
-        }
-    }
-
-    onAddPlanCancel(): void {
-        this.addDialogVisible.set(false);
-        this.addPlanName.reset('');
-        this.addPlanWidth.reset(30);
-        this.addPlanHeight.reset(15);
-        this.addPlanSpacing.reset(0.5);
-    }
-
-    rename(): void {
-        const plan = this.activePlan();
-        if (!plan) {
-            return;
-        }
-
-        this.renamePlanName.setValue(plan.name);
-        this.renameDialogVisible.set(true);
-    }
-
-    onRenamePlanCancel(): void {
-        this.renameDialogVisible.set(false);
-        this.renamePlanName.reset();
-    }
-
-    confirmRenamePlan(): void {
-        if (this.dialogActionPending()) {
-            return; // Prevent multiple clicks
-        }
-
-        const newName = this.renamePlanName.value;
-        if (!newName?.trim()) {
-            return;
-        }
-
-        const plan = this.activePlan();
-        if (!plan) {
-            return;
-        }
-
-        this.dialogActionPending.set(true);
-
-        try {
-            plan.name = newName;
-            this.floorPlans.set([...this.floorPlans()]);
-            this.renameDialogVisible.set(false);
-            this.renamePlanName.reset();
-        } finally {
-            this.dialogActionPending.set(false);
-        }
-    }
-
-    delete(): void {
-        const plan = this.activePlan();
-        if (!plan) {
-            return;
-        }
-        this.deleteDialogVisible.set(true);
-    }
-
-    confirmDeletePlan(): void {
-        if (this.dialogActionPending()) {
-            return; // Prevent multiple clicks
-        }
-
-        const plan = this.activePlan();
+    activateReadOnlyMode(): void {
+        this.isReadOnly.set(true);
+        this.selectedId.set(null);
         const salonId = this.salon()?.id;
-        if (!salonId || !plan) {
+        if (salonId) {
+            this.reloadFromServer(salonId);
+        }
+    }
+
+    save(): void {
+        const salonId = this.salon()?.id;
+        if (!salonId) {
             return;
         }
 
-        this.dialogActionPending.set(true);
+        this.isLoading.set(true);
+        combineLatest([
+                          this.floorPlanService.batchSave(salonId, this.floorPlans(), this.floorPlansToRemove()),
+                          this.floorPlanSettingsService.save(salonId, this.settings())
+                      ])
+            .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
+            .subscribe(([plans]) => {
+                this.floorPlans.set(plans.length ? plans : [emptyFloorPlan('Plan', 1)]);
+                this.floorPlansToRemove.set([]);
+                this.activeIndex.set(Math.min(this.activeIndex(), Math.max(0, plans.length - 1)));
+                this.isReadOnly.set(true);
+                this.selectedId.set(null);
+            });
+    }
 
-        try {
-            if (plan.id) {
-                this.floorPlansToRemove.set([...this.floorPlansToRemove(), plan.id]);
+    previousState(): void {
+        window.history.back();
+    }
+
+    // ----------------------------------------------------- mutation du plan
+
+    /** Remplace le plan actif par une nouvelle référence, pour relancer le rendu. */
+    private setActivePlan(plan: IFloorPlan): void {
+        const plans = [...this.floorPlans()];
+        plans[this.activeIndex()] = plan;
+        this.floorPlans.set(plans);
+    }
+
+    private mutateActivePlan(mutator: (plan: IFloorPlan) => void, snapshot = true): void {
+        const current = this.activePlan();
+        if (!current) {
+            return;
+        }
+        if (snapshot) {
+            this.pushHistory();
+        }
+        const draft: IFloorPlan = {
+            ...current,
+            locations: current.locations.map(location => ({...location})),
+            elements: current.elements.map(element => ({...element}))
+        };
+        mutator(draft);
+        this.setActivePlan(draft);
+    }
+
+    // -------------------------------------------------------------- historique
+
+    private snapshot(): HistoryEntry {
+        return {
+            plans: structuredClone(this.floorPlans()),
+            settings: structuredClone(this.settings()),
+            idsToDelete: [...this.floorPlansToRemove()]
+        };
+    }
+
+    private pushHistory(): void {
+        this.history.push(this.snapshot());
+        if (this.history.length > HISTORY_LIMIT) {
+            this.history.shift();
+        }
+        this.future = [];
+        this.historyVersion.update(version => version + 1);
+    }
+
+    undo(): void {
+        const entry = this.history.pop();
+        if (!entry) {
+            return;
+        }
+        this.future.push(this.snapshot());
+        this.restore(entry);
+    }
+
+    redo(): void {
+        const entry = this.future.pop();
+        if (!entry) {
+            return;
+        }
+        this.history.push(this.snapshot());
+        this.restore(entry);
+    }
+
+    private restore(entry: HistoryEntry): void {
+        this.floorPlans.set(entry.plans);
+        this.settings.set(entry.settings);
+        this.floorPlansToRemove.set(entry.idsToDelete);
+        this.activeIndex.set(Math.min(this.activeIndex(), Math.max(0, entry.plans.length - 1)));
+        this.historyVersion.update(version => version + 1);
+    }
+
+    // ------------------------------------------------------------- placement
+
+    private placementOptions(excludeId?: string): PlacementOptions {
+        const plan = this.activePlan();
+        const settings = this.settings();
+        return {
+            moveStepMeter: settings.moveStepMeter,
+            snapEnabled: this.snapEnabled(),
+            magnetEnabled: settings.magnet,
+            planWidthMeter: plan?.widthMeter ?? 0,
+            planHeightMeter: plan?.heightMeter ?? 0,
+            neighbours: plan
+                        ? objectsOf(plan)
+                            .filter(object => object.id !== excludeId)
+                            .map(object => object.rect)
+                        : []
+        };
+    }
+
+    onNextAngleChanged(angle: number): void {
+        this.nextAngleDeg.set(angle);
+    }
+
+    /** Le glissé depuis la palette referme le tiroir mobile pour dégager le plan. */
+    onPaletteDragStarted(): void {
+        this.drawerOpen.set(false);
+    }
+
+    /** Dépôt d'une carte de la palette sur le plan. */
+    onPaletteDropped(drop: PaletteDrop): void {
+        const canvas = this.canvas();
+        const plan = this.activePlan();
+        if (!canvas || !plan) {
+            return;
+        }
+
+        const point = canvas.clientToPlanPoint(drop.clientX, drop.clientY);
+        if (!canvas.containsPlanPoint(point)) {
+            return;
+        }
+
+        this.placeTemplate(drop.template, point);
+    }
+
+    private placeTemplate(template: PaletteTemplate, point: Point): void {
+        const plan = this.activePlan();
+        if (!plan) {
+            return;
+        }
+
+        if (template.kind === 'EXHIBITOR') {
+            // Sur un emplacement libre, l'exposant y est attribué ; ailleurs, un stand est créé.
+            const target = objectsOf(plan).find(object =>
+                object.location && !object.location.stand && inside(point, object.rect)
+            );
+            if (target?.location) {
+                this.assignStandTo(target.location.id, template.stand);
+            } else if (template.stand.dimension) {
+                this.createLocation(template.stand.dimension, point, template.stand);
+            }
+            return;
+        }
+
+        if (template.kind === 'DIMENSION') {
+            this.createLocation(template.dimension, point, null);
+            return;
+        }
+
+        this.createElement(template.type, point);
+    }
+
+    private createLocation(dimension: IPriceStandSalon, point: Point, stand: IStand | null): void {
+        const size = dimensionSizeOf(dimension);
+        const rect: Rect = {
+            x: point.x - size.widthMeter / 2,
+            y: point.y - size.depthMeter / 2,
+            w: size.widthMeter,
+            h: size.depthMeter,
+            rot: this.nextAngleDeg()
+        };
+        placeAt(rect, point.x, point.y, this.placementOptions());
+
+        const location: IFloorLocation = {
+            id: uuid(),
+            idDimension: dimension.id,
+            centerX: round3(rect.x + rect.w / 2),
+            centerY: round3(rect.y + rect.h / 2),
+            widthMeter: rect.w,
+            depthMeter: rect.h,
+            rotationDeg: rect.rot ?? 0,
+            position: null,
+            stand: stand ? {id: stand.id} : null,
+            prereserved: null
+        };
+
+        this.mutateActivePlan(plan => plan.locations.push(location));
+        this.selectedId.set(location.id);
+    }
+
+    private createElement(type: FloorElementType, point: Point): void {
+        const setting = this.settings().elementTypes[type] ?? DEFAULT_ELEMENT_TYPES[type];
+        const rect: Rect = {
+            x: point.x - setting.widthMeter / 2,
+            y: point.y - setting.depthMeter / 2,
+            w: setting.widthMeter,
+            h: setting.depthMeter,
+            rot: this.nextAngleDeg()
+        };
+        placeAt(rect, point.x, point.y, this.placementOptions());
+
+        const element: IFloorElement = {
+            id: uuid(),
+            type,
+            label: null,
+            centerX: round3(rect.x + rect.w / 2),
+            centerY: round3(rect.y + rect.h / 2),
+            widthMeter: rect.w,
+            depthMeter: rect.h,
+            rotationDeg: rect.rot ?? 0,
+            blockingOverride: null
+        };
+
+        this.mutateActivePlan(plan => plan.elements.push(element));
+        this.selectedId.set(element.id);
+    }
+
+    // ----------------------------------------------------------- interactions
+
+    onCanvasPointerDownOnObject(payload: { event: PointerEvent; object: FloorObject }): void {
+        const {event, object} = payload;
+        const canvas = this.canvas();
+        if (!canvas) {
+            return;
+        }
+
+        this.selectedId.set(object.id);
+
+        if (this.isNumberAttribution() && object.location) {
+            this.applyNextPosition(object.location.id);
+            return;
+        }
+
+        if (this.isReadOnly()) {
+            return;
+        }
+
+        this.drag = {
+            mode: 'MOVE',
+            objectId: object.id,
+            origin: {...object.rect},
+            start: canvas.toPlanPoint(event),
+            moved: false
+        };
+    }
+
+    onCanvasPointerDownOnBackground(_event: PointerEvent): void {
+        this.selectedId.set(null);
+    }
+
+    onRotationHandleDown(payload: { event: PointerEvent; object: FloorObject }): void {
+        const canvas = this.canvas();
+        if (!canvas) {
+            return;
+        }
+        this.drag = {
+            mode: 'ROTATE',
+            objectId: payload.object.id,
+            origin: {...payload.object.rect},
+            start: canvas.toPlanPoint(payload.event),
+            moved: false
+        };
+    }
+
+    onResizeHandleDown(payload: { event: PointerEvent; object: FloorObject }): void {
+        const canvas = this.canvas();
+        if (!canvas) {
+            return;
+        }
+        this.drag = {
+            mode: 'RESIZE',
+            objectId: payload.object.id,
+            origin: {...payload.object.rect},
+            start: canvas.toPlanPoint(payload.event),
+            moved: false
+        };
+    }
+
+    onCanvasPointerMoved(payload: { event: PointerEvent; point: Point }): void {
+        this.cursor.set(payload.point);
+    }
+
+    private onWindowPointerMove(event: PointerEvent): void {
+        const drag = this.drag;
+        const canvas = this.canvas();
+        if (!drag || !canvas) {
+            return;
+        }
+
+        const point = canvas.toPlanPoint(event);
+        if (!drag.moved) {
+            this.pushHistory();
+            drag.moved = true;
+        }
+
+        const settings = this.settings();
+        const rect: Rect = {...drag.origin};
+
+        if (drag.mode === 'MOVE') {
+            const centerX = drag.origin.x + drag.origin.w / 2 + (point.x - drag.start.x);
+            const centerY = drag.origin.y + drag.origin.h / 2 + (point.y - drag.start.y);
+            placeAt(rect, centerX, centerY, this.placementOptions(drag.objectId));
+        } else if (drag.mode === 'ROTATE') {
+            const center = {x: drag.origin.x + drag.origin.w / 2, y: drag.origin.y + drag.origin.h / 2};
+            rect.rot = snapAngle(angleTo(center, point) + 90, settings.rotationStepDeg, event.shiftKey);
+        } else {
+            rect.w = round3(Math.max(0.1, point.x - drag.origin.x));
+            // Un mur ne change que de longueur.
+            const isWall = this.selectedObject()?.element?.type === 'WALL';
+            rect.h = isWall ? drag.origin.h : round3(Math.max(0.1, point.y - drag.origin.y));
+        }
+
+        this.applyRectToObject(drag.objectId, rect, false);
+    }
+
+    private endDrag(): void {
+        this.drag = null;
+    }
+
+    private applyRectToObject(objectId: string, rect: Rect, snapshot = true): void {
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === objectId);
+            if (location) {
+                applyRect(location, rect);
+                return;
+            }
+            const element = plan.elements.find(item => item.id === objectId);
+            if (element) {
+                applyRect(element, rect);
+            }
+        }, snapshot);
+    }
+
+    onContextMenuRequested(payload: { event: MouseEvent; object: FloorObject }): void {
+        if (this.isReadOnly()) {
+            return;
+        }
+        this.selectedId.set(payload.object.id);
+        this.contextMenuItems.set(this.buildContextMenuItems(payload.object));
+        this.contextMenu()?.show(payload.event);
+    }
+
+    private buildContextMenuItems(object: FloorObject): MenuItem[] {
+        const items: MenuItem[] = [];
+        const location = object.location;
+
+        if (location) {
+            if (!location.stand) {
+                const available = this.unassignedStands();
+                if (available.length) {
+                    items.push({
+                                   label: 'Attribuer à...',
+                                   icon: `${PrimeIcons.USER_PLUS} text-success`,
+                                   items: available.map(stand => ({
+                                       label: getFormattedParticipationName(stand.participation),
+                                       icon: stand.dimension?.id === location.idDimension
+                                             ? `${PrimeIcons.VERIFIED} text-success`
+                                             : `${PrimeIcons.EXCLAMATION_CIRCLE} text-warning`,
+                                       command: () => this.assignStandTo(location.id, stand)
+                                   }))
+                               });
+                } else {
+                    items.push({label: 'Aucun stand disponible', icon: PrimeIcons.USER, disabled: true});
+                }
+            } else {
+                items.push({
+                               label: 'Désattribuer',
+                               icon: `${PrimeIcons.USER_MINUS} text-warning`,
+                               command: () => this.releaseStand(location.id)
+                           });
             }
 
-            const next = this.floorPlans().filter((_, i) => i !== this.activeIndex());
-            // renumber positions
-            next.sort((a, b) => a.position - b.position).forEach((fp, i) => (fp.position = i + 1));
+            if (location.prereserved) {
+                items.push({
+                               label: 'Annuler la réservation',
+                               icon: `${PrimeIcons.TAG} text-warning`,
+                               command: () => this.cancelPrereservation(location.id)
+                           });
+            } else if (!location.stand) {
+                items.push({
+                               label: 'Réserver la place...',
+                               icon: `${PrimeIcons.TAG} text-success`,
+                               command: () => this.openPrereservedDialog(location.id)
+                           });
+            }
 
-            this.floorPlans.set(next);
-            this.activeIndex.set(Math.max(0, this.activeIndex() - 1));
-            this.deleteDialogVisible.set(false);
-        } finally {
-            this.dialogActionPending.set(false);
-        }
-    }
-
-    onDeletePlanCancel(): void {
-        this.deleteDialogVisible.set(false);
-    }
-
-    // Build context menu items for a given plan index
-    private buildContextMenuItemsForPlanIndex(planIndex: number): MenuItem[] {
-        const items: MenuItem[] = [];
-
-        items.push({
-                       label: 'Configuration',
-                       icon: 'pi pi-pencil',
-                       command: () => {
-                           this.activeIndex.set(planIndex);
-                           this.rename();
-                       }
-                   });
-
-        const canMoveRight = planIndex < this.floorPlans().length - 1;
-        const canMoveLeft = planIndex > 0;
-
-        if (canMoveRight) {
             items.push({
-                           label: 'Déplacer à droite',
-                           icon: 'pi pi-arrow-right',
-                           command: () => {
-                               this.activeIndex.set(planIndex);
-                               this.movePositionFloorPlan('right');
-                           }
+                           label: 'Détail de l\'emplacement',
+                           icon: PrimeIcons.INFO_CIRCLE,
+                           command: () => this.standDialogVisible.set(true)
                        });
         }
 
-        if (canMoveLeft) {
-            items.push({
-                           label: 'Déplacer à gauche',
-                           icon: 'pi pi-arrow-left',
-                           command: () => {
-                               this.activeIndex.set(planIndex);
-                               this.movePositionFloorPlan('left');
-                           }
-                       });
-        }
-
+        items.push({label: 'Dupliquer', icon: PrimeIcons.COPY, command: () => this.duplicateSelected()});
         items.push({
-                       label: 'Supprimer',
-                       icon: 'pi pi-trash',
+                       label: 'Supprimer l\'emplacement',
+                       icon: `${PrimeIcons.TRASH} text-danger`,
                        styleClass: 'p-menuitem-danger',
-                       command: () => {
-                           this.activeIndex.set(planIndex);
-                           this.delete();
-                       }
+                       command: () => this.deleteSelected()
                    });
 
         return items;
     }
 
-    // ---------------------------------------------------------------------------
-    // save
-    save(): void {
-        this.resetPalette();
-        const salonId = this.salon()?.id;
-        if (!salonId) {
-            return;
-        }
+    // -------------------------------------------------- actions sur l'objet
 
-        const floorPlansToSave = this.floorPlans().map(fp => mapFloorPlan(fp));
-        const idsToDelete = this.floorPlansToRemove();
-
-        // Si aucune modification, passer en mode lecture seule directement
-        if (floorPlansToSave.length === 0 && idsToDelete.length === 0) {
-            this.activateReadOnlyMode();
-            return;
-        }
-
-        this.isLoading.set(true);
-
-        this.floorPlanService.batchSave(salonId, floorPlansToSave, idsToDelete)
-            .pipe(
-                finalize(() => this.isLoading.set(false)),
-                takeUntilDestroyed(this.destroyRef)
-            )
-            .subscribe({
-                           next: (updatedFloorPlans) => {
-                               // Mettre à jour les floorPlans avec la réponse du backend
-                               this.floorPlans.set(updatedFloorPlans.map(floor => mapFloorPlanLight(floor, this.availableDimensions(), this.stands())));
-                               // Vider la liste des suppressions
-                               this.floorPlansToRemove.set([]);
-                               // Réinitialiser l'index actif si nécessaire
-                               if (this.activeIndex() >= updatedFloorPlans.length && updatedFloorPlans.length > 0) {
-                                   this.activeIndex.set(updatedFloorPlans.length - 1);
-                               } else if (updatedFloorPlans.length === 0) {
-                                   this.activeIndex.set(0);
-                               }
-                               this.activateReadOnlyMode();
-                           },
-                           error: () => {
-                               // Le toast d'erreur sera géré par l'intercepteur HTTP
-                           }
-                       });
+    assignStandTo(locationId: string, stand: IStand): void {
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === locationId);
+            if (location) {
+                location.stand = {id: stand.id};
+                location.prereserved = null;
+            }
+        });
     }
 
-    // ---------------------------------------------------------------------------
-    // actions menu
+    onStandAssigned(stand: IStand): void {
+        const id = this.selectedId();
+        if (id) {
+            this.assignStandTo(id, stand);
+        }
+    }
+
+    releaseStand(locationId: string | null = this.selectedId()): void {
+        if (!locationId) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === locationId);
+            if (location) {
+                location.stand = null;
+            }
+        });
+    }
+
+    duplicateSelected(): void {
+        const object = this.selectedObject();
+        if (!object) {
+            return;
+        }
+
+        // La copie est posée dans la direction de la grande longueur.
+        const rect: Rect = {...object.rect};
+        const alongWidth = rect.w >= rect.h;
+        const centerX = rect.x + rect.w / 2 + (alongWidth ? rect.w : 0);
+        const centerY = rect.y + rect.h / 2 + (alongWidth ? 0 : rect.h);
+        placeAt(rect, centerX, centerY, this.placementOptions());
+
+        const newId = uuid();
+        const nextPosition = this.computeNextPosition();
+
+        this.mutateActivePlan(draft => {
+            if (object.location) {
+                const copy: IFloorLocation = {
+                    ...object.location,
+                    id: newId,
+                    stand: null,
+                    prereserved: null,
+                    position: nextPosition
+                };
+                applyRect(copy, rect);
+                draft.locations.push(copy);
+            } else if (object.element) {
+                const copy: IFloorElement = {...object.element, id: newId};
+                applyRect(copy, rect);
+                draft.elements.push(copy);
+            }
+        });
+
+        this.selectedId.set(newId);
+    }
+
+    deleteSelected(): void {
+        const id = this.selectedId();
+        if (!id) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            plan.locations = plan.locations.filter(location => location.id !== id);
+            plan.elements = plan.elements.filter(element => element.id !== id);
+        });
+        this.selectedId.set(null);
+    }
+
+    rotateSelected(deltaDeg: number): void {
+        const object = this.selectedObject();
+        if (!object) {
+            return;
+        }
+        this.applyRectToObject(object.id, {
+            ...object.rect,
+            rot: normalizeAngle((object.rect.rot ?? 0) + deltaDeg)
+        });
+    }
+
+    setSelectedAngle(angle: number): void {
+        const object = this.selectedObject();
+        if (object) {
+            this.applyRectToObject(object.id, {...object.rect, rot: normalizeAngle(angle)});
+        }
+    }
+
+    moveSelected(dx: number, dy: number): void {
+        const object = this.selectedObject();
+        if (!object) {
+            return;
+        }
+        const rect: Rect = {...object.rect};
+        placeAt(rect, rect.x + rect.w / 2 + dx, rect.y + rect.h / 2 + dy, this.placementOptions(object.id));
+        this.applyRectToObject(object.id, rect);
+    }
+
+    onPositionChanged(position: number | null): void {
+        const id = this.selectedId();
+        if (!id) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === id);
+            if (location) {
+                location.position = position;
+            }
+        });
+    }
+
+    onDimensionChanged(dimension: IPriceStandSalon): void {
+        const id = this.selectedId();
+        if (!id) {
+            return;
+        }
+        const size = dimensionSizeOf(dimension);
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === id);
+            if (location) {
+                location.idDimension = dimension.id;
+                location.widthMeter = size.widthMeter;
+                location.depthMeter = size.depthMeter;
+            }
+        });
+    }
+
+    onElementTypeChanged(type: FloorElementType): void {
+        const id = this.selectedId();
+        if (!id) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            const element = plan.elements.find(item => item.id === id);
+            if (element) {
+                element.type = type;
+            }
+        });
+    }
+
+    onElementLabelChanged(label: string): void {
+        const id = this.selectedId();
+        if (!id) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            const element = plan.elements.find(item => item.id === id);
+            if (element) {
+                element.label = label.trim() || null;
+            }
+        });
+    }
+
+    onElementSizeChanged(size: { widthMeter: number; depthMeter: number }): void {
+        const object = this.selectedObject();
+        if (object) {
+            this.applyRectToObject(object.id, {
+                ...object.rect,
+                w: Math.max(0.1, size.widthMeter),
+                h: Math.max(0.1, size.depthMeter)
+            });
+        }
+    }
+
+    onBlockingChanged(blocking: boolean | null): void {
+        const id = this.selectedId();
+        if (!id) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            const element = plan.elements.find(item => item.id === id);
+            if (!element) {
+                return;
+            }
+            const defaultBlocking = this.settings().elementTypes[element.type].blocking;
+            element.blockingOverride = blocking == null || blocking === defaultBlocking ? null : blocking;
+        });
+    }
+
+    // ------------------------------------------------------ pré-réservation
+
+    openPrereservedDialog(locationId: string): void {
+        this.prereservedTargetId = locationId;
+        this.prereservedNote = '';
+        this.prereservedDialogVisible.set(true);
+    }
+
+    canConfirmPrereserved(): boolean {
+        return this.prereservedNote.trim().length > 0;
+    }
+
+    confirmPrereserved(): void {
+        const id = this.prereservedTargetId;
+        const note = this.prereservedNote.trim();
+        if (!id || !note) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === id);
+            if (location) {
+                location.prereserved = {note};
+            }
+        });
+        this.prereservedDialogVisible.set(false);
+        this.prereservedTargetId = null;
+        this.prereservedNote = '';
+    }
+
+    cancelPrereservation(locationId: string): void {
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === locationId);
+            if (location) {
+                location.prereserved = null;
+            }
+        });
+    }
+
+    // --------------------------------------------------------- numérotation
+
+    private applyNextPosition(locationId: string): void {
+        const position = this.nextPosition.value;
+        if (position == null) {
+            return;
+        }
+        this.mutateActivePlan(plan => {
+            const location = plan.locations.find(item => item.id === locationId);
+            if (location) {
+                location.position = position;
+            }
+        });
+        if (this.automaticallyIncrementNumber()) {
+            this.nextPosition.setValue(position + 1);
+        }
+    }
+
+    // ------------------------------------------------------------ recherche
+
+    private applySearch(stand: IStand | null): void {
+        if (!stand) {
+            this.searchedId.set(null);
+            return;
+        }
+
+        const plans = this.floorPlans();
+        for (let index = 0; index < plans.length; index++) {
+            const location = plans[index].locations.find(item => item.stand?.id === stand.id);
+            if (location) {
+                this.activeIndex.set(index);
+                this.selectedId.set(location.id);
+                this.searchedId.set(location.id);
+                this.searchDialogVisible.set(false);
+                setTimeout(() => this.centerOn(location.id));
+                return;
+            }
+        }
+    }
+
+    focusConflict(objectId: string): void {
+        this.selectedId.set(objectId);
+        this.centerOn(objectId);
+    }
+
+    nextConflict(): void {
+        const ids = [...new Set(this.conflicts().map(conflict => conflict.objectId))];
+        if (!ids.length) {
+            return;
+        }
+        const current = this.selectedId();
+        const index = current ? ids.indexOf(current) : -1;
+        this.focusConflict(ids[(index + 1) % ids.length]);
+    }
+
+    private centerOn(objectId: string): void {
+        const canvas = this.canvas();
+        const viewport = this.viewport()?.nativeElement;
+        const center = canvas?.centerOf(objectId);
+        if (!canvas || !viewport || !center) {
+            return;
+        }
+
+        const ppm = this.pixelsPerMeter();
+        const ruler = canvas.rulerMeter();
+        viewport.scrollLeft = (center.x + ruler) * ppm - viewport.clientWidth / 2;
+        viewport.scrollTop = (center.y + ruler) * ppm - viewport.clientHeight / 2;
+    }
+
+    // ----------------------------------------------------------------- zoom
+
+    zoom(factor: number): void {
+        this.pixelsPerMeter.update(ppm => clamp(Math.round(ppm * factor), MIN_PPM, MAX_PPM));
+    }
+
+    fitToView(): void {
+        const viewport = this.viewport()?.nativeElement;
+        const plan = this.activePlan();
+        if (!viewport || !plan) {
+            return;
+        }
+        const ppm = Math.min(
+            (viewport.clientWidth - 60) / Math.max(plan.widthMeter, 1),
+            (viewport.clientHeight - 60) / Math.max(plan.heightMeter, 1)
+        );
+        this.pixelsPerMeter.set(clamp(Math.floor(ppm), MIN_PPM, MAX_PPM));
+    }
+
+    onWheel(event: WheelEvent): void {
+        if (!event.ctrlKey) {
+            return;
+        }
+        event.preventDefault();
+        this.zoom(event.deltaY < 0 ? 1.12 : 1 / 1.12);
+    }
+
+    // -------------------------------------------------------------- onglets
+
+    selectPlan(index: number): void {
+        this.activeIndex.set(index);
+        this.selectedId.set(null);
+    }
+
+    openSettingsDialog(newPlanName: string | null = null): void {
+        this.settingsDialogNewPlanName.set(newPlanName);
+        this.settingsDialogVisible.set(true);
+    }
+
+    onSettingsApplied(result: SettingsResult): void {
+        if (!result) {
+            return;
+        }
+
+        this.pushHistory();
+        this.settings.set(result.settings);
+        this.floorPlans.set(result.plans.length ? result.plans : [emptyFloorPlan('Plan', 1)]);
+        this.floorPlansToRemove.update(ids => [...ids, ...result.idsToDelete]);
+        this.activeIndex.set(Math.min(this.activeIndex(), Math.max(0, result.plans.length - 1)));
+        this.selectedId.set(null);
+
+        const details: string[] = [];
+        if (this.conflictCount() > 0) {
+            details.push(`${this.conflictCount()} conflit(s) à revoir`);
+        }
+        if (result.displacedStands > 0) {
+            details.push(`${result.displacedStands} exposant(s) à replacer`);
+        }
+
+        this.messageService.add({
+                                    severity: 'success',
+                                    summary: 'Réglages appliqués',
+                                    detail: details.join(' · ') || undefined
+                                });
+    }
+
+    // -------------------------------------------------------------- clavier
+
+    private onKeyDown(event: KeyboardEvent): void {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('input, textarea, select, [contenteditable="true"], .p-dialog')) {
+            return;
+        }
+
+        if ((event.ctrlKey || event.metaKey) && event.code === 'KeyZ') {
+            event.preventDefault();
+            this.undo();
+            return;
+        }
+        if ((event.ctrlKey || event.metaKey) && event.code === 'KeyY') {
+            event.preventDefault();
+            this.redo();
+            return;
+        }
+        if ((event.ctrlKey || event.metaKey) && event.code === 'KeyD') {
+            event.preventDefault();
+            this.duplicateSelected();
+            return;
+        }
+
+        if (event.code === 'Escape') {
+            this.selectedId.set(null);
+            return;
+        }
+
+        if (event.code === 'KeyT') {
+            this.displayTechnical.update(value => !value);
+            return;
+        }
+
+        if (this.isReadOnly() || !this.selectedId()) {
+            return;
+        }
+
+        const settings = this.settings();
+        const step = event.altKey ? FREE_STEP : settings.moveStepMeter;
+
+        switch (event.code) {
+            case 'Delete':
+            case 'Backspace':
+                event.preventDefault();
+                this.deleteSelected();
+                break;
+            case 'KeyR':
+                event.preventDefault();
+                this.rotateSelected(90);
+                break;
+            case 'KeyQ':
+                event.preventDefault();
+                this.rotateSelected(-settings.rotationStepDeg);
+                break;
+            case 'KeyE':
+                event.preventDefault();
+                this.rotateSelected(settings.rotationStepDeg);
+                break;
+            case 'ArrowLeft':
+                event.preventDefault();
+                this.moveSelected(-step, 0);
+                break;
+            case 'ArrowRight':
+                event.preventDefault();
+                this.moveSelected(step, 0);
+                break;
+            case 'ArrowUp':
+                event.preventDefault();
+                this.moveSelected(0, -step);
+                break;
+            case 'ArrowDown':
+                event.preventDefault();
+                this.moveSelected(0, step);
+                break;
+            default:
+                break;
+        }
+    }
+
+    // --------------------------------------------------------- menu Actions
+
     private loadAvailableActions(): void {
         const salonId = this.salon()?.id;
         if (!salonId) {
             return;
         }
-        this.actionsService.getAvailableActions('salon', salonId, 'floor-plan').subscribe(availableActions => {
-            this.menuCache.set(this.buildActionsMenu(availableActions));
-        });
+        this.actionsService.getAvailableActions('salon', salonId, 'floor-plan')
+            .subscribe(actions => this.menuCache.set(this.buildActionsMenu(actions)));
     }
 
     private buildActionsMenu(availableActions: AvailableAction[]): AppMenuItem[] {
@@ -764,582 +1285,53 @@ export class FloorPlanDetailComponent {
         );
     }
 
-    clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
-        if (action.type === 'DOWNLOAD') {
-            this.isLoading.set(true);
-            const salonId = this.salon()?.id;
-            if (!salonId) {
-                this.isLoading.set(false);
-                return;
-            }
-            this.actionsService.downloadAction(action.contextCode, salonId)
-                .pipe(finalize(() => this.isLoading.set(false)))
-                .subscribe(res => {
-                    const cd = res.headers.get('content-disposition') ?? '';
-                    const filename = this.getFilenameFromContentDisposition(cd) ?? 'document.pdf';
-
-                    const blob = res.body!;
-                    const url = window.URL.createObjectURL(blob);
-
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    a.click();
-
-                    window.URL.revokeObjectURL(url);
-                });
-        } else {
-            console.warn('Action type unknown : ' + action.type);
+    clickAction(action: AvailableAction, _htmlElement?: HTMLElement): void {
+        if (action.type !== 'DOWNLOAD') {
+            return;
         }
+        const salonId = this.salon()?.id;
+        if (!salonId) {
+            return;
+        }
+
+        this.isLoading.set(true);
+        this.actionsService.downloadAction(action.contextCode, salonId)
+            .pipe(finalize(() => this.isLoading.set(false)))
+            .subscribe(response => {
+                const disposition = response.headers.get('content-disposition') ?? '';
+                const filename = this.getFilenameFromContentDisposition(disposition) ?? 'document.pdf';
+                const url = window.URL.createObjectURL(response.body!);
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.click();
+
+                window.URL.revokeObjectURL(url);
+            });
     }
 
-    private getFilenameFromContentDisposition(cd: string): string | null {
-        if (!cd) {
+    private getFilenameFromContentDisposition(contentDisposition: string): string | null {
+        if (!contentDisposition) {
             return null;
         }
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = filenameRegex.exec(cd);
-        if (matches != null && matches[1]) {
-            return matches[1].replace(/['"]/g, '');
-        }
-        return null;
+        const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
+        return matches?.[1] ? matches[1].replace(/['"]/g, '') : null;
     }
 
-    // ---------------------------------------------------------------------------
-    // grid logic
-    adaptCursor(cell: GridCell): 'move' | 'pointer' | 'default' {
-        if (this.showDimensions() || this.showAvailableStands()) {
-            return 'move';
-        }
-        return 'pointer';
+    toggleSensibleInformation(): void {
+        this.navigationService.hideSensibleInformation.update(value => !value);
     }
 
-    private outOfBound(row: number, col: number, shape: { rows: number; cols: number }): boolean {
-        return (
-            row < 0 ||
-            col < 0 ||
-            row + shape.rows > this.nbHeightTiles() ||
-            col + shape.cols > this.nbWidthTiles()
-        );
+    participationLink(stand: IStand, page: 'view' | 'billing'): string[] {
+        return ['/salons', this.salon()?.id ?? '', 'participations', stand.participation?.id ?? '', page];
     }
 
-    private tryGetCell(row: number, col: number): GridCell | null {
-        const cells = this.activeCells();
-        if (!cells.length) {
-            return null;
-        }
-        if (row < 0 || col < 0) {
-            return null;
-        }
-        if (row >= cells.length) {
-            return null;
-        }
-        if (col >= cells[0].length) {
-            return null;
-        }
-        return cells[row][col];
-    }
-
-    private canPlaceShape(row: number, col: number, shape: { rows: number; cols: number }): boolean {
-        if (this.outOfBound(row, col, shape)) {
-            return false;
-        }
-
-        for (let i = 0; i < shape.rows; i++) {
-            for (let j = 0; j < shape.cols; j++) {
-                const cell = this.tryGetCell(row + i, col + j);
-                if (!cell || cell.unusable) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private placeShape(row: number, col: number, dimension: DimensionCell): void {
-        const uuid = v4();
-        const cellsForIndex: GridCell[] = [];
-
-        for (let i = 0; i < dimension.rows; i++) {
-            for (let j = 0; j < dimension.cols; j++) {
-                const cell = this.tryGetCell(row + i, col + j);
-                if (!cell) {
-                    continue;
-                }
-
-                if (i === 0 && j === 0) {
-                    cell.firstCell = true;
-                    cell.dimension = dimension;
-                }
-                cell.unusable = true;
-                cell.id = uuid;
-                cellsForIndex.push(cell);
-            }
-        }
-
-        this.shapeIndex.set(uuid, cellsForIndex);
-    }
-
-    drop(event: CdkDragDrop<any[]>): void {
-        this.clearHighlights();
-
-        if (!this.gridContainer) {
-            return;
-        }
-
-        // important: clone pour éviter que les rotations de palette touchent les dims déjà posées
-        const dimensionCell = structuredClone(event.item.data) as DimensionCell;
-
-        const gridRect = this.gridContainer.nativeElement.getBoundingClientRect();
-        const x = event.dropPoint.x - gridRect.left;
-        const y = event.dropPoint.y - gridRect.top;
-
-        const row = Math.floor(y / this.PIXELS);
-        const col = Math.floor(x / this.PIXELS);
-
-        if (!this.canPlaceShape(row, col, dimensionCell)) {
-            return;
-        }
-
-        this.placeShape(row, col, dimensionCell);
-
-        const standId = dimensionCell?.stand?.id;
-        if (standId) {
-            this.assignedStandDimensions.set([...this.assignedStandDimensions(), dimensionCell]);
-            this.unassignedStandDimensions.set(this.unassignedStandDimensions().filter(d => d.stand!.id !== standId));
-            this.standIndex.set(standId, {planIndex: this.activeIndex(), dimension: dimensionCell});
-        }
-    }
-
-    startDragging(cell: GridCell): void {
-        this.isDragging.set(true);
-        this.draggingCell = cell;
-
-        const shapeId = cell.id;
-        if (!shapeId) {
-            return;
-        }
-
-        const cells = this.shapeIndex.get(shapeId) ?? [cell];
-        for (const c of cells) {
-            if (!c.firstCell) {
-                c.id = null;
-                c.dimension = null;
-            }
-            c.colorHighlight = this.DEFAULT_HIGHLIGHT;
-            c.unusable = false;
-        }
-
-        // après startDragging, seul le firstCell garde l'id (comme ton code actuel)
-        this.shapeIndex.set(shapeId, [cell]);
-    }
-
-    finishDragging(cell: GridCell): void {
-        this.isDragging.set(false);
-
-        const shapeId = cell.id;
-        if (!shapeId) {
-            this.draggingCell = null;
-            return;
-        }
-
-        const cells = this.shapeIndex.get(shapeId) ?? [cell];
-        for (const c of cells) {
-            this.resetCell(c);
-        }
-
-        this.shapeIndex.delete(shapeId);
-        this.draggingCell = null;
-    }
-
-    highlightCells(event: CdkDragMove<any>): void {
-        // throttle to 1/animation frame
-        this.pendingHighlightEvent = event;
-        if (this.highlightRaf) {
-            return;
-        }
-
-        this.highlightRaf = requestAnimationFrame(() => {
-            this.highlightRaf = 0;
-            const ev = this.pendingHighlightEvent;
-            this.pendingHighlightEvent = null;
-            if (ev) {
-                this.applyHighlight(ev);
-            }
-        });
-    }
-
-    private applyHighlight(event: CdkDragMove<any>): void {
-        this.clearHighlights();
-
-        const shape = event.source.data as { rows: number; cols: number };
-        if (!this.gridContainer) {
-            return;
-        }
-
-        const gridRect = this.gridContainer.nativeElement.getBoundingClientRect();
-        const x = event.pointerPosition.x - gridRect.left;
-        const y = event.pointerPosition.y - gridRect.top;
-
-        const row = Math.floor(y / this.PIXELS);
-        const col = Math.floor(x / this.PIXELS);
-
-        const cellsToPaint: GridCell[] = [];
-        for (let i = 0; i < shape.rows; i++) {
-            for (let j = 0; j < shape.cols; j++) {
-                const c = this.tryGetCell(row + i, col + j);
-                if (c) {
-                    cellsToPaint.push(c);
-                }
-            }
-        }
-
-        const ok = this.canPlaceShape(row, col, shape);
-        const color = ok ? 'var(--app-surface-muted)' : 'var(--app-danger)';
-        for (const c of cellsToPaint) {
-            c.colorHighlight = color;
-        }
-
-        this.highlightedCells = cellsToPaint;
-    }
-
-    clearHighlights(): void {
-        // only reset the previously highlighted cells (big perf win)
-        for (const c of this.highlightedCells) {
-            c.colorHighlight = this.DEFAULT_HIGHLIGHT;
-        }
-        this.highlightedCells = [];
-    }
-
-    private resetCell(cell: GridCell): void {
-        cell.id = null;
-        cell.firstCell = false;
-        cell.dimension = null;
-        cell.colorHighlight = this.DEFAULT_HIGHLIGHT;
-        cell.unusable = false;
-    }
-
-    // ---------------------------------------------------------------------------
-    // click / dblclick
-    onClick(event: MouseEvent, cell: GridCell): void {
-        event.preventDefault();
-        event.stopPropagation();
-
-        clearTimeout(this.clickTimer);
-        this.clickTimer = setTimeout(() => {
-            (this.isReadOnly() || !this.isNumberAttribution())
-            ? this.openStandDialog(cell)
-            : this.onClickNumberAttribution(cell);
-        }, this.clickDelay);
-    }
-
-    onDoubleClick(event: MouseEvent, cell: GridCell): void {
-        clearTimeout(this.clickTimer);
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.idDisplaySensibleInformation.set(
-            this.idDisplaySensibleInformation() ? null : (cell.id ?? null)
-        );
-    }
-
-    onClickNumberAttribution(cell: GridCell): void {
-        if (this.isReadOnly() || !this.isNumberAttribution() || !cell?.dimension) {
-            return;
-        }
-
-        const current = Number(this.nextPosition.value ?? 0);
-        if (current === 0) {
-            cell.dimension.position = null;
-            return;
-        }
-
-        cell.dimension.position = current;
-        if (this.automaticallyIncrementNumber()) {
-            this.nextPosition.setValue(current + 1);
-        }
-    }
-
-    changeAttributionMode(): void {
-        if (this.isReadOnly()) {
-            return;
-        }
-        this.isNumberAttribution.set(!this.isNumberAttribution());
-        if (this.isNumberAttribution()) {
-            this.displayHeader.set(true);
-        }
-    }
-
-    changeAutoIncrement(): void {
-        if (this.isReadOnly() || !this.isNumberAttribution()) {
-            return;
-        }
-        this.automaticallyIncrementNumber.set(!this.automaticallyIncrementNumber());
-    }
-
-    changeDisplayName(): void {
-        this.displayFullname.set(!this.displayFullname());
-    }
-
-    changeTechnicalInfo(): void {
-        this.displayTechnical.set(!this.displayTechnical());
-    }
-
-    changeHeader(): void {
-        this.displayHeader.set(!this.displayHeader());
-    }
-
-    // ---------------------------------------------------------------------------
-    // rotation
-    private rotate(d: DimensionCell): void {
-        const r = d.rows;
-        d.rows = d.cols;
-        d.cols = r;
-    }
-
-    changeRotationAvailableDimensions(): void {
-        const next = this.availableDimensions().map(d => (this.rotate(d), d));
-        this.availableDimensions.set(next);
-    }
-
-    changeRotationAvailableStands(): void {
-        const next = this.unassignedStandDimensions().map(d => (this.rotate(d), d));
-        this.unassignedStandDimensions.set(next);
-    }
-
-    // ---------------------------------------------------------------------------
-    // context menu / assign / remove / prereserved
-    openContextMenu(event: MouseEvent, cell: GridCell): void {
-        event.preventDefault();
-        if (this.isReadOnly()) {
-            return;
-        }
-
-        if (!cell?.id) {
-            this.cm?.hide();
-            return;
-        }
-
-        this.contextMenuItems.set(this.buildContextMenuItems(cell));
-        this.cm?.show(event);
-    }
-
-    openStandDialog(cell: GridCell | null): void {
-        this.selectStandDialog.set(cell);
-        this.standDialogVisible.set(true);
-    }
-
-    removeShapeById(shapeId: string | null | undefined): void {
-        if (!shapeId) {
-            return;
-        }
-
-        const cells = this.shapeIndex.get(shapeId);
-        if (!cells?.length) {
-            return;
-        }
-
-        for (const cell of cells) {
-            this.unassignCell(cell);
-            this.resetCell(cell);
-        }
-
-        this.shapeIndex.delete(shapeId);
-        this.cm?.hide();
-    }
-
-    unassign(shapeId: string | null | undefined): void {
-        if (!shapeId) {
-            return;
-        }
-
-        const cells = this.shapeIndex.get(shapeId);
-        if (!cells?.length) {
-            return;
-        }
-
-        for (const cell of cells) {
-            this.unassignCell(cell);
-        }
-
-        this.cm?.hide();
-    }
-
-    assign(givenStand: IStand, givenCell: GridCell | null): void {
-        if (!givenCell?.id) {
-            return;
-        }
-
-        const cells = this.shapeIndex.get(givenCell.id);
-        if (!cells?.length) {
-            return;
-        }
-
-        for (const cell of cells) {
-            if (!cell.dimension) {
-                continue;
-            }
-            cell.dimension.stand = structuredClone(givenStand);
-            cell.dimension.color = getColorStand(cell.dimension.stand);
-        }
-
-        // assign only once in assignedStandDimensions list (firstCell dimension)
-        const first = cells.find(c => c.firstCell)?.dimension;
-        if (first) {
-            this.assignedStandDimensions.set([...this.assignedStandDimensions(), first]);
-            this.standIndex.set(givenStand.id!, {planIndex: this.activeIndex(), dimension: first});
-        }
-
-        this.unassignedStandDimensions.set(this.unassignedStandDimensions().filter(d => d.stand!.id !== givenStand.id));
-        this.cm?.hide();
-    }
-
-    prereserved(dimension: DimensionCell): void {
-        this.prereservedTargetDimension = dimension;
-        this.prereservedNote = null;
-        this.prereservedDialogVisible.set(true);
-        this.cm?.hide();
-    }
-
-    onPrereservedDialogHide(): void {
-        this.prereservedNote = null;
-        this.prereservedTargetDimension = null;
-        this.prereservedDialogVisible.set(false);
-    }
-
-    canConfirmPrereserved(): boolean {
-        return this.prereservedNote != null && this.prereservedNote.trim().length > 0;
-    }
-
-    confirmPrereserved(): void {
-        if (!this.prereservedTargetDimension || !this.prereservedNote) {
-            return;
-        }
-        this.prereservedTargetDimension.prereserved = {note: this.prereservedNote.trim()};
-        this.onPrereservedDialogHide();
-    }
-
-    cancelPrereserved(cell: DimensionCell): void {
-        if (!cell) {
-            return;
-        }
-        cell.prereserved = null;
-        this.cm?.hide();
-    }
-
-    private unassignCell(cell: GridCell): void {
-        if (!cell.dimension?.stand) {
-            return;
-        }
-
-        const standId = cell.dimension.stand.id!;
-        this.assignedStandDimensions.set(this.assignedStandDimensions().filter(c => c.stand!.id !== standId));
-
-        this.unassignedStandDimensions.set([
-                                               ...this.unassignedStandDimensions(),
-                                               convertAvailableDimensionCell(cell.dimension.stand.dimension, cell.dimension.stand)
-                                           ]);
-
-        // index search
-        this.standIndex.delete(standId);
-
-        cell.dimension.stand = null;
-        cell.dimension.color = getColorStand(cell.dimension.stand);
-    }
-
-    private buildContextMenuItems(cell: GridCell): MenuItem[] {
-        const items: MenuItem[] = [];
-        const available = this.unassignedStandDimensions();
-
-        if (!cell.dimension?.stand) {
-            if (available.length) {
-                items.push({
-                               label: 'Attribuer à...',
-                               icon: PrimeIcons.USER_PLUS + ' text-success',
-                               items: available.map(dim => ({
-                                   label: this.getFormattedParticipationName(dim.stand!.participation),
-                                   icon:
-                                       dim.stand!.dimension?.id === cell.dimension?.idDimension
-                                       ? PrimeIcons.VERIFIED + ' text-success'
-                                       : PrimeIcons.EXCLAMATION_CIRCLE + ' text-warning',
-                                   command: () => this.assign(dim.stand!, cell)
-                               }))
-                           });
-            } else {
-                items.push({label: 'Aucun stand disponible', icon: PrimeIcons.USER, disabled: true});
-            }
-        }
-
-        if (cell.dimension?.stand) {
-            items.push({
-                           label: 'Désattribuer',
-                           icon: PrimeIcons.USER_MINUS + ' text-warning',
-                           command: () => this.unassign(cell.id)
-                       });
-        }
-
-        if (cell.dimension?.prereserved) {
-            items.push({
-                           label: 'Annuler la réservation',
-                           icon: PrimeIcons.TAG + ' text-warning',
-                           command: () => this.cancelPrereserved(cell.dimension!)
-                       });
-        }
-
-        if (!cell.dimension?.stand && !cell.dimension?.prereserved) {
-            items.push({
-                           label: 'Réserver la place...',
-                           icon: PrimeIcons.TAG + ' text-success',
-                           command: () => this.prereserved(cell.dimension!)
-                       });
-        }
-
-        items.push({
-                       label: 'Supprimer l\'emplacement',
-                       icon: PrimeIcons.TRASH + ' text-danger',
-                       command: () => this.removeShapeById(cell.id)
-                   });
-
-        return items;
-    }
-
-    // ---------------------------------------------------------------------------
-    // keyboard
-    private handleKeydown(event: KeyboardEvent): void {
-        if (this.isDragging() && event.code === 'KeyR' && this.draggingCell?.dimension) {
-            event.preventDefault();
-            this.rotate(this.draggingCell.dimension);
-            this.clearHighlights();
-        }
-    }
-
-    // ---------------------------------------------------------------------------
-    // shape index
-    private rebuildShapeIndex(data: IFloorPlanData): void {
-        this.shapeIndex.clear();
-        for (const row of data.cells) {
-            for (const cell of row) {
-                if (!cell.id) {
-                    continue;
-                }
-                const list = this.shapeIndex.get(cell.id) ?? [];
-                list.push(cell);
-                this.shapeIndex.set(cell.id, list);
-            }
-        }
-    }
-
-    previousState(): void {
-        window.history.back();
-    }
-}
-
-export function formatterStandDimension(cell: DimensionCell): string {
-    return removeAccents(getFormattedParticipationName(cell.stand?.participation));
-}
-
-export function selectFilterStandDimension(): string {
-    return `stand.participation.therapistName,stand.participation.exhibitor.${selectFilterExhibitor()
-        .split(',')
-        .join(',exhibitor.')}`;
+    protected readonly formatSize = formatSize;
+    protected readonly formatterStand = (stand: IStand): string =>
+        removeAccents(getFormattedParticipationName(stand?.participation));
+    protected readonly selectFilterStand = (): string =>
+        `participation.therapistName,participation.exhibitor.${selectFilterExhibitor().split(',').join(',exhibitor.')}`;
+    protected readonly getExhibitorFullName = getExhibitorFullName;
+    protected readonly getFormattedParticipationName = getFormattedParticipationName;
 }

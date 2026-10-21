@@ -1,0 +1,277 @@
+<div class="fp-inspector">
+    @if (location(); as location) {
+        <!-- ============================== Stand sélectionné -->
+        <div class="fp-inspector-header">
+            <span class="fp-card-meta">
+                {{ (location.stand ? 'floorPlan.inspector.assigned' : 'floorPlan.inspector.emptySlot') | translate }}
+                · {{ plan().name }}
+            </span>
+            <div class="fp-inspector-title">
+                <h5>
+                    <span jhiTranslate="floorPlan.stand.title"></span>
+                    @if (location.position != null) {
+                        <span>&nbsp;{{ location.position }}</span>
+                    }
+                </h5>
+                <span class="fp-chip-static">{{ sizeLabel() }} m</span>
+            </div>
+        </div>
+
+        @for (conflict of selectedConflicts(); track $index) {
+            <div class="fp-alert fp-alert-danger">
+                <span [jhiTranslate]="conflict.kind === 'OUT_OF_PLAN' ? 'floorPlan.stand.outOfPlan' : 'floorPlan.stand.overlap'"></span>
+            </div>
+        }
+
+        @if (mismatch()) {
+            <div class="fp-alert fp-alert-warn" jhiTranslate="floorPlan.stand.differentDimension"></div>
+        }
+
+        @if (location.prereserved) {
+            <div class="fp-alert fp-alert-accent">
+                <strong jhiTranslate="floorPlan.stand.prereserved"></strong>
+                <span>{{ location.prereserved.note }}</span>
+            </div>
+        }
+
+        @if (stand(); as stand) {
+            @if (displaySensibleInformation()) {
+                <div [style.border-left-color]="standColor()" class="fp-exhibitor-box">
+                    <div class="fp-card-title">{{ standName() }}</div>
+                    <div class="fp-card-meta">{{ personName() }}</div>
+                    <div class="fp-card-meta">{{ categoryKey() | translate }}</div>
+                    <p-tag [value]="'stand.status.list.' + stand.status | translate" class="mt-1"/>
+                </div>
+
+                <!-- Fiche technique -->
+                <h6 class="fp-section-title" jhiTranslate="floorPlan.tech.title"></h6>
+                <div class="fp-tech-grid">
+                    @for (tile of technicalTiles(); track tile.labelKey) {
+                        <div [class.highlighted]="tile.highlighted" [class.missing]="tile.missing" class="fp-tech-tile">
+                            <span class="fp-tech-icon"><fa-icon [icon]="tile.icon"></fa-icon></span>
+                            <span class="fp-tech-value">
+                                {{ tile.value.startsWith('floorPlan.') ? (tile.value | translate) : tile.value }}
+                            </span>
+                            <span [jhiTranslate]="tile.labelKey" class="fp-card-meta"></span>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (!readOnly()) {
+                <button-box (clickedEvent)="standReleased.emit()"
+                            primeIcon="pi-user-minus"
+                            translateKey="floorPlan.stand.release"
+                            type="secondary"/>
+            }
+        } @else if (!readOnly()) {
+            <select-box [enableFilter]="true"
+                        [formControl]="assignControl"
+                        [formatterFunction]="formatterStand"
+                        [options]="assignableStands()"
+                        (blur)="onAssignBlur()"
+                        (change)="onAssignBlur()"
+                        fieldName="assignStand"
+                        translateKey="floorPlan.stand.assign"/>
+            <p class="fp-card-meta">
+                {{ 'floorPlan.stand.sameDimension' | translate: {n: sameDimensionStands().length} }}
+            </p>
+        }
+
+        @if (!readOnly()) {
+            <h6 class="fp-section-title" jhiTranslate="floorPlan.inspector.placement"></h6>
+
+            <number-box (blur)="onPositionBlur()"
+                        [formControl]="positionControl"
+                        fieldName="position"
+                        translateKey="floorPlan.nextPosition"/>
+
+            <select-box (change)="onDimensionBlur()"
+                        [enableFilter]="true"
+                        [formControl]="dimensionControl"
+                        [formatterFunction]="formatterDimension"
+                        [options]="dimensions()"
+                        fieldName="dimension"
+                        translateKey="floorPlan.detail.dimension"/>
+
+            <ng-container *ngTemplateOutlet="orientation"></ng-container>
+
+            <div class="fp-inspector-actions">
+                <button-box (clickedEvent)="duplicateRequested.emit()"
+                            primeIcon="pi-copy"
+                            translateKey="common.duplicate"
+                            type="secondary"/>
+                <button-box (clickedEvent)="deleteRequested.emit()"
+                            primeIcon="pi-trash"
+                            translateKey="common.delete"
+                            type="danger"/>
+            </div>
+        }
+    } @else if (element(); as element) {
+        <!-- ============================== Élément sélectionné -->
+        <div class="fp-inspector-header">
+            <span class="fp-card-meta">{{ plan().name }}</span>
+            <div class="fp-inspector-title">
+                <h5>{{ elementTypeKey(element.type) | translate }}</h5>
+                <span class="fp-chip-static">{{ sizeLabel() }} m</span>
+            </div>
+        </div>
+
+        @if (!readOnly()) {
+            <select-box (change)="onTypeBlur()"
+                        [formControl]="typeControl"
+                        [formatterFunction]="formatterElementType"
+                        [needTranslation]="true"
+                        [options]="elementTypes"
+                        fieldName="elementType"
+                        translateKey="floorPlan.element.type"/>
+
+            <text-box (blur)="onLabelBlur()"
+                      [formControl]="labelControl"
+                      fieldName="label"
+                      translateKey="floorPlan.element.label"/>
+
+            <div class="fp-inspector-row">
+                <number-box (blur)="onSizeBlur()"
+                            [formControl]="widthControl"
+                            [modeDecimal]="true"
+                            fieldName="widthMeter"
+                            translateKey="floorPlan.width"/>
+                <number-box (blur)="onSizeBlur()"
+                            [formControl]="depthControl"
+                            [modeDecimal]="true"
+                            fieldName="depthMeter"
+                            translateKey="floorPlan.depth"/>
+            </div>
+
+            <ng-container *ngTemplateOutlet="orientation"></ng-container>
+
+            <div class="fp-blocking-box">
+                <checkbox-box (change)="onBlockingToggle()"
+                              [formControl]="blockingControl"
+                              fieldName="blocking"
+                              translateKey="floorPlan.element.blocking"/>
+                <p [jhiTranslate]="blockingHelpKey()" class="fp-card-meta"></p>
+
+                @if (blockingIsCustom()) {
+                    <p class="fp-card-meta" jhiTranslate="floorPlan.element.custom"></p>
+                    <button-box (clickedEvent)="resetBlocking()"
+                                primeIcon="pi-replay"
+                                translateKey="floorPlan.element.reset"
+                                type="secondary"/>
+                }
+            </div>
+
+            <div class="fp-inspector-actions">
+                <button-box (clickedEvent)="duplicateRequested.emit()"
+                            primeIcon="pi-copy"
+                            translateKey="common.duplicate"
+                            type="secondary"/>
+                <button-box (clickedEvent)="deleteRequested.emit()"
+                            primeIcon="pi-trash"
+                            translateKey="common.delete"
+                            type="danger"/>
+            </div>
+        }
+    } @else {
+        <!-- ============================== Vue d'ensemble -->
+        <h6 class="fp-section-title" jhiTranslate="floorPlan.summary.title"></h6>
+
+        <div class="fp-kpi-grid">
+            <div class="fp-kpi">
+                <span class="fp-kpi-value">{{ placedCount() }} / {{ totalStands() }}</span>
+                <span class="fp-card-meta" jhiTranslate="floorPlan.summary.placed"></span>
+            </div>
+            <div class="fp-kpi">
+                <span class="fp-kpi-value">{{ freeCount() }}</span>
+                <span class="fp-card-meta" jhiTranslate="floorPlan.summary.free"></span>
+            </div>
+            <div class="fp-kpi" [class.has-conflict]="conflictCount() > 0">
+                <span class="fp-kpi-value">{{ conflictCount() }}</span>
+                <span class="fp-card-meta" jhiTranslate="floorPlan.summary.conflicts"></span>
+            </div>
+        </div>
+
+        @if (conflictEntries().length) {
+            <h6 class="fp-section-title" jhiTranslate="floorPlan.summary.toFix"></h6>
+            @for (entry of conflictEntries(); track entry.objectId) {
+                <button (click)="conflictSelected.emit(entry.objectId)" class="fp-list-row danger" type="button">
+                    <span class="text-ellipsis">{{ entry.label }}</span>
+                    <span [jhiTranslate]="entry.messageKey" class="fp-card-meta"></span>
+                </button>
+            }
+        }
+
+        @if (mismatchEntries().length) {
+            <h6 class="fp-section-title" jhiTranslate="floorPlan.summary.mismatches"></h6>
+            @for (entry of mismatchEntries(); track entry.objectId) {
+                <button (click)="conflictSelected.emit(entry.objectId)" class="fp-list-row warn" type="button">
+                    <span class="text-ellipsis">{{ entry.label }}</span>
+                    <span [jhiTranslate]="entry.messageKey" class="fp-card-meta"></span>
+                </button>
+            }
+        }
+
+        @if (categoryLegend().length) {
+            <h6 class="fp-section-title" jhiTranslate="floorPlan.summary.legend"></h6>
+            <div class="fp-legend">
+                @for (entry of categoryLegend(); track entry.key) {
+                    <span class="fp-legend-item">
+                        <span [style.background-color]="entry.color" class="fp-legend-swatch"></span>
+                        {{ entry.key | translate }}
+                    </span>
+                }
+            </div>
+        }
+
+        @if (statusBars().length) {
+            <h6 class="fp-section-title" jhiTranslate="floorPlan.summary.statuses"></h6>
+            @for (bar of statusBars(); track bar.status) {
+                <div class="fp-status-bar">
+                    <span class="fp-card-meta text-ellipsis">{{ 'stand.status.list.' + bar.status | translate }}</span>
+                    <span class="fp-progress">
+                        <span [style.background-color]="bar.color" [style.width.%]="bar.ratio * 100"
+                              class="fp-progress-value"></span>
+                    </span>
+                    <span class="fp-card-meta">{{ bar.count }}</span>
+                </div>
+            }
+        }
+
+        <h6 class="fp-section-title">
+            {{ 'floorPlan.summary.logistics' | translate: {plan: plan().name} }}
+        </h6>
+        <div class="fp-kpi-grid">
+            <div class="fp-kpi">
+                <span class="fp-kpi-value">{{ logistics().outlets }}</span>
+                <span class="fp-card-meta" jhiTranslate="floorPlan.summary.outlets"></span>
+            </div>
+            <div class="fp-kpi">
+                <span class="fp-kpi-value">{{ logistics().chairs }}</span>
+                <span class="fp-card-meta" jhiTranslate="floorPlan.tech.chairs"></span>
+            </div>
+            <div class="fp-kpi">
+                <span class="fp-kpi-value">{{ logistics().tables }}</span>
+                <span class="fp-card-meta" jhiTranslate="floorPlan.tech.tables"></span>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Boussole d'orientation, commune aux stands et aux éléments -->
+<ng-template #orientation>
+    <h6 class="fp-section-title" jhiTranslate="floorPlan.orientation.title"></h6>
+    <div class="fp-compass">
+        @for (angle of compassAngles; track angle) {
+            <button (click)="setAngle(angle)"
+                    [class.active]="angleOf(location() ?? element()) === angle"
+                    class="fp-compass-button"
+                    type="button">{{ angle }}°
+            </button>
+        }
+    </div>
+    <number-box (blur)="onAngleBlur()"
+                [formControl]="angleControl"
+                fieldName="rotationDeg"
+                translateKey="floorPlan.orientation.precise"/>
+</ng-template>

@@ -1,0 +1,159 @@
+:host {
+  display: block;
+}
+
+.floor-plan-canvas {
+  display: block;
+  touch-action: none;
+  user-select: none;
+}
+
+.fp-floor {
+  fill: var(--app-floor);
+  stroke: var(--app-ink);
+}
+
+.fp-grid-line {
+  stroke: var(--app-grid);
+}
+
+.fp-grid-line-strong {
+  stroke: var(--app-grid-strong);
+}
+
+.fp-hatch-conflict {
+  stroke: var(--app-danger);
+}
+
+.fp-hatch-prereserved {
+  stroke: var(--app-accent);
+}
+
+.fp-hatch-aisle {
+  stroke: var(--app-grid-strong);
+}
+
+.fp-ruler-tick {
+  stroke: var(--app-edge);
+}
+
+.fp-ruler-label {
+  fill: var(--app-ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.fp-ruler-label-y {
+  text-anchor: end;
+}
+
+.fp-scale-label {
+  fill: var(--app-muted);
+  text-anchor: end;
+  dominant-baseline: central;
+}
+
+.fp-item {
+  cursor: pointer;
+}
+
+.fp-shape {
+  stroke: var(--app-edge);
+}
+
+.fp-item.fp-conflict .fp-shape {
+  stroke: var(--app-danger);
+}
+
+.fp-item.fp-mismatch .fp-shape {
+  stroke: var(--app-warn);
+}
+
+.fp-item.fp-selected .fp-shape,
+.fp-item.fp-searched .fp-shape {
+  stroke: var(--app-accent);
+}
+
+.fp-overlay {
+  pointer-events: none;
+}
+
+.fp-step {
+  stroke: var(--app-ink);
+  fill: none;
+}
+
+.fp-band {
+  fill: var(--app-ink);
+  fill-opacity: 0.075;
+}
+
+.fp-band-rule {
+  stroke: var(--app-ink);
+  stroke-opacity: 0.2;
+}
+
+.fp-number {
+  fill: var(--app-ink);
+  font-weight: 500;
+  font-stretch: condensed;
+  text-anchor: start;
+  dominant-baseline: central;
+}
+
+.fp-text {
+  fill: var(--app-ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.fp-text.fp-text-muted {
+  fill: var(--app-muted);
+}
+
+.fp-chip {
+  fill: var(--app-surface);
+  stroke: var(--app-muted);
+}
+
+.fp-chip.fp-chip-active {
+  fill: var(--app-amber-soft);
+  stroke: var(--app-amber);
+}
+
+.fp-chip-glyph {
+  fill: var(--app-muted);
+}
+
+.fp-chip-glyph-active {
+  fill: var(--app-amber);
+}
+
+.fp-chip-label {
+  fill: var(--app-ink);
+  text-anchor: start;
+  dominant-baseline: central;
+}
+
+.fp-selection {
+  fill: none;
+  stroke: var(--app-accent);
+}
+
+.fp-handle-stem {
+  stroke: var(--app-accent);
+}
+
+.fp-handle {
+  fill: var(--app-surface);
+  stroke: var(--app-accent);
+  stroke-width: 0.02;
+}
+
+.fp-handle-rotate {
+  cursor: grab;
+}
+
+.fp-handle-resize {
+  cursor: nwse-resize;
+}

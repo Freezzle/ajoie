@@ -1,0 +1,246 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+.fp-inspector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fp-inspector-header {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.fp-inspector-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.fp-inspector-title h5 {
+  margin: 0;
+  font-size: var(--app-fs-md);
+}
+
+.fp-chip-static {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--app-surface-muted);
+  color: var(--app-muted);
+  font-size: var(--app-fs-xs);
+}
+
+.fp-section-title {
+  margin: 0.4rem 0 0;
+  color: var(--app-muted);
+  font-size: var(--app-fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fp-card-title {
+  font-size: var(--app-fs-sm);
+  font-weight: 600;
+}
+
+.fp-card-meta {
+  color: var(--app-muted);
+  font-size: var(--app-fs-xs);
+}
+
+.fp-alert {
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.4rem;
+  font-size: var(--app-fs-xs);
+}
+
+.fp-alert-danger {
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+
+.fp-alert-warn {
+  background: var(--app-warn-soft);
+  color: var(--app-warn);
+}
+
+.fp-alert-accent {
+  display: flex;
+  flex-direction: column;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
+}
+
+.fp-exhibitor-box {
+  padding: 0.5rem;
+  border: 1px solid var(--app-line);
+  border-left: 0.35rem solid var(--app-line);
+  border-radius: 0.5rem;
+}
+
+.fp-tech-grid {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fp-tech-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem;
+  border: 1px solid var(--app-line);
+  border-radius: 0.5rem;
+}
+
+.fp-tech-tile.missing {
+  border-style: dashed;
+  color: var(--app-muted);
+}
+
+.fp-tech-tile.highlighted {
+  border-color: var(--app-amber);
+  background: var(--app-amber-soft);
+}
+
+.fp-tech-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.4rem;
+  background: var(--app-surface-muted);
+}
+
+.fp-tech-value {
+  font-size: var(--app-fs-sm);
+  font-weight: 600;
+}
+
+.fp-inspector-row {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fp-inspector-actions {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.fp-compass {
+  display: grid;
+  gap: 0.2rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.fp-compass-button {
+  padding: 0.2rem 0;
+  border: 1px solid var(--app-line);
+  border-radius: 0.35rem;
+  background: var(--app-surface);
+  font-size: var(--app-fs-xs);
+}
+
+.fp-compass-button.active {
+  border-color: var(--app-accent);
+  background: var(--app-accent-soft);
+}
+
+.fp-blocking-box {
+  padding: 0.5rem;
+  border: 1px solid var(--app-line);
+  border-radius: 0.5rem;
+}
+
+.fp-kpi-grid {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.fp-kpi {
+  display: flex;
+  flex-direction: column;
+  padding: 0.4rem;
+  border: 1px solid var(--app-line);
+  border-radius: 0.5rem;
+}
+
+.fp-kpi.has-conflict {
+  border-color: var(--app-danger);
+  color: var(--app-danger);
+}
+
+.fp-kpi-value {
+  font-size: var(--app-fs-md);
+  font-weight: 600;
+}
+
+.fp-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--app-line);
+  border-radius: 0.4rem;
+  background: var(--app-surface);
+  font-size: var(--app-fs-xs);
+  text-align: left;
+}
+
+.fp-list-row.danger {
+  border-left: 0.2rem solid var(--app-danger);
+}
+
+.fp-list-row.warn {
+  border-left: 0.2rem solid var(--app-warn);
+}
+
+.fp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.fp-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--app-fs-xs);
+}
+
+.fp-legend-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 0.2rem;
+}
+
+.fp-status-bar {
+  display: grid;
+  align-items: center;
+  gap: 0.35rem;
+  grid-template-columns: 6rem 1fr auto;
+}
+
+.fp-progress {
+  display: block;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--app-surface-muted);
+}
+
+.fp-progress-value {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}

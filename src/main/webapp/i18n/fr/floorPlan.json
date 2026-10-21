@@ -4,43 +4,165 @@
     "attributionMode": "Attribuer une position",
     "automaticallyIncrementNumber": "Incrémenter position automatiquement",
     "changeRotation": "Changer de rotation",
-    "delete": {
-      "button": "Supprimer",
-      "question": "Voulez-vous supprimer le plan \"{{floorName}}\" ?"
-    },
+    "depth": "Profondeur (m)",
     "detail": {
       "category": "Catégorie",
       "comment": "Commentaire",
       "dimension": "Dimension",
       "dimensionParticipation": "Dimension participation",
       "dimensionPlan": "Dimension sur plan",
+      "goToBilling": "Facturation",
+      "goToParticipation": "Participation",
       "location": "Détail de l'emplacement",
       "name": "Nom",
       "prereserved": "Pré-réservé",
-      "status": "Status",
+      "status": "Statut",
       "tags": "Tags",
       "therapist": "Thérapeute"
     },
     "differentDimension": "Les dimensions diffèrent",
     "displayName": "Voir nom / nom de thérapeute",
-    "height": "Hauteur (m)",
+    "height": "Profondeur (m)",
     "loading": "Chargement en cours...",
-    "move": {
-      "left": "Déplacer",
-      "right": "Déplacer"
-    },
     "name": "Nom du plan",
     "nextPosition": "Position",
-    "noFloorPlanFound": "Aucun plan trouvé. Veuiller en créer un !",
-    "rename": "Renommer",
+    "noFloorPlanFound": "Aucun plan trouvé. Veuillez en créer un !",
     "reserve": {
       "note": "Note",
       "title": "Réserver la place"
     },
-    "spacing": "Espacement (m)",
     "standSearching": "Recherche de la position d'un stand attribué",
     "technicalInfo": "Voir information technique",
     "unknown": "Inconnu",
-    "width": "Largeur (m)"
+    "width": "Largeur (m)",
+    "canvas": {
+      "scale": "{{size}} m · grille {{grid}} m · pas {{step}} m"
+    },
+    "view": {
+      "exhibitor": "Exposant",
+      "technical": "Technique",
+      "header": "Afficher le bandeau",
+      "personName": "Afficher le nom de la personne",
+      "standName": "Afficher le nom du stand",
+      "sensible": "Afficher les informations sensibles",
+      "snap": "Caler au pas",
+      "fit": "Tout voir",
+      "togglePalette": "Afficher ou masquer la palette",
+      "toggleInspector": "Afficher ou masquer le panneau de détail"
+    },
+    "status": {
+      "locations": "emplacements",
+      "assigned": "attribués",
+      "free": "libres",
+      "noConflict": "Aucun conflit"
+    },
+    "palette": {
+      "exhibitors": "Exposants",
+      "empty": "Vides",
+      "elements": "Éléments",
+      "summary": "Bilan",
+      "filter": "Filtrer les exposants à placer",
+      "nextAngle": "Angle des prochains posés",
+      "dragHelp": "Glissez une carte sur le plan pour la poser.",
+      "placed": "{{n}} posés · {{need}} demandés",
+      "blocking": "Bloquant",
+      "nonBlocking": "Non bloquant",
+      "noExhibitor": "Tous les exposants sont placés."
+    },
+    "inspector": {
+      "assigned": "Stand attribué",
+      "emptySlot": "Emplacement vide",
+      "placement": "Placement"
+    },
+    "stand": {
+      "title": "Stand",
+      "free": "libre",
+      "prereserved": "pré-réservé",
+      "overlap": "Chevauchement",
+      "sizeMismatch": "Demandé {{asked}}, emplacement {{slot}}",
+      "shared": "Stand partagé",
+      "outOfPlan": "dépasse du plan",
+      "release": "Libérer l'emplacement",
+      "assign": "Attribuer à un exposant",
+      "sameDimension": "Même dimension ({{n}})",
+      "otherDimension": "Autres dimensions",
+      "conform": "Dimension conforme",
+      "differentDimension": "Dimension différente"
+    },
+    "tech": {
+      "title": "Fiche technique",
+      "electricity": "Électricité",
+      "chairs": "Chaises",
+      "tables": "Tables",
+      "shared": "Stand partagé",
+      "yes": "Oui",
+      "no": "Non"
+    },
+    "element": {
+      "type": "Type",
+      "label": "Libellé",
+      "blocking": "Bloquant",
+      "nonBlocking": "Non bloquant",
+      "blockingHelp": "Un stand posé dessus passe en conflit.",
+      "nonBlockingHelp": "Les stands peuvent le recouvrir sans conflit.",
+      "custom": "Réglage propre à cet objet",
+      "reset": "Revenir au défaut",
+      "types": {
+        "AISLE": "Allée",
+        "DOOR": "Entrée",
+        "EXIT": "Sortie de secours",
+        "STAIRS": "Escalier",
+        "ELEVATOR": "Ascenseur",
+        "STAGE": "Scène",
+        "BAR": "Buvette",
+        "WC": "Toilettes",
+        "TECH": "Local technique",
+        "POWER": "Borne électrique",
+        "MARK": "Repère",
+        "WALL": "Mur",
+        "PILLAR": "Pilier"
+      }
+    },
+    "orientation": {
+      "title": "Orientation",
+      "precise": "Angle précis"
+    },
+    "summary": {
+      "title": "Vue d'ensemble",
+      "placed": "exposants placés",
+      "free": "emplacements libres",
+      "conflicts": "conflits",
+      "toFix": "À corriger",
+      "mismatches": "Dimensions différentes",
+      "legend": "Catégories",
+      "statuses": "Statuts · stands placés",
+      "logistics": "Logistique · {{plan}}",
+      "outlets": "prises"
+    },
+    "settings": {
+      "title": "Réglages du plan",
+      "gridAndSteps": "Grille et pas",
+      "plans": "Plans",
+      "elements": "Éléments",
+      "grid": "Grille affichée",
+      "gridHelp": "Lignes fines du plan, un trait plus marqué chaque mètre et tous les 5 m.",
+      "move": "Pas de déplacement",
+      "moveHelp": "Les objets se calent sur ce pas en glissant et avec les flèches. Alt + flèche : 5 cm.",
+      "rotation": "Pas de rotation",
+      "rotationHelp": "Poignée de rotation et touches Q / E. Maj + poignée : degré par degré.",
+      "magnet": "Aimanter aux bords voisins",
+      "magnetHelp": "Colle un objet contre le mur ou le stand d'à côté quand il en est à moins de 35 cm.",
+      "addPlan": "Ajouter un plan",
+      "shrinkHelp": "Réduire un plan ne supprime rien : les stands qui dépassent passent en conflit.",
+      "deleteConfirm": "{{n}} exposant(s) à replacer",
+      "keep": "Garder",
+      "elementsHelp": "Taille à la pose et comportement par défaut. Chaque objet posé peut ensuite avoir son propre réglage.",
+      "apply": "Appliquer",
+      "applied": "Réglages appliqués",
+      "moreConflicts": "{{n}} conflit(s) à revoir",
+      "toReplace": "{{n}} exposant(s) à replacer",
+      "errorPlanSize": "« {{name}} » : largeur et profondeur entre 2 et 400 m.",
+      "errorElementSize": "{{type}} : taille d'au moins 10 cm."
+    }
   }
 }

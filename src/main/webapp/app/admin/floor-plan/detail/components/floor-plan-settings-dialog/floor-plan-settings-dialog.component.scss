@@ -1,0 +1,52 @@
+.fp-settings-preview {
+  width: 100%;
+  height: 5rem;
+  border: 1px solid var(--app-line);
+  border-radius: 0.4rem;
+  background: var(--app-floor);
+}
+
+.fp-preview-grid {
+  stroke: var(--app-grid-strong);
+  stroke-width: 0.01;
+}
+
+.fp-preview-dot {
+  fill: var(--app-accent);
+}
+
+.fp-preview-stand {
+  fill: var(--app-accent-soft);
+  stroke: var(--app-accent);
+  stroke-width: 0.02;
+}
+
+.fp-preview-rotated {
+  fill: var(--app-surface-2);
+  stroke: var(--app-edge);
+  stroke-width: 0.02;
+}
+
+.fp-preview-label {
+  fill: var(--app-ink);
+  font-size: 0.22px;
+}
+
+.fp-settings-number {
+  width: 6rem;
+}
+
+.fp-settings-preview-cell {
+  width: 3.2rem;
+}
+
+.fp-preview-rect {
+  display: block;
+  border: 1px solid var(--app-edge);
+  background: var(--app-surface-2);
+}
+
+.fp-preview-rect.non-blocking {
+  border-style: dashed;
+  opacity: 0.55;
+}

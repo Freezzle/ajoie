@@ -1,5 +1,7 @@
 package ch.salon.web.rest;
 
+import ch.salon.domain.FloorPlanSettings;
+import ch.salon.domain.FloorPlanSettingsData;
 import ch.salon.domain.Participation;
 import ch.salon.domain.PlanningTalksSalon;
 import ch.salon.domain.PlanningVolunteerSalon;
@@ -160,6 +162,22 @@ public class AdminSalonResource {
             @RequestBody FloorPlanBatchRequestDTO request) {
         FloorPlanBatchResponseDTO response = salonService.batchUpdateFloorPlans(idSalon, request);
         return ResourceUtil.updated("floorPlans", idSalon).body(response);
+    }
+
+    @GetMapping("/{idSalon}/floor-plan-settings")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<FloorPlanSettingsData> getFloorPlanSettings(
+            @PathVariable(value = "idSalon") final UUID idSalon) {
+        return ResponseEntity.ok(salonService.getFloorPlanSettings(idSalon).getData());
+    }
+
+    @PutMapping("/{idSalon}/floor-plan-settings")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<FloorPlanSettingsData> updateFloorPlanSettings(
+            @PathVariable(value = "idSalon") final UUID idSalon,
+            @RequestBody FloorPlanSettingsData settings) {
+        FloorPlanSettings updated = salonService.updateFloorPlanSettings(idSalon, settings);
+        return ResourceUtil.updated("floorPlanSettings", idSalon).body(updated.getData());
     }
 
     @PutMapping("/{idSalon}/planning-talks")

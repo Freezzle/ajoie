@@ -38,6 +38,8 @@ public class SalonService {
     private final WorkshopRepository workshopRepository;
     private final InvoicingPlanRepository invoicingPlanRepository;
     private final FloorPlanSalonRepository floorPlanSalonRepository;
+    private final FloorPlanSettingsRepository floorPlanSettingsRepository;
+    private final FloorPlanMigrator floorPlanMigrator;
     private final SalonMapper salonMapper;
     private final FloorPlanSalonMapper floorPlanSalonMapper;
     private final PriceStandMapper priceStandMapper;
@@ -156,7 +158,55 @@ public class SalonService {
         }
 
         return this.floorPlanSalonRepository.findBySalonIdOrderByPosition(idSalon).stream()
-                .map(floorPlanSalonMapper::toDto).toList();
+                .map(floorPlanSalonMapper::toDto)
+                .peek(dto -> dto.setData(this.floorPlanMigrator.toCurrentFormat(dto.getData())))
+                .toList();
+    }
+
+    /**
+     * Réglages du plan de la salle. Un salon qui n'en a pas encore reçoit les valeurs par
+     * défaut, dont la grille reprend le pas des anciens plans quand il y en a un.
+     */
+    public FloorPlanSettings getFloorPlanSettings(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        return this.floorPlanSettingsRepository.findBySalonId(idSalon)
+                .orElseGet(() -> buildDefaultFloorPlanSettings(idSalon));
+    }
+
+    public FloorPlanSettings updateFloorPlanSettings(UUID idSalon, FloorPlanSettingsData data) {
+        if (idSalon == null || data == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        Salon salon = this.salonRepository.findById(idSalon).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        FloorPlanSettings settings = this.floorPlanSettingsRepository.findBySalonId(idSalon)
+                .orElseGet(() -> {
+                    FloorPlanSettings created = new FloorPlanSettings();
+                    created.setSalon(salon);
+                    return created;
+                });
+        settings.setData(data);
+
+        return this.floorPlanSettingsRepository.save(settings);
+    }
+
+    private FloorPlanSettings buildDefaultFloorPlanSettings(UUID idSalon) {
+        FloorPlanSettingsData data = FloorPlanSettingsData.defaults();
+
+        this.floorPlanSalonRepository.findBySalonIdOrderByPosition(idSalon).stream()
+                .map(plan -> this.floorPlanMigrator.legacySpacingMeter(plan.getData()))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(data::setGridMeter);
+
+        FloorPlanSettings settings = new FloorPlanSettings();
+        settings.setData(data);
+        return settings;
     }
 
     public FloorPlanBatchResponseDTO batchUpdateFloorPlans(UUID idSalon, FloorPlanBatchRequestDTO request) {
