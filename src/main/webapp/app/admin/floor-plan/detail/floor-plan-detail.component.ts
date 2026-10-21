@@ -193,7 +193,7 @@ export class FloorPlanDetailComponent {
 
     readonly pixelsPerMeter = signal(30);
     readonly displayTechnical = signal(false);
-    readonly displayFullname = signal(false);
+    readonly displayFullname = signal(true);
     readonly displayHeader = signal(true);
     readonly snapEnabled = signal(true);
     readonly isNumberAttribution = signal(false);
