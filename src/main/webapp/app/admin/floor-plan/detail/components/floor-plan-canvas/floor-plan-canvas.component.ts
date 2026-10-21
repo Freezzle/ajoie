@@ -438,19 +438,6 @@ export class FloorPlanCanvasComponent {
                 muted: false
             }));
 
-        const secondary = this.secondaryName(stand);
-        const secondarySize = size * 0.78;
-        const secondaryY = bodyTop + bodyHeight * 0.4 + lines.length * size * 1.15 + secondarySize * 0.6;
-
-        if (secondary && secondaryY + secondarySize / 2 < bodyTop + bodyHeight) {
-            lines.push({
-                y: secondaryY,
-                size: secondarySize,
-                text: cutText(secondary, innerWidth, secondarySize),
-                muted: true
-            });
-        }
-
         return lines;
     }
 
