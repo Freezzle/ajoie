@@ -6,6 +6,7 @@ import ch.salon.service.ParticipationService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.ExhibitorDTO;
 import ch.salon.service.dto.ExhibitorLightDTO;
+import ch.salon.service.dto.ExhibitorListDTO;
 import ch.salon.service.dto.ParticipationDTO;
 import ch.salon.utils.ResourceUtil;
 import ch.salon.utils.ResponseUtil;
@@ -74,10 +75,10 @@ public class AdminExhibitorResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<ExhibitorDTO> getAllExhibitors() {
+    public List<ExhibitorListDTO> getAllExhibitors() {
         log.debug("REST request to get all Exhibitors");
 
-        return exhibitorService.findAll();
+        return exhibitorService.findAllForList();
     }
 
     @GetMapping("/{idExhibitor}")

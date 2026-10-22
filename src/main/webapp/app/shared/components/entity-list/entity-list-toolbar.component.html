@@ -1,0 +1,47 @@
+<div class="el-toolbar">
+    <div class="el-toolbar-row">
+        <p-iconfield class="el-search" iconPosition="left">
+            <p-inputicon>
+                <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input [ngModel]="query()"
+                   (ngModelChange)="query.set($event)"
+                   [placeholder]="placeholderKey() | translate"
+                   pInputText
+                   type="text"/>
+        </p-iconfield>
+
+        <entity-group-sort-menu [(groupBy)]="groupBy"
+                                [(sort)]="sort"
+                                [groupOptions]="groupOptions()"
+                                [isDefault]="isDefault()"
+                                [sortOptions]="sortOptions()"/>
+    </div>
+
+    @if (visibleGroups().length > 0) {
+        <div class="el-chips">
+            @for (group of visibleGroups(); track group.key; let first = $first) {
+                @if (!first) {
+                    <span class="el-chips-separator"></span>
+                }
+                <span class="el-chips-label">{{ group.labelKey | translate }}</span>
+                @for (chip of group.chips; track chip.key) {
+                    <button (click)="toggleChip(chip)"
+                            [attr.aria-pressed]="isActive(chip)"
+                            [class.el-chip--on]="isActive(chip)"
+                            [style.--el-color]="chip.dotColor ?? chip.color ?? 'var(--app-text-muted)'"
+                            class="el-chip"
+                            type="button">
+                        @if (chip.dotColor) {
+                            <i class="el-dot"></i>
+                        } @else if (chip.icon) {
+                            <fa-icon [icon]="chip.icon"></fa-icon>
+                        }
+                        {{ chip.labelKey | translate }}
+                        <small>{{ chip.count }}</small>
+                    </button>
+                }
+            }
+        </div>
+    }
+</div>

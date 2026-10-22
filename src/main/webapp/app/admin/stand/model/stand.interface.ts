@@ -18,6 +18,7 @@ export interface IStand {
     category: Category | null;
     subCategories: string[] | [];
     extraInformation: string | null;
+    registrationDate: string | null;
     participation: IParticipation;
     dimension: IPriceStandSalon;
 }

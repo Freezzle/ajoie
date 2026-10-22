@@ -46,6 +46,36 @@
     },
     "subCategories": "Tags",
     "title": "Les stands",
+    "list": {
+      "searchPlaceholder": "Rechercher une description, un thérapeute, un tag",
+      "open": "Ouvrir la fiche du stand",
+      "countSingular": "stand",
+      "countPlural": "stands",
+      "sharedWithCoExhibitor": "Partagé (co-exposant)",
+      "status": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "CLOSED": "Clôturé",
+        "IN_VERIFICATION": "En vérification",
+        "REFUSED": "Refusé",
+        "VALIDATED": "Validé"
+      },
+      "statusGroup": {
+        "ACCEPTED": "Acceptés",
+        "CANCELED": "Annulés",
+        "CLOSED": "Clôturés",
+        "IN_VERIFICATION": "À vérifier",
+        "REFUSED": "Refusés",
+        "VALIDATED": "Validés",
+        "OUT": "Écartés"
+      },
+      "summary": {
+        "activeSingular": "actif",
+        "activePlural": "actifs",
+        "discardedSingular": "écarté",
+        "discardedPlural": "écartés"
+      }
+    },
     "urlPicture": "Url de l'image",
     "viewClipboard": "Liste technique",
     "viewStandard": "Vue standard",

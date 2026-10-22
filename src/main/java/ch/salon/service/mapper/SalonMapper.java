@@ -8,6 +8,9 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring",uses = {AddressMapper.class, BankAccountMapper.class, PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface SalonMapper {
 
+    @Mapping(target = "nbParticipations", ignore = true)
+    @Mapping(target = "nbConferences", ignore = true)
+    @Mapping(target = "nbWorkshops", ignore = true)
     SalonDTO toDto(Salon salon);
 
     @Mapping(target = "tenantId", ignore = true)

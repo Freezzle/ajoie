@@ -22,6 +22,29 @@
       }
     },
     "title": "Les ateliers",
-    "titleField": "Titre"
+    "titleField": "Titre",
+    "list": {
+      "searchPlaceholder": "Rechercher un titre, un thérapeute",
+      "open": "Ouvrir la fiche de l'atelier",
+      "countSingular": "atelier",
+      "countPlural": "ateliers",
+      "status": {
+        "ACCEPTED": "Accepté",
+        "CANCELED": "Annulé",
+        "CLOSED": "Clôturé",
+        "IN_VERIFICATION": "En vérification",
+        "REFUSED": "Refusé",
+        "VALIDATED": "Validé"
+      },
+      "statusGroup": {
+        "ACCEPTED": "Acceptés",
+        "CANCELED": "Annulés",
+        "CLOSED": "Clôturés",
+        "IN_VERIFICATION": "À vérifier",
+        "REFUSED": "Refusés",
+        "VALIDATED": "Validés",
+        "OUT": "Écartés"
+      }
+    }
   }
 }

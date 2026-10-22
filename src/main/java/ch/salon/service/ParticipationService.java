@@ -3,6 +3,7 @@ package ch.salon.service;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Salon;
+import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.State;
@@ -10,6 +11,7 @@ import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.*;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.ParticipationDTO;
+import ch.salon.service.dto.ParticipationListDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.ParticipationMapper;
 import ch.salon.web.rest.dto.InfoInvoice;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -32,6 +35,7 @@ public class ParticipationService {
 
     private final StandRepository standRepository;
     private final ConferenceRepository conferenceRepository;
+    private final WorkshopRepository workshopRepository;
     private final EventLogService eventLogService;
     private final SalonRepository salonRepository;
     private final InvoicingPlanRepository invoicingPlanRepository;
@@ -184,6 +188,70 @@ public class ParticipationService {
         throw new IllegalStateException("No filter given");
     }
 
+    /**
+     * Participations d'un salon, enrichies des compteurs de prestations et de factures
+     * utilisés par le pied de chaque ligne de la liste.
+     *
+     * <p>Une requête par type, puis regroupement en mémoire : pas de N+1.</p>
+     */
+    @Transactional(readOnly = true)
+    public List<ParticipationListDTO> findAllForList(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid salon id", ENTITY_NAME, "idnull");
+        }
+
+        Map<UUID, List<InvoicingPlan>> invoicingsByParticipation = invoicingPlanRepository
+                .findByParticipation_Salon_Id(idSalon).stream()
+                .collect(Collectors.groupingBy(invoicingPlan -> invoicingPlan.getParticipation().getId()));
+
+        List<Stand> stands = standRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
+                .filter(stand -> isActive(stand.getStatus())).toList();
+
+        Map<UUID, Long> standsByParticipation = countByParticipation(
+                stands.stream().map(stand -> stand.getParticipation().getId()));
+        Map<UUID, Long> sharedStandsByParticipation = countByParticipation(
+                stands.stream().filter(stand -> Boolean.TRUE.equals(stand.getShared()))
+                        .map(stand -> stand.getParticipation().getId()));
+
+        Map<UUID, Long> conferencesByParticipation = countByParticipation(
+                conferenceRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
+                        .filter(conference -> isActive(conference.getStatus()))
+                        .map(conference -> conference.getParticipation().getId()));
+
+        Map<UUID, Long> workshopsByParticipation = countByParticipation(
+                workshopRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
+                        .filter(workshop -> isActive(workshop.getStatus()))
+                        .map(workshop -> workshop.getParticipation().getId()));
+
+        return participationRepository.findBySalonIdOrderByRegistrationDateDesc(idSalon).stream()
+                .map(participation -> {
+                    ParticipationListDTO dto = participationMapper.toListDto(participation);
+                    UUID id = participation.getId();
+
+                    dto.setNbStands(standsByParticipation.getOrDefault(id, 0L));
+                    dto.setNbSharedStands(sharedStandsByParticipation.getOrDefault(id, 0L));
+                    dto.setNbConferences(conferencesByParticipation.getOrDefault(id, 0L));
+                    dto.setNbWorkshops(workshopsByParticipation.getOrDefault(id, 0L));
+
+                    InfoInvoice infoInvoice = buildInfoInvoice(invoicingsByParticipation.get(id));
+                    dto.setNbDraft(infoInvoice.getNbDraft());
+                    dto.setNbIssued(infoInvoice.getNbIssued());
+                    dto.setNbPaid(infoInvoice.getNbPaid());
+                    dto.setNbExpired(infoInvoice.getNbExpired());
+
+                    return dto;
+                })
+                .toList();
+    }
+
+    private static Map<UUID, Long> countByParticipation(Stream<UUID> participationIds) {
+        return participationIds.collect(Collectors.groupingBy(id -> id, Collectors.counting()));
+    }
+
+    private static boolean isActive(Status status) {
+        return status != Status.REFUSED && status != Status.CANCELED;
+    }
+
     public Optional<Participation> get(UUID id) {
         if (id == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -212,6 +280,7 @@ public class ParticipationService {
     public List<String> getExhibitorEmailsWithActiveParticipations() {
         List<Status> activeStatuses = Arrays.asList(Status.ACCEPTED, Status.VALIDATED, Status.CLOSED);
         return participationRepository.findByStatusIn(activeStatuses).stream()
+                .filter(participation -> !participation.getExhibitor().isRedFlag())
                 .map(participation -> participation.getExhibitor().getEmail())
                 .distinct()
                 .sorted()

@@ -1,4 +1,4 @@
-import {Component, inject, input, LOCALE_ID, OnInit, ViewChild} from '@angular/core';
+import {Component, computed, inject, input, LOCALE_ID, OnInit, signal, ViewChild} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
@@ -20,6 +20,12 @@ import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
+import {
+    DateTimelinePoint,
+    TimelineDotComponent
+} from '../../../shared/components/timeline-dot/timeline-dot.component';
+import {ParticipationService} from '../../participation/service/participation.service';
+import {IParticipation} from '../../participation/model/participation.interface';
 
 @Component({
                selector: 'app-salon-stats',
@@ -34,7 +40,8 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
                    ConfirmPopup,
                    CardComponent,
                    ContentPageComponent,
-                   ButtonBoxComponent
+                   ButtonBoxComponent,
+                   TimelineDotComponent
                ]
            })
 export class SalonStatsComponent implements OnInit {
@@ -46,9 +53,89 @@ export class SalonStatsComponent implements OnInit {
     private readonly messageService = inject(MessageService);
     readonly navigationService = inject(NavigationStateService);
     private readonly locale = inject(LOCALE_ID);
+    private readonly participationService = inject(ParticipationService);
+
+    /** Inscriptions du salon, utilisées par la ligne de temps. */
+    readonly participations = signal<IParticipation[]>([]);
+
+    readonly timelineStart = computed(() => {
+        const startingDate = this.salon()?.startingDate;
+        if (!startingDate) {
+            return null;
+        }
+
+        const start = new Date(startingDate);
+        start.setMonth(start.getMonth() - 7);
+
+        return start;
+    });
+
+    readonly timelineEnd = computed(() => {
+        const endingDate = this.salon()?.endingDate;
+
+        return endingDate ? new Date(endingDate) : null;
+    });
+
+    readonly points = computed<DateTimelinePoint[]>(() => {
+        const start = this.timelineStart();
+        const end = this.timelineEnd();
+
+        if (!start || !end) {
+            return [];
+        }
+
+        const points: DateTimelinePoint[] = this.participations()
+                                                .filter(participation => !!participation.registrationDate)
+                                                .map(participation => ({
+                                                    date: new Date(participation.registrationDate!),
+                                                    label: null,
+                                                    kind: 'registration' as const
+                                                }));
+
+        // on normalise end pour comparaison
+        const lastMoment = new Date(end);
+        lastMoment.setHours(23, 59, 59, 999);
+
+        // on part du 1er du mois suivant celui de start, à minuit
+        const cursor = new Date(start);
+        cursor.setDate(1);
+        cursor.setHours(0, 0, 0, 0);
+        cursor.setMonth(cursor.getMonth() + 1);
+
+        while (cursor <= lastMoment) {
+            points.push({
+                            date: new Date(cursor),
+                            label: cursor.toLocaleDateString('fr-CH', {
+                                month: '2-digit',
+                                year: 'numeric'
+                            }),
+                            kind: 'month'
+                        });
+
+            cursor.setMonth(cursor.getMonth() + 1);
+        }
+
+        const today = new Date();
+        if (today >= start && today <= lastMoment) {
+            points.push({date: today, label: 'Aujourd\'hui', kind: 'today'});
+        }
+
+        return points.sort((a, b) => a.date.getTime() - b.date.getTime());
+    });
 
     ngOnInit(): void {
         this.loadStats();
+        this.loadParticipations();
+    }
+
+    loadParticipations(): void {
+        const idSalon = this.salon()?.id;
+        if (!idSalon) {
+            return;
+        }
+
+        this.participationService.query(idSalon)
+            .subscribe(result => this.participations.set(result.body ?? []));
     }
 
     packStatsByKey(cancelledDimensions: Record<string, number>,
@@ -131,6 +218,7 @@ export class SalonStatsComponent implements OnInit {
 
             this.fileUploader.clear();
             this.loadStats();
+            this.loadParticipations();
         });
     }
 

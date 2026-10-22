@@ -1,0 +1,49 @@
+<button (click)="menu.toggle($event)"
+        [attr.aria-label]="'entityList.groupSort' | translate"
+        [class.el-tool-button--modified]="!isDefault()"
+        [title]="'entityList.groupSort' | translate"
+        aria-haspopup="menu"
+        class="el-tool-button"
+        type="button">
+    <i class="pi pi-sliders-h"></i>
+</button>
+
+<p-popover #menu appendTo="body" styleClass="el-group-sort-panel">
+    <div class="el-radio-list" role="menu">
+        @if (groupOptions().length > 1) {
+            <div class="el-radio-label">{{ 'entityList.groupBy' | translate }}</div>
+            @for (option of groupOptions(); track option.key) {
+                <label [class.el-radio--checked]="groupBy() === option.key" class="el-radio">
+                    <input (change)="selectGroup(option.key)"
+                           [checked]="groupBy() === option.key"
+                           [value]="option.key"
+                           name="el-group"
+                           type="radio"/>
+                    <span>{{ option.labelKey | translate }}</span>
+                </label>
+            }
+        }
+
+        @if (sortOptions().length > 1) {
+            @if (groupOptions().length > 1) {
+                <hr/>
+            }
+            <div class="el-radio-label">{{ 'entityList.sortBy' | translate }}</div>
+            @for (option of sortOptions(); track option.key) {
+                <label [class.el-radio--checked]="sort() === option.key" class="el-radio">
+                    <input (change)="selectSort(option.key)"
+                           [checked]="sort() === option.key"
+                           [value]="option.key"
+                           name="el-sort"
+                           type="radio"/>
+                    <span>
+                        {{ option.labelKey | translate }}
+                        @if (option.hintKey) {
+                            <small>{{ option.hintKey | translate }}</small>
+                        }
+                    </span>
+                </label>
+            }
+        }
+    </div>
+</p-popover>

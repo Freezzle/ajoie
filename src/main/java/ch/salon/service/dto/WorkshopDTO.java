@@ -4,6 +4,7 @@ import ch.salon.domain.enumeration.Status;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -14,5 +15,6 @@ public class WorkshopDTO implements Serializable {
     private String description;
     private Status status;
     private String extraInformation;
+    private Instant registrationDate;
     private ParticipationLightDTO participation;
 }

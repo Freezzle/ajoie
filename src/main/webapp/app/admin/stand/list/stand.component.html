@@ -1,219 +1,203 @@
 <app-content-page>
     <div appMenuBarStart>
-        <h3>{{ 'stand.title' | translate }}</h3>
+        <h3 jhiTranslate="stand.title">Les stands</h3>
+        <div class="el-subtitle">
+            @if (subtitle()) {
+                <b>{{ subtitle() }}</b> ·
+            }
+            {{ countLabel() }}
+        </div>
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading"
+                    [isDisabled]="isLoading()"
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
-        @if (standardView) {
-            <split-menu-box [items]="actionMenuItems"
-                            [buttonDisabled]="isLoading"/>
-        } @else {
-            <button-box (clickedEvent)="standardView = true"
-                        [primeIcon]="isLoading ? 'pi-spin' : 'pi-sync'"
-                        [isDisabled]="isLoading"
-                        translateKey="stand.viewStandard"/>
-        }
+
+        <menu-box [buttonDisabled]="isLoading()"
+                  [items]="pageMenuItems()"
+                  buttonIcon="pi-ellipsis-h"
+                  type="secondary"/>
+
+        <button-box (clickedEvent)="create()"
+                    [isDisabled]="isLoading()"
+                    primeIcon="pi-plus"
+                    translateKey="common.create"/>
     </div>
+
     <app-alert-error></app-alert-error>
-
-
     <p-confirmpopup/>
-    <app-card [showHeader]="false">
-        <div appCardBody>
-            <div class="row">
-                @if (standardView) {
-                    <p-table #dt2
-                             [globalFilterFields]="['participation.exhibitor.firstName', 'participation.exhibitor.lastName', 'participation.therapistName']"
-                             [loading]="isLoading"
-                             [paginator]="true"
-                             [rowsPerPageOptions]="[10, 25, 50]"
-                             [rows]="10"
-                             [sortOrder]="-1"
-                             [tableStyle]="{ 'min-width': '70rem' }"
-                             [value]="stands"
-                             dataKey="id"
-                             sortField="registrationDate">
-                        <ng-template #caption>
-                            <div class="flex">
-                                <p-iconfield class="ml-auto" iconPosition="left">
-                                    <p-inputicon>
-                                        <i class="pi pi-search"></i>
-                                    </p-inputicon>
-                                    <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
-                                           placeholder="Recherche"
-                                           type="text"/>
-                                </p-iconfield>
-                            </div>
-                        </ng-template>
-                        <ng-template #header>
-                            <tr>
-                                <th pSortableColumn="fullNameFilter">{{ 'stand.participation' | translate }}
-                                    <p-sortIcon field="fullNameFilter"/>
-                                </th>
-                                <th pSortableColumn="description">{{ 'stand.description' | translate }}
-                                    <p-sortIcon field="description"/>
-                                    <p-columnFilter display="menu"
-                                                    field="description"
-                                                    matchMode="contains"
-                                                    type="text"></p-columnFilter>
-                                </th>
-                                <th pSortableColumn="category">{{ 'stand.category.label' | translate }}
-                                    <p-sortIcon field="category"/>
-                                </th>
-                                <th pSortableColumn="dimension">{{ 'stand.dimension' | translate }}
-                                    <p-sortIcon field="dimension"/>
-                                </th>
-                                <th>Info</th>
-                                <th pSortableColumn="status">{{ 'stand.status.label' | translate }}
-                                    <p-sortIcon field="status"/>
-                                    <p-columnFilter [showAddButton]="false" [showMatchModes]="false" [showOperator]="false"
-                                                    display="menu" field="status"
-                                                    matchMode="in">
-                                        <ng-template #filter let-filter="filterCallback" let-value>
-                                            <p-multiselect (ngModelChange)="filter($event)" [ngModel]="value"
-                                                           [options]="statusValues" [panelStyle]="{ minWidth: '16rem' }"
-                                                           class="w-14r">
-                                                    <ng-template #item let-option>
-                                                        <div class="flex items-center gap-2">
-                                                            <fa-icon [class]="option.status | colorStatus"
-                                                                     [icon]="option.status | status"
-                                                                     [title]="'stand.status.list.' + option.status | translate"></fa-icon>
-                                                            <span>{{ 'stand.status.list.' + option | translate }}</span>
-                                                        </div>
-                                                    </ng-template>
-                                                </p-multiselect>
-                                        </ng-template>
-                                    </p-columnFilter>
-                                </th>
-                                <th>&nbsp;</th>
-                            </tr>
-                        </ng-template>
-                        <ng-template #body let-stand>
-                            <tr>
-                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate-medium">
-                                    @if (stand.participation) {
-                                        <a (click)="$event.stopPropagation()"
-                                           [routerLink]="['/admin','salons',params.get('idSalon'),'participations',stand.participation.id,'view']">{{ stand.fullNameFilter }}
-                                        </a>
-                                    }
-                                </td>
-                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate">
-                                    {{ stand.description }}
-                                    @if (stand.subCategories.length > 0) {
-                                        <div>
-                                            @for (subCategory of stand.subCategories; track subCategory) {
-                                                <p-tag [value]="subCategory"/>
+
+    @if (standardView()) {
+        <div class="el-list">
+            <entity-list-toolbar [(activeChips)]="state.activeChips"
+                                 [(query)]="state.query"
+                                 [(sort)]="state.sort"
+                                 (groupByChange)="state.setGroupBy($event)"
+                                 [chipGroups]="chipGroups()"
+                                 [groupBy]="state.groupBy()"
+                                 [groupOptions]="groupOptions"
+                                 [isDefault]="state.isDefault"
+                                 [sortOptions]="state.sortOptions"
+                                 placeholderKey="stand.list.searchPlaceholder"/>
+
+            @if (isLoading()) {
+                <div class="el-empty">
+                    <i class="pi pi-spin pi-spinner"></i>
+                </div>
+            } @else if (stands().length === 0) {
+                <div class="el-empty">
+                    <b>{{ 'stand.notFound' | translate }}</b>
+                </div>
+            } @else if (filtered().length === 0) {
+                <div class="el-empty">
+                    <b>{{ 'entityList.empty.filtered' | translate }}</b>
+                    <span>{{ 'entityList.empty.hint' | translate }}</span>
+                    <button-box (clickedEvent)="state.clearFilters()"
+                                translateKey="entityList.clearFilters"
+                                type="secondary"/>
+                </div>
+            } @else {
+                @for (group of groups(); track group.key) {
+                    <entity-list-group (collapsedChange)="setCollapsed(group, $event)"
+                                       [collapsed]="isCollapsed(group)"
+                                       [color]="group.color"
+                                       [count]="group.items.length"
+                                       [label]="group.label"
+                                       [rawLabel]="group.rawLabel ?? false"
+                                       [ratio]="group.ratio">
+                        <span groupSummary>{{ groupSummary(group) }}</span>
+
+                        @for (stand of group.items; track stand.id) {
+                            <entity-row [actions]="actionsFor(stand)"
+                                        [link]="['./', stand.id, 'view']"
+                                        [linkLabel]="'stand.list.open' | translate">
+                                <entity-highlight rowTitle
+                                                  [query]="state.query()"
+                                                  [text]="stand.description"/>
+
+                                <entity-status rowStatus
+                                               [color]="statusColor(stand.status)"
+                                               [labelKey]="statusLabelKey(stand.status)"
+                                               [strikethrough]="stand.status === Status.CANCELED"/>
+
+                                <entity-highlight rowMeta
+                                                  [query]="state.query()"
+                                                  [text]="stand.participation.therapistName"/>
+
+                                <span rowSide class="el-category" [style.--el-color]="categoryColorOf(stand)">
+                                    <i class="el-square"></i>{{ categoryLabelKey(stand) | translate }}
+                                </span>
+
+                                <ng-container rowFoot>
+                                    @if (visibleTags(stand).length > 0) {
+                                        <span class="el-foot-item">
+                                            @for (tag of visibleTags(stand); track tag) {
+                                                <span class="el-tag">
+                                                    <entity-highlight [query]="state.query()" [text]="tag"/>
+                                                </span>
                                             }
-                                        </div>
+                                            @if (extraTags(stand) > 0) {
+                                                <span class="el-tag">+{{ extraTags(stand) }}</span>
+                                            }
+                                        </span>
                                     }
-                                </td>
-                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate-small">
-                                    {{ 'stand.category.list.' + stand.category | translate }}
-                                </td>
-                                <td [routerLink]="['./', stand.id, 'view']"
-                                    class="clickable truncate-medium">{{ stand.dimension.dimension }}
-                                </td>
-                                <td [routerLink]="['./', stand.id, 'view']" class="clickable truncate-medium">
-                                    @if (stand.participation.crushOfHeart) {
-                                        <i class="pi pi-heart text-danger"></i>
+
+                                    @if (dimensionLabel(stand); as dimension) {
+                                        <entity-foot-item [label]="dimension"
+                                                          icon="ruler-combined"/>
                                     }
-                                    @if (stand.participation.guestOfHonor) {
-                                        <i class="pi pi-star golden-icon"></i>
-                                    }
+
                                     @if (stand.shared) {
-                                        <i class="pi pi-arrow-right-arrow-left text-primary"></i>
+                                        <entity-foot-item color="var(--app-share)"
+                                                          icon="people-arrows"
+                                                          labelKey="stand.list.sharedWithCoExhibitor"/>
                                     }
+
+                                    @if (stand.needElectricity) {
+                                        <entity-foot-item color="var(--app-warn)"
+                                                          icon="bolt"
+                                                          labelKey="entityList.signal.electricity"/>
+                                    }
+
                                     @if (stand.extraInformation) {
-                                        <i [title]="stand.extraInformation"
-                                           class="pi pi-sticky-note text-warning"></i>
+                                        <entity-foot-item [detail]="stand.extraInformation"
+                                                          icon="note-sticky"
+                                                          labelKey="entityList.internalComment"/>
                                     }
-                                </td>
-                                <td [routerLink]="['./', stand.id, 'view']" class="clickable">
-                                    <fa-icon [class]="stand.status | colorStatus"
-                                             [icon]="stand.status | status"
-                                             [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                        <button-box (clickedEvent)="delete($event, stand)"
-                                    [showText]="false"
-                                    primeIcon="pi-times"
-                                    translateKey="common.delete"
-                                    type="danger"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </ng-template>
-                        <ng-template #emptymessage>
-                            <tr>
-                                <td colspan="6">{{ 'stand.notFound' | translate }}</td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                } @else {
-                    <div class="table-responsive table-entities">
-                        <table class="table table-hover">
-                            <thead class="thead-primary">
-                            <tr>
-                                <th>Nom de thérapeute</th>
-                                <th>Nom complet</th>
-                                <th>Description</th>
-                                <th>Site internet</th>
-                                <th>Facebook</th>
-                                <th>Instagram</th>
-                                <th>Url Image</th>
-                                <th>Catégorie</th>
-                                <th>Statut</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                @if (isLoading) {
-                                    <tr>
-                                        <td class="text-center" colspan="8">
-                                            <p-progress-spinner [style]="{ width: '50px', height: '50px' }"
-                                                                animationDuration="1s"
-                                                                fill="transparent"
-                                                                strokeWidth="5"/>
-                                        </td>
-                                    </tr>
-                                } @else {
-                                    @for (stand of stands; track stand) {
-                                        <tr>
-                                            <td (click)="clipboard(stand.participation.therapistName)"
-                                                class="{{stand.participation.therapistName ? 'clipboard' : ''}} truncate-small">{{ stand.participation.therapistName }}
-                                            </td>
-                                            <td (click)="clipboard(getFirstExhibitorName(stand.participation.exhibitor))"
-                                                class="{{stand.participation.exhibitor ? 'clipboard' : ''}} truncate-small">{{ getFirstExhibitorName(stand.participation.exhibitor) }}
-                                            </td>
-                                            <td (click)="clipboard(stand.description)"
-                                                class="{{stand.description ? 'clipboard' : ''}} truncate-small">{{ stand.description }}
-                                            </td>
-                                            <td (click)="clipboard(stand.website)"
-                                                class="{{stand.website ? 'clipboard' : ''}} truncate-small">{{ stand.website ?? '' }}
-                                            </td>
-                                            <td (click)="clipboard(stand.facebook)"
-                                                class="{{stand.facebook ? 'clipboard' : ''}} truncate-small">{{ stand.facebook ?? '' }}
-                                            </td>
-                                            <td (click)="clipboard(stand.instagram)"
-                                                class="{{stand.instagram ? 'clipboard' : ''}} truncate-small">{{ stand.instagram ?? '' }}
-                                            </td>
-                                            <td (click)="clipboard(stand.urlPicture)"
-                                                class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small">{{ stand.urlPicture ?? '' }}
-                                            </td>
-                                            <td class="truncate-small">{{ stand.category ? (formatterCategory(Category[stand.category]) | translate) : '' }}</td>
-                                            <td class="truncate-small">{{ stand.status ? (formatterStatus(Status[stand.status]) | translate) : '' }}</td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
+                                </ng-container>
+                            </entity-row>
+                        }
+                    </entity-list-group>
+                }
+
+                @if (hasMore()) {
+                    <div class="el-more">
+                        <button-box (clickedEvent)="showMore()"
+                                    translateKey="entityList.showMore"
+                                    type="secondary"/>
                     </div>
                 }
-            </div>
+            }
         </div>
-    </app-card>
+    } @else {
+        <div class="table-responsive table-entities">
+            <table class="table table-hover">
+                <thead class="thead-primary">
+                <tr>
+                    <th>Nom de thérapeute</th>
+                    <th>Nom complet</th>
+                    <th>Description</th>
+                    <th>Site internet</th>
+                    <th>Facebook</th>
+                    <th>Instagram</th>
+                    <th>Url Image</th>
+                    <th>Catégorie</th>
+                    <th>Statut</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading()) {
+                        <tr>
+                            <td class="text-center" colspan="9">
+                                <p-progress-spinner [style]="{ width: '50px', height: '50px' }"
+                                                    animationDuration="1s"
+                                                    fill="transparent"
+                                                    strokeWidth="5"/>
+                            </td>
+                        </tr>
+                    } @else {
+                        @for (stand of stands(); track stand.id) {
+                            <tr>
+                                <td (click)="clipboard(stand.participation.therapistName)"
+                                    class="{{stand.participation.therapistName ? 'clipboard' : ''}} truncate-small">{{ stand.participation.therapistName }}
+                                </td>
+                                <td (click)="clipboard(getFirstExhibitorName(stand.participation.exhibitor))"
+                                    class="{{stand.participation.exhibitor ? 'clipboard' : ''}} truncate-small">{{ getFirstExhibitorName(stand.participation.exhibitor) }}
+                                </td>
+                                <td (click)="clipboard(stand.description)"
+                                    class="{{stand.description ? 'clipboard' : ''}} truncate-small">{{ stand.description }}
+                                </td>
+                                <td (click)="clipboard(stand.website)"
+                                    class="{{stand.website ? 'clipboard' : ''}} truncate-small">{{ stand.website ?? '' }}
+                                </td>
+                                <td (click)="clipboard(stand.facebook)"
+                                    class="{{stand.facebook ? 'clipboard' : ''}} truncate-small">{{ stand.facebook ?? '' }}
+                                </td>
+                                <td (click)="clipboard(stand.instagram)"
+                                    class="{{stand.instagram ? 'clipboard' : ''}} truncate-small">{{ stand.instagram ?? '' }}
+                                </td>
+                                <td (click)="clipboard(stand.urlPicture)"
+                                    class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small">{{ stand.urlPicture ?? '' }}
+                                </td>
+                                <td class="truncate-small">{{ stand.category ? (formatterCategory(Category[stand.category]) | translate) : '' }}</td>
+                                <td class="truncate-small">{{ stand.status ? (formatterStatus(Status[stand.status]) | translate) : '' }}</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </app-content-page>

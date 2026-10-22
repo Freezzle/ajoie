@@ -1,78 +1,121 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {combineLatest, filter, switchMap, tap} from 'rxjs';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {MenuItem} from 'primeng/api';
+import {ConfirmPopup} from 'primeng/confirmpopup';
+import {filter, switchMap, tap} from 'rxjs';
+import {finalize} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormatMediumDatePipe} from 'app/shared/date';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {getFormattedParticipationName, IInfoInvoice, IParticipation} from '../model/participation.interface';
-import {ParticipationService} from '../service/participation.service';
-import {getExhibitorFullName, IExhibitor} from '../../exhibitor/model/exhibitor.interface';
-import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
-import StatusPipe from '../../../shared/pipe/status.pipe';
+import {AlertErrorComponent} from 'app/shared/alert/alert-error.component';
+import {ButtonBoxComponent} from 'app/shared/components/button-box/button-box.component';
+import {ContentPageComponent} from 'app/shared/components/content-page/content-page.component';
+import {MenuBoxComponent} from 'app/shared/components/menu-box/menu-box.component';
+import {
+    applyChipFilters,
+    buildStatusChipGroup,
+    compareAlpha,
+    compareDateDesc,
+    EntityAction,
+    EntityGroup,
+    EntityListState,
+    FilterChipGroup,
+    GROUP_ALPHA_KEY,
+    GROUP_STATUS_KEY,
+    groupByAlphabet,
+    groupByKey,
+    matchesSearch,
+    SORT_ALPHA_KEY,
+    SORT_DATE_KEY,
+    STATUS_COLLAPSED_BY_DEFAULT,
+    STATUS_GROUP_ORDER,
+    statusChipPredicates,
+    statusColor
+} from 'app/shared/components/entity-list';
+import {EntityCountComponent} from 'app/shared/components/entity-list/entity-count.component';
+import {EntityFootItemComponent} from 'app/shared/components/entity-list/entity-foot-item.component';
+import {EntityHighlightComponent} from 'app/shared/components/entity-list/entity-highlight.component';
+import {EntityListGroupComponent} from 'app/shared/components/entity-list/entity-list-group.component';
+import {EntityListToolbarComponent} from 'app/shared/components/entity-list/entity-list-toolbar.component';
+import {EntityRowComponent} from 'app/shared/components/entity-list/entity-row.component';
+import {EntityStatusComponent} from 'app/shared/components/entity-list/entity-status.component';
+import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.service';
+import {NavigationStateService} from 'app/layouts/navbar/navigation-state.service';
+import {copyToClipboard} from 'app/core/util/utils';
 import {Status} from '../../enumerations/status.model';
-import {finalize} from 'rxjs/operators';
-import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {ConfirmPopup} from 'primeng/confirmpopup';
+import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
+import {getFormattedParticipationName, IParticipationList} from '../model/participation.interface';
+import {ParticipationService} from '../service/participation.service';
 
-import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
+/** Nombre de lignes affichées avant le bouton « Afficher plus ». */
+const PAGE_SIZE = 150;
 
-import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
-import {TableModule} from 'primeng/table';
-import {DateTimelinePoint, TimelineDotComponent} from '../../../shared/components/timeline-dot/timeline-dot.component';
-import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
-import {OverlayBadge} from 'primeng/overlaybadge';
-import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
-import {CardComponent} from '../../../shared/components/card/card.component';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {MultiSelect} from 'primeng/multiselect';
-import {SplitMenuBoxComponent} from '../../../shared/components/split-menu-box/split-menu-box.component';
-import {TranslateService} from '@ngx-translate/core';
-import {MenuItem} from 'primeng/api';
-import {copyToClipboard} from '../../../core/util/utils';
+/** Segments de la mini-jauge de facturation, dans l'ordre d'affichage. */
+interface InvoiceSegment {
+    key: string;
+    value: number;
+    color: string;
+}
 
 @Component({
                selector: 'app-participation',
-               templateUrl: './participation.component.html',
                imports: [
-                   RouterModule,
-                   FormsModule,
                    SharedModule,
                    FormatMediumDatePipe,
-                   ColorStatusPipe,
-                   StatusPipe,
-                   ReactiveFormsModule,
+                   AlertErrorComponent,
                    ButtonBoxComponent,
                    ConfirmPopup,
-                   
-                   
-                   AlertErrorComponent,
-                   TableModule,
-                   TimelineDotComponent,
-                   OverlayBadge,
                    ContentPageComponent,
-                   CardComponent,
-                   IconField,
-                   InputIcon,
-                   InputText,
-                   MultiSelect,
-                   SplitMenuBoxComponent
-               ]
+                   MenuBoxComponent,
+                   EntityCountComponent,
+                   EntityFootItemComponent,
+                   EntityHighlightComponent,
+                   EntityListGroupComponent,
+                   EntityListToolbarComponent,
+                   EntityRowComponent,
+                   EntityStatusComponent
+               ],
+               templateUrl: './participation.component.html',
+               changeDetection: ChangeDetectionStrategy.OnPush
            })
 export class ParticipationComponent implements OnInit {
-    participations = signal<IParticipation[]>([]);
-    isLoading = false;
-    statusValues = Object.keys(Status);
-    infoInvoicesMap: { [id: string]: IInfoInvoice } = {};
-    protected confirmDialogService = inject(ConfirmDialogService);
-    protected readonly navigationStateService = inject(NavigationStateService);
-    private readonly participationService = inject(ParticipationService);
-    private readonly translateService = inject(TranslateService);
+    readonly participations = signal<IParticipationList[]>([]);
+    readonly isLoading = signal<boolean>(false);
+    readonly idSalon = signal<string | null>(null);
+    readonly visibleLimit = signal<number>(PAGE_SIZE);
+
     private readonly activatedRoute = inject(ActivatedRoute);
     private readonly router = inject(Router);
-    private readonly idSalon = signal<string | null>(null);
+    private readonly participationService = inject(ParticipationService);
+    private readonly confirmDialogService = inject(ConfirmDialogService);
+    private readonly translateService = inject(TranslateService);
+    private readonly navigationStateService = inject(NavigationStateService);
+
+    readonly state = new EntityListState({
+                                             defaultGroupBy: GROUP_STATUS_KEY,
+                                             defaultSort: SORT_DATE_KEY,
+                                             sortOptions: [
+                                                 {
+                                                     key: SORT_DATE_KEY,
+                                                     labelKey: 'entityList.sort.date',
+                                                     hintKey: 'entityList.sort.hint.registrationDate'
+                                                 },
+                                                 {
+                                                     key: SORT_ALPHA_KEY,
+                                                     labelKey: 'entityList.sort.alpha',
+                                                     hintKey: 'entityList.sort.hint.therapistName'
+                                                 }
+                                             ],
+                                             collapsedByDefault: groupBy => groupBy === GROUP_STATUS_KEY
+                                                                            ? STATUS_COLLAPSED_BY_DEFAULT
+                                                                            : []
+                                         });
+
+    readonly groupOptions = [
+        {key: GROUP_STATUS_KEY, labelKey: 'entityList.group.status'},
+        {key: GROUP_ALPHA_KEY, labelKey: 'entityList.group.alpha'}
+    ];
 
     /**
      * Le salon est chargé de manière asynchrone par la navbar : on ne l'utilise que
@@ -85,130 +128,153 @@ export class ParticipationComponent implements OnInit {
         return idSalon && salon?.id === idSalon ? salon : null;
     });
 
-    readonly timelineStart = computed(() => {
+    private readonly predicates = computed<Record<string, (p: IParticipationList) => boolean>>(() => ({
+        ...statusChipPredicates<IParticipationList>(participation => participation.status),
+        alert: p => !!p.exhibitor?.redFlag || !!p.exhibitor?.duplicateDetected,
+        expiredInvoice: p => this.nbExpired(p) > 0,
+        toInvoice: p => this.isActive(p) && this.nbInvoices(p) === 0,
+        crushOfHeart: p => !!p.crushOfHeart,
+        guestOfHonor: p => !!p.guestOfHonor,
+        arrangement: p => !!p.needArrangement,
+        offer: p => !!p.hasOffer,
+        comment: p => !!p.extraInformation
+    }));
+
+    readonly chipGroups = computed<FilterChipGroup[]>(() => {
+        const items = this.participations();
+        const predicates = this.predicates();
+        const count = (key: string): number => items.filter(predicates[key]).length;
+
+        return [
+            buildStatusChipGroup(items, participation => participation.status, 'participation.list.statusGroup'),
+            {
+                key: 'signals',
+                labelKey: 'entityList.filterGroup.signals',
+                mode: 'and',
+                chips: [
+                    {
+                        key: 'alert',
+                        labelKey: 'entityList.signal.alerts',
+                        icon: 'triangle-exclamation',
+                        color: 'var(--app-danger)',
+                        count: count('alert')
+                    },
+                    {
+                        key: 'expiredInvoice',
+                        labelKey: 'entityList.signal.expiredInvoice',
+                        icon: 'file-invoice',
+                        color: 'var(--app-danger)',
+                        count: count('expiredInvoice')
+                    },
+                    {
+                        key: 'toInvoice',
+                        labelKey: 'entityList.signal.toInvoice',
+                        icon: 'file-invoice',
+                        color: 'var(--app-status-accepted)',
+                        count: count('toInvoice')
+                    },
+                    {
+                        key: 'comment',
+                        labelKey: 'entityList.signal.comment',
+                        icon: 'note-sticky',
+                        color: 'var(--app-text)',
+                        count: count('comment')
+                    }
+                ]
+            }
+        ];
+    });
+
+    readonly filtered = computed<IParticipationList[]>(() => {
+        const query = this.state.query();
+        const searched = this.participations().filter(p => matchesSearch([
+                                                                             p.therapistName,
+                                                                             getExhibitorFullName(p.exhibitor),
+                                                                             p.exhibitor?.email,
+                                                                             p.clientNumber
+                                                                         ], query));
+
+        const filtered = applyChipFilters(searched,
+                                          this.chipGroups(),
+                                          new Set(this.state.activeChips()),
+                                          this.predicates());
+
+        return [...filtered].sort(this.comparator());
+    });
+
+    readonly visible = computed(() => this.filtered().slice(0, this.visibleLimit()));
+
+    readonly hasMore = computed(() => this.filtered().length > this.visibleLimit());
+
+    readonly groups = computed<EntityGroup<IParticipationList>[]>(() => {
+        const items = this.visible();
+
+        if (this.state.groupBy() === GROUP_ALPHA_KEY) {
+            return groupByAlphabet(items, participation => participation.therapistName);
+        }
+
+        return groupByKey(items,
+                          STATUS_GROUP_ORDER,
+                          participation => participation.status,
+                          key => `participation.list.statusGroup.${key}`,
+                          key => statusColor(key as Status));
+    });
+
+    readonly subtitle = computed(() => this.currentSalon()?.place ?? '');
+
+    /** « J-x » avant l'ouverture du salon, vide si le salon a commencé. */
+    readonly daysBeforeOpening = computed(() => {
         const startingDate = this.currentSalon()?.startingDate;
         if (!startingDate) {
-            return null;
-        }
-
-        const start = new Date(startingDate);
-        start.setMonth(start.getMonth() - 7);
-
-        return start;
-    });
-
-    readonly timelineEnd = computed(() => {
-        const endingDate = this.currentSalon()?.endingDate;
-
-        return endingDate ? new Date(endingDate) : null;
-    });
-
-    readonly points = computed<DateTimelinePoint[]>(() => {
-        const start = this.timelineStart();
-        const end = this.timelineEnd();
-
-        if (!start || !end) {
-            return [];
-        }
-
-        const points: DateTimelinePoint[] = this.participations()
-                                                .filter(participation => !!participation.registrationDate)
-                                                .map(participation => ({
-                                                    date: new Date(participation.registrationDate!),
-                                                    label: null,
-                                                    kind: 'registration' as const
-                                                }));
-
-        // on normalise end pour comparaison
-        const lastMoment = new Date(end);
-        lastMoment.setHours(23, 59, 59, 999);
-
-        // on part du 1er du mois suivant celui de start, à minuit
-        const cursor = new Date(start);
-        cursor.setDate(1);
-        cursor.setHours(0, 0, 0, 0);
-        cursor.setMonth(cursor.getMonth() + 1);
-
-        while (cursor <= lastMoment) {
-            points.push({
-                            date: new Date(cursor),
-                            label: cursor.toLocaleDateString('fr-CH', {
-                                month: '2-digit',
-                                year: 'numeric'
-                            }),
-                            kind: 'month'
-                        });
-
-            cursor.setMonth(cursor.getMonth() + 1);
+            return '';
         }
 
         const today = new Date();
-        if (today >= start && today <= lastMoment) {
-            points.push({date: today, label: 'Aujourd\'hui', kind: 'today'});
-        }
+        today.setHours(0, 0, 0, 0);
+        const start = new Date(startingDate);
+        start.setHours(0, 0, 0, 0);
 
-        return points.sort((a, b) => a.date.getTime() - b.date.getTime());
+        const days = Math.round((start.getTime() - today.getTime()) / 86400000);
+
+        return days > 0 ? `J-${days}` : '';
     });
 
-    ngOnInit(): void {
-        combineLatest([this.activatedRoute.paramMap, this.activatedRoute.data]).subscribe(
-            ([params]) => {
-                const idSalon = params.get('idSalon')!;
-                if (this.idSalon() === idSalon) {
-                    return;
-                }
+    readonly countLabel = computed(() => {
+        const count = this.participations().length;
+        const key = count > 1 ? 'participation.list.countPlural' : 'participation.list.countSingular';
 
-                this.idSalon.set(idSalon);
-                this.participations.set([]);
-                this.infoInvoicesMap = {};
+        return `${count} ${this.translateService.instant(key) as string}`;
+    });
 
-                this.load();
-                this.participationService.getInfosInvoiceForSalon(idSalon).subscribe(infoInvoicesMap => {
-                    if (this.idSalon() !== idSalon) {
-                        return;
-                    }
-
-                    this.infoInvoicesMap = infoInvoicesMap || {};
-                });
-            });
-    }
-
-    delete(htmlElement: HTMLElement, participation: IParticipation): void {
-        this.confirmDialogService.delete(htmlElement, 'participation.delete.question', {
-            fullName: getFormattedParticipationName(participation)
-        }).pipe(
-            filter(confirmed => confirmed),
-            switchMap(() => this.participationService.delete(participation.id)),
-            tap(() => this.load()) // Recharge les données
-        ).subscribe();
-    }
-
-    readonly actionMenuItems: MenuItem[] = [
+    readonly pageMenuItems = computed<MenuItem[]>(() => [
         {
             label: this.translateService.instant('common.refresh') as string,
             icon: 'pi pi-sync',
-            command: () => this.refresh()
-        },
-        {
-            label: this.translateService.instant('common.create') as string,
-            icon: 'pi pi-plus',
-            command: () => this.router.navigate(['./new'], {relativeTo: this.activatedRoute})
+            command: () => this.load()
         },
         {
             label: this.translateService.instant('participation.copyActiveExhibitorEmails') as string,
             icon: 'pi pi-copy',
             command: () => this.clipboardActiveExhibitorEmails()
         }
-    ];
+    ]);
 
-    clipboardActiveExhibitorEmails(): void {
-        this.isLoading = true;
+    constructor() {
+        this.state.connectQueryParams(this.activatedRoute, this.router);
+    }
 
-        this.participationService.getExhibitorEmailsWithActiveParticipations()
-            .pipe(finalize(() => this.isLoading = false))
-            .subscribe(emails => {
-                copyToClipboard(emails.join(','));
-            });
+    ngOnInit(): void {
+        this.activatedRoute.paramMap.subscribe(params => {
+            const idSalon = params.get('idSalon');
+            if (this.idSalon() === idSalon) {
+                return;
+            }
+
+            this.idSalon.set(idSalon);
+            this.participations.set([]);
+
+            this.load();
+        });
     }
 
     load(): void {
@@ -217,11 +283,11 @@ export class ParticipationComponent implements OnInit {
             return;
         }
 
-        this.isLoading = true;
+        this.isLoading.set(true);
 
         this.participationService
             .query(idSalon)
-            .pipe(finalize(() => (this.isLoading = false)))
+            .pipe(finalize(() => this.isLoading.set(false)))
             .subscribe(result => {
                 // le salon a pu changer pendant la requête : on ignore une réponse obsolète
                 if (this.idSalon() !== idSalon) {
@@ -232,19 +298,165 @@ export class ParticipationComponent implements OnInit {
             });
     }
 
-    getInfoInvoice(idParticipation: string): IInfoInvoice {
-        return this.infoInvoicesMap[idParticipation];
+    delete(target: HTMLElement, participation: IParticipationList): void {
+        this.confirmDialogService.delete(target, 'participation.delete.question', {
+            fullName: getFormattedParticipationName(participation)
+        }).pipe(
+            filter(confirmed => confirmed),
+            switchMap(() => this.participationService.delete(participation.id)),
+            tap(() => this.load())
+        ).subscribe();
     }
 
-    getExhibitorFullName(exhibitor: IExhibitor | null | undefined): string {
-        return getExhibitorFullName(exhibitor);
+    clipboardActiveExhibitorEmails(): void {
+        this.isLoading.set(true);
+
+        this.participationService.getExhibitorEmailsWithActiveParticipations()
+            .pipe(finalize(() => this.isLoading.set(false)))
+            .subscribe(emails => copyToClipboard(emails.join(',')));
     }
 
-    refresh(): void {
-        this.load();
+    actionsFor(participation: IParticipationList): EntityAction[] {
+        return this.rowActions().get(participation.id) ?? [];
+    }
+
+    /**
+     * Les actions sont calculées une fois par jeu de données : un tableau recréé à
+     * chaque détection de changement reconstruirait le menu sous le curseur, ce qui
+     * obligerait à cliquer deux fois.
+     */
+    private readonly rowActions = computed(() => new Map<string, EntityAction[]>(
+        this.visible().map(participation => [participation.id, this.buildActions(participation)])));
+
+    private buildActions(participation: IParticipationList): EntityAction[] {
+        const idExhibitor = participation.exhibitor?.id;
+
+        return [
+            {
+                labelKey: 'entityList.action.detail',
+                icon: 'pi pi-eye',
+                routerLink: ['./', participation.id, 'view']
+            },
+            {
+                labelKey: 'entityList.action.client',
+                icon: 'pi pi-user',
+                routerLink: idExhibitor ? ['/admin', 'exhibitors', idExhibitor, 'view'] : undefined,
+                hidden: !idExhibitor
+            },
+            {
+                labelKey: 'entityList.action.billing',
+                icon: 'pi pi-euro',
+                routerLink: ['./', participation.id, 'billing']
+            },
+            {
+                labelKey: 'entityList.action.delete',
+                icon: 'pi pi-trash',
+                danger: true,
+                separatorBefore: true,
+                run: target => this.delete(target, participation)
+            }
+        ];
+    }
+
+    /** Résumé de groupe : « x échues · p/t payées », ou « pas de facture ». */
+    groupSummary(group: EntityGroup<IParticipationList>): string {
+        const total = group.items.reduce((sum, p) => sum + this.nbInvoices(p), 0);
+
+        if (total === 0) {
+            return this.translateService.instant('participation.list.summary.noInvoice') as string;
+        }
+
+        const paid = group.items.reduce((sum, p) => sum + p.nbPaid, 0);
+        const expired = group.items.reduce((sum, p) => sum + this.nbExpired(p), 0);
+        const paidLabel = this.translateService.instant('participation.list.summary.paid') as string;
+        const summary = `${paid}/${total} ${paidLabel}`;
+
+        if (expired === 0) {
+            return summary;
+        }
+
+        const expiredLabel = this.translateService.instant(expired > 1
+                                                           ? 'participation.list.summary.expiredPlural'
+                                                           : 'participation.list.summary.expiredSingular') as string;
+
+        return `${expired} ${expiredLabel} · ${summary}`;
+    }
+
+    nbInvoices(participation: IParticipationList): number {
+        return participation.nbDraft + participation.nbIssued + participation.nbPaid;
+    }
+
+    nbExpired(participation: IParticipationList): number {
+        return participation.nbExpired;
+    }
+
+    /** Segments non nuls de la mini-jauge de facturation. */
+    invoiceSegments(participation: IParticipationList): InvoiceSegment[] {
+        return [
+            {key: 'paid', value: participation.nbPaid, color: 'var(--app-status-validated)'},
+            {key: 'issued', value: participation.nbIssued, color: 'var(--app-status-accepted)'},
+            {key: 'draft', value: participation.nbDraft, color: 'var(--app-border)'},
+            {key: 'expired', value: participation.nbExpired, color: 'var(--app-danger)'}
+        ].filter(segment => segment.value > 0);
+    }
+
+    /** Une participation active sans facture est « à facturer ». */
+    isActive(participation: IParticipationList): boolean {
+        return participation.status === Status.ACCEPTED || participation.status === Status.VALIDATED;
+    }
+
+    showToInvoice(participation: IParticipationList): boolean {
+        return this.nbInvoices(participation) === 0 && participation.nbExpired === 0 && this.isActive(participation);
+    }
+
+    /** « (partagé) » ou « (dont partagé) » à côté du nombre de stands. */
+    sharedStandDetail(participation: IParticipationList): string | null {
+        if (participation.nbSharedStands === 0) {
+            return null;
+        }
+
+        return this.translateService.instant(participation.nbStands > 1
+                                             ? 'participation.list.foot.withSharedStand'
+                                             : 'participation.list.foot.sharedStand') as string;
+    }
+
+    statusLabelKey(status: Status): string {
+        return `participation.list.status.${status}`;
+    }
+
+    exhibitorName(participation: IParticipationList): string {
+        return getExhibitorFullName(participation.exhibitor);
+    }
+
+    isCollapsed(group: EntityGroup<IParticipationList>): boolean {
+        return this.state.isCollapsed(group.key);
+    }
+
+    setCollapsed(group: EntityGroup<IParticipationList>, collapsed: boolean): void {
+        this.state.setCollapsed(group.key, collapsed);
+    }
+
+    showMore(): void {
+        this.visibleLimit.update(limit => limit + PAGE_SIZE);
+    }
+
+    create(): void {
+        void this.router.navigate(['./new'], {relativeTo: this.activatedRoute});
     }
 
     previousState(): void {
         window.history.back();
     }
+
+    private comparator(): (a: IParticipationList, b: IParticipationList) => number {
+        if (this.state.sort() === SORT_ALPHA_KEY) {
+            return (a, b) => compareAlpha(a.therapistName, b.therapistName) ||
+                             compareDateDesc(a.registrationDate, b.registrationDate);
+        }
+
+        return (a, b) => compareDateDesc(a.registrationDate, b.registrationDate);
+    }
+
+    protected readonly Status = Status;
+    protected readonly statusColor = statusColor;
 }

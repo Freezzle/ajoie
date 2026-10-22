@@ -1,403 +1,504 @@
-# Plan du salon : nouvelle version (placement libre en mètres)
+# Listes d'administration : un modèle commun (participations, stands, conférences, ateliers, salons)
 
-Spécification à destination de GitHub Copilot pour réécrire l'écran **Plan de la salle** (`src/main/webapp/app/admin/floor-plan/detail/`).
+Spécification à destination de GitHub Copilot pour réécrire **cinq écrans de liste** sur un **modèle unique** :
 
-La référence visuelle et fonctionnelle est la maquette HTML **« Plan du salon · Bandeau » (F1)**. Ouvre-la dans un navigateur et compare-la à ton résultat à chaque étape. Le bouton « Données » de la maquette affiche le JSON cible.
+| Liste | Dossier actuel |
+|---|---|
+| Participations | `src/main/webapp/app/admin/participation/list/` |
+| Stands | `src/main/webapp/app/admin/stand/list/` |
+| Conférences | `src/main/webapp/app/admin/conference/list/` |
+| Ateliers | `src/main/webapp/app/admin/workshop/list/` |
+| Salons | `src/main/webapp/app/admin/salon/list/` |
 
-> **Copilot, lis d'abord le projet.** Ce document ne connaît pas le dépôt en détail. Avant d'écrire du code, parcours le composant actuel (`floor-plan-detail.component.*`, `floor-plan-dimension-tile`, `floor-plan.model.ts`, les services `FloorPlanService`, `StandService`, `SalonService`), les composants partagés (`src/main/webapp/app/shared/`) et les fichiers de thème et de traduction. Partout où ce document décrit un champ, un bouton, une popin, une icône ou une couleur, **reprends ce qui existe déjà dans le projet** et ne crée quelque chose de nouveau que s'il n'y a vraiment pas d'équivalent.
+La référence visuelle et fonctionnelle est la maquette **`docs/listes.maquette.html`**.
+- Ouvre-la dans un navigateur.
+- Les quatre onglets du haut correspondent aux thématiques. Le sélecteur **Liste** (onglet 3) bascule entre conférences et ateliers.
+- Le sélecteur **Aperçu** bascule entre **Ordinateur** et **Mobile**. Les deux affichages sont à reproduire.
+- Le pli « Ce qui est commun et ce qui change », sous chaque onglet, résume la thématique.
+- Les noms, montants, numéros et dates de la maquette sont fictifs.
+
+> **Copilot, lis d'abord le projet.** Ce document ne connaît pas le dépôt en détail. Avant d'écrire du code, parcours :
+> - les cinq composants de liste actuels ;
+> - les modèles `participation.interface.ts`, `exhibitor.interface.ts`, `stand.interface.ts`, `conference.interface.ts`, `workshop.interface.ts`, `salon.interface.ts`, `price-stand-salon.interface.ts`, `category.model.ts`, `status.model.ts` ;
+> - les services correspondants et les fichiers de routes (`*.routes.ts`) ;
+> - côté back : `AdminSalonResource`, le `ParticipationService` Java (`getInfoInvoicesForSalon`, `buildInfoInvoice`), `SalonService.findAll`, les repositories `Stand`, `Conference`, `Workshop`, `InvoicingPlan`, `Participation` ;
+> - les composants partagés (`src/main/webapp/app/shared/`), `content/scss/_variables.scss` et les fichiers `i18n/fr/*.json`.
+>
+> Partout où ce document décrit un bouton, un menu, une icône ou une couleur, **reprends ce qui existe déjà**. Ne crée quelque chose de nouveau que s'il n'y a vraiment pas d'équivalent.
 
 ---
 
 ## 1. Règles d'implémentation
 
-1. **Réutiliser l'existant, toujours.**
-  - Page et cartes : `app-content-page` (zones `appMenuBarStart` / `appMenuBarEnd`), `app-card`.
-  - Boutons : `button-box` (avec `primeIcon`, `translateKey`, `type`, `showText`, `isDisabled`) et `menu-box` pour le menu Actions.
-  - Popins : `dialog-box` (avec `[(visible)]`, `mode="edit"`, `(confirm)` / `(cancel)`).
-  - Champs : `text-box`, `number-box` (dont `modeDecimal`), `select-box` (avec filtre), et les `FormControl` réactifs comme aujourd'hui.
-  - Composants PrimeNG déjà importés : `p-tabs`, `p-tag`, `p-contextMenu`, `p-confirmpopup`, `p-divider`, `p-iftalabel` / `pTextarea`.
-  - Icônes : les mêmes familles que l'écran actuel, PrimeIcons (`pi-*`) dans les boutons et FontAwesome (`fa-icon`) dans le contenu. Garde les pipes `colorStatus` et `status` pour le statut de participation.
-  - Couleurs : les variables CSS du thème (`--app-surface-muted`, `--app-danger`, etc.) et `getColorStand()` pour les catégories. **Aucune couleur en dur** dans le nouveau code. Si une teinte manque (ambre pour l'électricité, par exemple), ajoute une variable dans le fichier de thème, avec ses valeurs claire et sombre.
-  - Traductions : `jhiTranslate` / pipe `translate`. Ajoute les clés en français, puis dans les autres langues présentes.
-2. **Même style de code que l'existant** : composant standalone, `ChangeDetectionStrategy.OnPush`, `signal` / `computed` / `effect`, `takeUntilDestroyed`, services injectés avec `inject()`.
-3. **Pas de nouvelle dépendance npm.** Le plan est dessiné en SVG à la main. Le glisser-déposer libre se fait avec les Pointer Events (CDK Drag & Drop reste possible pour la palette, mais le placement sur le plan est en coordonnées libres).
-4. **Découper** : un composant conteneur (page), un composant `floor-plan-canvas` (SVG et interactions), un `floor-plan-palette`, un `floor-plan-inspector`, un `floor-plan-settings-dialog`, et des fonctions pures pour la géométrie (`floor-plan.geometry.ts`), testées unitairement.
-5. **Ne rien perdre** : chaque point de la section 2 doit rester disponible après la refonte.
+1. **Un seul modèle, des composants partagés.** Les cinq listes doivent se ressembler au maximum : même en-tête, même structure de ligne, même pied, même menu d'actions. Le socle commun vit dans `src/main/webapp/app/shared/components/entity-list/` (section 3). Chaque écran ne fournit que son contenu, ses filtres, ses options de groupement et de tri, et ses actions.
+2. **Pas de détail déplié dans la liste.** Un clic sur une ligne ouvre **la fiche qui existe déjà** (`./:id/view`). La liste ne duplique pas cette fiche.
+3. **Réutiliser l'existant.**
+    - Page : `app-content-page` (zones `appMenuBarStart` / `appMenuBarEnd`), `app-alert-error`, `p-confirmpopup`.
+    - Boutons : `button-box`. Menus (⋯ de la page, rouage de la ligne) : `menu-box` ou `p-menu` en mode `popup`, comme ce qui existe déjà.
+    - Menu « Grouper et trier » : `p-popover` (ou l'équivalent déjà utilisé) contenant des `p-radiobutton`.
+    - Recherche : `p-iconfield` + `pInputText`.
+    - Icônes : FontAwesome (`fa-icon`) dans le contenu, PrimeIcons dans les boutons. Reprends les icônes déjà utilisées pour les mêmes informations (`heart`, `star`, `note-sticky`, `handshake-simple`, `gift`, `flag`, `triangle-exclamation`…). Grouper et trier : `pi-sliders-h`. Rouage : `pi-cog`.
+    - Statuts : libellés `*.status.list.*` et couleurs `--app-status-*`. Catégories : `--app-category-*` et `stand.category.list.*`.
+    - Suppression : `ConfirmDialogService.delete(...)`, comme aujourd'hui. Presse-papiers : `copyToClipboard`.
+    - Couleurs : uniquement les variables du thème, **aucune couleur en dur**. Ajoute une variable dans `_variables.scss` si une teinte manque.
+    - Traductions : `jhiTranslate` / pipe `translate`, avec les clés dans `i18n/fr/` (section 9).
+4. **Style de code de l'existant.**
+    - Composants standalone, `ChangeDetectionStrategy.OnPush`.
+    - `signal` / `computed` / `input` / `output` / `model`, `inject()`.
+    - `@if` / `@for` avec `track` sur l'identifiant.
+5. **Pas de nouvelle dépendance npm.**
+6. **On remplace `p-table`** et son paginateur par des listes `<ul>/<li>` construites à la main. Au-delà de 150 lignes, ajoute un bouton « Afficher plus ».
+7. **Logique pure testée.** Filtres, tris, regroupements et éléments de pied sont des fonctions pures dans un fichier `*.list.utils.ts` par écran (plus `entity-list.utils.ts` pour le commun), avec leurs tests.
+8. **Ne rien perdre** : chaque fonctionnalité actuelle listée en section 5 doit rester disponible.
 
 ---
 
-## 2. Fonctionnalités actuelles à conserver (checklist)
+## 2. Le modèle commun (ce que montre la maquette)
 
-- [ ] Titre `salon.floorPlan`, bouton **Retour**.
-- [ ] **Mode lecture par défaut**. En lecture : bouton **Modifier** et menu **Actions** (`actionsService.getAvailableActions('salon', id, 'floor-plan')`, téléchargement PDF via `clickAction` / `getFilenameFromContentDisposition`, à garder tel quel).
-- [ ] En édition : **Annuler** (recharge depuis le serveur) et **Enregistrer** (`floorPlanService.batchSave(salonId, plans, idsToDelete)`, puis retour en lecture).
-- [ ] Chargement combiné : stands du salon, plans et dimensions vendues (`salonService.getDimensionStands`). Les stands `CANCELED` et `REFUSED` sont exclus de la palette.
-- [ ] Plusieurs plans en onglets (`p-tabs`), avec création, renommage, réordonnancement et suppression. Ces actions passent désormais par la popin **Réglages** (section 7), et un « + » dans les onglets ouvre la popin sur un nouveau plan.
-- [ ] Palette des **stands non attribués** (à la dimension du stand) et des **dimensions disponibles** (emplacements vides).
-- [ ] **Recherche d'un stand attribué** (sélecteur filtrable, aujourd'hui dans une `dialog-box`) : bascule sur le bon plan, centre et met en évidence le stand.
-- [ ] Bascules d'affichage existantes, rebranchées sur le nouveau rendu :
-  - `displayTechnical` devient le sélecteur **Exposant / Technique** ;
-  - `displayFullname` devient le bouton **nom du stand / nom de la personne** ;
-  - `displayHeader` peut masquer le bandeau des stands si tu veux garder ce réglage.
-- [ ] Masquage des informations sensibles (`navigationService.hideSensibleInformation()`, `idDisplaySensibleInformation`) : même logique sur le nom et le statut.
-- [ ] **Mode attribution des numéros** (`isNumberAttribution`, `nextPosition`, `automaticallyIncrementNumber`) : un clic sur un stand lui donne le numéro suivant. À garder, par exemple comme bouton « Numéroter » dans la barre d'outils.
-- [ ] **Pré-réservation** avec note (popin existante) sur un emplacement vide.
-- [ ] **Détail d'un stand** en lecture (thérapeute, nom, statut, catégorie, tags, dimension du plan, dimension demandée, pré-réservation, commentaire), avec les liens vers la participation et la facturation.
-- [ ] Menu contextuel (clic droit) sur un stand, avec les mêmes actions qu'aujourd'hui.
-- [ ] Désactivation des boutons pendant `isLoading()`.
+### 2.1 En-tête
 
----
+- **Gauche** : le titre de l'écran. Dessous, en petit et en gris, une ligne de contexte (le salon courant pour les listes d'un salon, un total pour les salons).
+- **Droite** :
+    - le bouton **Retour** actuel ;
+    - un bouton icône **⋯** qui ouvre le menu d'actions de la liste ;
+    - le bouton principal **Créer** (`pi-plus`), qui n'affiche que l'icône sur mobile.
 
-## 3. Nouveau modèle de données
+### 2.2 Barre d'outils
 
-On abandonne la grille de cellules (`cells[][]`, `firstCell`, `unusable`). **Tout est stocké en mètres.** Chaque objet est un rectangle défini par son centre, sa largeur, sa profondeur et un angle.
+**Ligne 1** : la recherche prend toute la place. Juste à sa droite, un **bouton icône carré « Grouper et trier »** (`pi-sliders-h`, même hauteur que le champ, info-bulle et `aria-label` « Grouper et trier »). Sur mobile, les deux restent sur la même ligne.
 
-### 3.1 Front (`floor-plan.model.ts`)
+Un clic sur le bouton ouvre un **menu ancré sous le bouton, aligné à droite**, avec deux sections à **boutons radio** :
 
-```ts
-export interface IFloorPlan {
-  id: string | null;
-  position: number;            // ordre des onglets
-  name: string;
-  widthMeter: number;
-  heightMeter: number;         // profondeur de la salle
-  locations: IFloorLocation[]; // emplacements de stand
-  elements: IFloorElement[];   // murs, allées, escaliers…
-}
+- **Grouper par** : les options de l'écran (section 2.3).
+- Un séparateur.
+- **Trier par** : les options de l'écran. Chaque option a une aide en petit et en gris sous le libellé, qui dit sur quoi porte le tri (« date d'inscription », « nom du thérapeute », « titre », « date de début », « nom du salon »).
+- L'option cochée est en graisse 700.
+- Si une seule option de tri reste disponible, la section « Trier par » et son séparateur sont masqués.
 
-export interface IFloorLocation {
-  id: string;                  // uuid (v4, comme aujourd'hui)
-  idDimension: string;         // IPriceStandSalon.id
-  centerX: number; centerY: number;
-  widthMeter: number; depthMeter: number;
-  rotationDeg: number;         // 0–360, sens horaire, autour du centre
-  position: number | null;     // numéro du stand
-  stand: Pick<IStand, 'id'> | null;
-  prereserved: { note: string } | null;
-}
+**Comportement du menu** :
+- Un choix s'applique **immédiatement**, et le menu **reste ouvert** pour pouvoir régler l'autre section.
+- Il se ferme au clic à l'extérieur ou avec Échap.
+- Quand le groupement ou le tri n'est **pas celui par défaut**, le bouton est mis en évidence : bord et icône couleur primaire, fond primaire léger, et un petit point primaire dans son coin haut droit.
 
-export type FloorElementType = 'WALL' | 'PILLAR' | 'AISLE' | 'DOOR' | 'EXIT' | 'STAIRS' | 'ELEVATOR'
-  | 'STAGE' | 'BAR' | 'WC' | 'TECH' | 'POWER' | 'MARK';
+**Ligne 2** : une rangée de **puces** qui défile horizontalement. Elles sont organisées en groupes, chacun précédé d'un petit libellé en capitales grises, avec un séparateur vertical entre les groupes.
+- Chaque puce affiche son **effectif**, calculé sur toute la liste.
+- Les puces de signaux à 0 sont masquées. Les puces de statut et de période restent toujours affichées.
+- **Logique** : les puces du groupe « Statut » (ou « Période ») se combinent en **OU** ; celles du groupe « Signaux » en **ET** ; les groupes entre eux en **ET** avec la recherche.
+- Puce active : bord et texte couleur primaire, fond primaire léger, `aria-pressed="true"`.
 
-export interface IFloorElement {
-  id: string;
-  type: FloorElementType;
-  label: string | null;        // libellé affiché, sinon libellé du type
-  centerX: number; centerY: number;
-  widthMeter: number; depthMeter: number;
-  rotationDeg: number;
-  blockingOverride: boolean | null; // null = valeur par défaut du type
-}
+**Recherche et état** :
+- La recherche ignore les accents et la casse.
+- La recherche, le groupement, le tri et les filtres sont synchronisés avec les **query params** (`?q=…&group=…&sort=…&f=…`).
 
-export interface IFloorPlanSettings {     // une seule par salon
-  gridMeter: number;          // 0.25 | 0.5 | 1, grille affichée
-  moveStepMeter: number;      // 0.05 | 0.1 | 0.25 | 0.5 | 1, pas de déplacement
-  rotationStepDeg: number;    // 1 | 5 | 15 | 45
-  magnet: boolean;
-  elementTypes: Record<FloorElementType, { widthMeter: number; depthMeter: number; blocking: boolean }>;
-}
-```
+### 2.3 Grouper et trier (règles communes)
 
-En interne, le canvas peut travailler avec `x, y` (coin haut-gauche avant rotation), `w`, `h`, `rot`. On convertit au chargement et à l'enregistrement : `x = centerX - w/2`.
-
-### 3.2 Valeurs par défaut des types d'éléments
-
-| Type | Libellé | Largeur × profondeur | Bloquant |
-|---|---|---|---|
-| AISLE | Allée | 10 × 2 | oui |
-| DOOR | Entrée | 5 × 2,5 | oui |
-| EXIT | Sortie de secours | 1,5 × 2,5 | oui |
-| STAIRS | Escalier | 1,4 × 3,2 | oui |
-| ELEVATOR | Ascenseur | 1,8 × 1,8 | oui |
-| STAGE | Scène | 6 × 4 | oui |
-| BAR | Buvette | 5 × 4 | oui |
-| WC | Toilettes | 2,5 × 1,6 | oui |
-| TECH | Local technique | 2 × 2 | oui |
-| POWER | Borne électrique | 0,4 × 0,4 | non |
-| MARK | Repère (annotation) | 3 × 2 | non |
-| WALL | Mur | 4 × 0,2 | oui |
-| PILLAR | Pilier | 0,5 × 0,5 | oui |
-
-### 3.3 Back-end et migration
-
-- Adapter l'entité, le DTO et le `batchSave` pour stocker `locations`, `elements`, les dimensions du plan et les réglages. **Regarde comment le plan est stocké aujourd'hui** (probablement le JSON des cellules) et reste dans le même mode de stockage. Ajoute un changelog Liquibase si le schéma change.
-- **Migrer les plans existants** (au chargement côté back, ou par un script). Pour chaque cellule `firstCell` qui porte une `dimension`, avec `s = spacingMeter`, `row` / `col` la position de la cellule et `rows` / `cols` la taille de la dimension en cellules :
-  - `widthMeter = cols * s`, `depthMeter = rows * s` ;
-  - `centerX = col * s + widthMeter / 2`, `centerY = row * s + depthMeter / 2` ;
-  - `rotationDeg = 0` ;
-  - `position`, `stand`, `prereserved` sont repris tels quels.
-
-  `widthMeter` et `heightMeter` du plan sont conservés. `spacingMeter` devient la `gridMeter` par défaut. Attention : `convertAvailableDimensionCell` croise largeur et profondeur (`cols = heightMeter * 2`). Vérifie l'orientation sur un vrai plan avant de migrer.
-
----
-
-## 4. Géométrie (fonctions pures, à tester)
-
-Tout se calcule en mètres. Le SVG est en mètres lui aussi (`viewBox` en mètres) et le zoom ne fait que changer la taille du `<svg>`.
-
-- **Coins** d'un rectangle tourné : centre `c`, demi-largeur `hw`, demi-profondeur `hh`, angle `a` → coins `c + R(a)·(±hw, ±hh)`.
-- **Chevauchement** : test des axes séparateurs (SAT) sur les 4 axes (angle de A, A + 90°, angle de B, B + 90°), avec une tolérance `EPS = 0.01` pour que deux stands bord à bord ne soient pas en conflit. Si les deux angles valent 0, un simple test de boîtes alignées suffit.
-- **Point dans un objet** : on ramène le point dans le repère de l'objet (rotation inverse), puis `|u| ≤ w/2 && |v| ≤ h/2`.
-- **Dépasse du plan** : la boîte englobante des coins sort de `[0, widthMeter] × [0, heightMeter]`.
-- **Calage au pas** : `snap(v) = round(v / moveStep) * moveStep` (5 cm si le calage est désactivé). Un objet droit cale son coin haut-gauche, un objet en biais cale son centre.
-- **Aimant** (si activé, seuil 35 cm) : dans le repère de l'objet, il colle ses bords aux bords des objets **de même angle** proches, et aux murs du plan pour les objets droits.
-- **Rotation** : angle ramené dans `[0, 360[`. Avec la poignée, l'angle est arrondi au `rotationStepDeg` et attiré vers 0 / 90 / 180 / 270° à moins de 4°. Maj + poignée tourne degré par degré.
-
-## 5. Règles de conflit
-
-| Cas | Résultat |
-|---|---|
-| Stand × stand qui se chevauchent | Conflit sur les deux |
-| Stand × élément bloquant | Conflit sur les deux |
-| Stand × élément non bloquant | Rien |
-| Élément × élément | Jamais de conflit |
-| Stand qui dépasse du plan | Conflit « dépasse du plan » |
-| Exposant dans un emplacement d'une autre dimension | **Avertissement** (orange), pas un conflit |
-
-- Un élément est bloquant si `blockingOverride ?? settings.elementTypes[type].blocking`.
-- **On n'empêche jamais un placement** : l'objet est posé et signalé, rien n'est déplacé automatiquement. C'est voulu, pour ne pas bloquer l'organisatrice.
-- Les conflits sont recalculés à chaque rendu dans un `computed` (une seule fois par rendu, pas une fois par stand).
-- La liste des conflits est cliquable : un clic sélectionne le stand, bascule sur le bon plan et le centre. Le compteur rouge de la barre d'état passe au conflit suivant.
-
----
-
-## 6. Rendu du plan (SVG)
-
-### 6.1 Fond et calques
-
-1. Sol du plan : rectangle `--surface`, bord épais.
-2. Grille : un `pattern` au pas `gridMeter` (trait fin) et un trait plus marqué tous les 5 m.
-3. Règles graduées en mètres en haut et à gauche (chiffre tous les 5 m), et en bas à droite « 30 × 15 m · grille 0,5 m · pas 0,25 m ».
-4. Éléments de surface (allées, entrée, scène…), puis stands, puis repères, puis murs, piliers et bornes, puis l'objet sélectionné **toujours au-dessus**.
-
-### 6.2 Tailles de texte « à l'écran »
-
-Les textes et pictos visent une taille en pixels écran, bornée par la place disponible en mètres. Ils restent lisibles en vue d'ensemble et ne deviennent pas énormes quand on zoome.
-
-```ts
-const px = (n: number) => n / pixelsPerMeter;                        // n pixels écran → mètres
-const fitS = (target: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, target));
-```
-
-### 6.3 Cadre de lecture
-
-Le texte d'un objet tourné est contre-tourné par multiples de 90° pour rester au plus près de l'horizontale. Pour un objet étroit (largeur < 0,8 × profondeur et < 2,2 m), le texte suit la grande longueur.
-
-### 6.4 Stand (le cœur de la maquette)
-
-- **Fond** : couleur de catégorie via `getColorStand(stand)`. Emplacement vide : fond `--surface`, bord pointillé. Pré-réservé : hachures fines couleur accent.
-- **Bandeau en tête** (dans le cadre de lecture), de hauteur `hh = min(fitS(px(20), 0.24, 0.62), H * 0.38)` :
-  - fond `--ink` à 7,5 % d'opacité et filet en bas ;
-  - à gauche, le **numéro** (`position`), en police condensée medium, taille `hh * 0.58` ;
-  - à droite, de droite à gauche :
-    1. **pastille de statut** : rond plein de la couleur du statut (`colorStatus`) avec l'icône du statut (`status`) en blanc ;
-    2. **chevauchement** (icône deux carrés, rouge `--app-danger`) ;
-    3. **dimension différente** (double flèche, orange) ;
-    4. **pré-réservé** (étiquette, accent) ;
-    5. **stand partagé** (deux personnes, gris).
-
-    Les pictos qui ne tiennent pas sont retirés en partant de la fin de cette liste.
-  - Pour une icône FontAwesome dans le SVG, prends le `IconDefinition` (`icon[0]` largeur, `icon[1]` hauteur, `icon[4]` chemin) et dessine un `<svg viewBox>` imbriqué. C'est la même icône que le pipe `status` sait déjà choisir.
-- **Corps, mode Exposant** :
-  - nom du stand (ou nom de la personne selon la bascule), centré, une ou deux lignes avec « … », graisse **regular**, taille `fitS(px(12.5), m*0.11, min(0.42, bodyH*0.3))` ;
-  - en dessous, en plus petit et gris, l'autre nom s'il reste de la place.
-- **Corps, mode Technique** : petites étiquettes arrondies centrées qui passent à la ligne si besoin :
-  - ⚡ électricité, sur fond ambre si demandée, en pointillés gris sinon ;
-  - chaise + nombre ;
-  - table + nombre.
-
-  Hauteur `min(fitS(px(18), 0.2, 0.46), bodyH*0.4)`. Les données viennent des champs que la tuile actuelle affiche déjà en mode technique (électricité, chaises, tables, stand partagé).
-- **Emplacement vide** : bandeau avec le numéro (plus l'étiquette s'il est pré-réservé), et au centre « 3 × 2 » puis « libre » ou « pré-réservé ».
-- **États** :
-  - conflit : bord rouge et hachures rouges ;
-  - dimension différente : bord orange ;
-  - sélection : contour pointillé accent, plus une **poignée de rotation** (rond au bout d'une tige, au-dessus de l'objet) ;
-  - cible d'un dépôt : bord accent épais et fond accent clair.
-- **Info-bulle** (`<title>`) : « Stand 12 · 3 × 2 m », nom et personne, statut, puis les alertes, une par ligne.
-- **Il n'y a pas de marqueur de façade** sur les stands : pas de trait épais ni de triangle. Seul l'angle compte.
-
-### 6.5 Éléments
-
-| Type | Dessin |
-|---|---|
-| Mur, pilier | Plein `--ink`, sans texte |
-| Allée | Hachures diagonales légères, bord pointillé, libellé en capitales espacées |
-| Entrée | Fond accent clair, bord pointillé accent |
-| Sortie de secours | Fond vert clair, bord vert |
-| **Escalier** | Fond `--surface`, bord `--ink`, **une ligne par marche tous les 28 cm**, perpendiculaire à la grande longueur. **Pas de flèche.** Libellé seulement s'il est renseigné, sur une petite plaque |
-| Ascenseur | Cadre intérieur, deux diagonales en croix, trait de porte en bas |
-| Toilettes | « WC » en capitales espacées |
-| Borne électrique | Rond ambre avec un éclair |
-| Repère | Contour pointillé, sans fond |
-| Scène, buvette, local technique | Fond `--surface-2`, libellé centré |
-
-Un élément **non bloquant** est dessiné à 45 % d'opacité avec un bord pointillé, ce qui se voit d'un coup d'œil.
-
----
-
-## 7. Popin « Réglages »
-
-Ouverte par le bouton **Réglages** (`pi-sliders-h`) de la barre d'outils, par le « + » des onglets (avec un nouveau plan pré-rempli et son nom en focus) et par la pastille « Grille 0,5 m · pas 0,25 m · 15° » de la barre d'état.
-
-Utilise `dialog-box` en grand format (environ 880 px, plein écran sur mobile), avec un en-tête, une barre d'ancres « Grille et pas · Plans · Éléments » et un pied fixe **Annuler / Appliquer**. **La popin travaille sur un brouillon** : rien ne change avant « Appliquer ».
-
-1. **Grille et pas**
-  - Aperçu SVG d'une bande de 8 m : traits de grille, points aux positions possibles, un stand de 3 m posé vers 1,3 m (« x = 1,25 m ») et un rectangle tourné du pas de rotation.
-  - **Grille affichée** : sélecteur segmenté 0,25 / 0,5 / 1 m. Aide : « Lignes fines du plan, un trait plus marqué chaque mètre et tous les 5 m. »
-  - **Pas de déplacement** : 0,05 / 0,1 / 0,25 / 0,5 / 1 m. Aide : « Les objets se calent sur ce pas en glissant et avec les flèches. Alt + flèche : 5 cm. »
-  - **Pas de rotation** : 1 / 5 / 15 / 45°.
-  - **Aimanter aux bords voisins** : interrupteur.
-
-   Pour le sélecteur segmenté, regarde si un composant existe (`p-selectbutton` ou équivalent du projet), sinon un groupe de `button-box`.
-2. **Plans** : une ligne par plan avec ↑ ↓ pour l'ordre, le nom (`text-box`), la largeur et la profondeur (`number-box` décimal, suffixe m), le nombre d'objets, et une corbeille.
-  - Supprimer un plan qui contient des objets demande une confirmation dans la ligne : « 3 exposants à replacer · Supprimer / Garder ».
-  - « Ajouter un plan » ajoute une ligne de 20 × 10 m.
-  - Aide : « Réduire un plan ne supprime rien : les stands qui dépassent passent en conflit. »
-3. **Éléments** : une ligne par type avec un mini-aperçu, le libellé et l'aide, la largeur et la profondeur par défaut, et un interrupteur **Bloquant**.
-
-**Validation** : plans entre 2 et 400 m, éléments d'au moins 10 cm. En cas d'erreur, un message rouge apparaît dans le pied et la popin défile jusqu'à la section concernée.
-
-**Application** :
-- les réglages et les plans (ordre, noms, tailles, suppressions) sont remplacés ;
-- les ids des plans supprimés vont dans `floorPlansToRemove` ;
-- un toast « Réglages appliqués » s'affiche, complété au besoin par « · N conflits à revoir » et « · N exposants à replacer » ;
-- l'opération est **annulable** avec Ctrl+Z.
-
----
-
-## 8. Interactions
-
-| Action | Souris / clavier | Tactile |
+| Écran | Grouper par (défaut en premier) | Trier par (défaut en premier) |
 |---|---|---|
-| Poser un exposant | Glisser sa carte : sur un emplacement **libre**, l'exposant y est attribué ; ailleurs, un stand à sa dimension est créé | Toucher la carte (elle s'« arme »), puis toucher le plan |
-| Poser un emplacement vide ou un élément | Glisser depuis la palette, ou cliquer pour l'armer et poser plusieurs fois de suite | Pareil, au toucher |
-| Déplacer | Glisser l'objet (calage au pas, aimant) ; flèches = 1 pas, Alt + flèches = 5 cm | Glisser avec un doigt |
-| Tourner | Poignée ; Q / E = ∓ pas de rotation ; R = quart de tour | Poignée |
-| Redimensionner un élément | Poignée ronde au coin bas-droit (un mur ne change que de longueur) | Pareil |
-| Dupliquer | Ctrl+D : copie collée dans la direction de la grande longueur, nouveau numéro | Barre flottante |
-| Supprimer | Suppr | Barre flottante |
-| Annuler / Rétablir | Ctrl+Z / Ctrl+Y (historique de 100 états, réglages compris) | Boutons de la barre |
-| Zoom | Ctrl + molette (centré sur la souris), boutons − / +, « Tout voir » | Pincer à deux doigts |
-| Afficher Exposant / Technique | T | Sélecteur |
-| Tout désélectionner, désarmer | Échap | Toucher le fond |
+| Participations | Statut · Alphabet | Date d'inscription · Alphabet |
+| Stands | Catégorie · Statut · Alphabet | Date d'inscription · Alphabet |
+| Conférences / ateliers | Statut · Alphabet | Date d'inscription · Alphabet · Titre |
+| Salons | Statut (état calculé) · Alphabet | Date de début · Titre |
 
-- **Barre flottante** au-dessus de l'objet sélectionné : −pas, champ angle (°), +pas, 90°, dupliquer, supprimer. Sur mobile, elle est centrée en bas du plan.
-- Pendant une rotation, un **rapporteur** s'affiche autour du centre avec l'angle en cours.
-- Les raccourcis sont ignorés quand le focus est dans un champ ou une popin.
+- **Alphabet**, en groupement comme en tri, porte sur le **nom du thérapeute** (`therapistName` ou `participation.therapistName`). Pour les salons, il porte sur le **nom du salon** (`place`).
+- **Grouper par Alphabet** :
+    - un groupe par initiale (sans accent, en majuscule ; « # » pour un nom vide ou qui ne commence pas par une lettre) ;
+    - groupes triés de A à Z, aucun groupe replié par défaut ;
+    - le point du groupe est en couleur primaire.
+- **Tri** :
+    - **Date** est décroissant ;
+    - **Alphabet** et **Titre** sont croissants, sans accent, avec la date décroissante en cas d'égalité ;
+    - le tri s'applique à l'intérieur de chaque groupe.
+- **Option redondante masquée** : quand on groupe par Alphabet, l'option de tri sur la même clé disparaît (Alphabet, et Titre pour les salons). Si c'était le tri actif, on repasse sur **Date**.
+- **Changer de groupement** réinitialise les groupes repliés aux valeurs par défaut de ce groupement.
 
----
+### 2.4 Groupes
 
-## 9. Panneaux
+- **En-tête de groupe** : un bouton pleine largeur, **collant** en haut de la zone de liste. Il contient :
+    - un chevron (−90° quand le groupe est replié) ;
+    - un point de couleur ;
+    - le libellé ;
+    - l'effectif dans une pastille ;
+    - à droite, un résumé propre à l'écran ;
+    - dessous, une barre de 4 px dont la largeur vaut la part du groupe dans le total.
+- Certains groupes sont repliés par défaut. **Tous s'ouvrent** dès qu'une recherche ou un filtre est actif.
 
-### 9.1 Palette (gauche)
+### 2.5 Ligne
 
-Trois onglets :
-- **Exposants** (avec le nombre à placer) : champ de filtre, cartes groupées par catégorie avec la pastille de couleur, le nom, la personne, un point de statut et la dimension demandée.
-- **Vides** : une carte par dimension vendue, avec un mini-rectangle à l'échelle, « n posés · n demandés », une barre de remplissage et une pastille « −2 » s'il manque des emplacements.
-- **Éléments** : grille de cartes avec un mini-aperçu dessiné comme sur le plan, le libellé, l'aide et un badge « Bloquant » ou « Non bloquant ».
+Une carte : fond `--app-surface`, bord 1 px, rayon 10 px, 6 px d'écart entre les cartes. **Aucun badge et aucune bordure de couleur** sur les deux premiers niveaux. Au survol, le bord fonce et une ombre légère apparaît. Le curseur est une main sur toute la carte.
 
-Commun aux onglets : « **Angle des prochains posés** », avec des boutons ↓ ← ↑ → ↘ (0 / 90 / 180 / 270 / 315°).
+```
+ordinateur et mobile :  "titre    statut"
+                        "méta     droite"
+                        "pied …………………………… ⚙"
+```
 
-### 9.2 Inspecteur (droite)
+- **Titre** : 15 px, graisse 600, coupé avec « … ». Surligne la partie qui correspond à la recherche.
+- **Statut** : calé à droite, point de 8 px + libellé, 13,5 px, graisse 700, couleur du statut. Les éléments annulés sont barrés.
+- **Méta** et **droite** : 12,5 px, gris.
+- **Pied** : une 3e ligne séparée par un trait **pointillé**, 11,5 px, **toujours présente** (elle porte le rouage).
+    - À gauche, les informations secondaires : éléments « icône + libellé (+ précision en gris) » séparés par un « · ». Les tags sont de petites étiquettes arrondies.
+    - **On n'affiche que ce qui existe.** Un compteur à 0, un booléen faux, un texte vide ou une liste vide ne produisent rien : ni « 0 conférence », ni « Inscriptions fermées », ni « Aucune dimension ».
+    - **Tout en bas à droite**, le **rouage** (`pi-cog`) : un bouton icône de 30 px, gris, sans bord. Au survol ou quand son menu est ouvert, il prend un fond léger et un bord, et l'icône tourne de 45°.
 
-**Stand sélectionné** :
-- En-tête : « Stand attribué · Halle principale », puis « Stand 12 » et une puce « 3 × 2 m ».
-- Alerte rouge pour chaque conflit et alerte orange pour une dimension différente.
-- Encadré exposant (couleur de catégorie, nom, personne, catégorie), statut en `p-tag` coloré, puce « Dimension conforme ».
-- **Fiche technique** en 4 tuiles (icône dans un carré arrondi, valeur, libellé) : Électricité (oui/non, ambre si oui), Chaises, Tables, Stand partagé. Une valeur absente s'affiche en tuile pointillée grise.
-- Bouton « Libérer l'emplacement » : retire l'exposant et garde l'emplacement.
-- Emplacement vide : `select-box` « Attribuer à un exposant », avec d'abord le groupe « Même dimension (n) » puis « Autres dimensions », et la note de pré-réservation.
-- Numéro (`number-box`), Dimension (`select-box`), **Orientation** (boussole de 8 directions avec l'angle au centre, plus un champ « Angle précis »).
-- Actions : Pivoter, Dupliquer, Supprimer.
+**Clic sur la ligne** : ouvre la fiche existante de l'élément (route de la section 6).
+- Implémente-le de façon accessible : le titre est un vrai lien `<a [routerLink]>` dont le pseudo-élément `::after` couvre toute la carte (« lien étendu »).
+- Le rouage est placé au-dessus (`position: relative; z-index: 1`) pour rester cliquable sans déclencher la navigation.
+- Entrée sur la carte ouvre la fiche. Le clic molette ou Ctrl+clic ouvre un nouvel onglet, ce qui est automatique avec un vrai lien.
 
-**Élément sélectionné** :
-- Type (`select-box`), libellé, largeur et profondeur, orientation.
-- Bloc **Bloquant** avec un interrupteur et une phrase d'explication. Si la valeur diffère du défaut du type, afficher « Réglage propre à cet objet… » et un lien **Revenir au défaut**, qui remet `blockingOverride` à `null`.
+**Menu du rouage** :
+- Un menu contextuel ancré au rouage, aligné à droite, qui s'ouvre **vers le haut** s'il n'y a pas la place en dessous.
+- Il contient les actions de l'écran (section 6), chacune avec son icône. **Supprimer** vient en dernier, après un séparateur, en rouge.
+- Un seul menu est ouvert à la fois. Il se ferme au clic à l'extérieur, avec Échap, au défilement de la liste, ou après le choix d'une action.
+- Ouvrir le menu ne déclenche pas la navigation.
 
-**Rien de sélectionné**, vue d'ensemble :
-- 3 indicateurs : exposants placés sur le total, emplacements libres, conflits.
-- Liste « À corriger » cliquable, puis « Dimensions différentes ».
-- Légende des catégories.
-- **Statuts des stands placés** en barres (une par statut, couleur du statut, nombre).
-- **Logistique du plan** : nombre de prises, de chaises et de tables.
+### 2.6 Responsive
 
-### 9.3 Barre du haut et barre d'état
-
-- **Barre du haut** : onglets des plans (avec un compteur rouge de conflits), sélecteur Exposant / Technique, bouton nom du stand / personne, recherche, Annuler / Rétablir, calage au pas (on/off), aimant (on/off), zoom − / valeur / + / Tout voir, Réglages.
-- **Barre d'état** : coordonnées du curseur en mètres, « 29 emplacements · 21 attribués · 8 libres », pastille des conflits (passe au suivant) ou « Aucun conflit », pastille Grille / pas.
-
----
-
-## 10. Mobile (< 900 px)
-
-- En-tête compact : titre et onglets des plans sur une ligne, puis une ligne d'outils qui défile horizontalement, avec des boutons en icône seule.
-- Le plan occupe tout l'écran restant. Le zoom initial cadre la hauteur, avec au moins 24 px/m pour que les étiquettes restent lisibles, et on fait défiler le plan sur le côté.
-- **Tiroir en bas** à la place des deux panneaux :
-  - fermé, il n'affiche que la barre d'onglets (Exposants / Vides / Éléments / **Bilan**) ;
-  - avec une sélection, il affiche « Stand 12 · Nom », un compteur de conflits, une flèche pour l'ouvrir et une croix pour désélectionner ;
-  - toucher un onglet ou la poignée ouvre le tiroir (environ 64 % de la hauteur) ;
-  - **armer** un élément le referme pour libérer le plan.
-- La barre flottante de rotation est centrée en bas du plan, et les toasts s'affichent au-dessus du tiroir.
-- La popin Réglages passe en plein écran, et ses lignes de tableau passent sur deux lignes.
-- Un doigt sur le fond fait défiler le plan, un doigt sur un objet le déplace (`touch-action: none` sur les objets), deux doigts zooment.
-- **Aucun défilement horizontal de la page.**
+- La bascule se fait sur la **largeur du composant**, pas de la fenêtre : `container-type: inline-size` sur l'hôte de la liste, puis `@container (max-width: 720px)`.
+- Sur mobile :
+    - marges réduites à 12 px ;
+    - la recherche et le bouton « Grouper et trier » restent sur une ligne ;
+    - les puces défilent ;
+    - les alertes de la ligne n'affichent que leur icône.
+- **Aucun défilement horizontal de la page à 390 px.**
 
 ---
 
-## 11. Clés de traduction à ajouter (fr)
+## 3. Composants partagés (`shared/components/entity-list/`)
 
-Range-les sous `floorPlan.*` en suivant la structure existante. Principales clés :
+| Composant | Rôle | Entrées / sorties principales |
+|---|---|---|
+| `entity-list-toolbar` | Recherche + bouton « Grouper et trier » + rangée de puces groupées | `query` (model), `groupBy` (model), `groupOptions: {key, labelKey}[]`, `defaultGroupBy`, `sort` (model), `sortOptions: {key, labelKey, hintKey}[]` (déjà filtrées selon `groupBy`), `defaultSort`, `chipGroups: {key, labelKey, chips: {key, labelKey, icon?, dotColor?, count}[]}[]`, `activeChips` (model) |
+| `entity-group-sort-menu` | Bouton icône et menu à boutons radio (utilisé par la barre d'outils) | `groupBy` (model), `groupOptions`, `sort` (model), `sortOptions`, `isDefault` |
+| `entity-list-group` | En-tête de groupe collant et repliable, avec projection des lignes | `label`, `color`, `count`, `ratio`, `collapsed` (model), slot `[groupSummary]` |
+| `entity-row` | Carte : deux niveaux + pied + rouage, lien étendu vers la fiche | `link` (commands du `routerLink`), `linkLabel` (pour `aria-label`), `actions: MenuItem[]` ; slots `[rowTitle]`, `[rowStatus]`, `[rowMeta]`, `[rowSide]`, `[rowFoot]` |
+| `entity-status` | Point + libellé coloré | `status`, `i18nPrefix` (`participation.status.list`, `stand.status.list`…), `masculine?` |
+| `entity-foot-item` | Élément du pied : icône + libellé + précision | `icon`, `labelKey` ou `label`, `detail?`, `color?` |
+| `entity-count` | Compteur du pied (« 2 stands »), qui ne s'affiche pas s'il vaut 0 | `icon`, `count`, `singularKey`, `pluralKey` |
 
-```json
-{
-  "floorPlan": {
-    "view": { "exhibitor": "Exposant", "technical": "Technique", "personName": "Afficher le nom de la personne", "standName": "Afficher le nom du stand" },
-    "palette": { "exhibitors": "Exposants", "empty": "Vides", "elements": "Éléments", "summary": "Bilan", "filter": "Filtrer les exposants à placer", "nextAngle": "Angle des prochains posés", "placed": "{{n}} posés · {{need}} demandés", "blocking": "Bloquant", "nonBlocking": "Non bloquant" },
-    "stand": { "free": "libre", "prereserved": "pré-réservé", "overlap": "Chevauchement", "sizeMismatch": "Demandé {{asked}}, emplacement {{slot}}", "shared": "Stand partagé", "outOfPlan": "dépasse du plan", "release": "Libérer l'emplacement", "sameDimension": "Même dimension ({{n}})", "otherDimension": "Autres dimensions", "conform": "Dimension conforme" },
-    "tech": { "title": "Fiche technique", "electricity": "Électricité", "chairs": "Chaises", "tables": "Tables", "shared": "Stand partagé", "yes": "Oui", "no": "Non" },
-    "element": { "blocking": "Bloquant", "nonBlocking": "Non bloquant", "blockingHelp": "Un stand posé dessus passe en conflit.", "nonBlockingHelp": "Les stands peuvent le recouvrir sans conflit.", "custom": "Réglage propre à cet objet", "reset": "Revenir au défaut", "types": { "AISLE": "Allée", "DOOR": "Entrée", "EXIT": "Sortie de secours", "STAIRS": "Escalier", "ELEVATOR": "Ascenseur", "STAGE": "Scène", "BAR": "Buvette", "WC": "Toilettes", "TECH": "Local technique", "POWER": "Borne électrique", "MARK": "Repère", "WALL": "Mur", "PILLAR": "Pilier" } },
-    "orientation": { "title": "Orientation", "precise": "Angle précis" },
-    "summary": { "title": "Vue d'ensemble", "placed": "exposants placés", "free": "emplacements libres", "conflicts": "conflits", "toFix": "À corriger", "statuses": "Statuts · stands placés", "logistics": "Logistique · {{plan}}", "outlets": "prises" },
-    "settings": {
-      "title": "Réglages du plan", "gridAndSteps": "Grille et pas", "plans": "Plans", "elements": "Éléments",
-      "grid": "Grille affichée", "gridHelp": "Lignes fines du plan, un trait plus marqué chaque mètre et tous les 5 m.",
-      "move": "Pas de déplacement", "moveHelp": "Les objets se calent sur ce pas en glissant et avec les flèches. Alt + flèche : 5 cm.",
-      "rotation": "Pas de rotation", "rotationHelp": "Poignée de rotation et touches Q / E. Maj + poignée : degré par degré.",
-      "magnet": "Aimanter aux bords voisins", "magnetHelp": "Colle un objet contre le mur ou le stand d'à côté quand il en est à moins de 35 cm.",
-      "addPlan": "Ajouter un plan", "shrinkHelp": "Réduire un plan ne supprime rien : les stands qui dépassent passent en conflit.",
-      "deleteConfirm": "{{n}} exposant(s) à replacer", "keep": "Garder",
-      "elementsHelp": "Taille à la pose et comportement par défaut. Chaque objet posé peut ensuite avoir son propre réglage.",
-      "apply": "Appliquer", "applied": "Réglages appliqués", "moreConflicts": "{{n}} conflit(s) à revoir", "toReplace": "{{n}} exposant(s) à replacer",
-      "errorPlanSize": "« {{name}} » : largeur et profondeur entre 2 et 400 m.", "errorElementSize": "{{type}} : taille d'au moins 10 cm."
-    }
-  }
+`entity-list.utils.ts` contient les fonctions communes, avec leurs tests :
+- `groupByAlphabet(items, keyFn)` ;
+- `compareAlpha` ;
+- `compareDateDesc` ;
+- `availableSorts(groupBy, sorts, sameKeyAsAlpha)` ;
+- `matchesSearch(item, fields, query)`.
+
+Chaque écran garde son composant conteneur (`participation.component`, `stand.component`…), qui :
+- charge les données ;
+- tient l'état dans des signals : `query`, `groupBy`, `sort`, `activeChips`, `collapsedGroups` ;
+- calcule `filtered` et `groups` avec `computed` ;
+- construit, pour chaque ligne, la liste d'actions du rouage (`MenuItem[]`), avec la suppression branchée sur sa méthode `delete` actuelle ;
+- assemble les composants partagés dans son template.
+
+**Ordre de réalisation** : construis d'abord ces composants et la liste des **conférences** (la plus simple), puis les autres écrans.
+
+---
+
+## 4. Back-end
+
+### 4.1 Résumé des participations d'un salon
+
+Le pied des participations a besoin d'informations absentes de `IParticipation` : les nombres de stands (dont partagés), de conférences et d'ateliers. On ajoute **un endpoint de résumé par salon**, sur le modèle de `info-invoices`, qui reprend aussi les compteurs de factures :
+
+```
+GET /api/admin/salons/{idSalon}/participations/summaries  →  Map<UUID, ParticipationSummary>
+```
+
+```java
+@Data
+public class ParticipationSummary implements Serializable {
+    long nbDraft = 0L; long nbIssued = 0L; long nbPaid = 0L; long nbExpired = 0L;          // via buildInfoInvoice
+    long nbStands = 0L; long nbSharedStands = 0L; long nbConferences = 0L; long nbWorkshops = 0L; // REFUSED et CANCELED exclus
 }
 ```
 
+- Charge **une requête par type** et regroupe par participation : `findByParticipation_Salon_Id` pour les plans de facturation, `findByParticipationSalonIdOrderByRegistrationDateDesc` pour les stands, conférences et ateliers. Pas de N+1.
+- Garde l'endpoint `info-invoices` tant que tu n'as pas vérifié qu'il n'est plus utilisé ailleurs.
+- Côté front : `IParticipationSummary extends IInfoInvoice` et `ParticipationService.getSummariesForSalon(idSalon)`, chargé en parallèle de `query(idSalon)`. Une participation absente du résultat est traitée comme « rien ».
+
+### 4.2 Résumé des salons
+
+Le pied des salons a besoin du nombre de participations, de conférences et d'ateliers par salon.
+- Ajoute `GET /api/admin/salons/summaries` → `Map<UUID, SalonSummary>`, avec `{ nbParticipations, nbConferences, nbWorkshops }`.
+- Les statuts REFUSED et CANCELED sont exclus des trois compteurs.
+- Utilise des requêtes `count … group by salon`. Ne charge pas les entités.
+- Le nombre de dimensions vient de `priceStandSalons`, déjà présent dans `SalonDTO`.
+
+### 4.3 Données déjà disponibles
+
+- **Stands, conférences, ateliers** : chaque élément arrive avec sa `participation` (`therapistName`, `exhibitor`).
+- **Conférences et ateliers** : `registrationDate` existe côté entité (les repositories trient dessus). Ajoute-le aux interfaces TS s'il manque.
+- **Stand** : `shared` est un simple booléen. **Il n'y a pas de nom de co-exposant** : on affiche « Partagé (co-exposant) », sans nom.
+
 ---
 
-## 12. Plan d'implémentation (dans l'ordre)
+## 5. Fonctionnalités actuelles à conserver (checklist)
 
-1. **Modèle et géométrie** : `floor-plan.model.ts` (section 3), puis `floor-plan.geometry.ts` (section 4) avec ses tests unitaires (chevauchement droit et tourné, bord à bord sans conflit, point dans un objet tourné, calage, normalisation d'angle).
-2. **Back-end** : DTO, stockage, `batchSave`, migration des anciens plans, réglages du salon.
-3. **Canvas en lecture seule** : SVG, grille, règles, éléments, stands avec bandeau et corps, bascules Exposant / Technique et nom, info-bulles, zoom et « Tout voir ». Vérifier sur un vrai salon migré.
-4. **Conflits** : `computed`, styles des états, liste cliquable, compteur dans les onglets.
-5. **Édition** : sélection, déplacement avec calage et aimant, rotation (poignée, rapporteur, Q / E / R), redimensionnement des éléments, barre flottante, historique Annuler / Rétablir, raccourcis.
-6. **Palette** : exposants, vides, éléments, angle des prochains posés, glisser-déposer et mode « armé ».
-7. **Inspecteur** : stand, élément (interrupteur Bloquant et retour au défaut), vue d'ensemble, fiche technique.
-8. **Popin Réglages** (section 7), branchée sur les onglets et la barre d'état.
-9. **Fonctionnalités conservées** (section 2) : mode lecture, menu Actions, recherche, numérotation, pré-réservation, détail en lecture, menu contextuel, informations sensibles.
-10. **Mobile** (section 10).
-11. **Traductions** dans toutes les langues présentes, puis relecture visuelle en thème clair et sombre.
+- [ ] **Toutes les listes** :
+    - titre, bouton Retour, Créer (`./new`), Rafraîchir ;
+    - suppression avec confirmation puis rechargement (désormais depuis le rouage) ;
+    - état vide (`*.notFound`) ;
+    - état de chargement ;
+    - accès à la fiche `./:id/view` (désormais par clic sur la ligne).
+- [ ] **Participations** :
+    - « Copier les e-mails des exposants actifs » ;
+    - chargement par `idSalon`, en ignorant les réponses obsolètes ;
+    - carte **« Ligne de temps des inscriptions »** (`timeline-dot`), conservée sous la liste.
+- [ ] **Stands** :
+    - la vue « presse-papiers » (`standardView = false`, tri par catégorie puis thérapeute, clic sur une cellule = copie) **reste accessible depuis le menu ⋯**, inchangée ;
+    - le lien vers la participation est conservé (dans le rouage).
+- [ ] **Stands, conférences, ateliers** : les listes servent aussi **sous une participation** (`idParticipation` dans la route). Elles gardent le même rendu, avec le contexte « Participation de {thérapeute} » sous le titre.
+- [ ] **Salons** : l'accès aux participations du salon, aux statistiques et aux autres sous-écrans reste disponible (rouage ou fiche du salon).
 
-## 13. Critères d'acceptation
+---
 
-- [ ] Un stand peut être posé n'importe où au pas choisi, tourné à n'importe quel angle, et ses conflits sont justes, y compris en biais.
-- [ ] Deux stands bord à bord ne sont pas en conflit.
-- [ ] Un pilier passé en « non bloquant » supprime le conflit du stand qui le recouvre, et Ctrl+Z le rétablit.
-- [ ] Changer le pas de déplacement à 0,5 m dans Réglages fait caler les stands sur 0,5 m.
-- [ ] Supprimer un plan avec des exposants demande confirmation, puis les exposants reviennent dans « Exposants à placer ».
-- [ ] L'escalier affiche ses marches sans flèche, et les stands n'ont aucun trait ni triangle de façade.
-- [ ] Sur un téléphone de 390 px de large, la page ne défile pas horizontalement, le tiroir s'ouvre et se ferme, et on peut poser, déplacer, tourner et zoomer au doigt.
-- [ ] Toutes les fonctionnalités de la section 2 fonctionnent encore.
-- [ ] Aucune couleur en dur ni nouveau composant de formulaire quand un composant partagé existe.
+## 6. Écran par écran
+
+### 6.1 Participations
+
+**Contexte sous le titre** : nom du salon (`place`) · dates · **J-x** avant l'ouverture (depuis `navigationStateService.salon()`).
+**Menu ⋯** : Rafraîchir, Copier les e-mails des exposants actifs.
+
+**Grouper par** : Statut (défaut) · Alphabet (`therapistName`).
+**Trier par** : Date (`registrationDate`, défaut) · Alphabet (`therapistName`).
+
+**Puces** :
+
+| Groupe | Puce | Condition |
+|---|---|---|
+| Statut | À vérifier · Acceptées · Validées · Clôturées · Écartées | `status` ; Écartées = `REFUSED` ou `CANCELED` |
+| Signaux | Alertes | `exhibitor.redFlag` ou `exhibitor.duplicateDetected` |
+| | Facture échue | `nbExpired > 0` |
+| | À facturer | `ACCEPTED`/`VALIDATED` et aucune facture |
+| | Coup de cœur | `crushOfHeart` |
+| | Invité d'honneur | `guestOfHonor` |
+| | Arrangement | `needArrangement` |
+| | Offre cadeau | `hasOffer` |
+| | Commentaire | `extraInformation` non vide |
+
+**Groupes par statut** : ordre `IN_VERIFICATION, ACCEPTED, VALIDATED, CLOSED, REFUSED, CANCELED`, avec `REFUSED` et `CANCELED` repliés par défaut.
+**Résumé à droite de chaque groupe** (statut ou lettre) : « x échues · p/t payées », ou « pas de facture ».
+
+**Ligne** :
+
+| Zone | Contenu |
+|---|---|
+| Titre | `therapistName` |
+| Statut | statut de la participation (féminin) |
+| Méta | nom complet de l'exposant, suivi de « ⚑ Red flag » et/ou « Doublon » en texte coloré (icônes seules sur mobile) |
+| Droite | « inscrit le 15 avr. » (seulement la date sur mobile) |
+
+Le pied contient, dans cet ordre, **uniquement les éléments présents** :
+1. **Info facture** :
+    - s'il y a des factures : mini-jauge de 48 px (payé / en attente / brouillon / échu) + « **p/t** payée(s) », ou « **x échue(s)** » en rouge ;
+    - si rien n'est facturé : « À facturer » (bleu) pour une participation acceptée ou validée, et rien sinon.
+2. **Prestations** : seulement les compteurs non nuls, par exemple « 1 stand · 2 ateliers ». On écrit « (partagé) » ou « (dont partagé) » si `nbSharedStands > 0`.
+3. Invité d'honneur (`star`, or).
+4. Coup de cœur (`heart`, rouge).
+5. Arrangement (`handshake-simple`, bleu).
+6. **Offre** (`gift`, violet) + texte `offer` en gris, coupé.
+7. **Note** (`note-sticky`) + `extraInformation` en gris, coupé.
+
+**Clic sur la ligne** : `./:id/view`.
+**Rouage** :
+- Fiche exposant (`/admin/exhibitors/:exhibitorId/view`) ;
+- Facturation (`./:id/billing`) ;
+- Supprimer.
+
+### 6.2 Stands
+
+**Contexte sous le titre** : salon · dates · « N stands » (ou la participation, si la liste est sous une participation).
+**Menu ⋯** : Rafraîchir, **Vue presse-papiers** (vue technique actuelle).
+
+**Grouper par** : Catégorie (défaut) · Statut · Alphabet (`participation.therapistName`).
+**Trier par** : Date (`registrationDate`, défaut) · Alphabet (`participation.therapistName`).
+
+**Puces** :
+
+| Groupe | Puce | Condition |
+|---|---|---|
+| Statut | À vérifier · Acceptés · Validés · Clôturés · Écartés | libellés **au masculin** |
+| Signaux | Partagé | `shared` |
+| | Électricité | `needElectricity` |
+| | Commentaire | `extraInformation` |
+
+Il n'y a **pas de filtre par dimension**.
+
+**Groupes** :
+- par **catégorie** : ordre de l'enum `Category`, point de couleur `--app-category-*`, aucun groupe replié ;
+- par **statut** : libellés au masculin, `REFUSED` et `CANCELED` repliés.
+
+**Résumé à droite de chaque groupe** : « n actifs · m écartés ».
+
+**Ligne** :
+
+| Zone | Contenu |
+|---|---|
+| Titre | `description` |
+| Statut | statut du stand (masculin) |
+| Méta | `participation.therapistName` |
+| Droite | catégorie : petit carré de couleur + libellé |
+
+Le pied contient, **uniquement si présents** :
+- les **3 premiers tags** (`subCategories`) en petites étiquettes, plus « +n » s'il y en a d'autres ;
+- la **dimension** (`dimension.dimension`, icône règle) ;
+- « **Partagé (co-exposant)** » si `shared` ;
+- **Note** + `extraInformation`.
+
+**Clic sur la ligne** : `./:id/view`.
+**Rouage** :
+- Participation (`/admin/salons/:idSalon/participations/:idParticipation/view`) ;
+- Supprimer.
+
+### 6.3 Conférences et ateliers (un seul rendu pour deux écrans)
+
+Les deux modèles sont identiques (`title`, `description`, `status`, `extraInformation`, `participation`).
+- Crée un composant de présentation commun : `shared/components/entity-list/talk-list` ou `admin/common/talk-list`.
+- `conference.component` et `workshop.component` l'alimentent avec leur service et leurs clés de traduction (`conference.*` / `workshop.*`).
+
+**Contexte sous le titre** : salon · dates · « N conférences » (ou « N ateliers »).
+**Menu ⋯** : Rafraîchir.
+
+**Grouper par** : Statut (défaut) · Alphabet (`participation.therapistName`).
+**Trier par** : Date (`registrationDate`, défaut) · Alphabet (`participation.therapistName`) · Titre (`title`).
+
+**Puces** :
+- Statut (au féminin pour les conférences, au masculin pour les ateliers : « Acceptés », « Validés »…) ;
+- Signaux : **Avec commentaire**.
+
+**Groupes par statut** : `REFUSED` et `CANCELED` repliés. Pas de résumé à droite, quel que soit le groupement.
+
+**Ligne** :
+- titre : `title` ;
+- statut ;
+- méta : `participation.therapistName` ;
+- droite : vide ;
+- pied : **Note** + `extraInformation` s'il existe, sinon seulement le rouage.
+
+**Clic sur la ligne** : `./:id/view`.
+**Rouage** : Participation, Supprimer.
+
+### 6.4 Salons
+
+**Contexte sous le titre** : « N salons · M actifs » (non archivés).
+**Menu ⋯** : Rafraîchir, et les actions du menu actuel (importer des inscriptions, si elle s'y trouve).
+
+**Grouper par** : Statut (état calculé, défaut) · Alphabet (`place`).
+**Trier par** : Date (`startingDate` décroissante, défaut) · Titre (`place`).
+- Quand on groupe par Alphabet, le tri Titre est masqué, et avec lui la section « Trier par » du menu (il ne reste que Date).
+
+**État calculé** (affiché comme un statut) :
+
+| État | Condition | Couleur | Libellé |
+|---|---|---|---|
+| Archivé | `archived` | `--app-status-canceled` | « Archivé » |
+| Terminé | `endingDate` < aujourd'hui | `--app-status-closed` | « Terminé » |
+| En cours | `startingDate` ≤ aujourd'hui | `--app-status-validated` | « En cours » |
+| À venir | sinon | `--app-status-accepted` | « À venir », suivi de « · J-x » en gris si l'ouverture est dans 60 jours ou moins |
+
+**Puces** : seulement le groupe **Période** (En cours, À venir, Terminés, Archivés). Pas de filtre « Inscriptions ouvertes » ni « Sans dimension ».
+
+**Groupes par statut** : dans l'ordre En cours, À venir, Terminés, Archivés, avec les **Archivés repliés** par défaut.
+**Résumé à droite de chaque groupe** : « n participations ».
+
+**Ligne** :
+
+| Zone | Contenu |
+|---|---|
+| Titre | `place` (libellé « Nom du salon ») |
+| Statut | état calculé (ci-dessus) |
+| Méta | « Réf. » + `referenceNumber` |
+| Droite | période en graisse 600 : « 13–15 nov. 2026 », ou « 30 oct. – 2 nov. 2026 » si les mois diffèrent |
+
+Le pied contient, **uniquement si présents** :
+- « Inscriptions en ligne ouvertes » (vert, icône globe) si `registrationEnabled` ;
+- « n dimensions » s'il y en a au moins une ;
+- les compteurs non nuls parmi « n participations · n conférences · n ateliers ».
+
+**Clic sur la ligne** : `./:id/view`.
+**Rouage** :
+- Participations (`./:id/participations`) ;
+- Statistiques (`./:id/stats`) ;
+- Supprimer.
+
+---
+
+## 7. Styles
+
+Les noms de la maquette correspondent aux variables du projet comme suit. Vérifie chaque correspondance dans `_variables.scss`.
+
+| Maquette | Projet |
+|---|---|
+| `--fg` / `--muted` | `--app-text` / `--app-text-muted` |
+| `--line` / `--line-strong` | `--app-border` / `--app-line` |
+| `--surface` / `--surface-2` / `--bg` | `--app-surface` / `--app-surface-2` / `--app-surface-muted` |
+| `--accent` / `--accent-soft` | `--app-primary` (ou `--app-accent`) / `--app-accent-soft` |
+| `--danger` / `--warn` / `--gold` | `--app-danger` / `--app-warn` / `--app-status-gold` |
+| `--st-ver` … `--st-can` | `--app-status-verification` / `-accepted` / `-validated` / `-closed` / `-refused` / `-canceled` |
+| `--cat-therapist` … `--cat-none` | `--app-category-therapist` / `-artisanat` / `-mediumnity` / `-energetic` / `-miscellaneous` / `-none` |
+| `--gift` (violet de l'offre) | à ajouter (`--app-offer`) si absent |
+
+Le mode sombre n'est pas activé dans l'application (`darkModeSelector: false`) : rien de spécifique à prévoir. Les chiffres sont en `font-variant-numeric: tabular-nums`.
+
+---
+
+## 8. Ce qui n'est pas à reproduire
+
+- Les sélecteurs de démonstration de la maquette (Aperçu, Liste).
+- Les données inventées de la maquette.
+- Les toasts de la maquette (« Ouverture de… », actions) : ce sont des navigations ou les méthodes existantes.
+- Toute sélection multiple ou action de masse.
+- Tout détail déplié dans la liste.
+
+---
+
+## 9. Traductions
+
+- **Clés communes** dans `i18n/fr/global.json` ou `common.json`, selon la convention du projet :
+    - `entityList.search`, `entityList.groupSort` (« Grouper et trier ») ;
+    - `entityList.groupBy` (« Grouper par »), `entityList.sortBy` (« Trier par ») ;
+    - `entityList.group.{status|category|alpha}`, `entityList.sort.{date|alpha|title}` et leurs aides ;
+    - `entityList.filterGroup.{status|period|signals}` ;
+    - `entityList.actions` (« Actions »), `entityList.internalComment` ;
+    - `entityList.empty.filtered`, `entityList.clearFilters`.
+- **Clés par écran**, dans un bloc `list` de chaque fichier (`participation.json`, `stand.json`, `conference.json`, `workshop.json`, `salon.json`) :
+    - libellés des puces, des groupes, des éléments du pied et des actions du rouage ;
+    - aides de tri propres à l'écran ;
+    - libellé d'accessibilité de la ligne (« Ouvrir la fiche de la participation »…).
+- Reprends les libellés de la maquette mot pour mot.
+- Pour les pluriels, suis la méthode déjà utilisée dans le projet.
+
+---
+
+## 10. Ordre de travail
+
+1. **Socle partagé** (section 3) : barre d'outils et menu « Grouper et trier », groupes, ligne à lien étendu et rouage, fonctions de la section 2.3. Valide-le sur les **conférences**, puis sur les **ateliers** (rendu commun).
+2. **Stands** : trois groupements, vue presse-papiers conservée.
+3. **Back-end** : `ParticipationSummary` et `SalonSummary`, avec leurs tests d'intégration.
+4. **Participations** : chargement des résumés, ligne et pied complets, rouage.
+5. **Salons** : état calculé, résumés, rouage.
+6. **Fonctionnalités conservées** (section 5), dont l'usage des listes sous une participation.
+7. **Traductions**, puis relecture côte à côte avec la maquette, à 1 200 px et à 390 px.
+
+## 11. Critères d'acceptation
+
+- [ ] Les cinq listes partagent les mêmes composants (en-tête, menu « Grouper et trier », puces, groupes, ligne, pied, rouage), et un écran ne réécrit aucun de ces éléments.
+- [ ] Le groupement et le tri ne prennent qu'un bouton icône à droite de la recherche. Son menu propose des boutons radio « Grouper par » et « Trier par », reste ouvert après un choix, et le bouton est mis en évidence quand un réglage n'est pas celui par défaut.
+- [ ] Chaque liste peut être groupée par Statut ou par Alphabet, et les stands aussi par Catégorie. Grouper par Alphabet masque le tri redondant.
+- [ ] Le tri par Date suit la date d'inscription (la date de début pour les salons). Alphabet trie sur le nom du thérapeute. Titre est proposé pour les conférences, les ateliers et les salons.
+- [ ] Il n'y a plus de détail déplié ni de bouton « Voir ».
+    - Un clic n'importe où sur la ligne ouvre la fiche existante. Ctrl+clic ouvre un nouvel onglet.
+    - Entrée sur la ligne focalisée ouvre la fiche.
+- [ ] Chaque ligne a un rouage en bas à droite de son pied. Son menu liste les actions de l'écran, avec Supprimer en dernier, en rouge, et l'ouvrir ne déclenche pas la navigation.
+- [ ] Sur chaque liste, la ligne tient sur deux niveaux, statut en haut à droite, sans badge ni bordure de couleur.
+- [ ] Aucun pied n'affiche de compteur à 0 ni d'information absente.
+- [ ] Participations : le pied montre, quand ils existent, la facture, les stands, conférences et ateliers non nuls, coup de cœur, invité d'honneur, arrangement, offre et commentaire. Le rouage propose Fiche exposant, Facturation et Supprimer.
+- [ ] Stands : le pied montre les 3 premiers tags, la dimension, « Partagé (co-exposant) » et le commentaire. Le rouage propose Participation et Supprimer.
+- [ ] Conférences et ateliers : un seul composant de rendu, pied limité au commentaire. Le rouage propose Participation et Supprimer.
+- [ ] Salons :
+    - la ligne montre le nom, la référence et la période ;
+    - le pied montre, quand elles existent, les inscriptions en ligne ouvertes, les dimensions, les participations, les conférences et les ateliers ;
+    - le rouage propose Participations, Statistiques et Supprimer ;
+    - les archivés sont repliés.
+- [ ] Les statuts d'un même groupe de puces se combinent en OU, les signaux en ET, et les effectifs des puces sont justes.
+- [ ] À 390 px de large : pas de défilement horizontal, la recherche et le bouton « Grouper et trier » restent sur une ligne, et les puces défilent.
+- [ ] Toutes les fonctionnalités de la section 5 fonctionnent encore.

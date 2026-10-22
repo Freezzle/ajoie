@@ -1,0 +1,12 @@
+@if (count() > 0) {
+    <span class="el-foot-item el-foot-count">
+        @if (icon(); as icon) {
+            <fa-icon [icon]="icon"></fa-icon>
+        }
+        <b>{{ count() }}</b>
+        <span>{{ (count() > 1 ? pluralKey() : singularKey()) | translate }}</span>
+        @if (detail()) {
+            <em>{{ detail() }}</em>
+        }
+    </span>
+}

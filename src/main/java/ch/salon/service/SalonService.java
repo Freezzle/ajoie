@@ -116,10 +116,48 @@ public class SalonService {
     }
 
     public List<SalonDTO> findAll() {
+        return findAll(false);
+    }
+
+    /**
+     * Salons, enrichis des compteurs affichés dans le pied de la liste.
+     *
+     * @param includeArchived vrai pour la liste d'administration, qui montre aussi les salons archivés
+     */
+    public List<SalonDTO> findAll(boolean includeArchived) {
+        List<Status> discarded = List.of(Status.REFUSED, Status.CANCELED);
+
+        Map<UUID, Long> participations = toCountBySalon(
+                participationRepository.countBySalonExcludingStatuses(discarded));
+        Map<UUID, Long> conferences = toCountBySalon(
+                conferenceRepository.countBySalonExcludingStatuses(discarded));
+        Map<UUID, Long> workshops = toCountBySalon(
+                workshopRepository.countBySalonExcludingStatuses(discarded));
+
         return salonRepository.findAll().stream()
-                .filter(s -> !s.isArchived())
-                .map(salonMapper::toDto)
+                .filter(s -> includeArchived || !s.isArchived())
+                .map(salon -> {
+                    SalonDTO dto = salonMapper.toDto(salon);
+
+                    dto.setNbParticipations(participations.getOrDefault(salon.getId(), 0L));
+                    dto.setNbConferences(conferences.getOrDefault(salon.getId(), 0L));
+                    dto.setNbWorkshops(workshops.getOrDefault(salon.getId(), 0L));
+
+                    return dto;
+                })
                 .toList();
+    }
+
+    private static Map<UUID, Long> toCountBySalon(List<Object[]> rows) {
+        Map<UUID, Long> counts = new HashMap<>();
+
+        rows.forEach(row -> {
+            if (row[0] != null) {
+                counts.put((UUID) row[0], (Long) row[1]);
+            }
+        });
+
+        return counts;
     }
 
     public Optional<SalonDTO> get(UUID id) {

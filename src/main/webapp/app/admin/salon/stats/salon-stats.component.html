@@ -245,6 +245,18 @@
     </app-card>
     <app-card>
         <div appCardHeader>
+            <h4>Ligne de temps des inscriptions</h4>
+        </div>
+        <div appCardBody>
+            @if (timelineStart(); as start) {
+                @if (timelineEnd(); as end) {
+                    <timeline-dot [endDate]="end" [points]="points()" [startDate]="start"/>
+                }
+            }
+        </div>
+    </app-card>
+    <app-card>
+        <div appCardHeader>
             <h4>Importation d'un Google Forms</h4>
         </div>
         <div appCardBody>

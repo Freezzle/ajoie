@@ -51,6 +51,47 @@
     "ratingServiceQuality": "Prestations soignées",
     "registrationDate": "Date d'inscription",
     "linkedServices": "Les prestations souscrites",
+    "list": {
+      "searchPlaceholder": "Rechercher un thérapeute, un exposant, un e-mail",
+      "open": "Ouvrir la fiche de la participation",
+      "countSingular": "participation",
+      "countPlural": "participations",
+      "registeredOn": "inscrit le",
+      "status": {
+        "ACCEPTED": "Acceptée",
+        "CANCELED": "Annulée",
+        "CLOSED": "Clôturée",
+        "IN_VERIFICATION": "En vérification",
+        "REFUSED": "Refusée",
+        "VALIDATED": "Validée"
+      },
+      "statusGroup": {
+        "ACCEPTED": "Acceptées",
+        "CANCELED": "Annulées",
+        "CLOSED": "Clôturées",
+        "IN_VERIFICATION": "À vérifier",
+        "REFUSED": "Refusées",
+        "VALIDATED": "Validées",
+        "OUT": "Écartées"
+      },
+      "summary": {
+        "noInvoice": "pas de facture",
+        "paid": "payées",
+        "expiredSingular": "échue",
+        "expiredPlural": "échues"
+      },
+      "foot": {
+        "standSingular": "stand",
+        "standPlural": "stands",
+        "sharedStand": "(partagé)",
+        "withSharedStand": "(dont partagé)",
+        "conferenceSingular": "conférence",
+        "conferencePlural": "conférences",
+        "workshopSingular": "atelier",
+        "workshopPlural": "ateliers",
+        "offer": "Offre"
+      }
+    },
     "status": {
       "label": "Statut",
       "list": {

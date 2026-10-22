@@ -4,8 +4,11 @@
   --app-surface-muted: #f7f6f1;
   --app-border: #ddd;
   --app-text: #575757;
+  --app-text-muted: #8a8a8a;
 
   --app-primary: #325d88;
+  --app-primary-soft: #e8eef5;
+  --app-primary-line: #a8bfd6;
   --app-secondary: #acacac;
   --app-warning: #e89d0e;
   --app-sucess: #83ca1a;
@@ -44,13 +47,18 @@
   --app-category-none: #dddddd;
 
   // Couleurs des statuts de participation.
-  // Elles reprennent exactement les classes appliquées par le pipe `colorStatus` :
-  // text-primary, text-danger, text-secondary et golden-icon.
+  // Les six statuts ont chacun leur teinte, pour rester lisibles en point de 8 px
+  // et en libellé dans les listes.
   --app-status-gold: #efbf00;
-  --app-status-accepted: var(--bs-primary);
-  --app-status-validated: var(--bs-primary);
-  --app-status-closed: var(--app-status-gold);
-  --app-status-verification: var(--bs-secondary);
-  --app-status-refused: var(--bs-danger);
-  --app-status-canceled: var(--bs-danger);
+  --app-status-verification: #8a5d00;
+  --app-status-accepted: #325d88;
+  --app-status-validated: #1b6b37;
+  --app-status-closed: #6b6b6b;
+  --app-status-refused: #b3261e;
+  --app-status-canceled: #9a9a9a;
+
+  // Signaux des listes (coup de cœur, stand partagé, offre cadeau).
+  --app-heart: #b4372f;
+  --app-share: #1f4e8c;
+  --app-offer: #7a3e8f;
 }

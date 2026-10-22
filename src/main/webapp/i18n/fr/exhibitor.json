@@ -30,6 +30,34 @@
         "label": "Langue"
       }
     },
+    "list": {
+      "searchPlaceholder": "Rechercher un nom, un e-mail, un téléphone",
+      "open": "Ouvrir la fiche du client",
+      "countSingular": "client",
+      "countPlural": "clients",
+      "sort": {
+        "lastName": "Nom",
+        "firstName": "Prénom",
+        "city": "Localité"
+      },
+      "status": {
+        "redFlag": "Bloqué",
+        "duplicate": "Doublon"
+      },
+      "signal": {
+        "redFlag": "Bloqué",
+        "duplicate": "Doublon",
+        "newsletter": "Newsletter",
+        "comment": "Commentaire",
+        "noParticipation": "Sans participation"
+      },
+      "foot": {
+        "newsletter": "Newsletter",
+        "lastSalon": "Dernier salon",
+        "participationSingular": "participation",
+        "participationPlural": "participations"
+      }
+    },
     "newsletter": "Newsletter",
     "notFound": "Aucun exposant",
     "npaLocalite": "Npa et localité",

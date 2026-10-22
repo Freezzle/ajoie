@@ -38,6 +38,17 @@ export interface IInfoInvoice {
     nbExpired: number;
 }
 
+/**
+ * Participation enrichie renvoyée par la liste d'un salon : compteurs de prestations
+ * et de factures, pour afficher le pied de chaque ligne sans requête supplémentaire.
+ */
+export interface IParticipationList extends IParticipation, IInfoInvoice {
+    nbStands: number;
+    nbSharedStands: number;
+    nbConferences: number;
+    nbWorkshops: number;
+}
+
 export function containsParticipationName(
   participation: IParticipation | null,
   filterText: string,

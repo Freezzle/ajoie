@@ -7,5 +7,6 @@ export interface IConference {
     description: string;
     status: Status;
     extraInformation: string | null;
+    registrationDate: string | null;
     participation: IParticipation;
 }

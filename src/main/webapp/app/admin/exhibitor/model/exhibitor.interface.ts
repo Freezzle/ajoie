@@ -18,6 +18,11 @@ export interface IExhibitor {
     extraInformation: string | null;
     billingAddress: IAddress | null;
     bankAccount: IBankAccount | null;
+
+    /** Compteurs de l'annuaire : participations écartées exclues. */
+    nbParticipations?: number;
+    lastSalonPlace?: string | null;
+    lastSalonDate?: string | null;
 }
 
 export function getExhibitorFullName(exhibitor: IExhibitor | null | undefined): string {

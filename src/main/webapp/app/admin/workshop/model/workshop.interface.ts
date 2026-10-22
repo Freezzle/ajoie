@@ -7,5 +7,6 @@ export interface IWorkshop {
     description: string;
     status: Status;
     extraInformation: string | null;
+    registrationDate: string | null;
     participation: IParticipation;
 }

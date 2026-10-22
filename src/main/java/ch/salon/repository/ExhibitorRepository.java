@@ -21,5 +21,5 @@ public interface ExhibitorRepository extends JpaRepository<Exhibitor, UUID> {
 
     Exhibitor findByEmail(String email);
 
-    List<Exhibitor> findAllByNewsletterIsTrue();
+    List<Exhibitor> findAllByNewsletterIsTrueAndRedFlagIsFalse();
 }

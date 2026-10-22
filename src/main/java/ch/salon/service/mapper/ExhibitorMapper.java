@@ -3,6 +3,7 @@ package ch.salon.service.mapper;
 import ch.salon.domain.Exhibitor;
 import ch.salon.service.dto.ExhibitorDTO;
 import ch.salon.service.dto.ExhibitorLightDTO;
+import ch.salon.service.dto.ExhibitorListDTO;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",uses = {AddressMapper.class, BankAccountMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
@@ -18,6 +19,11 @@ public interface ExhibitorMapper {
     Exhibitor toEntity(ExhibitorDTO exhibitor);
 
     ExhibitorLightDTO toLightDto(Exhibitor exhibitor);
+
+    @Mapping(target = "nbParticipations", ignore = true)
+    @Mapping(target = "lastSalonPlace", ignore = true)
+    @Mapping(target = "lastSalonDate", ignore = true)
+    ExhibitorListDTO toListDto(Exhibitor exhibitor);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tenantId", ignore = true)

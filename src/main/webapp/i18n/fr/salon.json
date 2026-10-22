@@ -40,6 +40,31 @@
     "stands": "Les stands",
     "startingDate": "Date de début",
     "statistiques": "Statistiques du salon",
+    "list": {
+      "searchPlaceholder": "Rechercher un salon, une référence",
+      "open": "Ouvrir la fiche du salon",
+      "countSingular": "salon",
+      "countPlural": "salons",
+      "activeCount": "actifs",
+      "reference": "Réf.",
+      "state": {
+        "NOW": "En cours",
+        "NEXT": "À venir",
+        "PAST": "Terminé",
+        "ARCHIVED": "Archivé"
+      },
+      "stateGroup": {
+        "NOW": "En cours",
+        "NEXT": "À venir",
+        "PAST": "Terminés",
+        "ARCHIVED": "Archivés"
+      },
+      "foot": {
+        "registrationOpen": "Inscriptions en ligne ouvertes",
+        "dimensionSingular": "dimension",
+        "dimensionPlural": "dimensions"
+      }
+    },
     "stats": {
       "billingPaid": "Payé",
       "billingUnpaid": "Impayé",

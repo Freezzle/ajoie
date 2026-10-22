@@ -1,0 +1,108 @@
+<app-content-page>
+    <div appMenuBarStart>
+        <h3>{{ i18nPrefix() + '.title' | translate }}</h3>
+        <div class="el-subtitle">
+            @if (subtitle()) {
+                <b>{{ subtitle() }}</b> ·
+            }
+            {{ countLabel() }}
+        </div>
+    </div>
+    <div appMenuBarEnd>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading()"
+                    [showText]="false"
+                    primeIcon="pi-arrow-left"
+                    translateKey="common.back"/>
+
+        <menu-box [buttonDisabled]="isLoading()"
+                  [items]="pageMenuItems()"
+                  buttonIcon="pi-ellipsis-h"
+                  type="secondary"/>
+
+        <button-box (clickedEvent)="create()"
+                    [isDisabled]="isLoading()"
+                    primeIcon="pi-plus"
+                    translateKey="common.create"/>
+    </div>
+
+    <app-alert-error></app-alert-error>
+    <p-confirmpopup/>
+
+    <div class="el-list">
+        <entity-list-toolbar [(activeChips)]="state.activeChips"
+                             [(query)]="state.query"
+                             [chipGroups]="chipGroups()"
+                             [groupBy]="state.groupBy()"
+                             (groupByChange)="state.setGroupBy($event)"
+                             [groupOptions]="groupOptions"
+                             [isDefault]="state.isDefault"
+                             [placeholderKey]="i18nPrefix() + '.list.searchPlaceholder'"
+                             [(sort)]="state.sort"
+                             [sortOptions]="state.sortOptions"/>
+
+        @if (isLoading()) {
+            <div class="el-empty">
+                <i class="pi pi-spin pi-spinner"></i>
+            </div>
+        } @else if (items().length === 0) {
+            <div class="el-empty">
+                <b>{{ i18nPrefix() + '.notFound' | translate }}</b>
+            </div>
+        } @else if (filtered().length === 0) {
+            <div class="el-empty">
+                <b>{{ 'entityList.empty.filtered' | translate }}</b>
+                <span>{{ 'entityList.empty.hint' | translate }}</span>
+                <button-box (clickedEvent)="state.clearFilters()"
+                            translateKey="entityList.clearFilters"
+                            type="secondary"/>
+            </div>
+        } @else {
+            @for (group of groups(); track group.key) {
+                <entity-list-group [collapsed]="isCollapsed(group)"
+                                   (collapsedChange)="setCollapsed(group, $event)"
+                                   [color]="group.color"
+                                   [count]="group.items.length"
+                                   [label]="group.label"
+                                   [rawLabel]="group.rawLabel ?? false"
+                                   [ratio]="group.ratio">
+                    @for (talk of group.items; track talk.id) {
+                        <entity-row [actions]="actionsFor(talk)"
+                                    [link]="['./', talk.id, 'view']"
+                                    [linkLabel]="i18nPrefix() + '.list.open' | translate">
+                            <entity-highlight rowTitle
+                                              [query]="state.query()"
+                                              [text]="talk.title"/>
+
+                            <entity-status rowStatus
+                                           [color]="statusColor(talk.status)"
+                                           [labelKey]="statusLabelKey(talk.status)"
+                                           [strikethrough]="talk.status === Status.CANCELED"/>
+
+                            <span rowMeta class="el-row-meta-text">
+                                <entity-highlight [query]="state.query()"
+                                                  [text]="talk.participation.therapistName"/>
+                            </span>
+
+                            <ng-container rowFoot>
+                                @if (talk.extraInformation) {
+                                    <entity-foot-item [detail]="talk.extraInformation"
+                                                      icon="note-sticky"
+                                                      labelKey="entityList.internalComment"/>
+                                }
+                            </ng-container>
+                        </entity-row>
+                    }
+                </entity-list-group>
+            }
+
+            @if (hasMore()) {
+                <div class="el-more">
+                    <button-box (clickedEvent)="showMore()"
+                                translateKey="entityList.showMore"
+                                type="secondary"/>
+                </div>
+            }
+        }
+    </div>
+</app-content-page>

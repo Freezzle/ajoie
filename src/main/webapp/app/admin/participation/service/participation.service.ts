@@ -4,7 +4,12 @@ import {map, Observable} from 'rxjs';
 
 import dayjs from 'dayjs/esm';
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
-import {getFormattedParticipationName, IInfoInvoice, IParticipation} from '../model/participation.interface';
+import {
+    getFormattedParticipationName,
+    IInfoInvoice,
+    IParticipation,
+    IParticipationList
+} from '../model/participation.interface';
 import {removeAccents} from '../../../shared/utils/string.util';
 import {IInvoicingPlan} from '../model/invoicing-plan.interface';
 
@@ -36,9 +41,10 @@ export class ParticipationService {
                    .pipe(map(res => this.convertResponseFromServer(res)));
     }
 
-    query(idSalon: string): Observable<HttpResponse<IParticipation[]>> {
+    query(idSalon: string): Observable<HttpResponse<IParticipationList[]>> {
         return this.http
-                   .get<IParticipation[]>(`${this.salonResourceUrl}/${idSalon}/participations`, {observe: 'response'})
+                   .get<IParticipationList[]>(`${this.salonResourceUrl}/${idSalon}/participations`,
+                                              {observe: 'response'})
                    .pipe(map(res => this.convertResponseArrayFromServer(res)));
     }
 
@@ -85,13 +91,13 @@ export class ParticipationService {
                          });
     }
 
-    protected convertResponseArrayFromServer(res: HttpResponse<IParticipation[]>): HttpResponse<IParticipation[]> {
+    protected convertResponseArrayFromServer<T extends IParticipation>(res: HttpResponse<T[]>): HttpResponse<T[]> {
         return res.clone({
                              body: res.body ? res.body.map(item => this.convertDateFromServer(item)) : null
                          });
     }
 
-    protected convertDateFromServer(restParticipation: IParticipation): IParticipation {
+    protected convertDateFromServer<T extends IParticipation>(restParticipation: T): T {
         return {
             ...restParticipation,
             registrationDate: restParticipation.registrationDate ? dayjs(restParticipation.registrationDate).toDate() :

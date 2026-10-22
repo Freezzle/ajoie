@@ -34,4 +34,10 @@ public class SalonDTO implements Serializable {
     private AddressDTO eventAddress;
     private BankAccountDTO bankAccount;
     private Set<PriceStandDTO> priceStandSalons = new HashSet<>();
+
+    // Compteurs utilisés par le pied de la liste des salons.
+    // Les participations, conférences et ateliers écartés (refusés, annulés) sont exclus.
+    private long nbParticipations = 0L;
+    private long nbConferences = 0L;
+    private long nbWorkshops = 0L;
 }

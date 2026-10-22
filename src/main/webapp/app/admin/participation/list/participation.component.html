@@ -1,228 +1,213 @@
-<app-content-page>
+﻿<app-content-page>
     <div appMenuBarStart>
         <h3 jhiTranslate="participation.title">Les participations</h3>
+        <div class="el-subtitle">
+            @if (subtitle()) {
+                <b>{{ subtitle() }}</b> Â·
+            }
+            {{ countLabel() }}
+            @if (daysBeforeOpening()) {
+                Â· {{ daysBeforeOpening() }}
+            }
+        </div>
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading"
+                    [isDisabled]="isLoading()"
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
-        <split-menu-box [items]="actionMenuItems"
-                        [buttonDisabled]="isLoading"/>
+
+        <menu-box [buttonDisabled]="isLoading()"
+                  [items]="pageMenuItems()"
+                  buttonIcon="pi-ellipsis-h"
+                  type="secondary"/>
+
+        <button-box (clickedEvent)="create()"
+                    [isDisabled]="isLoading()"
+                    primeIcon="pi-plus"
+                    translateKey="common.create"/>
     </div>
+
     <app-alert-error></app-alert-error>
-
-
     <p-confirmpopup/>
-    <app-card [showHeader]="false">
-        <div appCardBody>
-            <div class="row">
-                <p-table #dt2
-                         [globalFilterFields]="['exhibitor.firstName', 'exhibitor.lastName', 'therapistName']"
-                         [loading]="isLoading"
-                         [paginator]="true"
-                         [rowsPerPageOptions]="[10, 25, 50]"
-                         [rows]="10"
-                         [sortOrder]="-1"
-                         [tableStyle]="{ 'min-width': '70rem' }"
-                         [value]="participations()"
-                         dataKey="id"
-                         sortField="registrationDate">
-                    <ng-template #caption>
-                        <div class="flex">
-                            <p-iconfield class="ml-auto" iconPosition="left">
-                                <p-inputicon>
-                                    <i class="pi pi-search"></i>
-                                </p-inputicon>
-                                <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
-                                       placeholder="Recherche"
-                                       type="text"/>
-                            </p-iconfield>
-                        </div>
-                    </ng-template>
-                    <ng-template #header>
-                        <tr>
-                            <th pSortableColumn="exhibitor.lastName">{{ 'exhibitor.fullName' | translate }}
-                                <p-sortIcon field="exhibitor.lastName"/>
-                            </th>
-                            <th pSortableColumn="therapistName">{{ 'exhibitor.therapistName' | translate }}
-                                <p-sortIcon field="therapistName"/>
-                            </th>
-                            <th pSortableColumn="registrationDate">{{ 'participation.registrationDate' | translate }}
-                                <p-sortIcon field="registrationDate"/>
-                                <p-columnFilter display="menu"
-                                                field="registrationDate"
-                                                matchMode="dateAfter"
-                                                type="date"></p-columnFilter>
-                            </th>
-                            <th pSortableColumn="status">{{ 'participation.status.label' | translate }}
-                                <p-sortIcon field="status"/>
-                                <p-columnFilter [showAddButton]="false" [showMatchModes]="false" [showOperator]="false" display="menu"
-                                                field="status" matchMode="in">
-                                    <ng-template #filter let-filter="filterCallback" let-value>
-                                        <p-multiselect (ngModelChange)="filter($event)" [ngModel]="value"
-                                                       [options]="statusValues" [panelStyle]="{ minWidth: '16rem' }"
-                                                       class="w-14r">
-                                            <ng-template #item let-option>
-                                                <div class="flex items-center gap-2">
-                                                    <fa-icon [class]="option | colorStatus"
-                                                             [icon]="option | status"
-                                                             [title]="'participation.status.list.' + option | translate"></fa-icon>
-                                                    <span>{{ 'participation.status.list.' + option | translate }}</span>
-                                                </div>
-                                            </ng-template>
-                                        </p-multiselect>
-                                    </ng-template>
-                                </p-columnFilter>
-                            </th>
-                            <th>Info</th>
-                            <th>Info Facture</th>
-                            <th>&nbsp;</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template #body let-participation>
-                        <tr>
-                            <td [routerLink]="['./', participation.id, 'view']" class="clickable truncate-medium">
-                                @if (participation.exhibitor) {
-                                    <div class="d-flex gap-1">
-                                        <a (click)="$event.stopPropagation()"
-                                           [routerLink]="['/admin', 'exhibitors', participation.exhibitor.id, 'view']">
-                                            {{ getExhibitorFullName(participation.exhibitor) }}
-                                        </a>
-                                        @if (participation.exhibitor.redFlag) {
-                                            <fa-icon [title]="'exhibitor.redFlag' | translate"
-                                                     class="text-danger"
-                                                     icon="flag"></fa-icon>
-                                        }
-                                        @if (participation.exhibitor.duplicateDetected) {
-                                            <fa-icon [title]="'exhibitor.duplicateDetected' | translate"
-                                                     class="text-warning"
-                                                     icon="triangle-exclamation"></fa-icon>
-                                        }
-                                    </div>
-                                }
-                            </td>
-                            <td [routerLink]="['./', participation.id, 'view']" class="clickable truncate">
-                                {{ participation.therapistName }}
-                            </td>
-                            <td [routerLink]="['./', participation.id, 'view']" class="clickable truncate-small">
-                                {{ participation.registrationDate | formatMediumDate }}
-                            </td>
-                            <td [routerLink]="['./', participation.id, 'view']" class="clickable">
-                                <fa-icon [class]="participation.status | colorStatus"
-                                         [icon]="participation.status | status"
-                                         [title]="'participation.status.list.' + participation.status | translate"></fa-icon>
-                            </td>
-                            <td [routerLink]="['./', participation.id, 'view']" class="clickable">
-                                @if (participation.crushOfHeart) {
-                                    <fa-icon class="text-danger" icon="heart"></fa-icon>
-                                }
-                                @if (participation.guestOfHonor) {
-                                    <fa-icon class="golden-icon" icon="star"></fa-icon>
-                                }
-                                @if (participation.extraInformation) {
-                                    <fa-icon [title]="participation.extraInformation" class="text-warning"
-                                             icon="note-sticky"/>
-                                }
-                                @if (participation.needArrangement) {
-                                    <fa-icon class="text-primary" icon="handshake-simple"></fa-icon>
-                                }
-                                @if (participation.hasOffer) {
-                                    <fa-icon [title]="participation.offer" class="text-primary" icon="gift"></fa-icon>
-                                }
-                            </td>
-                            <td [routerLink]="['./', participation.id, 'view']" class="clickable">
-                                @let infoInvoice = getInfoInvoice(participation.id);
-                                @if (infoInvoice) {
-                                    <div class="d-flex flex-wrap gap-2">
-                                        @if (infoInvoice.nbDraft > 1) {
-                                            <p-overlay-badge [value]="infoInvoice.nbDraft"
-                                                             class="p-badge-xs"
-                                                             severity="success">
-                                                <fa-icon [title]="'invoicingPlan.drafts' | translate"
-                                                         class="text-success"
-                                                         icon="sheet-plastic"></fa-icon>
-                                            </p-overlay-badge>
-                                        } @else if (infoInvoice.nbDraft == 1) {
-                                            <fa-icon [title]="'invoicingPlan.drafts' | translate"
-                                                     class="text-success"
-                                                     icon="sheet-plastic"></fa-icon>
-                                        }
 
-                                        @if (infoInvoice.nbIssued > 1) {
-                                            <p-overlay-badge [value]="infoInvoice.nbIssued" class="p-badge-xs"
-                                                             severity="info">
-                                                <fa-icon [title]="'invoicingPlan.waitingPayments' | translate"
-                                                         class="text-info"
-                                                         icon="file-import"></fa-icon>
-                                            </p-overlay-badge>
-                                        } @else if (infoInvoice.nbIssued == 1) {
-                                            <fa-icon [title]="'invoicingPlan.waitingPayments' | translate"
-                                                     class="text-info"
-                                                     icon="file-import"></fa-icon>
-                                        }
+    <div class="el-list">
+        <entity-list-toolbar [(activeChips)]="state.activeChips"
+                             [(query)]="state.query"
+                             [(sort)]="state.sort"
+                             (groupByChange)="state.setGroupBy($event)"
+                             [chipGroups]="chipGroups()"
+                             [groupBy]="state.groupBy()"
+                             [groupOptions]="groupOptions"
+                             [isDefault]="state.isDefault"
+                             [sortOptions]="state.sortOptions"
+                             placeholderKey="participation.list.searchPlaceholder"/>
 
-                                        @if (infoInvoice.nbPaid > 1) {
-                                            <p-overlay-badge [value]="infoInvoice.nbPaid"
-                                                             class="p-badge-xs"
-                                                             severity="contrast">
-                                                <fa-icon [title]="'invoicingPlan.paids' | translate"
-                                                         class="text-primary"
-                                                         icon="file-circle-check"></fa-icon>
-                                            </p-overlay-badge>
-                                        } @else if (infoInvoice.nbPaid == 1) {
-                                            <fa-icon [title]="'invoicingPlan.paids' | translate"
-                                                     class="text-primary"
-                                                     icon="file-circle-check"></fa-icon>
-                                        }
-
-                                        @if (infoInvoice.nbExpired > 1) {
-                                            <p-overlay-badge [value]="infoInvoice.nbExpired"
-                                                             class="p-badge-xs"
-                                                             severity="danger">
-                                                <fa-icon [title]="'invoicingPlan.expirations' | translate"
-                                                         class="text-danger"
-                                                         icon="clock"></fa-icon>
-                                            </p-overlay-badge>
-                                        } @else if (infoInvoice.nbExpired == 1) {
-                                            <fa-icon [title]="'invoicingPlan.expirations' | translate"
-                                                     class="text-danger"
-                                                     icon="clock"></fa-icon>
-                                        }
-                                    </div>
-                                }
-                            </td>
-                            <td class="text-end">
-                                <div class="btn-group">
-                                    <button-box (clickedEvent)="delete($event, participation)"
-                                                [showText]="false"
-                                                primeIcon="pi-times"
-                                                translateKey="common.delete"
-                                                type="danger"/>
-                                </div>
-                            </td>
-                        </tr>
-                    </ng-template>
-                    <ng-template #emptymessage>
-                        <tr>
-                            <td colspan="6">{{ 'participation.notFound' | translate }}</td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+        @if (isLoading()) {
+            <div class="el-empty">
+                <i class="pi pi-spin pi-spinner"></i>
             </div>
-        </div>
-    </app-card>
-    <app-card>
-        <div appCardHeader>
-            <h4>Ligne de temps des inscriptions</h4>
-        </div>
-        <div appCardBody>
-            @if (timelineStart(); as start) {
-                @if (timelineEnd(); as end) {
-                    <timeline-dot [endDate]="end" [points]="points()" [startDate]="start"/>
-                }
+        } @else if (participations().length === 0) {
+            <div class="el-empty">
+                <b>{{ 'participation.notFound' | translate }}</b>
+            </div>
+        } @else if (filtered().length === 0) {
+            <div class="el-empty">
+                <b>{{ 'entityList.empty.filtered' | translate }}</b>
+                <span>{{ 'entityList.empty.hint' | translate }}</span>
+                <button-box (clickedEvent)="state.clearFilters()"
+                            translateKey="entityList.clearFilters"
+                            type="secondary"/>
+            </div>
+        } @else {
+            @for (group of groups(); track group.key) {
+                <entity-list-group (collapsedChange)="setCollapsed(group, $event)"
+                                   [collapsed]="isCollapsed(group)"
+                                   [color]="group.color"
+                                   [count]="group.items.length"
+                                   [label]="group.label"
+                                   [rawLabel]="group.rawLabel ?? false"
+                                   [ratio]="group.ratio">
+                    <span groupSummary>{{ groupSummary(group) }}</span>
+
+                    @for (participation of group.items; track participation.id) {
+                        <entity-row [actions]="actionsFor(participation)"
+                                    [link]="['./', participation.id, 'view']"
+                                    [linkLabel]="'participation.list.open' | translate">
+                            <entity-highlight rowTitle
+                                              [query]="state.query()"
+                                              [text]="participation.therapistName"/>
+
+                            <entity-status rowStatus
+                                           [color]="statusColor(participation.status)"
+                                           [labelKey]="statusLabelKey(participation.status)"
+                                           [strikethrough]="participation.status === Status.CANCELED"/>
+
+                            <ng-container rowMeta>
+                                <span class="el-row-meta-text">
+                                    <entity-highlight [query]="state.query()"
+                                                      [text]="exhibitorName(participation)"/>
+                                </span>
+                                @if (participation.exhibitor.redFlag) {
+                                    <span class="el-alert"
+                                          [style.--el-color]="'var(--app-danger)'"
+                                          [title]="'exhibitor.redFlag' | translate">
+                                        <fa-icon icon="flag"></fa-icon>
+                                        <span class="el-desktop-only">{{ 'exhibitor.redFlag' | translate }}</span>
+                                    </span>
+                                }
+                                @if (participation.exhibitor.duplicateDetected) {
+                                    <span class="el-alert"
+                                          [style.--el-color]="'var(--app-warn)'"
+                                          [title]="'exhibitor.duplicateDetected' | translate">
+                                        <fa-icon icon="triangle-exclamation"></fa-icon>
+                                        <span class="el-desktop-only">{{
+                                                'exhibitor.duplicateDetected' | translate
+                                            }}</span>
+                                    </span>
+                                }
+                            </ng-container>
+
+                            <span rowSide>
+                                <span class="el-desktop-only">{{ 'participation.list.registeredOn' | translate }}</span>
+                                {{ participation.registrationDate | formatMediumDate }}
+                            </span>
+
+                            <ng-container rowFoot>
+                                @if (nbInvoices(participation) > 0 || participation.nbExpired > 0) {
+                                    <span class="el-foot-item el-foot-count">
+                                        <span class="el-gauge">
+                                            @for (segment of invoiceSegments(participation); track segment.key) {
+                                                <i [style.background]="segment.color"
+                                                   [style.flex]="segment.value"></i>
+                                            }
+                                        </span>
+                                        @if (participation.nbExpired > 0) {
+                                            <b [style.color]="'var(--app-danger)'">
+                                                {{ participation.nbExpired }}
+                                                {{
+                                                    (participation.nbExpired > 1
+                                                        ? 'participation.list.summary.expiredPlural'
+                                                        : 'participation.list.summary.expiredSingular') | translate
+                                                }}
+                                            </b>
+                                        } @else {
+                                            <b>{{ participation.nbPaid }}/{{ nbInvoices(participation) }}</b>
+                                            <span>{{ 'participation.list.summary.paid' | translate }}</span>
+                                        }
+                                    </span>
+                                } @else if (showToInvoice(participation)) {
+                                    <entity-foot-item color="var(--app-status-accepted)"
+                                                      icon="file-invoice"
+                                                      labelKey="entityList.signal.toInvoice"/>
+                                }
+
+                                @if (participation.nbStands > 0) {
+                                    <entity-count [count]="participation.nbStands"
+                                                  [detail]="sharedStandDetail(participation)"
+                                                  icon="shop"
+                                                  pluralKey="participation.list.foot.standPlural"
+                                                  singularKey="participation.list.foot.standSingular"/>
+                                }
+
+                                @if (participation.nbConferences > 0) {
+                                    <entity-count [count]="participation.nbConferences"
+                                                  icon="microphone-lines"
+                                                  pluralKey="participation.list.foot.conferencePlural"
+                                                  singularKey="participation.list.foot.conferenceSingular"/>
+                                }
+
+                                @if (participation.nbWorkshops > 0) {
+                                    <entity-count [count]="participation.nbWorkshops"
+                                                  icon="comments"
+                                                  pluralKey="participation.list.foot.workshopPlural"
+                                                  singularKey="participation.list.foot.workshopSingular"/>
+                                }
+
+                                @if (participation.guestOfHonor) {
+                                    <entity-foot-item color="var(--app-status-gold)"
+                                                      icon="star"
+                                                      labelKey="entityList.signal.guestOfHonor"/>
+                                }
+
+                                @if (participation.crushOfHeart) {
+                                    <entity-foot-item color="var(--app-heart)"
+                                                      icon="heart"
+                                                      labelKey="entityList.signal.crushOfHeart"/>
+                                }
+
+                                @if (participation.needArrangement) {
+                                    <entity-foot-item color="var(--app-status-accepted)"
+                                                      icon="handshake-simple"
+                                                      labelKey="entityList.signal.arrangement"/>
+                                }
+
+                                @if (participation.hasOffer) {
+                                    <entity-foot-item [detail]="participation.offer"
+                                                      color="var(--app-offer)"
+                                                      icon="gift"
+                                                      labelKey="participation.list.foot.offer"/>
+                                }
+
+                                @if (participation.extraInformation) {
+                                    <entity-foot-item [detail]="participation.extraInformation"
+                                                      icon="note-sticky"
+                                                      labelKey="entityList.internalComment"/>
+                                }
+                            </ng-container>
+                        </entity-row>
+                    }
+                </entity-list-group>
             }
-        </div>
-    </app-card>
+
+            @if (hasMore()) {
+                <div class="el-more">
+                    <button-box (clickedEvent)="showMore()"
+                                translateKey="entityList.showMore"
+                                type="secondary"/>
+                </div>
+            }
+        }
+    </div>
 </app-content-page>

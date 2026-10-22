@@ -1,0 +1,11 @@
+@if (labelKey()) {
+    <span [class.el-status--out]="strikethrough()"
+          [style.--el-color]="color()"
+          class="el-status">
+        <i class="el-dot"></i>
+        <span>{{ labelKey()! | translate }}</span>
+        @if (suffix()) {
+            <small>{{ suffix() }}</small>
+        }
+    </span>
+}

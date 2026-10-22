@@ -1,0 +1,22 @@
+<button (click)="toggle()"
+        [attr.aria-expanded]="!collapsed()"
+        [style.--el-color]="color()"
+        class="el-group-head"
+        type="button">
+    <i [class.el-chevron--collapsed]="collapsed()" class="pi pi-chevron-down el-chevron"></i>
+    <span class="el-group-title">
+        <i class="el-dot"></i>
+        {{ rawLabel() ? label() : (label() | translate) }}
+    </span>
+    <span class="el-group-count">{{ count() }}</span>
+    <span class="el-group-summary">
+        <ng-content select="[groupSummary]"></ng-content>
+    </span>
+    <span class="el-group-bar"><i [style.width.%]="percent"></i></span>
+</button>
+
+@if (!collapsed()) {
+    <div class="el-rows">
+        <ng-content></ng-content>
+    </div>
+}

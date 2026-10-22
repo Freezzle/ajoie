@@ -97,5 +97,69 @@
       "required": "Ce champ est obligatoire"
     },
     "view": "Détail"
+  },
+  "entityList": {
+    "search": "Rechercher",
+    "groupSort": "Grouper et trier",
+    "groupBy": "Grouper par",
+    "sortBy": "Trier par",
+    "group": {
+      "status": "Statut",
+      "category": "Catégorie",
+      "alpha": "Alphabet"
+    },
+    "sort": {
+      "date": "Date",
+      "alpha": "Alphabet",
+      "title": "Titre",
+      "hint": {
+        "registrationDate": "date d'inscription",
+        "therapistName": "nom du thérapeute",
+        "title": "titre",
+        "startingDate": "date de début",
+        "place": "nom du salon",
+        "lastName": "nom de famille",
+        "firstName": "prénom",
+        "city": "localité"
+      }
+    },
+    "filterGroup": {
+      "status": "Statut",
+      "period": "Période",
+      "signals": "Signaux"
+    },
+    "actions": "Actions",
+    "internalComment": "Note",
+    "showMore": "Afficher plus",
+    "signal": {
+      "comment": "Avec commentaire",
+      "alerts": "Alertes",
+      "expiredInvoice": "Facture échue",
+      "toInvoice": "À facturer",
+      "crushOfHeart": "Coup de cœur",
+      "guestOfHonor": "Invité d'honneur",
+      "arrangement": "Arrangement",
+      "offer": "Offre cadeau",
+      "shared": "Partagé",
+      "electricity": "Électricité"
+    },
+    "action": {
+      "detail": "Détail",
+      "client": "Fiche client",
+      "participation": "Participation",
+      "participations": "Participations",
+      "billing": "Facturation",
+      "stats": "Statistiques",
+      "copyEmail": "Copier l'e-mail",
+      "delete": "Supprimer"
+    },
+    "context": {
+      "participation": "Participation de {{name}}"
+    },
+    "empty": {
+      "filtered": "Aucun résultat",
+      "hint": "Retirez un filtre ou élargissez la recherche."
+    },
+    "clearFilters": "Tout effacer"
   }
 }

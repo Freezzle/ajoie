@@ -22,6 +22,29 @@
       }
     },
     "title": "Les conférences",
-    "titleField": "Titre"
+    "titleField": "Titre",
+    "list": {
+      "searchPlaceholder": "Rechercher un titre, un thérapeute",
+      "open": "Ouvrir la fiche de la conférence",
+      "countSingular": "conférence",
+      "countPlural": "conférences",
+      "status": {
+        "ACCEPTED": "Acceptée",
+        "CANCELED": "Annulée",
+        "CLOSED": "Clôturée",
+        "IN_VERIFICATION": "En vérification",
+        "REFUSED": "Refusée",
+        "VALIDATED": "Validée"
+      },
+      "statusGroup": {
+        "ACCEPTED": "Acceptées",
+        "CANCELED": "Annulées",
+        "CLOSED": "Clôturées",
+        "IN_VERIFICATION": "À vérifier",
+        "REFUSED": "Refusées",
+        "VALIDATED": "Validées",
+        "OUT": "Écartées"
+      }
+    }
   }
 }

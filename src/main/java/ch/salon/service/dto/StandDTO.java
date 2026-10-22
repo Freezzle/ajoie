@@ -5,6 +5,7 @@ import ch.salon.domain.enumeration.Status;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -26,6 +27,7 @@ public class StandDTO implements Serializable {
     private Set<String> subCategories = new HashSet<>();
     private Status status;
     private String extraInformation;
+    private Instant registrationDate;
     private ParticipationLightDTO participation;
     private PriceStandLightDTO dimension;
 }

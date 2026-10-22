@@ -84,10 +84,11 @@ public class AdminSalonResource {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<SalonDTO> getAllSalons() {
+    public List<SalonDTO> getAllSalons(
+            @RequestParam(name = "includeArchived", required = false, defaultValue = "false") boolean includeArchived) {
         log.debug("REST request to get all Salons");
 
-        return salonService.findAll();
+        return salonService.findAll(includeArchived);
     }
 
     @GetMapping("/{idSalon}")
@@ -109,10 +110,10 @@ public class AdminSalonResource {
 
     @GetMapping("{idSalon}/participations")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public List<Participation> getAllParticipations(@PathVariable(name = "idSalon", required = false) UUID idSalon) {
+    public List<ParticipationListDTO> getAllParticipations(@PathVariable(name = "idSalon", required = false) UUID idSalon) {
         log.debug("REST request to get all Participations");
 
-        return participationService.findAll(idSalon);
+        return participationService.findAllForList(idSalon);
     }
 
     @PostMapping("/{idSalon}/import-inscriptions")

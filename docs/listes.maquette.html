@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ajoie · Listes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --backdrop:#E6EAE5; --bg:#F3F5F2; --surface:#FFFFFF; --surface-2:#F5F7F4;
+  --line:#DFE3DD; --line-strong:#C8CEC6; --fg:#1B1F1C; --muted:#59625C;
+  --accent:#1F5C4F; --accent-hover:#174A3F; --accent-soft:#E1EEE9; --accent-line:#9CC3B7; --accent-fg:#FFFFFF;
+  --danger:#B3261E; --danger-soft:#FBE9E7; --frame:#1B1F1C;
+  --st-ver:#8A5A00; --st-acc:#1F4E8C; --st-val:#1B6B37; --st-clo:#59625C; --st-ref:#B3261E; --st-can:#8B938D;
+  --heart:#B4372F; --gold:#946A00; --share:#1F4E8C; --gift:#7A3E8F; --warn:#8A5A00; --ok:#1B6B37;
+  --cat-therapist:#2E7D6B; --cat-artisanat:#9A5B2E; --cat-mediumnity:#6B4A9E; --cat-energetic:#C2662D; --cat-misc:#5B6B7A; --cat-none:#8B938D;
+  --shadow:0 24px 60px rgba(20,30,25,.16),0 2px 6px rgba(20,30,25,.06);
+  --font-ui:'Figtree',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-display:'Bricolage Grotesque','Figtree',ui-sans-serif,system-ui,sans-serif;
+  --r:10px; color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+svg.i{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px}
+svg.i.s{width:12px;height:12px;vertical-align:-1.5px}
+svg.i.f{fill:currentColor;stroke:none}
+svg.i.l{width:16px;height:16px}
+
+/* ── Page de démonstration ── */
+.page{max-width:1200px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.top h1{margin:0;font-family:var(--font-display);font-size:26px;font-weight:700;letter-spacing:-.01em}
+.top p{margin:4px 0 0;color:var(--muted);font-size:14px;max-width:66ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.ctl{display:flex;align-items:center;gap:8px}
+.ctl[hidden]{display:none}
+.ctl-l{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{min-height:38px;padding:0 14px;border:0;border-radius:9px;background:transparent;font-size:14px;color:var(--muted);font-weight:500}
+.seg button:hover{color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tab{text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);display:flex;flex-direction:column;gap:3px;min-width:0}
+.tab:hover{border-color:var(--line-strong)}
+.tab[aria-selected="true"]{border:2px solid var(--accent);background:var(--accent-soft);padding:11.5px 13.5px}
+.tab-n{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tab[aria-selected="true"] .tab-n{color:var(--accent)}
+.tab-t{font-family:var(--font-display);font-size:17px;font-weight:700}
+.tab-d{font-size:13px;color:var(--muted)}
+@media (max-width:980px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.tabs{grid-template-columns:minmax(0,1fr)}}
+.stage{background:var(--backdrop);border-radius:18px;padding:28px 16px;display:flex;justify-content:center;align-items:flex-start;min-height:860px}
+.viewport{container-type:inline-size;container-name:vp;width:100%;display:flex;justify-content:center}
+.viewport.mobile{width:390px;max-width:100%;height:820px;border:10px solid var(--frame);border-radius:44px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+@media (max-width:560px){.stage{padding:0;background:transparent}.viewport.mobile{border:0;border-radius:0;box-shadow:none;height:780px}}
+
+/* ── Application ── */
+.app{position:relative;width:100%;max-width:1180px;height:820px;display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.viewport.mobile .app{height:100%;border:0;border-radius:0;box-shadow:none;max-width:none}
+.app-head{flex:none;display:flex;flex-direction:column;gap:12px;padding:18px 24px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.title-row{display:flex;align-items:center;gap:12px}
+.title-row .tt{min-width:0;flex:1}
+.title-row h2{margin:0;font-family:var(--font-display);font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.title-row .ss{font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title-row .ss b{color:var(--fg);font-weight:600}
+.head-acts{display:flex;gap:8px;align-items:center;position:relative}
+.btn{min-height:40px;padding:0 16px;border-radius:var(--r);border:0;font-weight:700;font-size:14.5px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--accent-fg)}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-quiet{background:var(--surface);color:var(--fg);border:1.5px solid var(--line-strong);font-weight:600}
+.btn-quiet:hover{border-color:var(--fg)}
+.btn-danger{background:var(--surface);color:var(--danger);border:1.5px solid color-mix(in srgb,var(--danger) 45%,var(--surface));font-weight:600}
+.btn-danger:hover{background:var(--danger-soft)}
+.btn-sm{min-height:36px;padding:0 12px;font-size:13.5px}
+.btn-icon{width:40px;padding:0;justify-content:center}
+.omenu{position:absolute;right:0;top:calc(100% + 6px);z-index:20;min-width:270px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:5px;display:none}
+.omenu.on{display:block}
+.omenu button{display:flex;width:100%;align-items:center;gap:10px;min-height:40px;padding:0 10px;border:0;border-radius:8px;background:none;font-size:14px;font-weight:500;text-align:left}
+.omenu button:hover{background:var(--surface-2)}
+.omenu button svg{color:var(--muted)}
+.omenu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+
+/* Barre d'outils commune */
+.hB{display:flex;flex-direction:column;gap:10px}
+.hB .r1{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hB .r2{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.hB .r2::-webkit-scrollbar{display:none}
+.search{position:relative;flex:1 1 300px;min-width:220px}
+.search>svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search input{width:100%;height:42px;padding:0 12px 0 36px;border:1.5px solid var(--line-strong);border-radius:var(--r);background:var(--surface);font-size:15px}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.sortseg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:2px;gap:2px;flex:none}
+.sortseg button{min-height:34px;padding:0 11px;border:0;border-radius:8px;background:transparent;font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+.sortseg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.segctl{display:flex;align-items:center;gap:6px;flex:none}
+.fgl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);flex:none;padding:0 2px}
+.fchip{min-height:34px;padding:0 12px;border:1.5px solid var(--line-strong);border-radius:999px;background:var(--surface);font-size:13.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:none}
+.fchip i.d{width:8px;height:8px;border-radius:99px;background:var(--c)}
+.fchip svg{color:var(--c,var(--muted))}
+.fchip small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fchip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
+.fchip[aria-pressed="true"] small{color:var(--accent)}
+.tb-sep{width:1px;align-self:stretch;background:var(--line);flex:none;margin:0 2px}
+
+.list-area{flex:1;min-height:0;overflow-y:auto;padding:0 24px 24px;position:relative}
+.empty{margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 16px;border:1.5px dashed var(--line-strong);border-radius:14px;color:var(--muted);text-align:center}
+.empty b{color:var(--fg);font-family:var(--font-display);font-size:17px}
+
+/* Groupes */
+.ghead{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 2px 8px;background:var(--bg);border:0;width:100%;text-align:left}
+.ghead h3{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.ghead h3 i{width:9px;height:9px;border-radius:99px;background:var(--c)}
+.ghead .count{font-size:12px;font-weight:700;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+.ghead .chev{color:var(--muted);transition:transform .2s}
+.ghead[aria-expanded="false"] .chev{transform:rotate(-90deg)}
+.ghead .gsum{margin-left:auto;font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.ghead .gsum span{color:var(--muted);font-weight:500}
+.ghead .gsum .bad{color:var(--danger);font-weight:700}
+.gbar{flex:1 1 100%;height:4px;border-radius:99px;background:var(--line);overflow:hidden}
+.gbar i{display:block;height:100%;background:var(--c);border-radius:99px;opacity:.85}
+
+/* bouton Grouper / Trier */
+.gs-wrap{position:relative;flex:none}
+.gs-btn{height:42px;width:42px}
+.gs-btn.mod{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.gs-btn.mod::after{content:"";position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:99px;background:var(--accent)}
+.gs-btn{position:relative}
+.gsmenu{min-width:240px;padding:6px}
+.gsmenu .ml{padding:6px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rad{display:flex;align-items:center;gap:10px;min-height:38px;padding:4px 10px;border-radius:8px;cursor:pointer;font-size:14px}
+.rad:hover{background:var(--surface-2)}
+.rad input{accent-color:var(--accent);width:16px;height:16px;margin:0;flex:none}
+.rad span{display:flex;flex-direction:column;line-height:1.25}
+.rad small{font-size:12px;color:var(--muted)}
+.rad:has(input:checked){font-weight:700}
+.rowmenu{position:absolute;right:auto;min-width:220px;z-index:30}
+.rowmenu button.dgr{color:var(--danger)}
+.rowmenu button.dgr svg{color:var(--danger)}
+/* ── Ligne commune ── */
+.rows{display:flex;flex-direction:column;gap:6px}
+.xr{position:relative;display:block;color:inherit;text-decoration:none;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;cursor:pointer;transition:border-color .12s, box-shadow .12s}
+.xr:hover{border-color:var(--line-strong);box-shadow:0 2px 8px -4px rgba(20,30,25,.18)}
+.xr:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+.xr:hover{border-color:var(--line-strong)}
+.xr.open{border-color:var(--accent-line);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent)}
+.xr-h{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"nm st" "meta sub" "foot foot";column-gap:16px;row-gap:3px;align-items:center;padding:11px 14px 10px;cursor:pointer;min-height:62px}
+.r-nm{grid-area:nm;display:flex;align-items:center;gap:8px;min-width:0}
+.r-nm b{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.r-al{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;white-space:nowrap;color:var(--c)}
+.r-st{grid-area:st;justify-self:end;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--c);white-space:nowrap}
+.r-st i{width:8px;height:8px;border-radius:99px;background:var(--c)}
+.r-st.can{text-decoration:line-through;text-decoration-thickness:1px;font-weight:600}
+.r-st small{font-weight:600;color:var(--muted)}
+.r-meta{grid-area:meta;font-size:12.5px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px}
+.r-meta .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.r-sub{grid-area:sub;justify-self:end;font-size:12.5px;color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:6px}
+.r-sub b{color:var(--fg);font-weight:600}
+.cat{display:inline-flex;align-items:center;gap:6px;color:var(--fg);font-weight:600}
+.cat i{width:8px;height:8px;border-radius:2px;background:var(--c)}
+mark{background:color-mix(in srgb,var(--st-ver) 28%,transparent);color:inherit;border-radius:2px}
+.dl{display:inline}
+/* pied */
+.r-foot{grid-area:foot;margin:6px 0 0;padding:4px 0 0;border-top:1px dashed var(--line);display:flex;align-items:center;gap:8px;font-size:11.5px;line-height:1.3;color:var(--muted);min-height:30px}
+.ft-items{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+.gear{margin-left:auto;flex:none;width:30px;height:30px;border-radius:8px;border:1px solid transparent;background:none;color:var(--muted);display:grid;place-items:center;padding:0;align-self:flex-end}
+.gear:hover,.gear.on{background:var(--surface-2);border-color:var(--line);color:var(--fg)}
+.gear svg{transition:transform .25s}
+.gear.on svg{transform:rotate(45deg)}
+.xr.open .r-foot{border-top-color:var(--accent-line)}
+.ft-t{display:inline-flex;align-items:center;gap:4px;font-weight:600;color:var(--c,var(--fg));max-width:100%;min-width:0}
+.ft-t .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ft-t em{font-style:normal;font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:34ch}
+.ft-t.n{color:var(--fg);font-weight:500}
+.ft-t.n b{font-weight:700}
+.ft-t.z{color:var(--muted);font-weight:500}
+.ft-t.z b{font-weight:600}
+.ft-sep{color:var(--line-strong);font-weight:700}
+.mchip{display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 7px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font-size:10.5px;font-weight:700;color:var(--fg);white-space:nowrap}
+.mini{display:inline-flex;gap:2px;width:48px;height:6px;border-radius:99px;overflow:hidden;background:var(--line);flex:none}
+.mini i{display:block;height:100%}
+
+.ftoast{position:absolute;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;bottom:18px;z-index:7;max-width:calc(100% - 32px);padding:10px 16px;border-radius:12px;background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);transition:all .22s}
+.ftoast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ── Ordinateur / mobile ── */
+
+@container vp (max-width:720px){
+  .dl{display:none}
+  .app-head{padding:14px 14px 12px;gap:10px}
+  .title-row h2{font-size:22px}
+  .title-row .ss{font-size:12.5px}
+  .head-acts .btn-primary .dl{display:none}
+  .search{flex:1 1 auto;min-width:0}
+  .hB .r1{flex-wrap:nowrap}
+  .list-area{padding:0 12px 24px}
+  .xr-h{padding:10px 12px 8px;column-gap:10px}
+  .r-st{font-size:12.5px}
+  .r-sub{max-width:44cqw;overflow:hidden}
+  .ft-t em{max-width:20ch}
+  .r-foot{min-height:24px}
+}
+
+.notes{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.notes summary{font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer}
+.notes ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:14px}
+.notes li{margin-bottom:5px}.notes li b{color:var(--fg)}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div>
+      <h1>Listes · un seul modèle, quatre thématiques</h1>
+      <p>Même en-tête (recherche, bouton « Grouper et trier », puces Statut / Signaux), même ligne (deux niveaux, statut en haut à droite, pied pointillé avec le rouage d'actions). Un clic sur la ligne ouvre la fiche existante. Seuls le contenu, les filtres, le tri et le regroupement changent selon la thématique. Données fictives.</p>
+    </div>
+    <div class="controls">
+      <div class="ctl"><span class="ctl-l">Aperçu</span><div class="seg" id="dev-seg"></div></div>
+      <div class="ctl" id="kind-ctl" hidden><span class="ctl-l">Liste</span><div class="seg" id="kind-seg"></div></div>
+    </div>
+  </header>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <main class="stage"><div class="viewport" id="vp"></div></main>
+  <details class="notes" open>
+    <summary>Ce qui est commun et ce qui change</summary>
+    <ul id="notes"></ul>
+  </details>
+</div>
+
+<script>
+/* ================= Icônes ================= */
+const IC={
+  heart:'<svg class="i s f" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.9 4.5 6.6 4.5c2.2 0 3.6 1.2 5.4 3.2 1.8-2 3.2-3.2 5.4-3.2 3.7 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z"/></svg>',
+  star:'<svg class="i s f" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.2 6.6.7-5 4.5 1.4 6.6L12 17.2l-5.9 3.3 1.4-6.6-5-4.5 6.6-.7z"/></svg>',
+  share:'<svg class="i s" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9.5" r="2.6"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15.5 14.6c3 .1 5.5 2 5.5 5"/></svg>',
+  hand:'<svg class="i s" viewBox="0 0 24 24"><path d="M3 12l4-4 4 2 3-3 3 1 4 4-4 4h-3l-3 3-3-3H5z"/></svg>',
+  gift:'<svg class="i s" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 3.5 8 4.2C6 4.8 7 8 12 8zm0 0s1.5-4.5 4-3.8C18 4.8 17 8 12 8z"/></svg>',
+  note:'<svg class="i s" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M9 11h6M9 15h4"/></svg>',
+  flag:'<svg class="i s f" viewBox="0 0 24 24"><path d="M5 21V3.5h11l-1.6 4 1.6 4H6.8V21z"/></svg>',
+  dup:'<svg class="i s" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',
+  file:'<svg class="i s" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>',
+  stand:'<svg class="i s" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 10h18"/></svg>',
+  mic:'<svg class="i s" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  brush:'<svg class="i s" viewBox="0 0 24 24"><path d="M14 4l6 6-8 8H6v-6z"/><path d="M3 21l3-3"/></svg>',
+  bolt:'<svg class="i s" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
+  ruler:'<svg class="i s" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="1"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/></svg>',
+  globe:'<svg class="i s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>',
+  users:'<svg class="i s" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .6 3.5 2.6 3.5 6"/></svg>',
+  chev:'<svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
+  plus:'<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  dots:'<svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/></svg>',
+  search:'<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>',
+  refresh:'<svg class="i" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.5-4.6L4 8M4 3v5h5M4 13a8 8 0 0 0 14.5 4.6L20 16M20 21v-5h-5"/></svg>',
+  copy:'<svg class="i" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',
+  clip:'<svg class="i" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6"/></svg>',
+  upload:'<svg class="i" viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
+  back:'<svg class="i" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  alert:'<svg class="i s" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.01"/></svg>',
+  gear:'<svg class="i l" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  sliders:'<svg class="i l" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>',
+  arrow:'<svg class="i l" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  user:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
+  euro:'<svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>',
+  trash:'<svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
+  open:'<svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  chart:'<svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  list:'<svg class="i" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+};
+
+/* ================= Helpers ================= */
+const TODAY=new Date("2026-10-22T12:00:00");
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const MO=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const D=s=>new Date(s+"T12:00:00");
+const fmtD=s=>{const d=D(s);return d.getDate()+(d.getDate()===1?"er":"")+" "+MO[d.getMonth()]};
+const fmtDY=s=>fmtD(s)+" "+D(s).getFullYear();
+const period=(a,b)=>{const x=D(a),y=D(b);return x.getMonth()===y.getMonth()&&x.getFullYear()===y.getFullYear()?`${x.getDate()}–${y.getDate()} ${MO[y.getMonth()]} ${y.getFullYear()}`:`${fmtD(a)} – ${fmtDY(b)}`};
+const days=s=>Math.round((TODAY-D(s))/864e5);
+const rel=s=>{const n=days(s);if(n<=0)return"aujourd'hui";if(n===1)return"hier";if(n<7)return"il y a "+n+" j";if(n<35)return"il y a "+Math.round(n/7)+" sem.";return"il y a "+Math.round(n/30.4)+" mois"};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>String(s??"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const hl=(s,q)=>{if(!q)return esc(s);const i=norm(s).indexOf(norm(q));if(i<0)return esc(s);return esc(s.slice(0,i))+"<mark>"+esc(s.slice(i,i+q.length))+"</mark>"+esc(s.slice(i+q.length))};
+const plural=(n,s,pl)=>n+" "+(n>1?(pl||s+"s"):s);
+const chf=n=>Math.round(n).toLocaleString("fr-CH").replace(/[  ]/g," ")+" CHF";
+const enumList=a=>a.length>1?a.slice(0,-1).join(", ")+" et "+a.at(-1):a[0]||"";
+const stars=v=>`<span class="stars" title="${v}/6">${"★".repeat(v)}<s>${"★".repeat(6-v)}</s></span>`;
+const tile=(n,label,cls="")=>`<div class="tile"><b class="${cls||(n===0||n==="0"?"z":"")}">${n}</b><span title="${esc(label)}">${label}</span></div>`;
+const facts=rows=>`<dl class="facts">${rows.filter(r=>r&&r[1]!==null&&r[1]!==undefined&&r[1]!=="").map(([k,v,lt])=>`<div><dt>${k}</dt><dd class="${lt?"lt":""}">${v}</dd></div>`).join("")}</dl>`;
+
+/* statuts (enum Status) */
+const STATUS={
+  IN_VERIFICATION:{l:"En vérification",g:"À vérifier",c:"var(--st-ver)"},
+  ACCEPTED:{l:"Acceptée",g:"Acceptées",c:"var(--st-acc)"},
+  VALIDATED:{l:"Validée",g:"Validées",c:"var(--st-val)"},
+  CLOSED:{l:"Clôturée",g:"Clôturées",c:"var(--st-clo)"},
+  REFUSED:{l:"Refusée",g:"Refusées",c:"var(--st-ref)"},
+  CANCELED:{l:"Annulée",g:"Annulées",c:"var(--st-can)"}};
+const ORDER=["IN_VERIFICATION","ACCEPTED","VALIDATED","CLOSED","REFUSED","CANCELED"];
+const masc=l=>l.replace(/ée$/,"é").replace(/ées$/,"és");
+const stLabel=(s,m)=>m?masc(STATUS[s].l):STATUS[s].l;
+const statusChips=(m)=>[
+  ...["IN_VERIFICATION","ACCEPTED","VALIDATED","CLOSED"].map(s=>({k:"st_"+s,grp:"st",l:m&&s!=="IN_VERIFICATION"?masc(STATUS[s].g):STATUS[s].g,dot:STATUS[s].c,f:x=>x.status===s})),
+  {k:"st_OUT",grp:"st",l:m?"Écartés":"Écartées",dot:STATUS.REFUSED.c,f:x=>["REFUSED","CANCELED"].includes(x.status)}];
+const INV={p:{l:"payée",c:"var(--st-val)"},i:{l:"en attente",c:"var(--st-acc)"},d:{l:"brouillon",c:"var(--line-strong)"},e:{l:"échue",c:"var(--danger)"}};
+const invWord=(k,n)=>n+" "+INV[k].l+(k!=="i"&&n>1?"s":"");
+
+/* ================= Données ================= */
+const TOWNS=["Porrentruy","Delémont","Alle","Courgenay","Fontenais","Bonfol","Courtedoux","Saignelégier","Bure","Moutier","Courrendlin","Bassecourt"];
+let UID=0;
+const PART=[];
+const P=(first,last,ther,date,status,o={})=>{const id=++UID;const p={id,first,last,ther,date,status,
+  email:(first[0]+"."+last).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z.]/g,"")+"@exemple.ch",
+  town:TOWNS[id%TOWNS.length], meals:[id%2,id%3===0?1:0,1],
+  nbStands:id%6===0?2:1, nbShared:0, nbConf:id%3===0?1:0, nbWork:id%4===0?2:id%4===1?1:0,
+  rating:[3+id%4,2+id%5,4+id%3], red:false,dup:false,crush:false,honor:false,arr:false,offer:null,comment:null,inv:null,...o};
+  if(p.inv)p.inv={d:0,i:0,p:0,e:0,...p.inv}; p.total=p.nbStands*380+p.nbConf*150+p.nbWork*90+(p.meals[0]+p.meals[1]+p.meals[2])*28;
+  const t=p.inv?p.inv.d+p.inv.i+p.inv.p+p.inv.e:0; p.paid=t?p.total*p.inv.p/t:0; PART.push(p); return p};
+P("Léa","Membrez","Cabinet Équilibre","2026-03-18","VALIDATED",{crush:true,inv:{p:2}});
+P("Julien","Chapatte","Massages Chapatte","2026-03-25","VALIDATED",{honor:true,offer:"−10 % sur la première séance",inv:{p:1,i:1}});
+P("Sophie","Theurillat","Reiki & Sens","2026-04-02","ACCEPTED",{comment:"Souhaite un stand proche de l'entrée",inv:{i:1,e:1}});
+P("Marc","Fleury","Ostéo Fleury","2026-04-10","VALIDATED",{inv:{p:3}});
+P("Nadia","Berberat","Les Huiles de Nadia","2026-04-15","IN_VERIFICATION",{dup:true,inv:{d:1}});
+P("Pierre-Alain","Crelier","Shiatsu PAC","2026-04-22","REFUSED",{red:true,comment:"Facture 2025 jamais réglée"});
+P("Camille","Rérat","Atelier Sonore","2026-05-03","ACCEPTED",{nbShared:1,inv:{d:1,i:1}});
+P("Yves","Choulat","Kinésiologie Choulat","2026-05-11","VALIDATED",{});
+P("Élodie","Gigon","Naturo'Ajoie","2026-05-19","CLOSED",{crush:true,inv:{p:2}});
+P("Thomas","Willemin","Fleurs de Bach","2026-05-27","CANCELED",{});
+P("Anaïs","Juillerat","Yoga du Doubs","2026-06-04","ACCEPTED",{crush:true,offer:"Cours d'essai offert",inv:{i:2,e:1}});
+P("Fabienne","Comment","Réflexo Comment","2026-06-12","VALIDATED",{offer:"Bon de 20 CHF au tirage",inv:{p:1}});
+P("Lucas","Frossard","Pierres & Minéraux","2026-06-20","IN_VERIFICATION",{});
+P("Nadia","Berbérat","Huiles de Nadia","2026-06-28","IN_VERIFICATION",{dup:true});
+P("Mélanie","Cerf","Hypnose Cerf","2026-07-06","ACCEPTED",{nbShared:1,comment:"Arrivera le samedi à 10 h",inv:{d:2}});
+P("Olivier","Varé","Sophrologie Varé","2026-07-15","VALIDATED",{honor:true,crush:true,inv:{p:1,i:1}});
+P("Jessica","Prêtre","Ayurveda Prêtre","2026-07-29","ACCEPTED",{arr:true,inv:{i:1,e:2}});
+P("Damien","Bourquard","Qi Gong Bourquard","2026-08-08","IN_VERIFICATION",{});
+P("Valérie","Hêche","Magnétisme Hêche","2026-08-19","REFUSED",{});
+P("Stéphane","Noirjean","Bols tibétains SN","2026-09-02","ACCEPTED",{arr:true,inv:{d:1}});
+P("Laure","Maître","Cosmétiques Maître","2026-09-15","IN_VERIFICATION",{red:true,comment:"Produits non certifiés ? À contrôler"});
+P("Raphaël","Joliat","Acupuncture Joliat","2026-09-28","VALIDATED",{inv:{i:1}});
+P("Inès","Guenat","Doula Guenat","2026-10-09","IN_VERIFICATION",{crush:true});
+P("Bastien","Petignat","Thé & Plantes","2026-10-17","IN_VERIFICATION",{offer:"Dégustation gratuite"});
+P("Chloé","Vallat","Massage bébé","2026-10-20","IN_VERIFICATION",{});
+const pById=id=>PART.find(p=>p.id===id);
+
+const CATS={THERAPIST:{l:"Thérapeute",c:"var(--cat-therapist)"},ARTISANAT:{l:"Artisanat",c:"var(--cat-artisanat)"},MEDIUMNITY:{l:"Médiumnité",c:"var(--cat-mediumnity)"},ENERGETIC:{l:"Énergétique",c:"var(--cat-energetic)"},MISCELLANEOUS:{l:"Divers",c:"var(--cat-misc)"},NONE:{l:"Sans catégorie",c:"var(--cat-none)"}};
+const DIMS={"2x2":{l:"2 × 2 m",price:280},"3x2":{l:"3 × 2 m",price:380},"4x2":{l:"4 × 2 m",price:480},"6x2":{l:"6 × 2 m",price:690}};
+let SID=0;
+const STANDS=[
+ [1,"Soins énergétiques et équilibrage des chakras","THERAPIST","VALIDATED","3x2",["Reiki","Chakras","Soins"],{elec:true,t:1,c:2}],
+ [2,"Massages relaxants et sportifs, démonstrations sur chaise","THERAPIST","VALIDATED","4x2",["Massage","Sport","Détente","Chaise ergonomique"],{t:1,c:3,elec:true}],
+ [3,"Reiki Usui et lecture d'aura","ENERGETIC","ACCEPTED","2x2",["Reiki","Aura"],{c:2,comment:"Proche de l'entrée si possible"}],
+ [4,"Ostéopathie : conseils posturaux et petits bilans","THERAPIST","VALIDATED","3x2",["Ostéopathie","Posture","Dos"],{t:2,c:2}],
+ [5,"Huiles essentielles bio et diffuseurs","ARTISANAT","IN_VERIFICATION","3x2",["Aromathérapie","Bio","Diffuseurs","Cosmétique","Vente"],{elec:true,t:2,c:1}],
+ [7,"Bains sonores, bols et gongs","ENERGETIC","ACCEPTED","3x2",["Son","Gong","Méditation"],{shared:true,co:"Mélanie Cerf",elec:true,t:1,c:4}],
+ [8,"Kinésiologie et gestion du stress","THERAPIST","VALIDATED","2x2",["Kinésiologie","Stress"],{t:1,c:2}],
+ [9,"Naturopathie, tisanes et conseils saisonniers","THERAPIST","CLOSED","3x2",["Naturopathie","Tisanes","Saisons"],{t:1,c:2}],
+ [11,"Yoga doux et respiration","THERAPIST","ACCEPTED","4x2",["Yoga","Respiration","Cours"],{t:0,c:6,comment:"Tapis fournis par l'exposante"}],
+ [12,"Réflexologie plantaire","THERAPIST","VALIDATED","2x2",["Réflexologie","Pieds"],{t:1,c:2}],
+ [13,"Pierres, minéraux et bijoux en lithothérapie","ARTISANAT","IN_VERIFICATION","4x2",["Minéraux","Bijoux","Lithothérapie","Vente"],{elec:true,t:3,c:1}],
+ [15,"Hypnose ericksonienne et séances découverte","THERAPIST","ACCEPTED","3x2",["Hypnose","Découverte"],{shared:true,co:"Camille Rérat",t:1,c:3}],
+ [16,"Sophrologie et relaxation guidée","THERAPIST","VALIDATED","3x2",["Sophrologie","Relaxation"],{t:1,c:4}],
+ [17,"Ayurveda : massages abhyanga et épices","ENERGETIC","ACCEPTED","4x2",["Ayurveda","Massage","Épices"],{elec:true,t:2,c:2}],
+ [18,"Qi gong, démonstrations toutes les heures","ENERGETIC","IN_VERIFICATION","6x2",["Qi gong","Démonstration"],{t:0,c:0,comment:"Besoin d'un espace dégagé devant le stand"}],
+ [20,"Bols tibétains et voyages sonores","MEDIUMNITY","ACCEPTED","2x2",["Son","Bols tibétains"],{t:1,c:2}],
+ [21,"Cosmétiques naturels faits main","ARTISANAT","IN_VERIFICATION","3x2",["Cosmétique","Fait main","Vente"],{elec:true,t:2,c:1,comment:"Vérifier les certifications"}],
+ [22,"Acupuncture et médecine chinoise","THERAPIST","VALIDATED","3x2",["Acupuncture","MTC"],{t:1,c:2}],
+ [24,"Thés, plantes et infusions artisanales","MISCELLANEOUS","IN_VERIFICATION","3x2",["Thé","Plantes","Dégustation"],{elec:true,t:2,c:2}],
+ [6,"Shiatsu sur futon","THERAPIST","REFUSED","2x2",["Shiatsu"],{t:0,c:1}],
+ [10,"Élixirs floraux du Dr Bach","NONE","CANCELED","2x2",["Fleurs de Bach"],{t:1,c:1}],
+].map(([pid,desc,cat,status,dim,tags,o])=>({id:++SID,pid,desc,cat,status,dim,tags,shared:false,co:null,elec:false,t:1,c:2,comment:null,...o}));
+
+let CID=0;
+const TALKS=[
+ ["conf",3,"Le Reiki au quotidien : mythes et réalités","Une heure pour comprendre ce que le Reiki peut apporter au quotidien, ce qu'il ne peut pas promettre, et comment choisir un praticien sérieux.\nTémoignages et questions du public en fin de séance.","ACCEPTED",null],
+ ["conf",6,"Le shiatsu, une médecine du toucher","Origines japonaises, principes des méridiens et place du shiatsu à côté de la médecine conventionnelle.","REFUSED","Exposant refusé, conférence à retirer du programme"],
+ ["conf",9,"Se soigner avec les plantes de saison","Panorama des plantes médicinales de l'automne et de l'hiver, préparations simples à faire chez soi, précautions d'usage.","CLOSED",null],
+ ["conf",12,"Réflexologie : ce que disent nos pieds","Démonstration commentée, cartographie des zones réflexes et exercices d'auto-massage.","VALIDATED",null],
+ ["conf",15,"L'hypnose pour arrêter de fumer","Comment fonctionne une séance, ce qu'il faut en attendre, et pourquoi la motivation reste la clé.","ACCEPTED","Demande le vidéoprojecteur"],
+ ["conf",18,"Qi gong et longévité","Les grands principes du qi gong et cinq mouvements à reproduire chez soi.","IN_VERIFICATION",null],
+ ["conf",21,"Cosmétique naturelle : lire une étiquette","Ingrédients à connaître, labels fiables et pièges du marketing « vert ».","IN_VERIFICATION","Contenu à valider avant publication"],
+ ["conf",24,"Le thé, du jardin à la tasse","Histoire, familles de thés et bonnes températures d'infusion, avec dégustation.","IN_VERIFICATION",null],
+ ["work",1,"Atelier d'auto-massage des mains","En petit groupe, apprendre trois enchaînements simples pour détendre les mains et les avant-bras.","VALIDATED",null],
+ ["work",4,"Postures au bureau : 20 minutes pour son dos","Exercices et réglages simples du poste de travail, à faire debout ou assis.","VALIDATED",null],
+ ["work",5,"Fabriquer son roll-on aux huiles essentielles","Chaque participant repart avec son flacon. Matériel fourni, 12 places.","IN_VERIFICATION","Coût du matériel à facturer à part ?"],
+ ["work",8,"Initiation à la kinésiologie","Tests musculaires de base et premiers exercices d'équilibrage.","ACCEPTED",null],
+ ["work",11,"Yoga doux pour débutants","Séance de 45 minutes accessible à tous, sans matériel.","ACCEPTED","Prévoir la salle annexe"],
+ ["work",11,"Respiration et cohérence cardiaque","Comprendre et pratiquer la cohérence cardiaque en 30 minutes.","ACCEPTED",null],
+ ["work",16,"Relaxation guidée en groupe","Une séance de sophrologie pour découvrir la relaxation dynamique.","VALIDATED",null],
+ ["work",20,"Voyage sonore aux bols tibétains","Allongé ou assis, une immersion de 40 minutes dans les vibrations des bols.","IN_VERIFICATION",null],
+ ["work",10,"Choisir son élixir floral","Atelier découverte des fleurs de Bach.","CANCELED",null],
+].map(([kind,pid,title,descr,status,comment],i)=>({id:++CID,kind,pid,title,descr,status,comment,date:(()=>{const d=new Date(D(pById(pid).date).getTime()+(3+i%9)*864e5);return d.toISOString().slice(0,10)})()}));
+
+const SALONS=[
+ {id:1,place:"Salon Bien-être d'Ajoie",ref:"SBA-2026",start:"2026-11-13",end:"2026-11-15",reg:true,regOpen:"2026-03-01",regClose:"2026-10-31",dims:["2x2","3x2","4x2","6x2"],nbP:25,nbC:8,nbW:9,addr:"Salle de l'Inter, Porrentruy",archived:false,prices:{m:[22,28,22],c:150,w:90,sh:120},comment:null},
+ {id:2,place:"Marché de Noël bien-être",ref:"MNB-2026",start:"2026-12-05",end:"2026-12-06",reg:true,regOpen:"2026-09-15",regClose:"2026-11-20",dims:["2x2","3x2"],nbP:11,nbC:0,nbW:3,addr:"Halle des expositions, Delémont",archived:false,prices:{m:[20,0,20],c:0,w:60,sh:80},comment:"Pas de conférence cette année"},
+ {id:3,place:"Salon Bien-être d'Ajoie",ref:"SBA-2027",start:"2027-11-12",end:"2027-11-14",reg:false,regOpen:null,regClose:null,dims:[],nbP:0,nbC:0,nbW:0,addr:"Salle de l'Inter, Porrentruy",archived:false,prices:{m:[22,28,22],c:150,w:90,sh:120},comment:"Brouillon : tarifs à confirmer"},
+ {id:4,place:"Salon d'automne",ref:"SAD-2026",start:"2026-10-17",end:"2026-10-25",reg:false,regOpen:"2026-01-10",regClose:"2026-09-30",dims:["3x2","4x2"],nbP:18,nbC:4,nbW:6,addr:"Centre culturel, Delémont",archived:false,prices:{m:[20,25,20],c:120,w:80,sh:100},comment:null},
+ {id:5,place:"Salon de printemps",ref:"SPD-2025",start:"2025-04-12",end:"2025-04-13",reg:false,regOpen:"2025-01-10",regClose:"2025-03-31",dims:["3x2","4x2"],nbP:21,nbC:5,nbW:7,addr:"Centre culturel, Delémont",archived:false,prices:{m:[20,25,20],c:120,w:80,sh:100},comment:null},
+ {id:6,place:"Salon Bien-être d'Ajoie",ref:"SBA-2025",start:"2025-11-14",end:"2025-11-16",reg:false,regOpen:"2025-03-01",regClose:"2025-10-31",dims:["2x2","3x2","4x2"],nbP:23,nbC:7,nbW:8,addr:"Salle de l'Inter, Porrentruy",archived:true,prices:{m:[22,28,22],c:150,w:90,sh:120},comment:null},
+ {id:7,place:"Salon Bien-être d'Ajoie",ref:"SBA-2024",start:"2024-11-15",end:"2024-11-17",reg:false,regOpen:"2024-03-01",regClose:"2024-10-31",dims:["2x2","3x2","4x2"],nbP:20,nbC:6,nbW:6,addr:"Salle de l'Inter, Porrentruy",archived:true,prices:{m:[20,25,20],c:140,w:80,sh:110},comment:null},
+];
+const salonState=s=>s.archived?"ARCHIVED":D(s.end)<TODAY?"PAST":D(s.start)<=TODAY?"NOW":"NEXT";
+const SSTATE={NOW:{l:"En cours",g:"En cours",c:"var(--st-val)"},NEXT:{l:"À venir",g:"À venir",c:"var(--st-acc)"},PAST:{l:"Terminé",g:"Terminés",c:"var(--st-clo)"},ARCHIVED:{l:"Archivé",g:"Archivés",c:"var(--st-can)"}};
+
+/* ================= Thématiques ================= */
+const exhName=p=>p.first+" "+p.last;
+const exhAlerts=p=>[p.red?`<span class="r-al" style="--c:var(--danger)" title="Red flag">${IC.flag}<span class="dl">Red flag</span></span>`:"",p.dup?`<span class="r-al" style="--c:var(--warn)" title="Doublon détecté">${IC.dup}<span class="dl">Doublon</span></span>`:""].join("");
+const invTot=p=>p.inv?p.inv.d+p.inv.i+p.inv.p+p.inv.e:0;
+const mealTxt=p=>[["sam. midi",0],["sam. soir",1],["dim. midi",2]].filter(([,k])=>p.meals[k]).map(([l,k])=>p.meals[k]+" "+l).join(" · ");
+const nbMeals=p=>p.meals[0]+p.meals[1]+p.meals[2];
+
+const THEMES={
+/* ---------------- PARTICIPATIONS ---------------- */
+part:{
+  tab:{n:"Thématique 1",t:"Participations",d:"Grouper par statut ou alphabet. Trier par date d'inscription ou alphabet (thérapeute)."},
+  title:"Participations", sub:()=>`<b>Salon Bien-être d'Ajoie</b> · 13–15 nov. 2026 · J-22`,
+  create:"Créer", menu:[["refresh","Rafraîchir"],["copy","Copier les e-mails des exposants actifs"]],
+  placeholder:"Rechercher un thérapeute, un exposant, un e-mail",
+  data:()=>PART, search:p=>[p.ther,exhName(p),p.email],
+  alpha:p=>p.ther, dateOf:p=>p.date,
+  sorts:[["date","Date"],["alpha","Alphabet"]],
+  chips:[...statusChips(false),
+    {k:"alert",grp:"sig",l:"Alertes",ic:IC.alert,c:"var(--danger)",f:p=>p.red||p.dup},
+    {k:"exp",grp:"sig",l:"Facture échue",ic:IC.file,c:"var(--danger)",f:p=>p.inv&&p.inv.e>0},
+    {k:"noinv",grp:"sig",l:"À facturer",ic:IC.file,c:"var(--st-acc)",f:p=>["ACCEPTED","VALIDATED"].includes(p.status)&&!invTot(p)},
+    {k:"crush",grp:"sig",l:"Coup de cœur",ic:IC.heart,c:"var(--heart)",f:p=>p.crush},
+    {k:"honor",grp:"sig",l:"Invité d'honneur",ic:IC.star,c:"var(--gold)",f:p=>p.honor},
+    {k:"arr",grp:"sig",l:"Arrangement",ic:IC.hand,c:"var(--st-acc)",f:p=>p.arr},
+    {k:"offer",grp:"sig",l:"Offre cadeau",ic:IC.gift,c:"var(--gift)",f:p=>!!p.offer},
+    {k:"comment",grp:"sig",l:"Commentaire",ic:IC.note,c:"var(--fg)",f:p=>!!p.comment}],
+  groupings:[["status","Statut"],["alpha","Alphabet"]],
+  status:{order:ORDER,of:p=>p.status,meta:g=>({l:STATUS[g].g,c:STATUS[g].c}),collapsed:["REFUSED","CANCELED"]},
+  groups:{
+    sum:rows=>{const it=rows.reduce((a,p)=>a+invTot(p),0),pd=rows.reduce((a,p)=>a+(p.inv?p.inv.p:0),0),ex=rows.reduce((a,p)=>a+(p.inv?p.inv.e:0),0);
+      return it?`${ex?`<span class="bad">${ex} échue${ex>1?"s":""}</span> <span>·</span> `:""}${pd}/${it} <span>payées</span>`:`<span>pas de facture</span>`}},
+  row:(p,q)=>({
+    title:hl(p.ther,q), st:{l:stLabel(p.status),c:STATUS[p.status].c,can:p.status==="CANCELED"},
+    meta:`<span class="tx">${hl(exhName(p),q)}</span>${exhAlerts(p)}`,
+    sub:`<span><span class="dl">inscrit le </span>${fmtD(p.date)}</span>`,
+    foot:[
+      invFoot(p),
+      {html:cnts([[IC.stand,p.nbStands,p.nbShared?"stand (partagé)":"stand",p.nbShared?"stands (dont partagé)":"stands"],[IC.mic,p.nbConf,"conférence","conférences"],[IC.brush,p.nbWork,"atelier","ateliers"]])},
+      p.honor&&{ic:IC.star,t:"Invité d'honneur",c:"var(--gold)"},
+      p.crush&&{ic:IC.heart,t:"Coup de cœur",c:"var(--heart)"},
+      p.arr&&{ic:IC.hand,t:"Arrangement",c:"var(--st-acc)"},
+      p.offer&&{ic:IC.gift,t:"Offre",x:p.offer,c:"var(--gift)"},
+      p.comment&&{ic:IC.note,t:"Note",x:p.comment,c:"var(--fg)"}]}),
+  actions:[["Fiche exposant","user"],["Facturation","euro"],["Supprimer","trash","del"]],
+  notes:["<b>Ligne 1</b> : nom du thérapeute, statut à droite. <b>Ligne 2</b> : exposant (avec red flag / doublon), date d'inscription à droite.","<b>Pied</b> : uniquement ce qui existe : factures (mini-jauge) ou « À facturer », les prestations non nulles (« 1 stand · 2 ateliers »), invité d'honneur, coup de cœur, arrangement, offre, note.","<b>Clic sur la ligne</b> : ouvre la fiche de la participation. <b>Rouage</b> (en bas à droite) : Fiche exposant, Facturation, Supprimer.","<b>Grouper</b> : Statut, Alphabet (initiale du thérapeute). <b>Trier</b> : Date d'inscription, Alphabet (masqué quand on groupe par alphabet). <b>Filtres propres</b> : Alertes, Facture échue, À facturer, Coup de cœur, Invité d'honneur, Arrangement, Offre cadeau, Commentaire."]
+},
+/* ---------------- STANDS ---------------- */
+stand:{
+  tab:{n:"Thématique 2",t:"Stands",d:"Grouper par catégorie, statut ou alphabet. Trier par date ou alphabet (thérapeute)."},
+  title:"Stands", sub:()=>`<b>Salon Bien-être d'Ajoie</b> · 13–15 nov. 2026 · ${STANDS.length} stands`,
+  create:"Créer", menu:[["refresh","Rafraîchir"],["clip","Vue presse-papiers (catégorie, thérapeute)"]],
+  placeholder:"Rechercher une description, un thérapeute, un tag",
+  data:()=>STANDS, search:s=>[s.desc,pById(s.pid).ther,exhName(pById(s.pid)),...s.tags],
+  alpha:s=>pById(s.pid).ther, dateOf:s=>pById(s.pid).date,
+  sorts:[["date","Date"],["alpha","Alphabet"]],
+  chips:[...statusChips(true),
+    {k:"shared",grp:"sig",l:"Partagé",ic:IC.share,c:"var(--share)",f:s=>s.shared},
+    {k:"elec",grp:"sig",l:"Électricité",ic:IC.bolt,c:"var(--warn)",f:s=>s.elec},
+    {k:"comment",grp:"sig",l:"Commentaire",ic:IC.note,c:"var(--fg)",f:s=>!!s.comment}],
+  groupings:[["cat","Catégorie"],["status","Statut"],["alpha","Alphabet"]],
+  cat:{order:Object.keys(CATS),of:s=>s.cat,meta:g=>({l:CATS[g].l,c:CATS[g].c}),collapsed:[]},
+  status:{order:ORDER,of:s=>s.status,meta:g=>({l:g==="IN_VERIFICATION"?STATUS[g].g:masc(STATUS[g].g),c:STATUS[g].c}),collapsed:["REFUSED","CANCELED"]},
+  groups:{
+    sum:rows=>{const a=rows.filter(s=>["REFUSED","CANCELED"].includes(s.status)).length;return `${rows.length-a} <span>actifs</span>${a?` <span>· ${a} écarté${a>1?"s":""}</span>`:""}`}},
+  row:(s,q)=>{const p=pById(s.pid);return{
+    title:hl(s.desc,q), st:{l:stLabel(s.status,true),c:STATUS[s.status].c,can:s.status==="CANCELED"},
+    meta:`<span class="tx">${hl(p.ther,q)}</span>`,
+    sub:`<span class="cat" style="--c:${CATS[s.cat].c}"><i></i>${CATS[s.cat].l}</span>`,
+    foot:[
+      s.tags.length&&{html:s.tags.slice(0,3).map(t=>`<span class="mchip">${hl(t,q)}</span>`).join("")+(s.tags.length>3?`<span class="ft-t n">+${s.tags.length-3}</span>`:"")},
+      {ic:IC.ruler,t:DIMS[s.dim].l,c:"var(--fg)"},
+      s.shared&&{ic:IC.share,t:"Partagé (co-exposant)",c:"var(--share)"},
+      s.comment&&{ic:IC.note,t:"Note",x:s.comment,c:"var(--fg)"}]}},
+  actions:[["Participation","list"],["Supprimer","trash","del"]],
+  notes:["<b>Ligne 1</b> : description, statut à droite. <b>Ligne 2</b> : thérapeute, catégorie (pastille de couleur) à droite.","<b>Pied</b> : 3 premiers tags (+n), dimension, « Partagé (co-exposant) », commentaire interne s'il existe.","<b>Clic sur la ligne</b> : ouvre la fiche du stand. <b>Rouage</b> : Participation, Supprimer.","<b>Grouper</b> : Catégorie (par défaut), Statut, Alphabet (initiale du thérapeute). <b>Trier</b> : Date d'inscription, Alphabet.","<b>Filtres propres</b> : Partagé, Électricité, Commentaire. Pas de filtre par dimension."]
+},
+/* ---------------- CONFÉRENCES & ATELIERS ---------------- */
+talk:{
+  tab:{n:"Thématique 3",t:"Conférences & ateliers",d:"Même liste pour les deux. Grouper par statut ou alphabet. Trier par date, alphabet ou titre."},
+  title:()=>KIND==="conf"?"Conférences":"Ateliers", sub:()=>`<b>Salon Bien-être d'Ajoie</b> · 13–15 nov. 2026 · ${TALKS.filter(t=>t.kind===KIND).length} ${KIND==="conf"?"conférences":"ateliers"}`,
+  create:"Créer", menu:[["refresh","Rafraîchir"]],
+  placeholder:()=>KIND==="conf"?"Rechercher un titre, un thérapeute":"Rechercher un titre, un thérapeute",
+  data:()=>TALKS.filter(t=>t.kind===KIND), search:t=>[t.title,pById(t.pid).ther,exhName(pById(t.pid)),t.descr],
+  alpha:t=>pById(t.pid).ther, dateOf:t=>t.date, titleOf:t=>t.title,
+  sorts:[["date","Date"],["alpha","Alphabet"],["title","Titre"]],
+  get chips(){return [...statusChips(KIND==="work"),{k:"comment",grp:"sig",l:"Avec commentaire",ic:IC.note,c:"var(--fg)",f:t=>!!t.comment}]},
+  groupings:[["status","Statut"],["alpha","Alphabet"]],
+  status:{order:ORDER,of:t=>t.status,meta:g=>({l:KIND==="work"&&g!=="IN_VERIFICATION"?masc(STATUS[g].g):STATUS[g].g,c:STATUS[g].c}),collapsed:["REFUSED","CANCELED"]},
+  groups:{sum:()=>""},
+  row:(t,q)=>{const p=pById(t.pid);return{
+    title:hl(t.title,q), st:{l:stLabel(t.status,KIND==="work"),c:STATUS[t.status].c,can:t.status==="CANCELED"},
+    meta:`<span class="tx">${hl(p.ther,q)}</span>`, sub:"",
+    foot:[t.comment&&{ic:IC.note,t:"Note",x:t.comment,c:"var(--fg)"}]}},
+  actions:[["Participation","list"],["Supprimer","trash","del"]],
+  notes:["<b>Un seul composant</b> pour les conférences et les ateliers (même modèle : titre, description, statut, commentaire, participation). Utilisez le sélecteur « Liste » en haut.","<b>Ligne 1</b> : titre, statut à droite. <b>Ligne 2</b> : thérapeute.","<b>Pied</b> : seulement le commentaire interne, et seulement s'il existe (le rouage est toujours là, en bas à droite).","<b>Clic sur la ligne</b> : ouvre la fiche. <b>Rouage</b> : Participation, Supprimer.","<b>Grouper</b> : Statut, Alphabet (initiale du thérapeute). <b>Trier</b> : Date d'inscription, Alphabet (thérapeute), Titre. <b>Filtres</b> : statuts et « Avec commentaire »."]
+},
+/* ---------------- SALONS ---------------- */
+salon:{
+  tab:{n:"Thématique 4",t:"Salons",d:"Grouper par statut (période) ou alphabet. Trier par date de début ou titre."},
+  title:"Salons", sub:()=>`${SALONS.length} salons · ${SALONS.filter(s=>!s.archived).length} actifs`,
+  create:"Créer", menu:[["refresh","Rafraîchir"],["import","Importer des inscriptions"]],
+  placeholder:"Rechercher un salon, une référence",
+  data:()=>SALONS, search:s=>[s.place,s.ref,s.addr],
+  alpha:s=>s.place, dateOf:s=>s.start, titleOf:s=>s.place, alphaIsTitle:true,
+  sorts:[["date","Date"],["title","Titre"]],
+  chips:[...["NOW","NEXT","PAST","ARCHIVED"].map(k=>({k:"ss_"+k,grp:"st",l:SSTATE[k].g,dot:SSTATE[k].c,f:s=>salonState(s)===k}))],
+  chipGroups:[["st","Période"]],
+  groupings:[["status","Statut"],["alpha","Alphabet"]],
+  status:{order:["NOW","NEXT","PAST","ARCHIVED"],of:salonState,meta:g=>({l:SSTATE[g].g,c:SSTATE[g].c}),collapsed:["ARCHIVED"]},
+  groups:{
+    sum:rows=>`${rows.reduce((a,s)=>a+s.nbP,0)} <span>participations</span>`},
+  row:(s,q)=>{const st=salonState(s), jd=Math.ceil((D(s.start)-TODAY)/864e5);return{
+    title:hl(s.place,q), st:{l:SSTATE[st].l+(st==="NEXT"&&jd<=60?` <small>· J-${jd}</small>`:""),c:SSTATE[st].c},
+    meta:`<span class="tx">Réf. ${hl(s.ref,q)}</span>`, sub:`<b>${period(s.start,s.end)}</b>`,
+    foot:[
+      s.reg&&{ic:IC.globe,t:"Inscriptions en ligne ouvertes",c:"var(--st-val)"},
+      s.dims.length&&{ic:IC.ruler,t:plural(s.dims.length,"dimension"),c:"var(--fg)"},
+      {html:cnts([[IC.users,s.nbP,"participation","participations"],[IC.mic,s.nbC,"conférence","conférences"],[IC.brush,s.nbW,"atelier","ateliers"]])}]}},
+  actions:[["Participations","list"],["Statistiques","chart"],["Supprimer","trash","del"]],
+  notes:["<b>Ligne 1</b> : nom du salon (champ <code>place</code>), état calculé à droite (En cours, À venir · J-x, Terminé, Archivé). <b>Ligne 2</b> : n° de référence, période à droite.","<b>Pied</b> : uniquement ce qui existe : « Inscriptions en ligne ouvertes » si actives, nombre de dimensions s'il y en a, participations · conférences · ateliers non nuls.","<b>Clic sur la ligne</b> : ouvre la fiche du salon. <b>Rouage</b> : Participations, Statistiques, Supprimer.","<b>Grouper</b> : Statut (en cours, à venir, terminés, archivés repliés) ou Alphabet (initiale du nom). <b>Trier</b> : Date de début, Titre (masqué quand on groupe par alphabet). <b>Filtres</b> : la période seulement."]
+}};
+function invSegs(p){const t=invTot(p);const rest=p.total-p.paid;const nonPaid=p.inv.i+p.inv.d+p.inv.e||1;
+  return [["p",p.paid],["i",rest*p.inv.i/nonPaid],["d",rest*p.inv.d/nonPaid],["e",rest*p.inv.e/nonPaid]].filter(([,v])=>v>0).map(([k,v])=>`<i style="flex:${v};background:${INV[k].c}"></i>`).join("")}
+function invFoot(p){const t=invTot(p);
+  if(!t) return ["ACCEPTED","VALIDATED"].includes(p.status)?{ic:IC.file,t:"À facturer",c:"var(--st-acc)"}:null;
+  const bar=`<span class="mini">${["p","i","d","e"].filter(k=>p.inv[k]).map(k=>`<i style="flex:${p.inv[k]};background:${INV[k].c}"></i>`).join("")}</span>`;
+  return {html:`<span class="ft-t n">${bar}${p.inv.e?`<b style="color:var(--danger)">${p.inv.e} échue${p.inv.e>1?"s":""}</b>`:`<b>${p.inv.p}/${p.inv.p+p.inv.i+p.inv.d}</b>&nbsp;payée${p.inv.p>1?"s":""}`}</span>`};
+}
+const cnt=(ic,n,s,pl)=>`<span class="ft-t n ${n?"":"z"}">${ic}<b>${n}</b><span>${n>1?pl:s}</span></span>`;
+const cnts=a=>{const v=a.filter(x=>x[1]>0);return v.length?v.map(x=>cnt(...x)).join('<span class="ft-sep">·</span>'):null};
+const memo=c=>c?`<div class="memo">${IC.note}<div><b>Commentaire interne</b>${esc(c)}</div></div>`:"";
+
+/* ================= Moteur commun ================= */
+let THEME="part", KIND="conf", DEV="desktop";
+const STATE={};
+const defCollapsed=g=>new Set(g==="alpha"?[]:(T()[g].collapsed||[]));
+const st=()=>{const k=THEME+(THEME==="talk"?"_"+KIND:"");if(!STATE[k]){const g=T().groupings[0][0];STATE[k]={q:"",sort:"date",group:g,f:new Set(),open:new Set(),collapsed:defCollapsed(g)}}return STATE[k]};
+const sortsFor=S=>T().sorts.filter(([k])=>!(S.group==="alpha"&&(k==="alpha"||(T().alphaIsTitle&&k==="title"))));
+const letter=x=>{const c=norm(T().alpha(x)).replace(/[^a-z]/g,"")[0];return c?c.toUpperCase():"#"};
+const SORTHINT={part:{date:"date d'inscription",alpha:"nom du thérapeute"},stand:{date:"date d'inscription",alpha:"nom du thérapeute"},talk:{date:"date d'inscription",alpha:"nom du thérapeute",title:"titre"},salon:{date:"date de début",title:"nom du salon"}};
+const SORTFN={date:(a,b)=>T().dateOf(b).localeCompare(T().dateOf(a)),
+  alpha:(a,b)=>norm(T().alpha(a)).localeCompare(norm(T().alpha(b)))||T().dateOf(b).localeCompare(T().dateOf(a)),
+  title:(a,b)=>norm(T().titleOf(a)).localeCompare(norm(T().titleOf(b)))};
+const T=()=>THEMES[THEME];
+const val=v=>typeof v==="function"?v():v;
+
+function shell(){
+  const vp=$("#vp"); vp.className="viewport"+(DEV==="mobile"?" mobile":"");
+  vp.innerHTML=`<div class="app">
+    <div class="app-head">
+      <div class="title-row">
+        <div class="tt"><h2>${val(T().title)}</h2><div class="ss">${T().sub()}</div></div>
+        <div class="head-acts">
+          <button class="btn btn-quiet btn-icon" id="omBtn" aria-label="Plus d'actions" aria-haspopup="menu">${IC.dots}</button>
+          <button class="btn btn-primary" id="create">${IC.plus}<span class="dl">${T().create}</span></button>
+          <div class="omenu" id="om" role="menu">${T().menu.map(([k,l])=>`<button data-om="${l}">${IC[k==="copy"?"copy":k==="clip"?"clip":k==="import"?"upload":"refresh"]}${l}</button>`).join("")}<hr><button data-om="Retour">${IC.back}Retour</button></div>
+        </div>
+      </div>
+      <div id="tools"></div>
+    </div>
+    <div class="list-area" id="list"></div>
+    <div class="omenu rowmenu" id="rowMenu" role="menu"></div>
+    <div class="ftoast" id="toast"></div>
+  </div>`;
+  $("#list").addEventListener("scroll",closeRowMenu,{passive:true});
+  $("#omBtn").onclick=e=>{e.stopPropagation();$("#om").classList.toggle("on")};
+  $$("[data-om]").forEach(b=>b.onclick=()=>{$("#om").classList.remove("on");toast(b.dataset.om)});
+  $("#create").onclick=()=>toast("Formulaire de création");
+  renderTools(); renderList();
+}
+function chipCount(c){return val(T().data).filter(c.f).length}
+function renderTools(){
+  const S=st(), focus=document.activeElement&&document.activeElement.id==="q";
+  const groups=T().chipGroups||[["st","Statut"],["sig","Signaux"]];
+  const chip=c=>{const n=chipCount(c);return `<button class="fchip" data-f="${c.k}" aria-pressed="${S.f.has(c.k)}" style="--c:${c.dot||c.c}">${c.dot?'<i class="d"></i>':c.ic}${c.l}<small>${n}</small></button>`};
+  $("#tools").innerHTML=`<div class="hB">
+    <div class="r1"><label class="search">${IC.search}<input id="q" placeholder="${val(T().placeholder)}" value="${esc(S.q)}"></label>
+      <div class="gs-wrap"><button class="btn btn-quiet btn-icon gs-btn ${S.group!==T().groupings[0][0]||S.sort!=="date"?"mod":""}" id="gsBtn" aria-haspopup="menu" aria-expanded="false" title="Grouper et trier" aria-label="Grouper et trier">${IC.sliders}</button>
+        <div class="omenu gsmenu" id="gsMenu" role="menu">
+          <div class="ml">Grouper par</div>${T().groupings.map(([k,l])=>`<label class="rad"><input type="radio" name="grp" value="${k}" ${S.group===k?"checked":""}><span>${l}</span></label>`).join("")}
+          ${sortsFor(S).length>1?`<hr><div class="ml">Trier par</div>${sortsFor(S).map(([k,l])=>`<label class="rad"><input type="radio" name="srt" value="${k}" ${S.sort===k?"checked":""}><span>${l}${SORTHINT[THEME]&&SORTHINT[THEME][k]?`<small>${SORTHINT[THEME][k]}</small>`:""}</span></label>`).join("")}`:""}
+        </div></div></div>
+    <div class="r2">${groups.map(([g,l],i)=>{const cs=T().chips.filter(c=>c.grp===g&&(g==="st"||chipCount(c)>0));return cs.length?`${i?'<span class="tb-sep"></span>':""}<span class="fgl">${l}</span>${cs.map(chip).join("")}`:""}).join("")}</div></div>`;
+  const q=$("#q"); q.oninput=e=>{S.q=e.target.value;renderList()};
+  if(focus){q.focus();q.setSelectionRange(q.value.length,q.value.length)}
+  $$("#tools [data-f]").forEach(b=>b.onclick=()=>{const k=b.dataset.f;S.f.has(k)?S.f.delete(k):S.f.add(k);renderTools();renderList()});
+  const gb=$("#gsBtn"), gm=$("#gsMenu");
+  gb.onclick=e=>{e.stopPropagation();closeRowMenu();const on=!gm.classList.contains("on");gm.classList.toggle("on",on);gb.setAttribute("aria-expanded",on)};
+  gm.onclick=e=>e.stopPropagation();
+  $$('#gsMenu input[name="grp"]').forEach(i=>i.onchange=()=>{S.group=i.value;S.collapsed=defCollapsed(S.group);if(!sortsFor(S).some(([k])=>k===S.sort))S.sort="date";renderTools();$("#gsMenu").classList.add("on");renderList()});
+  $$('#gsMenu input[name="srt"]').forEach(i=>i.onchange=()=>{S.sort=i.value;renderTools();$("#gsMenu").classList.add("on");renderList()});
+}
+function filtered(){
+  const S=st(), th=T();
+  let l=val(th.data).filter(x=>!S.q||th.search(x).some(s=>norm(s).includes(norm(S.q))));
+  const byGrp={}; [...S.f].forEach(k=>{const c=th.chips.find(c=>c.k===k);(byGrp[c.grp]=byGrp[c.grp]||[]).push(c)});
+  Object.entries(byGrp).forEach(([g,cs])=>{ l=g==="sig"?l.filter(x=>cs.every(c=>c.f(x))):l.filter(x=>cs.some(c=>c.f(x))) });
+  return l.sort(SORTFN[S.sort]);
+}
+function footHtml(items){
+  const it=items.filter(x=>x&&(!("html" in x)||x.html));
+  return it.map(x=>x.html?x.html:`<span class="ft-t" style="--c:${x.c}">${x.ic||""}<span class="tx">${esc(x.t)}</span>${x.x?`<em>${esc(x.x)}</em>`:""}</span>`).join('<span class="ft-sep">·</span>');
+}
+const OPEN_LABEL=()=>THEME==="salon"?"la fiche du salon":THEME==="stand"?"la fiche du stand":THEME==="talk"?(KIND==="conf"?"la fiche de la conférence":"la fiche de l'atelier"):"la fiche de la participation";
+function row(x){
+  const S=st(), r=T().row(x,S.q), f=footHtml(r.foot);
+  return `<div class="xr" data-id="${x.id}" role="link" tabindex="0" aria-label="Ouvrir ${OPEN_LABEL()}">
+    <div class="xr-h">
+      <span class="r-nm"><b>${r.title}</b></span>
+      <span class="r-st ${r.st.can?"can":""}" style="--c:${r.st.c}"><i></i>${r.st.l}</span>
+      <span class="r-meta">${r.meta}</span>
+      <span class="r-sub">${r.sub}</span>
+      <div class="r-foot"><span class="ft-items">${f}</span><button class="gear" data-gear title="Actions" aria-label="Actions" aria-haspopup="menu">${IC.gear}</button></div>
+    </div>
+  </div>`;
+}
+function renderList(){
+  const S=st(), th=T(), l=filtered(), box=$("#list"), all=val(th.data).length;
+  if(!l.length){box.innerHTML=`<div class="empty"><b>Aucun résultat</b><span>Retirez un filtre ou élargissez la recherche.</span><button class="btn btn-quiet btn-sm" id="rst">Tout effacer</button></div>`;
+    $("#rst").onclick=()=>{S.q="";S.f.clear();renderTools();renderList()};return}
+  const G=S.group==="alpha"?{of:letter,meta:k=>({l:k,c:"var(--accent)"})}:th[S.group];
+  const g={}; l.forEach(x=>{const k=G.of(x);(g[k]=g[k]||[]).push(x)});
+  const order=S.group==="alpha"?Object.keys(g).sort():G.order.filter(k=>g[k]);
+  const force=!!S.q||S.f.size>0;
+  box.innerHTML=order.map(k=>{const rows=g[k],m=G.meta(k),open=!S.collapsed.has(k)||force;
+    return `<button class="ghead" data-g="${k}" aria-expanded="${open}" style="--c:${m.c}"><span class="chev">${IC.chev}</span><h3><i></i>${m.l}</h3><span class="count">${rows.length}</span><span class="gsum">${th.groups.sum(rows)}</span><span class="gbar"><i style="width:${Math.round(rows.length/all*100)}%"></i></span></button>
+      ${open?`<div class="rows">${rows.map(row).join("")}</div>`:""}`}).join("");
+  $$("#list .ghead").forEach(b=>b.onclick=()=>{const k=b.dataset.g;S.collapsed.has(k)?S.collapsed.delete(k):S.collapsed.add(k);renderList()});
+  $$("#list .xr").forEach(el=>{
+    el.onclick=e=>{e.preventDefault();if(e.target.closest("[data-gear]"))return;closeRowMenu();toast("Ouverture de "+OPEN_LABEL())};
+    el.onkeydown=e=>{if(e.target===el&&e.key==="Enter"){toast("Ouverture de "+OPEN_LABEL())}};
+    el.querySelector("[data-gear]").onclick=e=>{e.preventDefault();e.stopPropagation();openRowMenu(e.currentTarget)};
+  });
+}
+function openRowMenu(btn){
+  const app=$(".app"), m=$("#rowMenu");
+  if(m.classList.contains("on")&&m._btn===btn){closeRowMenu();return}
+  $("#gsMenu")&&$("#gsMenu").classList.remove("on");
+  m.innerHTML=val(T().actions).map(([l,ic,k])=>`${k==="del"?"<hr>":""}<button class="${k==="del"?"dgr":""}" data-act="${l}">${IC[ic]}${l}</button>`).join("");
+  m.classList.add("on"); m._btn=btn; btn.classList.add("on");
+  const a=app.getBoundingClientRect(), b=btn.getBoundingClientRect(), h=m.offsetHeight, w=m.offsetWidth;
+  let top=b.bottom-a.top+4; if(top+h>a.height-8) top=b.top-a.top-h-4;
+  m.style.top=top+"px"; m.style.left=Math.max(8,b.right-a.left-w)+"px";
+  m.querySelectorAll("[data-act]").forEach(x=>x.onclick=e=>{e.stopPropagation();closeRowMenu();toast(x.dataset.act==="Supprimer"?"Confirmation de suppression":x.dataset.act)});
+}
+function closeRowMenu(){const m=$("#rowMenu");if(!m)return;m.classList.remove("on");if(m._btn)m._btn.classList.remove("on");m._btn=null}
+let tt; function toast(m){const t=$("#toast");if(!t)return;t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2200)}
+document.addEventListener("click",e=>{if(!e.target.closest(".head-acts")){const m=$("#om");m&&m.classList.remove("on")}
+  if(!e.target.closest(".gs-wrap")){const g=$("#gsMenu");g&&g.classList.remove("on");const b=$("#gsBtn");b&&b.setAttribute("aria-expanded","false")}
+  if(!e.target.closest("#rowMenu,[data-gear]"))closeRowMenu()});
+addEventListener("keydown",e=>{if(e.key==="Escape"){closeRowMenu();const g=$("#gsMenu");g&&g.classList.remove("on")}});
+
+/* ================= Page ================= */
+function seg(id,items,cur,fn){const el=$(id);el.innerHTML=items.map(([v,l])=>`<button data-v="${v}" aria-pressed="${v===cur}">${l}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{fn(b.dataset.v);el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))})}
+seg("#dev-seg",[["desktop","Ordinateur"],["mobile","Mobile"]],DEV,v=>{DEV=v;shell()});
+seg("#kind-seg",[["conf","Conférences"],["work","Ateliers"]],KIND,v=>{KIND=v;shell()});
+function renderNotes(){$("#notes").innerHTML=T().notes.map(n=>`<li>${n}</li>`).join("")+`<li><b>Commun à toutes les listes</b> : recherche + bouton icône « Grouper et trier » (menu à boutons radio), puces Statut / Signaux avec effectifs (statuts en OU, signaux en ET), groupes repliables collants, ligne à deux niveaux sans badge, pied toujours présent avec le rouage d'actions en bas à droite, clic sur la ligne = ouverture de la fiche existante.</li>`}
+$("#tabs").innerHTML=Object.entries(THEMES).map(([k,t])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${k===THEME}"><span class="tab-n">${t.tab.n}</span><span class="tab-t">${t.tab.t}</span><span class="tab-d">${t.tab.d}</span></button>`).join("");
+$$("#tabs .tab").forEach(b=>b.onclick=()=>{THEME=b.dataset.t;$$("#tabs .tab").forEach(x=>x.setAttribute("aria-selected",x===b));$("#kind-ctl").hidden=THEME!=="talk";renderNotes();shell()});
+// premier détail ouvert pour la démo
+STATE.part={q:"",sort:"date",group:"status",f:new Set(),open:new Set(),collapsed:new Set(["REFUSED","CANCELED"])};
+renderNotes(); shell();
+</script>
+</body>
+</html>

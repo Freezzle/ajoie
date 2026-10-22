@@ -6,6 +6,7 @@ import ch.salon.domain.enumeration.Status;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,4 +33,12 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
 
     @EntityGraph(attributePaths = {"exhibitor"})
     List<Participation> findByStatusIn(List<Status> statuses);
+
+    /** Nombre de participations actives par salon : [idSalon, compteur]. */
+    @Query("SELECT p.salon.id, COUNT(p) FROM Participation p WHERE p.status NOT IN :statuses GROUP BY p.salon.id")
+    List<Object[]> countBySalonExcludingStatuses(@Param("statuses") List<Status> statuses);
+
+    /** Salons des participations actives, par client : [idExposant, nom du salon, date de début]. */
+    @Query("SELECT p.exhibitor.id, p.salon.place, p.salon.startingDate FROM Participation p WHERE p.status NOT IN :statuses")
+    List<Object[]> findSalonsByExhibitorExcludingStatuses(@Param("statuses") List<Status> statuses);
 }

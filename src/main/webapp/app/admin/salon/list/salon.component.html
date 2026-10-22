@@ -1,109 +1,135 @@
 <app-content-page>
     <div appMenuBarStart>
         <h3 jhiTranslate="salon.title">Les salons</h3>
+        <div class="el-subtitle">{{ subtitle() }}</div>
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading"
+                    [isDisabled]="isLoading()"
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
-        <split-menu-box [items]="actionMenuItems"
-                        [buttonDisabled]="isLoading"/>
+
+        <menu-box [buttonDisabled]="isLoading()"
+                  [items]="pageMenuItems()"
+                  buttonIcon="pi-ellipsis-h"
+                  type="secondary"/>
+
+        <button-box (clickedEvent)="create()"
+                    [isDisabled]="isLoading()"
+                    primeIcon="pi-plus"
+                    translateKey="common.create"/>
     </div>
+
     <app-alert-error></app-alert-error>
-
-
     <p-confirmpopup/>
-    <app-card [showHeader]="false">
-        <div appCardBody>
-            <div class="row">
-                <p-table #dt2
-                         [globalFilterFields]="['place', 'referenceNumber']"
-                         [loading]="isLoading"
-                         [paginator]="true"
-                         [rowsPerPageOptions]="[10, 25, 50]"
-                         [rows]="10"
-                         [sortOrder]="-1"
-                         [tableStyle]="{ 'min-width': '70rem' }"
-                         [value]="salons"
-                         dataKey="id"
-                         sortField="startingDate">
-                    <ng-template #caption>
-                        <div class="flex">
-                            <p-iconfield class="ml-auto" iconPosition="left">
-                                <p-inputicon>
-                                    <i class="pi pi-search"></i>
-                                </p-inputicon>
-                                <input (input)="dt2.filterGlobal($event.target.value, 'contains')" pInputText
-                                       placeholder="Recherche"
-                                       type="text"/>
-                            </p-iconfield>
-                        </div>
-                    </ng-template>
-                    <ng-template #header>
-                        <tr>
-                            <th pSortableColumn="place">{{ 'salon.place' | translate }}
-                                <p-sortIcon field="place"/>
-                            </th>
-                            <th pSortableColumn="referenceNumber">{{ 'salon.referenceNumber' | translate }}
-                                <p-sortIcon field="referenceNumber"/>
-                            </th>
-                            <th pSortableColumn="startingDate">
-                                {{ 'salon.startingDate' | translate }}
-                                <p-sortIcon field="startingDate"/>
-                                <p-columnFilter display="menu"
-                                                field="startingDate"
-                                                matchMode="dateAfter"
-                                                size="small"
-                                                type="date"></p-columnFilter>
-                            </th>
-                            <th pSortableColumn="endingDate">
-                                {{ 'salon.endingDate' | translate }}
-                                <p-sortIcon field="endingDate"/>
-                                <p-columnFilter display="menu"
-                                                field="endingDate"
-                                                matchMode="dateBefore"
-                                                size="small"
-                                                type="date"></p-columnFilter>
-                            </th>
-                            <th>&nbsp;</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template #body let-salon>
-                        <tr>
-                            <td [routerLink]="['./', salon.id, 'participations']"
-                                class="clickable truncate-medium">{{ salon.place }}
-                            </td>
-                            <td [routerLink]="['./', salon.id, 'participations']"
-                                class="clickable truncate-small">{{ salon.referenceNumber }}
-                            </td>
-                            <td [routerLink]="['./', salon.id, 'participations']" class="clickable truncate-small">{{
-                                    salon.startingDate | formatMediumDate
-                                }}
-                            </td>
-                            <td [routerLink]="['./', salon.id, 'participations']" class="clickable truncate-small">{{
-                                    salon.endingDate | formatMediumDate
-                                }}
-                            </td>
-                            <td class="text-end">
-                                <div class="btn-group">
-                                    <button-box (clickedEvent)="delete($event, salon)"
-                                                [showText]="false"
-                                                primeIcon="pi-times"
-                                                translateKey="common.delete"
-                                                type="danger"/>
-                                </div>
-                            </td>
-                        </tr>
-                    </ng-template>
-                    <ng-template #emptymessage>
-                        <tr>
-                            <td colspan="5">{{ 'salon.notFound' | translate }}</td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+
+    <div class="el-list">
+        <entity-list-toolbar [(activeChips)]="state.activeChips"
+                             [(query)]="state.query"
+                             [(sort)]="state.sort"
+                             (groupByChange)="state.setGroupBy($event)"
+                             [chipGroups]="chipGroups()"
+                             [groupBy]="state.groupBy()"
+                             [groupOptions]="groupOptions"
+                             [isDefault]="state.isDefault"
+                             [sortOptions]="state.sortOptions"
+                             placeholderKey="salon.list.searchPlaceholder"/>
+
+        @if (isLoading()) {
+            <div class="el-empty">
+                <i class="pi pi-spin pi-spinner"></i>
             </div>
-        </div>
-    </app-card>
+        } @else if (salons().length === 0) {
+            <div class="el-empty">
+                <b>{{ 'salon.notFound' | translate }}</b>
+            </div>
+        } @else if (filtered().length === 0) {
+            <div class="el-empty">
+                <b>{{ 'entityList.empty.filtered' | translate }}</b>
+                <span>{{ 'entityList.empty.hint' | translate }}</span>
+                <button-box (clickedEvent)="state.clearFilters()"
+                            translateKey="entityList.clearFilters"
+                            type="secondary"/>
+            </div>
+        } @else {
+            @for (group of groups(); track group.key) {
+                <entity-list-group (collapsedChange)="setCollapsed(group, $event)"
+                                   [collapsed]="isCollapsed(group)"
+                                   [color]="group.color"
+                                   [count]="group.items.length"
+                                   [label]="group.label"
+                                   [rawLabel]="group.rawLabel ?? false"
+                                   [ratio]="group.ratio">
+                    <span groupSummary>{{ groupSummary(group) }}</span>
+
+                    @for (salon of group.items; track salon.id) {
+                        <entity-row [actions]="actionsFor(salon)"
+                                    [link]="['./', salon.id, 'view']"
+                                    [linkLabel]="'salon.list.open' | translate">
+                            <entity-highlight rowTitle
+                                              [query]="state.query()"
+                                              [text]="salon.place"/>
+
+                            <entity-status rowStatus
+                                           [color]="stateColor(salon)"
+                                           [labelKey]="stateLabelKey(salon)"
+                                           [suffix]="stateSuffix(salon)"/>
+
+                            <span rowMeta>
+                                {{ 'salon.list.reference' | translate }}
+                                <entity-highlight [query]="state.query()" [text]="salon.referenceNumber"/>
+                            </span>
+
+                            <span rowSide><b>{{ period(salon) }}</b></span>
+
+                            <ng-container rowFoot>
+                                @if (salon.registrationEnabled) {
+                                    <entity-foot-item color="var(--app-status-validated)"
+                                                      icon="globe"
+                                                      labelKey="salon.list.foot.registrationOpen"/>
+                                }
+
+                                @if (nbDimensions(salon) > 0) {
+                                    <entity-count [count]="nbDimensions(salon)"
+                                                  icon="ruler-combined"
+                                                  pluralKey="salon.list.foot.dimensionPlural"
+                                                  singularKey="salon.list.foot.dimensionSingular"/>
+                                }
+
+                                @if ((salon.nbParticipations ?? 0) > 0) {
+                                    <entity-count [count]="salon.nbParticipations ?? 0"
+                                                  icon="users"
+                                                  pluralKey="participation.list.countPlural"
+                                                  singularKey="participation.list.countSingular"/>
+                                }
+
+                                @if ((salon.nbConferences ?? 0) > 0) {
+                                    <entity-count [count]="salon.nbConferences ?? 0"
+                                                  icon="microphone-lines"
+                                                  pluralKey="conference.list.countPlural"
+                                                  singularKey="conference.list.countSingular"/>
+                                }
+
+                                @if ((salon.nbWorkshops ?? 0) > 0) {
+                                    <entity-count [count]="salon.nbWorkshops ?? 0"
+                                                  icon="comments"
+                                                  pluralKey="workshop.list.countPlural"
+                                                  singularKey="workshop.list.countSingular"/>
+                                }
+                            </ng-container>
+                        </entity-row>
+                    }
+                </entity-list-group>
+            }
+
+            @if (hasMore()) {
+                <div class="el-more">
+                    <button-box (clickedEvent)="showMore()"
+                                translateKey="entityList.showMore"
+                                type="secondary"/>
+                </div>
+            }
+        }
+    </div>
 </app-content-page>

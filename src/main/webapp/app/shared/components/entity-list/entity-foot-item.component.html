@@ -1,0 +1,11 @@
+@if (labelKey() || label()) {
+    <span [style.--el-color]="color()" class="el-foot-item">
+        @if (icon(); as icon) {
+            <fa-icon [icon]="icon"></fa-icon>
+        }
+        <span class="el-foot-text">{{ labelKey() ? (labelKey()! | translate) : label() }}</span>
+        @if (detail()) {
+            <em>{{ detail() }}</em>
+        }
+    </span>
+}

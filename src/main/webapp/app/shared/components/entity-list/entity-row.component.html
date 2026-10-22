@@ -1,0 +1,39 @@
+<div class="el-row">
+    <span class="el-row-name">
+        <a [attr.aria-label]="linkLabel()"
+           [routerLink]="link()"
+           class="el-row-link">
+            <ng-content select="[rowTitle]"></ng-content>
+        </a>
+    </span>
+    <span class="el-row-status">
+        <ng-content select="[rowStatus]"></ng-content>
+    </span>
+    <span class="el-row-meta">
+        <ng-content select="[rowMeta]"></ng-content>
+    </span>
+    <span class="el-row-side">
+        <ng-content select="[rowSide]"></ng-content>
+    </span>
+    <div class="el-row-foot">
+        <span class="el-foot-items">
+            <ng-content select="[rowFoot]"></ng-content>
+        </span>
+
+        @if (menuItems().length > 0) {
+            <p-menu #menu
+                    [model]="menuItems()"
+                    [popup]="true"
+                    appendTo="body"/>
+            <button #gear
+                    (click)="menu.toggle($event); $event.stopPropagation()"
+                    [attr.aria-label]="actionsLabel()"
+                    [title]="actionsLabel()"
+                    aria-haspopup="menu"
+                    class="el-gear"
+                    type="button">
+                <i class="pi pi-cog"></i>
+            </button>
+        }
+    </div>
+</div>

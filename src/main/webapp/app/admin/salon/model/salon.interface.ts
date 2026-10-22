@@ -26,6 +26,10 @@ export interface ISalon {
     registrationWelcomeTitle: string | null;
     registrationWelcomeText: string | null;
     sourceSalonId?: string | null;
+    /** Compteurs du pied de la liste : prestations écartées exclues. */
+    nbParticipations?: number;
+    nbConferences?: number;
+    nbWorkshops?: number;
 }
 
 export type NewSalon = Omit<ISalon, 'id'> & { id: null };
