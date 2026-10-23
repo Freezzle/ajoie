@@ -1,0 +1,10 @@
+@if (count() > 0) {
+    @let text = labelKey() | translate;
+
+    <span [style.--el-color]="color()" [title]="text" class="el-foot-item el-foot-badge">
+        <fa-icon [attr.aria-label]="text" [icon]="icon()"></fa-icon>
+        @if (count() > 1) {
+            <b>{{ count() }}</b>
+        }
+    </span>
+}
