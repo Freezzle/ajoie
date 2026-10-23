@@ -11,10 +11,16 @@ import {
 
 import {Category} from '../admin/enumerations/category.model';
 import {ProcessedImageUpload} from '../shared/utils/image-resize.util';
+import {requiredPictureValidator} from '../shared/components/image-upload-box/image-upload.validator';
 import {InvoiceSendingMethod} from '../admin/enumerations/invoice-sending-method.model';
 import {ModePaymentMeals} from '../admin/enumerations/mode-payment-meals.model';
 import {IAddress} from '../admin/common/address.model';
-import {IRegistrationRequest, IRegistrationStand, IRegistrationTalk} from './registration.model';
+import {
+    IRegistrationImageUpload,
+    IRegistrationRequest,
+    IRegistrationStand,
+    IRegistrationTalk
+} from './registration.model';
 
 export type TalkFormGroup = FormGroup<{
     title: FormControl<string | null>;
@@ -33,7 +39,6 @@ export type StandFormGroup = FormGroup<{
     website: FormControl<string | null>;
     instagram: FormControl<string | null>;
     facebook: FormControl<string | null>;
-    urlPicture: FormControl<string | null>;
     sharedFirstName: FormControl<string | null>;
     sharedLastName: FormControl<string | null>;
     sharedTherapistName: FormControl<string | null>;
@@ -44,7 +49,6 @@ export type StandFormGroup = FormGroup<{
     sharedWebsite: FormControl<string | null>;
     sharedInstagram: FormControl<string | null>;
     sharedFacebook: FormControl<string | null>;
-    sharedUrlPicture: FormControl<string | null>;
     pictureUpload: FormControl<ProcessedImageUpload | null>;
     sharedPictureUpload: FormControl<ProcessedImageUpload | null>;
     hasPicture: FormControl<boolean>;
@@ -98,11 +102,16 @@ export type RegistrationFormGroup = FormGroup<{
 
 export type RegistrationFormValue = ReturnType<RegistrationFormGroup['getRawValue']>;
 
-/** Une adresse est valide si la rue, le NPA et la localité sont renseignés. */
-export function requiredAddressValidator(): ValidatorFn {
+/**
+ * Une adresse est valide si la rue, le n°, le NPA, la localité et le pays sont renseignés.
+ * Les mêmes champs sont marqués obligatoires par `AddressFormComponent` : les deux doivent rester alignés.
+ */
+export function requiredAddressValidator(options?: {requireFullName?: boolean}): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
         const value = control.value as IAddress | null;
-        const filled = !!value && !!value.street?.trim() && !!value.postalCode?.trim() && !!value.city?.trim();
+        const filled = !!value && !!value.street?.trim() && !!value.houseNumber?.trim() &&
+            !!value.postalCode?.trim() && !!value.city?.trim() && !!value.isoCountry?.trim() &&
+            (!options?.requireFullName || !!value.fullName?.trim());
         return filled ? null : {required: true};
     };
 }
@@ -127,6 +136,21 @@ export function atLeastOneServiceValidator(): ValidatorFn {
 
 export function mustBeTrueValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => (control.value === true ? null : {required: true});
+}
+
+/**
+ * N'envoie au serveur que ce dont il a besoin : l'aperçu (`previewUrl`) est un doublon base64 de
+ * `dataBase64` qui doublerait inutilement la taille de la requête.
+ */
+function toImagePayload(upload: ProcessedImageUpload | null | undefined): IRegistrationImageUpload | null {
+    if (!upload) {
+        return null;
+    }
+    return {
+        filename: upload.filename,
+        contentType: upload.contentType,
+        dataBase64: upload.dataBase64
+    };
 }
 
 @Injectable({providedIn: 'root'})
@@ -181,6 +205,9 @@ export class RegistrationFormService {
     }
 
     createStandGroup(): StandFormGroup {
+        const hasPicture = new FormControl(false, {nonNullable: true});
+        const hasSharedPicture = new FormControl(false, {nonNullable: true});
+
         return new FormGroup({
             description: new FormControl<string | null>(null, [Validators.required, Validators.maxLength(500)]),
             dimension: new FormControl<any>(null, [Validators.required]),
@@ -193,7 +220,6 @@ export class RegistrationFormService {
             website: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             instagram: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             facebook: new FormControl<string | null>(null, [Validators.maxLength(100)]),
-            urlPicture: new FormControl<string | null>(null, [Validators.maxLength(500)]),
             sharedFirstName: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedLastName: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedTherapistName: new FormControl<string | null>(null, [Validators.maxLength(100)]),
@@ -204,11 +230,11 @@ export class RegistrationFormService {
             sharedWebsite: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedInstagram: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedFacebook: new FormControl<string | null>(null, [Validators.maxLength(100)]),
-            sharedUrlPicture: new FormControl<string | null>(null, [Validators.maxLength(500)]),
-            pictureUpload: new FormControl<ProcessedImageUpload | null>(null),
+            pictureUpload: new FormControl<ProcessedImageUpload | null>(null,
+                [requiredPictureValidator(() => hasPicture.value)]),
             sharedPictureUpload: new FormControl<ProcessedImageUpload | null>(null),
-            hasPicture: new FormControl(false, {nonNullable: true}),
-            hasSharedPicture: new FormControl(false, {nonNullable: true})
+            hasPicture,
+            hasSharedPicture
         });
     }
 
@@ -251,15 +277,25 @@ export class RegistrationFormService {
 
         exhibitor.controls.differentBillingAddress.valueChanges.subscribe(different => {
             const billing = exhibitor.controls.billingAddress;
-            billing.setValidators(different ? [requiredAddressValidator()] : []);
+            billing.setValidators(different ? [requiredAddressValidator({requireFullName: true})] : []);
+            if (!different) {
+                billing.setValue(null, {emitEvent: false});
+            }
+            billing.markAsUntouched();
             billing.updateValueAndValidity({emitEvent: false});
         });
 
         services.controls.wantStand.valueChanges.subscribe(want => {
             this.toggle(services.controls.stand, !!want);
+            if (!want) {
+                this.resetStand(services.controls.stand);
+            }
         });
 
         services.controls.stand.controls.shared.valueChanges.subscribe(shared => {
+            if (!shared) {
+                this.clearCoExhibitor(services.controls.stand);
+            }
             this.refreshCoExhibitorValidators(services.controls.stand, !!shared);
         });
 
@@ -268,12 +304,18 @@ export class RegistrationFormService {
             if (want && services.controls.conferences.length === 0) {
                 services.controls.conferences.push(this.createTalkGroup());
             }
+            if (!want) {
+                services.controls.conferences.clear({emitEvent: false});
+            }
         });
 
         services.controls.wantWorkshop.valueChanges.subscribe(want => {
             this.toggle(services.controls.workshops, !!want);
             if (want && services.controls.workshops.length === 0) {
                 services.controls.workshops.push(this.createTalkGroup());
+            }
+            if (!want) {
+                services.controls.workshops.clear({emitEvent: false});
             }
         });
 
@@ -295,8 +337,36 @@ export class RegistrationFormService {
             const offer = participation.controls.offer;
             offer.setValidators(hasOffer ? [Validators.required, Validators.maxLength(500)] :
                 [Validators.maxLength(500)]);
+            if (!hasOffer) {
+                offer.setValue(null, {emitEvent: false});
+                offer.markAsUntouched();
+            }
             offer.updateValueAndValidity({emitEvent: false});
         });
+    }
+
+    /** Réinitialise entièrement le stand (prestation repassée sur « Non »). */
+    private resetStand(stand: StandFormGroup): void {
+        stand.reset({
+                        description: null,
+                        dimension: null,
+                        category: null,
+                        subCategories: [],
+                        nbTable: 1,
+                        nbChair: 2,
+                        needElectricity: false,
+                        shared: false,
+                        website: null,
+                        instagram: null,
+                        facebook: null,
+                        sharedSubCategories: [],
+                        pictureUpload: null,
+                        sharedPictureUpload: null,
+                        hasPicture: false,
+                        hasSharedPicture: false
+                    }, {emitEvent: false});
+
+        this.refreshCoExhibitorValidators(stand, false);
     }
 
     /** Les informations du co-exposant ne sont exigées que si le stand est partagé. */
@@ -313,6 +383,35 @@ export class RegistrationFormService {
             control.setValidators(shared ? [Validators.required, ...validators] : validators);
             control.updateValueAndValidity({emitEvent: false});
         });
+
+        stand.controls.sharedPictureUpload.setValidators(
+            shared ? [requiredPictureValidator(() => stand.controls.hasSharedPicture.value)] : []);
+        stand.controls.sharedPictureUpload.updateValueAndValidity({emitEvent: false});
+    }
+
+    /** Remet à zéro toutes les informations du co-exposant (stand plus partagé). */
+    private clearCoExhibitor(stand: StandFormGroup): void {
+        const sharedControls = [
+            stand.controls.sharedFirstName,
+            stand.controls.sharedLastName,
+            stand.controls.sharedTherapistName,
+            stand.controls.sharedEmail,
+            stand.controls.sharedDescription,
+            stand.controls.sharedCategory,
+            stand.controls.sharedWebsite,
+            stand.controls.sharedInstagram,
+            stand.controls.sharedFacebook,
+            stand.controls.sharedPictureUpload
+        ];
+
+        sharedControls.forEach(control => {
+            control.setValue(null, {emitEvent: false});
+            control.markAsUntouched();
+        });
+
+        stand.controls.sharedSubCategories.setValue([], {emitEvent: false});
+        stand.controls.sharedSubCategories.markAsUntouched();
+        stand.controls.hasSharedPicture.setValue(false, {emitEvent: false});
     }
 
     private toggle(control: AbstractControl, enabled: boolean): void {
@@ -359,7 +458,6 @@ export class RegistrationFormService {
                             website: stand.website ?? null,
                             instagram: stand.instagram ?? null,
                             facebook: stand.facebook ?? null,
-                            urlPicture: stand.urlPicture ?? null,
                             sharedFirstName: shared ? stand.sharedFirstName ?? null : null,
                             sharedLastName: shared ? stand.sharedLastName ?? null : null,
                             sharedTherapistName: shared ? stand.sharedTherapistName ?? null : null,
@@ -370,9 +468,8 @@ export class RegistrationFormService {
                             sharedWebsite: shared ? stand.sharedWebsite ?? null : null,
                             sharedInstagram: shared ? stand.sharedInstagram ?? null : null,
                             sharedFacebook: shared ? stand.sharedFacebook ?? null : null,
-                            sharedUrlPicture: shared ? stand.sharedUrlPicture ?? null : null,
-                            pictureUpload: stand.pictureUpload ?? null,
-                            sharedPictureUpload: shared ? stand.sharedPictureUpload ?? null : null
+                            pictureUpload: toImagePayload(stand.pictureUpload),
+                            sharedPictureUpload: shared ? toImagePayload(stand.sharedPictureUpload) : null
                         });
         }
 
@@ -470,7 +567,6 @@ export class RegistrationFormService {
                                                    website: stand.website,
                                                    instagram: stand.instagram,
                                                    facebook: stand.facebook,
-                                                   urlPicture: stand.urlPicture,
                                                    sharedFirstName: stand.sharedFirstName,
                                                    sharedLastName: stand.sharedLastName,
                                                    sharedTherapistName: stand.sharedTherapistName,
@@ -481,11 +577,12 @@ export class RegistrationFormService {
                                                    sharedWebsite: stand.sharedWebsite,
                                                    sharedInstagram: stand.sharedInstagram,
                                                    sharedFacebook: stand.sharedFacebook,
-                                                   sharedUrlPicture: stand.sharedUrlPicture,
                                                    hasPicture: !!stand.hasPicture,
                                                    hasSharedPicture: !!stand.hasSharedPicture
                                                });
             this.refreshCoExhibitorValidators(services.controls.stand, !!stand.shared);
+            // Une image déjà enregistrée satisfait l'obligation : il faut revalider après le patch.
+            services.controls.stand.controls.pictureUpload.updateValueAndValidity({emitEvent: false});
         }
 
         services.controls.conferences.clear({emitEvent: false});
@@ -501,9 +598,26 @@ export class RegistrationFormService {
 
     // -------------------- BROUILLON (sessionStorage) --------------------
 
-    /** Valeur brute du formulaire, sérialisable, pour la sauvegarde du brouillon en session. */
+    /**
+     * Valeur brute du formulaire, sérialisable, pour la sauvegarde du brouillon en session.
+     *
+     * Les images sont volontairement exclues : encodées en base64 (et dupliquées par leur aperçu),
+     * elles feraient exploser le quota du sessionStorage et feraient perdre tout le brouillon.
+     */
     getRawValue(form: RegistrationFormGroup): RegistrationFormValue {
-        return form.getRawValue();
+        const value = form.getRawValue();
+
+        return {
+            ...value,
+            services: {
+                ...value.services,
+                stand: {
+                    ...value.services.stand,
+                    pictureUpload: null,
+                    sharedPictureUpload: null
+                }
+            }
+        };
     }
 
     /**
@@ -519,6 +633,7 @@ export class RegistrationFormService {
 
         services.controls.stand.patchValue(draftServices.stand);
         this.refreshCoExhibitorValidators(services.controls.stand, !!draftServices.stand?.shared);
+        services.controls.stand.controls.pictureUpload.updateValueAndValidity({emitEvent: false});
 
         services.controls.conferences.clear({emitEvent: false});
         (draftServices.conferences ?? []).forEach(talk => services.controls.conferences.push(

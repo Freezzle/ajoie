@@ -1,6 +1,11 @@
 <div class="image-upload-box">
     @if (translateKey) {
-        <label class="image-upload-box__label" [for]="'field_' + fieldName">{{ translateKey | translate }}</label>
+        <label class="image-upload-box__label" [for]="'field_' + fieldName">
+            {{ translateKey | translate }}
+            @if (isRequired) {
+                <span class="text-danger">*</span>
+            }
+        </label>
     }
 
     @if (hasPicture) {
@@ -56,5 +61,9 @@
 
     @if (errorKey) {
         <small class="image-upload-box__error">{{ errorKey | translate }}</small>
+    }
+
+    @if (control) {
+        <error-box [formControlElement]="control"/>
     }
 </div>

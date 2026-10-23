@@ -106,11 +106,13 @@ export class StandUpdateComponent implements OnInit {
 
     onPictureRemoved(): void {
         this.editForm.controls.removePicture.setValue(true);
+        this.editForm.controls.pictureUpload.updateValueAndValidity();
         this.picturePreviewUrl = null;
     }
 
     onSharedPictureRemoved(): void {
         this.editForm.controls.removeSharedPicture.setValue(true);
+        this.editForm.controls.sharedPictureUpload.updateValueAndValidity();
         this.sharedPicturePreviewUrl = null;
     }
 

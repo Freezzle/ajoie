@@ -113,6 +113,7 @@
                 </div>
                 <div class="mt-4 col-12">
                     <image-upload-box [existingPictureUrl]="picturePreviewUrl"
+                                      [required]="true"
                                       (existingRemoved)="onPictureRemoved()"
                                       fieldName="pictureUpload"
                                       formControlName="pictureUpload"
@@ -195,6 +196,7 @@
                     </div>
                     <div class="mt-4 col-12">
                         <image-upload-box [existingPictureUrl]="sharedPicturePreviewUrl"
+                                          [required]="true"
                                           (existingRemoved)="onSharedPictureRemoved()"
                                           fieldName="sharedPictureUpload"
                                           formControlName="sharedPictureUpload"

@@ -3,7 +3,13 @@ import {InvoiceSendingMethod} from '../admin/enumerations/invoice-sending-method
 import {ModePaymentMeals} from '../admin/enumerations/mode-payment-meals.model';
 import {IAddress} from '../admin/common/address.model';
 import {Status} from '../admin/enumerations/status.model';
-import {ProcessedImageUpload} from '../shared/utils/image-resize.util';
+
+/** Image envoyée au serveur : seules ces trois informations sont utiles. */
+export interface IRegistrationImageUpload {
+    filename: string;
+    contentType: string;
+    dataBase64: string;
+}
 
 export interface IPublicDimension {
     id: string;
@@ -83,7 +89,6 @@ export interface IRegistrationStand {
     website: string | null;
     instagram: string | null;
     facebook: string | null;
-    urlPicture: string | null;
     sharedFirstName: string | null;
     sharedLastName: string | null;
     sharedTherapistName: string | null;
@@ -94,11 +99,10 @@ export interface IRegistrationStand {
     sharedWebsite: string | null;
     sharedInstagram: string | null;
     sharedFacebook: string | null;
-    sharedUrlPicture: string | null;
     /** Image du stand envoyée par l'exposant (base64), absente si inchangée. */
-    pictureUpload?: ProcessedImageUpload | null;
+    pictureUpload?: IRegistrationImageUpload | null;
     /** Image du co-exposant envoyée par l'exposant (base64), absente si inchangée. */
-    sharedPictureUpload?: ProcessedImageUpload | null;
+    sharedPictureUpload?: IRegistrationImageUpload | null;
     /** Lecture seule : une image a déjà été envoyée (aucun aperçu n'est exposé publiquement). */
     hasPicture?: boolean;
     hasSharedPicture?: boolean;

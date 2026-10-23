@@ -1,7 +1,8 @@
 import {Component, EventEmitter, Input, Optional, Output, Self, ViewChild} from '@angular/core';
-import {ControlValueAccessor, NgControl} from '@angular/forms';
+import {ControlValueAccessor, FormControl, NgControl, Validators} from '@angular/forms';
 import {FileUpload, FileUploadHandlerEvent} from 'primeng/fileupload';
 import SharedModule from '../../shared.module';
+import {ErrorBoxComponent} from '../../error-box/error-box.component';
 import {
     IMAGE_ACCEPT_ATTRIBUTE,
     IMAGE_MAX_BYTES,
@@ -18,7 +19,7 @@ import {
  * base64 ; le serveur refait l'intégralité des contrôles.
  */
 @Component({
-               imports: [SharedModule, FileUpload],
+               imports: [SharedModule, FileUpload, ErrorBoxComponent],
                selector: 'image-upload-box',
                templateUrl: './image-upload-box.component.html',
                styleUrls: ['./image-upload-box.component.scss']
@@ -34,6 +35,9 @@ export class ImageUploadBoxComponent implements ControlValueAccessor {
     /** Indique qu'une image existe déjà sans en exposer l'aperçu (inscription publique). */
     @Input()
     hasExistingPicture: boolean = false;
+    /** Affiche l'astérisque « champ obligatoire » (la validation reste portée par le formulaire). */
+    @Input()
+    required: boolean = false;
 
     /** Émis lorsque l'utilisateur supprime l'image déjà enregistrée. */
     @Output()
@@ -55,6 +59,14 @@ export class ImageUploadBoxComponent implements ControlValueAccessor {
         if (this.controlDir) {
             this.controlDir.valueAccessor = this;
         }
+    }
+
+    get control(): FormControl | null {
+        return (this.controlDir?.control as FormControl | null) ?? null;
+    }
+
+    get isRequired(): boolean {
+        return this.required || (this.control?.hasValidator(Validators.required) ?? false);
     }
 
     get showsExisting(): boolean {
@@ -125,6 +137,8 @@ export class ImageUploadBoxComponent implements ControlValueAccessor {
             this.existingRemovedFlag = true;
             this.existingRemoved.emit();
             this.onTouched();
+            // L'image existante comptait pour la validation « champ obligatoire ».
+            this.control?.updateValueAndValidity();
         }
     }
 }

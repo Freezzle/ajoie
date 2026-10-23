@@ -15,11 +15,27 @@ export class StandService {
     protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/stands');
 
     create(stand: IStand): Observable<IStand> {
-        return this.http.post<IStand>(this.resourceUrl, stand);
+        return this.http.post<IStand>(this.resourceUrl, this.trimUploads(stand));
     }
 
     update(stand: IStand): Observable<IStand> {
-        return this.http.put<IStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`, stand);
+        return this.http.put<IStand>(`${this.resourceUrl}/${this.getStandIdentifier(stand)}`,
+            this.trimUploads(stand));
+    }
+
+    /**
+     * L'aperçu local (`previewUrl`) est un doublon base64 de `dataBase64` : l'envoyer doublerait
+     * inutilement la taille de la requête.
+     */
+    private trimUploads(stand: IStand): IStand {
+        const trim = (upload: IStand['pictureUpload']): IStand['pictureUpload'] =>
+            upload ? {...upload, previewUrl: ''} : null;
+
+        return {
+            ...stand,
+            pictureUpload: trim(stand.pictureUpload),
+            sharedPictureUpload: trim(stand.sharedPictureUpload)
+        };
     }
 
     find(idStand: string): Observable<HttpResponse<IStand>> {

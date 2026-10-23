@@ -1,9 +1,11 @@
-import {Component, forwardRef, inject, Input, OnInit} from '@angular/core';
+import {Component, DoCheck, forwardRef, inject, Injector, Input, OnInit} from '@angular/core';
 import {
+    AbstractControl,
     ControlValueAccessor,
     FormControl,
     FormGroup,
     NG_VALUE_ACCESSOR,
+    NgControl,
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
@@ -37,9 +39,11 @@ export interface AddressFormValue {
                    }
                ]
            })
-export class AddressFormComponent implements OnInit, ControlValueAccessor {
+export class AddressFormComponent implements OnInit, DoCheck, ControlValueAccessor {
     @Input() required = false;
     @Input() showFormalFields = false;
+    /** Exige en plus le nom complet (utilisé pour l'adresse de facturation). */
+    @Input() requireFullName = false;
 
     countryService = inject(CountryService);
 
@@ -56,6 +60,9 @@ export class AddressFormComponent implements OnInit, ControlValueAccessor {
                                     extraLine: new FormControl<string | null>(null)
                                 });
 
+    private injector = inject(Injector);
+    private parentControl: AbstractControl | null = null;
+    private parentTouched = false;
     private onChange: (value: AddressFormValue | null) => void = () => {
     };
     private onTouched: () => void = () => {
@@ -69,6 +76,29 @@ export class AddressFormComponent implements OnInit, ControlValueAccessor {
 
     ngOnInit(): void {
         this.updateValidators();
+    }
+
+    /**
+     * Le formulaire interne est invisible du formulaire parent : sans cette synchronisation, un
+     * `markAllAsTouched()` sur le parent n'afficherait aucune erreur sur les champs d'adresse.
+     * <p>
+     * La résolution est faite ici (et non dans `ngOnInit`) car la directive `formControlName` n'a
+     * pas encore exposé son contrôle au moment de l'initialisation du composant.
+     */
+    ngDoCheck(): void {
+        this.parentControl ??= this.injector.get(NgControl, null, {optional: true})?.control ?? null;
+
+        const touched = this.parentControl?.touched ?? false;
+        if (touched === this.parentTouched) {
+            return;
+        }
+
+        this.parentTouched = touched;
+        if (touched) {
+            this.addressForm.markAllAsTouched();
+        } else {
+            this.addressForm.markAsUntouched();
+        }
     }
 
     writeValue(value: IAddress | null): void {
@@ -102,6 +132,8 @@ export class AddressFormComponent implements OnInit, ControlValueAccessor {
         this.addressForm.get('houseNumber')?.setValidators(validators);
         this.addressForm.get('city')?.setValidators(validators);
         this.addressForm.get('isoCountry')?.setValidators(validators);
+        this.addressForm.get('fullName')?.setValidators(
+            this.required && this.requireFullName ? [Validators.required] : []);
         this.addressForm.updateValueAndValidity();
     }
 

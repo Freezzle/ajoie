@@ -70,9 +70,6 @@ public class RegistrationStandDTO implements Serializable {
     @Size(max = 100)
     private String sharedFacebook;
 
-    @Size(max = 500)
-    private String sharedUrlPicture;
-
     @Size(max = 100)
     private String website;
 
@@ -81,9 +78,6 @@ public class RegistrationStandDTO implements Serializable {
 
     @Size(max = 100)
     private String facebook;
-
-    @Size(max = 500)
-    private String urlPicture;
 
     /**
      * Nouvelle image du stand (base64), facultative.

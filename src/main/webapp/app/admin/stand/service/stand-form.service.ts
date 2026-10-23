@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {IStand} from '../model/stand.interface';
 import {CustomValidatorModel} from '../../../shared/field-error/custom-validator.model';
+import {requiredPictureValidator} from '../../../shared/components/image-upload-box/image-upload.validator';
 import {Status} from '../../enumerations/status.model';
 
 export type StandFormGroup = {
@@ -46,7 +47,13 @@ export class StandFormService {
             ...(stand ?? {})
         };
 
-        return new FormGroup<StandFormGroup>({
+        // Une image déjà enregistrée satisfait l'obligation tant qu'elle n'est pas supprimée.
+        const removePicture = new FormControl(false, {nonNullable: true});
+        const removeSharedPicture = new FormControl(false, {nonNullable: true});
+        const hasPicture = (): boolean => !!raw.picture && !removePicture.value;
+        const hasSharedPicture = (): boolean => !!raw.sharedPicture && !removeSharedPicture.value;
+
+        const form = new FormGroup<StandFormGroup>({
                                                  id: new FormControl(raw.id),
                                                  description: new FormControl(raw.description, [
                                                      Validators.required,
@@ -84,11 +91,46 @@ export class StandFormService {
                                                  extraInformation: new FormControl(raw.extraInformation),
                                                  participation: new FormControl(raw.participation, Validators.required),
                                                  dimension: new FormControl(raw.dimension, Validators.required),
-                                                 pictureUpload: new FormControl(null),
+                                                 pictureUpload: new FormControl(null,
+                                                     [requiredPictureValidator(hasPicture)]),
                                                  sharedPictureUpload: new FormControl(null),
-                                                 removePicture: new FormControl(false, {nonNullable: true}),
-                                                 removeSharedPicture: new FormControl(false, {nonNullable: true})
+                                                 removePicture,
+                                                 removeSharedPicture
                                              });
+
+        // L'image du co-exposant n'est exigée que si le stand est partagé.
+        const refreshSharedPictureValidator = (shared: boolean | null): void => {
+            form.controls.sharedPictureUpload.setValidators(
+                shared ? [requiredPictureValidator(hasSharedPicture)] : []);
+            form.controls.sharedPictureUpload.updateValueAndValidity({emitEvent: false});
+        };
+
+        refreshSharedPictureValidator(raw.shared);
+        form.controls.shared.valueChanges.subscribe(shared => {
+            if (!shared) {
+                this.clearCoExhibitor(form);
+            }
+            refreshSharedPictureValidator(shared);
+        });
+
+        return form;
+    }
+
+    /** Remet à zéro les informations du co-exposant quand le stand n'est plus partagé. */
+    private clearCoExhibitor(form: FormGroup<StandFormGroup>): void {
+        form.patchValue({
+                            sharedFirstName: null,
+                            sharedLastName: null,
+                            sharedTherapistName: null,
+                            sharedEmail: null,
+                            sharedDescription: null,
+                            sharedCategory: null,
+                            sharedSubCategories: [],
+                            sharedWebsite: null,
+                            sharedInstagram: null,
+                            sharedFacebook: null,
+                            sharedPictureUpload: null
+                        }, {emitEvent: false});
     }
 
     getStand(form: FormGroup<StandFormGroup>): IStand {

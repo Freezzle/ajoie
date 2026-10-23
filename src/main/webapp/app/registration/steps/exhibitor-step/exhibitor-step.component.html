@@ -42,7 +42,10 @@
         @if (form.controls.differentBillingAddress.value) {
             <div class="registration-reveal">
                 <h4 class="registration-subtitle">{{ 'exhibitor.billingAddress' | translate }}</h4>
-                <app-address-form [required]="true" [showFormalFields]="true" formControlName="billingAddress"/>
+                <app-address-form [required]="true"
+                                  [requireFullName]="true"
+                                  [showFormalFields]="true"
+                                  formControlName="billingAddress"/>
             </div>
         }
     </app-registration-card>

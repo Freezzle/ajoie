@@ -413,9 +413,11 @@ public class PublicRegistrationService {
 
     /**
      * Enregistre la nouvelle image si le public en a envoyé une, sinon reporte celle déjà présente.
+     * <p>
+     * L'image est obligatoire : le formulaire le vérifie déjà, mais un client peut le contourner.
      */
     private void applyStandPicture(Stand stand, StandPictureType type, ImageUploadDTO upload,
-            StandCarryOver carryOver, boolean keep) {
+            StandCarryOver carryOver, boolean keep, String missingErrorKey) {
         if (!keep) {
             return;
         }
@@ -426,9 +428,11 @@ public class PublicRegistrationService {
         }
 
         StandPictureService.StandPictureSnapshot previous = carryOver.pictures().get(type);
-        if (previous != null) {
-            standPictureService.restore(stand, previous);
+        if (previous == null) {
+            throw new BadRequestAlertException("Une image est requise", ENTITY_NAME, missingErrorKey);
         }
+
+        standPictureService.restore(stand, previous);
     }
 
     private RegistrationStandDTO toStandDTO(Stand stand) {
@@ -445,7 +449,6 @@ public class PublicRegistrationService {
         dto.setWebsite(stand.getWebsite());
         dto.setInstagram(stand.getInstagram());
         dto.setFacebook(stand.getFacebook());
-        dto.setUrlPicture(stand.getUrlPicture());
         dto.setSharedFirstName(stand.getSharedFirstName());
         dto.setSharedLastName(stand.getSharedLastName());
         dto.setSharedTherapistName(stand.getSharedTherapistName());
@@ -458,7 +461,6 @@ public class PublicRegistrationService {
         dto.setSharedWebsite(stand.getSharedWebsite());
         dto.setSharedInstagram(stand.getSharedInstagram());
         dto.setSharedFacebook(stand.getSharedFacebook());
-        dto.setSharedUrlPicture(stand.getSharedUrlPicture());
         dto.setHasPicture(standPictureService.exists(stand.getId(), StandPictureType.MAIN));
         dto.setHasSharedPicture(standPictureService.exists(stand.getId(), StandPictureType.SHARED));
         return dto;
@@ -582,9 +584,10 @@ public class PublicRegistrationService {
             stand.setExtraInformation(null);
             stand = standRepository.save(stand);
 
-            applyStandPicture(stand, StandPictureType.MAIN, standDTO.getPictureUpload(), carryOver, true);
+            applyStandPicture(stand, StandPictureType.MAIN, standDTO.getPictureUpload(), carryOver, true,
+                    "registration.stand-picture-required");
             applyStandPicture(stand, StandPictureType.SHARED, standDTO.getSharedPictureUpload(), carryOver,
-                    standDTO.isShared());
+                    standDTO.isShared(), "registration.co-exhibitor-picture-required");
         }
 
         for (RegistrationTalkDTO talk : request.getConferences()) {

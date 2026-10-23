@@ -44,6 +44,8 @@
       "offer-required": "Merci de décrire votre offre.",
       "billing-address-required": "Merci de renseigner l'adresse de facturation.",
       "captcha-invalid": "La vérification anti-robot a échoué. Merci de réessayer.",
+      "stand-picture-required": "Une image est requise pour le stand.",
+      "co-exhibitor-picture-required": "Une image est requise pour le co-exposant.",
       "rate-limited": "Trop de tentatives. Merci de réessayer dans quelques minutes."
     },
     "server.not.reachable": "Serveur inaccessible",

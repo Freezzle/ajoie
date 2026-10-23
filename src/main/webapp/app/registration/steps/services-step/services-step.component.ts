@@ -87,6 +87,19 @@ export class ServicesStepComponent {
         this.form.controls[controlName].setValue(value);
     }
 
+    /** L'image existante ne compte plus : le champ redevient obligatoire. */
+    onPictureRemoved(): void {
+        const stand = this.form.controls.stand;
+        stand.controls.hasPicture.setValue(false);
+        stand.controls.pictureUpload.updateValueAndValidity();
+    }
+
+    onSharedPictureRemoved(): void {
+        const stand = this.form.controls.stand;
+        stand.controls.hasSharedPicture.setValue(false);
+        stand.controls.sharedPictureUpload.updateValueAndValidity();
+    }
+
     addConference(): void {
         this.form.controls.conferences.push(this.formService.createTalkGroup());
     }
