@@ -3,11 +3,7 @@
         <h3 jhiTranslate="participation.title">Les participations</h3>
         <div class="el-subtitle">
             @if (subtitle()) {
-                <b>{{ subtitle() }}</b> Â·
-            }
-            {{ countLabel() }}
-            @if (daysBeforeOpening()) {
-                Â· {{ daysBeforeOpening() }}
+                <b>{{ subtitle() }}</b>
             }
         </div>
     </div>
