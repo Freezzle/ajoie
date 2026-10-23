@@ -1,0 +1,60 @@
+<div class="image-upload-box">
+    @if (translateKey) {
+        <label class="image-upload-box__label" [for]="'field_' + fieldName">{{ translateKey | translate }}</label>
+    }
+
+    @if (hasPicture) {
+        <div class="image-upload-box__preview">
+            @if (value) {
+                <img [src]="value.previewUrl" [alt]="value.filename"/>
+                <div class="image-upload-box__details">
+                    <span class="image-upload-box__filename">{{ value.filename }}</span>
+                    <span class="image-upload-box__meta">{{ value.width }}&times;{{ value.height }} px</span>
+                </div>
+            } @else if (existingPictureUrl) {
+                <img [src]="existingPictureUrl" alt="{{ 'global.image.existing' | translate }}"/>
+                <div class="image-upload-box__details">
+                    <span class="image-upload-box__filename">{{ 'global.image.existing' | translate }}</span>
+                </div>
+            } @else {
+                <div class="image-upload-box__details">
+                    <span class="image-upload-box__filename">{{ 'global.image.alreadySent' | translate }}</span>
+                </div>
+            }
+
+            @if (!disabled) {
+                <button class="image-upload-box__remove" type="button" (click)="remove()">
+                    {{ 'global.image.remove' | translate }}
+                </button>
+            }
+        </div>
+    }
+
+    @if (!disabled) {
+        <p-fileupload #uploader
+                      [accept]="acceptAttribute"
+                      [auto]="true"
+                      [customUpload]="true"
+                      [maxFileSize]="maxBytes"
+                      [multiple]="false"
+                      [showCancelButton]="false"
+                      [showUploadButton]="false"
+                      (uploadHandler)="select($event)"
+                      [chooseLabel]="'global.image.choose' | translate"
+                      [invalidFileSizeMessageSummary]="'global.image.error.sizeSummary' | translate"
+                      [invalidFileSizeMessageDetail]="'global.image.error.sizeDetail' | translate"
+                      [invalidFileTypeMessageSummary]="'global.image.error.typeSummary' | translate"
+                      [invalidFileTypeMessageDetail]="'global.image.error.typeDetail' | translate"
+                      mode="advanced">
+            <ng-template #empty>
+                <div class="image-upload-box__dropzone">{{ 'global.image.dropHint' | translate }}</div>
+            </ng-template>
+        </p-fileupload>
+    }
+
+    <small class="image-upload-box__hint">{{ 'global.image.hint' | translate }}</small>
+
+    @if (errorKey) {
+        <small class="image-upload-box__error">{{ errorKey | translate }}</small>
+    }
+</div>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Image uploadée d'un stand (exposant et co-exposant).
+        Les anciennes colonnes stand.url_picture / stand.shared_url_picture sont conservées
+        telles quelles pour garder la trace des liens Google Drive historiques.
+    -->
+    <changeSet id="0.0.2-202610-stand-picture" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="stand_picture"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="stand_picture">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stand_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filename" type="varchar(255)"/>
+            <column name="size_bytes" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="height" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="checksum" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data" type="${blobType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploaded_date" type="${datetimeType}"/>
+        </createTable>
+
+        <createIndex indexName="ux_stand_picture__stand_type" tableName="stand_picture" unique="true">
+            <column name="stand_id"/>
+            <column name="type"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="stand_id"
+                                 baseTableName="stand_picture"
+                                 constraintName="fk_stand_picture__stand_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="stand"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"/>
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="stand_picture" constraintName="fk_stand_picture__stand_id"/>
+            <dropIndex indexName="ux_stand_picture__stand_type" tableName="stand_picture"/>
+            <dropTable tableName="stand_picture"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Correctif : la propriété ${blobType} vaut "blob", que PostgreSQL traduit en "oid"
+        (large object). Hibernate mappe un byte[] en "bytea", d'où une erreur à l'insertion
+        (« column "data" is of type oid but expression is of type bytea »).
+
+        Aucune ligne ne peut exister dans la table : toutes les insertions échouaient. On purge
+        donc par sécurité avant de recréer la colonne au bon type.
+    -->
+    <changeSet id="0.0.2-202610-stand-picture-data-bytea" author="freezzle" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="stand_picture"/>
+                <sqlCheck expectedResult="oid">
+                    SELECT format_type(a.atttypid, a.atttypmod)
+                    FROM pg_attribute a
+                    WHERE a.attrelid = 'stand_picture'::regclass
+                      AND a.attname = 'data'
+                      AND a.attnum > 0
+                      AND NOT a.attisdropped;
+                </sqlCheck>
+            </and>
+        </preConditions>
+
+        <sql>
+            DELETE FROM stand_picture;
+            ALTER TABLE stand_picture DROP COLUMN data;
+            ALTER TABLE stand_picture ADD COLUMN data bytea NOT NULL;
+        </sql>
+
+        <rollback>
+            <sql>
+                DELETE FROM stand_picture;
+                ALTER TABLE stand_picture DROP COLUMN data;
+                ALTER TABLE stand_picture ADD COLUMN data oid NOT NULL;
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
