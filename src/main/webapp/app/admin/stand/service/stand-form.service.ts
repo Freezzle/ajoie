@@ -32,6 +32,10 @@ export type StandFormGroup = {
     extraInformation: FormControl<IStand['extraInformation'] | null>;
     participation: FormControl<IStand['participation'] | null>;
     dimension: FormControl<IStand['dimension'] | null>;
+    pictureUpload: FormControl<IStand['pictureUpload']>;
+    sharedPictureUpload: FormControl<IStand['sharedPictureUpload']>;
+    removePicture: FormControl<boolean>;
+    removeSharedPicture: FormControl<boolean>;
 };
 
 @Injectable({providedIn: 'root'})
@@ -79,7 +83,11 @@ export class StandFormService {
                                                  subCategories: new FormControl(raw.subCategories),
                                                  extraInformation: new FormControl(raw.extraInformation),
                                                  participation: new FormControl(raw.participation, Validators.required),
-                                                 dimension: new FormControl(raw.dimension, Validators.required)
+                                                 dimension: new FormControl(raw.dimension, Validators.required),
+                                                 pictureUpload: new FormControl(null),
+                                                 sharedPictureUpload: new FormControl(null),
+                                                 removePicture: new FormControl(false, {nonNullable: true}),
+                                                 removeSharedPicture: new FormControl(false, {nonNullable: true})
                                              });
     }
 

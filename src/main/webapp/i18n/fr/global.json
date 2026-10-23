@@ -20,6 +20,13 @@
       "not.image": "Le fichier doit être une image et non du type \"{{ fileType }}\""
     },
     "id.exists": "Une nouvelle entité {{entityName}} ne peut pas avoir d'identifiant !",
+    "image": {
+      "empty": "Aucune image reçue.",
+      "invalid-content": "Cette image est illisible ou corrompue.",
+      "invalid-type": "Seules les images JPG et PNG sont acceptées.",
+      "too-large": "L'image dépasse la taille maximale de 1 Mo.",
+      "too-many-pixels": "Les dimensions de cette image sont trop grandes."
+    },
     "idinvalid": "Invalid Id",
     "idnotfound": "ID cannot be found",
     "idnull": "Identifiant invalide",
@@ -46,6 +53,23 @@
   "footer": "Ceci est votre pied de page",
   "global": {
     "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
+  "image": {
+    "alreadySent": "Image déjà envoyée",
+    "choose": "Choisir une image",
+    "dropHint": "Glisse et relâche une image ici.",
+    "error": {
+      "size": "L'image dépasse la taille maximale de 1 Mo.",
+      "sizeDetail": "la taille maximale autorisée est de 1 Mo.",
+      "sizeSummary": "{0} : fichier trop volumineux, ",
+      "type": "Seules les images JPG et PNG sont acceptées.",
+      "typeDetail": "seules les images JPG et PNG sont acceptées.",
+      "typeSummary": "{0} : format non accepté, ",
+      "unreadable": "Cette image n'a pas pu être lue."
+    },
+    "existing": "Image enregistrée",
+    "hint": "JPG ou PNG, 1 Mo maximum. L'image est automatiquement redimensionnée à 500 px de large.",
+    "remove": "Supprimer l'image"
+  },
     "field": {
       "id": "ID"
     },

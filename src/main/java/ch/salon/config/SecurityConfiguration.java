@@ -2,6 +2,7 @@ package ch.salon.config;
 
 import ch.salon.repository.UserRepository;
 import ch.salon.security.AuthoritiesConstants;
+import ch.salon.web.filter.PublicPayloadSizeFilter;
 import ch.salon.web.filter.SpaWebFilter;
 import ch.salon.utils.CookieCsrfFilter;
 import ch.salon.utils.SalonProperties;
@@ -67,6 +68,7 @@ public class SecurityConfiguration {
                 )
                 .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new PublicPayloadSizeFilter(), BasicAuthenticationFilter.class)
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives(salonProperties.getSecurity().getContentSecurityPolicy())

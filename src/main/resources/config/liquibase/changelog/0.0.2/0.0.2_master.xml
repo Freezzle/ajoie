@@ -26,4 +26,8 @@
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-floor-plan.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-stand-co-exhibitor.xml"
              relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-stand-picture.xml"
+             relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-stand-picture-data-bytea.xml"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

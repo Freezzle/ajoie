@@ -154,6 +154,7 @@
                     <th>Facebook</th>
                     <th>Instagram</th>
                     <th>Url Image</th>
+                    <th>Image</th>
                     <th>Catégorie</th>
                     <th>Statut</th>
                 </tr>
@@ -161,7 +162,7 @@
                 <tbody>
                     @if (isLoading()) {
                         <tr>
-                            <td class="text-center" colspan="9">
+                            <td class="text-center" colspan="10">
                                 <p-progress-spinner [style]="{ width: '50px', height: '50px' }"
                                                     animationDuration="1s"
                                                     fill="transparent"
@@ -191,6 +192,13 @@
                                 </td>
                                 <td (click)="clipboard(stand.urlPicture)"
                                     class="{{stand.urlPicture ? 'clipboard' : ''}} truncate-small">{{ stand.urlPicture ?? '' }}
+                                </td>
+                                <td (click)="copyPicture(stand)"
+                                    class="{{stand.picture ? 'clipboard' : ''}} truncate-small"
+                                    [title]="stand.picture ? ('stand.pictureCopy' | translate) : ''">
+                                    @if (stand.picture) {
+                                        <i class="pi pi-image"></i>
+                                    }
                                 </td>
                                 <td class="truncate-small">{{ stand.category ? (formatterCategory(Category[stand.category]) | translate) : '' }}</td>
                                 <td class="truncate-small">{{ stand.status ? (formatterStatus(Status[stand.status]) | translate) : '' }}</td>

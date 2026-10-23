@@ -45,6 +45,7 @@ import {EntityStatusComponent} from 'app/shared/components/entity-list/entity-st
 import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.service';
 import {NavigationStateService} from 'app/layouts/navbar/navigation-state.service';
 import {copyToClipboard} from 'app/core/util/utils';
+import {toPngBlob} from 'app/shared/utils/image-resize.util';
 import {Category, formatterCategory} from '../../enumerations/category.model';
 import {formatterStatus, Status} from '../../enumerations/status.model';
 import {getExhibitorFullName, getFirstExhibitorName} from '../../exhibitor/model/exhibitor.interface';
@@ -377,6 +378,24 @@ export class StandComponent implements OnInit {
 
     clipboard(value: string | null | undefined): void {
         copyToClipboard(value);
+    }
+
+    /**
+     * Copie l'image uploadée dans le presse-papier. Les navigateurs n'acceptent que du PNG :
+     * les JPEG sont convertis à la volée.
+     */
+    copyPicture(stand: IStand): void {
+        if (!stand.picture) {
+            return;
+        }
+
+        this.standService.downloadPicture(stand.id, 'MAIN').subscribe(blob => {
+            toPngBlob(blob)
+                .then(png => navigator.clipboard.write([new ClipboardItem({'image/png': png})]))
+                .catch(() => {
+                    // Presse-papier indisponible (contexte non sécurisé ou navigateur non compatible).
+                });
+        });
     }
 
     /** Vue technique : tri par catégorie puis thérapeute, clic sur une cellule = copie. */

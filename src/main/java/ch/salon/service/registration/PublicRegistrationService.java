@@ -11,6 +11,7 @@ import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.Status;
+import ch.salon.domain.enumeration.StandPictureType;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.ExhibitorRepository;
 import ch.salon.repository.ParticipationRepository;
@@ -22,6 +23,8 @@ import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.RefreshInvoicingPlansService;
+import ch.salon.service.StandPictureService;
+import ch.salon.service.dto.ImageUploadDTO;
 import ch.salon.service.dto.registration.PublicDimensionDTO;
 import ch.salon.service.dto.registration.PublicPricesDTO;
 import ch.salon.service.dto.registration.PublicSalonInfoDTO;
@@ -46,6 +49,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -76,6 +80,7 @@ public class PublicRegistrationService {
     private final RefreshInvoicingPlansService refreshInvoicingPlansService;
     private final EventLogService eventLogService;
     private final RegistrationEmailService registrationEmailService;
+    private final StandPictureService standPictureService;
     private final TransactionalTenantOperation transactionalOps;
 
     // -------------------- API PUBLIQUE --------------------
@@ -159,7 +164,7 @@ public class PublicRegistrationService {
         applyParticipation(participation, request.getParticipation(), exhibitor);
         participation = participationRepository.save(participation);
 
-        createServices(participation, request, now);
+        createServices(participation, request, now, StandCarryOver.empty());
 
         eventLogService.eventFromSystem("Inscription en ligne reçue", EventType.EVENT, EntityType.PARTICIPATION,
                 participation.getId(), null);
@@ -188,7 +193,12 @@ public class PublicRegistrationService {
         applyParticipation(participation, request.getParticipation(), exhibitor);
         participation = participationRepository.save(participation);
 
-        standRepository.deleteAll(standRepository.findByParticipationIdOrderByRegistrationDateDesc(participationId));
+        List<Stand> existingStands = standRepository.findByParticipationIdOrderByRegistrationDateDesc(participationId);
+        // Les prestations sont supprimées puis recréées : on met de côté ce que le public ne peut pas
+        // modifier (lien historique Google Drive) ainsi que les images déjà envoyées.
+        StandCarryOver carryOver = captureCarryOver(existingStands);
+
+        standRepository.deleteAll(existingStands);
         conferenceRepository.deleteAll(
                 conferenceRepository.findByParticipationIdOrderByRegistrationDateDesc(participationId));
         workshopRepository.deleteAll(
@@ -197,7 +207,7 @@ public class PublicRegistrationService {
         conferenceRepository.flush();
         workshopRepository.flush();
 
-        createServices(participation, request, Instant.now());
+        createServices(participation, request, Instant.now(), carryOver);
 
         eventLogService.eventFromSystem("Inscription en ligne modifiée par l'exposant", EventType.EVENT,
                 EntityType.PARTICIPATION, participation.getId(), null);
@@ -341,7 +351,7 @@ public class PublicRegistrationService {
         return request;
     }
 
-    private void applyCoExhibitor(Stand stand, RegistrationStandDTO standDTO) {
+    private void applyCoExhibitor(Stand stand, RegistrationStandDTO standDTO, StandCarryOver carryOver) {
         if (!standDTO.isShared()) {
             stand.setSharedFirstName(null);
             stand.setSharedLastName(null);
@@ -369,7 +379,56 @@ public class PublicRegistrationService {
         stand.setSharedWebsite(sub(standDTO.getSharedWebsite(), 100));
         stand.setSharedInstagram(sub(standDTO.getSharedInstagram(), 100));
         stand.setSharedFacebook(sub(standDTO.getSharedFacebook(), 100));
-        stand.setSharedUrlPicture(sub(standDTO.getSharedUrlPicture(), 500));
+        // Le lien historique n'est plus saisissable publiquement : on conserve la valeur existante.
+        stand.setSharedUrlPicture(carryOver.sharedUrlPicture());
+    }
+
+    /**
+     * Valeurs d'un stand que le formulaire public ne peut pas modifier et qui doivent survivre à la
+     * suppression/recréation des prestations lors d'une modification d'inscription.
+     */
+    private record StandCarryOver(String urlPicture, String sharedUrlPicture,
+                                  Map<StandPictureType, StandPictureService.StandPictureSnapshot> pictures) {
+
+        static StandCarryOver empty() {
+            return new StandCarryOver(null, null, Map.of());
+        }
+    }
+
+    private StandCarryOver captureCarryOver(List<Stand> existingStands) {
+        if (existingStands.isEmpty()) {
+            return StandCarryOver.empty();
+        }
+
+        Stand previous = existingStands.get(0);
+        Map<StandPictureType, StandPictureService.StandPictureSnapshot> pictures = standPictureService.snapshot(
+                previous.getId());
+
+        // Supprimé explicitement pour ne pas laisser d'entités orphelines en session (la FK est en
+        // cascade côté base, mais Hibernate ne le sait pas).
+        standPictureService.deleteAllForStand(previous.getId());
+
+        return new StandCarryOver(previous.getUrlPicture(), previous.getSharedUrlPicture(), pictures);
+    }
+
+    /**
+     * Enregistre la nouvelle image si le public en a envoyé une, sinon reporte celle déjà présente.
+     */
+    private void applyStandPicture(Stand stand, StandPictureType type, ImageUploadDTO upload,
+            StandCarryOver carryOver, boolean keep) {
+        if (!keep) {
+            return;
+        }
+
+        if (upload != null) {
+            standPictureService.save(stand, type, upload);
+            return;
+        }
+
+        StandPictureService.StandPictureSnapshot previous = carryOver.pictures().get(type);
+        if (previous != null) {
+            standPictureService.restore(stand, previous);
+        }
     }
 
     private RegistrationStandDTO toStandDTO(Stand stand) {
@@ -400,6 +459,8 @@ public class PublicRegistrationService {
         dto.setSharedInstagram(stand.getSharedInstagram());
         dto.setSharedFacebook(stand.getSharedFacebook());
         dto.setSharedUrlPicture(stand.getSharedUrlPicture());
+        dto.setHasPicture(standPictureService.exists(stand.getId(), StandPictureType.MAIN));
+        dto.setHasSharedPicture(standPictureService.exists(stand.getId(), StandPictureType.SHARED));
         return dto;
     }
 
@@ -495,7 +556,8 @@ public class PublicRegistrationService {
         participation.setAcceptedContract(dto.isAcceptedContract());
     }
 
-    private void createServices(Participation participation, RegistrationRequestDTO request, Instant now) {
+    private void createServices(Participation participation, RegistrationRequestDTO request, Instant now,
+            StandCarryOver carryOver) {
         for (RegistrationStandDTO standDTO : request.getStands()) {
             Stand stand = new Stand();
             stand.setRegistrationDate(now);
@@ -513,11 +575,16 @@ public class PublicRegistrationService {
             stand.setWebsite(sub(standDTO.getWebsite(), 100));
             stand.setInstagram(sub(standDTO.getInstagram(), 100));
             stand.setFacebook(sub(standDTO.getFacebook(), 100));
-            stand.setUrlPicture(sub(standDTO.getUrlPicture(), 500));
-            applyCoExhibitor(stand, standDTO);
+            // Le lien historique n'est plus saisissable publiquement : on conserve la valeur existante.
+            stand.setUrlPicture(carryOver.urlPicture());
+            applyCoExhibitor(stand, standDTO, carryOver);
             stand.setStatus(Status.IN_VERIFICATION);
             stand.setExtraInformation(null);
-            standRepository.save(stand);
+            stand = standRepository.save(stand);
+
+            applyStandPicture(stand, StandPictureType.MAIN, standDTO.getPictureUpload(), carryOver, true);
+            applyStandPicture(stand, StandPictureType.SHARED, standDTO.getSharedPictureUpload(), carryOver,
+                    standDTO.isShared());
         }
 
         for (RegistrationTalkDTO talk : request.getConferences()) {

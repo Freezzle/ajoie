@@ -73,7 +73,11 @@
                     <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
                 </div>
                 <div class="mt-4 col-12">
-                    <text-box fieldName="urlPicture" formControlName="urlPicture" translateKey="stand.urlPicture"/>
+                    <image-upload-box [hasExistingPicture]="form.controls.stand.controls.hasPicture.value"
+                                      (existingRemoved)="form.controls.stand.controls.hasPicture.setValue(false)"
+                                      fieldName="pictureUpload"
+                                      formControlName="pictureUpload"
+                                      translateKey="stand.picture"/>
                 </div>
             </div>
 
@@ -149,9 +153,11 @@
                                       translateKey="stand.facebook"/>
                         </div>
                         <div class="mt-4 col-12">
-                            <text-box fieldName="sharedUrlPicture"
-                                      formControlName="sharedUrlPicture"
-                                      translateKey="stand.urlPicture"/>
+                            <image-upload-box [hasExistingPicture]="form.controls.stand.controls.hasSharedPicture.value"
+                                              (existingRemoved)="form.controls.stand.controls.hasSharedPicture.setValue(false)"
+                                              fieldName="sharedPictureUpload"
+                                              formControlName="sharedPictureUpload"
+                                              translateKey="stand.coExhibitor.picture"/>
                         </div>
                     </div>
                 </div>

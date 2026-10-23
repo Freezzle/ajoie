@@ -2,6 +2,18 @@ import {IParticipation} from '../../participation/model/participation.interface'
 import {Status} from '../../enumerations/status.model';
 import {Category} from '../../enumerations/category.model';
 import {IPriceStandSalon} from '../../salon/model/price-stand-salon.interface';
+import {ProcessedImageUpload} from '../../../shared/utils/image-resize.util';
+
+/**
+ * Métadonnées d'une image enregistrée en base (les octets sont servis par un endpoint dédié).
+ */
+export interface IImageMetadata {
+    contentType: string;
+    filename: string | null;
+    sizeBytes: number;
+    width: number;
+    height: number;
+}
 
 export interface IStand {
     id: string;
@@ -9,6 +21,7 @@ export interface IStand {
     website: string | null;
     instagram: string | null;
     facebook: string | null;
+    /** Ancien lien Google Drive, conservé en lecture seule pour l'historique. */
     urlPicture: string | null;
     shared: boolean;
     nbTable: number;
@@ -24,6 +37,7 @@ export interface IStand {
     sharedWebsite: string | null;
     sharedInstagram: string | null;
     sharedFacebook: string | null;
+    /** Ancien lien Google Drive du co-exposant, conservé en lecture seule pour l'historique. */
     sharedUrlPicture: string | null;
     status: Status;
     category: Category | null;
@@ -32,4 +46,10 @@ export interface IStand {
     registrationDate: string | null;
     participation: IParticipation;
     dimension: IPriceStandSalon;
+    picture: IImageMetadata | null;
+    sharedPicture: IImageMetadata | null;
+    pictureUpload: ProcessedImageUpload | null;
+    sharedPictureUpload: ProcessedImageUpload | null;
+    removePicture: boolean;
+    removeSharedPicture: boolean;
 }

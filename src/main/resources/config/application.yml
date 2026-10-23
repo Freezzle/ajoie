@@ -59,6 +59,11 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  servlet:
+    multipart:
+      # Imports de fichiers (CSV/Excel) et uploads : borne haute volontairement basse.
+      max-file-size: 2MB
+      max-request-size: 4MB
   task:
     execution:
       thread-name-prefix: salon-task-

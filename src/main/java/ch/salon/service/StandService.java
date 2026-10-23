@@ -3,7 +3,9 @@ package ch.salon.service;
 import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.StandPictureType;
 import ch.salon.repository.StandRepository;
+import ch.salon.service.dto.ImageMetadataDTO;
 import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.dto.StandDTO;
 import ch.salon.service.mapper.StandMapper;
@@ -30,6 +32,7 @@ public class StandService {
     private final StandRepository standRepository;
     private final ParticipationService participationService;
     private final EventLogService eventLogService;
+    private final StandPictureService standPictureService;
     private final StandMapper standMapper;
 
     public UUID create(StandDTO stand) {
@@ -47,6 +50,9 @@ public class StandService {
         Stand entity = standMapper.toEntity(stand);
         entity.setRegistrationDate(Instant.now());
         entity = standRepository.save(entity);
+
+        standPictureService.applyChanges(entity, stand.getPictureUpload(), stand.isRemovePicture(),
+                stand.getSharedPictureUpload(), stand.isRemoveSharedPicture());
 
         this.eventLogService.eventFromSystem("Stand ajouté", EventType.EVENT, EntityType.PARTICIPATION,
                 entity.getParticipation().getId(), null);
@@ -94,19 +100,50 @@ public class StandService {
 
         standMapper.updateEntityFromDto(stand, standExisting);
 
-        return standMapper.toDto(standExisting);
+        standPictureService.applyChanges(standExisting, stand.getPictureUpload(), stand.isRemovePicture(),
+                stand.getSharedPictureUpload(), stand.isRemoveSharedPicture());
+
+        return withPictures(standMapper.toDto(standExisting));
+    }
+
+    /**
+     * Enrichit un DTO avec les métadonnées des images (jamais les octets).
+     */
+    private StandDTO withPictures(StandDTO dto) {
+        standPictureService.getMetadata(dto.getId(), StandPictureType.MAIN).ifPresent(dto::setPicture);
+        standPictureService.getMetadata(dto.getId(), StandPictureType.SHARED).ifPresent(dto::setSharedPicture);
+        return dto;
+    }
+
+    /**
+     * Variante groupée : une seule requête pour toute la liste.
+     */
+    private List<StandDTO> withPictures(List<StandDTO> stands) {
+        Map<UUID, Map<StandPictureType, ImageMetadataDTO>> metadata = standPictureService.getMetadataByStandIds(
+                stands.stream().map(StandDTO::getId).toList());
+
+        stands.forEach(stand -> {
+            Map<StandPictureType, ImageMetadataDTO> byType = metadata.getOrDefault(stand.getId(), Map.of());
+            stand.setPicture(byType.get(StandPictureType.MAIN));
+            stand.setSharedPicture(byType.get(StandPictureType.SHARED));
+        });
+
+        return stands;
     }
 
     public List<StandDTO> findAll(UUID idSalon, UUID idParticipation) {
+        List<StandDTO> stands;
         if (idParticipation != null) {
-            return standRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation).stream()
-                                  .map(standMapper::toDto).toList();
+            stands = standRepository.findByParticipationIdOrderByRegistrationDateDesc(idParticipation).stream()
+                                    .map(standMapper::toDto).toList();
         } else if (idSalon != null) {
-            return standRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
-                                  .map(standMapper::toDto).toList();
+            stands = standRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
+                                    .map(standMapper::toDto).toList();
+        } else {
+            throw new IllegalStateException("No filter given");
         }
 
-        throw new IllegalStateException("No filter given");
+        return withPictures(stands);
     }
 
     public Optional<StandDTO> get(UUID id) {
@@ -114,7 +151,7 @@ public class StandService {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
-        return standRepository.findById(id).map(standMapper::toDto);
+        return standRepository.findById(id).map(standMapper::toDto).map(this::withPictures);
     }
 
     public void delete(UUID id) {
@@ -123,6 +160,7 @@ public class StandService {
         }
 
         UUID idParticipation = get(id).map(StandDTO::getParticipation).map(ParticipationLightDTO::getId).orElseThrow();
+        standPictureService.deleteAllForStand(id);
         standRepository.deleteById(id);
         this.eventLogService.eventFromSystem("Stand supprimé", EventType.EVENT, EntityType.PARTICIPATION,
                 idParticipation, null);

@@ -35,6 +35,7 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 import {ChipsBoxComponent} from '../../../shared/components/chips-box/chips-box.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
+import {ImageUploadBoxComponent} from '../../../shared/components/image-upload-box/image-upload-box.component';
 
 @Component({
                selector: 'app-stand-update',
@@ -50,7 +51,8 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
                    SelectBoxComponent,
                    CheckboxBoxComponent,
                    LinkBoxComponent,
-                   
+                   ImageUploadBoxComponent,
+
                    AlertErrorComponent,
                    ConfirmPopup,
                    
@@ -68,6 +70,8 @@ export class StandUpdateComponent implements OnInit {
     categoryValues = Object.keys(Category);
     participationsOptions: IParticipation[] = [];
     dimensionsOptions: IPriceStandSalon[] = [];
+    picturePreviewUrl: string | null = null;
+    sharedPicturePreviewUrl: string | null = null;
     protected salonService = inject(SalonService);
     protected standService = inject(StandService);
     protected standFormService = inject(StandFormService);
@@ -88,6 +92,7 @@ export class StandUpdateComponent implements OnInit {
         const participationId = this.activatedRoute.snapshot.paramMap.get('idParticipation')!;
         this.initialStand = {...data['stand']};
         this.editForm = this.standFormService.createStandFormGroup(this.initialStand);
+        this.refreshPicturePreviews();
 
         if (data['readonly']) {
             this.isReadOnly = true;
@@ -97,6 +102,16 @@ export class StandUpdateComponent implements OnInit {
         }
 
         this.loadRelationshipsOptions(this.eventId, participationId);
+    }
+
+    onPictureRemoved(): void {
+        this.editForm.controls.removePicture.setValue(true);
+        this.picturePreviewUrl = null;
+    }
+
+    onSharedPictureRemoved(): void {
+        this.editForm.controls.removeSharedPicture.setValue(true);
+        this.sharedPicturePreviewUrl = null;
     }
 
     edit(): void {
@@ -112,6 +127,22 @@ export class StandUpdateComponent implements OnInit {
         this.isReadOnly = true;
         this.editForm = this.standFormService.createStandFormGroup(this.initialStand);
         this.editForm.disable();
+        this.refreshPicturePreviews();
+    }
+
+    /**
+     * Les images sont servies par un endpoint dédié : on ne manipule jamais les octets ici.
+     */
+    private refreshPicturePreviews(): void {
+        const stand = this.initialStand;
+        const cacheBuster = `?v=${Date.now()}`;
+
+        this.picturePreviewUrl = stand?.id && stand.picture
+                                 ? this.standService.pictureUrl(stand.id, 'MAIN') + cacheBuster
+                                 : null;
+        this.sharedPicturePreviewUrl = stand?.id && stand.sharedPicture
+                                       ? this.standService.pictureUrl(stand.id, 'SHARED') + cacheBuster
+                                       : null;
     }
 
     save(): void {

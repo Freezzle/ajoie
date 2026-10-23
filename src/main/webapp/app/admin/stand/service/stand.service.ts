@@ -6,6 +6,8 @@ import {ApplicationConfigService} from 'app/core/config/application-config.servi
 import {createRequestOption} from 'app/core/request/request-util';
 import {IStand} from '../model/stand.interface';
 
+export type StandPictureType = 'MAIN' | 'SHARED';
+
 @Injectable({providedIn: 'root'})
 export class StandService {
     protected http = inject(HttpClient);
@@ -31,6 +33,20 @@ export class StandService {
 
     delete(idStand: string): Observable<unknown> {
         return this.http.delete(`${this.resourceUrl}/${idStand}`);
+    }
+
+    /**
+     * URL de l'image d'un stand, directement utilisable dans une balise `img` (session cookie).
+     */
+    pictureUrl(idStand: string, type: StandPictureType): string {
+        return `${this.resourceUrl}/${idStand}/pictures/${type}`;
+    }
+
+    downloadPicture(idStand: string, type: StandPictureType, asAttachment = false): Observable<Blob> {
+        return this.http.get(this.pictureUrl(idStand, type), {
+            params: asAttachment ? {download: 'true'} : {},
+            responseType: 'blob'
+        });
     }
 
     getStandIdentifier(stand: Pick<IStand, 'id'>): string {

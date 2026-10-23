@@ -2,6 +2,7 @@ package ch.salon.service.dto;
 
 import ch.salon.domain.enumeration.Category;
 import ch.salon.domain.enumeration.Status;
+import jakarta.validation.Valid;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -41,4 +42,25 @@ public class StandDTO implements Serializable {
     private Instant registrationDate;
     private ParticipationLightDTO participation;
     private PriceStandLightDTO dimension;
+
+    /**
+     * Métadonnées des images uploadées (lecture seule, alimentées par le service).
+     */
+    private ImageMetadataDTO picture;
+    private ImageMetadataDTO sharedPicture;
+
+    /**
+     * Nouvelles images à enregistrer (écriture seule).
+     */
+    @Valid
+    private ImageUploadDTO pictureUpload;
+
+    @Valid
+    private ImageUploadDTO sharedPictureUpload;
+
+    /**
+     * Demande de suppression de l'image existante (écriture seule).
+     */
+    private boolean removePicture;
+    private boolean removeSharedPicture;
 }

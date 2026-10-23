@@ -10,6 +10,7 @@ import {CounterBoxComponent} from '../../../shared/components/counter-box/counte
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
+import {ImageUploadBoxComponent} from '../../../shared/components/image-upload-box/image-upload-box.component';
 import {Category, formatterCategory} from '../../../admin/enumerations/category.model';
 import {IPublicDimension, IRegistrationPrices} from '../../registration.model';
 import {formatPrice, priceHint} from '../../registration-price.util';
@@ -28,6 +29,7 @@ import {ServiceQuestionCardComponent} from './service-question-card/service-ques
                    SelectBoxComponent,
                    TextBoxComponent,
                    TextareaBoxComponent,
+                   ImageUploadBoxComponent,
                    ServiceQuestionCardComponent
                ],
                templateUrl: './services-step.component.html'

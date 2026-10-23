@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 
 import {Category} from '../admin/enumerations/category.model';
+import {ProcessedImageUpload} from '../shared/utils/image-resize.util';
 import {InvoiceSendingMethod} from '../admin/enumerations/invoice-sending-method.model';
 import {ModePaymentMeals} from '../admin/enumerations/mode-payment-meals.model';
 import {IAddress} from '../admin/common/address.model';
@@ -44,6 +45,10 @@ export type StandFormGroup = FormGroup<{
     sharedInstagram: FormControl<string | null>;
     sharedFacebook: FormControl<string | null>;
     sharedUrlPicture: FormControl<string | null>;
+    pictureUpload: FormControl<ProcessedImageUpload | null>;
+    sharedPictureUpload: FormControl<ProcessedImageUpload | null>;
+    hasPicture: FormControl<boolean>;
+    hasSharedPicture: FormControl<boolean>;
 }>;
 
 export type ExhibitorFormGroup = FormGroup<{
@@ -199,7 +204,11 @@ export class RegistrationFormService {
             sharedWebsite: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedInstagram: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedFacebook: new FormControl<string | null>(null, [Validators.maxLength(100)]),
-            sharedUrlPicture: new FormControl<string | null>(null, [Validators.maxLength(500)])
+            sharedUrlPicture: new FormControl<string | null>(null, [Validators.maxLength(500)]),
+            pictureUpload: new FormControl<ProcessedImageUpload | null>(null),
+            sharedPictureUpload: new FormControl<ProcessedImageUpload | null>(null),
+            hasPicture: new FormControl(false, {nonNullable: true}),
+            hasSharedPicture: new FormControl(false, {nonNullable: true})
         });
     }
 
@@ -361,7 +370,9 @@ export class RegistrationFormService {
                             sharedWebsite: shared ? stand.sharedWebsite ?? null : null,
                             sharedInstagram: shared ? stand.sharedInstagram ?? null : null,
                             sharedFacebook: shared ? stand.sharedFacebook ?? null : null,
-                            sharedUrlPicture: shared ? stand.sharedUrlPicture ?? null : null
+                            sharedUrlPicture: shared ? stand.sharedUrlPicture ?? null : null,
+                            pictureUpload: stand.pictureUpload ?? null,
+                            sharedPictureUpload: shared ? stand.sharedPictureUpload ?? null : null
                         });
         }
 
@@ -470,7 +481,9 @@ export class RegistrationFormService {
                                                    sharedWebsite: stand.sharedWebsite,
                                                    sharedInstagram: stand.sharedInstagram,
                                                    sharedFacebook: stand.sharedFacebook,
-                                                   sharedUrlPicture: stand.sharedUrlPicture
+                                                   sharedUrlPicture: stand.sharedUrlPicture,
+                                                   hasPicture: !!stand.hasPicture,
+                                                   hasSharedPicture: !!stand.hasSharedPicture
                                                });
             this.refreshCoExhibitorValidators(services.controls.stand, !!stand.shared);
         }

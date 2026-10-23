@@ -112,7 +112,19 @@
                     <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
                 </div>
                 <div class="mt-4 col-12">
-                    <text-box fieldName="urlPicture" formControlName="urlPicture" translateKey="stand.urlPicture"/>
+                    <image-upload-box [existingPictureUrl]="picturePreviewUrl"
+                                      (existingRemoved)="onPictureRemoved()"
+                                      fieldName="pictureUpload"
+                                      formControlName="pictureUpload"
+                                      translateKey="stand.picture"/>
+                    @if (initialStand?.urlPicture) {
+                        <div class="mt-2">
+                            <span class="me-2">{{ 'stand.urlPicture' | translate }} :</span>
+                            <a [href]="initialStand!.urlPicture" rel="noopener noreferrer" target="_blank">
+                                {{ initialStand!.urlPicture }}
+                            </a>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -182,9 +194,19 @@
                                   translateKey="stand.coExhibitor.facebook"/>
                     </div>
                     <div class="mt-4 col-12">
-                        <text-box fieldName="sharedUrlPicture"
-                                  formControlName="sharedUrlPicture"
-                                  translateKey="stand.coExhibitor.urlPicture"/>
+                        <image-upload-box [existingPictureUrl]="sharedPicturePreviewUrl"
+                                          (existingRemoved)="onSharedPictureRemoved()"
+                                          fieldName="sharedPictureUpload"
+                                          formControlName="sharedPictureUpload"
+                                          translateKey="stand.coExhibitor.picture"/>
+                        @if (initialStand?.sharedUrlPicture) {
+                            <div class="mt-2">
+                                <span class="me-2">{{ 'stand.coExhibitor.urlPicture' | translate }} :</span>
+                                <a [href]="initialStand!.sharedUrlPicture" rel="noopener noreferrer" target="_blank">
+                                    {{ initialStand!.sharedUrlPicture }}
+                                </a>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

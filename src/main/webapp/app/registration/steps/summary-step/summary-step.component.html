@@ -140,10 +140,10 @@
                             <dd>{{ standValue.sharedFacebook }}</dd>
                         </div>
                     }
-                    @if (standValue.sharedUrlPicture) {
+                    @if (standValue.sharedPictureUpload || standValue.hasSharedPicture) {
                         <div class="summary-row">
-                            <dt>{{ 'stand.coExhibitor.urlPicture' | translate }}</dt>
-                            <dd>{{ standValue.sharedUrlPicture }}</dd>
+                            <dt>{{ 'stand.coExhibitor.picture' | translate }}</dt>
+                            <dd>{{ standValue.sharedPictureUpload?.filename ?? ('global.image.alreadySent' | translate) }}</dd>
                         </div>
                     }
                 }
@@ -165,10 +165,10 @@
                         <dd>{{ standValue.facebook }}</dd>
                     </div>
                 }
-                @if (standValue.urlPicture) {
+                @if (standValue.pictureUpload || standValue.hasPicture) {
                     <div class="summary-row">
-                        <dt>{{ 'stand.urlPicture' | translate }}</dt>
-                        <dd>{{ standValue.urlPicture }}</dd>
+                        <dt>{{ 'stand.picture' | translate }}</dt>
+                        <dd>{{ standValue.pictureUpload?.filename ?? ('global.image.alreadySent' | translate) }}</dd>
                     </div>
                 }
             </dl>

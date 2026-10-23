@@ -8,6 +8,12 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring",uses = {ParticipationMapper.class, PriceStandMapper.class}, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface StandMapper {
 
+    @Mapping(target = "picture", ignore = true)
+    @Mapping(target = "sharedPicture", ignore = true)
+    @Mapping(target = "pictureUpload", ignore = true)
+    @Mapping(target = "sharedPictureUpload", ignore = true)
+    @Mapping(target = "removePicture", ignore = true)
+    @Mapping(target = "removeSharedPicture", ignore = true)
     StandDTO toDto(Stand stand);
 
     @Mapping(target = "tenantId", ignore = true)

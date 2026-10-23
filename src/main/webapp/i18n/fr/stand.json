@@ -13,6 +13,7 @@
       "fullName": "Co-exposant",
       "instagram": "Instagram du co-exposant",
       "lastName": "Nom du co-exposant",
+      "picture": "Image du co-exposant",
       "subCategories": "Mots-clés",
       "therapistName": "Nom de thérapeute du co-exposant",
       "urlPicture": "Url de l'image du co-exposant",
@@ -92,6 +93,8 @@
       }
     },
     "urlPicture": "Url de l'image",
+    "picture": "Image du stand",
+    "pictureCopy": "Copier l'image dans le presse-papier",
     "viewClipboard": "Liste technique",
     "viewStandard": "Vue standard",
     "website": "Site internet"
