@@ -20,6 +20,9 @@
             <ng-content select="[rowFoot]"></ng-content>
         </span>
 
+        <!-- Une seule ligne : `:empty` ne doit pas être cassé par des espaces. -->
+        <span class="el-foot-group"><ng-content select="[rowFootEnd]"></ng-content></span>
+
         @if (menuItems().length > 0) {
             <p-menu #menu
                     [model]="menuItems()"

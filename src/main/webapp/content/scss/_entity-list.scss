@@ -462,6 +462,28 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   }
 }
 
+/* Groupe d'infos prioritaires, poussé à droite du pied et toujours visible. */
+.el-foot-group {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding-left: 8px;
+  border-left: 1px solid var(--app-border);
+  white-space: nowrap;
+
+  /* Aucun contenu projeté : ni espace, ni trait séparateur. */
+  &:empty {
+    display: none;
+  }
+
+  /* Un composant qui n'a rien à afficher ne laisse pas d'espace. */
+  > *:empty {
+    display: none;
+  }
+}
+
 .el-row-meta-text {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -523,20 +545,21 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   white-space: nowrap;
 }
 
-/* Mini-jauge de facturation. */
-.el-gauge {
-  display: inline-flex;
+/* Icône de pied accompagnée d'une pastille de comptage. */
+.el-foot-badge {
   gap: 2px;
-  width: 48px;
-  height: 6px;
-  border-radius: 99px;
-  overflow: hidden;
-  background: var(--app-border);
-  flex: none;
 
-  i {
-    display: block;
-    height: 100%;
+  .el-badge {
+    min-width: 15px;
+    height: 15px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--el-color, var(--app-text));
+    color: var(--app-surface);
+    font-size: var(--app-fs-xs);
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
   }
 }
 
@@ -673,5 +696,11 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
 
   .el-row-foot {
     min-height: 24px;
+  }
+
+  /* Le groupe prioritaire reste intact : seules les autres infos se réduisent. */
+  .el-foot-group {
+    gap: 5px;
+    padding-left: 6px;
   }
 }

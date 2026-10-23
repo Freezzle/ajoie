@@ -34,6 +34,7 @@ import {
     statusColor
 } from 'app/shared/components/entity-list';
 import {EntityCountComponent} from 'app/shared/components/entity-list/entity-count.component';
+import {EntityFootBadgeComponent} from 'app/shared/components/entity-list/entity-foot-badge.component';
 import {EntityFootItemComponent} from 'app/shared/components/entity-list/entity-foot-item.component';
 import {EntityHighlightComponent} from 'app/shared/components/entity-list/entity-highlight.component';
 import {EntityListGroupComponent} from 'app/shared/components/entity-list/entity-list-group.component';
@@ -51,10 +52,12 @@ import {ParticipationService} from '../service/participation.service';
 /** Nombre de lignes affichées avant le bouton « Afficher plus ». */
 const PAGE_SIZE = 150;
 
-/** Segments de la mini-jauge de facturation, dans l'ordre d'affichage. */
-interface InvoiceSegment {
+/** Pastille de facturation affichée dans le pied d'une ligne. */
+interface InvoiceBadge {
     key: string;
-    value: number;
+    count: number;
+    icon: string;
+    labelKey: string;
     color: string;
 }
 
@@ -69,6 +72,7 @@ interface InvoiceSegment {
                    ContentPageComponent,
                    MenuBoxComponent,
                    EntityCountComponent,
+                   EntityFootBadgeComponent,
                    EntityFootItemComponent,
                    EntityHighlightComponent,
                    EntityListGroupComponent,
@@ -390,14 +394,38 @@ export class ParticipationComponent implements OnInit {
         return participation.nbExpired;
     }
 
-    /** Segments non nuls de la mini-jauge de facturation. */
-    invoiceSegments(participation: IParticipationList): InvoiceSegment[] {
+    /** Pastilles de facturation non nulles, dans l'ordre du cycle de vie d'une facture. */
+    invoiceBadges(participation: IParticipationList): InvoiceBadge[] {
         return [
-            {key: 'paid', value: participation.nbPaid, color: 'var(--app-status-validated)'},
-            {key: 'issued', value: participation.nbIssued, color: 'var(--app-status-accepted)'},
-            {key: 'draft', value: participation.nbDraft, color: 'var(--app-border)'},
-            {key: 'expired', value: participation.nbExpired, color: 'var(--app-danger)'}
-        ].filter(segment => segment.value > 0);
+            {
+                key: 'draft',
+                count: participation.nbDraft,
+                icon: 'sheet-plastic',
+                labelKey: 'invoicingPlan.drafts',
+                color: 'var(--app-status-closed)'
+            },
+            {
+                key: 'issued',
+                count: participation.nbIssued,
+                icon: 'file-import',
+                labelKey: 'invoicingPlan.waitingPayments',
+                color: 'var(--app-status-accepted)'
+            },
+            {
+                key: 'paid',
+                count: participation.nbPaid,
+                icon: 'file-circle-check',
+                labelKey: 'invoicingPlan.paids',
+                color: 'var(--app-status-validated)'
+            },
+            {
+                key: 'expired',
+                count: participation.nbExpired,
+                icon: 'clock',
+                labelKey: 'invoicingPlan.expirations',
+                color: 'var(--app-danger)'
+            }
+        ].filter(badge => badge.count > 0);
     }
 
     /** Une participation active sans facture est « à facturer ». */

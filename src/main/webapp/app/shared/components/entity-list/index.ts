@@ -3,6 +3,7 @@ export * from './entity-list.utils';
 export * from './entity-list.status';
 export * from './entity-list-state';
 export * from './entity-count.component';
+export * from './entity-foot-badge.component';
 export * from './entity-foot-item.component';
 export * from './entity-group-sort-menu.component';
 export * from './entity-highlight.component';

@@ -111,34 +111,6 @@
                             </span>
 
                             <ng-container rowFoot>
-                                @if (nbInvoices(participation) > 0 || participation.nbExpired > 0) {
-                                    <span class="el-foot-item el-foot-count">
-                                        <span class="el-gauge">
-                                            @for (segment of invoiceSegments(participation); track segment.key) {
-                                                <i [style.background]="segment.color"
-                                                   [style.flex]="segment.value"></i>
-                                            }
-                                        </span>
-                                        @if (participation.nbExpired > 0) {
-                                            <b [style.color]="'var(--app-danger)'">
-                                                {{ participation.nbExpired }}
-                                                {{
-                                                    (participation.nbExpired > 1
-                                                        ? 'participation.list.summary.expiredPlural'
-                                                        : 'participation.list.summary.expiredSingular') | translate
-                                                }}
-                                            </b>
-                                        } @else {
-                                            <b>{{ participation.nbPaid }}/{{ nbInvoices(participation) }}</b>
-                                            <span>{{ 'participation.list.summary.paid' | translate }}</span>
-                                        }
-                                    </span>
-                                } @else if (showToInvoice(participation)) {
-                                    <entity-foot-item color="var(--app-status-accepted)"
-                                                      icon="file-invoice"
-                                                      labelKey="entityList.signal.toInvoice"/>
-                                }
-
                                 @if (participation.nbStands > 0) {
                                     <entity-count [count]="participation.nbStands"
                                                   [detail]="sharedStandDetail(participation)"
@@ -191,6 +163,21 @@
                                                       [showLabel]="true"
                                                       icon="note-sticky"
                                                       labelKey="entityList.internalComment"/>
+                                }
+                            </ng-container>
+
+                            <ng-container rowFootEnd>
+                                @for (badge of invoiceBadges(participation); track badge.key) {
+                                    <entity-foot-badge [color]="badge.color"
+                                                       [count]="badge.count"
+                                                       [icon]="badge.icon"
+                                                       [labelKey]="badge.labelKey"/>
+                                }
+
+                                @if (showToInvoice(participation)) {
+                                    <entity-foot-item color="var(--app-status-accepted)"
+                                                      icon="file-invoice"
+                                                      labelKey="entityList.signal.toInvoice"/>
                                 }
                             </ng-container>
                         </entity-row>
