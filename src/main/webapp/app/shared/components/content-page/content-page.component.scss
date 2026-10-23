@@ -18,8 +18,9 @@
   margin: 0 1.5rem;
 
   background-color: var(--app-surface);
-  border: 1px solid var(--p-inputtext-border-color);
+  border: 1px solid var(--app-border);
   border-top: none;
+  border-radius: 0 0 10px 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   .page-header-start {
