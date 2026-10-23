@@ -255,7 +255,7 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   width: 100%;
   padding: 12px 2px 8px;
   border: 0;
-  background: var(--app-surface);
+  background: transparent;
   text-align: left;
   color: var(--app-text);
 }
@@ -384,7 +384,7 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   }
 
   &:hover {
-    color: var(--app-primary);
+    color: var(--app-primary) !important;
     text-decoration: none;
   }
 }

@@ -21,7 +21,7 @@
     "firstName": "Prénom",
     "lastName": "Nom de famille",
     "fullName": "Nom complet",
-    "homeAddress": "Adresse de domicile",
+    "homeAddress": "Adresse de courrier",
     "language": {
       "list": {
         "de": "Allemand",

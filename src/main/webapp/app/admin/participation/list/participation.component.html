@@ -99,7 +99,7 @@
                                 }
                                 @if (participation.exhibitor.duplicateDetected) {
                                     <span class="el-alert"
-                                          [style.--el-color]="'var(--app-warn)'"
+                                          [style.--el-color]="'var(var(--app-status-refused)'"
                                           [title]="'exhibitor.duplicateDetected' | translate">
                                         <fa-icon icon="triangle-exclamation"></fa-icon>
                                         <span class="el-desktop-only">{{
@@ -192,6 +192,7 @@
 
                                 @if (participation.extraInformation) {
                                     <entity-foot-item [detail]="participation.extraInformation"
+                                                      [showLabel]="true"
                                                       icon="note-sticky"
                                                       labelKey="entityList.internalComment"/>
                                 }

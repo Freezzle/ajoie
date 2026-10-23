@@ -106,6 +106,7 @@
 
                                     @if (dimensionLabel(stand); as dimension) {
                                         <entity-foot-item [label]="dimension"
+                                                          [showLabel]="true"
                                                           icon="ruler-combined"/>
                                     }
 
@@ -123,6 +124,7 @@
 
                                     @if (stand.extraInformation) {
                                         <entity-foot-item [detail]="stand.extraInformation"
+                                                          [showLabel]="true"
                                                           icon="note-sticky"
                                                           labelKey="entityList.internalComment"/>
                                     }

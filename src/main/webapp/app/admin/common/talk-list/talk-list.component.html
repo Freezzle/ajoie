@@ -87,6 +87,7 @@
                             <ng-container rowFoot>
                                 @if (talk.extraInformation) {
                                     <entity-foot-item [detail]="talk.extraInformation"
+                                                      [showLabel]="true"
                                                       icon="note-sticky"
                                                       labelKey="entityList.internalComment"/>
                                 }

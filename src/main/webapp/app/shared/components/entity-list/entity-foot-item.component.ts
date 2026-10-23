@@ -5,6 +5,10 @@ import SharedModule from '../../shared.module';
 /**
  * Élément du pied d'une ligne : icône + libellé (+ précision en gris).
  * Rien ne s'affiche si ni `labelKey` ni `label` ne sont fournis.
+ *
+ * Un libellé statique traduit (`labelKey`) n'est pas écrit dans le pied : seule
+ * l'icône colorée est affichée, le texte restant accessible en infobulle. Les
+ * valeurs dynamiques (`label`) et les précisions (`detail`) restent visibles.
  */
 @Component({
                selector: 'entity-foot-item',
@@ -20,4 +24,6 @@ export class EntityFootItemComponent {
     /** Texte secondaire en gris, coupé s'il est trop long. */
     readonly detail = input<string | null>(null);
     readonly color = input<string>('var(--app-text)');
+    /** Force l'affichage du texte issu de `labelKey` à côté de l'icône. */
+    readonly showLabel = input<boolean>(false);
 }

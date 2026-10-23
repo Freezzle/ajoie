@@ -87,11 +87,12 @@
                                 }
 
                                 @if (languageLabelKey(exhibitor); as languageKey) {
-                                    <entity-foot-item [labelKey]="languageKey" icon="comments"/>
+                                    <entity-foot-item [labelKey]="languageKey" [showLabel]="true" icon="comments"/>
                                 }
 
                                 @if (exhibitor.newsletter) {
-                                    <entity-foot-item color="var(--app-status-accepted)"
+                                    <entity-foot-item [showLabel]="true"
+                                                      color="var(--app-status-accepted)"
                                                       icon="envelope"
                                                       labelKey="exhibitor.list.foot.newsletter"/>
                                 }
@@ -105,12 +106,14 @@
 
                                 @if (exhibitor.lastSalonPlace) {
                                     <entity-foot-item [detail]="exhibitor.lastSalonPlace"
+                                                      [showLabel]="true"
                                                       icon="calendar-alt"
                                                       labelKey="exhibitor.list.foot.lastSalon"/>
                                 }
 
                                 @if (exhibitor.extraInformation) {
                                     <entity-foot-item [detail]="exhibitor.extraInformation"
+                                                      [showLabel]="true"
                                                       icon="note-sticky"
                                                       labelKey="entityList.internalComment"/>
                                 }
