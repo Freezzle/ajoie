@@ -92,6 +92,7 @@
                     @case (2) {
                         <app-participation-step [email]="form.controls.exhibitor.controls.email.value"
                                                  [form]="form.controls.participation"
+                                                 [hasBillingAddress]="!!form.controls.exhibitor.controls.differentBillingAddress.value"
                                                  [prices]="prices"/>
                     }
                     @default {

@@ -1,0 +1,15 @@
+.info-icon {
+  color: var(--p-text-muted-color, #6b655d);
+  cursor: help;
+  font-size: 0.9rem;
+  margin-left: 0.35rem;
+  // Les libellés flottants PrimeNG (p-iftalabel) désactivent les évènements de souris :
+  // on les réactive sur l'icône pour que l'infobulle reste déclenchable.
+  pointer-events: auto;
+  vertical-align: middle;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--p-primary-color, #8a6d3b);
+  }
+}

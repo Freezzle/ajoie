@@ -11,9 +11,9 @@ import {TextBoxComponent} from '../../../shared/components/text-box/text-box.com
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {RegistrationCardComponent} from '../../registration-card/registration-card.component';
 import {
-    formatterInvoiceMethod,
     InvoiceSendingMethod
 } from '../../../admin/enumerations/invoice-sending-method.model';
+import {registrationInvoiceMethodKey} from '../../registration-invoice.util';
 import {
     formatterModePaymentMeals,
     ModePaymentMeals
@@ -40,15 +40,23 @@ export class ParticipationStepComponent {
     @Input({required: true}) form!: ParticipationFormGroup;
     @Input() prices: IRegistrationPrices | null = null;
     @Input() email: string | null = null;
+    /** Vrai si l'exposant a saisi une adresse de facturation distincte. */
+    @Input() hasBillingAddress: boolean = false;
 
     readonly modePaymentMealsValues: ModePaymentMeals[] = [ModePaymentMeals.MIXED, ModePaymentMeals.SEPARATE];
     readonly invoiceSendingMethodValues: InvoiceSendingMethod[] =
         [InvoiceSendingMethod.EMAIL, InvoiceSendingMethod.POSTAL];
 
     protected readonly formatterModePaymentMeals = formatterModePaymentMeals;
-    protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
 
     private translateService = inject(TranslateService);
+
+    /**
+     * Le libellé de l'envoi postal dépend de l'adresse réellement utilisée :
+     * adresse de facturation si elle est renseignée, sinon adresse de courrier.
+     */
+    formatterInvoiceMethod = (method: InvoiceSendingMethod | null): string =>
+        registrationInvoiceMethodKey(method, this.hasBillingAddress);
 
     get totalMeals(): number {
         return (this.form.controls.nbMeal1.value ?? 0) + (this.form.controls.nbMeal2.value ?? 0) +

@@ -29,7 +29,7 @@
       }
     },
     "modePaymentMeals": {
-      "label": "Paiment des bons repas",
+      "label": "Paiment des repas",
       "list": {
         "MIXED": "Avec la facture principale",
         "SEPARATE": "Directement sur place au salon",

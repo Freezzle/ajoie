@@ -75,6 +75,41 @@ public class Stand implements Serializable, TenantOwned {
     @Column(name = "need_electricity")
     private Boolean needElectricity;
 
+    @Column(name = "shared_first_name")
+    private String sharedFirstName;
+
+    @Column(name = "shared_last_name")
+    private String sharedLastName;
+
+    @Column(name = "shared_therapist_name")
+    private String sharedTherapistName;
+
+    @Column(name = "shared_email")
+    private String sharedEmail;
+
+    @Column(name = "shared_description")
+    private String sharedDescription;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shared_category")
+    private Category sharedCategory;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "shared_sub_categories", columnDefinition = "json")
+    private Set<String> sharedSubCategories;
+
+    @Column(name = "shared_website")
+    private String sharedWebsite;
+
+    @Column(name = "shared_instagram")
+    private String sharedInstagram;
+
+    @Column(name = "shared_facebook")
+    private String sharedFacebook;
+
+    @Column(name = "shared_url_picture")
+    private String sharedUrlPicture;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private Status status;

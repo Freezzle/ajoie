@@ -133,6 +133,12 @@
                                                   singularKey="participation.list.foot.workshopSingular"/>
                                 }
 
+                                @if (participation.publicRegistration) {
+                                    <entity-foot-item color="var(--app-status-validated)"
+                                                      icon="globe"
+                                                      labelKey="entityList.signal.onlineRegistration"/>
+                                }
+
                                 @if (participation.guestOfHonor) {
                                     <entity-foot-item color="var(--app-status-gold)"
                                                       icon="star"

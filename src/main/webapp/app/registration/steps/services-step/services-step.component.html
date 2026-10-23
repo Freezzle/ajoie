@@ -37,24 +37,27 @@
                 <div class="mt-4 col-12">
                     <chips-box fieldName="subCategories"
                                formControlName="subCategories"
+                               infoKey="registration.services.subCategoriesInfo"
                                translateKey="stand.subCategories"/>
                 </div>
-                <div class="mt-4 col-12 col-lg-6">
-                    <counter-box fieldName="nbTable" formControlName="nbTable" translateKey="stand.nbTable"/>
+            </div>
+
+            <h3 class="registration-subtitle">{{ 'registration.services.logisticsTitle' | translate }}</h3>
+            <p class="registration-help">{{ 'registration.services.logisticsHelp' | translate }}</p>
+            <div class="row">
+                <div class="mt-4 col-12">
+                    <counter-box [hint]="'registration.services.tableSizeHint' | translate"
+                                 fieldName="nbTable"
+                                 formControlName="nbTable"
+                                 translateKey="stand.nbTable"/>
                 </div>
-                <div class="mt-4 col-12 col-lg-6">
+                <div class="mt-4 col-12">
                     <counter-box fieldName="nbChair" formControlName="nbChair" translateKey="stand.nbChair"/>
                 </div>
-                <div class="mt-4 col-12 col-lg-6">
+                <div class="mt-4 col-12">
                     <checkbox-box fieldName="needElectricity"
                                   formControlName="needElectricity"
                                   translateKey="stand.needElectricity"/>
-                </div>
-                <div class="mt-4 col-12 col-lg-6">
-                    <checkbox-box [hint]="sharedStandHint"
-                                  fieldName="shared"
-                                  formControlName="shared"
-                                  translateKey="stand.shared"/>
                 </div>
             </div>
 
@@ -73,6 +76,86 @@
                     <text-box fieldName="urlPicture" formControlName="urlPicture" translateKey="stand.urlPicture"/>
                 </div>
             </div>
+
+            <h3 class="registration-subtitle">{{ 'registration.services.coExhibitorTitle' | translate }}</h3>
+            <p class="registration-help">{{ 'registration.services.coExhibitorHelp' | translate }}</p>
+            <div class="row">
+                <div class="mt-4 col-12">
+                    <checkbox-box [hint]="sharedStandHint"
+                                  fieldName="shared"
+                                  formControlName="shared"
+                                  translateKey="stand.shared"/>
+                </div>
+            </div>
+
+            @if (form.controls.stand.controls.shared.value) {
+                <div class="registration-reveal">
+                    <div class="row">
+                        <div class="mt-4 col-12 col-lg-6">
+                            <text-box fieldName="sharedLastName"
+                                      formControlName="sharedLastName"
+                                      translateKey="stand.coExhibitor.lastName"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-6">
+                          <text-box fieldName="sharedFirstName"
+                                    formControlName="sharedFirstName"
+                                    translateKey="stand.coExhibitor.firstName"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-6">
+                            <text-box fieldName="sharedTherapistName"
+                                      formControlName="sharedTherapistName"
+                                      translateKey="stand.coExhibitor.therapistName"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-6">
+                            <text-box fieldName="sharedEmail"
+                                      formControlName="sharedEmail"
+                                      translateKey="stand.coExhibitor.email"/>
+                        </div>
+                        <div class="mt-4 col-12">
+                            <textarea-box [maxLength]="500"
+                                          [rows]="5"
+                                          [showCounter]="true"
+                                          fieldName="sharedDescription"
+                                          formControlName="sharedDescription"
+                                          translateKey="stand.coExhibitor.description"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-6">
+                            <select-box [formatterFunction]="formatterCategory"
+                                        [needTranslation]="true"
+                                        [options]="categories"
+                                        fieldName="sharedCategory"
+                                        formControlName="sharedCategory"
+                                        translateKey="stand.coExhibitor.category"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-6">
+                            <chips-box fieldName="sharedSubCategories"
+                                       formControlName="sharedSubCategories"
+                                       infoKey="registration.services.subCategoriesInfo"
+                                       translateKey="stand.coExhibitor.subCategories"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-4">
+                            <text-box fieldName="sharedWebsite"
+                                      formControlName="sharedWebsite"
+                                      translateKey="stand.website"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-4">
+                            <text-box fieldName="sharedInstagram"
+                                      formControlName="sharedInstagram"
+                                      translateKey="stand.instagram"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-4">
+                            <text-box fieldName="sharedFacebook"
+                                      formControlName="sharedFacebook"
+                                      translateKey="stand.facebook"/>
+                        </div>
+                        <div class="mt-4 col-12">
+                            <text-box fieldName="sharedUrlPicture"
+                                      formControlName="sharedUrlPicture"
+                                      translateKey="stand.urlPicture"/>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </app-service-question-card>
 

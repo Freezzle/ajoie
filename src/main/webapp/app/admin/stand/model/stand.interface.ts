@@ -14,6 +14,17 @@ export interface IStand {
     nbTable: number;
     nbChair: number;
     needElectricity: boolean;
+    sharedFirstName: string | null;
+    sharedLastName: string | null;
+    sharedTherapistName: string | null;
+    sharedEmail: string | null;
+    sharedDescription: string | null;
+    sharedCategory: Category | null;
+    sharedSubCategories: string[] | [];
+    sharedWebsite: string | null;
+    sharedInstagram: string | null;
+    sharedFacebook: string | null;
+    sharedUrlPicture: string | null;
     status: Status;
     category: Category | null;
     subCategories: string[] | [];

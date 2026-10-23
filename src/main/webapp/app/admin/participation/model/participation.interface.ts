@@ -23,6 +23,7 @@ export interface IParticipation {
     crushOfHeart: boolean;
     additionnalInformation: string | null;
     status: Status;
+    publicRegistration: boolean;
     extraInformation: string | null;
     exhibitor: IExhibitor;
     salon: ISalon;

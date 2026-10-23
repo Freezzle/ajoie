@@ -26,12 +26,16 @@
     </app-registration-card>
 
     <app-registration-card titleKey="registration.exhibitor.addressTitle">
-        <h4 class="registration-subtitle">{{ 'exhibitor.homeAddress' | translate }}</h4>
+        <h4 class="registration-subtitle">
+            {{ 'exhibitor.homeAddress' | translate }}
+            <info-icon textKey="registration.exhibitor.homeAddressInfo"/>
+        </h4>
         <app-address-form [required]="true" [showFormalFields]="false" formControlName="homeAddress"/>
 
         <div class="mt-4">
             <checkbox-box fieldName="differentBillingAddress"
                           formControlName="differentBillingAddress"
+                          infoKey="registration.exhibitor.billingAddressInfo"
                           translateKey="exhibitor.differentBillingAddress"/>
         </div>
 

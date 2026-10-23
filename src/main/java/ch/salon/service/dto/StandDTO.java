@@ -23,6 +23,17 @@ public class StandDTO implements Serializable {
     private Long nbTable;
     private Long nbChair;
     private Boolean needElectricity;
+    private String sharedFirstName;
+    private String sharedLastName;
+    private String sharedTherapistName;
+    private String sharedEmail;
+    private String sharedDescription;
+    private Category sharedCategory;
+    private Set<String> sharedSubCategories = new HashSet<>();
+    private String sharedWebsite;
+    private String sharedInstagram;
+    private String sharedFacebook;
+    private String sharedUrlPicture;
     private Category category;
     private Set<String> subCategories = new HashSet<>();
     private Status status;

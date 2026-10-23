@@ -6,6 +6,7 @@ import {AddressFormComponent} from '../../../shared/components/address-form/addr
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
+import {InfoIconComponent} from '../../../shared/components/info-icon/info-icon.component';
 import {RegistrationCardComponent} from '../../registration-card/registration-card.component';
 import {ExhibitorFormGroup} from '../../registration-form.service';
 
@@ -18,6 +19,7 @@ import {ExhibitorFormGroup} from '../../registration-form.service';
                    CheckboxBoxComponent,
                    SelectBoxComponent,
                    TextBoxComponent,
+                   InfoIconComponent,
                    RegistrationCardComponent
                ],
                templateUrl: './exhibitor-step.component.html'

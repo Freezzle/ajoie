@@ -1,7 +1,22 @@
 {
   "stand": {
     "card": {
-      "socialNetwork": "Réseau sociaux"
+      "socialNetwork": "Réseau sociaux",
+      "coExhibitor": "Co-exposant"
+    },
+    "coExhibitor": {
+      "category": "Catégorie du co-exposant",
+      "description": "Description du co-stand",
+      "email": "E-mail du co-exposant",
+      "facebook": "Facebook du co-exposant",
+      "firstName": "Prénom du co-exposant",
+      "fullName": "Co-exposant",
+      "instagram": "Instagram du co-exposant",
+      "lastName": "Nom du co-exposant",
+      "subCategories": "Mots-clés",
+      "therapistName": "Nom de thérapeute du co-exposant",
+      "urlPicture": "Url de l'image du co-exposant",
+      "website": "Site internet du co-exposant"
     },
     "category": {
       "label": "Catégorie",
@@ -31,7 +46,7 @@
     "notFound": "Aucun stand",
     "participation": "Participation",
     "position": "Position",
-    "shared": "Partagé ?",
+    "shared": "Partagé avec un co-exposant ?",
     "status": {
       "label": "Statut",
       "list": {
@@ -44,7 +59,7 @@
         "null": " "
       }
     },
-    "subCategories": "Tags",
+    "subCategories": "Mots-clés",
     "title": "Les stands",
     "list": {
       "searchPlaceholder": "Rechercher une description, un thérapeute, un tag",

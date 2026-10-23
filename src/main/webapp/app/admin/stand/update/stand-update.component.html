@@ -118,6 +118,79 @@
         </div>
     </app-card>
 
+    @if (editForm.controls.shared.value) {
+        <app-card>
+            <div appCardHeader>
+                <h4>{{ 'stand.card.coExhibitor' | translate }}</h4>
+            </div>
+            <div appCardBody>
+                <div class="row">
+                    <div class="mt-4 col-lg-6">
+                      <text-box fieldName="sharedLastName"
+                                formControlName="sharedLastName"
+                                translateKey="stand.coExhibitor.lastName"/>
+                    </div>
+                    <div class="mt-4 col-lg-6">
+                        <text-box fieldName="sharedFirstName"
+                                  formControlName="sharedFirstName"
+                                  translateKey="stand.coExhibitor.firstName"/>
+                    </div>
+                    <div class="mt-4 col-lg-6">
+                        <text-box fieldName="sharedTherapistName"
+                                  formControlName="sharedTherapistName"
+                                  translateKey="stand.coExhibitor.therapistName"/>
+                    </div>
+                    <div class="mt-4 col-lg-6">
+                        <text-box fieldName="sharedEmail"
+                                  formControlName="sharedEmail"
+                                  translateKey="stand.coExhibitor.email"/>
+                    </div>
+                    <div class="mt-4 col-12">
+                        <textarea-box [maxLength]="500"
+                                      [rows]="6"
+                                      [showCounter]="true"
+                                      fieldName="sharedDescription"
+                                      formControlName="sharedDescription"
+                                      translateKey="stand.coExhibitor.description"/>
+                    </div>
+                    <div class="mt-4 col-lg-6">
+                        <select-box [formatterFunction]="formatterCategory"
+                                    [needTranslation]="true"
+                                    [options]="categoryValues"
+                                    fieldName="sharedCategory"
+                                    formControlName="sharedCategory"
+                                    translateKey="stand.coExhibitor.category"/>
+                    </div>
+                    <div class="mt-4 col-lg-6">
+                        <chips-box fieldName="sharedSubCategories"
+                                   formControlName="sharedSubCategories"
+                                   translateKey="stand.coExhibitor.subCategories"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <text-box fieldName="sharedWebsite"
+                                  formControlName="sharedWebsite"
+                                  translateKey="stand.coExhibitor.website"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <text-box fieldName="sharedInstagram"
+                                  formControlName="sharedInstagram"
+                                  translateKey="stand.coExhibitor.instagram"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <text-box fieldName="sharedFacebook"
+                                  formControlName="sharedFacebook"
+                                  translateKey="stand.coExhibitor.facebook"/>
+                    </div>
+                    <div class="mt-4 col-12">
+                        <text-box fieldName="sharedUrlPicture"
+                                  formControlName="sharedUrlPicture"
+                                  translateKey="stand.coExhibitor.urlPicture"/>
+                    </div>
+                </div>
+            </div>
+        </app-card>
+    }
+
     <app-card>
         <div appCardHeader><h4>{{ 'common.info-intern' | translate }}</h4></div>
         <div appCardBody>

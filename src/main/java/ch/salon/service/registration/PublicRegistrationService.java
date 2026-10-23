@@ -341,6 +341,37 @@ public class PublicRegistrationService {
         return request;
     }
 
+    private void applyCoExhibitor(Stand stand, RegistrationStandDTO standDTO) {
+        if (!standDTO.isShared()) {
+            stand.setSharedFirstName(null);
+            stand.setSharedLastName(null);
+            stand.setSharedTherapistName(null);
+            stand.setSharedEmail(null);
+            stand.setSharedDescription(null);
+            stand.setSharedCategory(null);
+            stand.setSharedSubCategories(new LinkedHashSet<>());
+            stand.setSharedWebsite(null);
+            stand.setSharedInstagram(null);
+            stand.setSharedFacebook(null);
+            stand.setSharedUrlPicture(null);
+            return;
+        }
+
+        stand.setSharedFirstName(sub(standDTO.getSharedFirstName(), 100));
+        stand.setSharedLastName(sub(standDTO.getSharedLastName(), 100));
+        stand.setSharedTherapistName(sub(standDTO.getSharedTherapistName(), 100));
+        stand.setSharedEmail(sub(standDTO.getSharedEmail(), 100));
+        stand.setSharedDescription(sub(standDTO.getSharedDescription(), 500));
+        stand.setSharedCategory(standDTO.getSharedCategory());
+        stand.setSharedSubCategories(
+                standDTO.getSharedSubCategories() != null ? new LinkedHashSet<>(standDTO.getSharedSubCategories()) :
+                        new LinkedHashSet<>());
+        stand.setSharedWebsite(sub(standDTO.getSharedWebsite(), 100));
+        stand.setSharedInstagram(sub(standDTO.getSharedInstagram(), 100));
+        stand.setSharedFacebook(sub(standDTO.getSharedFacebook(), 100));
+        stand.setSharedUrlPicture(sub(standDTO.getSharedUrlPicture(), 500));
+    }
+
     private RegistrationStandDTO toStandDTO(Stand stand) {
         RegistrationStandDTO dto = new RegistrationStandDTO();
         dto.setDescription(stand.getDescription());
@@ -356,6 +387,19 @@ public class PublicRegistrationService {
         dto.setInstagram(stand.getInstagram());
         dto.setFacebook(stand.getFacebook());
         dto.setUrlPicture(stand.getUrlPicture());
+        dto.setSharedFirstName(stand.getSharedFirstName());
+        dto.setSharedLastName(stand.getSharedLastName());
+        dto.setSharedTherapistName(stand.getSharedTherapistName());
+        dto.setSharedEmail(stand.getSharedEmail());
+        dto.setSharedDescription(stand.getSharedDescription());
+        dto.setSharedCategory(stand.getSharedCategory());
+        dto.setSharedSubCategories(
+                stand.getSharedSubCategories() != null ? new LinkedHashSet<>(stand.getSharedSubCategories()) :
+                        new LinkedHashSet<>());
+        dto.setSharedWebsite(stand.getSharedWebsite());
+        dto.setSharedInstagram(stand.getSharedInstagram());
+        dto.setSharedFacebook(stand.getSharedFacebook());
+        dto.setSharedUrlPicture(stand.getSharedUrlPicture());
         return dto;
     }
 
@@ -470,6 +514,7 @@ public class PublicRegistrationService {
             stand.setInstagram(sub(standDTO.getInstagram(), 100));
             stand.setFacebook(sub(standDTO.getFacebook(), 100));
             stand.setUrlPicture(sub(standDTO.getUrlPicture(), 500));
+            applyCoExhibitor(stand, standDTO);
             stand.setStatus(Status.IN_VERIFICATION);
             stand.setExtraInformation(null);
             standRepository.save(stand);

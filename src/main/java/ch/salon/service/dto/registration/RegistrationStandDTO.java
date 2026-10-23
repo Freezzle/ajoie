@@ -41,6 +41,37 @@ public class RegistrationStandDTO implements Serializable {
     private boolean shared;
 
     @Size(max = 100)
+    private String sharedFirstName;
+
+    @Size(max = 100)
+    private String sharedLastName;
+
+    @Size(max = 100)
+    private String sharedTherapistName;
+
+    @Size(max = 100)
+    private String sharedEmail;
+
+    @Size(max = 500)
+    private String sharedDescription;
+
+    private Category sharedCategory;
+
+    private Set<String> sharedSubCategories = new LinkedHashSet<>();
+
+    @Size(max = 100)
+    private String sharedWebsite;
+
+    @Size(max = 100)
+    private String sharedInstagram;
+
+    @Size(max = 100)
+    private String sharedFacebook;
+
+    @Size(max = 500)
+    private String sharedUrlPicture;
+
+    @Size(max = 100)
     private String website;
 
     @Size(max = 100)

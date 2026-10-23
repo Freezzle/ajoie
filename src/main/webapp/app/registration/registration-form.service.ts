@@ -33,6 +33,17 @@ export type StandFormGroup = FormGroup<{
     instagram: FormControl<string | null>;
     facebook: FormControl<string | null>;
     urlPicture: FormControl<string | null>;
+    sharedFirstName: FormControl<string | null>;
+    sharedLastName: FormControl<string | null>;
+    sharedTherapistName: FormControl<string | null>;
+    sharedEmail: FormControl<string | null>;
+    sharedDescription: FormControl<string | null>;
+    sharedCategory: FormControl<Category | null>;
+    sharedSubCategories: FormControl<string[] | null>;
+    sharedWebsite: FormControl<string | null>;
+    sharedInstagram: FormControl<string | null>;
+    sharedFacebook: FormControl<string | null>;
+    sharedUrlPicture: FormControl<string | null>;
 }>;
 
 export type ExhibitorFormGroup = FormGroup<{
@@ -177,7 +188,18 @@ export class RegistrationFormService {
             website: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             instagram: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             facebook: new FormControl<string | null>(null, [Validators.maxLength(100)]),
-            urlPicture: new FormControl<string | null>(null, [Validators.maxLength(500)])
+            urlPicture: new FormControl<string | null>(null, [Validators.maxLength(500)]),
+            sharedFirstName: new FormControl<string | null>(null, [Validators.maxLength(100)]),
+            sharedLastName: new FormControl<string | null>(null, [Validators.maxLength(100)]),
+            sharedTherapistName: new FormControl<string | null>(null, [Validators.maxLength(100)]),
+            sharedEmail: new FormControl<string | null>(null, [Validators.email, Validators.maxLength(100)]),
+            sharedDescription: new FormControl<string | null>(null, [Validators.maxLength(500)]),
+            sharedCategory: new FormControl<Category | null>(null),
+            sharedSubCategories: new FormControl<string[] | null>([]),
+            sharedWebsite: new FormControl<string | null>(null, [Validators.maxLength(100)]),
+            sharedInstagram: new FormControl<string | null>(null, [Validators.maxLength(100)]),
+            sharedFacebook: new FormControl<string | null>(null, [Validators.maxLength(100)]),
+            sharedUrlPicture: new FormControl<string | null>(null, [Validators.maxLength(500)])
         });
     }
 
@@ -228,6 +250,10 @@ export class RegistrationFormService {
             this.toggle(services.controls.stand, !!want);
         });
 
+        services.controls.stand.controls.shared.valueChanges.subscribe(shared => {
+            this.refreshCoExhibitorValidators(services.controls.stand, !!shared);
+        });
+
         services.controls.wantConference.valueChanges.subscribe(want => {
             this.toggle(services.controls.conferences, !!want);
             if (want && services.controls.conferences.length === 0) {
@@ -264,6 +290,22 @@ export class RegistrationFormService {
         });
     }
 
+    /** Les informations du co-exposant ne sont exigées que si le stand est partagé. */
+    private refreshCoExhibitorValidators(stand: StandFormGroup, shared: boolean): void {
+        const required: [AbstractControl, ValidatorFn[]][] = [
+            [stand.controls.sharedFirstName, [Validators.maxLength(100)]],
+            [stand.controls.sharedLastName, [Validators.maxLength(100)]],
+            [stand.controls.sharedEmail, [Validators.email, Validators.maxLength(100)]],
+            [stand.controls.sharedDescription, [Validators.maxLength(500)]],
+            [stand.controls.sharedCategory, []]
+        ];
+
+        required.forEach(([control, validators]) => {
+            control.setValidators(shared ? [Validators.required, ...validators] : validators);
+            control.updateValueAndValidity({emitEvent: false});
+        });
+    }
+
     private toggle(control: AbstractControl, enabled: boolean): void {
         if (enabled) {
             control.enable({emitEvent: false});
@@ -295,6 +337,7 @@ export class RegistrationFormService {
         const stands: IRegistrationStand[] = [];
         if (services.controls.wantStand.value) {
             const stand = services.controls.stand.getRawValue();
+            const shared = !!stand.shared;
             stands.push({
                             description: stand.description ?? '',
                             dimensionId: stand.dimension?.id ?? null,
@@ -303,11 +346,22 @@ export class RegistrationFormService {
                             nbTable: stand.nbTable ?? 0,
                             nbChair: stand.nbChair ?? 0,
                             needElectricity: !!stand.needElectricity,
-                            shared: !!stand.shared,
+                            shared,
                             website: stand.website ?? null,
                             instagram: stand.instagram ?? null,
                             facebook: stand.facebook ?? null,
-                            urlPicture: stand.urlPicture ?? null
+                            urlPicture: stand.urlPicture ?? null,
+                            sharedFirstName: shared ? stand.sharedFirstName ?? null : null,
+                            sharedLastName: shared ? stand.sharedLastName ?? null : null,
+                            sharedTherapistName: shared ? stand.sharedTherapistName ?? null : null,
+                            sharedEmail: shared ? stand.sharedEmail ?? null : null,
+                            sharedDescription: shared ? stand.sharedDescription ?? null : null,
+                            sharedCategory: shared ? stand.sharedCategory ?? null : null,
+                            sharedSubCategories: shared ? stand.sharedSubCategories ?? [] : [],
+                            sharedWebsite: shared ? stand.sharedWebsite ?? null : null,
+                            sharedInstagram: shared ? stand.sharedInstagram ?? null : null,
+                            sharedFacebook: shared ? stand.sharedFacebook ?? null : null,
+                            sharedUrlPicture: shared ? stand.sharedUrlPicture ?? null : null
                         });
         }
 
@@ -405,8 +459,20 @@ export class RegistrationFormService {
                                                    website: stand.website,
                                                    instagram: stand.instagram,
                                                    facebook: stand.facebook,
-                                                   urlPicture: stand.urlPicture
+                                                   urlPicture: stand.urlPicture,
+                                                   sharedFirstName: stand.sharedFirstName,
+                                                   sharedLastName: stand.sharedLastName,
+                                                   sharedTherapistName: stand.sharedTherapistName,
+                                                   sharedEmail: stand.sharedEmail,
+                                                   sharedDescription: stand.sharedDescription,
+                                                   sharedCategory: stand.sharedCategory,
+                                                   sharedSubCategories: stand.sharedSubCategories ?? [],
+                                                   sharedWebsite: stand.sharedWebsite,
+                                                   sharedInstagram: stand.sharedInstagram,
+                                                   sharedFacebook: stand.sharedFacebook,
+                                                   sharedUrlPicture: stand.sharedUrlPicture
                                                });
+            this.refreshCoExhibitorValidators(services.controls.stand, !!stand.shared);
         }
 
         services.controls.conferences.clear({emitEvent: false});
@@ -439,6 +505,7 @@ export class RegistrationFormService {
         const draftServices = draft.services;
 
         services.controls.stand.patchValue(draftServices.stand);
+        this.refreshCoExhibitorValidators(services.controls.stand, !!draftServices.stand?.shared);
 
         services.controls.conferences.clear({emitEvent: false});
         (draftServices.conferences ?? []).forEach(talk => services.controls.conferences.push(

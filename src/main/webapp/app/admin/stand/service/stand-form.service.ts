@@ -15,6 +15,17 @@ export type StandFormGroup = {
     nbTable: FormControl<IStand['nbTable'] | null>;
     nbChair: FormControl<IStand['nbChair'] | null>;
     needElectricity: FormControl<IStand['needElectricity'] | null>;
+    sharedFirstName: FormControl<IStand['sharedFirstName'] | null>;
+    sharedLastName: FormControl<IStand['sharedLastName'] | null>;
+    sharedTherapistName: FormControl<IStand['sharedTherapistName'] | null>;
+    sharedEmail: FormControl<IStand['sharedEmail'] | null>;
+    sharedDescription: FormControl<IStand['sharedDescription'] | null>;
+    sharedCategory: FormControl<IStand['sharedCategory'] | null>;
+    sharedSubCategories: FormControl<IStand['sharedSubCategories'] | null>;
+    sharedWebsite: FormControl<IStand['sharedWebsite'] | null>;
+    sharedInstagram: FormControl<IStand['sharedInstagram'] | null>;
+    sharedFacebook: FormControl<IStand['sharedFacebook'] | null>;
+    sharedUrlPicture: FormControl<IStand['sharedUrlPicture'] | null>;
     status: FormControl<IStand['status'] | null>;
     category: FormControl<IStand['category'] | null>;
     subCategories: FormControl<IStand['subCategories'] | null>;
@@ -51,6 +62,18 @@ export class StandFormService {
                                                      CustomValidatorModel.onlyNumbers
                                                  ]),
                                                  needElectricity: new FormControl(raw.needElectricity, Validators.required),
+                                                 sharedFirstName: new FormControl(raw.sharedFirstName),
+                                                 sharedLastName: new FormControl(raw.sharedLastName),
+                                                 sharedTherapistName: new FormControl(raw.sharedTherapistName),
+                                                 sharedEmail: new FormControl(raw.sharedEmail),
+                                                 sharedDescription: new FormControl(raw.sharedDescription,
+                                                     Validators.maxLength(500)),
+                                                 sharedCategory: new FormControl(raw.sharedCategory),
+                                                 sharedSubCategories: new FormControl(raw.sharedSubCategories),
+                                                 sharedWebsite: new FormControl(raw.sharedWebsite),
+                                                 sharedInstagram: new FormControl(raw.sharedInstagram),
+                                                 sharedFacebook: new FormControl(raw.sharedFacebook),
+                                                 sharedUrlPicture: new FormControl(raw.sharedUrlPicture),
                                                  status: new FormControl(raw.status, Validators.required),
                                                  category: new FormControl(raw.category),
                                                  subCategories: new FormControl(raw.subCategories),
@@ -66,14 +89,15 @@ export class StandFormService {
 
     private getDefaultStandFormValue(): Pick<IStand,
         'status' | 'nbTable' | 'nbChair' | 'subCategories' | 'needElectricity'
-        | 'shared'> {
+        | 'shared' | 'sharedSubCategories'> {
         return {
             status: Status.IN_VERIFICATION,
             nbTable: 0,
             nbChair: 0,
             needElectricity: true,
             subCategories: [],
-            shared: false
+            shared: false,
+            sharedSubCategories: []
         };
     }
 }

@@ -16,6 +16,9 @@
         @if (control.hasValidator(Validators.required)) {
             <span class="text-danger">*</span>
         }
+        @if (infoKey) {
+            <info-icon [textKey]="infoKey"/>
+        }
         <small>{{ 'autocomplete.chips.suffix' | translate }}</small>
     </label>
 </p-iftalabel>

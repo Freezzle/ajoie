@@ -5,9 +5,11 @@ import {ErrorModel} from '../../field-error/error.model';
 import {ErrorBoxComponent} from '../../error-box/error-box.component';
 import {IftaLabel} from 'primeng/iftalabel';
 import {AutoComplete} from 'primeng/autocomplete';
+import {InfoIconComponent} from '../info-icon/info-icon.component';
 
 @Component({
-               imports: [SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, IftaLabel, AutoComplete],
+               imports: [SharedModule, ReactiveFormsModule, ErrorBoxComponent, IftaLabel, IftaLabel, AutoComplete,
+                   InfoIconComponent],
                selector: 'chips-box',
                templateUrl: './chips-box.component.html'
            })
@@ -18,6 +20,9 @@ export class ChipsBoxComponent implements ControlValueAccessor {
     fieldName: string = '';
     @Input()
     maxChips: number = 3;
+    /** Clé de traduction affichée dans une infobulle à côté du libellé. */
+    @Input()
+    infoKey: string | null = null;
     disabled: boolean = false;
     value: string = '';
     protected readonly Validators = Validators;

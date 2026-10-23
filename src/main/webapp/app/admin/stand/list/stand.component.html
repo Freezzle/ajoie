@@ -90,19 +90,6 @@
                                 </span>
 
                                 <ng-container rowFoot>
-                                    @if (visibleTags(stand).length > 0) {
-                                        <span class="el-foot-item">
-                                            @for (tag of visibleTags(stand); track tag) {
-                                                <span class="el-tag">
-                                                    <entity-highlight [query]="state.query()" [text]="tag"/>
-                                                </span>
-                                            }
-                                            @if (extraTags(stand) > 0) {
-                                                <span class="el-tag">+{{ extraTags(stand) }}</span>
-                                            }
-                                        </span>
-                                    }
-
                                     @if (dimensionLabel(stand); as dimension) {
                                         <entity-foot-item [label]="dimension"
                                                           [showLabel]="true"
@@ -120,6 +107,19 @@
                                                           icon="bolt"
                                                           labelKey="entityList.signal.electricity"/>
                                     }
+
+                                  @if (visibleTags(stand).length > 0) {
+                                    <span class="el-foot-item">
+                                            @for (tag of visibleTags(stand); track tag) {
+                                              <span class="el-tag">
+                                                    <entity-highlight [query]="state.query()" [text]="tag"/>
+                                                </span>
+                                            }
+                                      @if (extraTags(stand) > 0) {
+                                        <span class="el-tag">+{{ extraTags(stand) }}</span>
+                                      }
+                                        </span>
+                                  }
 
                                     @if (stand.extraInformation) {
                                         <entity-foot-item [detail]="stand.extraInformation"

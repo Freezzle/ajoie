@@ -93,6 +93,60 @@
                     <dt>{{ 'stand.shared' | translate }}</dt>
                     <dd>{{ (standValue.shared ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
                 </div>
+                @if (standValue.shared) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.coExhibitor.fullName' | translate }}</dt>
+                        <dd>{{ standValue.sharedFirstName }} {{ standValue.sharedLastName }}</dd>
+                    </div>
+                    @if (standValue.sharedTherapistName) {
+                        <div class="summary-row">
+                            <dt>{{ 'stand.coExhibitor.therapistName' | translate }}</dt>
+                            <dd>{{ standValue.sharedTherapistName }}</dd>
+                        </div>
+                    }
+                    <div class="summary-row">
+                        <dt>{{ 'stand.coExhibitor.email' | translate }}</dt>
+                        <dd>{{ standValue.sharedEmail }}</dd>
+                    </div>
+                    <div class="summary-row">
+                        <dt>{{ 'stand.coExhibitor.description' | translate }}</dt>
+                        <dd>{{ standValue.sharedDescription }}</dd>
+                    </div>
+                    <div class="summary-row">
+                        <dt>{{ 'stand.coExhibitor.category' | translate }}</dt>
+                        <dd>{{ formatterCategory(standValue.sharedCategory) | translate }}</dd>
+                    </div>
+                    @if (standValue.sharedSubCategories?.length) {
+                        <div class="summary-row">
+                            <dt>{{ 'stand.coExhibitor.subCategories' | translate }}</dt>
+                            <dd>{{ standValue.sharedSubCategories?.join(', ') }}</dd>
+                        </div>
+                    }
+                    @if (standValue.sharedWebsite) {
+                        <div class="summary-row">
+                            <dt>{{ 'stand.coExhibitor.website' | translate }}</dt>
+                            <dd>{{ standValue.sharedWebsite }}</dd>
+                        </div>
+                    }
+                    @if (standValue.sharedInstagram) {
+                        <div class="summary-row">
+                            <dt>{{ 'stand.coExhibitor.instagram' | translate }}</dt>
+                            <dd>{{ standValue.sharedInstagram }}</dd>
+                        </div>
+                    }
+                    @if (standValue.sharedFacebook) {
+                        <div class="summary-row">
+                            <dt>{{ 'stand.coExhibitor.facebook' | translate }}</dt>
+                            <dd>{{ standValue.sharedFacebook }}</dd>
+                        </div>
+                    }
+                    @if (standValue.sharedUrlPicture) {
+                        <div class="summary-row">
+                            <dt>{{ 'stand.coExhibitor.urlPicture' | translate }}</dt>
+                            <dd>{{ standValue.sharedUrlPicture }}</dd>
+                        </div>
+                    }
+                }
                 @if (standValue.website) {
                     <div class="summary-row">
                         <dt>{{ 'stand.website' | translate }}</dt>

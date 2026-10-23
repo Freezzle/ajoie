@@ -9,9 +9,10 @@ import {
 } from '@angular/forms';
 import SharedModule from '../../shared.module';
 import {ToggleSwitch} from 'primeng/toggleswitch';
+import {InfoIconComponent} from '../info-icon/info-icon.component';
 
 @Component({
-               imports: [ReactiveFormsModule, FormsModule, SharedModule, ToggleSwitch],
+               imports: [ReactiveFormsModule, FormsModule, SharedModule, ToggleSwitch, InfoIconComponent],
                selector: 'checkbox-box',
                templateUrl: './checkbox-box.component.html',
                styleUrl: './checkbox-box.component.scss'
@@ -19,6 +20,8 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
 export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
     @Input() translateKey?: string;
     @Input() hint: string | null = null;
+    /** Clé de traduction affichée dans une infobulle à côté du libellé. */
+    @Input() infoKey: string | null = null;
     @Input() fieldName: string = '';
     @Input() value: boolean = false;
     @Input() forceDisabled: boolean = false;

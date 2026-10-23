@@ -1,6 +1,9 @@
 <div class="checkbox-box {{control.disabled ? 'disabled' : ''}} d-flex p-3 justify-content-between align-items-center">
         <div class="checkbox-box-labels">
             <div>{{(translateKey ?? '') | translate}}
+              @if (infoKey) {
+                <info-icon [textKey]="infoKey"/>
+              }
               @if (hint) {
                 <small class="checkbox-box-hint">{{ hint }}</small>
               }

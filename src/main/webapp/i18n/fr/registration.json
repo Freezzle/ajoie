@@ -55,6 +55,8 @@
       "addressTitle": "Vos adresses",
       "preferencesTitle": "Vos préférences",
       "therapistNameHelp": "Nom affiché pendant le salon, si aucun, dans ce cas le nom et prénom seront utilisés",
+      "homeAddressInfo": "Là où des documents doivent vous être transmis physiquement.",
+      "billingAddressInfo": "Là où vous désirez recevoir votre facturation et qui sera mentionnée sur la facture.",
       "emailLocked": "L'adresse e-mail ne peut pas être modifiée : votre lien personnel y est rattaché."
     },
     "services": {
@@ -67,12 +69,19 @@
       "talkDescription": "Description",
       "addConference": "Ajouter une autre conférence",
       "addWorkshop": "Ajouter un autre atelier",
-      "remove": "Retirer"
+      "remove": "Retirer",
+      "subCategoriesInfo": "Permet de citer quelques mots-clés sur ce que propose votre stand.",
+      "logisticsTitle": "Logistique",
+      "logisticsHelp": "Que désirez-vous avoir dans votre stand à votre arrivée ?",
+      "tableSizeHint": "180 cm x 70 cm",
+      "coExhibitorTitle": "Stand partagé avec un co-exposant",
+      "coExhibitorHelp": "Si vous partagez votre stand avec un autre exposant qui exerce une autre activité principale."
     },
     "participation": {
       "mealsTitle": "Les repas",
-      "mealsHelp": "Indiquez le nombre de repas souhaités pour votre équipe.",
+      "mealsHelp": "Indiquez le nombre de repas souhaités pour votre équipe. Les prix sont à tarifs préférentiels uniquement pour les exposants.",
       "invoiceTitle": "Mode d'envoi de la facture principale",
+      "invoicePostalHome": "A l'adresse de courrier",
       "offerTitle": "Tirage au sort RFJ",
       "offerTitleHelp": "Souhaitez-vous offrir un soin ou un cadeau pour le tirage au sort de la radio RFJ ?",
       "additionalTitle": "Dernières précisions"
