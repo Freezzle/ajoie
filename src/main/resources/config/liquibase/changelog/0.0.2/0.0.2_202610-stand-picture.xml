@@ -7,12 +7,18 @@
         Image uploadée d'un stand (exposant et co-exposant).
         Les anciennes colonnes stand.url_picture / stand.shared_url_picture sont conservées
         telles quelles pour garder la trace des liens Google Drive historiques.
+
+        NB : on utilise un sqlCheck plutôt que <tableExists>, car cette précondition déclenche un
+        snapshot Liquibase qui lit pg_catalog.pg_database — table sur laquelle l'utilisateur de la
+        base de prod n'a pas le droit SELECT (« permission denied for table pg_database »).
     -->
     <changeSet id="0.0.2-202610-stand-picture" author="freezzle">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="stand_picture"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name = 'stand_picture'
+            </sqlCheck>
         </preConditions>
 
         <createTable tableName="stand_picture">

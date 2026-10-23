@@ -10,20 +10,22 @@
 
         Aucune ligne ne peut exister dans la table : toutes les insertions échouaient. On purge
         donc par sécurité avant de recréer la colonne au bon type.
+
+        NB : on utilise un sqlCheck plutôt que <tableExists>, car cette précondition déclenche un
+        snapshot Liquibase qui lit pg_catalog.pg_database — table sur laquelle l'utilisateur de la
+        base de prod n'a pas le droit SELECT (« permission denied for table pg_database »).
+        La requête ci-dessous couvre à la fois l'existence de la table et le type de la colonne
+        (elle retourne 0 si la table est absente, contrairement à un cast ::regclass).
     -->
     <changeSet id="0.0.2-202610-stand-picture-data-bytea" author="freezzle" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="stand_picture"/>
-                <sqlCheck expectedResult="oid">
-                    SELECT format_type(a.atttypid, a.atttypmod)
-                    FROM pg_attribute a
-                    WHERE a.attrelid = 'stand_picture'::regclass
-                      AND a.attname = 'data'
-                      AND a.attnum > 0
-                      AND NOT a.attisdropped;
-                </sqlCheck>
-            </and>
+            <sqlCheck expectedResult="1">
+                SELECT count(*) FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND table_name = 'stand_picture'
+                  AND column_name = 'data'
+                  AND data_type = 'oid'
+            </sqlCheck>
         </preConditions>
 
         <sql>
