@@ -114,8 +114,13 @@ public class PublicRegistrationService {
             RegistrationRequestDTO request) {
         UUID tenantId = resolveTenant(salonId);
 
-        return TenantContextHolder.runAsTenant(tenantId,
+        RegistrationResponseDTO response = TenantContextHolder.runAsTenant(tenantId,
                 () -> transactionalOps.executeAndReturn(() -> doUpdate(salonId, participationId, token, request)));
+
+        // Envoi après commit : l'exposant reçoit le récapitulatif PDF correspondant aux données enregistrées.
+        registrationEmailService.sendRegistrationUpdated(tenantId, participationId, salonId, token);
+
+        return response;
     }
 
     // -------------------- TENANT --------------------

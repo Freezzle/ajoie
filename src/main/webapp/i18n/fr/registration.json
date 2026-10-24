@@ -11,6 +11,10 @@
       "registrationTitle": "Charte d'inscription",
       "salonTitle": "Charte du salon"
     },
+    "salonBanner": {
+      "salon": "Salon de {{place}}",
+      "aria": "Vous vous inscrivez au salon de {{place}}, {{dates}}"
+    },
     "actions": {
       "previous": "Précédent",
       "continue": "Continuer",

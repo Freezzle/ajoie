@@ -1,0 +1,321 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <link href="styles.css" media="all" rel="stylesheet" type="text/css" />
+  <style>
+    .section-title {
+      background-color: #cae164;
+      padding: 4px 5px;
+      font-weight: bold;
+      margin-top: 14px;
+    }
+
+    .field-label {
+      width: 35%;
+      vertical-align: top;
+      padding: 2px 5px 2px 0;
+      color: #555555;
+    }
+
+    .field-value {
+      vertical-align: top;
+      padding: 2px 0;
+    }
+
+    .block {
+      border: 1px solid #cccccc;
+      padding: 5px;
+      margin-bottom: 6px;
+    }
+
+    .chart-text {
+      padding: 2px 0;
+    }
+
+    .chart-text p {
+      margin: 0 0 6px;
+    }
+
+    .chart-text ul, .chart-text ol {
+      margin: 0 0 6px;
+      padding-left: 18px;
+    }
+
+    .disclaimer {
+      color: #555555;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div class="header" th:include="common/header::header"></div>
+<div class="letterhead" th:include="common/letterhead::letterhead"></div>
+<div class="body">
+
+  <table class="padding-all-5">
+    <tr>
+      <td class="top-left">
+        <span th:utext="#{document.registration-summary.salon}"></span>
+        [[${salonPlace}]]<br />
+        <span th:utext="#{document.registration-summary.dates}"></span>
+        [[${startDate}]] - [[${endDate}]]<br />
+      </td>
+      <td class="top-right">
+                <span th:if="${reference}">
+                    <span th:utext="#{document.registration-summary.reference}"></span>
+                    [[${reference}]]<br />
+                </span>
+        <span th:if="${registrationDate}">
+                    <span th:utext="#{document.registration-summary.registration-date}"></span>
+                    [[${registrationDate}]]
+                </span>
+      </td>
+    </tr>
+  </table>
+
+  <p class="disclaimer" th:utext="#{document.registration-summary.intro}"></p>
+
+  <!-- EXPOSANT -->
+  <div class="section-title" th:utext="#{document.registration-summary.exhibitor.title}"></div>
+  <div class="block">
+    <table>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.name}"></td>
+        <td class="field-value">[[${firstName}]] [[${lastName}]]</td>
+      </tr>
+      <tr th:if="${therapistName}">
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.therapist-name}"></td>
+        <td class="field-value">[[${therapistName}]]</td>
+      </tr>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.email}"></td>
+        <td class="field-value">[[${email}]]</td>
+      </tr>
+      <tr th:if="${phoneNumber}">
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.phone}"></td>
+        <td class="field-value">[[${phoneNumber}]]</td>
+      </tr>
+      <tr th:if="${homeAddress}">
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.home-address}"></td>
+        <td class="field-value">[[${homeAddress}]]</td>
+      </tr>
+      <tr th:if="${differentBillingAddress}">
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.billing-address}"></td>
+        <td class="field-value">
+          <span th:if="${billingFullName}">[[${billingFullName}]], </span>[[${billingAddress}]]
+        </td>
+      </tr>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.newsletter}"></td>
+        <td class="field-value">
+          <span th:if="${newsletter}" th:utext="#{document.registration-summary.yes}"></span>
+          <span th:unless="${newsletter}" th:utext="#{document.registration-summary.no}"></span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PRESTATIONS -->
+  <div class="section-title" th:utext="#{document.registration-summary.services.title}"></div>
+
+  <p th:unless="${hasServices}" th:utext="#{document.registration-summary.services.none}"></p>
+
+  <div class="block" th:each="stand: ${stands}">
+    <table>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.stand.dimension}"></td>
+        <td class="field-value">[[${stand.dimension()}]]</td>
+      </tr>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
+        <td class="field-value">[[${stand.description()}]]</td>
+      </tr>
+      <tr th:if="${stand.category()}">
+        <td class="field-label" th:utext="#{document.registration-summary.stand.category}"></td>
+        <td class="field-value">
+          [[${stand.category()}]]<span th:if="${stand.subCategories()}"> - [[${stand.subCategories()}]]</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.stand.equipment}"></td>
+        <td class="field-value">
+          <span th:utext="#{document.registration-summary.stand.tables(${stand.nbTable()})}"></span>,
+          <span th:utext="#{document.registration-summary.stand.chairs(${stand.nbChair()})}"></span>,
+          <span th:if="${stand.needElectricity()}"
+                th:utext="#{document.registration-summary.stand.electricity-yes}"></span>
+          <span th:unless="${stand.needElectricity()}"
+                th:utext="#{document.registration-summary.stand.electricity-no}"></span>
+        </td>
+      </tr>
+      <tr th:if="${stand.website() != null or stand.instagram() != null or stand.facebook() != null}">
+        <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
+        <td class="field-value">
+          <span th:if="${stand.website()}">[[${stand.website()}]]<br /></span>
+          <span th:if="${stand.instagram()}">[[${stand.instagram()}]]<br /></span>
+          <span th:if="${stand.facebook()}">[[${stand.facebook()}]]</span>
+        </td>
+      </tr>
+    </table>
+
+    <table th:if="${stand.shared()}">
+      <tr>
+        <td colspan="2" class="padding-top-5">
+          <b th:utext="#{document.registration-summary.stand.co-exhibitor}"></b>
+        </td>
+      </tr>
+      <tr th:if="${stand.sharedName()}">
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.name}"></td>
+        <td class="field-value">[[${stand.sharedName()}]]</td>
+      </tr>
+      <tr th:if="${stand.sharedTherapistName()}">
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.therapist-name}"></td>
+        <td class="field-value">[[${stand.sharedTherapistName()}]]</td>
+      </tr>
+      <tr th:if="${stand.sharedEmail()}">
+        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.email}"></td>
+        <td class="field-value">[[${stand.sharedEmail()}]]</td>
+      </tr>
+      <tr th:if="${stand.sharedDescription()}">
+        <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
+        <td class="field-value">[[${stand.sharedDescription()}]]</td>
+      </tr>
+      <tr th:if="${stand.sharedCategory()}">
+        <td class="field-label" th:utext="#{document.registration-summary.stand.category}"></td>
+        <td class="field-value">
+          [[${stand.sharedCategory()}]]<span th:if="${stand.sharedSubCategories()}">
+                    - [[${stand.sharedSubCategories()}]]</span>
+        </td>
+      </tr>
+      <tr th:if="${stand.sharedWebsite() != null or stand.sharedInstagram() != null or stand.sharedFacebook() != null}">
+        <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
+        <td class="field-value">
+          <span th:if="${stand.sharedWebsite()}">[[${stand.sharedWebsite()}]]<br /></span>
+          <span th:if="${stand.sharedInstagram()}">[[${stand.sharedInstagram()}]]<br /></span>
+          <span th:if="${stand.sharedFacebook()}">[[${stand.sharedFacebook()}]]</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block" th:each="conference: ${conferences}">
+    <table>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.conference}"></td>
+        <td class="field-value"><b>[[${conference.getTitle()}]]</b></td>
+      </tr>
+      <tr th:if="${conference.getDescription()}">
+        <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
+        <td class="field-value">[[${conference.getDescription()}]]</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block" th:each="workshop: ${workshops}">
+    <table>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.workshop}"></td>
+        <td class="field-value"><b>[[${workshop.getTitle()}]]</b></td>
+      </tr>
+      <tr th:if="${workshop.getDescription()}">
+        <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
+        <td class="field-value">[[${workshop.getDescription()}]]</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PARTICIPATION -->
+  <div class="section-title" th:utext="#{document.registration-summary.participation.title}"></div>
+  <div class="block">
+    <table>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.meals.saturday-midday}"></td>
+        <td class="field-value">[[${nbMeal1}]]</td>
+      </tr>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.meals.saturday-evening}"></td>
+        <td class="field-value">[[${nbMeal2}]]</td>
+      </tr>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.meals.sunday-midday}"></td>
+        <td class="field-value">[[${nbMeal3}]]</td>
+      </tr>
+      <tr th:if="${hasMeals and modePaymentMeals != null}">
+        <td class="field-label" th:utext="#{document.registration-summary.meals.payment-mode}"></td>
+        <td class="field-value">[[${modePaymentMeals}]]</td>
+      </tr>
+      <tr>
+        <td class="field-label" th:utext="#{document.registration-summary.invoice-sending.label}"></td>
+        <td class="field-value">[[${invoiceSendingMethod}]]</td>
+      </tr>
+      <tr th:if="${hasOffer}">
+        <td class="field-label" th:utext="#{document.registration-summary.offer}"></td>
+        <td class="field-value">[[${offer}]]</td>
+      </tr>
+      <tr th:if="${additionnalInformation}">
+        <td class="field-label" th:utext="#{document.registration-summary.additional-information}"></td>
+        <td class="field-value">[[${additionnalInformation}]]</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ESTIMATION DES COUTS -->
+  <div th:if="${hasCost}">
+    <div class="section-title" th:utext="#{document.registration-summary.cost.title}"></div>
+    <div class="block">
+      <table class="padding-all-5">
+        <thead class="bg">
+        <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40">
+          <span th:utext="#{document.registration-summary.cost.description}"></span>
+        </td>
+        <td class="bottom-right width-20 padding-top-5 padding-bottom-5">
+          <span th:utext="#{document.registration-summary.cost.price}"></span>
+        </td>
+        <td class="bottom-center width-10 padding-top-5 padding-bottom-5">
+          <span th:utext="#{document.registration-summary.cost.quantity}"></span>
+        </td>
+        <td class="bottom-right padding-right-5 width-30 padding-top-5 padding-bottom-5">
+          <span th:utext="#{document.registration-summary.cost.amount}"></span>
+        </td>
+        </thead>
+        <tr th:each="line: ${costLines}">
+          <td class="center-left padding-left-5">[[${line.label()}]]</td>
+          <td class="center-right">[[${#numbers.formatDecimal(line.unitPrice(), 1, 2, 'POINT')}]]</td>
+          <td class="center-center">[[${line.quantity()}]]</td>
+          <td class="center-right padding-right-5">
+            [[${#numbers.formatDecimal(line.amount(), 1, 2, 'POINT')}]]
+          </td>
+        </tr>
+        <tr class="bg">
+          <td class="top-left padding-left-5 padding-bottom-5 padding-top-5" colspan="3">
+            <span th:utext="#{document.registration-summary.cost.total}"></span>
+          </td>
+          <td class="top-right padding-right-5 padding-bottom-5 padding-top-5">
+            <b>CHF [[${#numbers.formatDecimal(costTotal, 1, 2, 'POINT')}]]</b>
+          </td>
+        </tr>
+      </table>
+      <p class="disclaimer" th:utext="#{document.registration-summary.cost.disclaimer}"></p>
+    </div>
+  </div>
+
+  <!-- CHARTES -->
+  <div th:if="${chartText != null or salonChartText != null}">
+    <div class="section-title" th:utext="#{document.registration-summary.charts.title}"></div>
+    <div class="block">
+    <div th:if="${chartText}">
+      <h3 th:utext="#{document.registration-summary.charts.registration}"></h3>
+      <div class="chart-text" th:utext="${chartText}"></div>
+      <p th:if="${acceptedContract}" th:utext="#{document.registration-summary.charts.accepted}"></p>
+    </div>
+
+    <div th:if="${salonChartText}">
+      <h3 th:utext="#{document.registration-summary.charts.salon}"></h3>
+      <div class="chart-text" th:utext="${salonChartText}"></div>
+      <p th:if="${acceptedChart}" th:utext="#{document.registration-summary.charts.accepted}"></p>
+    </div>
+  </div>
+</div>
+</div>
+</body>
+</html>

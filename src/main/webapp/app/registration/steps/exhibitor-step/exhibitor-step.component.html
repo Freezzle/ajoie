@@ -1,11 +1,11 @@
 <section [formGroup]="form">
     <app-registration-card titleKey="registration.exhibitor.contactTitle">
         <div class="row">
-            <div class="mt-4 col-12 col-lg-6">
+          <div class="mt-4 mt-lg-0 col-12 col-lg-6">
+            <text-box fieldName="lastName" formControlName="lastName" translateKey="exhibitor.lastName"/>
+          </div>
+            <div class="mt-4 mt-lg-0 col-12 col-lg-6">
                 <text-box fieldName="firstName" formControlName="firstName" translateKey="exhibitor.firstName"/>
-            </div>
-            <div class="mt-4 col-12 col-lg-6">
-                <text-box fieldName="lastName" formControlName="lastName" translateKey="exhibitor.lastName"/>
             </div>
             <div class="mt-4 col-12">
                 <text-box fieldName="therapistName"
@@ -52,7 +52,7 @@
 
     <app-registration-card titleKey="registration.exhibitor.preferencesTitle">
         <div class="row">
-            <div class="mt-4 col-12 col-lg-6">
+            <div class="mt-4 mt-lg-0 col-12 col-lg-6">
                 <select-box [formatterFunction]="formatterLanguage"
                             [needTranslation]="true"
                             [options]="languages"
@@ -60,7 +60,7 @@
                             formControlName="language"
                             translateKey="exhibitor.language.list.label"/>
             </div>
-            <div class="mt-4 col-12 col-lg-6">
+            <div class="mt-4 mt-lg-0 col-12 col-lg-6">
                 <checkbox-box fieldName="newsletter" formControlName="newsletter" translateKey="exhibitor.newsletter"/>
             </div>
         </div>

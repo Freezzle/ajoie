@@ -3,7 +3,7 @@
   border-radius: 20px;
   background: var(--p-surface-0, #fff);
   padding: 1.25rem;
-  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
 
   .registration-card-head {
     display: flex;
@@ -14,7 +14,7 @@
   }
 
   .registration-card-title {
-    font-size: 1.05rem;
+    font-size: 1.6rem !important;
     font-weight: 500;
     margin: 0;
   }

@@ -287,6 +287,18 @@ export class RegistrationFormService {
         consents.updateValueAndValidity({emitEvent: false});
     }
 
+    /**
+     * En modification, l'exposant doit ré-accepter explicitement les chartes : on décoche les cases
+     * reprises de l'inscription existante. `applyChartsAvailability` recochera ensuite celles qui ne
+     * sont pas affichées.
+     */
+    resetConsents(form: RegistrationFormGroup): void {
+        const consents = form.controls.consents;
+        consents.reset({acceptedChart: false, acceptedContract: false}, {emitEvent: false});
+        consents.markAsUntouched();
+        consents.markAsPristine();
+    }
+
     private applyChartControl(control: FormControl<boolean | null>, displayed: boolean): void {
         control.setValidators(displayed ? [mustBeTrueValidator()] : []);
         if (!displayed) {

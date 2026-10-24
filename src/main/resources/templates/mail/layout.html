@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>Event</title>
+    <style type="text/css">
+        .mail-body p {
+            margin: 0 0 12px 0;
+            line-height: 1.5;
+        }
+
+        .mail-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .mail-body ul,
+        .mail-body ol {
+            margin: 0 0 12px 0;
+            padding-left: 22px;
+        }
+    </style>
 </head>
 
 <body style="margin:0; padding:0; width:100%; min-width:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; background-color:#fafafa; font-family:sans-serif, Arial, Helvetica; font-size:16px;">
@@ -25,7 +41,7 @@
                                 <td style="text-align:center;">
                                     <!-- Note: font-size responsive via <style> n'est plus possible en inline seul -->
                                     <h1 style="margin:0; color:#004d40; font-weight:bold; letter-spacing:1px; font-size:30px;">
-                                        L'Ajoie de mieux vivre 2026 </h1>
+                                        L'Ajoie de mieux vivre </h1>
                                 </td>
                             </tr>
                         </table>
@@ -38,7 +54,7 @@
 
                 <tr>
                     <td style="padding:0 40px 40px 40px;">
-                        <div style="overflow-wrap: break-word; word-break: break-word;white-space:pre-line;" th:utext="${bodyHtml}"></div>
+                        <div class="mail-body" style="overflow-wrap: break-word; word-break: break-word; line-height:1.5;" th:utext="${bodyHtml}"></div>
                     </td>
                 </tr>
 

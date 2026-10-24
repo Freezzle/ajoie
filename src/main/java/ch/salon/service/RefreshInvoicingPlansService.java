@@ -10,6 +10,7 @@ import ch.salon.domain.Stand;
 import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
@@ -480,6 +481,45 @@ public class RefreshInvoicingPlansService {
         }
 
         return new InvoiceCoverage(allElementsPresent, diffs);
+    }
+
+    /**
+     * Estime, <b>sans aucun effet de bord</b>, le coût d'une participation à partir des mêmes règles que
+     * la facturation ({@link #buildExpectedInvoices}). Utilisé pour le récapitulatif d'inscription remis
+     * à l'exposant : les montants sont indicatifs, seule la facture émise fait foi.
+     * <p>
+     * Les lignes de quantité nulle sont écartées et les frais postaux sont ajoutés lorsque l'exposant a
+     * choisi de recevoir sa facture par courrier.
+     */
+    @Transactional(readOnly = true)
+    public InvoiceEstimate estimateCost(Participation participation) {
+        Salon salon = salonRepository.findById(participation.getSalon().getId()).orElseThrow();
+        Status[] statuses = Status.getActiveStatuses();
+        UUID participationId = participation.getId();
+
+        var expected = buildExpectedInvoices(participation, salon,
+                standRepository.findByParticipationIdAndStatusInOrderByRegistrationDateDesc(participationId, statuses),
+                conferenceRepository.findByParticipationIdAndStatusInOrderByRegistrationDateDesc(participationId,
+                        statuses),
+                workshopRepository.findByParticipationIdAndStatusInOrderByRegistrationDateDesc(participationId,
+                        statuses));
+
+        List<InvoiceEstimate.Line> lines = new java.util.ArrayList<>(expected.values().stream()
+                .filter(item -> item.quantity() > 0)
+                .sorted(Comparator.comparingInt((InvoiceExpected item) -> getInvoiceTypeOrder(item.type()))
+                        .thenComparing(InvoiceExpected::label))
+                .map(item -> new InvoiceEstimate.Line(item.type(), item.label(), item.quantity(), item.unitPrice(),
+                        item.getExpectedTotal()))
+                .toList());
+
+        if (participation.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {
+            String label = messageSource.getMessage("invoice.sending-postal.label", null, Locale.FRENCH);
+            lines.add(new InvoiceEstimate.Line(POSTAL_FEE, label, 1L, InvoicingPlanService.POSTAL_FEE_AMOUNT,
+                    InvoicingPlanService.POSTAL_FEE_AMOUNT));
+        }
+
+        double total = lines.stream().mapToDouble(InvoiceEstimate.Line::amount).sum();
+        return new InvoiceEstimate(List.copyOf(lines), total);
     }
 
     /**

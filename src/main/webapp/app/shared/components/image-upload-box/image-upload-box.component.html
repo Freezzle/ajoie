@@ -35,7 +35,8 @@
         </div>
     }
 
-    @if (!disabled) {
+    <!-- La zone de dépôt est masquée tant qu'une image est présente : l'utilisateur doit d'abord la supprimer. -->
+    @if (!disabled && !hasPicture) {
         <p-fileupload #uploader
                       [accept]="acceptAttribute"
                       [auto]="true"
@@ -55,9 +56,9 @@
                 <div class="image-upload-box__dropzone">{{ 'global.image.dropHint' | translate }}</div>
             </ng-template>
         </p-fileupload>
-    }
 
-    <small class="image-upload-box__hint">{{ 'global.image.hint' | translate }}</small>
+        <small class="image-upload-box__hint">{{ 'global.image.hint' | translate }}</small>
+    }
 
     @if (errorKey) {
         <small class="image-upload-box__error">{{ errorKey | translate }}</small>

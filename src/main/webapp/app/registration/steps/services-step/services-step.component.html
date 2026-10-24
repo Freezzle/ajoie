@@ -8,7 +8,7 @@
                                (answerChange)="setAnswer('wantStand', $event)">
         <div formGroupName="stand">
             <div class="row">
-                <div class="mt-4 col-12">
+                <div class="col-12">
                     <textarea-box [maxLength]="500"
                                   [rows]="5"
                                   [showCounter]="true"
@@ -45,7 +45,7 @@
             <h3 class="registration-subtitle">{{ 'registration.services.logisticsTitle' | translate }}</h3>
             <p class="registration-help">{{ 'registration.services.logisticsHelp' | translate }}</p>
             <div class="row">
-                <div class="mt-4 col-12">
+                <div class="col-12">
                     <counter-box [hint]="'registration.services.tableSizeHint' | translate"
                                  fieldName="nbTable"
                                  formControlName="nbTable"
@@ -179,7 +179,7 @@
             @for (talk of form.controls.conferences.controls; track talk; let i = $index) {
                 <div [formGroupName]="i" class="registration-talk">
                     <div class="row">
-                        <div class="mt-4 col-12">
+                        <div class="col-12">
                             <text-box [maxLength]="500"
                                       fieldName="conferenceTitle{{ i }}"
                                       formControlName="title"
@@ -227,7 +227,7 @@
             @for (talk of form.controls.workshops.controls; track talk; let i = $index) {
                 <div [formGroupName]="i" class="registration-talk">
                     <div class="row">
-                        <div class="mt-4 col-12">
+                        <div class="col-12">
                             <text-box [maxLength]="500"
                                       fieldName="workshopTitle{{ i }}"
                                       formControlName="title"

@@ -69,7 +69,7 @@
       "unreadable": "Cette image n'a pas pu être lue."
     },
     "existing": "Image enregistrée",
-    "hint": "JPG ou PNG, 1 Mo maximum. L'image est automatiquement redimensionnée à 500 px de large.",
+    "hint": "Format JPG ou PNG et jusqu'à 1 Mo maximum.",
     "remove": "Supprimer l'image"
   },
     "field": {

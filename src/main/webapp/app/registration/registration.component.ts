@@ -1,4 +1,4 @@
-import {Component, computed, ElementRef, inject, OnInit, signal, ViewChild} from '@angular/core';
+import {Component, computed, ElementRef, inject, LOCALE_ID, OnInit, signal, ViewChild} from '@angular/core';
 import {AbstractControl, FormArray, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -19,6 +19,7 @@ import {ServicesStepComponent} from './steps/services-step/services-step.compone
 import {SummaryStepComponent} from './steps/summary-step/summary-step.component';
 import {TurnstileBoxComponent} from './turnstile-box.component';
 import {RegistrationCardComponent} from './registration-card/registration-card.component';
+import {formatSalonDateRange} from './registration-date-range.util';
 
 const STEPS: StepDescriptor[] = [
     {key: 'exhibitor', shortLabelKey: 'registration.steps.shortExhibitor', labelKey: 'registration.steps.exhibitor'},
@@ -82,6 +83,7 @@ export default class RegistrationComponent implements OnInit {
     private formService = inject(RegistrationFormService);
     private draftStorage = inject(RegistrationDraftStorageService);
     private alertService = inject(AlertService);
+    private locale = inject(LOCALE_ID);
 
     private salonId = '';
     private participationId: string | null = null;
@@ -106,6 +108,12 @@ export default class RegistrationComponent implements OnInit {
 
     get registrationOpen(): boolean {
         return this.editMode() || this.salonInfo()?.registrationOpen === true;
+    }
+
+    /** Dates du salon affichées dans le bandeau, ex. « 13 – 14 mars 2027 ». */
+    get salonDateRange(): string | null {
+        const info = this.salonInfo();
+        return info ? formatSalonDateRange(info.startingDate, info.endingDate, this.locale) : null;
     }
 
     /** Texte de la charte d'inscription, null si le salon ne l'a pas renseigné (card masquée). */
@@ -394,6 +402,9 @@ export default class RegistrationComponent implements OnInit {
                            next: (request: IRegistrationRequest) => {
                                this.registrationStatus.set(request.status ?? null);
                                this.formService.patchFromRequest(this.form, request, this.dimensions);
+                               if (!this.readOnly()) {
+                                   this.formService.resetConsents(this.form);
+                               }
                                this.applyChartsAvailability();
 
                                if (this.readOnly()) {
