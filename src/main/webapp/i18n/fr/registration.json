@@ -7,6 +7,10 @@
       "title": "Inscription",
       "start": "Commencer l'inscription"
     },
+    "chart": {
+      "registrationTitle": "Charte d'inscription",
+      "salonTitle": "Charte du salon"
+    },
     "actions": {
       "previous": "Précédent",
       "continue": "Continuer",
@@ -91,9 +95,8 @@
       "stand": "Stand",
       "conferences": "Conférence",
       "workshops": "Atelier",
-      "consents": "Vos engagements",
-      "acceptChart": "J'ai lu et j'accepte la charte des exposants",
-      "acceptContract": "J'ai lu et j'accepte les conditions de participation"
+      "acceptChart": "J'ai lu et j'accepte la charte du salon",
+      "acceptContract": "J'ai lu et j'accepte les conditions d'inscription"
     },
     "price": {
       "included": "Inclus",
@@ -117,8 +120,8 @@
     },
     "done": {
       "thanks": "Merci {{firstName}} !",
-      "message": "Une confirmation sera envoyée à {{email}} après vérification de votre demande.",
-      "editHint": "Vous recevrez également un lien personnel pour modifier votre inscription tant qu'elle est en cours de vérification."
+      "message": "Un email de confirmation de votre inscription vous a été envoyé à {{email}}.",
+      "editHint": "Un lien personnel dans cet email vous permet de revenir à tout moment sur l'inscription et modifier votre inscription tant que le statut de votre demande est en cours de vérification."
     },
     "status": {
       "title": "Statut de l'inscription",

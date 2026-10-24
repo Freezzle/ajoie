@@ -62,6 +62,39 @@
     }
   }
 
+  // Le texte des chartes est injecté via [innerHTML] depuis l'éditeur riche de l'administration.
+  .summary-chart-text {
+    margin-top: 0.75rem;
+    color: var(--p-text-muted-color, #6b655d);
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    p {
+      margin: 0 0 0.75rem;
+    }
+
+    ul,
+    ol {
+      margin: 0 0 0.75rem;
+      padding-left: 1.5rem;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
   .summary-card-head {
     display: flex;
     align-items: center;

@@ -32,6 +32,10 @@ export class SummaryStepComponent {
     @Input() dimensions: IPublicDimension[] = [];
     @Input() prices: IRegistrationPrices | null = null;
     @Input() readOnly: boolean = false;
+    /** Texte de la charte d'inscription (case `acceptedContract`). Null = card masquée. */
+    @Input() chartText: string | null = null;
+    /** Texte de la charte du salon (case `acceptedChart`). Null = card masquée. */
+    @Input() salonChartText: string | null = null;
 
     @Output() editStep = new EventEmitter<{step: number; anchor?: string}>();
 

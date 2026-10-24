@@ -29,6 +29,8 @@ public class SalonDTO implements Serializable {
     private Instant registrationClosingDate;
     private String registrationWelcomeTitle;
     private String registrationWelcomeText;
+    private String registrationChartText;
+    private String registrationSalonChartText;
     private UUID sourceSalonId;
     private AddressDTO headquartersAddress;
     private AddressDTO eventAddress;

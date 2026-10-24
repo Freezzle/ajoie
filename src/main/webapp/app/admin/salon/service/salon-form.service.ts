@@ -33,6 +33,8 @@ export type SalonFormGroup = {
     registrationClosingDate: FormControl<ISalon['registrationClosingDate'] | string | null>;
     registrationWelcomeTitle: FormControl<ISalon['registrationWelcomeTitle'] | null>;
     registrationWelcomeText: FormControl<ISalon['registrationWelcomeText'] | null>;
+    registrationChartText: FormControl<ISalon['registrationChartText'] | null>;
+    registrationSalonChartText: FormControl<ISalon['registrationSalonChartText'] | null>;
 };
 
 @Injectable({providedIn: 'root'})
@@ -78,7 +80,11 @@ export class SalonFormService {
                                                  registrationWelcomeTitle: new FormControl(
                                                      raw.registrationWelcomeTitle ?? null, Validators.maxLength(255)),
                                                  registrationWelcomeText: new FormControl(
-                                                     raw.registrationWelcomeText ?? null)
+                                                     raw.registrationWelcomeText ?? null),
+                                                 registrationChartText: new FormControl(
+                                                     raw.registrationChartText ?? null),
+                                                 registrationSalonChartText: new FormControl(
+                                                     raw.registrationSalonChartText ?? null)
                                              });
     }
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Textes des chartes affichées dans l'étape récapitulatif du formulaire d'inscription publique -->
+    <changeSet id="0.0.2-202610-salon-registration-charts" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon"/>
+        </preConditions>
+
+        <addColumn tableName="salon">
+            <column name="registration_chart_text" type="text"/>
+            <column name="registration_salon_chart_text" type="text"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="salon" columnName="registration_chart_text"/>
+            <dropColumn tableName="salon" columnName="registration_salon_chart_text"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -268,6 +268,28 @@ export class RegistrationFormService {
         });
     }
 
+    /**
+     * Les chartes ne sont affichées que si le salon a défini leur texte. Lorsqu'une charte est masquée,
+     * la case correspondante n'est plus demandée à l'exposant : on la force à `true` (le backend valide
+     * `@AssertTrue`) et on retire son validateur.
+     */
+    applyChartsAvailability(form: RegistrationFormGroup,
+                            availability: {chart: boolean; salonChart: boolean}): void {
+        const consents = form.controls.consents;
+        this.applyChartControl(consents.controls.acceptedContract, availability.chart);
+        this.applyChartControl(consents.controls.acceptedChart, availability.salonChart);
+        consents.updateValueAndValidity({emitEvent: false});
+    }
+
+    private applyChartControl(control: FormControl<boolean | null>, displayed: boolean): void {
+        control.setValidators(displayed ? [mustBeTrueValidator()] : []);
+        if (!displayed) {
+            control.setValue(true, {emitEvent: false});
+            control.markAsUntouched();
+        }
+        control.updateValueAndValidity({emitEvent: false});
+    }
+
     // -------------------- VALIDATEURS CONDITIONNELS --------------------
 
     private wireConditionalValidators(form: RegistrationFormGroup): void {

@@ -8,10 +8,7 @@ import ch.salon.domain.PriceStandSalon;
 import ch.salon.domain.Salon;
 import ch.salon.domain.Stand;
 import ch.salon.domain.Workshop;
-import ch.salon.domain.enumeration.EntityType;
-import ch.salon.domain.enumeration.EventType;
-import ch.salon.domain.enumeration.Status;
-import ch.salon.domain.enumeration.StandPictureType;
+import ch.salon.domain.enumeration.*;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.repository.ExhibitorRepository;
 import ch.salon.repository.ParticipationRepository;
@@ -280,6 +277,8 @@ public class PublicRegistrationService {
         dto.setRegistrationClosingDate(salon.getRegistrationClosingDate());
         dto.setRegistrationWelcomeTitle(salon.getRegistrationWelcomeTitle());
         dto.setRegistrationWelcomeText(salon.getRegistrationWelcomeText());
+        dto.setRegistrationChartText(salon.getRegistrationChartText());
+        dto.setRegistrationSalonChartText(salon.getRegistrationSalonChartText());
 
         String closedReason = computeClosedReason(salon);
         dto.setClosedReason(closedReason);
@@ -549,7 +548,7 @@ public class PublicRegistrationService {
         participation.setNbMeal1(dto.getNbMeal1());
         participation.setNbMeal2(dto.getNbMeal2());
         participation.setNbMeal3(dto.getNbMeal3());
-        participation.setModePaymentMeals(dto.totalMeals() > 0 ? dto.getModePaymentMeals() : null);
+        participation.setModePaymentMeals(dto.totalMeals() > 0 ? dto.getModePaymentMeals() : ModePaymentMeals.SEPARATE);
         participation.setInvoiceSendingMethod(dto.getInvoiceSendingMethod());
         participation.setHasOffer(dto.isHasOffer());
         participation.setOffer(dto.isHasOffer() ? sub(dto.getOffer(), 500) : null);

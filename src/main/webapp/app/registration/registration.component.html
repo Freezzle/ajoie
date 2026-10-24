@@ -96,12 +96,14 @@
                                                  [prices]="prices"/>
                     }
                     @default {
-                        <app-summary-step [consentsForm]="form.controls.consents"
+                        <app-summary-step [chartText]="chartText"
+                                          [consentsForm]="form.controls.consents"
                                           [dimensions]="dimensions"
                                           [exhibitorForm]="form.controls.exhibitor"
                                           [participationForm]="form.controls.participation"
                                           [prices]="prices"
                                           [readOnly]="readOnly()"
+                                          [salonChartText]="salonChartText"
                                           [servicesForm]="form.controls.services"
                                           (editStep)="onEditFromSummary($event)"/>
 

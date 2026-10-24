@@ -25,6 +25,8 @@ export interface ISalon {
     registrationClosingDate: Date | null;
     registrationWelcomeTitle: string | null;
     registrationWelcomeText: string | null;
+    registrationChartText: string | null;
+    registrationSalonChartText: string | null;
     sourceSalonId?: string | null;
     /** Compteurs du pied de la liste : prestations écartées exclues. */
     nbParticipations?: number;

@@ -108,6 +108,32 @@ export default class RegistrationComponent implements OnInit {
         return this.editMode() || this.salonInfo()?.registrationOpen === true;
     }
 
+    /** Texte de la charte d'inscription, null si le salon ne l'a pas renseigné (card masquée). */
+    get chartText(): string | null {
+        return this.cleanHtml(this.salonInfo()?.registrationChartText);
+    }
+
+    /** Texte de la charte du salon, null si le salon ne l'a pas renseigné (card masquée). */
+    get salonChartText(): string | null {
+        return this.cleanHtml(this.salonInfo()?.registrationSalonChartText);
+    }
+
+    private cleanHtml(value: string | null | undefined): string | null {
+        if (!value) {
+            return null;
+        }
+        // L'éditeur riche enregistre parfois un contenu "vide" (<p><br></p>) : on le considère comme absent.
+        const stripped = value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+        return stripped.length > 0 ? value : null;
+    }
+
+    private applyChartsAvailability(): void {
+        this.formService.applyChartsAvailability(this.form, {
+            chart: this.chartText !== null,
+            salonChart: this.salonChartText !== null
+        });
+    }
+
     ngOnInit(): void {
         this.form = this.formService.createForm();
         this.form.valueChanges.subscribe(() => this.refreshStates());
@@ -140,6 +166,7 @@ export default class RegistrationComponent implements OnInit {
                     this.loadExistingRegistration();
                 } else {
                     this.restoreDraftIfAny();
+                    this.applyChartsAvailability();
                     this.loading.set(false);
                     this.refreshStates();
                 }
@@ -358,6 +385,7 @@ export default class RegistrationComponent implements OnInit {
                            next: (request: IRegistrationRequest) => {
                                this.registrationStatus.set(request.status ?? null);
                                this.formService.patchFromRequest(this.form, request, this.dimensions);
+                               this.applyChartsAvailability();
 
                                if (this.readOnly()) {
                                    this.form.disable({emitEvent: false});

@@ -310,20 +310,33 @@
         }
     }
 
-    <div class="summary-card" [formGroup]="consentsForm">
-        <h3>{{ 'registration.summary.consents' | translate }}</h3>
-        <div class="mt-3">
-            <checkbox-box fieldName="acceptedChart"
-                          formControlName="acceptedChart"
-                          translateKey="registration.summary.acceptChart"/>
+    @if (chartText) {
+        <div class="summary-card" [formGroup]="consentsForm">
+            <h3>{{ 'registration.chart.registrationTitle' | translate }}</h3>
+            <div class="summary-chart-text" [innerHTML]="chartText"></div>
+            <div class="mt-3">
+                <checkbox-box fieldName="acceptedContract"
+                              formControlName="acceptedContract"
+                              translateKey="registration.summary.acceptContract"/>
+            </div>
+            @if (consentsForm.controls.acceptedContract.invalid && consentsForm.controls.acceptedContract.touched) {
+                <p class="registration-error">{{ 'registration.errors.consentRequired' | translate }}</p>
+            }
         </div>
-        <div class="mt-3">
-            <checkbox-box fieldName="acceptedContract"
-                          formControlName="acceptedContract"
-                          translateKey="registration.summary.acceptContract"/>
+    }
+
+    @if (salonChartText) {
+        <div class="summary-card" [formGroup]="consentsForm">
+            <h3>{{ 'registration.chart.salonTitle' | translate }}</h3>
+            <div class="summary-chart-text" [innerHTML]="salonChartText"></div>
+            <div class="mt-3">
+                <checkbox-box fieldName="acceptedChart"
+                              formControlName="acceptedChart"
+                              translateKey="registration.summary.acceptChart"/>
+            </div>
+            @if (consentsForm.controls.acceptedChart.invalid && consentsForm.controls.acceptedChart.touched) {
+                <p class="registration-error">{{ 'registration.errors.consentRequired' | translate }}</p>
+            }
         </div>
-        @if (consentsForm.invalid && consentsForm.touched) {
-            <p class="registration-error">{{ 'registration.errors.consentRequired' | translate }}</p>
-        }
-    </div>
+    }
 </section>

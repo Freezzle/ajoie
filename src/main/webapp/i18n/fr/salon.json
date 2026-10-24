@@ -35,7 +35,9 @@
       "linkCopied": "Lien d'inscription copié",
       "linkCopyFailed": "Impossible de copier le lien",
       "welcomeTitle": "Titre de la page d'accueil",
-      "welcomeText": "Texte de la page d'accueil"
+      "welcomeText": "Texte de la page d'accueil",
+      "chartText": "Texte de la charte d'inscription",
+      "salonChartText": "Texte de la charte du salon"
     },
     "stands": "Les stands",
     "startingDate": "Date de début",

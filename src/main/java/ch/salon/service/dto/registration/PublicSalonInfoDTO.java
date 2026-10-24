@@ -35,6 +35,12 @@ public class PublicSalonInfoDTO implements Serializable {
     private String registrationWelcomeText;
 
     /**
+     * Textes des chartes affichés dans l'étape récapitulatif du formulaire d'inscription.
+     */
+    private String registrationChartText;
+    private String registrationSalonChartText;
+
+    /**
      * Raison de fermeture : {@code DISABLED}, {@code NOT_YET_OPEN} ou {@code CLOSED}. Null si ouvert.
      */
     private String closedReason;
