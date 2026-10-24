@@ -4,7 +4,7 @@
         [popup]="true">
     <ng-template let-item pTemplate="item">
         <div class="menu-item-container">
-            <div class="menu-item-left" (click)="onItemClick($event, item)">
+            <div class="menu-item-left">
                 @if (item.icon) {
                     <i [class]="item.icon"></i>
                 }

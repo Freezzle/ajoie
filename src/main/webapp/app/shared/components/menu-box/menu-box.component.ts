@@ -31,13 +31,6 @@ export class MenuBoxComponent {
 
     constructor(private translateService: TranslateService) {}
 
-    onItemClick(event: Event, item: AppMenuItem): void {
-        if (item.command && !item.disabled) {
-            item.command({originalEvent: event, item: item});
-            this.menu.hide();
-        }
-    }
-
     showHelp(event: Event, helpText: string, conditionalKeys: ConditionalKey[] = []): void {
         event.stopPropagation();
         this.currentHelpText = helpText;
