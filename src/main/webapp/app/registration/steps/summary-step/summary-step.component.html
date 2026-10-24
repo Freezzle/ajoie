@@ -60,7 +60,7 @@
             </div>
             <dl class="summary-list">
                 <div class="summary-row">
-                    <dt>{{ 'stand.description' | translate }}</dt>
+                    <dt>{{ 'registration.services.standDescription' | translate }}</dt>
                     <dd>{{ standValue.description }}</dd>
                 </div>
                 <div class="summary-row">
@@ -93,7 +93,45 @@
                     <dt>{{ 'stand.shared' | translate }}</dt>
                     <dd>{{ (standValue.shared ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
                 </div>
-                @if (standValue.shared) {
+                @if (standValue.website) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.website' | translate }}</dt>
+                        <dd>{{ standValue.website }}</dd>
+                    </div>
+                }
+                @if (standValue.instagram) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.instagram' | translate }}</dt>
+                        <dd>{{ standValue.instagram }}</dd>
+                    </div>
+                }
+                @if (standValue.facebook) {
+                    <div class="summary-row">
+                        <dt>{{ 'stand.facebook' | translate }}</dt>
+                        <dd>{{ standValue.facebook }}</dd>
+                    </div>
+                }
+                @if (standValue.pictureUpload || standValue.hasPicture) {
+                    <div class="summary-row">
+                        <dt>{{ 'registration.services.standPicture' | translate }}</dt>
+                        <dd>{{ standValue.pictureUpload?.filename ?? ('global.image.alreadySent' | translate) }}</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+
+        @if (standValue.shared) {
+            <div class="summary-card">
+                <div class="summary-card-head">
+                    <h3>{{ 'stand.card.coExhibitor' | translate }}</h3>
+                    @if (!readOnly) {
+                        <button-box (clickedEvent)="onEdit(1, 'card-stand')"
+                                    primeIcon="pi-pencil"
+                                    translateKey="registration.summary.edit"
+                                    type="secondary"/>
+                    }
+                </div>
+                <dl class="summary-list">
                     <div class="summary-row">
                         <dt>{{ 'stand.coExhibitor.fullName' | translate }}</dt>
                         <dd>{{ standValue.sharedFirstName }} {{ standValue.sharedLastName }}</dd>
@@ -109,7 +147,7 @@
                         <dd>{{ standValue.sharedEmail }}</dd>
                     </div>
                     <div class="summary-row">
-                        <dt>{{ 'stand.coExhibitor.description' | translate }}</dt>
+                        <dt>{{ 'registration.services.coExhibitorDescription' | translate }}</dt>
                         <dd>{{ standValue.sharedDescription }}</dd>
                     </div>
                     <div class="summary-row">
@@ -142,37 +180,13 @@
                     }
                     @if (standValue.sharedPictureUpload || standValue.hasSharedPicture) {
                         <div class="summary-row">
-                            <dt>{{ 'stand.coExhibitor.picture' | translate }}</dt>
+                            <dt>{{ 'registration.services.coExhibitorPicture' | translate }}</dt>
                             <dd>{{ standValue.sharedPictureUpload?.filename ?? ('global.image.alreadySent' | translate) }}</dd>
                         </div>
                     }
-                }
-                @if (standValue.website) {
-                    <div class="summary-row">
-                        <dt>{{ 'stand.website' | translate }}</dt>
-                        <dd>{{ standValue.website }}</dd>
-                    </div>
-                }
-                @if (standValue.instagram) {
-                    <div class="summary-row">
-                        <dt>{{ 'stand.instagram' | translate }}</dt>
-                        <dd>{{ standValue.instagram }}</dd>
-                    </div>
-                }
-                @if (standValue.facebook) {
-                    <div class="summary-row">
-                        <dt>{{ 'stand.facebook' | translate }}</dt>
-                        <dd>{{ standValue.facebook }}</dd>
-                    </div>
-                }
-                @if (standValue.pictureUpload || standValue.hasPicture) {
-                    <div class="summary-row">
-                        <dt>{{ 'stand.picture' | translate }}</dt>
-                        <dd>{{ standValue.pictureUpload?.filename ?? ('global.image.alreadySent' | translate) }}</dd>
-                    </div>
-                }
-            </dl>
-        </div>
+                </dl>
+            </div>
+        }
     }
 
     @if (conferenceControls.length) {
@@ -258,7 +272,7 @@
             }
             @if (totalMeals > 0 && participation.modePaymentMeals) {
                 <div class="summary-row">
-                    <dt>{{ 'participation.modePaymentMeals.label' | translate }}</dt>
+                    <dt>{{ 'registration.participation.modePaymentMeals.label' | translate }}</dt>
                     <dd>{{ formatterModePaymentMeals(participation.modePaymentMeals) | translate }}</dd>
                 </div>
             }

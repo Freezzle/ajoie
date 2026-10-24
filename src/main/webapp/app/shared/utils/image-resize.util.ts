@@ -6,7 +6,7 @@
  * confort d'utilisation et pour éviter d'envoyer des fichiers inutilement lourds.
  */
 
-export const IMAGE_MAX_BYTES = 1024 * 1024;
+export const IMAGE_MAX_BYTES = 2.5 * 1024 * 1024;
 export const IMAGE_MAX_WIDTH = 500;
 export const IMAGE_ACCEPTED_TYPES = ['image/jpeg', 'image/png'];
 export const IMAGE_ACCEPT_ATTRIBUTE = 'image/jpeg,image/png';

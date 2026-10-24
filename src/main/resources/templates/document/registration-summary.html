@@ -121,81 +121,92 @@
 
   <p th:unless="${hasServices}" th:utext="#{document.registration-summary.services.none}"></p>
 
-  <div class="block" th:each="stand: ${stands}">
-    <table>
-      <tr>
-        <td class="field-label" th:utext="#{document.registration-summary.stand.dimension}"></td>
-        <td class="field-value">[[${stand.dimension()}]]</td>
-      </tr>
-      <tr>
-        <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
-        <td class="field-value">[[${stand.description()}]]</td>
-      </tr>
-      <tr th:if="${stand.category()}">
-        <td class="field-label" th:utext="#{document.registration-summary.stand.category}"></td>
-        <td class="field-value">
-          [[${stand.category()}]]<span th:if="${stand.subCategories()}"> - [[${stand.subCategories()}]]</span>
-        </td>
-      </tr>
-      <tr>
-        <td class="field-label" th:utext="#{document.registration-summary.stand.equipment}"></td>
-        <td class="field-value">
-          <span th:utext="#{document.registration-summary.stand.tables(${stand.nbTable()})}"></span>,
-          <span th:utext="#{document.registration-summary.stand.chairs(${stand.nbChair()})}"></span>,
-          <span th:if="${stand.needElectricity()}"
-                th:utext="#{document.registration-summary.stand.electricity-yes}"></span>
-          <span th:unless="${stand.needElectricity()}"
-                th:utext="#{document.registration-summary.stand.electricity-no}"></span>
-        </td>
-      </tr>
-      <tr th:if="${stand.website() != null or stand.instagram() != null or stand.facebook() != null}">
-        <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
-        <td class="field-value">
-          <span th:if="${stand.website()}">[[${stand.website()}]]<br /></span>
-          <span th:if="${stand.instagram()}">[[${stand.instagram()}]]<br /></span>
-          <span th:if="${stand.facebook()}">[[${stand.facebook()}]]</span>
-        </td>
-      </tr>
-    </table>
+  <div th:each="stand: ${stands}">
+    <div class="block">
+      <table>
+        <tr>
+          <td class="field-label" th:utext="#{document.registration-summary.stand.dimension}"></td>
+          <td class="field-value">[[${stand.dimension()}]]</td>
+        </tr>
+        <tr>
+          <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
+          <td class="field-value">[[${stand.description()}]]</td>
+        </tr>
+        <tr th:if="${stand.category()}">
+          <td class="field-label" th:utext="#{document.registration-summary.stand.category}"></td>
+          <td class="field-value">
+            [[${stand.category()}]]<span th:if="${stand.subCategories()}"> - [[${stand.subCategories()}]]</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="field-label" th:utext="#{document.registration-summary.stand.equipment}"></td>
+          <td class="field-value">
+            <span th:utext="#{document.registration-summary.stand.tables(${stand.nbTable()})}"></span>,
+            <span th:utext="#{document.registration-summary.stand.chairs(${stand.nbChair()})}"></span>,
+            <span th:if="${stand.needElectricity()}"
+                  th:utext="#{document.registration-summary.stand.electricity-yes}"></span>
+            <span th:unless="${stand.needElectricity()}"
+                  th:utext="#{document.registration-summary.stand.electricity-no}"></span>
+          </td>
+        </tr>
+        <tr>
+          <td class="field-label" th:utext="#{document.registration-summary.stand.shared}"></td>
+          <td class="field-value">
+            <span th:if="${stand.shared()}" th:utext="#{document.registration-summary.yes}"></span>
+            <span th:unless="${stand.shared()}" th:utext="#{document.registration-summary.no}"></span>
+          </td>
+        </tr>
+        <tr th:if="${stand.website() != null or stand.instagram() != null or stand.facebook() != null}">
+          <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
+          <td class="field-value">
+            <span th:if="${stand.website()}">[[${stand.website()}]]<br /></span>
+            <span th:if="${stand.instagram()}">[[${stand.instagram()}]]<br /></span>
+            <span th:if="${stand.facebook()}">[[${stand.facebook()}]]</span>
+          </td>
+        </tr>
+      </table>
+    </div>
 
-    <table th:if="${stand.shared()}">
-      <tr>
-        <td colspan="2" class="padding-top-5">
-          <b th:utext="#{document.registration-summary.stand.co-exhibitor}"></b>
-        </td>
-      </tr>
-      <tr th:if="${stand.sharedName()}">
-        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.name}"></td>
-        <td class="field-value">[[${stand.sharedName()}]]</td>
-      </tr>
-      <tr th:if="${stand.sharedTherapistName()}">
-        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.therapist-name}"></td>
-        <td class="field-value">[[${stand.sharedTherapistName()}]]</td>
-      </tr>
-      <tr th:if="${stand.sharedEmail()}">
-        <td class="field-label" th:utext="#{document.registration-summary.exhibitor.email}"></td>
-        <td class="field-value">[[${stand.sharedEmail()}]]</td>
-      </tr>
-      <tr th:if="${stand.sharedDescription()}">
-        <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
-        <td class="field-value">[[${stand.sharedDescription()}]]</td>
-      </tr>
-      <tr th:if="${stand.sharedCategory()}">
-        <td class="field-label" th:utext="#{document.registration-summary.stand.category}"></td>
-        <td class="field-value">
-          [[${stand.sharedCategory()}]]<span th:if="${stand.sharedSubCategories()}">
-                    - [[${stand.sharedSubCategories()}]]</span>
-        </td>
-      </tr>
-      <tr th:if="${stand.sharedWebsite() != null or stand.sharedInstagram() != null or stand.sharedFacebook() != null}">
-        <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
-        <td class="field-value">
-          <span th:if="${stand.sharedWebsite()}">[[${stand.sharedWebsite()}]]<br /></span>
-          <span th:if="${stand.sharedInstagram()}">[[${stand.sharedInstagram()}]]<br /></span>
-          <span th:if="${stand.sharedFacebook()}">[[${stand.sharedFacebook()}]]</span>
-        </td>
-      </tr>
-    </table>
+    <div class="block" th:if="${stand.shared()}">
+      <table>
+        <tr>
+          <td colspan="2" class="padding-bottom-5">
+            <b th:utext="#{document.registration-summary.stand.co-exhibitor}"></b>
+          </td>
+        </tr>
+        <tr th:if="${stand.sharedName()}">
+          <td class="field-label" th:utext="#{document.registration-summary.exhibitor.name}"></td>
+          <td class="field-value">[[${stand.sharedName()}]]</td>
+        </tr>
+        <tr th:if="${stand.sharedTherapistName()}">
+          <td class="field-label" th:utext="#{document.registration-summary.exhibitor.therapist-name}"></td>
+          <td class="field-value">[[${stand.sharedTherapistName()}]]</td>
+        </tr>
+        <tr th:if="${stand.sharedEmail()}">
+          <td class="field-label" th:utext="#{document.registration-summary.exhibitor.email}"></td>
+          <td class="field-value">[[${stand.sharedEmail()}]]</td>
+        </tr>
+        <tr th:if="${stand.sharedDescription()}">
+          <td class="field-label" th:utext="#{document.registration-summary.stand.description}"></td>
+          <td class="field-value">[[${stand.sharedDescription()}]]</td>
+        </tr>
+        <tr th:if="${stand.sharedCategory()}">
+          <td class="field-label" th:utext="#{document.registration-summary.stand.category}"></td>
+          <td class="field-value">
+            [[${stand.sharedCategory()}]]<span th:if="${stand.sharedSubCategories()}">
+                      - [[${stand.sharedSubCategories()}]]</span>
+          </td>
+        </tr>
+        <tr th:if="${stand.sharedWebsite() != null or stand.sharedInstagram() != null or stand.sharedFacebook() != null}">
+          <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
+          <td class="field-value">
+            <span th:if="${stand.sharedWebsite()}">[[${stand.sharedWebsite()}]]<br /></span>
+            <span th:if="${stand.sharedInstagram()}">[[${stand.sharedInstagram()}]]<br /></span>
+            <span th:if="${stand.sharedFacebook()}">[[${stand.sharedFacebook()}]]</span>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
 
   <div class="block" th:each="conference: ${conferences}">

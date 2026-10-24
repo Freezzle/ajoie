@@ -6,11 +6,11 @@ import {ButtonBoxComponent} from '../../../shared/components/button-box/button-b
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {formatterCategory} from '../../../admin/enumerations/category.model';
 import {InvoiceSendingMethod} from '../../../admin/enumerations/invoice-sending-method.model';
-import {formatterModePaymentMeals} from '../../../admin/enumerations/mode-payment-meals.model';
 import {IAddress} from '../../../admin/common/address.model';
 import {IPublicDimension, IRegistrationPrices} from '../../registration.model';
 import {CostEstimate, computeCostEstimate, formatPrice} from '../../registration-price.util';
 import {registrationInvoiceMethodKey} from '../../registration-invoice.util';
+import {registrationModePaymentMealsKey} from '../../registration-meal-payment.util';
 import {
     ConsentsFormGroup,
     ExhibitorFormGroup,
@@ -40,7 +40,7 @@ export class SummaryStepComponent {
     @Output() editStep = new EventEmitter<{step: number; anchor?: string}>();
 
     protected readonly formatterCategory = formatterCategory;
-    protected readonly formatterModePaymentMeals = formatterModePaymentMeals;
+    protected readonly formatterModePaymentMeals = registrationModePaymentMealsKey;
 
     formatterInvoiceMethod = (method: InvoiceSendingMethod | null): string =>
         registrationInvoiceMethodKey(method, !!this.exhibitor.differentBillingAddress);

@@ -3,7 +3,6 @@
                      [addOnTab]="true"
                      [formControl]="control"
                      [id]="'field_' + fieldName"
-                     [inputSize]="maxChips"
                      [showClear]="!control.disabled"
                      [typeahead]="false"
                      fluid="true"
@@ -20,6 +19,9 @@
             <info-icon [textKey]="infoKey"/>
         }
         <small>{{ 'autocomplete.chips.suffix' | translate }}</small>
+        @if (maxChips !== null) {
+            <small>{{ 'autocomplete.chips.max' | translate: {max: maxChips} }}</small>
+        }
     </label>
 </p-iftalabel>
 @if (control.errors) {

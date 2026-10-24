@@ -1,7 +1,8 @@
 {
   "autocomplete": {
     "chips": {
-      "suffix": "(Pressez TAB pour ajouter)"
+      "suffix": "(Pressez TAB pour ajouter)",
+      "max": "({{max}} maximum)"
     }
   },
   "entity": {
@@ -24,7 +25,7 @@
       "empty": "Aucune image reçue.",
       "invalid-content": "Cette image est illisible ou corrompue.",
       "invalid-type": "Seules les images JPG et PNG sont acceptées.",
-      "too-large": "L'image dépasse la taille maximale de 1 Mo.",
+      "too-large": "L'image dépasse la taille maximale de 2.5 Mo.",
       "too-many-pixels": "Les dimensions de cette image sont trop grandes."
     },
     "idinvalid": "Invalid Id",
@@ -60,8 +61,8 @@
     "choose": "Choisir une image",
     "dropHint": "Glisse et relâche une image ici.",
     "error": {
-      "size": "L'image dépasse la taille maximale de 1 Mo.",
-      "sizeDetail": "la taille maximale autorisée est de 1 Mo.",
+      "size": "L'image dépasse la taille maximale de 2.5 Mo.",
+      "sizeDetail": "la taille maximale autorisée est de 2.5 Mo.",
       "sizeSummary": "{0} : fichier trop volumineux, ",
       "type": "Seules les images JPG et PNG sont acceptées.",
       "typeDetail": "seules les images JPG et PNG sont acceptées.",
@@ -69,7 +70,7 @@
       "unreadable": "Cette image n'a pas pu être lue."
     },
     "existing": "Image enregistrée",
-    "hint": "Format JPG ou PNG et jusqu'à 1 Mo maximum.",
+    "hint": "Format JPG ou PNG et jusqu'à 2.5 Mo maximum.",
     "remove": "Supprimer l'image"
   },
     "field": {

@@ -35,11 +35,11 @@
       "exhibitor": "Qui êtes-vous ?",
       "services": "Que souhaitez-vous proposer ?",
       "participation": "Votre participation",
-      "summary": "Tout est bon ?"
+      "summary": "Récapitulatif"
     },
     "intros": {
-      "exhibitor": "Ces informations nous permettent de vous contacter et de préparer votre venue à {{place}}.",
-      "services": "Choisissez une ou plusieurs prestations. Vous pourrez tout modifier avant l'envoi.",
+      "exhibitor": "Ces informations nous permettent de vous contacter et de préparer votre venue.",
+      "services": "Choisissez une ou plusieurs prestations.",
       "participation": "Repas, facturation et dernières précisions à nous transmettre.",
       "summary": "Relisez votre demande, acceptez la charte et les conditions, puis envoyez."
     },
@@ -62,9 +62,10 @@
       "contactTitle": "Vos informations personnelles",
       "addressTitle": "Vos adresses",
       "preferencesTitle": "Vos préférences",
-      "therapistNameHelp": "Nom affiché pendant le salon, si aucun, dans ce cas le nom et prénom seront utilisés",
-      "homeAddressInfo": "Là où des documents doivent vous être transmis physiquement.",
-      "billingAddressInfo": "Là où vous désirez recevoir votre facturation et qui sera mentionnée sur la facture.",
+      "therapistNameHelp": "Nom affiché pendant le salon. Si vide, le nom et prénom seront utilisés.",
+      "homeAddressInfo": "Nous vous transmettrons les documents/éléments physiques via cette adresse, si aucune adresse de facturation.",
+      "differentBillingAddress": "Utilisez-vous une adresse de facturation ?",
+      "billingAddressInfo": "L'adresse sera mentionnée sur la facture, QR code. Les documents/éléments physiques seront également envoyés via cette adresse.",
       "emailLocked": "L'adresse e-mail ne peut pas être modifiée : votre lien personnel y est rattaché."
     },
     "services": {
@@ -79,15 +80,26 @@
       "addWorkshop": "Ajouter un autre atelier",
       "remove": "Retirer",
       "subCategoriesInfo": "Permet de citer quelques mots-clés sur ce que propose votre stand.",
+      "standDescription": "Description de votre stand",
+      "standPicture": "Image de votre entité (logo, photo profil, photo du stand, ...)",
+      "coExhibitorDescription": "Description du stand du co-exposant",
+      "coExhibitorPicture": "Image de l'entité co-exposant (logo, photo profil, photo du stand, ...)",
       "logisticsTitle": "Logistique",
       "logisticsHelp": "Que désirez-vous avoir dans votre stand à votre arrivée ?",
       "tableSizeHint": "180 cm x 70 cm",
       "coExhibitorTitle": "Stand partagé avec un co-exposant",
-      "coExhibitorHelp": "Si vous partagez votre stand avec un autre exposant qui exerce une autre activité principale."
+      "coExhibitorHelp": "Si vous partagez votre stand avec une personne qui exerce une autre activité principale."
     },
     "participation": {
       "mealsTitle": "Les repas",
       "mealsHelp": "Indiquez le nombre de repas souhaités pour votre équipe. Les prix sont à tarifs préférentiels uniquement pour les exposants.",
+      "modePaymentMeals": {
+        "label": "Méthode de paiement des repas",
+        "list": {
+          "MIXED": "Dans la facture principale",
+          "SEPARATE": "Séparement (sur place)"
+        }
+      },
       "invoiceTitle": "Mode d'envoi de la facture principale",
       "invoicePostalHome": "A l'adresse de courrier",
       "offerTitle": "Tirage au sort RFJ",
@@ -110,7 +122,7 @@
       "estimatedCost": "Coût estimé des prestations",
       "total": "Total",
       "quantity": "× {{quantity}}",
-      "disclaimer": "Montant indicatif. La facture définitive vous sera envoyée après acceptation de votre inscription.",
+      "disclaimer": "Montant indicatif. La facture définitive vous sera envoyée après acceptation de votre inscription par le comité d'organisation.",
       "lines": {
         "stand": "Stand {{dimension}}",
         "sharedStand": "Stand partagé",

@@ -14,8 +14,8 @@ import {
     InvoiceSendingMethod
 } from '../../../admin/enumerations/invoice-sending-method.model';
 import {registrationInvoiceMethodKey} from '../../registration-invoice.util';
+import {registrationModePaymentMealsKey} from '../../registration-meal-payment.util';
 import {
-    formatterModePaymentMeals,
     ModePaymentMeals
 } from '../../../admin/enumerations/mode-payment-meals.model';
 import {IRegistrationPrices} from '../../registration.model';
@@ -47,7 +47,7 @@ export class ParticipationStepComponent {
     readonly invoiceSendingMethodValues: InvoiceSendingMethod[] =
         [InvoiceSendingMethod.EMAIL, InvoiceSendingMethod.POSTAL];
 
-    protected readonly formatterModePaymentMeals = formatterModePaymentMeals;
+    protected readonly formatterModePaymentMeals = registrationModePaymentMealsKey;
 
     private translateService = inject(TranslateService);
 

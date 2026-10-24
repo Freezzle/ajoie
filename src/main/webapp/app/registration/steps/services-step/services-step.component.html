@@ -14,7 +14,7 @@
                                   [showCounter]="true"
                                   fieldName="standDescription"
                                   formControlName="description"
-                                  translateKey="stand.description"/>
+                                  translateKey="registration.services.standDescription"/>
                 </div>
                 <div class="mt-4 col-12 col-lg-6">
                     <select-box [enableFilter]="true"
@@ -36,6 +36,7 @@
                 </div>
                 <div class="mt-4 col-12">
                     <chips-box fieldName="subCategories"
+                               [maxChips]="3"
                                formControlName="subCategories"
                                infoKey="registration.services.subCategoriesInfo"
                                translateKey="stand.subCategories"/>
@@ -78,14 +79,14 @@
                                       (existingRemoved)="onPictureRemoved()"
                                       fieldName="pictureUpload"
                                       formControlName="pictureUpload"
-                                      translateKey="stand.picture"/>
+                                      translateKey="registration.services.standPicture"/>
                 </div>
             </div>
 
             <h3 class="registration-subtitle">{{ 'registration.services.coExhibitorTitle' | translate }}</h3>
             <p class="registration-help">{{ 'registration.services.coExhibitorHelp' | translate }}</p>
             <div class="row">
-                <div class="mt-4 col-12">
+                <div class="col-12">
                     <checkbox-box [hint]="sharedStandHint"
                                   fieldName="shared"
                                   formControlName="shared"
@@ -122,7 +123,7 @@
                                           [showCounter]="true"
                                           fieldName="sharedDescription"
                                           formControlName="sharedDescription"
-                                          translateKey="stand.coExhibitor.description"/>
+                                          translateKey="registration.services.coExhibitorDescription"/>
                         </div>
                         <div class="mt-4 col-12 col-lg-6">
                             <select-box [formatterFunction]="formatterCategory"
@@ -134,6 +135,7 @@
                         </div>
                         <div class="mt-4 col-12 col-lg-6">
                             <chips-box fieldName="sharedSubCategories"
+                                       [maxChips]="3"
                                        formControlName="sharedSubCategories"
                                        infoKey="registration.services.subCategoriesInfo"
                                        translateKey="stand.coExhibitor.subCategories"/>
@@ -159,7 +161,7 @@
                                               (existingRemoved)="onSharedPictureRemoved()"
                                               fieldName="sharedPictureUpload"
                                               formControlName="sharedPictureUpload"
-                                              translateKey="stand.coExhibitor.picture"/>
+                                              translateKey="registration.services.coExhibitorPicture"/>
                         </div>
                     </div>
                 </div>

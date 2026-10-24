@@ -11,9 +11,9 @@ import java.util.Set;
 public final class ImageConstraints {
 
     /**
-     * Taille maximale acceptée pour le fichier d'origine (1 Mo).
+     * Taille maximale acceptée pour le fichier d'origine (2.5 Mo).
      */
-    public static final long MAX_BYTES = 1024L * 1024L;
+    public static final long MAX_BYTES = 2560L * 1024L;
 
     /**
      * Largeur maximale conservée en base. La hauteur suit le ratio d'origine.

@@ -16,8 +16,11 @@ import java.io.Serializable;
 public class ImageUploadDTO implements Serializable {
 
     /**
-     * Borne large volontairement : la limite réelle (1 Mo sur les octets décodés) est appliquée par
-     * {@code ImageProcessingService}. Le base64 ajoute environ 33 % de volume.
+     * Borne large volontairement : la limite réelle sur les octets décodés
+     * ({@link ch.salon.service.image.ImageConstraints#MAX_BYTES}) est appliquée par
+     * {@code ImageProcessingService}. Les images sont déjà réduites à 500 px de large par le
+     * navigateur avant l'envoi : le payload transmis reste très en dessous de cette borne.
+     * Le base64 ajoute environ 33 % de volume.
      */
     public static final int MAX_BASE64_LENGTH = 1_600_000;
 
