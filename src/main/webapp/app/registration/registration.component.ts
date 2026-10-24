@@ -295,13 +295,22 @@ export default class RegistrationComponent implements OnInit {
         if (control instanceof FormGroup) {
             const nested = Object.values(control.controls)
                                  .reduce((total, child) => total + this.countInvalidControls(child), 0);
-            return nested === 0 && control.invalid ? 1 : nested;
+            return nested === 0 && control.invalid ? this.invalidWeight(control) : nested;
         }
         if (control instanceof FormArray) {
             const nested = control.controls.reduce((total, child) => total + this.countInvalidControls(child), 0);
-            return nested === 0 && control.invalid ? 1 : nested;
+            return nested === 0 && control.invalid ? this.invalidWeight(control) : nested;
         }
-        return control.invalid ? 1 : 0;
+        return control.invalid ? this.invalidWeight(control) : 0;
+    }
+
+    /**
+     * Un contrôle peut masquer un sous-formulaire entier (cas des adresses, gérées par un seul
+     * `FormControl`) : son validateur expose alors `missingCount` pour annoncer le vrai nombre de champs.
+     */
+    private invalidWeight(control: AbstractControl): number {
+        const missingCount = control.errors?.['required']?.missingCount;
+        return typeof missingCount === 'number' && missingCount > 0 ? missingCount : 1;
     }
 
     private focusFirstInvalid(): void {

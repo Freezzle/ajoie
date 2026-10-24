@@ -105,14 +105,20 @@ export type RegistrationFormValue = ReturnType<RegistrationFormGroup['getRawValu
 /**
  * Une adresse est valide si la rue, le n°, le NPA, la localité et le pays sont renseignés.
  * Les mêmes champs sont marqués obligatoires par `AddressFormComponent` : les deux doivent rester alignés.
+ * <p>
+ * L'erreur transporte `missingCount` : le formulaire parent ne voit qu'un seul contrôle pour toute
+ * l'adresse, cette information lui permet d'annoncer le vrai nombre de champs à compléter.
  */
 export function requiredAddressValidator(options?: {requireFullName?: boolean}): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
         const value = control.value as IAddress | null;
-        const filled = !!value && !!value.street?.trim() && !!value.houseNumber?.trim() &&
-            !!value.postalCode?.trim() && !!value.city?.trim() && !!value.isoCountry?.trim() &&
-            (!options?.requireFullName || !!value.fullName?.trim());
-        return filled ? null : {required: true};
+        const required: (keyof IAddress)[] = ['street', 'houseNumber', 'postalCode', 'city', 'isoCountry'];
+        if (options?.requireFullName) {
+            required.push('fullName');
+        }
+
+        const missingCount = required.filter(field => !(value?.[field] as string | null)?.trim()).length;
+        return missingCount === 0 ? null : {required: {missingCount}};
     };
 }
 

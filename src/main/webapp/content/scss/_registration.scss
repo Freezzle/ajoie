@@ -63,12 +63,13 @@
   }
 
   // Le texte des chartes est injecté via [innerHTML] depuis l'éditeur riche de l'administration.
+  // `overflow-wrap: break-word` (et non `word-break`/`overflow-wrap: anywhere`) : seuls les mots qui ne
+  // tiennent pas seuls sur une ligne sont coupés, les mots courants restent entiers.
   .summary-chart-text {
     margin-top: 0.75rem;
     color: var(--p-text-muted-color, #6b655d);
     max-width: 100%;
     overflow-wrap: break-word;
-    word-break: break-word;
 
     p {
       margin: 0 0 0.75rem;
@@ -83,6 +84,12 @@
     img {
       max-width: 100%;
       height: auto;
+    }
+
+    table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
     }
 
     pre {
