@@ -935,21 +935,15 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   border-radius: 12px;
   overflow: hidden;
 
+  /* En-tête et pied se distinguent du corps par leur teinte et leur trait tireté. */
   > header {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    border-bottom: 1px solid var(--app-border);
-
-    h4 {
-      margin: 0;
-      font-size: var(--app-fs-xs);
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--app-text-muted);
-    }
+    border-bottom: 1px dashed var(--app-primary-line);
+    background: var(--app-primary-soft);
+    color: var(--app-primary);
   }
 
   > footer {
@@ -958,8 +952,9 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
     justify-content: space-between;
     gap: 10px;
     padding: 9px 14px;
-    border-top: 1px solid var(--app-border);
-    background: var(--app-surface-muted);
+    border-top: 1px dashed var(--app-primary-line);
+    background: var(--app-primary-soft);
+    color: var(--app-primary);
     font-size: var(--app-fs-sm);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -969,8 +964,8 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
 .el-ip-count {
   font-size: var(--app-fs-xs);
   font-weight: 700;
-  color: var(--app-text-muted);
-  background: var(--app-surface-muted);
+  color: var(--app-primary);
+  background: var(--app-surface);
   border-radius: 999px;
   padding: 0 7px;
 }
@@ -981,7 +976,7 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   padding: 0;
 
   li + li .el-ip-item {
-    border-top: 1px solid var(--app-border);
+    border-top: 1px dashed var(--app-border);
   }
 }
 
@@ -1102,7 +1097,7 @@ button.el-ip-item {
   padding: 12px 14px;
   border: 1px solid var(--app-border);
   border-radius: 12px;
-  background: var(--app-surface-muted);
+  background: var(--app-surface);
 
   b {
     display: block;

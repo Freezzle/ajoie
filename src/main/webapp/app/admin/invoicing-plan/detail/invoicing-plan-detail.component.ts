@@ -151,6 +151,8 @@ export class InvoicingPlanDetailComponent implements OnInit {
         return codes.map(code => this.availableAction(code)).filter((action): action is AvailableAction => !!action);
     });
 
+    readonly canSeePayments = computed(() => this.summary().state !== State.IS_ISSUING && !this.helper.isDraft(this.summary().state));
+
     /** « Ajouter un paiement » n'est pas une action serveur. */
     readonly canAddPayment = computed(() => this.summary().state === State.ISSUED && this.canMutate());
 

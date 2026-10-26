@@ -39,7 +39,8 @@
     },
     "invoices": {
       "label": "Lignes de la facture",
-      "notFound": "Aucune facture"
+      "notFound": "Aucune facture",
+      "total": "Total des lignes de factures"
     },
     "invoicings": "Les lignes de facture",
     "invoicingPlans": "Les factures",
@@ -203,7 +204,8 @@
     },
     "payments": {
       "label": "Paiements",
-      "notFound": "Aucun paiement"
+      "notFound": "Aucun paiement",
+      "total": "Total des paiements"
     },
     "receipt": {
       "send": "Quittance par e-mail"
