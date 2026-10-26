@@ -1,4 +1,14 @@
-import {Component, EventEmitter, Input, Optional, Output, Self, ViewChild} from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    Optional,
+    Output,
+    Self,
+    SimpleChanges,
+    ViewChild
+} from '@angular/core';
 import {ControlValueAccessor, FormControl, NgControl, Validators} from '@angular/forms';
 import {FileUpload, FileUploadHandlerEvent} from 'primeng/fileupload';
 import SharedModule from '../../shared.module';
@@ -24,7 +34,7 @@ import {
                templateUrl: './image-upload-box.component.html',
                styleUrls: ['./image-upload-box.component.scss']
            })
-export class ImageUploadBoxComponent implements ControlValueAccessor {
+export class ImageUploadBoxComponent implements ControlValueAccessor, OnChanges {
     @Input()
     translateKey: string | undefined;
     @Input()
@@ -35,9 +45,15 @@ export class ImageUploadBoxComponent implements ControlValueAccessor {
     /** Indique qu'une image existe déjà sans en exposer l'aperçu (inscription publique). */
     @Input()
     hasExistingPicture: boolean = false;
-    /** Affiche l'astérisque « champ obligatoire » (la validation reste portée par le formulaire). */
+    /**
+     * Affiche l'astérisque « champ obligatoire » (la validation reste portée par le formulaire).
+     *
+     * Volontairement nommé autrement que `required` : `[required]` combiné à `formControlName`
+     * activerait la directive native `RequiredValidator`, qui rendrait le champ invalide tant
+     * qu'aucun *nouveau* fichier n'est choisi, même lorsqu'une image est déjà enregistrée.
+     */
     @Input()
-    required: boolean = false;
+    requiredField: boolean = false;
 
     /** Émis lorsque l'utilisateur supprime l'image déjà enregistrée. */
     @Output()
@@ -66,7 +82,7 @@ export class ImageUploadBoxComponent implements ControlValueAccessor {
     }
 
     get isRequired(): boolean {
-        return this.required || (this.control?.hasValidator(Validators.required) ?? false);
+        return this.requiredField || (this.control?.hasValidator(Validators.required) ?? false);
     }
 
     get showsExisting(): boolean {
@@ -75,6 +91,19 @@ export class ImageUploadBoxComponent implements ControlValueAccessor {
 
     get hasPicture(): boolean {
         return this.value !== null || this.showsExisting;
+    }
+
+    /**
+     * Une image existante qui réapparaît (annulation de l'édition, rechargement du parent) annule
+     * la suppression locale, sans quoi la zone de dépôt resterait affichée à tort.
+     */
+    ngOnChanges(changes: SimpleChanges): void {
+        const existingRestored = (!!changes['existingPictureUrl'] && !!this.existingPictureUrl)
+                                 || (!!changes['hasExistingPicture'] && this.hasExistingPicture);
+
+        if (existingRestored) {
+            this.existingRemovedFlag = false;
+        }
     }
 
     onChange: (value: ProcessedImageUpload | null) => void = () => {

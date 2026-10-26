@@ -75,7 +75,7 @@
                 </div>
                 <div class="mt-4 col-12">
                     <image-upload-box [hasExistingPicture]="form.controls.stand.controls.hasPicture.value"
-                                      [required]="true"
+                                      [requiredField]="true"
                                       (existingRemoved)="onPictureRemoved()"
                                       fieldName="pictureUpload"
                                       formControlName="pictureUpload"
@@ -157,7 +157,7 @@
                         </div>
                         <div class="mt-4 col-12">
                             <image-upload-box [hasExistingPicture]="form.controls.stand.controls.hasSharedPicture.value"
-                                              [required]="true"
+                                              [requiredField]="true"
                                               (existingRemoved)="onSharedPictureRemoved()"
                                               fieldName="sharedPictureUpload"
                                               formControlName="sharedPictureUpload"
