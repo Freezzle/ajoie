@@ -1,10 +1,28 @@
+<!--
+    Le titre n'est projeté qu'une seule fois : deux `<ng-content>` de même sélecteur
+    partagent le même emplacement, et seul le premier reçoit le contenu.
+-->
+<ng-template #rowTitle>
+    <ng-content select="[rowTitle]"></ng-content>
+</ng-template>
+
 <div class="el-row">
     <span class="el-row-name">
-        <a [attr.aria-label]="linkLabel()"
-           [routerLink]="link()"
-           class="el-row-link">
-            <ng-content select="[rowTitle]"></ng-content>
-        </a>
+        @if (expandable()) {
+            <button (click)="toggle()"
+                    [attr.aria-expanded]="expanded()"
+                    [attr.aria-label]="linkLabel()"
+                    class="el-row-link el-row-toggle"
+                    type="button">
+                <ng-container *ngTemplateOutlet="rowTitle"></ng-container>
+            </button>
+        } @else {
+          <a [attr.aria-label]="linkLabel()"
+             [routerLink]="link()"
+             class="el-row-link">
+            <ng-container *ngTemplateOutlet="rowTitle"></ng-container>
+          </a>
+        }
     </span>
     <span class="el-row-status">
         <ng-content select="[rowStatus]"></ng-content>
@@ -23,20 +41,19 @@
         <!-- Une seule ligne : `:empty` ne doit pas être cassé par des espaces. -->
         <span class="el-foot-group"><ng-content select="[rowFootEnd]"></ng-content></span>
 
-        @if (menuItems().length > 0) {
-            <p-menu #menu
-                    [model]="menuItems()"
-                    [popup]="true"
-                    appendTo="body"/>
-            <button #gear
-                    (click)="menu.toggle($event); $event.stopPropagation()"
-                    [attr.aria-label]="actionsLabel()"
-                    [title]="actionsLabel()"
-                    aria-haspopup="menu"
-                    class="el-gear"
-                    type="button">
-                <i class="pi pi-cog"></i>
-            </button>
+        @if (showMenu()) {
+            <entity-actions-menu (opened)="menuOpened.emit()" [actions]="actions()"/>
         }
     </div>
+
+    <!--
+        Projeté après le pied : le détail passe au-dessus du lien étendu.
+        Le slot existe dès le départ pour une ligne dépliable : un `<ng-content>` qui
+        apparaît après coup ne récupérerait pas le contenu déjà créé par l'appelant.
+    -->
+    @if (expandable()) {
+        <div [class.el-row-detail--closed]="!expanded()" class="el-row-detail">
+            <ng-content select="[rowDetail]"></ng-content>
+        </div>
+    }
 </div>

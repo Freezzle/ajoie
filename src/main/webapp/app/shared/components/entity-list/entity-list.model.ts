@@ -69,6 +69,8 @@ export interface EntityAction {
     danger?: boolean;
     separatorBefore?: boolean;
     hidden?: boolean;
+    /** Affichée mais non cliquable (par exemple pendant le chargement des actions serveur). */
+    disabled?: boolean;
 }
 
 export const SORT_DATE_KEY = 'date';

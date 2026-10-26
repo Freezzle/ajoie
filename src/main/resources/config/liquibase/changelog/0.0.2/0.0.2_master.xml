@@ -31,4 +31,6 @@
              relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-stand-picture-data-bytea.xml"
              relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-invoicing-plan-reminder.xml"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

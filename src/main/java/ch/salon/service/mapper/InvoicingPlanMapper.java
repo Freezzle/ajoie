@@ -29,6 +29,13 @@ public interface InvoicingPlanMapper {
     @Mapping(target = "totalAmount", expression = "java(invoicingPlan.getInvoicesTotal())")
     @Mapping(target = "paidAmount", expression = "java(invoicingPlan.getPaymentsTotal())")
     @Mapping(target = "balance", expression = "java(invoicingPlan.getInvoicesTotal() - invoicingPlan.getPaymentsTotal())")
+    @Mapping(target = "hasCustomPrice",
+            expression = "java(invoicingPlan.getInvoices().stream().anyMatch(ch.salon.domain.Invoice::hasDifference))")
+    @Mapping(target = "lastPaymentDate",
+            expression = "java(invoicingPlan.getPayments().stream().map(ch.salon.domain.Payment::getBillingDate)"
+                    + ".filter(java.util.Objects::nonNull).max(java.time.Instant::compareTo).orElse(null))")
+    // Les rappels vivent dans une table dédiée, chargée en une requête par le service.
+    @Mapping(target = "reminderDates", ignore = true)
     @Mapping(target = "expirationDate", source = "expirationDate")
     InvoicingPlanListDTO toListDto(InvoicingPlan invoicingPlan);
 }

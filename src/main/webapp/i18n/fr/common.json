@@ -129,6 +129,7 @@
       "signals": "Signaux"
     },
     "actions": "Actions",
+    "loading": "Chargement…",
     "internalComment": "Note",
     "showMore": "Afficher plus",
     "signal": {

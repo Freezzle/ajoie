@@ -24,12 +24,21 @@ export interface IInvoicingPlanList {
     id: string;
     billingNumber?: string | null;
     state?: State | null;
+    generationDate?: dayjs.Dayjs | null;
+    issuedDate?: dayjs.Dayjs | null;
     expirationDate?: dayjs.Dayjs | null;
+    invoiceSendingMethod?: InvoiceSendingMethod | null;
+    needArrangement?: boolean | null;
     participation?: IParticipationLight | null;
     nbInvoiceLines?: number | null;
     totalAmount?: number | null;
     paidAmount?: number | null;
     balance?: number | null;
+    /** Vrai si au moins une ligne a un montant différent du montant par défaut. */
+    hasCustomPrice?: boolean | null;
+    lastPaymentDate?: dayjs.Dayjs | null;
+    /** Dates des rappels envoyés, les plus anciennes d'abord. */
+    reminderDates?: dayjs.Dayjs[] | null;
 }
 
 export interface IParticipationLight {

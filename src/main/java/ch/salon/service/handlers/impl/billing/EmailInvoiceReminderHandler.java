@@ -1,10 +1,12 @@
 package ch.salon.service.handlers.impl.billing;
 
 import ch.salon.domain.InvoicingPlan;
+import ch.salon.domain.InvoicingPlanReminder;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.State;
+import ch.salon.repository.InvoicingPlanReminderRepository;
 import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
@@ -48,6 +50,7 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
     private final DownloadInvoiceHandler downloadInvoiceHandler;
     private final EventLogService eventLogService;
     private final InvoicingPlanRepository repository;
+    private final InvoicingPlanReminderRepository reminderRepository;
     private final TransactionalTenantOperation transactionalOps;
 
     @Value("${spring.mail.username:}")
@@ -119,6 +122,7 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
                 try {
                     InputStreamSource attachment = this.downloadInvoiceHandler.download(payload, context);
                     emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(payload, context), attachment));
+                    reminderRepository.save(new InvoicingPlanReminder(payload.getId(), Instant.now()));
                     eventLogService.eventFromSystem("Rappel envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, payload.getId(),
                             null);
                     eventLogService.eventFromSystem("Rappel renvoyée " + payload.getBillingNumber(), EventType.EMAIL,

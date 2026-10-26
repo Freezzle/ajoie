@@ -31,13 +31,131 @@
     "invoicingPlans": "Les factures",
     "list": {
       "title": "Les factures",
+      "open": "Déplier la facture",
+      "searchPlaceholder": "Exposant, n° de facture…",
       "billingNumber": "N° de facture",
       "client": "Client",
       "nbLines": "Nb lignes",
       "totalAmount": "Montant total",
       "balance": "Solde",
       "expirationDate": "Date d'expiration",
-      "state": "Statut"
+      "state": "Statut",
+      "group": {
+        "participation": "Participation",
+        "due": "Échéance"
+      },
+      "sort": {
+        "urgency": "Urgence",
+        "number": "N° de facture",
+        "balance": "Solde",
+        "hint": {
+          "urgency": "échues puis échéances proches",
+          "exhibitor": "nom de l'exposant"
+        }
+      },
+      "statusGroup": {
+        "late": "Échues",
+        "todo": "À envoyer",
+        "wait": "En attente de paiement",
+        "PAID": "Payées",
+        "CANCELLED": "Annulées"
+      },
+      "dueGroup": {
+        "late": "Échues",
+        "week": "Échéance dans 7 jours",
+        "later": "Échéance plus tard",
+        "nodate": "Pas encore envoyées",
+        "closed": "Soldées ou annulées"
+      },
+      "chip": {
+        "todo": "À envoyer",
+        "wait": "Envoyées",
+        "late": "Échues",
+        "PAID": "Payées",
+        "CANCELLED": "Annulées",
+        "postal": "Postale",
+        "reminded": "Relancée",
+        "customPrice": "Prix modifié"
+      },
+      "summary": {
+        "billed": "facturé",
+        "paid": "payé",
+        "left": "reste",
+        "draft": "brouillon",
+        "toInvoice": "à facturer",
+        "cashed": "encaissé"
+      },
+      "meta": {
+        "created": "créée {{date}}",
+        "issuing": "envoi en cours",
+        "due": "échéance {{date}}",
+        "paid": "payée {{date}}",
+        "cancelled": "annulée {{date}}"
+      },
+      "side": {
+        "toInvoice": "à facturer",
+        "left": "reste",
+        "paid": "payée",
+        "overpaid": "trop-perçu"
+      },
+      "foot": {
+        "lineSingular": "ligne",
+        "linePlural": "lignes",
+        "reminderSingular": "rappel",
+        "reminderPlural": "rappels",
+        "email": "Envoi par email",
+        "postal": "Envoi postal",
+        "arrangement": "Plan avec arrangement",
+        "customPrice": "Un prix diffère du prix par défaut"
+      },
+      "action": {
+        "onlyThisParticipation": "Voir uniquement cette participation",
+        "addPayment": "Ajouter un paiement",
+        "regenerate": "Régénérer les factures",
+        "regenerateQuestion": "Régénérer les brouillons de facture de cette participation ?"
+      }
+    },
+    "detail": {
+      "deleteLineQuestion": "Supprimer la ligne « {{label}} » ?",
+      "deletePaymentQuestion": "Supprimer ce paiement ?",
+      "next": {
+        "send": "À envoyer",
+        "post": "À poster",
+        "issuing": "Envoi en cours",
+        "remind": "À relancer",
+        "wait": "Attendre le paiement",
+        "close": "À clôturer",
+        "done": "Réglée",
+        "none": "Rien à faire"
+      },
+      "timeline": {
+        "generated": "Générée",
+        "issued": "Envoyée",
+        "reminder": "Rappel",
+        "due": "Échéance",
+        "paid": "Payée",
+        "cancelled": "Annulée",
+        "today": "Aujourd'hui {{date}}",
+        "afterIssue": "envoi + 30 j"
+      },
+      "balance": {
+        "toInvoice": "À facturer",
+        "due": "Solde dû",
+        "settled": "Soldé",
+        "overpaid": "Trop-perçu",
+        "cancelled": "Plan annulé",
+        "byEmail": "envoi par email",
+        "byPost": "envoi par la poste",
+        "dueOn": "échéance le {{date}}",
+        "lateSince": "échue depuis {{days}} j",
+        "paidOn": "payée le {{date}}",
+        "refund": "à rembourser",
+        "cancelledOn": "annulé le {{date}}"
+      },
+      "payments": {
+        "empty": "Aucun paiement reçu.",
+        "notYet": "Les paiements s'ajoutent une fois la facture envoyée."
+      }
     },
     "needArrangement": {
       "checked": "Plan avec arrangement",
@@ -69,6 +187,7 @@
     "state": {
       "CANCELLED": "Annulée",
       "DRAFT": "Brouillon",
+      "EXPIRED": "Échue",
       "ISOLATED": "Brouillon isolée",
       "ISSUED": "Envoyée",
       "IS_ISSUING": "En cours d'envoi",

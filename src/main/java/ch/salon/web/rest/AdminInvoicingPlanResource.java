@@ -4,6 +4,7 @@ import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoiceDTO;
+import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.PaymentDTO;
 import ch.salon.utils.ResourceUtil;
 import ch.salon.web.rest.dto.SplitInvoicing;
@@ -102,6 +103,14 @@ public class AdminInvoicingPlanResource {
         this.invoicingPlanService.deletePayment(idInvoicingPlan, idPayment);
 
         return ResourceUtil.deleted("payment", idPayment).build();
+    }
+
+    @GetMapping("/{idInvoicingPlan}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public InvoicingPlanDTO getInvoicingPlan(@PathVariable(value = "idInvoicingPlan") final UUID idInvoicingPlan) {
+        log.debug("REST request to get InvoicingPlan : {}", idInvoicingPlan);
+
+        return invoicingPlanService.findOne(idInvoicingPlan);
     }
 
     @GetMapping("/{idInvoicingPlan}/events")

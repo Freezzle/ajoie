@@ -389,11 +389,22 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   }
 }
 
+/* Mode dépliable : le titre est un bouton, mais garde l'apparence du lien. */
+.el-row-toggle {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  max-width: 100%;
+}
+
 .el-row-status {
   grid-area: status;
   justify-self: end;
 }
-
 .el-row-meta {
   grid-area: meta;
   font-size: var(--app-fs-sm);
@@ -438,6 +449,27 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   line-height: 1.3;
   color: var(--app-text-muted);
   min-height: 30px;
+}
+
+/*
+ * Contenu déplié d'une ligne. Il touche les bords de la carte (marges négatives)
+ * et passe au-dessus du lien étendu du titre grâce au `z-index`.
+ */
+.el-row-detail {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 1;
+  margin: 10px -14px -10px;
+  padding: 12px 14px;
+  background: var(--app-surface-muted);
+  border-top: 1px solid var(--app-border);
+  border-radius: 0 0 10px 10px;
+  cursor: default;
+}
+
+/* Ligne repliée : le slot reste en place, seul l'affichage disparaît. */
+.el-row-detail--closed {
+  display: none;
 }
 
 .el-foot-items {
@@ -674,6 +706,414 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   padding: 8px 0 4px;
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Détail d'un plan de facturation (`el-ip-` = invoicing plan)
+   ────────────────────────────────────────────────────────────── */
+.el-ip-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Bande d'actions, collée aux bords du détail. */
+.el-ip-band {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: -12px -14px 0;
+  padding: 9px 14px;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.el-ip-next {
+  font-size: var(--app-fs-sm);
+  font-weight: 700;
+  color: var(--app-text);
+
+  &.is-late {
+    color: var(--app-danger);
+  }
+
+  &.is-done {
+    color: var(--app-status-validated);
+  }
+}
+
+.el-ip-band-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+
+  /* Le rouage repris de la ligne se range simplement après les actions. */
+  .el-gear {
+    margin-left: 0;
+    align-self: center;
+  }
+}
+
+/* ── Frise des dates ────────────────────────────────────────── */
+.el-ip-timeline-wrap {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding: 2px 0 4px;
+}
+
+.el-ip-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--el-ip-steps, 4), minmax(var(--el-ip-step-min, 58px), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-align: center;
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+  }
+
+  /* Trait reliant deux jalons, derrière les pastilles. */
+  li + li::before {
+    content: '';
+    position: absolute;
+    top: 26px;
+    left: calc(-50% + 9px);
+    right: calc(50% + 9px);
+    height: 2px;
+    background: var(--app-border);
+  }
+
+  li.seg-ok::before {
+    background: var(--app-status-validated);
+  }
+
+  li.seg-run::before {
+    background: var(--app-status-accepted);
+  }
+
+  li.seg-bad::before {
+    background: var(--app-danger);
+  }
+
+  li.seg-fut::before {
+    background: repeating-linear-gradient(to right,
+      var(--app-border) 0 4px,
+      transparent 4px 8px);
+  }
+}
+
+.el-ip-step-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.el-ip-step-date {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.el-ip-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--app-border);
+  background: var(--app-surface);
+  z-index: 1;
+}
+
+.el-ip-timeline li.is-ok {
+  .el-ip-dot {
+    border-color: var(--app-status-validated);
+    background: var(--app-status-validated);
+  }
+}
+
+.el-ip-timeline li.is-warn {
+  color: var(--app-warn);
+
+  .el-ip-dot {
+    border-color: var(--app-warn);
+    background: var(--app-warn);
+  }
+}
+
+.el-ip-timeline li.is-now {
+  color: var(--app-status-accepted);
+
+  .el-ip-step-label {
+    font-weight: 700;
+  }
+
+  .el-ip-dot {
+    border-color: var(--app-status-accepted);
+    background: var(--app-surface);
+    box-shadow: 0 0 0 3px var(--app-primary-soft);
+  }
+}
+
+.el-ip-timeline li.is-bad {
+  color: var(--app-danger);
+
+  .el-ip-step-label,
+  .el-ip-step-date {
+    font-weight: 700;
+  }
+
+  .el-ip-dot {
+    border-color: var(--app-danger);
+    background: var(--app-danger);
+  }
+}
+
+/* Trait de progression jusqu'au point « aujourd'hui ». */
+.el-ip-progress {
+  position: absolute;
+  top: 26px;
+  height: 2px;
+  margin-left: 9px;
+  background: var(--app-text-muted);
+
+  &.is-late {
+    background: var(--app-danger);
+  }
+
+  &.is-run {
+    background: var(--app-status-accepted);
+  }
+}
+
+.el-ip-today {
+  position: absolute;
+  top: 21px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--app-status-gold);
+  box-shadow: 0 0 0 3px var(--app-warn-soft);
+  z-index: 2;
+}
+
+/* ── Cartes Lignes / Paiements ──────────────────────────────── */
+.el-ip-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  overflow: hidden;
+
+  > header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--app-border);
+
+    h4 {
+      margin: 0;
+      font-size: var(--app-fs-xs);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--app-text-muted);
+    }
+  }
+
+  > footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 14px;
+    border-top: 1px solid var(--app-border);
+    background: var(--app-surface-muted);
+    font-size: var(--app-fs-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.el-ip-count {
+  font-size: var(--app-fs-xs);
+  font-weight: 700;
+  color: var(--app-text-muted);
+  background: var(--app-surface-muted);
+  border-radius: 999px;
+  padding: 0 7px;
+}
+
+.el-ip-spacer {
+  flex: 1;
+}
+
+.el-ip-add {
+  appearance: none;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  border-radius: 999px;
+  padding: 1px 10px;
+  font-size: var(--app-fs-xs);
+  font-weight: 600;
+  color: var(--app-primary);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--app-primary);
+    background: var(--app-primary-soft);
+  }
+}
+
+.el-ip-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li + li .el-ip-item {
+    border-top: 1px solid var(--app-border);
+  }
+}
+
+.el-ip-item {
+  width: 100%;
+  appearance: none;
+  border: 0;
+  background: none;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  font-size: var(--app-fs-sm);
+  color: var(--app-text);
+}
+
+button.el-ip-item {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--app-surface-muted);
+  }
+}
+
+.el-ip-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.el-ip-item-title {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.el-ip-item-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  font-size: var(--app-fs-xs);
+  color: var(--app-text-muted);
+}
+
+.el-ip-item-value {
+  white-space: nowrap;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+
+  &.is-negative {
+    color: var(--app-danger);
+  }
+
+  &.is-paid {
+    color: var(--app-status-validated);
+  }
+}
+
+.el-ip-diff {
+  color: var(--app-warn);
+}
+
+.el-ip-empty {
+  padding: 10px 14px;
+  font-size: var(--app-fs-sm);
+  color: var(--app-text-muted);
+}
+
+/* ── Ligne de solde ─────────────────────────────────────────── */
+.el-ip-balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-surface-muted);
+
+  b {
+    display: block;
+    font-size: var(--app-fs-sm);
+    color: var(--app-text);
+  }
+
+  small {
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+  }
+
+  &.is-late {
+    background: var(--app-danger-soft);
+
+    .el-ip-balance-amount {
+      color: var(--app-danger);
+    }
+  }
+
+  &.is-settled {
+    background: var(--app-exit-soft);
+
+    .el-ip-balance-amount {
+      color: var(--app-status-validated);
+    }
+  }
+
+  &.is-overpaid {
+    background: var(--app-warn-soft);
+
+    .el-ip-balance-amount {
+      color: var(--app-warn);
+    }
+  }
+}
+
+.el-ip-balance-amount {
+  font-size: var(--app-fs-md);
+  font-weight: 700;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.el-ip-num {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--app-fs-sm);
+  color: var(--app-text-muted);
+}
+
+/* Montant d'un plan annulé. */
+.el-strike {
+  text-decoration: line-through;
+}
+
 /* ── Mobile : bascule sur la largeur du composant ────────────── */
 @container el (max-width: 720px) {
   .el-desktop-only {
@@ -702,5 +1142,45 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   .el-foot-group {
     gap: 5px;
     padding-left: 6px;
+  }
+
+  .el-row-detail {
+    margin: 8px -12px -8px;
+    padding: 10px 12px;
+  }
+
+  .el-ip-band {
+    margin: -10px -12px 0;
+    padding: 9px 12px;
+  }
+}
+
+@container el (max-width: 560px) {
+  /* Qté et prix d'une ligne passent sous le libellé : déjà géré par `el-ip-item-sub`. */
+  .el-ip-item {
+    padding: 9px 12px;
+  }
+}
+
+@container el (max-width: 520px) {
+  .el-ip-next {
+    width: 100%;
+  }
+
+  .el-ip-band-actions {
+    margin-left: 0;
+    width: 100%;
+
+    > * {
+      flex: 1;
+    }
+
+    > .el-gear {
+      flex: none;
+    }
+  }
+
+  .el-ip-timeline {
+    --el-ip-step-min: 54px;
   }
 }

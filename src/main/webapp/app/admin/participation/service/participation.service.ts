@@ -11,7 +11,7 @@ import {
     IParticipationList
 } from '../model/participation.interface';
 import {removeAccents} from '../../../shared/utils/string.util';
-import {IInvoicingPlan} from '../model/invoicing-plan.interface';
+import {IInvoicingPlan} from '../../invoicing-plan/model/invoicing-plan.interface';
 
 @Injectable({providedIn: 'root'})
 export class ParticipationService {

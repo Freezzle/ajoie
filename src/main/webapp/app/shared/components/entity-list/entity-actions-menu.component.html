@@ -1,0 +1,15 @@
+@if (menuItems().length > 0) {
+    <p-menu #menu
+            [model]="menuItems()"
+            [popup]="true"
+            appendTo="body"/>
+    <button #gear
+            (click)="openMenu(menu, $event)"
+            [attr.aria-label]="actionsLabel()"
+            [title]="actionsLabel()"
+            aria-haspopup="menu"
+            class="el-gear"
+            type="button">
+        <i class="pi pi-cog"></i>
+    </button>
+}

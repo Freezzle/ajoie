@@ -350,7 +350,7 @@ export class ParticipationComponent implements OnInit {
             {
                 labelKey: 'entityList.action.billing',
                 icon: 'pi pi-euro',
-                routerLink: ['./', participation.id, 'billing']
+                routerLink: ['./', participation.id, 'invoicing-plans']
             },
             {
                 labelKey: 'entityList.action.delete',

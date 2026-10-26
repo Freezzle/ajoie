@@ -1,8 +1,9 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {map, Observable} from 'rxjs';
+import dayjs from 'dayjs/esm';
 import {ApplicationConfigService} from 'app/core/config/application-config.service';
-import {IInvoice, IInvoicingPlanList, IPayment} from '../model/invoicing-plan.interface';
+import {IInvoice, IInvoicingPlan, IInvoicingPlanList, IPayment} from '../model/invoicing-plan.interface';
 
 @Injectable({providedIn: 'root'})
 export class InvoicingPlanService {
@@ -11,9 +12,14 @@ export class InvoicingPlanService {
     protected resourceUrl = this.applicationConfigService.getEndpointFor('api/admin/invoicing-plans');
     protected salonResourceUrl = this.applicationConfigService.getEndpointFor('api/admin/salons');
 
-    queryBySalon(idSalon: string): Observable<HttpResponse<IInvoicingPlanList[]>> {
-        return this.http.get<IInvoicingPlanList[]>(`${this.salonResourceUrl}/${idSalon}/invoicing-plans`,
-                                                    {observe: 'response'});
+    queryBySalon(idSalon: string): Observable<IInvoicingPlanList[]> {
+        return this.http.get<IInvoicingPlanList[]>(`${this.salonResourceUrl}/${idSalon}/invoicing-plans`)
+                   .pipe(map(plans => (plans ?? []).map(plan => this.convertListDatesFromServer(plan))));
+    }
+
+    find(idInvoicingPlan: string): Observable<IInvoicingPlan> {
+        return this.http.get<IInvoicingPlan>(`${this.resourceUrl}/${idInvoicingPlan}`)
+                   .pipe(map(plan => this.convertDatesFromServer(plan)));
     }
 
     createInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
@@ -57,4 +63,37 @@ export class InvoicingPlanService {
                                        {invoicesIds: invoicesIdsToMove},
                                        {observe: 'response'});
     }
+
+    /** Le serveur renvoie des dates ISO : la liste a besoin de vraies dates pour calculer l'urgence. */
+    private convertListDatesFromServer(plan: IInvoicingPlanList): IInvoicingPlanList {
+        return {
+            ...plan,
+            generationDate: toDayjs(plan.generationDate),
+            issuedDate: toDayjs(plan.issuedDate),
+            expirationDate: toDayjs(plan.expirationDate),
+            lastPaymentDate: toDayjs(plan.lastPaymentDate),
+            reminderDates: (plan.reminderDates ?? []).map(date => dayjs(date))
+        };
+    }
+
+    private convertDatesFromServer(plan: IInvoicingPlan): IInvoicingPlan {
+        return {
+            ...plan,
+            generationDate: toDayjs(plan.generationDate),
+            issuedDate: toDayjs(plan.issuedDate),
+            expirationDate: toDayjs(plan.expirationDate),
+            invoices: (plan.invoices ?? []).map(invoice => ({
+                ...invoice,
+                generationDate: toDayjs(invoice.generationDate)
+            })),
+            payments: (plan.payments ?? []).map(payment => ({
+                ...payment,
+                billingDate: toDayjs(payment.billingDate)
+            }))
+        };
+    }
+}
+
+function toDayjs(value: dayjs.Dayjs | null | undefined): dayjs.Dayjs | null {
+    return value ? dayjs(value) : null;
 }

@@ -2,10 +2,12 @@ package ch.salon.service;
 
 import ch.salon.domain.Invoice;
 import ch.salon.domain.InvoicingPlan;
+import ch.salon.domain.InvoicingPlanReminder;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Payment;
 import ch.salon.domain.enumeration.*;
 import ch.salon.repository.InvoiceRepository;
+import ch.salon.repository.InvoicingPlanReminderRepository;
 import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.repository.PaymentRepository;
@@ -41,6 +43,7 @@ public class InvoicingPlanService {
     private final EventLogService eventLogService;
 
     private final InvoicingPlanRepository repository;
+    private final InvoicingPlanReminderRepository reminderRepository;
 
     private final ParticipationRepository participationRepository;
     private final PaymentRepository paymentRepository;
@@ -55,9 +58,39 @@ public class InvoicingPlanService {
 
     public List<InvoicingPlanListDTO> findAllBySalonId(UUID idSalon) {
         List<InvoicingPlan> invoicingPlans = repository.findByParticipation_Salon_Id(idSalon);
+
+        Map<UUID, List<Instant>> remindersByPlan = findRemindersByPlan(
+                invoicingPlans.stream().map(InvoicingPlan::getId).toList());
+
         return invoicingPlans.stream()
-                .map(invoicingPlanMapper::toListDto)
+                .map(invoicingPlan -> {
+                    InvoicingPlanListDTO dto = invoicingPlanMapper.toListDto(invoicingPlan);
+                    dto.setReminderDates(remindersByPlan.getOrDefault(invoicingPlan.getId(), List.of()));
+                    return dto;
+                })
                 .toList();
+    }
+
+    public InvoicingPlanDTO findOne(UUID idInvoicingPlan) {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        return invoicingPlanMapper.toDto(invoicingPlan);
+    }
+
+    /** Dates de rappel de plusieurs plans, chargées en une seule requête. */
+    private Map<UUID, List<Instant>> findRemindersByPlan(List<UUID> idInvoicingPlans) {
+        if (idInvoicingPlans.isEmpty()) {
+            return Map.of();
+        }
+
+        return reminderRepository.findByInvoicingPlanIdInOrderBySentDateAsc(idInvoicingPlans).stream()
+                .collect(Collectors.groupingBy(InvoicingPlanReminder::getInvoicingPlanId,
+                        Collectors.mapping(InvoicingPlanReminder::getSentDate, Collectors.toList())));
     }
 
     public InvoiceDTO createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {

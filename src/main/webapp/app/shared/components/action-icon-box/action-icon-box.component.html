@@ -1,0 +1,11 @@
+@let text = label() ?? (labelKey() ? (labelKey() ?? '' | translate) : '');
+
+<button (click)="onClick($event)"
+        [attr.aria-label]="text"
+        [class.is-danger]="variant() === 'danger'"
+        [disabled]="isDisabled()"
+        [title]="text"
+        class="action-icon-box"
+        type="button">
+    <i [class]="'pi ' + primeIcon()"></i>
+</button>

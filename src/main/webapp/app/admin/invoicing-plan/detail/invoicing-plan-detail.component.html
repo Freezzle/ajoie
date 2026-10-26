@@ -1,0 +1,217 @@
+<div class="el-ip-detail">
+    <!-- ── Bande d'actions ─────────────────────────────────────────── -->
+    <div class="el-ip-band">
+        <b class="el-ip-next" [class]="nextStepClass()">
+            {{ 'invoicingPlan.detail.next.' + nextStepKey() | translate }}
+        </b>
+
+        <span class="el-ip-band-actions">
+            @for (action of mainActions(); track action.contextCode) {
+                <button-box (clickedEvent)="runAction(action, $event)"
+                            [translateKey]="action.labelKey"
+                            [type]="actionType(action)"/>
+            }
+
+            @if (canAddPayment()) {
+                <button-box (clickedEvent)="addPayment()"
+                            primeIcon="pi-plus"
+                            translateKey="invoicingPlan.list.action.addPayment"
+                            type="secondary"/>
+            }
+
+            <entity-actions-menu (opened)="menuOpened.emit()" [actions]="actions()"/>
+        </span>
+    </div>
+
+    <!-- ── Frise des dates ─────────────────────────────────────────── -->
+    <div class="el-ip-timeline-wrap">
+        <ol class="el-ip-timeline" [style.--el-ip-steps]="timeline().length">
+            @for (step of timeline(); track step.key) {
+                <li [class]="'is-' + step.status + ' ' + step.segment">
+                    <span class="el-ip-step-label">{{ step.label }}</span>
+                    <span class="el-ip-dot"></span>
+                    <span class="el-ip-step-date">{{ stepDate(step) }}</span>
+                </li>
+            }
+
+            @if (todayMarker(); as marker) {
+                <span class="el-ip-progress"
+                      [class]="marker.styleClass"
+                      [style.left.%]="marker.left - marker.width"
+                      [style.width.%]="marker.width"></span>
+                <span class="el-ip-today"
+                      [attr.aria-label]="todayTitle()"
+                      [style.left.%]="marker.left"
+                      [title]="todayTitle()"></span>
+            }
+        </ol>
+    </div>
+
+    @if (isLoading() && !plan()) {
+        <div class="el-ip-empty">
+            <i class="pi pi-spin pi-spinner"></i>
+        </div>
+    } @else {
+        <!-- ── Lignes de facture ───────────────────────────────────── -->
+        <section class="el-ip-card">
+            <header>
+                <strong>{{ 'invoicingPlan.invoices.label' | translate }}</strong>
+                <span class="el-ip-count">{{ invoices().length }}</span>
+                <span class="el-ip-spacer"></span>
+                @if (canAddInvoiceLine()) {
+                    <button (click)="addInvoiceLine()" class="el-ip-add" type="button">
+                        + {{ 'invoicingPlan.header.label' | translate }}
+                    </button>
+                }
+            </header>
+
+            @if (invoices().length === 0) {
+                <div class="el-ip-empty">{{ 'invoicingPlan.invoices.notFound' | translate }}</div>
+            } @else {
+                <ul class="el-ip-rows">
+                    @for (invoice of invoices(); track invoice.id) {
+                        <li>
+                            @if (canEditInvoiceLines()) {
+                                <button (click)="editInvoiceLine(invoice)" class="el-ip-item" type="button">
+                                    <ng-container
+                                        *ngTemplateOutlet="lineContent; context: {$implicit: invoice}"></ng-container>
+                                </button>
+                            } @else {
+                                <div class="el-ip-item">
+                                    <ng-container
+                                        *ngTemplateOutlet="lineContent; context: {$implicit: invoice}"></ng-container>
+                                </div>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            <footer>
+                <span>{{ 'invoicingPlan.header.sum' | translate }}</span>
+                <b>{{ invoicesTotal() | currency: 'CHF' }}</b>
+            </footer>
+        </section>
+
+        <!-- ── Paiements ───────────────────────────────────────────── -->
+        <section class="el-ip-card">
+            <header>
+                <strong>{{ 'invoicingPlan.payments.label' | translate }}</strong>
+                <span class="el-ip-count">{{ payments().length }}</span>
+            </header>
+
+            @if (payments().length === 0) {
+                <div class="el-ip-empty">{{ paymentsEmptyKey() | translate }}</div>
+            } @else {
+                <ul class="el-ip-rows">
+                    @for (payment of payments(); track payment.id) {
+                        <li>
+                            @if (canEditPayments()) {
+                                <button (click)="editPayment(payment)" class="el-ip-item" type="button">
+                                    <ng-container
+                                        *ngTemplateOutlet="paymentContent; context: {$implicit: payment}"></ng-container>
+                                </button>
+                            } @else {
+                                <div class="el-ip-item">
+                                    <ng-container
+                                        *ngTemplateOutlet="paymentContent; context: {$implicit: payment}"></ng-container>
+                                </div>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            <footer>
+                <span>{{ 'invoicingPlan.list.summary.paid' | translate }}</span>
+                <b>{{ paymentsTotal() | currency: 'CHF' }}</b>
+            </footer>
+        </section>
+
+        <!-- ── Solde ───────────────────────────────────────────────── -->
+        <div class="el-ip-balance" [class]="balanceCase().styleClass">
+            <span>
+                <b>{{ balanceCase().labelKey | translate }}</b>
+                @if (balanceCase().hint) {
+                    <small>{{ balanceCase().hint }}</small>
+                }
+            </span>
+            <span class="el-ip-balance-amount">
+                @if (balanceCase().amount === null) {
+                    —
+                } @else {
+                    {{ balanceCase().amount | currency: 'CHF' }}
+                }
+            </span>
+        </div>
+    }
+</div>
+
+<!-- ── Gabarits de ligne ───────────────────────────────────────────── -->
+<ng-template #lineContent let-invoice>
+    <span class="el-ip-item-main">
+        <span class="el-ip-item-title">
+            {{ invoice.label }}
+            @if (hasCustomAmount(invoice)) {
+                <fa-icon class="el-ip-diff"
+                         [title]="customAmountTitle(invoice)"
+                         icon="circle-info"></fa-icon>
+            }
+        </span>
+        <span class="el-ip-item-sub">
+            <span>{{ invoice.quantity }} × {{ invoice.customAmount | currency: 'CHF' }}</span>
+            @if (invoice.extraInformation) {
+                <span>{{ invoice.extraInformation }}</span>
+            }
+        </span>
+    </span>
+    <span class="el-ip-item-value" [class.is-negative]="lineAmount(invoice) < 0">
+        {{ lineAmount(invoice) | currency: 'CHF' }}
+    </span>
+    @if (isDeletableLine(invoice)) {
+        <action-icon-box (clickedEvent)="deleteInvoiceLine($event, invoice)"
+                         labelKey="common.delete"
+                         primeIcon="pi-trash"
+                         variant="danger"/>
+    }
+</ng-template>
+
+<ng-template #paymentContent let-payment>
+    <span class="el-ip-item-main">
+        <span class="el-ip-item-title">{{ payment.billingDate | formatMediumDate }}</span>
+        <span class="el-ip-item-sub">
+            <span>{{ paymentModeLabel(payment) }}</span>
+            @if (payment.extraInformation) {
+                <span>{{ payment.extraInformation }}</span>
+            }
+        </span>
+    </span>
+    <span class="el-ip-item-value is-paid">{{ payment.amount | currency: 'CHF' }}</span>
+    @if (canEditPayments()) {
+        <action-icon-box (clickedEvent)="deletePayment($event, payment)"
+                         labelKey="common.delete"
+                         primeIcon="pi-trash"
+                         variant="danger"/>
+    }
+</ng-template>
+
+<!-- ── Dialogues ───────────────────────────────────────────────────── -->
+@if (showInvoiceDialog()) {
+    <dialog-box (confirm)="onInvoiceDialogConfirm($event)"
+                [(visible)]="showInvoiceDialog"
+                [confirmLabel]="'common.save'"
+                [header]="(editingInvoice() ? 'invoicingPlan.invoice.dialog.edit' : 'invoicingPlan.invoice.dialog.create') | translate"
+                [mode]="'edit'">
+        <app-invoice-form [invoice]="editingInvoice()"/>
+    </dialog-box>
+}
+
+@if (showPaymentDialog()) {
+    <dialog-box (confirm)="onPaymentDialogConfirm($event)"
+                [(visible)]="showPaymentDialog"
+                [confirmLabel]="'common.save'"
+                [header]="(editingPayment() ? 'invoicingPlan.payment.dialog.edit' : 'invoicingPlan.payment.dialog.create') | translate"
+                [mode]="'edit'">
+        <app-payment-form [payment]="editingPayment()"/>
+    </dialog-box>
+}

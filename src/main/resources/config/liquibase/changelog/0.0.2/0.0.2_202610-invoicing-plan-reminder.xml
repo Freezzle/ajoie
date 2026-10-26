@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Rappels de paiement envoyés pour un plan de facturation.
+        Jusqu'ici la seule trace était un EventLog dont le libellé était un texte libre : la frise
+        de la facture a besoin d'une date par rappel, on la stocke donc dans une table dédiée.
+        Pas de reprise des rappels historiques : les plans antérieurs afficheront 0 rappel.
+
+        NB : on utilise un sqlCheck plutôt que <tableExists> (voir 0.0.2_202610-stand-picture.xml).
+    -->
+    <changeSet id="0.0.2-202610-invoicing-plan-reminder" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name = 'invoicing_plan_reminder'
+            </sqlCheck>
+        </preConditions>
+
+        <createTable tableName="invoicing_plan_reminder">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invoicing_plan_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sent_date" type="${datetimeType}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_invoicing_plan_reminder__plan" tableName="invoicing_plan_reminder">
+            <column name="invoicing_plan_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="invoicing_plan_id"
+                                 baseTableName="invoicing_plan_reminder"
+                                 constraintName="fk_invoicing_plan_reminder__plan_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="invoicing_plan"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"/>
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="invoicing_plan_reminder"
+                                      constraintName="fk_invoicing_plan_reminder__plan_id"/>
+            <dropIndex indexName="idx_invoicing_plan_reminder__plan" tableName="invoicing_plan_reminder"/>
+            <dropTable tableName="invoicing_plan_reminder"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

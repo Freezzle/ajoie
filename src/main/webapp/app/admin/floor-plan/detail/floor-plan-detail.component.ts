@@ -1323,7 +1323,7 @@ export class FloorPlanDetailComponent {
         this.navigationService.hideSensibleInformation.update(value => !value);
     }
 
-    participationLink(stand: IStand, page: 'view' | 'billing'): string[] {
+    participationLink(stand: IStand, page: 'view' | 'invoicing-plans'): string[] {
         return ['/salons', this.salon()?.id ?? '', 'participations', stand.participation?.id ?? '', page];
     }
 

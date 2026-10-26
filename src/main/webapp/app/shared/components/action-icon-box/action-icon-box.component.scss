@@ -1,0 +1,43 @@
+:host {
+  display: inline-flex;
+  flex: none;
+}
+
+.action-icon-box {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--app-text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: var(--app-surface-muted);
+    border-color: var(--app-border);
+    color: var(--app-text);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.is-danger {
+    color: var(--app-danger);
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      background: var(--app-danger-soft);
+      border-color: var(--app-danger);
+      color: var(--app-danger);
+    }
+  }
+}

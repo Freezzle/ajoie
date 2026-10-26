@@ -2,12 +2,12 @@ import {Routes} from '@angular/router';
 
 import {UserRouteAccessService} from 'app/core/auth/user-route-access.service';
 import {ParticipationComponent} from './list/participation.component';
-import {BillingComponent} from './billing/billing.component';
 import {ParticipationUpdateComponent} from './update/participation-update.component';
 import ParticipationResolve from './service/participation-routing-resolve.service';
 import conferenceRoutes from '../conference/conference.routes';
 import standRoutes from '../stand/stand.routes';
 import workshopRoutes from '../workshop/workshop.routes';
+import invoicingPlanRoutes from '../invoicing-plan/invoicing-plan.routes';
 
 const participationRoute: Routes = [
     {
@@ -28,12 +28,14 @@ const participationRoute: Routes = [
         canActivate: [UserRouteAccessService]
     },
     {
+        path: ':idParticipation/invoicing-plans',
+        children: invoicingPlanRoutes
+    },
+    {
+        // L'écran de facturation d'une participation est devenu la liste des factures filtrée.
         path: ':idParticipation/billing',
-        component: BillingComponent,
-        resolve: {
-            participation: ParticipationResolve
-        },
-        canActivate: [UserRouteAccessService]
+        redirectTo: ':idParticipation/invoicing-plans',
+        pathMatch: 'full'
     },
     {
         path: ':idParticipation/view',
