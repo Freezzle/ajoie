@@ -3,7 +3,9 @@
 
     <span [style.--el-color]="color()" [title]="text" class="el-foot-item">
         @if (icon(); as icon) {
-            <fa-icon [attr.aria-label]="text" [icon]="icon"></fa-icon>
+            <fa-icon [animation]="spin() ? 'spin' : undefined"
+                     [attr.aria-label]="text"
+                     [icon]="icon"></fa-icon>
         }
         @if (showLabel()) {
             <span class="el-foot-text">{{ text }}</span>

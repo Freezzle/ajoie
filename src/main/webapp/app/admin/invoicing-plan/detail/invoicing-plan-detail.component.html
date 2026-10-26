@@ -2,18 +2,23 @@
   <!-- ── Bande d'actions ─────────────────────────────────────────── -->
   <div class="el-ip-band">
     <b class="el-ip-next" [class]="nextStepClass()">
+      @if (isWaiting()) {
+        <fa-icon animation="spin" icon="spinner"></fa-icon>
+      }
       {{ 'invoicingPlan.detail.next.' + nextStepKey() | translate }}
     </b>
 
     <span class="el-ip-band-actions">
             @for (action of mainActions(); track action.contextCode) {
               <button-box (clickedEvent)="runAction(action, $event)"
+                          [isDisabled]="isWaiting()"
                           [translateKey]="action.labelKey"
                           [type]="actionType(action)" />
             }
 
       @if (canAddInvoiceLine()) {
         <button-box (clickedEvent)="addInvoiceLine()"
+                    [isDisabled]="isWaiting()"
                     primeIcon="pi-plus"
                     translateKey="invoicingPlan.list.action.addInvoiceLine"
                     type="secondary" />
@@ -21,6 +26,7 @@
 
       @if (canAddPayment()) {
         <button-box (clickedEvent)="addPayment()"
+                    [isDisabled]="isWaiting()"
                     primeIcon="pi-plus"
                     translateKey="invoicingPlan.list.action.addPayment"
                     type="secondary" />
@@ -34,7 +40,7 @@
   <div class="el-ip-timeline-wrap">
     <ol class="el-ip-timeline" [style.--el-ip-steps]="timeline().length">
       @for (step of timeline(); track step.key) {
-        <li [class]="'is-' + step.status + ' ' + step.segment">
+        <li [class]="'is-' + step.status + ' ' + step.segment" [attr.title]="step.hint ?? null">
           <span class="el-ip-step-label">{{ step.label }}</span>
           <span class="el-ip-dot"></span>
           <span class="el-ip-step-date">{{ stepDate(step) }}</span>

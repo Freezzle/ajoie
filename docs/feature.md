@@ -74,13 +74,13 @@ Ajouter à `InvoicingPlanListDTO` :
 | `invoiceSendingMethod` | `InvoiceSendingMethod` | `InvoicingPlan.invoiceSendingMethod` |
 | `needArrangement` | `Boolean` | `InvoicingPlan.needArrangement` |
 | `hasCustomPrice` | `Boolean` | vrai si au moins une ligne a `customAmount != defaultAmount` |
-| `reminderDates` | `List<Instant>` | table dédiée `invoicing_plan_reminder` (voir ci-dessous) |
+| `reminders` | `List<InvoicingPlanReminderDTO>` | table dédiée `invoicing_plan_reminder` (voir ci-dessous) |
 | `lastPaymentDate` | `Instant` | date du paiement le plus récent, ou `null` |
 | `cancelledDate` | `Instant` | facultatif ; sinon la frise affiche « Annulée » sans date |
 
 Les champs directs se mappent par MapStruct (même nom). `hasCustomPrice` et `lastPaymentDate` passent par `@Mapping(expression = …)`, comme `nbInvoiceLines`.
 
-**Dates de rappel.** Elles sont stockées dans une table dédiée `invoicing_plan_reminder` (`id`, `tenant_id`, `invoicing_plan_id`, `sent_date`), alimentée par `EmailInvoiceReminderHandler` à chaque envoi réussi. Dans `findAllBySalonId`, charger en **une seule requête** les rappels des plans du salon (`findByInvoicingPlanIdInOrderBySentDateAsc`) puis les grouper par plan. Pas de requête par plan.
+**Dates de rappel.** Elles sont stockées dans une table dédiée `invoicing_plan_reminder` (`id`, `tenant_id`, `invoicing_plan_id`, `sent_date`, `due_date_at_send`), alimentée par `EmailInvoiceReminderHandler` à chaque envoi réussi. `due_date_at_send` fige l'échéance du plan au moment de l'envoi : l'échéance courante est repoussée après une relance, et la frise a besoin de l'ancienne pour expliquer le rappel (nulle pour les rappels antérieurs à cette colonne). Dans `findAllBySalonId`, charger en **une seule requête** les rappels des plans du salon (`findByInvoicingPlanIdInOrderBySentDateAsc`) puis les grouper par plan. Pas de requête par plan.
 
 > L'historique antérieur n'est pas repris : les plans existants affichent 0 rappel. Les `EventLog` de rappel restent écrits, mais ne servent plus de source de vérité.
 
@@ -143,7 +143,7 @@ Groupe « Signaux » (mode `and`, masquées si effectif nul) :
 |---|---|---|---|
 | `postal` | Postale | `envelope` | `invoiceSendingMethod === POSTAL` |
 | `arrangement` | `entityList.signal.arrangement` | `handshake-simple` | `needArrangement` |
-| `reminded` | Relancée | `bell` | `state === ISSUED && reminderDates.length > 0` |
+| `reminded` | Relancée | `bell` | `state === ISSUED && reminders.length > 0` |
 | `customPrice` | Prix modifié | `tag` | `hasCustomPrice` |
 
 Pas de puce « partiellement payée ».
@@ -241,6 +241,28 @@ Créer `admin/invoicing-plan/service/invoicing-plan-actions.service.ts` en y dé
 
 **Rouage de la ligne (`actionsFor`)** : les `availableActions` du plan, **chargées à la demande** (première ouverture du rouage ou premier dépliage, mises en cache par plan ; un item « Chargement… » désactivé patiente), plus « Voir uniquement cette participation », « Fiche participation », « Fiche client » et « Historique » (`getEventLogs`). Calcul mis en cache dans un `computed`, comme `participation.component.ts`, pour éviter le double clic.
 
+### 5.5 Rafraîchissement après une action asynchrone
+
+Les envois d'email (facture, renvoi, rappel, quittance) se terminent dans un thread serveur bien après la réponse HTTP : la facture resterait affichée « En cours d'envoi » jusqu'à un rafraîchissement manuel. À la fin du traitement, et **après le commit**, `EntityChangeNotifier` publie `{entityType, entityId}` sur `/topic/salon/{idSalon}/entity-changed` (canal découpé par salon : le front connaît déjà cet identifiant, et un salon appartient à un seul locataire).
+
+Côté front, `EntityChangeService.watchSalon(idSalon)` réutilise le client STOMP de `PresenceService` (réabonnement à chaque reconnexion via `connected$`). La liste recharge alors **uniquement** la facture concernée (`GET /api/admin/invoicing-plans/{id}/summary` → `InvoicingPlanListDTO`), remplace la ligne dans son signal et recharge ses actions ; le détail ouvert se recharge grâce à un effet sur `summary()`.
+
+> Filet de sécurité : tant qu'une facture reste en `IS_ISSUING`, un rechargement unique est programmé 20 s plus tard, au cas où la notification n'arriverait jamais (socket coupé, serveur redémarré).
+
+**Attente visible.** `InvoicingPlanActionsService` marque la facture « en attente » dès qu'une action asynchrone est lancée (`invoice-send`, `invoice-send-again`, `invoice-reminder`, `receipt-send`) ; l'attente est levée à l'arrivée de la notification, avec une expiration de secours à 60 s. Une facture est en attente si elle est dans cet état **ou** si son état serveur est `IS_ISSUING`. Pendant ce temps : pastille « Envoi en cours… » avec spinner dans le pied de la ligne, spinner devant le libellé de la bande d'actions du détail, et actions serveur désactivées (le rouage garde la navigation et l'historique) pour éviter un double envoi.
+
+### 5.6 Portée du rafraîchissement d'une action
+
+Chaque action déclare côté serveur ce que l'écran doit relire : `ContextActionType.refreshScope()` renvoie `ENTITY`, `LIST` ou `NONE`, valeur transportée par `ActionAvailable` puis par `AvailableAction` côté front (repli sur `ENTITY`).
+
+| Portée | Effet | Actions |
+|---|---|---|
+| `ENTITY` | relire uniquement cette facture : sa ligne et le détail déplié | toutes les actions métier et emails |
+| `LIST` | recharger la liste | `invoice-split`, `invoice-delete`, `salon-duplicate` |
+| `NONE` | ne rien relire | tous les téléchargements |
+
+`InvoicingPlanActionsService.run()` renvoie donc un `Observable<RefreshScope>` : la liste applique la portée (`applyRefresh`), et le détail émet `refreshed` (ciblé) ou `changed` (liste). Les ajouts et modifications de lignes de facture et de paiements passent aussi en ciblé. Le détail ne se recharge pas lui-même : la liste remplace l'objet de la ligne et l'effet sur `summary()` déclenche l'unique relecture du détail. La vue d'une participation applique la même règle pour ne pas se relire après une action `NONE`.
+
 ---
 
 ## 6. Détail d'un plan : `InvoicingPlanDetailComponent`
@@ -288,7 +310,7 @@ Toutes les autres actions restent dans le rouage de la ligne.
 
 1. **Générée** : `generationDate`, toujours passée (`ok`).
 2. **Envoyée** : `issuedDate` ; sans date, elle est l'étape en cours (`now`) pour un brouillon et affiche « — ».
-3. **Rappel** : une étape par date de `reminderDates`, style `warn`.
+3. **Rappel** : une étape par entrée de `reminders`, style `warn`. Quand `dueDateAtSend` est connue et que le rappel a été envoyé après, le libellé devient « Rappel J+N » et une infobulle rappelle l'échéance dépassée.
 4. **Échéance** : `expirationDate` ; `ok` si payée, `bad` si échue, `now` si envoyée ; « envoi + 30 j » pour un brouillon. Omise si annulée.
 5. **Payée** (`lastPaymentDate`, `ok`), ou **Annulée** (`bad`).
 
@@ -353,11 +375,13 @@ Une ligne de tableau, même style que les pieds de tableau mais un peu plus haut
 | Fond du détail déplié, en-têtes et pieds de tableau | `--app-surface-muted` |
 | Bordures, traits, jalons futurs | `--app-border` |
 | Texte principal / secondaire | `--app-text` / `--app-text-muted` |
-| Statut Brouillon, Brouillon isolé | `--app-text-muted` |
+| Statut Brouillon, Brouillon isolé | `--app-status-neutral` |
 | Statut En cours d'envoi, Envoyée ; jalon « en cours » | `--app-status-accepted` (halo `--app-primary-soft`) |
-| Statut Échue, retard, montant échu | `--app-danger` (texte) ; `--app-status-refused` (point de statut) ; fond `--app-danger-soft` |
+| Statut Échue, retard, montant échu | `--app-danger` (texte) ; `--app-status-refused` (pastille de statut) ; fond `--app-danger-soft` |
 | Statut Payée, paiements, jalons passés | `--app-status-validated` ; fond `--app-exit-soft` |
 | Statut Annulée | `--app-status-canceled` (libellé barré) |
+
+> Le statut d'une ligne (`entity-status`) s'affiche en **pastille pleine** : la couleur du statut sert de fond et le libellé est écrit en blanc. La précision éventuelle (« · J-22 ») reste en gris, à l'extérieur de la pastille.
 | Échéance ≤ 7 jours, rappels, prix modifié, trop-perçu | `--app-warn` ; fond `--app-warn-soft` |
 | Arrangement | `--app-primary` |
 | Point « aujourd'hui » | `--app-status-gold` |
@@ -410,7 +434,7 @@ Réutiliser les clés existantes quand elles conviennent : `invoicingPlan.state.
 |---|---|
 | `java/.../service/dto/InvoicingPlanListDTO.java` | nouveaux champs (section 2) |
 | `java/.../service/mapper/InvoicingPlanMapper.java` | mappings `hasCustomPrice`, `lastPaymentDate` |
-| `java/.../service/InvoicingPlanService.java` | `reminderDates` en une requête, `findOne` |
+| `java/.../service/InvoicingPlanService.java` | `reminders` en une requête, `findOne` |
 | `java/.../domain/InvoicingPlanReminder.java` | **nouveau**, table dédiée des rappels |
 | `java/.../repository/InvoicingPlanReminderRepository.java` | **nouveau** |
 | `webapp/app/admin/invoicing-plan/model/invoicing-plan.interface.ts` | `IInvoicingPlanList` enrichi (déplacé) |

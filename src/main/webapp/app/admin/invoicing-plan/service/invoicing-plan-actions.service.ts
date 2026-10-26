@@ -1,17 +1,27 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
-import {Observable, Subject, filter, finalize, of} from 'rxjs';
+import {Observable, Subject, filter, finalize, of, timer} from 'rxjs';
 
 import {ActionFormDialogComponent} from 'app/shared/action-form-dialog/action-form-dialog.component';
 import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.service';
 import {EmailDialogComponent} from 'app/shared/email-dialog/email-dialog.component';
 import {EmailMessage} from 'app/shared/email-dialog/email-message';
-import {AvailableAction} from 'app/shared/model/available-action';
+import {AvailableAction, RefreshScope, refreshScopeOf} from 'app/shared/model/available-action';
 import {ActionsService} from '../../common/actions.service';
 
 /** Contexte d'actions des plans de facturation côté serveur. */
 const BILLING_DOMAIN = 'billing';
+
+/**
+ * Actions dont l'effet réel se produit après la réponse HTTP : le serveur termine l'envoi
+ * dans un thread séparé et prévient l'écran par WebSocket. La facture reste « en attente »
+ * jusque-là.
+ */
+const ASYNC_ACTION_CODES = ['invoice-send', 'invoice-send-again', 'invoice-reminder', 'receipt-send'];
+
+/** Garde-fou d'affichage : au-delà, on cesse d'annoncer une attente. */
+const PENDING_EXPIRY_MS = 60_000;
 
 /** État du chargement paresseux des actions d'un plan. */
 type ActionsState = 'loading' | AvailableAction[];
@@ -28,10 +38,35 @@ export class InvoicingPlanActionsService {
     /** Actions par identifiant de plan ; `loading` pendant la requête. */
     private readonly cache = signal<Record<string, ActionsState>>({});
 
+    /** Plans dont un envoi asynchrone est en cours côté serveur. */
+    private readonly pending = signal<Record<string, true>>({});
+
     private readonly actionsService = inject(ActionsService);
     private readonly modalService = inject(NgbModal);
     private readonly translateService = inject(TranslateService);
     private readonly confirmDialogService = inject(ConfirmDialogService);
+
+    /** Vrai tant que l'écran attend la fin d'un envoi déclenché sur ce plan. */
+    isPending(idInvoicingPlan: string): boolean {
+        return this.pending()[idInvoicingPlan] === true;
+    }
+
+    /** Appelé quand le serveur a notifié la fin du traitement, ou après un rechargement. */
+    clearPending(idInvoicingPlan: string): void {
+        if (!this.isPending(idInvoicingPlan)) {
+            return;
+        }
+
+        this.pending.update(pending => {
+            const {[idInvoicingPlan]: _removed, ...rest} = pending;
+
+            return rest;
+        });
+    }
+
+    clearAllPending(): void {
+        this.pending.set({});
+    }
 
     /** Actions connues d'un plan, ou `undefined` si elles ne sont pas encore chargées. */
     actionsOf(idInvoicingPlan: string): AvailableAction[] | undefined {
@@ -68,10 +103,10 @@ export class InvoicingPlanActionsService {
     }
 
     /**
-     * Exécute une action. L'observable se termine quand l'action a abouti, pour que
-     * l'appelant recharge la ligne et le détail ; il ne produit rien si l'utilisateur annule.
+     * Exécute une action et annonce ce qu'il faut relire ensuite : rien ne sort de
+     * l'observable si l'utilisateur annule.
      */
-    run(action: AvailableAction, idInvoicingPlan: string, target?: HTMLElement): Observable<void> {
+    run(action: AvailableAction, idInvoicingPlan: string, target?: HTMLElement): Observable<RefreshScope> {
         switch (action.type) {
             case 'EMAIL':
                 return this.runEmail(action, idInvoicingPlan);
@@ -96,8 +131,8 @@ export class InvoicingPlanActionsService {
                        });
     }
 
-    private runEmail(action: AvailableAction, idInvoicingPlan: string): Observable<void> {
-        const done = new Subject<void>();
+    private runEmail(action: AvailableAction, idInvoicingPlan: string): Observable<RefreshScope> {
+        const done = new Subject<RefreshScope>();
 
         this.actionsService.templateEmailAction(action.contextCode, idInvoicingPlan).subscribe(template => {
             const modalRef = this.modalService.open(EmailDialogComponent, {size: 'xl'});
@@ -113,15 +148,15 @@ export class InvoicingPlanActionsService {
                 }
 
                 this.actionsService.emailAction(action.contextCode, idInvoicingPlan, result)
-                    .subscribe(() => this.finish(done, idInvoicingPlan));
+                    .subscribe(() => this.finish(done, idInvoicingPlan, action));
             }).catch(() => done.complete());
         });
 
         return done.asObservable();
     }
 
-    private runDownload(action: AvailableAction, idInvoicingPlan: string): Observable<void> {
-        const done = new Subject<void>();
+    private runDownload(action: AvailableAction, idInvoicingPlan: string): Observable<RefreshScope> {
+        const done = new Subject<RefreshScope>();
 
         this.actionsService.downloadAction(action.contextCode, idInvoicingPlan)
             .pipe(finalize(() => done.complete()))
@@ -136,13 +171,16 @@ export class InvoicingPlanActionsService {
                 link.click();
 
                 window.URL.revokeObjectURL(url);
+
+                // Un téléchargement n'a normalement rien changé, mais c'est le serveur qui le dit.
+                done.next(refreshScopeOf(action));
             });
 
         return done.asObservable();
     }
 
-    private runBusiness(action: AvailableAction, idInvoicingPlan: string, target?: HTMLElement): Observable<void> {
-        const done = new Subject<void>();
+    private runBusiness(action: AvailableAction, idInvoicingPlan: string, target?: HTMLElement): Observable<RefreshScope> {
+        const done = new Subject<RefreshScope>();
 
         // Des champs sont requis : on passe par la modale de formulaire.
         if (action.requiredFields && action.requiredFields.length > 0) {
@@ -175,16 +213,30 @@ export class InvoicingPlanActionsService {
 
     private executeBusinessAction(action: AvailableAction,
                                   idInvoicingPlan: string,
-                                  done: Subject<void>,
+                                  done: Subject<RefreshScope>,
                                   payload?: Map<string, unknown>): void {
         this.actionsService.businessAction(action.contextCode, idInvoicingPlan, payload as Map<string, any>)
-            .subscribe(() => this.finish(done, idInvoicingPlan));
+            .subscribe(() => this.finish(done, idInvoicingPlan, action));
     }
 
-    private finish(done: Subject<void>, idInvoicingPlan: string): void {
+    private finish(done: Subject<RefreshScope>, idInvoicingPlan: string, action: AvailableAction): void {
+        this.markPendingIfAsync(idInvoicingPlan, action.contextCode);
         this.reload(idInvoicingPlan);
-        done.next();
+        done.next(refreshScopeOf(action));
         done.complete();
+    }
+
+    /**
+     * L'envoi se poursuit côté serveur après la réponse : on signale l'attente jusqu'à la
+     * notification de fin, avec une expiration de secours pour ne jamais rester bloqué.
+     */
+    private markPendingIfAsync(idInvoicingPlan: string, contextCode: string): void {
+        if (!ASYNC_ACTION_CODES.includes(contextCode)) {
+            return;
+        }
+
+        this.pending.update(pending => ({...pending, [idInvoicingPlan]: true}));
+        timer(PENDING_EXPIRY_MS).subscribe(() => this.clearPending(idInvoicingPlan));
     }
 }
 

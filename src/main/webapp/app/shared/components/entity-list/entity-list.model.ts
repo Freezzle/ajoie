@@ -117,7 +117,7 @@ export function statusColor(status: Status | string | null | undefined): string 
         case Status.CANCELED:
             return 'var(--app-status-canceled)';
         default:
-            return 'var(--app-text-muted)';
+            return 'var(--app-status-neutral)';
     }
 }
 

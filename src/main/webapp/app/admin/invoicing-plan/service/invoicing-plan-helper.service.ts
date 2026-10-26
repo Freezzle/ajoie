@@ -79,7 +79,7 @@ export class InvoicingPlanHelperService {
             case 'CANCELLED':
                 return 'var(--app-status-canceled)';
             default:
-                return 'var(--app-text-muted)';
+                return 'var(--app-status-neutral)';
         }
     }
 

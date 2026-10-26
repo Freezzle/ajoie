@@ -44,8 +44,19 @@ public class InvoicingPlanReminder implements Serializable, TenantOwned {
     @Column(name = "sent_date", nullable = false)
     private Instant sentDate;
 
-    public InvoicingPlanReminder(UUID invoicingPlanId, Instant sentDate) {
+    /**
+     * Échéance du plan au moment de l'envoi du rappel.
+     * <p>
+     * L'échéance de la facture est souvent repoussée après une relance : sans ce cliché, la frise
+     * ne permettrait plus de savoir combien de jours après l'échéance le rappel a été envoyé.
+     * Nulle pour les rappels antérieurs à cette colonne.
+     */
+    @Column(name = "due_date_at_send")
+    private Instant dueDateAtSend;
+
+    public InvoicingPlanReminder(UUID invoicingPlanId, Instant sentDate, Instant dueDateAtSend) {
         this.invoicingPlanId = invoicingPlanId;
         this.sentDate = sentDate;
+        this.dueDateAtSend = dueDateAtSend;
     }
 }

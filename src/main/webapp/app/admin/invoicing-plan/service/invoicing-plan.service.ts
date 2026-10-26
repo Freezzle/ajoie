@@ -22,6 +22,12 @@ export class InvoicingPlanService {
                    .pipe(map(plan => this.convertDatesFromServer(plan)));
     }
 
+    /** Ligne de liste d'une seule facture, pour rafraîchir une ligne sans recharger le salon. */
+    findSummary(idInvoicingPlan: string): Observable<IInvoicingPlanList> {
+        return this.http.get<IInvoicingPlanList>(`${this.resourceUrl}/${idInvoicingPlan}/summary`)
+                   .pipe(map(plan => this.convertListDatesFromServer(plan)));
+    }
+
     createInvoice(idInvoicingPlan: string, invoice: IInvoice): Observable<HttpResponse<IInvoice>> {
         return this.http.post<IInvoice>(`${this.resourceUrl}/${idInvoicingPlan}/invoices`, invoice,
                                         {observe: 'response'});
@@ -72,7 +78,10 @@ export class InvoicingPlanService {
             issuedDate: toDayjs(plan.issuedDate),
             expirationDate: toDayjs(plan.expirationDate),
             lastPaymentDate: toDayjs(plan.lastPaymentDate),
-            reminderDates: (plan.reminderDates ?? []).map(date => dayjs(date))
+            reminders: (plan.reminders ?? []).map(reminder => ({
+                sentDate: toDayjs(reminder.sentDate),
+                dueDateAtSend: toDayjs(reminder.dueDateAtSend)
+            }))
         };
     }
 

@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {MenuItem} from 'primeng/api';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import dayjs from 'dayjs/esm';
-import {filter, switchMap, tap} from 'rxjs';
+import {filter, Subscription, switchMap, tap, timer} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -35,6 +35,8 @@ import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.serv
 import {EventModalComponent} from 'app/shared/event-modal/event-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NavigationStateService} from 'app/layouts/navbar/navigation-state.service';
+import {RefreshScope} from 'app/shared/model/available-action';
+import {EntityChangeService} from '../../common/entity-change.service';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 import {State} from '../../enumerations/state.model';
 import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
@@ -59,6 +61,9 @@ const BUCKET_ORDER: InvoicingPlanBucket[] = ['late', 'todo', 'wait', 'PAID', 'CA
 
 /** Ordre des groupes « Échéance ». */
 const DUE_ORDER = ['late', 'week', 'later', 'nodate', 'closed'];
+
+/** Délai avant le rechargement de secours d'une facture restée « en cours d'envoi ». */
+const SAFETY_NET_DELAY_MS = 20_000;
 
 @Component({
                selector: 'app-invoicing-plan-list',
@@ -100,6 +105,16 @@ export class InvoicingPlanListComponent implements OnInit {
     private readonly modalService = inject(NgbModal);
     private readonly translateService = inject(TranslateService);
     private readonly navigationStateService = inject(NavigationStateService);
+    private readonly entityChangeService = inject(EntityChangeService);
+    private readonly destroyRef = inject(DestroyRef);
+
+    /** Abonnement aux changements poussés pour le salon affiché. */
+    private changeSubscription?: Subscription;
+    /**
+     * Factures dont le rechargement de secours a déjà été programmé, pour ne le faire
+     * qu'une fois par envoi même si la ligne est rafraîchie entre-temps.
+     */
+    private readonly armedSafetyNets = new Set<string>();
 
     protected readonly helper = inject(InvoicingPlanHelperService);
 
@@ -306,12 +321,71 @@ export class InvoicingPlanListComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.destroyRef.onDestroy(() => this.changeSubscription?.unsubscribe());
+
         this.activatedRoute.paramMap.subscribe(params => {
             this.idSalon.set(params.get('idSalon'));
             this.idParticipation.set(params.get('idParticipation'));
 
             this.load();
+            this.watchChanges();
         });
+    }
+
+    /**
+     * Les envois d'email (facture, rappel, quittance) se terminent dans un thread serveur
+     * bien après la réponse HTTP : sans ce canal, la ligne resterait sur « en cours d'envoi ».
+     */
+    private watchChanges(): void {
+        this.changeSubscription?.unsubscribe();
+        this.changeSubscription = undefined;
+        this.actionsService.clearAllPending();
+
+        const idSalon = this.idSalon();
+        if (!idSalon) {
+            return;
+        }
+
+        this.changeSubscription = this.entityChangeService.watchSalon(idSalon).subscribe(change => {
+            if (change.entityType === 'INVOICE_PLAN') {
+                this.refreshPlan(change.entityId);
+            }
+        });
+    }
+
+    /** Recharge une seule facture, sans toucher aux autres lignes ni au défilement. */
+    refreshPlan(idInvoicingPlan: string): void {
+        if (!this.invoicingPlans().some(plan => plan.id === idInvoicingPlan)) {
+            return;
+        }
+
+        this.invoicingPlanService.findSummary(idInvoicingPlan).subscribe(refreshed => {
+            this.invoicingPlans.update(
+                plans => plans.map(plan => (plan.id === refreshed.id ? refreshed : plan)));
+            this.actionsService.clearPending(idInvoicingPlan);
+            this.actionsService.reload(idInvoicingPlan);
+            this.armSafetyNet(refreshed);
+        });
+    }
+
+    /** Filet de sécurité si la notification n'arrive jamais : socket coupé, serveur redémarré. */
+    private armSafetyNets(plans: IInvoicingPlanList[]): void {
+        plans.forEach(plan => this.armSafetyNet(plan));
+    }
+
+    private armSafetyNet(plan: IInvoicingPlanList): void {
+        if (plan.state !== State.IS_ISSUING) {
+            this.armedSafetyNets.delete(plan.id);
+
+            return;
+        }
+
+        if (this.armedSafetyNets.has(plan.id)) {
+            return;
+        }
+
+        this.armedSafetyNets.add(plan.id);
+        timer(SAFETY_NET_DELAY_MS).subscribe(() => this.refreshPlan(plan.id));
     }
 
     load(): void {
@@ -334,9 +408,12 @@ export class InvoicingPlanListComponent implements OnInit {
 
                 const idParticipation = this.idParticipation();
 
-                this.invoicingPlans.set(idParticipation
-                                        ? plans.filter(plan => plan.participation?.id === idParticipation)
-                                        : plans);
+                const visiblePlans = idParticipation
+                                     ? plans.filter(plan => plan.participation?.id === idParticipation)
+                                     : plans;
+
+                this.invoicingPlans.set(visiblePlans);
+                this.armSafetyNets(visiblePlans);
             });
     }
 
@@ -346,6 +423,18 @@ export class InvoicingPlanListComponent implements OnInit {
 
         this.load();
         this.expandedPlanId.set(expanded);
+    }
+
+    /**
+     * Applique la portée annoncée par l'action : seules celles qui changent le nombre de
+     * factures justifient de recharger toute la liste.
+     */
+    applyRefresh(scope: RefreshScope, idInvoicingPlan: string): void {
+        if (scope === 'LIST') {
+            this.reloadAfterAction();
+        } else if (scope === 'ENTITY') {
+            this.refreshPlan(idInvoicingPlan);
+        }
     }
 
     regenerate(target: HTMLElement): void {
@@ -400,16 +489,18 @@ export class InvoicingPlanListComponent implements OnInit {
         const idParticipation = plan.participation?.id;
         const idExhibitor = plan.participation?.exhibitor?.id;
         const serverActions = this.actionsService.actionsOf(plan.id);
+        // Un envoi est en cours : relancer une action maintenant ferait doublon.
+        const waiting = this.isWaiting(plan);
 
         const dynamic: EntityAction[] = serverActions
                                         ? serverActions.map(action => ({
                 labelKey: action.labelKey,
                 icon: iconForActionType(action.type),
-                disabled: action.disabled,
+                disabled: action.disabled || waiting,
                 helpText: action.helpKey ? this.translateService.instant(action.helpKey) as string : undefined,
                 conditionalKeys: action.conditionalKeys ?? [],
                 run: target => this.actionsService.run(action, plan.id, target)
-                                   .subscribe(() => this.reloadAfterAction())
+                                   .subscribe(scope => this.applyRefresh(scope, plan.id))
             }))
                                         : [{labelKey: 'entityList.loading', icon: 'pi pi-spin pi-spinner', disabled: true}];
 
@@ -476,7 +567,15 @@ export class InvoicingPlanListComponent implements OnInit {
     }
 
     nbReminders(plan: IInvoicingPlanList): number {
-        return plan.reminderDates?.length ?? 0;
+        return plan.reminders?.length ?? 0;
+    }
+
+    /**
+     * Vrai tant qu'on attend la fin d'un envoi : état « en cours d'envoi » posé par le
+     * serveur, ou action asynchrone lancée depuis cet écran.
+     */
+    isWaiting(plan: IInvoicingPlanList): boolean {
+        return plan.state === State.IS_ISSUING || this.actionsService.isPending(plan.id);
     }
 
     isPostal(plan: IInvoicingPlanList): boolean {

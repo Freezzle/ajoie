@@ -15,6 +15,7 @@ import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.InvoiceDTO;
 import ch.salon.service.dto.InvoicingPlanDTO;
 import ch.salon.service.dto.InvoicingPlanListDTO;
+import ch.salon.service.dto.InvoicingPlanReminderDTO;
 import ch.salon.service.dto.PaymentDTO;
 import ch.salon.service.mapper.EventLogMapper;
 import ch.salon.service.mapper.InvoiceMapper;
@@ -59,13 +60,13 @@ public class InvoicingPlanService {
     public List<InvoicingPlanListDTO> findAllBySalonId(UUID idSalon) {
         List<InvoicingPlan> invoicingPlans = repository.findByParticipation_Salon_Id(idSalon);
 
-        Map<UUID, List<Instant>> remindersByPlan = findRemindersByPlan(
+        Map<UUID, List<InvoicingPlanReminderDTO>> remindersByPlan = findRemindersByPlan(
                 invoicingPlans.stream().map(InvoicingPlan::getId).toList());
 
         return invoicingPlans.stream()
                 .map(invoicingPlan -> {
                     InvoicingPlanListDTO dto = invoicingPlanMapper.toListDto(invoicingPlan);
-                    dto.setReminderDates(remindersByPlan.getOrDefault(invoicingPlan.getId(), List.of()));
+                    dto.setReminders(remindersByPlan.getOrDefault(invoicingPlan.getId(), List.of()));
                     return dto;
                 })
                 .toList();
@@ -82,15 +83,33 @@ public class InvoicingPlanService {
         return invoicingPlanMapper.toDto(invoicingPlan);
     }
 
-    /** Dates de rappel de plusieurs plans, chargées en une seule requête. */
-    private Map<UUID, List<Instant>> findRemindersByPlan(List<UUID> idInvoicingPlans) {
+    /** Ligne de liste d'une seule facture : même contenu que {@link #findAllBySalonId}, pour un plan. */
+    public InvoicingPlanListDTO findOneSummary(UUID idInvoicingPlan) {
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        InvoicingPlanListDTO dto = invoicingPlanMapper.toListDto(invoicingPlan);
+        dto.setReminders(reminderRepository.findByInvoicingPlanIdOrderBySentDateAsc(idInvoicingPlan).stream()
+                .map(reminder -> new InvoicingPlanReminderDTO(reminder.getSentDate(), reminder.getDueDateAtSend()))
+                .toList());
+
+        return dto;
+    }
+
+    /** Rappels de plusieurs plans, chargés en une seule requête. */
+    private Map<UUID, List<InvoicingPlanReminderDTO>> findRemindersByPlan(List<UUID> idInvoicingPlans) {
         if (idInvoicingPlans.isEmpty()) {
             return Map.of();
         }
 
         return reminderRepository.findByInvoicingPlanIdInOrderBySentDateAsc(idInvoicingPlans).stream()
                 .collect(Collectors.groupingBy(InvoicingPlanReminder::getInvoicingPlanId,
-                        Collectors.mapping(InvoicingPlanReminder::getSentDate, Collectors.toList())));
+                        Collectors.mapping(reminder -> new InvoicingPlanReminderDTO(reminder.getSentDate(),
+                                reminder.getDueDateAtSend()), Collectors.toList())));
     }
 
     public InvoiceDTO createInvoice(UUID idInvoicingPlan, InvoiceDTO invoiceDTO) {

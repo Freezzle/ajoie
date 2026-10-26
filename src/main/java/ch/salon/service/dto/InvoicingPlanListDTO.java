@@ -30,6 +30,6 @@ public class InvoicingPlanListDTO implements Serializable {
     private Boolean hasCustomPrice;
     /** Date du paiement le plus récent, ou null. */
     private Instant lastPaymentDate;
-    /** Dates des rappels envoyés, les plus anciennes d'abord. Rempli par le service. */
-    private List<Instant> reminderDates = new ArrayList<>();
+    /** Rappels envoyés, les plus anciens d'abord. Rempli par le service. */
+    private List<InvoicingPlanReminderDTO> reminders = new ArrayList<>();
 }

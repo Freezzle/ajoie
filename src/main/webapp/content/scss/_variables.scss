@@ -50,12 +50,14 @@
   // Les six statuts ont chacun leur teinte, pour rester lisibles en point de 8 px
   // et en libellé dans les listes.
   --app-status-gold: #efbf00;
-  --app-status-verification: #8a5d00;
+  --app-status-verification: #bd830a;
   --app-status-accepted: #325d88;
   --app-status-validated: #1b6b37;
   --app-status-closed: #6b6b6b;
   --app-status-refused: #b3261e;
   --app-status-canceled: #9a9a9a;
+  /* Statut neutre (brouillon, inconnu) : assez sombre pour porter du texte blanc. */
+  --app-status-neutral: #6f6f6f;
 
   // Signaux des listes (coup de cœur, stand partagé, offre cadeau).
   --app-heart: #b4372f;

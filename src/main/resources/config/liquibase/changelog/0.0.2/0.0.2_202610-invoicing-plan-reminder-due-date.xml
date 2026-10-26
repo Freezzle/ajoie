@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Échéance en vigueur au moment de l'envoi d'un rappel.
+
+        L'échéance de la facture est repoussée après une relance : la frise n'affiche donc plus que
+        la dernière échéance et on perd la raison du rappel (« envoyé combien de jours après
+        l'échéance ? »). On fige l'échéance du plan à chaque rappel.
+
+        Pas de reprise des données : l'échéance d'origine des rappels antérieurs est perdue, ils
+        resteront affichés sans retard.
+    -->
+    <changeSet id="0.0.2-202610-invoicing-plan-reminder-due-date" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND table_name = 'invoicing_plan_reminder'
+                  AND column_name = 'due_date_at_send'
+            </sqlCheck>
+        </preConditions>
+
+        <addColumn tableName="invoicing_plan_reminder">
+            <column name="due_date_at_send" type="${datetimeType}"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="invoicing_plan_reminder" columnName="due_date_at_send"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

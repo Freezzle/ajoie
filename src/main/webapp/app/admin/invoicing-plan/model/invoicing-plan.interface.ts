@@ -38,8 +38,18 @@ export interface IInvoicingPlanList {
     /** Vrai si au moins une ligne a un montant différent du montant par défaut. */
     hasCustomPrice?: boolean | null;
     lastPaymentDate?: dayjs.Dayjs | null;
-    /** Dates des rappels envoyés, les plus anciennes d'abord. */
-    reminderDates?: dayjs.Dayjs[] | null;
+    /** Rappels envoyés, les plus anciens d'abord. */
+    reminders?: IInvoicingPlanReminder[] | null;
+}
+
+/** Rappel de paiement envoyé pour une facture. */
+export interface IInvoicingPlanReminder {
+    sentDate?: dayjs.Dayjs | null;
+    /**
+     * Échéance du plan au moment de l'envoi : l'échéance courante est repoussée après une
+     * relance, celle-ci explique le rappel. Nulle pour les rappels d'avant cette mémorisation.
+     */
+    dueDateAtSend?: dayjs.Dayjs | null;
 }
 
 export interface IParticipationLight {

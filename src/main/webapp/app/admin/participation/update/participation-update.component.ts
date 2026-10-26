@@ -30,7 +30,7 @@ import {TextareaBoxComponent} from '../../../shared/components/textarea-box/text
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {IConference} from '../../conference/model/conference.interface';
 import {ActionsService} from '../../common/actions.service';
-import {AvailableAction} from '../../../shared/model/available-action';
+import {AvailableAction, refreshScopeOf} from '../../../shared/model/available-action';
 import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.component';
 import {EmailMessage} from '../../../shared/email-dialog/email-message';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
@@ -252,7 +252,7 @@ export class ParticipationUpdateComponent implements OnInit {
 
             modalRef.result.then((payload: Map<string, any>) => {
                 if (payload) {
-                    this.executeBusinessAction(action.contextCode, participationId, payload);
+                    this.executeBusinessAction(action, participationId, payload);
                 }
             }).catch(() => {
                 // Modal dismissed
@@ -267,18 +267,27 @@ export class ParticipationUpdateComponent implements OnInit {
             })
                 .pipe(filter(confirmed => confirmed))
                 .subscribe(() => {
-                    this.executeBusinessAction(action.contextCode, participationId);
+                    this.executeBusinessAction(action, participationId);
                 });
         }
     }
 
-    private executeBusinessAction(context: string, participationId: string, payload?: Map<string, any>): void {
+    private executeBusinessAction(action: AvailableAction, participationId: string, payload?: Map<string, any>): void {
         this.isLoading = true;
-        this.actionsService.businessAction(context, participationId, payload)
+        // Une action sans effet sur la participation (téléchargement) n'impose pas de la relire.
+        const reload = refreshScopeOf(action) !== 'NONE';
+
+        this.actionsService.businessAction(action.contextCode, participationId, payload)
             .pipe(
                 finalize(() => this.isLoading = false),
-                switchMap(() => this.participationService.find(participationId)))
-            .subscribe((participation) => this.load(participation.body, this.isReadOnly));
+                switchMap(() => reload
+                                ? this.participationService.find(participationId)
+                                : of(null)))
+            .subscribe(participation => {
+                if (participation) {
+                    this.load(participation.body, this.isReadOnly);
+                }
+            });
     }
 
     openEmailPopup(action: AvailableAction, id: string) {

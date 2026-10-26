@@ -19,6 +19,7 @@ import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.mail.EmailCreator;
+import ch.salon.service.websocket.EntityChangeNotifier;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 @RequiredArgsConstructor
@@ -52,6 +54,7 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
     private final InvoicingPlanRepository repository;
     private final InvoicingPlanReminderRepository reminderRepository;
     private final TransactionalTenantOperation transactionalOps;
+    private final EntityChangeNotifier entityChangeNotifier;
 
     @Value("${spring.mail.username:}")
     private String senderEmail;
@@ -111,8 +114,11 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
     @Transactional(propagation = Propagation.SUPPORTS)
     public void prepareAndSendInTenant(UUID idPlan, Map<String, Object> context, UUID tenantId) {
         TenantContextHolder.runAsTenant(tenantId, () -> {
+            AtomicReference<UUID> idSalon = new AtomicReference<>();
+
             transactionalOps.execute(() -> {
                 InvoicingPlan payload = this.repository.getReferenceById(idPlan);
+                idSalon.set(payload.getParticipation().getSalon().getId());
                 Object raw = context.get("emailMessage");
                 EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
                 if (emailMessage == null) {
@@ -122,7 +128,8 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
                 try {
                     InputStreamSource attachment = this.downloadInvoiceHandler.download(payload, context);
                     emailCreator.send(emailMessage, Map.of(this.downloadInvoiceHandler.getFilename(payload, context), attachment));
-                    reminderRepository.save(new InvoicingPlanReminder(payload.getId(), Instant.now()));
+                    reminderRepository.save(new InvoicingPlanReminder(payload.getId(), Instant.now(),
+                            payload.getExpirationDate()));
                     eventLogService.eventFromSystem("Rappel envoyée", EventType.EMAIL, EntityType.INVOICE_PLAN, payload.getId(),
                             null);
                     eventLogService.eventFromSystem("Rappel renvoyée " + payload.getBillingNumber(), EventType.EMAIL,
@@ -135,6 +142,9 @@ public class EmailInvoiceReminderHandler implements EmailActionHandler<Invoicing
                             EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
                 }
             });
+
+            // Après le commit : la frise affiche le rappel qui vient d'être enregistré.
+            entityChangeNotifier.notifyChanged(EntityType.INVOICE_PLAN, idPlan, idSalon.get());
         });
     }
 

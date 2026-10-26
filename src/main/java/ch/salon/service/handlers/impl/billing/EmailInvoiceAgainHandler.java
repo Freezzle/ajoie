@@ -12,6 +12,7 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.*;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.mail.EmailCreator;
+import ch.salon.service.websocket.EntityChangeNotifier;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 @RequiredArgsConstructor
@@ -43,6 +45,7 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
     private final EventLogService eventLogService;
     private final InvoicingPlanRepository repository;
     private final TransactionalTenantOperation transactionalOps;
+    private final EntityChangeNotifier entityChangeNotifier;
 
     @Value("${spring.mail.username:}")
     private String senderEmail;
@@ -100,8 +103,11 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
     @Transactional(propagation = Propagation.SUPPORTS)
     public void prepareAndSendInTenant(UUID idPlan, Map<String, Object> context, UUID tenantId) {
         TenantContextHolder.runAsTenant(tenantId, () -> {
+            AtomicReference<UUID> idSalon = new AtomicReference<>();
+
             transactionalOps.execute(() -> {
                 InvoicingPlan payload = this.repository.getReferenceById(idPlan);
+                idSalon.set(payload.getParticipation().getSalon().getId());
                 Object raw = context.get("emailMessage");
                 EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
                 if (emailMessage == null) {
@@ -123,6 +129,9 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
                             EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
                 }
             });
+
+            // Après le commit : la ligne affichée relit son état final (journal, frise, actions).
+            entityChangeNotifier.notifyChanged(EntityType.INVOICE_PLAN, idPlan, idSalon.get());
         });
     }
 

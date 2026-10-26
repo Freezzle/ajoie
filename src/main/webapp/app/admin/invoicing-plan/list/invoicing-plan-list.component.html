@@ -115,6 +115,14 @@
                             </span>
 
                             <ng-container rowFoot>
+                                @if (isWaiting(plan)) {
+                                    <entity-foot-item color="var(--app-status-accepted)"
+                                                      icon="spinner"
+                                                      labelKey="invoicingPlan.list.foot.sending"
+                                                      [showLabel]="true"
+                                                      [spin]="true"/>
+                                }
+
                                 @if (plan.nbInvoiceLines) {
                                     <entity-count [count]="plan.nbInvoiceLines"
                                                   icon="list"
@@ -154,6 +162,7 @@
                                 @if (isExpanded(plan)) {
                                     <app-invoicing-plan-detail (changed)="reloadAfterAction()"
                                                                (menuOpened)="onMenuOpened(plan)"
+                                                               (refreshed)="refreshPlan(plan.id)"
                                                                [actions]="actionsFor(plan)"
                                                                [planId]="plan.id"
                                                                [summary]="plan"/>

@@ -142,4 +142,24 @@ public enum ContextActionType {
             case INVOICE_DELETE -> 95;                       // Supprimer la facture
         };
     }
+
+    /**
+     * Ce que l'écran doit relire après cette action.
+     * <p>
+     * Par défaut une action ne touche que son entité : seules celles qui changent le
+     * <em>nombre</em> d'entités imposent un rechargement de liste, et les téléchargements
+     * ne modifient rien.
+     */
+    public RefreshScope refreshScope() {
+        return switch (this) {
+            // Consultation d'un document : rien n'a changé.
+            case INVOICE_DOWNLOAD, RECEIPT_DOWNLOAD, TALKS_PLANNING_DOWNLOAD, STANDS_DETAIL_DOWNLOAD,
+                 VOLUNTEER_PLANNING_DOWNLOAD -> RefreshScope.NONE;
+
+            // Le nombre d'entités change : la liste doit être rechargée.
+            case INVOICE_SPLIT, INVOICE_DELETE, SALON_DUPLICATE -> RefreshScope.LIST;
+
+            default -> RefreshScope.ENTITY;
+        };
+    }
 }

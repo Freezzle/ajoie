@@ -661,24 +661,35 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
 }
 
 /* ── Statut d'une ligne ──────────────────────────────────────── */
-.el-status {
+/* Pastille pleine : la couleur du statut porte le libellé, en blanc. */
+.el-status-wrap {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--app-fs-sm);
-  font-weight: 700;
-  color: var(--el-color, var(--app-text-muted));
   white-space: nowrap;
 
   small {
+    font-size: var(--app-fs-xs);
     font-weight: 600;
     color: var(--app-text-muted);
   }
+}
 
-  &.el-status--out span:first-of-type {
+.el-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--el-color, var(--app-status-neutral));
+  font-size: var(--app-fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--app-surface);
+  white-space: nowrap;
+
+  &.el-status--out {
     text-decoration: line-through;
     text-decoration-thickness: 1px;
-    font-weight: 600;
   }
 }
 

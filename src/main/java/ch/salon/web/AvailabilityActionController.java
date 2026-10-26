@@ -120,7 +120,8 @@ public class AvailabilityActionController {
                             actionSupport.getHelpKey(),
                             confirmationKey,
                             requiredFields,
-                            actionSupport.getConditionalKeys()
+                            actionSupport.getConditionalKeys(),
+                            context.refreshScope()
                         ));
                     }
                 }

@@ -15,6 +15,7 @@ import ch.salon.service.handlers.EmailAttachment;
 import ch.salon.service.handlers.EmailMessage;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.mail.EmailCreator;
+import ch.salon.service.websocket.EntityChangeNotifier;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class EmailReceiptHandler implements EmailActionHandler<InvoicingPlan>, A
     private final DownloadReceiptHandler downloadReceiptHandler;
     private final EventLogService eventLogService;
     private final InvoicingPlanRepository repository;
+    private final EntityChangeNotifier entityChangeNotifier;
 
     @Value("${spring.mail.username:}")
     private String senderEmail;
@@ -92,6 +94,10 @@ public class EmailReceiptHandler implements EmailActionHandler<InvoicingPlan>, A
                 eventLogService.eventFromSystem("Problème d'envoi de quittance " + payload.getBillingNumber(), EventType.EMAIL,
                         EntityType.PARTICIPATION, payload.getParticipation().getId(), null);
             }
+
+            // L'envoi lui-même est asynchrone : l'écran relit le journal de la facture.
+            entityChangeNotifier.notifyChanged(EntityType.INVOICE_PLAN, invoice.getId(),
+                    invoice.getParticipation().getSalon().getId());
         });
     }
 

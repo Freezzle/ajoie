@@ -17,6 +17,8 @@ export interface PresenceSummary {
 @Injectable({providedIn: 'root'})
 export class PresenceService {
     onlineCount$ : Observable<number> = of(0);
+    /** Vrai tant que le client STOMP est connecté : les abonnés se réabonnent à chaque reprise. */
+    readonly connected$ = new BehaviorSubject<boolean>(false);
     private applicationConfigService = inject(ApplicationConfigService);
     private accountService = inject(AccountService);
     private presenceSubject = new BehaviorSubject<PresenceSummary[]>([]);
@@ -78,8 +80,13 @@ export class PresenceService {
                                          // initial
                                          this.loadOnce();
                                          this.startPing();
+                                         this.connected$.next(true);
                                      },
-                                     onStompError: () => this.startRestFallback()
+                                     onWebSocketClose: () => this.connected$.next(false),
+                                     onStompError: () => {
+                                         this.connected$.next(false);
+                                         this.startRestFallback();
+                                     }
                                  });
 
         this.client.activate();
@@ -98,6 +105,7 @@ export class PresenceService {
         this.stopPing();
         this.client?.deactivate();
         this.client = undefined;
+        this.connected$.next(false);
     }
 
     private startPing() {

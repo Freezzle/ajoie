@@ -2,12 +2,13 @@ package ch.salon.service.handlers;
 
 import ch.salon.service.handlers.enums.ActionType;
 import ch.salon.service.handlers.enums.ContextActionType;
+import ch.salon.service.handlers.enums.RefreshScope;
 
 import java.util.List;
 
 public record ActionAvailable(String contextCode, ActionType type, boolean disabled, String labelKey,
                                String helpKey, String confirmationKey, List<RequiredField> requiredFields,
-                               List<ConditionalKey> conditionalKeys) {
+                               List<ConditionalKey> conditionalKeys, RefreshScope refreshScope) {
 
     /**
      * Retourne la clé de tri pour ordonner les actions.

@@ -12,6 +12,7 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.*;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.mail.EmailCreator;
+import ch.salon.service.websocket.EntityChangeNotifier;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 @RequiredArgsConstructor
@@ -44,6 +46,7 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan>, A
     private final EventLogService eventLogService;
     private final InvoicingPlanRepository repository;
     private final TransactionalTenantOperation transactionalOps;
+    private final EntityChangeNotifier entityChangeNotifier;
 
     @Value("${spring.mail.username:}")
     private String senderEmail;
@@ -113,8 +116,11 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan>, A
     @Transactional(propagation = Propagation.SUPPORTS)
     public void prepareAndSendInTenant(UUID idPlan, State oldState, Map<String, Object> context, UUID tenantId) {
         TenantContextHolder.runAsTenant(tenantId, () -> {
+            AtomicReference<UUID> idSalon = new AtomicReference<>();
+
             transactionalOps.execute(() -> {
                 InvoicingPlan plan = this.repository.getReferenceById(idPlan);
+                idSalon.set(plan.getParticipation().getSalon().getId());
                 Object raw = context.get("emailMessage");
                 EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
                 if (emailMessage == null) {
@@ -142,6 +148,9 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan>, A
                             EntityType.PARTICIPATION, plan.getParticipation().getId(), null);
                 }
             });
+
+            // Après le commit : l'écran qui affiche encore « en cours d'envoi » relit l'état final.
+            entityChangeNotifier.notifyChanged(EntityType.INVOICE_PLAN, idPlan, idSalon.get());
         });
     }
 

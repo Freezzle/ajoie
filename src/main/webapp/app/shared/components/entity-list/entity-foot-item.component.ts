@@ -26,4 +26,6 @@ export class EntityFootItemComponent {
     readonly color = input<string>('var(--app-text)');
     /** Force l'affichage du texte issu de `labelKey` à côté de l'icône. */
     readonly showLabel = input<boolean>(false);
+    /** Anime l'icône, pour signaler un traitement en cours. */
+    readonly spin = input<boolean>(false);
 }

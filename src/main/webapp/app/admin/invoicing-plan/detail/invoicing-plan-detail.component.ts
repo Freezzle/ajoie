@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, OnInit, output, signal} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import dayjs from 'dayjs/esm';
 import {filter, switchMap, tap} from 'rxjs';
@@ -11,7 +11,7 @@ import {DialogBoxComponent} from 'app/shared/components/dialog-box/dialog-box.co
 import {EntityActionsMenuComponent} from 'app/shared/components/entity-list/entity-actions-menu.component';
 import {EntityAction} from 'app/shared/components/entity-list/entity-list.model';
 import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.service';
-import {AvailableAction} from 'app/shared/model/available-action';
+import {AvailableAction, RefreshScope} from 'app/shared/model/available-action';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 import {formatterInvoiceNature, InvoiceNature, isNegativeNature} from '../../enumerations/invoice-nature.model';
 import {formatterPaymentMode} from '../../enumerations/mode.model';
@@ -34,6 +34,8 @@ interface TimelineStep {
     status: 'ok' | 'now' | 'bad' | 'warn' | 'future';
     /** Style du trait qui précède le jalon. */
     segment: '' | 'seg-ok' | 'seg-run' | 'seg-bad' | 'seg-fut';
+    /** Infobulle facultative, par exemple l'échéance qui a motivé un rappel. */
+    hint?: string;
 }
 
 /** Codes d'action du serveur mis en avant dans la bande d'actions. */
@@ -76,6 +78,8 @@ export class InvoicingPlanDetailComponent implements OnInit {
     readonly menuOpened = output<void>();
     /** Émis après toute modification : la liste se recharge. */
     readonly changed = output<void>();
+    /** Émis quand seule cette facture a changé : la liste ne relit que sa ligne. */
+    readonly refreshed = output<void>();
 
     readonly plan = signal<IInvoicingPlan | null>(null);
     readonly isLoading = signal<boolean>(false);
@@ -92,6 +96,23 @@ export class InvoicingPlanDetailComponent implements OnInit {
     private readonly helper = inject(InvoicingPlanHelperService);
 
     protected readonly State = State;
+
+    constructor() {
+        // La liste remplace l'objet `summary` quand la facture est rafraîchie (notamment à la
+        // fin d'un envoi asynchrone) : les lignes et les paiements doivent suivre.
+        let first = true;
+        effect(() => {
+            this.summary();
+
+            if (first) {
+                first = false;
+
+                return;
+            }
+
+            this.fetch();
+        });
+    }
 
     ngOnInit(): void {
         this.actionsService.ensureLoaded(this.planId());
@@ -115,7 +136,8 @@ export class InvoicingPlanDetailComponent implements OnInit {
     readonly nextStepKey = computed(() => {
         const plan = this.summary();
 
-        if (plan.state === State.IS_ISSUING) {
+        // Un envoi est en cours : c'est lui la prochaine étape, quel que soit l'état du plan.
+        if (plan.state === State.IS_ISSUING || this.actionsService.isPending(this.planId())) {
             return 'issuing';
         }
         if (this.helper.isDraft(plan.state)) {
@@ -152,6 +174,13 @@ export class InvoicingPlanDetailComponent implements OnInit {
     });
 
     readonly canSeePayments = computed(() => this.summary().state !== State.IS_ISSUING && !this.helper.isDraft(this.summary().state));
+
+    /**
+     * Vrai tant qu'on attend la fin d'un envoi : état « en cours d'envoi » posé par le
+     * serveur, ou action asynchrone lancée depuis cet écran.
+     */
+    readonly isWaiting = computed(() => this.summary().state === State.IS_ISSUING
+        || this.actionsService.isPending(this.planId()));
 
     /** « Ajouter un paiement » n'est pas une action serveur. */
     readonly canAddPayment = computed(() => this.summary().state === State.ISSUED && this.canMutate());
@@ -266,14 +295,34 @@ export class InvoicingPlanDetailComponent implements OnInit {
                        segment: ''
                    });
 
-        (plan.reminderDates ?? []).forEach((date, index) => steps.push({
-                                                                           key: `reminder-${index}`,
-                                                                           label: this.label('reminder'),
-                                                                           date,
-                                                                           fallback: '—',
-                                                                           status: 'warn',
-                                                                           segment: ''
-                                                                       }));
+        (plan.reminders ?? []).forEach((reminder, index) => {
+            const date = reminder.sentDate ?? null;
+            // L'échéance du plan est repoussée après une relance : on affiche le retard
+            // mesuré sur l'échéance qui était en vigueur au moment de l'envoi.
+            const days = reminder.dueDateAtSend && date
+                         ? dayjs(date).diff(dayjs(reminder.dueDateAtSend), 'day')
+                         : 0;
+            const isLate = days > 0;
+
+            steps.push({
+                           key: `reminder-${index}`,
+                           label: isLate
+                                  ? this.translateService.instant('invoicingPlan.detail.timeline.reminderLate',
+                                                                  {days}) as string
+                                  : this.label('reminder'),
+                           date,
+                           fallback: '—',
+                           status: 'warn',
+                           segment: '',
+                           hint: isLate
+                                 ? this.translateService.instant('invoicingPlan.detail.timeline.reminderHint',
+                                                                 {
+                                                                     days,
+                                                                     date: longDate(reminder.dueDateAtSend)
+                                                                 }) as string
+                                 : undefined
+                       });
+        });
 
         if (plan.state !== State.CANCELLED) {
             steps.push({
@@ -363,7 +412,8 @@ export class InvoicingPlanDetailComponent implements OnInit {
     // ── Interactions ─────────────────────────────────────────────────────────
 
     runAction(action: AvailableAction, target: HTMLElement): void {
-        this.actionsService.run(action, this.planId(), target).subscribe(() => this.reload());
+        this.actionsService.run(action, this.planId(), target)
+            .subscribe(scope => this.applyRefresh(scope));
     }
 
     addInvoiceLine(): void {
@@ -499,10 +549,28 @@ export class InvoicingPlanDetailComponent implements OnInit {
         return step.date ? dayjs(step.date).format('DD.MM') : step.fallback;
     }
 
-    private reload(): void {
-        this.fetch();
+    /**
+     * Applique la portée annoncée par l'action. En portée `ENTITY`, c'est la liste qui relit
+     * la ligne : l'effet sur `summary()` recharge ensuite ce détail, en une seule requête.
+     */
+    private applyRefresh(scope: RefreshScope): void {
+        if (scope === 'NONE') {
+            return;
+        }
+
         this.actionsService.reload(this.planId());
-        this.changed.emit();
+
+        if (scope === 'LIST') {
+            this.changed.emit();
+        } else {
+            this.refreshed.emit();
+        }
+    }
+
+    /** Modification locale (ligne de facture, paiement) : seule cette facture est relue. */
+    private reload(): void {
+        this.actionsService.reload(this.planId());
+        this.refreshed.emit();
     }
 
     private canMutate(): boolean {
