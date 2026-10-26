@@ -2,10 +2,10 @@
   "payment": {
     "type": {
       "list": {
-        "BANK": "Bancaire",
-        "CASH": "Argent comptant",
+        "BANK": "Virement bancaire",
+        "CASH": "Espèce",
         "OTHER": "Autre",
-        "SERVICE": "Service rendu",
+        "SERVICE": "Échange de service'",
         "null": "Inconnu"
       },
       "title": "Type"

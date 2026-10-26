@@ -7,7 +7,7 @@ import {DateBoxComponent} from '../../../shared/components/date-box/date-box.com
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {DialogDraftService} from '../../../shared/services/dialog-draft.service';
 import {IPayment} from '../model/invoicing-plan.interface';
-import {Mode} from '../../enumerations/mode.model';
+import {Mode, PAYMENT_MODES, autoPaymentLabelKey, formatterPaymentMode} from '../../enumerations/mode.model';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({
@@ -40,18 +40,24 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
         const pay = this.payment;
 
         // Options du mode de paiement
-        this.modeOptions = Object.values(Mode);
-        this.modeFormatter = (m: any) => m ? this.translate.instant('payment.type.list.' + m) as string : '';
+        this.modeOptions = PAYMENT_MODES;
+        this.modeFormatter = (m: any) => m ? this.translate.instant(formatterPaymentMode(m)) as string : '';
 
         // Date de paiement : si création → aujourd'hui
         const billingDate = this.parseBillingDate(pay?.billingDate);
+        const mode = pay?.paymentMode ?? Mode.BANK;
 
         this.form = this.fb.group({
+            paymentMode:      [mode, [Validators.required]],
+            label:            [{value: pay?.label ?? this.autoLabel(mode), disabled: mode !== Mode.OTHER},
+                               [Validators.required, Validators.maxLength(255)]],
             billingDate:      [billingDate, [Validators.required]],
-            paymentMode:      [pay?.paymentMode ?? Mode.BANK, [Validators.required]],
             amount:           [pay?.amount ?? null, [Validators.required, Validators.min(0)]],
             extraInformation: [pay?.extraInformation ?? ''],
         });
+
+        // Le libellé suit le mode, sauf en « Autre » où l'admin le saisit lui-même.
+        this.form.get('paymentMode')!.valueChanges.subscribe((value: Mode) => this.applyMode(value));
 
         this.draftService.registerDraft(() => {
             if (this.form.invalid) return null;
@@ -59,14 +65,48 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
             return {
                 billingDate:      this.formatDate(raw.billingDate),
                 paymentMode:      raw.paymentMode,
+                label:            trimmedOrNull(raw.label),
                 amount:           raw.amount,
                 extraInformation: raw.extraInformation?.trim() || null,
             };
         });
     }
 
+    /** Vrai quand l'admin doit saisir lui-même le libellé imprimé. */
+    get isCustomLabel(): boolean {
+        return this.form?.get('paymentMode')?.value === Mode.OTHER;
+    }
+
     ngOnDestroy(): void {
         this.draftService.unregisterDraft();
+    }
+
+    private applyMode(mode: Mode): void {
+        const labelControl = this.form.get('label')!;
+
+        if (mode === Mode.OTHER) {
+            labelControl.enable({emitEvent: false});
+            // Un libellé généré n'a plus de sens ici : on force une saisie explicite.
+            if (this.isAutoLabel(labelControl.value)) {
+                labelControl.setValue('', {emitEvent: false});
+            }
+            return;
+        }
+
+        labelControl.setValue(this.autoLabel(mode), {emitEvent: false});
+        labelControl.disable({emitEvent: false});
+    }
+
+    private isAutoLabel(value: string | null): boolean {
+        const label = value?.trim() ?? '';
+
+        return !label || PAYMENT_MODES.some(mode => mode !== Mode.OTHER && this.autoLabel(mode) === label);
+    }
+
+    private autoLabel(mode: Mode): string {
+        const key = autoPaymentLabelKey(mode);
+
+        return key ? this.translate.instant(key) as string : '';
     }
 
     private parseBillingDate(value: any): Date {
@@ -84,4 +124,10 @@ export class PaymentFormComponent implements OnInit, OnDestroy {
         if (typeof date === 'string') return date;
         return date.toISOString();
     }
+}
+
+function trimmedOrNull(value: string | null | undefined): string | null {
+    const trimmed = value?.trim();
+
+    return trimmed && trimmed.length > 0 ? trimmed : null;
 }

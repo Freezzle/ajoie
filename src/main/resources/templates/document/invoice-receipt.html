@@ -59,7 +59,8 @@
           <td colspan="4">&nbsp;</td>
         </tr>
         <tr th:each="payment: ${payments}" th:if="${hasPaidSomething}">
-          <td class="center-left padding-left-5" colspan="3" th:text="${payment.getExtraInformation()}" />
+          <td class="center-left padding-left-5" colspan="3"
+              th:text="${payment.getLabel() != null ? payment.getLabel() : #messages.msg('payment.cash.label')}" />
           <td class="center-right padding-right-5" th:text="-${#numbers.formatDecimal(payment.getAmount(), 1, 2, 'POINT')}" />
         </tr>
         <tr th:if="${hasPaidSomething}">

@@ -1,5 +1,6 @@
 package ch.salon.service;
 
+import ch.salon.service.document.PostalParty;
 import net.codecrete.qrbill.generator.Address;
 import net.codecrete.qrbill.generator.Bill;
 import net.codecrete.qrbill.generator.BillFormat;
@@ -22,33 +23,15 @@ public class GenerateQRCode {
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(QRBill.generate(bill));
     }
 
-    public Bill buildBill(String iban, double amount, String reference, String message, String creditorName,
-            String creditorStreet, String creditorHouseNo, String creditorZip, String creditorCity,
-            String creditorCountry, String debtorName, String debtorStreet, String debtorHouseNo, String debtorZip,
-            String debtorCity, String debtorCountry) {
-
-        Address creditor = new Address();
-        creditor.setName(creditorName);
-        creditor.setStreet(creditorStreet);
-        creditor.setHouseNo(creditorHouseNo);
-        creditor.setPostalCode(creditorZip);
-        creditor.setTown(creditorCity);
-        creditor.setCountryCode(creditorCountry);
-
-        Address debtor = new Address();
-        debtor.setName(debtorName);
-        debtor.setStreet(debtorStreet);
-        debtor.setHouseNo(debtorHouseNo);
-        debtor.setPostalCode(debtorZip);
-        debtor.setTown(debtorCity);
-        debtor.setCountryCode(debtorCountry);
+    public Bill buildBill(String iban, double amount, String reference, String message, PostalParty creditor,
+            PostalParty debtor) {
 
         Bill bill = new Bill();
         bill.setAccount(iban);
         bill.setAmountFromDouble(amount);
         bill.setCurrency("CHF");
-        bill.setCreditor(creditor);
-        bill.setDebtor(debtor);
+        bill.setCreditor(toQrAddress(creditor));
+        bill.setDebtor(toQrAddress(debtor));
         bill.setUnstructuredMessage(message);
 
         if (reference != null && !reference.isBlank()) {
@@ -56,5 +39,18 @@ public class GenerateQRCode {
         }
 
         return bill;
+    }
+
+    /** Les champs de la partie sont déjà structurés : rien à découper ici. */
+    private static Address toQrAddress(PostalParty party) {
+        Address address = new Address();
+        address.setName(party.getQrName());
+        address.setStreet(party.getStreet());
+        address.setHouseNo(party.getHouseNumber());
+        address.setPostalCode(party.getPostalCode());
+        address.setTown(party.getCity());
+        address.setCountryCode(party.getCountry());
+
+        return address;
     }
 }

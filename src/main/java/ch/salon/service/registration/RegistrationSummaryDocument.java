@@ -174,7 +174,7 @@ public class RegistrationSummaryDocument {
             return null;
         }
         String country = StringUtils.defaultIfBlank(address.getIsoCountry(), "CH");
-        return Address.buildStreet(address) + ", " + Address.buildCity(address) + " (" + country + ")";
+        return address.streetLine() + ", " + address.cityLine() + " (" + country + ")";
     }
 
     private String joinSubCategories(Set<String> subCategories) {

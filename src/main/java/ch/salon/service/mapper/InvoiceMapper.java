@@ -15,7 +15,6 @@ public interface InvoiceMapper {
 
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "position", ignore = true)
-    @Mapping(target = "reduction", ignore = true)
     Invoice toEntity(InvoiceDTO invoice);
 
     InvoiceLightDTO toLightDto(Invoice invoice);

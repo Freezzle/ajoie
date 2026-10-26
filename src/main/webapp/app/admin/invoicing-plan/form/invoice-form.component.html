@@ -1,5 +1,15 @@
 <div class="row" [formGroup]="form">
 
+    <!-- Nature de la ligne : le signe du montant en découle -->
+    <div class="col-12 mt-3">
+        <radio-box fieldName="nature"
+                   formControlName="nature"
+                   translateKey="invoicingPlan.invoice.nature.label"
+                   [options]="natures"
+                   [formatterFunction]="natureLabel"
+                   [hintFunction]="natureHint"/>
+    </div>
+
     <!-- Libellé -->
     <div class="col-12 mt-3">
         <text-box fieldName="label"
@@ -21,6 +31,12 @@
                     translateKey="invoicingPlan.invoice.qty"
                     [minValue]="1"/>
     </div>
+
+    @if (effect(); as effectLabel) {
+        <div class="col-12 mt-2">
+            <small class="text-muted">{{ effectLabel }}</small>
+        </div>
+    }
 
     <!-- Commentaire -->
     <div class="col-12 mt-3">

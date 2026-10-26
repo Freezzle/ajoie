@@ -102,8 +102,9 @@ public class InvoicingPlanService {
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         Invoice invoiceToCreate = invoiceMapper.toEntity(invoiceDTO);
-        invoiceToCreate.setDefaultAmount(invoiceDTO.getCustomAmount());
-        invoiceToCreate.setReduction(invoiceToCreate.getTotalAmount() < 0.00);
+        invoiceToCreate.setNature(invoiceDTO.getNature() != null ? invoiceDTO.getNature() : InvoiceNature.SERVICE);
+        invoiceToCreate.setCustomAmount(normalizeAmount(invoiceToCreate.getNature(), invoiceDTO.getCustomAmount()));
+        invoiceToCreate.setDefaultAmount(invoiceToCreate.getCustomAmount());
         invoiceToCreate = this.invoiceRepository.save(invoiceToCreate);
 
         invoicingPlan.getInvoices().add(invoiceToCreate);
@@ -125,26 +126,47 @@ public class InvoicingPlanService {
                 invoicingPlan.getInvoices().stream().filter(invoice -> invoice.getId().equals(idInvoice)).findFirst()
                         .orElseThrow();
 
-        if (!Objects.equals(invoiceFound.getCustomAmount(), invoiceDTO.getCustomAmount())) {
+        InvoiceNature nature = invoiceDTO.getNature() != null ? invoiceDTO.getNature() : InvoiceNature.SERVICE;
+        Double customAmount = normalizeAmount(nature, invoiceDTO.getCustomAmount());
+
+        if (!Objects.equals(invoiceFound.getCustomAmount(), customAmount)) {
             this.eventLogService.eventFromSystem("Ligne de facture modifiée", EventType.ACTION, INVOICE_PLAN,
                     invoicingPlan.getId(), null);
         }
 
         invoiceFound.setLabel(invoiceDTO.getLabel());
-        invoiceFound.setDefaultAmount(invoiceDTO.getDefaultAmount());
-        invoiceFound.setCustomAmount(invoiceDTO.getCustomAmount());
+        invoiceFound.setDefaultAmount(normalizeAmount(nature,
+                invoiceDTO.getDefaultAmount() != null ? invoiceDTO.getDefaultAmount() : invoiceDTO.getCustomAmount()));
+        invoiceFound.setCustomAmount(customAmount);
+        if (invoiceDTO.getQuantity() != null) {
+            invoiceFound.setQuantity(invoiceDTO.getQuantity());
+        }
         invoiceFound.setGenerationDate(Instant.now());
         invoiceFound.setExtraInformation(invoiceDTO.getExtraInformation());
         invoiceFound.setLock(invoiceDTO.getLock());
-        invoiceFound.setReduction(invoiceFound.getTotalAmount() < 0.00);
+        invoiceFound.setNature(nature);
 
         repository.save(invoicingPlan);
 
         return invoiceMapper.toDto(invoiceFound);
     }
 
-    public void deleteInvoice(UUID idInvoicingPlan, UUID idInvoice) {
-        InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
+    /**
+     * Le montant est toujours saisi en valeur absolue : c'est la nature de la ligne qui porte le
+     * signe. On évite ainsi qu'une ligne soit qualifiée de réduction simplement parce qu'un
+     * montant négatif a été tapé.
+     */
+    private Double normalizeAmount(InvoiceNature nature, Double amount) {
+        if (amount == null) {
+            throw new BadRequestAlertException("Amount is required", ENTITY_NAME, "amountnull");
+        }
+
+        double absolute = Math.abs(amount);
+
+        return nature == InvoiceNature.SERVICE ? absolute : -absolute;
+    }
+
+    public void deleteInvoice(UUID idInvoicingPlan, UUID idInvoice) {        InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
 
         Invoice invoiceFound =
                 invoicingPlan.getInvoices().stream().filter(invoice -> invoice.getId().equals(idInvoice)).findFirst()
@@ -165,6 +187,7 @@ public class InvoicingPlanService {
 
         InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
         Payment payment = paymentMapper.toEntity(paymentDTO);
+        payment.setLabel(resolvePaymentLabel(paymentDTO.getPaymentMode(), paymentDTO.getLabel()));
         payment = this.paymentRepository.save(payment);
 
         invoicingPlan.getPayments().add(payment);
@@ -194,12 +217,31 @@ public class InvoicingPlanService {
 
         paymentFound.setPaymentMode(paymentDTO.getPaymentMode());
         paymentFound.setBillingDate(paymentDTO.getBillingDate());
+        paymentFound.setLabel(resolvePaymentLabel(paymentDTO.getPaymentMode(), paymentDTO.getLabel()));
         paymentFound.setExtraInformation(paymentDTO.getExtraInformation());
         paymentFound.setAmount(paymentDTO.getAmount());
 
         repository.save(invoicingPlan);
 
         return paymentMapper.toDto(paymentFound);
+    }
+
+    /**
+     * Le libellé imprimé sur la facture et la quittance découle du mode de paiement : l'admin ne
+     * le saisit que pour le mode « Autre ». La note interne du paiement n'apparaît jamais sur un
+     * document client.
+     */
+    private String resolvePaymentLabel(Mode mode, String customLabel) {
+        if (mode == null || mode == Mode.OTHER) {
+            String label = customLabel != null ? customLabel.trim() : "";
+            if (label.isEmpty()) {
+                throw new BadRequestAlertException("A custom label is required", ENTITY_NAME, "label.required");
+            }
+            return label;
+        }
+
+        return messageSource.getMessage("payment." + mode.name().toLowerCase(Locale.ROOT) + ".label", null,
+                Locale.FRENCH);
     }
 
     public void deletePayment(UUID idInvoicingPlan, UUID idPayment) {
@@ -290,7 +332,7 @@ public class InvoicingPlanService {
             postalFee.setPosition((long) plan.getInvoices().size() + 1);
             postalFee.setReferenceId(null);
             postalFee.setLock(false);
-            postalFee.setReduction(false);
+            postalFee.setNature(InvoiceNature.SERVICE);
             postalFee.setGenerationDate(Instant.now());
             postalFee.setType(POSTAL_FEE);
             postalFee.setLabel(sub(messageSource.getMessage("invoice.sending-postal.label", null, Locale.FRENCH)));

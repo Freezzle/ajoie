@@ -1,6 +1,5 @@
 package ch.salon.service.handlers.impl.billing;
 
-import ch.salon.domain.Address;
 import ch.salon.domain.BankAccount;
 import ch.salon.domain.InvoicingPlan;
 import ch.salon.service.GenerateQRCode;
@@ -91,18 +90,8 @@ public class DownloadInvoiceHandler implements DocumentActionHandler<InvoicingPl
                     Math.max(0d, payload.getTotal()),
                     null,
                     "Facture " + payload.getBillingNumber(),
-                    sender.getEnterpriseName(),
-                    Address.extractStreetName(sender.getStreet()),
-                    Address.extractHouseNumber(sender.getStreet()),
-                    Address.extractPostalCode(sender.getCity()),
-                    Address.extractCityName(sender.getCity()),
-                    "CH",
-                    recipient.getFullName(),
-                    Address.extractStreetName(recipient.getStreet()),
-                    Address.extractHouseNumber(recipient.getStreet()),
-                    Address.extractPostalCode(recipient.getCity()),
-                    Address.extractCityName(recipient.getCity()),
-                    recipient.getCountry());
+                    sender,
+                    recipient);
 
             String dataUri = generateQRCode.toDataUri(bill);
             thymeleafCtxt.setVariable("qrBillDataUri", dataUri);

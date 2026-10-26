@@ -153,6 +153,9 @@
     <span class="el-ip-item-main">
         <span class="el-ip-item-title">
             {{ invoice.label }}
+            @if (natureBadge(invoice); as badge) {
+                <span class="el-ip-nature" [class]="badge.styleClass">{{ badge.labelKey | translate }}</span>
+            }
             @if (hasCustomAmount(invoice)) {
                 <fa-icon class="el-ip-diff"
                          [title]="customAmountTitle(invoice)"
@@ -179,11 +182,15 @@
 
 <ng-template #paymentContent let-payment>
     <span class="el-ip-item-main">
-        <span class="el-ip-item-title">{{ payment.billingDate | formatMediumDate }}</span>
+        <span class="el-ip-item-title">{{ paymentLabel(payment) }}</span>
         <span class="el-ip-item-sub">
+            <span>{{ payment.billingDate | formatMediumDate }}</span>
             <span>{{ paymentModeLabel(payment) }}</span>
             @if (payment.extraInformation) {
-                <span>{{ payment.extraInformation }}</span>
+                <span class="el-ip-internal">
+                    <b>{{ 'invoicingPlan.payment.internalBadge' | translate }}</b>
+                    {{ payment.extraInformation }}
+                </span>
             }
         </span>
     </span>

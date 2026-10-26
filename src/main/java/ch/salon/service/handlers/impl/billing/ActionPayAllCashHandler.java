@@ -13,10 +13,12 @@ import ch.salon.service.handlers.BusinessActionHandler;
 import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Map;
 
 @Component("payAllCashInvoicingPlan")
@@ -25,6 +27,7 @@ public class ActionPayAllCashHandler implements BusinessActionHandler<InvoicingP
 
     private final EventLogService eventLogService;
     private final ActionCloseHandler actionCloseHandler;
+    private final MessageSource messageSource;
 
     @Override
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
@@ -49,7 +52,7 @@ public class ActionPayAllCashHandler implements BusinessActionHandler<InvoicingP
         cashPayment.setAmount(remainingAmount.doubleValue());
         cashPayment.setPaymentMode(Mode.CASH);
         cashPayment.setBillingDate(Instant.now());
-        cashPayment.setExtraInformation("Paiement reçu");
+        cashPayment.setLabel(messageSource.getMessage("payment.cash.label", null, Locale.FRENCH));
 
         // Ajouter le paiement à la facture
         payload.getPayments().add(cashPayment);

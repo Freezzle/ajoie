@@ -3,6 +3,7 @@ package ch.salon.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
@@ -59,6 +60,11 @@ public class Address implements Serializable, TenantOwned {
     @Column(name = "extra_line")
     private String extraLine;
 
+    /**
+     * Découpage d'une ligne d'adresse héritée (import de l'ancien système) : à n'utiliser que
+     * pour transformer une chaîne libre en adresse structurée, jamais sur une adresse déjà
+     * stockée champ par champ.
+     */
     public static String extractStreetName(String fullStreet) {
         if (fullStreet == null || !fullStreet.contains(" ")) return fullStreet;
         return fullStreet.substring(0, fullStreet.lastIndexOf(" "));
@@ -80,21 +86,20 @@ public class Address implements Serializable, TenantOwned {
         return parts.length > 1 ? parts[1] : fullCity;
     }
 
-    public static String buildStreet(Address address) {
-        if (address.getStreet() != null && address.getHouseNumber() != null) {
-            return address.getStreet() + " " + address.getHouseNumber();
-        } else if (address.getStreet() != null) {
-            return address.getStreet();
-        }
-        return "Sous les chênes 109A";
+    /**
+     * « Rue 12 ». Renvoie une chaîne vide plutôt qu'une adresse de repli : une adresse
+     * incomplète ne doit jamais être remplacée par celle de quelqu'un d'autre.
+     */
+    public String streetLine() {
+        return join(street, houseNumber);
     }
 
-    public static String buildCity(Address address) {
-        if (address.getPostalCode() != null && address.getCity() != null) {
-            return address.getPostalCode() + " " + address.getCity();
-        } else if (address.getCity() != null) {
-            return address.getCity();
-        }
-        return "2944 Bonfol";
+    /** « 2944 Bonfol ». */
+    public String cityLine() {
+        return join(postalCode, city);
+    }
+
+    private static String join(String first, String second) {
+        return (StringUtils.trimToEmpty(first) + " " + StringUtils.trimToEmpty(second)).trim();
     }
 }

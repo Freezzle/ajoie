@@ -14,5 +14,6 @@ public class PaymentDTO implements Serializable {
     private Double amount;
     private Instant billingDate;
     private Mode paymentMode;
+    private String label;
     private String extraInformation;
 }

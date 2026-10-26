@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Nature métier d'une ligne de facture (SERVICE / REDUCTION / CORRECTION).
+
+        Jusqu'ici une ligne négative était systématiquement considérée comme une réduction
+        (booléen `reduction` déduit du signe du montant). Or les lignes « Rectif. : … » générées
+        automatiquement lors d'un changement de dimension de stand sont des annulations, pas des
+        gestes commerciaux : elles gonflaient à tort le total des réductions dans les statistiques.
+
+        Reprise des données :
+        - reduction = true                    -> REDUCTION
+        - montant total négatif (sinon)       -> CORRECTION
+        - reste                               -> SERVICE
+    -->
+    <changeSet id="0.0.2-202610-invoice-nature" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND table_name = 'invoice'
+                  AND column_name = 'nature'
+            </sqlCheck>
+        </preConditions>
+
+        <addColumn tableName="invoice">
+            <column name="nature" type="varchar(20)" defaultValue="SERVICE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <update tableName="invoice">
+            <column name="nature" value="REDUCTION"/>
+            <where>reduction = true</where>
+        </update>
+
+        <update tableName="invoice">
+            <column name="nature" value="CORRECTION"/>
+            <where>
+                (reduction IS NULL OR reduction = false)
+                AND coalesce(quantity, 1) * coalesce(custom_amount, 0) &lt; 0
+            </where>
+        </update>
+
+        <dropColumn tableName="invoice" columnName="reduction"/>
+
+        <rollback>
+            <addColumn tableName="invoice">
+                <column name="reduction" type="boolean" defaultValueBoolean="false"/>
+            </addColumn>
+            <update tableName="invoice">
+                <column name="reduction" valueBoolean="true"/>
+                <where>nature = 'REDUCTION'</where>
+            </update>
+            <dropColumn tableName="invoice" columnName="nature"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

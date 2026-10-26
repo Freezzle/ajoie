@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!--
+        Libellé client d'un paiement.
+
+        Jusqu'ici la facture et la quittance imprimaient `extra_information`, qui est pourtant le
+        champ de note interne de l'administration : toute remarque privée se retrouvait sur le
+        document envoyé à l'exposant. On introduit un `label` généré à partir du mode de paiement
+        (personnalisable uniquement pour le mode OTHER), et `extra_information` redevient une note
+        strictement interne.
+
+        Reprise des données :
+        - BANK    -> « Virement reçu »
+        - CASH    -> « Paiement reçu »
+        - SERVICE -> « Compensé par échange de services »
+        - OTHER   -> ancien commentaire, ou « Paiement reçu » à défaut
+        - puis on vide les commentaires qui n'étaient en réalité qu'un libellé généré.
+    -->
+    <changeSet id="0.0.2-202610-payment-label" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND table_name = 'payment'
+                  AND column_name = 'label'
+            </sqlCheck>
+        </preConditions>
+
+        <addColumn tableName="payment">
+            <column name="label" type="varchar(255)"/>
+        </addColumn>
+
+        <update tableName="payment">
+            <column name="label" value="Virement reçu"/>
+            <where>payment_mode = 'BANK'</where>
+        </update>
+
+        <update tableName="payment">
+            <column name="label" value="Paiement reçu"/>
+            <where>payment_mode = 'CASH'</where>
+        </update>
+
+        <update tableName="payment">
+            <column name="label" value="Compensé par échange de services"/>
+            <where>payment_mode = 'SERVICE'</where>
+        </update>
+
+        <sql>
+            UPDATE payment
+            SET label = coalesce(nullif(trim(extra_information), ''), 'Paiement reçu')
+            WHERE payment_mode = 'OTHER' OR payment_mode IS NULL
+        </sql>
+
+        <!-- Les anciens « commentaires » qui n'étaient qu'un libellé n'ont plus lieu d'être. -->
+        <sql>
+            UPDATE payment
+            SET extra_information = NULL
+            WHERE payment_mode IS NOT NULL
+              AND payment_mode != 'OTHER'
+              AND trim(extra_information) IN ('Paiement reçu', 'Virement reçu')
+        </sql>
+
+        <rollback>
+            <dropColumn tableName="payment" columnName="label"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

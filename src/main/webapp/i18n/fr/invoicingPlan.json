@@ -18,6 +18,20 @@
         "create": "Nouvelle ligne de facture",
         "edit": "Modifier la ligne de facture"
       },
+      "nature": {
+        "label": "Nature de la ligne",
+        "list": {
+          "SERVICE": "Prestation",
+          "REDUCTION": "Réduction",
+          "CORRECTION": "Rectification"
+        },
+        "hint": {
+          "SERVICE": "Montant facturé à l'exposant",
+          "REDUCTION": "Rabais offert, déduit du montant dû",
+          "CORRECTION": "Annule une ligne déjà facturée"
+        },
+        "effect": "Sera déduit de la facture : −CHF {{amount}}"
+      },
       "label": "Libellé",
       "amount": "Montant (CHF)",
       "qty": "Quantité",
@@ -171,7 +185,17 @@
       "date": "Date de paiement",
       "mode": "Mode de paiement",
       "amount": "Montant (CHF)",
-      "comment": "Commentaire"
+      "label": "Libellé sur la facture",
+      "labelAuto": "Généré automatiquement selon le mode de paiement",
+      "labelCustom": "Libellé personnalisé : il apparaîtra tel quel sur la facture",
+      "autoLabel": {
+        "BANK": "Virement reçu",
+        "CASH": "Paiement reçu",
+        "SERVICE": "Compensé par échange de services"
+      },
+      "comment": "Note interne",
+      "commentHint": "Visible uniquement par l'administration, jamais imprimée sur la facture",
+      "internalBadge": "Interne"
     },
     "payments": {
       "label": "Paiements",

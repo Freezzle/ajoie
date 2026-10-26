@@ -83,6 +83,11 @@ public class InvoicingPlan implements Serializable, TenantOwned {
         return getInvoices().stream().map(Invoice::getTotalAmount).reduce(0.00, Double::sum);
     }
 
+    /**
+     * Total « théorique » : ce qui aurait été facturé sans geste commercial.
+     * Les rectifications (annulations de lignes déjà facturées) en font partie et le font
+     * baisser, contrairement aux réductions qui sont comptées à part.
+     */
     public Double getInvoicesDefaultTotal() {
         return getInvoices().stream().filter(i -> !i.isReduction()).map(Invoice::getTotalDefaultAmount)
                             .reduce(0.00, Double::sum);
@@ -96,12 +101,17 @@ public class InvoicingPlan implements Serializable, TenantOwned {
         return getPayments().stream().map(Payment::getAmount).reduce(0.00, Double::sum);
     }
 
+    /**
+     * Total des gestes commerciaux : lignes explicitement marquées « réduction » plus les écarts
+     * de prix consentis sur les autres lignes. Les rectifications en sont exclues.
+     */
     public Double getReductionsTotal() {
         Double totalDiscount =
                 getInvoices().stream().filter(Invoice::isReduction).map(Invoice::getTotalAmount).map(Math::abs)
                              .reduce(0.00, Double::sum);
 
-        Double totalDiff = getInvoices().stream().filter(Invoice::hasDifference).filter(in -> !in.isReduction())
+        Double totalDiff = getInvoices().stream().filter(Invoice::hasDifference)
+                                        .filter(in -> !in.isReduction() && !in.isCorrection())
                                         .map(Invoice::getTotalDifference).map(Math::abs).reduce(0.00, Double::sum);
 
         return totalDiscount + totalDiff;

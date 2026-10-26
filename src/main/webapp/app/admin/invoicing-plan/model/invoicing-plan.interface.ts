@@ -4,6 +4,7 @@ import {Type} from '../../enumerations/type.model';
 import {Mode} from '../../enumerations/mode.model';
 import {AvailableAction} from '../../../shared/model/available-action';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
+import {InvoiceNature} from '../../enumerations/invoice-nature.model';
 import {IExhibitor} from '../../exhibitor/model/exhibitor.interface';
 
 export interface IInvoicingPlan {
@@ -53,6 +54,7 @@ export interface IInvoice {
     generationDate?: dayjs.Dayjs | null;
     referenceId?: string | null;
     type?: Type | null;
+    nature?: InvoiceNature | null;
     label?: string | null;
     defaultAmount?: number | null;
     customAmount?: number | null;
@@ -70,6 +72,9 @@ export interface IPayment {
     billingDate?: dayjs.Dayjs | null;
     paymentMode?: Mode | null;
     amount?: number | null;
+    /** Libellé imprimé sur la facture et la quittance. */
+    label?: string | null;
+    /** Note interne de l'administration, jamais reprise sur un document client. */
     extraInformation?: string | null;
 }
 

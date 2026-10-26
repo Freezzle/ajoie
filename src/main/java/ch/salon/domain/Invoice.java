@@ -1,5 +1,6 @@
 package ch.salon.domain;
 
+import ch.salon.domain.enumeration.InvoiceNature;
 import ch.salon.domain.enumeration.Type;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,8 +65,9 @@ public class Invoice implements Serializable, TenantOwned {
     @Column(name = "extra_information")
     private String extraInformation;
 
-    @Column(name = "reduction")
-    private boolean reduction = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "nature", nullable = false)
+    private InvoiceNature nature = InvoiceNature.SERVICE;
 
     public Invoice(Invoice invoice) {
         this.id = null;
@@ -79,7 +81,17 @@ public class Invoice implements Serializable, TenantOwned {
         this.customAmount = invoice.getCustomAmount();
         this.lock = invoice.getLock();
         this.extraInformation = invoice.getExtraInformation();
-        this.reduction = invoice.reduction;
+        this.nature = invoice.nature;
+    }
+
+    /** Geste commercial : seules ces lignes alimentent le total des réductions. */
+    public boolean isReduction() {
+        return this.nature == InvoiceNature.REDUCTION;
+    }
+
+    /** Annulation d'une ligne déjà facturée : diminue le total attendu sans être une réduction. */
+    public boolean isCorrection() {
+        return this.nature == InvoiceNature.CORRECTION;
     }
 
     public boolean hasDifference() {

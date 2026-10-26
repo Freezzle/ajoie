@@ -1,5 +1,6 @@
 package ch.salon.service.dto;
 
+import ch.salon.domain.enumeration.InvoiceNature;
 import ch.salon.domain.enumeration.Type;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class InvoiceDTO implements Serializable {
     private Instant generationDate;
     private UUID referenceId;
     private Type type;
+    private InvoiceNature nature;
     private String label;
     private Double defaultAmount;
     private Double customAmount;

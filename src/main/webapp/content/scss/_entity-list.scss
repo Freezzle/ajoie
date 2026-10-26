@@ -1022,6 +1022,45 @@ button.el-ip-item {
   color: var(--app-warn);
 }
 
+/* Note interne : visible uniquement dans l'admin, jamais sur la facture. */
+.el-ip-internal {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--app-text-muted);
+  font-style: italic;
+
+  b {
+    font-style: normal;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0 5px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+  }
+}
+
+/* Distingue un rabais consenti d'une annulation de ligne déjà facturée. */
+.el-ip-nature {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: var(--app-fs-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  &.is-reduction {
+    color: var(--app-status-validated);
+  }
+
+  &.is-correction {
+    color: var(--app-text-muted);
+  }
+}
+
 .el-ip-empty {
   padding: 10px 14px;
   font-size: var(--app-fs-sm);

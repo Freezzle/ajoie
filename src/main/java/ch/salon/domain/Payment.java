@@ -44,6 +44,11 @@ public class Payment implements Serializable, TenantOwned {
     @Column(name = "payment_mode")
     private Mode paymentMode;
 
+    /** Libellé imprimé sur la facture et la quittance, généré à partir du mode de paiement. */
+    @Column(name = "label")
+    private String label;
+
+    /** Note interne de l'administration : jamais reprise sur un document client. */
     @Column(name = "extra_information")
     private String extraInformation;
 
@@ -52,6 +57,7 @@ public class Payment implements Serializable, TenantOwned {
         this.amount = payment.getAmount();
         this.billingDate = payment.getBillingDate();
         this.paymentMode = payment.getPaymentMode();
+        this.label = payment.getLabel();
         this.extraInformation = payment.getExtraInformation();
     }
 }

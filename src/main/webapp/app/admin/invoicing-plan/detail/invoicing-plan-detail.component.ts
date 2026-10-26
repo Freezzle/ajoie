@@ -13,6 +13,8 @@ import {EntityAction} from 'app/shared/components/entity-list/entity-list.model'
 import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.service';
 import {AvailableAction} from 'app/shared/model/available-action';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
+import {formatterInvoiceNature, InvoiceNature, isNegativeNature} from '../../enumerations/invoice-nature.model';
+import {formatterPaymentMode} from '../../enumerations/mode.model';
 import {State} from '../../enumerations/state.model';
 import {Type} from '../../enumerations/type.model';
 import {InvoiceFormComponent} from '../form/invoice-form.component';
@@ -451,6 +453,18 @@ export class InvoicingPlanDetailComponent implements OnInit {
         return Number(invoice.customAmount ?? 0) !== Number(invoice.defaultAmount ?? 0);
     }
 
+    /** Distingue visuellement un rabais consenti d'une simple annulation de ligne. */
+    natureBadge(invoice: IInvoice): { labelKey: string; styleClass: string } | null {
+        if (!isNegativeNature(invoice.nature)) {
+            return null;
+        }
+
+        return {
+            labelKey:   formatterInvoiceNature(invoice.nature as InvoiceNature),
+            styleClass: invoice.nature === InvoiceNature.REDUCTION ? 'is-reduction' : 'is-correction'
+        };
+    }
+
     customAmountTitle(invoice: IInvoice): string {
         return this.translateService.instant('invoicingPlan.amount.different',
                                              {defaultPrice: invoice.defaultAmount}) as string;
@@ -462,8 +476,15 @@ export class InvoicingPlanDetailComponent implements OnInit {
 
     paymentModeLabel(payment: IPayment): string {
         return payment.paymentMode
-               ? this.translateService.instant(`payment.type.list.${payment.paymentMode}`) as string
+               ? this.translateService.instant(formatterPaymentMode(payment.paymentMode)) as string
                : '';
+    }
+
+    /** Libellé imprimé sur le document ; repli sur le mode pour les paiements historiques. */
+    paymentLabel(payment: IPayment): string {
+        const label = payment.label?.trim();
+
+        return label && label.length > 0 ? label : this.paymentModeLabel(payment);
     }
 
     paymentsEmptyKey(): string {

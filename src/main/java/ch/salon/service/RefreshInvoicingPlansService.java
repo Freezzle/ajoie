@@ -10,6 +10,7 @@ import ch.salon.domain.Stand;
 import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.InvoiceNature;
 import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.ModePaymentMeals;
 import ch.salon.domain.enumeration.State;
@@ -240,7 +241,7 @@ public class RefreshInvoicingPlansService {
                 cancel.setReferenceId(expected.referenceId());
                 cancel.setLock(false);
                 cancel.setGenerationDate(Instant.now());
-                cancel.setReduction(false);
+                cancel.setNature(InvoiceNature.CORRECTION);
                 cancel.setType(STAND);
 
                 String baseLabel = diff.existingLabel() != null ? diff.existingLabel() : expected.label();
@@ -259,7 +260,7 @@ public class RefreshInvoicingPlansService {
                 newStand.setLock(false);
                 newStand.setGenerationDate(Instant.now());
                 newStand.setType(STAND);
-                newStand.setReduction(false);
+                newStand.setNature(InvoiceNature.SERVICE);
                 newStand.setLabel(sub(expected.label()));
                 newStand.setQuantity(expectedQty);
                 newStand.setDefaultAmount(expected.unitPrice());
@@ -275,7 +276,6 @@ public class RefreshInvoicingPlansService {
             invoice.setPosition(position);
             invoice.setReferenceId(expected.referenceId());
             invoice.setLock(false);
-            invoice.setReduction(false);
             invoice.setGenerationDate(Instant.now());
             invoice.setType(expected.type());
             invoice.setLabel(sub(expected.label()));
@@ -294,6 +294,9 @@ public class RefreshInvoicingPlansService {
                 invoice.setDefaultAmount(deltaTotal);
                 invoice.setCustomAmount(deltaTotal);
             }
+
+            // Un delta négatif retire ce qui a déjà été facturé : c'est une rectification, pas un rabais.
+            invoice.setNature(invoice.getTotalAmount() < 0 ? InvoiceNature.CORRECTION : InvoiceNature.SERVICE);
 
             draft.getInvoices().add(invoice);
         }
