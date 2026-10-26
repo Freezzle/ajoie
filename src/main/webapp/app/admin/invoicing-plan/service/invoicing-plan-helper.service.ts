@@ -10,81 +10,92 @@ export type InvoicingPlanBucket = 'todo' | 'wait' | 'late' | 'PAID' | 'CANCELLED
 const URGENCY_TODO = 500;
 const URGENCY_CLOSED = 900;
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class InvoicingPlanHelperService {
+  calculateBalance(
+    totalAmount: number | null | undefined,
+    paidAmount: number | null | undefined,
+  ): number {
+    return (totalAmount ?? 0) - (paidAmount ?? 0);
+  }
 
-    calculateBalance(totalAmount: number | null | undefined, paidAmount: number | null | undefined): number {
-        return (totalAmount ?? 0) - (paidAmount ?? 0);
+  getStateBadgeClass(state: State | null | undefined): string {
+    switch (state) {
+      case State.PAID:
+        return 'bg-primary';
+      case State.CANCELLED:
+        return 'bg-danger';
+      case State.ISSUED:
+        return 'bg-info';
+      case State.DRAFT:
+      case State.ISOLATED:
+      case State.IS_ISSUING:
+        return 'bg-success';
+      default:
+        return 'bg-warning';
+    }
+  }
+
+  isExpired(
+    expirationDate: dayjs.Dayjs | null | undefined,
+    state: State | null | undefined,
+  ): boolean {
+    if (!expirationDate || state !== State.ISSUED) {
+      return false;
+    }
+    return dayjs().isAfter(expirationDate);
+  }
+
+  isDraft(state: State | null | undefined): boolean {
+    return state === State.DRAFT || state === State.ISOLATED;
+  }
+
+  /** Catégorie de travail : à envoyer, en attente, échue, payée ou annulée. */
+  bucket(plan: IInvoicingPlanList): InvoicingPlanBucket {
+    if (this.isDraft(plan.state) || plan.state === State.IS_ISSUING) {
+      return 'todo';
     }
 
-    getStateBadgeClass(state: State | null | undefined): string {
-        switch (state) {
-            case State.PAID:
-                return 'bg-primary';
-            case State.CANCELLED:
-                return 'bg-danger';
-            case State.ISSUED:
-                return 'bg-info';
-            case State.DRAFT:
-            case State.ISOLATED:
-            case State.IS_ISSUING:
-                return 'bg-success';
-            default:
-                return 'bg-warning';
-        }
+    if (plan.state === State.ISSUED) {
+      return this.isExpired(plan.expirationDate, plan.state) ? 'late' : 'wait';
     }
 
-    isExpired(expirationDate: dayjs.Dayjs | null | undefined, state: State | null | undefined): boolean {
-        if (!expirationDate || state !== State.ISSUED) {
-            return false;
-        }
-        return dayjs().isAfter(expirationDate);
+    return plan.state === State.PAID ? 'PAID' : 'CANCELLED';
+  }
+
+  /** Nombre de jours avant l'échéance (négatif si échue) ; le tri « Urgence » est croissant. */
+  urgency(plan: IInvoicingPlanList): number {
+    if (plan.state === State.ISSUED && plan.expirationDate) {
+      return dayjs(plan.expirationDate).startOf('day').diff(dayjs().startOf('day'), 'day');
     }
 
-    isDraft(state: State | null | undefined): boolean {
-        return state === State.DRAFT || state === State.ISOLATED;
+    return this.bucket(plan) === 'todo' ? URGENCY_TODO : URGENCY_CLOSED;
+  }
+
+  /** Couleur du point de statut, cohérente avec les puces et les groupes. */
+  stateColor(plan: IInvoicingPlanList): string {
+    switch (this.bucket(plan)) {
+      case 'late':
+        return 'var(--app-status-refused)';
+      case 'wait':
+        return this.urgency(plan) <= 7 ? 'var(--app-warn)' : 'var(--app-status-accepted)';
+      case 'PAID':
+        return 'var(--app-status-validated)';
+      case 'CANCELLED':
+        return 'var(--app-status-cancelled)';
+      default:
+        return plan.state === State.IS_ISSUING ||
+          plan.state === State.DRAFT ||
+          plan.state === State.ISOLATED
+          ? 'var(--app-status-verification)'
+          : 'var(--app-text-muted)';
     }
+  }
 
-    /** Catégorie de travail : à envoyer, en attente, échue, payée ou annulée. */
-    bucket(plan: IInvoicingPlanList): InvoicingPlanBucket {
-        if (this.isDraft(plan.state) || plan.state === State.IS_ISSUING) {
-            return 'todo';
-        }
-
-        if (plan.state === State.ISSUED) {
-            return this.isExpired(plan.expirationDate, plan.state) ? 'late' : 'wait';
-        }
-
-        return plan.state === State.PAID ? 'PAID' : 'CANCELLED';
-    }
-
-    /** Nombre de jours avant l'échéance (négatif si échue) ; le tri « Urgence » est croissant. */
-    urgency(plan: IInvoicingPlanList): number {
-        if (plan.state === State.ISSUED && plan.expirationDate) {
-            return dayjs(plan.expirationDate).startOf('day').diff(dayjs().startOf('day'), 'day');
-        }
-
-        return this.bucket(plan) === 'todo' ? URGENCY_TODO : URGENCY_CLOSED;
-    }
-
-    /** Couleur du point de statut, cohérente avec les puces et les groupes. */
-    stateColor(plan: IInvoicingPlanList): string {
-        switch (this.bucket(plan)) {
-            case 'late':
-                return 'var(--app-status-refused)';
-            case 'wait':
-                return 'var(--app-status-accepted)';
-            case 'PAID':
-                return 'var(--app-status-validated)';
-            case 'CANCELLED':
-                return 'var(--app-status-canceled)';
-            default:
-                return 'var(--app-status-neutral)';
-        }
-    }
-
-    /** Clé de traduction du statut affiché : une facture échue n'est plus « envoyée ». */
-    stateLabelKey(plan: IInvoicingPlanList): string {
-        return this.bucket(plan) === 'late' ? 'invoicingPlan.state.EXPIRED' : `invoicingPlan.state.${plan.state}`;
-    }
+  /** Clé de traduction du statut affiché : une facture échue n'est plus « envoyée ». */
+  stateLabelKey(plan: IInvoicingPlanList): string {
+    return this.bucket(plan) === 'late'
+      ? 'invoicingPlan.state.EXPIRED'
+      : `invoicingPlan.state.${plan.state}`;
+  }
 }

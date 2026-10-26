@@ -613,7 +613,7 @@ export class InvoicingPlanListComponent implements OnInit {
             case 'CANCELLED':
                 return 'var(--app-text-muted)';
             default:
-                return plan.state === State.IS_ISSUING ? 'var(--app-status-accepted)' : 'var(--app-text-muted)';
+                return (plan.state === State.IS_ISSUING || plan.state === State.DRAFT ||plan.state === State.ISOLATED) ? 'var(--app-status-verification)' : 'var(--app-text-muted)';
         }
     }
 
@@ -705,7 +705,7 @@ export class InvoicingPlanListComponent implements OnInit {
         }
 
         if (plans.every(plan => this.helper.isDraft(plan.state))) {
-            return 'var(--app-text-muted)';
+            return 'var(--app-status-verification)';
         }
 
         return 'var(--app-status-validated)';

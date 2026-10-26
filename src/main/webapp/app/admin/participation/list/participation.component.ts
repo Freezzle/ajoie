@@ -174,7 +174,7 @@ export class ParticipationComponent implements OnInit {
                         key: 'toInvoice',
                         labelKey: 'entityList.signal.toInvoice',
                         icon: 'file-invoice',
-                        color: 'var(--app-status-accepted)',
+                        color: 'var(--app-status-verification)',
                         count: count('toInvoice')
                     },
                     {
