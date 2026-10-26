@@ -2,7 +2,14 @@
     <div appMenuBarStart>
         <h3 jhiTranslate="invoicingPlan.list.title">Les factures</h3>
         <div class="el-subtitle">
-            @if (subtitle()) {
+            @if (participationContext(); as context) {
+                <a class="el-context-chip"
+                   [routerLink]="allInvoicesLink()"
+                   [title]="'invoicingPlan.list.action.allInvoices' | translate">
+                    <b>{{ context }}</b>
+                    <i class="pi pi-times"></i>
+                </a>
+            } @else if (subtitle()) {
                 <b>{{ subtitle() }}</b>
             }
         </div>
@@ -13,6 +20,14 @@
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
+
+        @if (idParticipation()) {
+            <button-box (clickedEvent)="regenerate($event)"
+                        [isDisabled]="isLoading()"
+                        primeIcon="pi-refresh"
+                        translateKey="invoicingPlan.list.action.regenerate"
+                        type="secondary"/>
+        }
 
         <menu-box [buttonDisabled]="isLoading()"
                   [items]="pageMenuItems()"

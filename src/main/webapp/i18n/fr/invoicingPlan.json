@@ -124,10 +124,14 @@
       },
       "action": {
         "onlyThisParticipation": "Voir uniquement cette participation",
+        "allInvoices": "Retirer le filtre et voir toutes les factures du salon",
         "addPayment": "Ajouter un paiement",
         "addInvoiceLine": "Ajouter une ligne",
         "regenerate": "Régénérer les factures",
         "regenerateQuestion": "Régénérer les brouillons de facture de cette participation ?"
+      },
+      "context": {
+        "participationUnknown": "Participation filtrée"
       }
     },
     "detail": {

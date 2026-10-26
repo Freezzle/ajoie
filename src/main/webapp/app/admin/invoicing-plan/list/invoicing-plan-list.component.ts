@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {MenuItem} from 'primeng/api';
 import {ConfirmPopup} from 'primeng/confirmpopup';
@@ -64,6 +64,7 @@ const DUE_ORDER = ['late', 'week', 'later', 'nodate', 'closed'];
                selector: 'app-invoicing-plan-list',
                imports: [
                    SharedModule,
+                   RouterLink,
                    AlertErrorComponent,
                    ButtonBoxComponent,
                    ConfirmPopup,
@@ -258,11 +259,7 @@ export class InvoicingPlanListComponent implements OnInit {
 
     readonly subtitle = computed(() => {
         if (this.idParticipation()) {
-            const name = this.participationName();
-
-            return name
-                   ? this.translateService.instant('entityList.context.participation', {name}) as string
-                   : '';
+            return '';
         }
 
         const salon = this.navigationStateService.salon();
@@ -271,26 +268,38 @@ export class InvoicingPlanListComponent implements OnInit {
         return !salon || (idSalon && salon.id !== idSalon) ? '' : salon.place;
     });
 
-    readonly pageMenuItems = computed<MenuItem[]>(() => {
-        const items: MenuItem[] = [
-            {
-                label: this.translateService.instant('common.refresh') as string,
-                icon: 'pi pi-sync',
-                command: () => this.load()
-            }
-        ];
-
-        // La régénération porte sur une participation : elle n'a de sens que filtrée.
-        if (this.idParticipation()) {
-            items.push({
-                           label: this.translateService.instant('invoicingPlan.list.action.regenerate') as string,
-                           icon: 'pi pi-refresh',
-                           command: event => this.regenerate(event.originalEvent?.target as HTMLElement)
-                       });
+    /**
+     * Libellé du filtre « participation » affiché sous le titre, `null` hors de ce mode.
+     *
+     * Le nom est déduit des factures chargées : une participation sans facture — justement le
+     * cas où l'on vient régénérer — n'en a aucune, d'où le libellé de repli.
+     */
+    readonly participationContext = computed(() => {
+        if (!this.idParticipation()) {
+            return null;
         }
 
-        return items;
+        const name = this.participationName();
+
+        return name
+               ? this.translateService.instant('entityList.context.participation', {name}) as string
+               : this.translateService.instant('invoicingPlan.list.context.participationUnknown') as string;
     });
+
+    /** Lien vers la liste complète du salon, utilisé pour retirer le filtre « participation ». */
+    readonly allInvoicesLink = computed(() => {
+        const idSalon = this.idSalon();
+
+        return idSalon ? ['/admin', 'salons', idSalon, 'invoicing-plans'] : [];
+    });
+
+    readonly pageMenuItems = computed<MenuItem[]>(() => [
+        {
+            label: this.translateService.instant('common.refresh') as string,
+            icon: 'pi pi-sync',
+            command: () => this.load()
+        }
+    ]);
 
     constructor() {
         this.state.connectQueryParams(this.activatedRoute, this.router);
