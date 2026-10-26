@@ -94,8 +94,15 @@ public class Invoice implements Serializable, TenantOwned {
         return this.nature == InvoiceNature.CORRECTION;
     }
 
+    /**
+     * Vrai si le prix facturé s'écarte du prix par défaut.
+     *
+     * La comparaison passe par {@code compareTo} : {@code BigDecimal.equals} tient compte de
+     * l'échelle, et {@code BigDecimal.valueOf(0.0d)} (« 0.0 ») n'est jamais égal à
+     * {@link BigDecimal#ZERO} (« 0 ») au sens de {@code equals}.
+     */
     public boolean hasDifference() {
-        return !BigDecimal.valueOf(getDifference()).equals(BigDecimal.ZERO);
+        return BigDecimal.valueOf(getDifference()).compareTo(BigDecimal.ZERO) != 0;
     }
 
     public Double getTotalDifference() {
