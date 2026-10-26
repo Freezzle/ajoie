@@ -25,7 +25,15 @@ public class ActionRepositoryConfiguration {
             for (Class<?> iface : interfaces) {
                 RepositoryAction annotation = iface.getAnnotation(RepositoryAction.class);
                 if (annotation != null && candidate instanceof JpaRepository<?, ?> repo) {
-                    result.put(annotation.value(), (JpaRepository<?, UUID>) repo);
+                    JpaRepository<?, UUID> previous = result.put(annotation.value(), (JpaRepository<?, UUID>) repo);
+
+                    // Deux dépôts sur le même domaine : celui qui gagne dépend de l'ordre des beans,
+                    // et les actions du domaine finiraient par chercher l'entité dans le mauvais dépôt.
+                    if (previous != null) {
+                        throw new IllegalStateException(
+                                "Duplicate @RepositoryAction(\"" + annotation.value() + "\") on " + iface.getName()
+                                        + " and " + previous.getClass().getName());
+                    }
                 }
             }
         }

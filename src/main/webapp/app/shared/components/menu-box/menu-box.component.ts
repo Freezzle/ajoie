@@ -1,18 +1,15 @@
-import {ChangeDetectionStrategy, Component, Input, ViewChild} from '@angular/core';
-import {Menu, MenuModule} from 'primeng/menu';
+﻿import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
-import {TranslateService} from '@ngx-translate/core';
+import {ActionMenuComponent} from '../action-menu/action-menu.component';
 import {ButtonBoxComponent} from '../button-box/button-box.component';
 import {SEVERITY} from '../../utils/severity';
 import {AppMenuItem} from '../../utils/app-menu-item.model';
-import {Popover} from 'primeng/popover';
-import {ConditionalKey} from '../../model/conditional-key';
 
+/** Bouton « Actions » ouvrant le menu partagé {@link ActionMenuComponent}. */
 @Component({
                selector: 'menu-box',
-               imports: [MenuModule, ButtonModule, ButtonBoxComponent, Popover],
+               imports: [ButtonModule, ButtonBoxComponent, ActionMenuComponent],
                templateUrl: './menu-box.component.html',
-               styleUrl: './menu-box.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush
            })
 export class MenuBoxComponent {
@@ -22,23 +19,4 @@ export class MenuBoxComponent {
     @Input() buttonIcon?: string;
     @Input() buttonDisabled = false;
     @Input() appendTo: any = 'body';
-
-    @ViewChild('menu') menu!: Menu;
-    @ViewChild('helpPopover') helpPopover!: Popover;
-
-    currentHelpText = '';
-    currentConditionalKeys: ConditionalKey[] = [];
-
-    constructor(private translateService: TranslateService) {}
-
-    showHelp(event: Event, helpText: string, conditionalKeys: ConditionalKey[] = []): void {
-        event.stopPropagation();
-        this.currentHelpText = helpText;
-        this.currentConditionalKeys = conditionalKeys;
-        this.helpPopover.toggle(event);
-    }
-
-    getTranslatedCondition(key: string): string {
-        return this.translateService.instant(key) as string;
-    }
 }

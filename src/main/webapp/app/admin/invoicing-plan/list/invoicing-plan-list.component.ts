@@ -397,8 +397,10 @@ export class InvoicingPlanListComponent implements OnInit {
                 labelKey: action.labelKey,
                 icon: iconForActionType(action.type),
                 disabled: action.disabled,
+                helpText: action.helpKey ? this.translateService.instant(action.helpKey) as string : undefined,
+                conditionalKeys: action.conditionalKeys ?? [],
                 run: target => this.actionsService.run(action, plan.id, target)
-                                       .subscribe(() => this.reloadAfterAction())
+                                   .subscribe(() => this.reloadAfterAction())
             }))
                                         : [{labelKey: 'entityList.loading', icon: 'pi pi-spin pi-spinner', disabled: true}];
 

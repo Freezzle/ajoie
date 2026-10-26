@@ -1,4 +1,5 @@
 import {Status} from '../../../admin/enumerations/status.model';
+import {ConditionalKey} from '../../model/conditional-key';
 
 /** Option de groupement proposée dans le menu « Grouper et trier ». */
 export interface GroupOption {
@@ -71,6 +72,10 @@ export interface EntityAction {
     hidden?: boolean;
     /** Affichée mais non cliquable (par exemple pendant le chargement des actions serveur). */
     disabled?: boolean;
+    /** Texte d'aide déjà traduit ; affiche une icône « ? » ouvrant un popover. */
+    helpText?: string;
+    /** Conditions d'exécution (OK/NOK) listées dans le popover d'aide. */
+    conditionalKeys?: ConditionalKey[];
 }
 
 export const SORT_DATE_KEY = 'date';

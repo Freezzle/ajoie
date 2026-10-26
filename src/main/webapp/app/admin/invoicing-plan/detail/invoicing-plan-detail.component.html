@@ -12,6 +12,13 @@
                             [type]="actionType(action)"/>
             }
 
+            @if (canAddInvoiceLine()) {
+                <button-box (clickedEvent)="addInvoiceLine()"
+                            primeIcon="pi-plus"
+                            translateKey="invoicingPlan.list.action.addInvoiceLine"
+                            type="secondary"/>
+            }
+
             @if (canAddPayment()) {
                 <button-box (clickedEvent)="addPayment()"
                             primeIcon="pi-plus"
@@ -57,12 +64,6 @@
             <header>
                 <strong>{{ 'invoicingPlan.invoices.label' | translate }}</strong>
                 <span class="el-ip-count">{{ invoices().length }}</span>
-                <span class="el-ip-spacer"></span>
-                @if (canAddInvoiceLine()) {
-                    <button (click)="addInvoiceLine()" class="el-ip-add" type="button">
-                        + {{ 'invoicingPlan.header.label' | translate }}
-                    </button>
-                }
             </header>
 
             @if (invoices().length === 0) {

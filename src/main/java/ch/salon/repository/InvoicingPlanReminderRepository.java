@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-@RepositoryAction("billing")
 public interface InvoicingPlanReminderRepository extends JpaRepository<InvoicingPlanReminder, UUID> {
 
     /** Rappels de plusieurs plans en une seule requête, pour éviter un N+1 sur la liste. */

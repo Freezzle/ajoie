@@ -628,9 +628,9 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
 }
 
 /* Action de suppression du rouage : en rouge, en dernier. */
-.el-menu-danger .p-menu-item-link,
-.el-menu-danger .p-menu-item-link .p-menu-item-icon,
-.el-menu-danger .p-menu-item-link .p-menu-item-label {
+.el-menu-danger .am-item-main,
+.el-menu-danger .am-item-main i,
+.el-menu-danger .am-item-main .p-menu-item-label {
   color: var(--app-danger);
 }
 
@@ -947,27 +947,6 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   background: var(--app-surface-muted);
   border-radius: 999px;
   padding: 0 7px;
-}
-
-.el-ip-spacer {
-  flex: 1;
-}
-
-.el-ip-add {
-  appearance: none;
-  border: 1px solid var(--app-border);
-  background: var(--app-surface);
-  border-radius: 999px;
-  padding: 1px 10px;
-  font-size: var(--app-fs-xs);
-  font-weight: 600;
-  color: var(--app-primary);
-  cursor: pointer;
-
-  &:hover {
-    border-color: var(--app-primary);
-    background: var(--app-primary-soft);
-  }
 }
 
 .el-ip-rows {

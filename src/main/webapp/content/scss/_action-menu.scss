@@ -1,0 +1,109 @@
+/*
+  Styles du menu d'actions partagé (`action-menu`).
+
+  Le `p-menu` est projeté dans `body` : ces règles doivent être globales, l'encapsulation
+  d'un composant n'aurait aucun effet dessus.
+*/
+
+.am-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--p-menu-item-padding);
+}
+
+.am-item-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--app-primary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--app-secondary);
+    text-decoration: none;
+  }
+}
+
+/* L'item désactivé garde une icône d'aide cliquable : c'est elle qui explique le blocage. */
+.p-menu .p-disabled {
+  opacity: 1;
+
+  .am-item-main {
+    opacity: 0.5;
+  }
+
+  .am-help {
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+}
+
+.am-help {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+  color: var(--app-primary);
+  cursor: pointer;
+  z-index: 1;
+  pointer-events: auto;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--app-secondary);
+  }
+
+  /* L'action est bloquée : l'aide devient l'avertissement qui en donne la raison. */
+  &.is-blocked {
+    color: var(--app-warning);
+
+    &:hover {
+      opacity: 0.8;
+      color: var(--app-warning);
+    }
+  }
+}
+
+.am-help-content {
+  padding: 0.75rem;
+  max-width: 300px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.am-help-text {
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.am-conditions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: var(--app-fs-md);
+
+    i {
+      flex-shrink: 0;
+      font-size: var(--app-fs-md);
+      font-weight: bold;
+    }
+
+    &.is-ok i {
+      color: var(--app-primary);
+    }
+
+    &.is-ko i {
+      color: var(--app-warning);
+    }
+  }
+}

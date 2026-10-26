@@ -2,6 +2,7 @@
 @use "content/scss/global";
 @use "content/scss/registration";
 @use "content/scss/entity-list";
+@use "content/scss/action-menu";
 
 :root {
   // PrimeNG injecte `:root,:host{color-scheme:light}` dans un <style> ajouté en fin

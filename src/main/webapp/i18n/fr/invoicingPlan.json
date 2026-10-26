@@ -111,6 +111,7 @@
       "action": {
         "onlyThisParticipation": "Voir uniquement cette participation",
         "addPayment": "Ajouter un paiement",
+        "addInvoiceLine": "Ajouter une ligne",
         "regenerate": "Régénérer les factures",
         "regenerateQuestion": "Régénérer les brouillons de facture de cette participation ?"
       }

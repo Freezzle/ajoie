@@ -555,7 +555,8 @@ p-iftalabel label {
 
 /* ── Utility: danger menu item ── */
 
-.danger-item .p-menu-item-link {
+.danger-item .am-item-main,
+.p-menuitem-danger .am-item-main {
   color: var(--app-danger) !important;
 }
 
