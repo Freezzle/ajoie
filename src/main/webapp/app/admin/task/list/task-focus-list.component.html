@@ -133,20 +133,32 @@
                 </div>
             } @else {
                 <div class="tfl-cards">
-                    @for (task of filteredTasks(); track task.id; let index = $index) {
-                        <app-task-card (changed)="load()"
-                                       (editRequested)="openEditTaskDialog($event)"
-                                       (expandedChange)="setExpanded(task, $event)"
-                                       (seeInList)="seeInList($event)"
-                                       (subtaskAddRequested)="openAddSubtaskDialog($event)"
-                                       (subtaskEditRequested)="openEditSubtaskDialog($event)"
-                                       [class.tfl-flash]="flashedTaskId() === task.id"
-                                       [expanded]="isExpanded(task, index)"
-                                       [extraActions]="taskExtraActions"
-                                       [id]="'task-card-' + task.id"
-                                       [known]="known()"
-                                       [query]="state.query()"
-                                       [task]="task"/>
+                    @for (group of taskGroups(); track group.key) {
+                        <entity-list-group (collapsedChange)="setCollapsed(group, $event)"
+                                           [collapsed]="isCollapsed(group)"
+                                           [color]="group.color"
+                                           [count]="group.items.length"
+                                           [label]="group.label"
+                                           [rawLabel]="group.rawLabel ?? false"
+                                           [ratio]="group.ratio">
+                            <span groupSummary>{{ taskGroupSummary(group) }}</span>
+
+                            @for (task of group.items; track task.id) {
+                                <app-task-card (changed)="load()"
+                                               (editRequested)="openEditTaskDialog($event)"
+                                               (expandedChange)="setExpanded(task, $event)"
+                                               (seeInList)="seeInList($event)"
+                                               (subtaskAddRequested)="openAddSubtaskDialog($event)"
+                                               (subtaskEditRequested)="openEditSubtaskDialog($event)"
+                                               [class.tfl-flash]="flashedTaskId() === task.id"
+                                               [expanded]="isExpanded(task)"
+                                               [extraActions]="taskExtraActions"
+                                               [id]="'task-card-' + task.id"
+                                               [known]="known()"
+                                               [query]="state.query()"
+                                               [task]="task"/>
+                            }
+                        </entity-list-group>
                     }
                 </div>
             }

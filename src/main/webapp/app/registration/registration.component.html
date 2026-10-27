@@ -63,7 +63,8 @@
         <div class="registration-shell registration-welcome">
             <app-registration-card
                 [title]="salonInfo()?.registrationWelcomeTitle || ('registration.welcome.title' | translate)">
-                <div class="registration-welcome-text" [innerHTML]="salonInfo()?.registrationWelcomeText"></div>
+                <div class="registration-welcome-text"
+                     [innerHTML]="salonInfo()?.registrationWelcomeText | richText"></div>
                 <div class="registration-welcome-actions">
                     <button-box (clickedEvent)="startRegistration()"
                                 [showText]="true"

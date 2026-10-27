@@ -4,6 +4,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import SharedModule from '../../../shared/shared.module';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
+import RichTextPipe from '../../../shared/pipe/rich-text.pipe';
 import {formatterCategory} from '../../../admin/enumerations/category.model';
 import {InvoiceSendingMethod} from '../../../admin/enumerations/invoice-sending-method.model';
 import {IAddress} from '../../../admin/common/address.model';
@@ -21,7 +22,7 @@ import {
 
 @Component({
                selector: 'app-summary-step',
-               imports: [SharedModule, ReactiveFormsModule, ButtonBoxComponent, CheckboxBoxComponent],
+               imports: [SharedModule, ReactiveFormsModule, ButtonBoxComponent, CheckboxBoxComponent, RichTextPipe],
                templateUrl: './summary-step.component.html'
            })
 export class SummaryStepComponent {

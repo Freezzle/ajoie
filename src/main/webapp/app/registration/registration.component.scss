@@ -150,12 +150,30 @@
 }
 
 // Le contenu est injecté via [innerHTML] : ::ng-deep nécessaire pour styliser le HTML brut non compilé par Angular.
-// `overflow-wrap: break-word` seul (pas de `word-break`/`anywhere` ni de `hyphens`) : seuls les mots qui ne
-// tiennent pas seuls sur une ligne sont coupés, les mots courants restent entiers.
+// `overflow-wrap: break-word` + `word-break: normal` : seuls les mots qui ne tiennent pas seuls sur une ligne
+// sont coupés, les mots courants restent entiers (le HTML est au préalable normalisé par le pipe `richText`,
+// qui supprime les espaces insécables empêchant les retours à la ligne).
 :host ::ng-deep .registration-welcome-text {
   color: var(--p-text-muted-color, #6b655d);
   max-width: 100%;
   overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+
+  p,
+  li,
+  td,
+  th,
+  blockquote,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
 
   p {
     margin: 0 0 1rem;

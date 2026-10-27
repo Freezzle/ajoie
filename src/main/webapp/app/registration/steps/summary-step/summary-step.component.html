@@ -327,7 +327,7 @@
     @if (chartText) {
         <div class="summary-card" [formGroup]="consentsForm">
             <h3>{{ 'registration.chart.registrationTitle' | translate }}</h3>
-            <div class="summary-chart-text" [innerHTML]="chartText"></div>
+            <div class="summary-chart-text" [innerHTML]="chartText | richText"></div>
             <div class="mt-3">
                 <checkbox-box fieldName="acceptedContract"
                               formControlName="acceptedContract"
@@ -342,7 +342,7 @@
     @if (salonChartText) {
         <div class="summary-card" [formGroup]="consentsForm">
             <h3>{{ 'registration.chart.salonTitle' | translate }}</h3>
-            <div class="summary-chart-text" [innerHTML]="salonChartText"></div>
+            <div class="summary-chart-text" [innerHTML]="salonChartText | richText"></div>
             <div class="mt-3">
                 <checkbox-box fieldName="acceptedChart"
                               formControlName="acceptedChart"

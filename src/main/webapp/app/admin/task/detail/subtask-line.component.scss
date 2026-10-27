@@ -10,6 +10,8 @@
     min-height: 40px;
     padding: 5px 8px;
     border-radius: 8px;
+    border: 1px solid var(--app-border);
+    background-color: var(--app-surface);
 
     &:hover {
         background: var(--app-surface-muted);

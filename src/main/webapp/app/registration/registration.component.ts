@@ -20,6 +20,8 @@ import {SummaryStepComponent} from './steps/summary-step/summary-step.component'
 import {TurnstileBoxComponent} from './turnstile-box.component';
 import {RegistrationCardComponent} from './registration-card/registration-card.component';
 import {formatSalonDateRange} from './registration-date-range.util';
+import RichTextPipe from '../shared/pipe/rich-text.pipe';
+import {prepareRichTextHtml} from '../shared/utils/rich-text.util';
 
 const STEPS: StepDescriptor[] = [
     {key: 'exhibitor', shortLabelKey: 'registration.steps.shortExhibitor', labelKey: 'registration.steps.exhibitor'},
@@ -44,7 +46,8 @@ const STEPS: StepDescriptor[] = [
                    ParticipationStepComponent,
                    SummaryStepComponent,
                    TurnstileBoxComponent,
-                   RegistrationCardComponent
+                   RegistrationCardComponent,
+                   RichTextPipe
                ],
                templateUrl: './registration.component.html',
                styleUrl: './registration.component.scss'
@@ -126,13 +129,12 @@ export default class RegistrationComponent implements OnInit {
         return this.cleanHtml(this.salonInfo()?.registrationSalonChartText);
     }
 
+    /**
+     * L'éditeur riche enregistre parfois un contenu "vide" (<p><br></p>) : on le considère comme absent.
+     * Le contenu conservé est normalisé (espaces insécables) pour autoriser les retours à la ligne.
+     */
     private cleanHtml(value: string | null | undefined): string | null {
-        if (!value) {
-            return null;
-        }
-        // L'éditeur riche enregistre parfois un contenu "vide" (<p><br></p>) : on le considère comme absent.
-        const stripped = value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
-        return stripped.length > 0 ? value : null;
+        return prepareRichTextHtml(value);
     }
 
     private applyChartsAvailability(): void {

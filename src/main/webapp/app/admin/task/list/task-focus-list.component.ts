@@ -54,6 +54,7 @@ import {
     responsibleColor,
     statusColorOf,
     TASK_STATUS_ORDER,
+    taskUrgency,
     toLocalDate,
     urgency,
     URGENCY_ORDER,
@@ -285,6 +286,14 @@ export class TaskFocusListComponent implements OnInit {
             .sort(compareTasks);
     });
 
+    /** Tâches groupées par échéance, toujours sur ce critère (pas de sélecteur dans cette vue). */
+    readonly taskGroups = computed<EntityGroup<ITaskInstance>[]>(() =>
+        groupByKey(this.filteredTasks(),
+                  URGENCY_ORDER,
+                  taskUrgency,
+                  key => `task.group.urgencyKey.${key}`,
+                  key => urgencyColor(key)));
+
     readonly counts = computed(() => countSubtasks(this.allSubtasks()));
 
     /** Jours restants avant le début du salon. */
@@ -380,14 +389,14 @@ export class TaskFocusListComponent implements OnInit {
 
     // ── Vue Tâches ──────────────────────────────────────────────────────────
 
-    /** Repliée par défaut, sauf la première carte ; tout s'ouvre pendant une recherche. */
-    isExpanded(task: ITaskInstance, index: number): boolean {
+    /** Repliée par défaut, sauf la toute première carte ; tout s'ouvre pendant une recherche. */
+    isExpanded(task: ITaskInstance): boolean {
         const override = this.cardOverrides()[task.id];
         if (override !== undefined) {
             return override;
         }
 
-        return this.state.isFiltering || index === 0;
+        return this.state.isFiltering || this.filteredTasks()[0]?.id === task.id;
     }
 
     setExpanded(task: ITaskInstance, expanded: boolean): void {
@@ -413,18 +422,23 @@ export class TaskFocusListComponent implements OnInit {
         });
     }
 
-    // ── Groupes de la vue Sous-tâches ───────────────────────────────────────
+    // ── Groupes ──────────────────────────────────────────────────────────────
 
-    isCollapsed(group: EntityGroup<IFlatSubtask>): boolean {
+    isCollapsed(group: EntityGroup<unknown>): boolean {
         return this.state.isCollapsed(group.key);
     }
 
-    setCollapsed(group: EntityGroup<IFlatSubtask>, collapsed: boolean): void {
+    setCollapsed(group: EntityGroup<unknown>, collapsed: boolean): void {
         this.state.setCollapsed(group.key, collapsed);
     }
 
+    /** Résumé d'un en-tête de groupe de tâches : effectifs de ses sous-tâches. */
+    taskGroupSummary(group: EntityGroup<ITaskInstance>): string {
+        return this.groupSummary({...group, items: flatten(group.items)}, false);
+    }
+
     /** Résumé d'un en-tête de groupe : « 2 en cours · 1 bloquée » (+ « 3/7 »). */
-    groupSummary(group: EntityGroup<IFlatSubtask>): string {
+    groupSummary(group: EntityGroup<IFlatSubtask>, withTotal = this.state.groupBy() === GROUP_RESPONSIBLE): string {
         const counts = countSubtasks(group.items);
         const parts: string[] = [];
 
@@ -434,7 +448,7 @@ export class TaskFocusListComponent implements OnInit {
         if (counts.blocked > 0) {
             parts.push(this.text('task.group.blocked', {count: counts.blocked}));
         }
-        if (this.state.groupBy() === GROUP_RESPONSIBLE) {
+        if (withTotal) {
             parts.push(`${counts.done}/${counts.total}`);
         }
 

@@ -204,6 +204,18 @@ export function nextSubtask(task: ITaskInstance): INextSubtask | null {
     return next ? {id: next.id, title: next.title, dueDate: effectiveDue(next)} : null;
 }
 
+/** Urgence d'une tâche : celle de sa prochaine sous-tâche active, sinon DONE/NODATE. */
+export function taskUrgency(task: ITaskInstance): Urgency {
+    const subtasks = task.subtasks ?? [];
+    const next = sortedSubtasks(task).find(isActive);
+
+    if (next) {
+        return urgency(next);
+    }
+
+    return subtasks.length > 0 ? 'DONE' : 'NODATE';
+}
+
 /** Effectifs d'une liste de sous-tâches, utilisés par les barres et les résumés. */
 export interface SubtaskCounts {
     total: number;
