@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Consentement de publication sur le site web (exposant et co-exposant) -->
+    <changeSet id="0.0.2-202610-stand-published" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="stand"/>
+        </preConditions>
+
+        <addColumn tableName="stand">
+            <column name="published_on_website" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shared_published_on_website" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="stand" columnName="published_on_website"/>
+            <dropColumn tableName="stand" columnName="shared_published_on_website"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

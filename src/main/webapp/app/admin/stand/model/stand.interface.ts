@@ -18,6 +18,8 @@ export interface IImageMetadata {
 export interface IStand {
     id: string;
     description: string;
+    /** L'exposant accepte d'être publié sur le site web du salon. */
+    publishedOnWebsite: boolean;
     website: string | null;
     instagram: string | null;
     facebook: string | null;
@@ -34,6 +36,8 @@ export interface IStand {
     sharedDescription: string | null;
     sharedCategory: Category | null;
     sharedSubCategories: string[] | [];
+    /** Le co-exposant accepte d'être publié sur le site web du salon. */
+    sharedPublishedOnWebsite: boolean;
     sharedWebsite: string | null;
     sharedInstagram: string | null;
     sharedFacebook: string | null;

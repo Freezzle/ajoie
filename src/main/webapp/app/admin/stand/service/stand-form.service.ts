@@ -8,6 +8,7 @@ import {Status} from '../../enumerations/status.model';
 export type StandFormGroup = {
     id: FormControl<IStand['id'] | null>;
     description: FormControl<IStand['description'] | null>;
+    publishedOnWebsite: FormControl<IStand['publishedOnWebsite'] | null>;
     website: FormControl<IStand['website'] | null>;
     instagram: FormControl<IStand['instagram'] | null>;
     facebook: FormControl<IStand['facebook'] | null>;
@@ -23,6 +24,7 @@ export type StandFormGroup = {
     sharedDescription: FormControl<IStand['sharedDescription'] | null>;
     sharedCategory: FormControl<IStand['sharedCategory'] | null>;
     sharedSubCategories: FormControl<IStand['sharedSubCategories'] | null>;
+    sharedPublishedOnWebsite: FormControl<IStand['sharedPublishedOnWebsite'] | null>;
     sharedWebsite: FormControl<IStand['sharedWebsite'] | null>;
     sharedInstagram: FormControl<IStand['sharedInstagram'] | null>;
     sharedFacebook: FormControl<IStand['sharedFacebook'] | null>;
@@ -52,6 +54,9 @@ export class StandFormService {
         const removeSharedPicture = new FormControl(false, {nonNullable: true});
         const hasPicture = (): boolean => !!raw.picture && !removePicture.value;
         const hasSharedPicture = (): boolean => !!raw.sharedPicture && !removeSharedPicture.value;
+        // Les images ne sont exigées que si le stand / le co-exposant est publié sur le site web.
+        const published = (): boolean => form.controls.publishedOnWebsite.value !== false;
+        const sharedPublished = (): boolean => form.controls.sharedPublishedOnWebsite.value !== false;
 
         const form = new FormGroup<StandFormGroup>({
                                                  id: new FormControl(raw.id),
@@ -59,6 +64,8 @@ export class StandFormService {
                                                      Validators.required,
                                                      Validators.maxLength(500)
                                                  ]),
+                                                 publishedOnWebsite: new FormControl(raw.publishedOnWebsite,
+                                                     Validators.required),
                                                  website: new FormControl(raw.website),
                                                  instagram: new FormControl(raw.instagram),
                                                  facebook: new FormControl(raw.facebook),
@@ -81,6 +88,8 @@ export class StandFormService {
                                                      Validators.maxLength(500)),
                                                  sharedCategory: new FormControl(raw.sharedCategory),
                                                  sharedSubCategories: new FormControl(raw.sharedSubCategories),
+                                                 sharedPublishedOnWebsite: new FormControl(
+                                                     raw.sharedPublishedOnWebsite, Validators.required),
                                                  sharedWebsite: new FormControl(raw.sharedWebsite),
                                                  sharedInstagram: new FormControl(raw.sharedInstagram),
                                                  sharedFacebook: new FormControl(raw.sharedFacebook),
@@ -92,16 +101,16 @@ export class StandFormService {
                                                  participation: new FormControl(raw.participation, Validators.required),
                                                  dimension: new FormControl(raw.dimension, Validators.required),
                                                  pictureUpload: new FormControl(null,
-                                                     [requiredPictureValidator(hasPicture)]),
+                                                     [requiredPictureValidator(() => !published() || hasPicture())]),
                                                  sharedPictureUpload: new FormControl(null),
                                                  removePicture,
                                                  removeSharedPicture
                                              });
 
-        // L'image du co-exposant n'est exigée que si le stand est partagé.
+        // L'image du co-exposant n'est exigée que si le stand est partagé et le co-exposant publié.
         const refreshSharedPictureValidator = (shared: boolean | null): void => {
             form.controls.sharedPictureUpload.setValidators(
-                shared ? [requiredPictureValidator(hasSharedPicture)] : []);
+                shared && sharedPublished() ? [requiredPictureValidator(hasSharedPicture)] : []);
             form.controls.sharedPictureUpload.updateValueAndValidity({emitEvent: false});
         };
 
@@ -113,7 +122,56 @@ export class StandFormService {
             refreshSharedPictureValidator(shared);
         });
 
+        form.controls.publishedOnWebsite.valueChanges.subscribe(isPublished => {
+            if (isPublished) {
+                // La publication est rétablie : l'image existante ne doit plus être supprimée.
+                form.controls.removePicture.setValue(false, {emitEvent: false});
+            } else {
+                this.clearPublication(form);
+            }
+            form.controls.pictureUpload.updateValueAndValidity({emitEvent: false});
+        });
+
+        form.controls.sharedPublishedOnWebsite.valueChanges.subscribe(isPublished => {
+            if (isPublished) {
+                form.controls.removeSharedPicture.setValue(false, {emitEvent: false});
+            } else {
+                this.clearSharedPublication(form);
+            }
+            refreshSharedPictureValidator(form.controls.shared.value);
+        });
+
         return form;
+    }
+
+    /**
+     * Efface les informations de l'exposant publiées sur le site web (réseaux sociaux et image)
+     * quand la publication est désactivée.
+     */
+    private clearPublication(form: FormGroup<StandFormGroup>): void {
+        form.patchValue({
+                            website: null,
+                            instagram: null,
+                            facebook: null,
+                            urlPicture: null,
+                            pictureUpload: null,
+                            removePicture: true
+                        }, {emitEvent: false});
+    }
+
+    /**
+     * Efface les informations du co-exposant publiées sur le site web (réseaux sociaux et image)
+     * quand sa publication est désactivée.
+     */
+    private clearSharedPublication(form: FormGroup<StandFormGroup>): void {
+        form.patchValue({
+                            sharedWebsite: null,
+                            sharedInstagram: null,
+                            sharedFacebook: null,
+                            sharedUrlPicture: null,
+                            sharedPictureUpload: null,
+                            removeSharedPicture: true
+                        }, {emitEvent: false});
     }
 
     /** Remet à zéro les informations du co-exposant quand le stand n'est plus partagé. */
@@ -126,6 +184,7 @@ export class StandFormService {
                             sharedDescription: null,
                             sharedCategory: null,
                             sharedSubCategories: [],
+                            sharedPublishedOnWebsite: true,
                             sharedWebsite: null,
                             sharedInstagram: null,
                             sharedFacebook: null,
@@ -139,7 +198,7 @@ export class StandFormService {
 
     private getDefaultStandFormValue(): Pick<IStand,
         'status' | 'nbTable' | 'nbChair' | 'subCategories' | 'needElectricity'
-        | 'shared' | 'sharedSubCategories'> {
+        | 'shared' | 'sharedSubCategories' | 'publishedOnWebsite' | 'sharedPublishedOnWebsite'> {
         return {
             status: Status.IN_VERIFICATION,
             nbTable: 0,
@@ -147,7 +206,9 @@ export class StandFormService {
             needElectricity: true,
             subCategories: [],
             shared: false,
-            sharedSubCategories: []
+            sharedSubCategories: [],
+            publishedOnWebsite: true,
+            sharedPublishedOnWebsite: true
         };
     }
 }

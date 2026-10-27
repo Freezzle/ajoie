@@ -364,12 +364,15 @@ public class PublicRegistrationService {
             stand.setSharedDescription(null);
             stand.setSharedCategory(null);
             stand.setSharedSubCategories(new LinkedHashSet<>());
+            stand.setSharedPublishedOnWebsite(true);
             stand.setSharedWebsite(null);
             stand.setSharedInstagram(null);
             stand.setSharedFacebook(null);
             stand.setSharedUrlPicture(null);
             return;
         }
+
+        boolean published = standDTO.isSharedPublishedOnWebsite();
 
         stand.setSharedFirstName(sub(standDTO.getSharedFirstName(), 100));
         stand.setSharedLastName(sub(standDTO.getSharedLastName(), 100));
@@ -380,11 +383,13 @@ public class PublicRegistrationService {
         stand.setSharedSubCategories(
                 standDTO.getSharedSubCategories() != null ? new LinkedHashSet<>(standDTO.getSharedSubCategories()) :
                         new LinkedHashSet<>());
-        stand.setSharedWebsite(sub(standDTO.getSharedWebsite(), 100));
-        stand.setSharedInstagram(sub(standDTO.getSharedInstagram(), 100));
-        stand.setSharedFacebook(sub(standDTO.getSharedFacebook(), 100));
+        stand.setSharedPublishedOnWebsite(published);
+        // Les réseaux sociaux ne sont conservés que si le co-exposant accepte d'être publié.
+        stand.setSharedWebsite(published ? sub(standDTO.getSharedWebsite(), 100) : null);
+        stand.setSharedInstagram(published ? sub(standDTO.getSharedInstagram(), 100) : null);
+        stand.setSharedFacebook(published ? sub(standDTO.getSharedFacebook(), 100) : null);
         // Le lien historique n'est plus saisissable publiquement : on conserve la valeur existante.
-        stand.setSharedUrlPicture(carryOver.sharedUrlPicture());
+        stand.setSharedUrlPicture(published ? carryOver.sharedUrlPicture() : null);
     }
 
     /**
@@ -450,6 +455,8 @@ public class PublicRegistrationService {
         dto.setNbChair(nullSafe(stand.getNbChair()));
         dto.setNeedElectricity(Boolean.TRUE.equals(stand.getNeedElectricity()));
         dto.setShared(Boolean.TRUE.equals(stand.getShared()));
+        dto.setPublishedOnWebsite(!Boolean.FALSE.equals(stand.getPublishedOnWebsite()));
+        dto.setSharedPublishedOnWebsite(!Boolean.FALSE.equals(stand.getSharedPublishedOnWebsite()));
         dto.setWebsite(stand.getWebsite());
         dto.setInstagram(stand.getInstagram());
         dto.setFacebook(stand.getFacebook());
@@ -578,20 +585,24 @@ public class PublicRegistrationService {
             stand.setNbChair(standDTO.getNbChair());
             stand.setNeedElectricity(standDTO.isNeedElectricity());
             stand.setShared(standDTO.isShared());
-            stand.setWebsite(sub(standDTO.getWebsite(), 100));
-            stand.setInstagram(sub(standDTO.getInstagram(), 100));
-            stand.setFacebook(sub(standDTO.getFacebook(), 100));
+            boolean published = standDTO.isPublishedOnWebsite();
+            stand.setPublishedOnWebsite(published);
+            // Les réseaux sociaux et l'image ne sont conservés que si l'exposant accepte d'être publié.
+            stand.setWebsite(published ? sub(standDTO.getWebsite(), 100) : null);
+            stand.setInstagram(published ? sub(standDTO.getInstagram(), 100) : null);
+            stand.setFacebook(published ? sub(standDTO.getFacebook(), 100) : null);
             // Le lien historique n'est plus saisissable publiquement : on conserve la valeur existante.
-            stand.setUrlPicture(carryOver.urlPicture());
+            stand.setUrlPicture(published ? carryOver.urlPicture() : null);
             applyCoExhibitor(stand, standDTO, carryOver);
             stand.setStatus(Status.IN_VERIFICATION);
             stand.setExtraInformation(null);
             stand = standRepository.save(stand);
 
-            applyStandPicture(stand, StandPictureType.MAIN, standDTO.getPictureUpload(), carryOver, true,
+            applyStandPicture(stand, StandPictureType.MAIN, standDTO.getPictureUpload(), carryOver, published,
                     "registration.stand-picture-required");
             applyStandPicture(stand, StandPictureType.SHARED, standDTO.getSharedPictureUpload(), carryOver,
-                    standDTO.isShared(), "registration.co-exhibitor-picture-required");
+                    standDTO.isShared() && standDTO.isSharedPublishedOnWebsite(),
+                    "registration.co-exhibitor-picture-required");
         }
 
         for (RegistrationTalkDTO talk : request.getConferences()) {

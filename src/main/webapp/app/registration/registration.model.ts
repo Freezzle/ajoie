@@ -88,6 +88,7 @@ export interface IRegistrationStand {
     nbChair: number;
     needElectricity: boolean;
     shared: boolean;
+    publishedOnWebsite: boolean;
     website: string | null;
     instagram: string | null;
     facebook: string | null;
@@ -98,6 +99,7 @@ export interface IRegistrationStand {
     sharedDescription: string | null;
     sharedCategory: Category | null;
     sharedSubCategories: string[];
+    sharedPublishedOnWebsite: boolean;
     sharedWebsite: string | null;
     sharedInstagram: string | null;
     sharedFacebook: string | null;

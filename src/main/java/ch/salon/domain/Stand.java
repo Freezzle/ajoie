@@ -43,6 +43,11 @@ public class Stand implements Serializable, TenantOwned {
     @Column(name = "description", nullable = false)
     private String description;
 
+    /** L'exposant accepte d'être publié sur le site web du salon (nom, description, réseaux, photo). */
+    @NotNull
+    @Column(name = "published_on_website", nullable = false)
+    private Boolean publishedOnWebsite = true;
+
     @Column(name = "website")
     private String website;
 
@@ -97,6 +102,11 @@ public class Stand implements Serializable, TenantOwned {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "shared_sub_categories", columnDefinition = "json")
     private Set<String> sharedSubCategories;
+
+    /** Le co-exposant accepte d'être publié sur le site web du salon. */
+    @NotNull
+    @Column(name = "shared_published_on_website", nullable = false)
+    private Boolean sharedPublishedOnWebsite = true;
 
     @Column(name = "shared_website")
     private String sharedWebsite;

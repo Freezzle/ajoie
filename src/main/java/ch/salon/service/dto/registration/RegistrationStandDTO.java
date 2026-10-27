@@ -42,6 +42,12 @@ public class RegistrationStandDTO implements Serializable {
 
     private boolean shared;
 
+    /** L'exposant accepte d'être publié sur le site web du salon. */
+    private boolean publishedOnWebsite = true;
+
+    /** Le co-exposant accepte d'être publié sur le site web du salon. */
+    private boolean sharedPublishedOnWebsite = true;
+
     @Size(max = 100)
     private String sharedFirstName;
 

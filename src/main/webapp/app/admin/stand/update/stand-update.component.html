@@ -102,32 +102,41 @@
         </div>
         <div appCardBody>
             <div class="row">
-                <div class="mt-4 col-lg-4">
-                    <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
-                </div>
-                <div class="mt-4 col-lg-4">
-                    <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
-                </div>
-                <div class="mt-4 col-12">
-                    <image-upload-box [existingPictureUrl]="picturePreviewUrl"
-                                      [requiredField]="true"
-                                      (existingRemoved)="onPictureRemoved()"
-                                      fieldName="pictureUpload"
-                                      formControlName="pictureUpload"
-                                      translateKey="stand.picture"/>
-                    @if (initialStand?.urlPicture) {
-                        <div class="mt-2">
-                            <span class="me-2">{{ 'stand.urlPicture' | translate }} :</span>
-                            <a [href]="initialStand!.urlPicture" rel="noopener noreferrer" target="_blank">
-                                {{ initialStand!.urlPicture }}
-                            </a>
-                        </div>
-                    }
+                <div class="col-12">
+                    <checkbox-box fieldName="publishedOnWebsite"
+                                  formControlName="publishedOnWebsite"
+                                  translateKey="stand.publishedOnWebsite"/>
                 </div>
             </div>
+            @if (editForm.controls.publishedOnWebsite.value) {
+                <div class="row">
+                    <div class="mt-4 col-lg-4">
+                        <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
+                    </div>
+                    <div class="mt-4 col-lg-4">
+                        <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
+                    </div>
+                    <div class="mt-4 col-12">
+                        <image-upload-box [existingPictureUrl]="picturePreviewUrl"
+                                          [requiredField]="true"
+                                          (existingRemoved)="onPictureRemoved()"
+                                          fieldName="pictureUpload"
+                                          formControlName="pictureUpload"
+                                          translateKey="stand.picture"/>
+                        @if (initialStand?.urlPicture) {
+                            <div class="mt-2">
+                                <span class="me-2">{{ 'stand.urlPicture' | translate }} :</span>
+                                <a [href]="initialStand!.urlPicture" rel="noopener noreferrer" target="_blank">
+                                    {{ initialStand!.urlPicture }}
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     </app-card>
 
@@ -179,37 +188,45 @@
                                    formControlName="sharedSubCategories"
                                    translateKey="stand.coExhibitor.subCategories"/>
                     </div>
-                    <div class="mt-4 col-lg-4">
-                        <text-box fieldName="sharedWebsite"
-                                  formControlName="sharedWebsite"
-                                  translateKey="stand.coExhibitor.website"/>
-                    </div>
-                    <div class="mt-4 col-lg-4">
-                        <text-box fieldName="sharedInstagram"
-                                  formControlName="sharedInstagram"
-                                  translateKey="stand.coExhibitor.instagram"/>
-                    </div>
-                    <div class="mt-4 col-lg-4">
-                        <text-box fieldName="sharedFacebook"
-                                  formControlName="sharedFacebook"
-                                  translateKey="stand.coExhibitor.facebook"/>
-                    </div>
                     <div class="mt-4 col-12">
-                        <image-upload-box [existingPictureUrl]="sharedPicturePreviewUrl"
-                                          [requiredField]="true"
-                                          (existingRemoved)="onSharedPictureRemoved()"
-                                          fieldName="sharedPictureUpload"
-                                          formControlName="sharedPictureUpload"
-                                          translateKey="stand.coExhibitor.picture"/>
-                        @if (initialStand?.sharedUrlPicture) {
-                            <div class="mt-2">
-                                <span class="me-2">{{ 'stand.coExhibitor.urlPicture' | translate }} :</span>
-                                <a [href]="initialStand!.sharedUrlPicture" rel="noopener noreferrer" target="_blank">
-                                    {{ initialStand!.sharedUrlPicture }}
-                                </a>
-                            </div>
-                        }
+                        <checkbox-box fieldName="sharedPublishedOnWebsite"
+                                      formControlName="sharedPublishedOnWebsite"
+                                      translateKey="stand.coExhibitor.publishedOnWebsite"/>
                     </div>
+                    @if (editForm.controls.sharedPublishedOnWebsite.value) {
+                        <div class="mt-4 col-lg-4">
+                            <text-box fieldName="sharedWebsite"
+                                      formControlName="sharedWebsite"
+                                      translateKey="stand.coExhibitor.website"/>
+                        </div>
+                        <div class="mt-4 col-lg-4">
+                            <text-box fieldName="sharedInstagram"
+                                      formControlName="sharedInstagram"
+                                      translateKey="stand.coExhibitor.instagram"/>
+                        </div>
+                        <div class="mt-4 col-lg-4">
+                            <text-box fieldName="sharedFacebook"
+                                      formControlName="sharedFacebook"
+                                      translateKey="stand.coExhibitor.facebook"/>
+                        </div>
+                        <div class="mt-4 col-12">
+                            <image-upload-box [existingPictureUrl]="sharedPicturePreviewUrl"
+                                              [requiredField]="true"
+                                              (existingRemoved)="onSharedPictureRemoved()"
+                                              fieldName="sharedPictureUpload"
+                                              formControlName="sharedPictureUpload"
+                                              translateKey="stand.coExhibitor.picture"/>
+                            @if (initialStand?.sharedUrlPicture) {
+                                <div class="mt-2">
+                                    <span class="me-2">{{ 'stand.coExhibitor.urlPicture' | translate }} :</span>
+                                    <a [href]="initialStand!.sharedUrlPicture" rel="noopener noreferrer"
+                                       target="_blank">
+                                        {{ initialStand!.sharedUrlPicture }}
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
         </app-card>

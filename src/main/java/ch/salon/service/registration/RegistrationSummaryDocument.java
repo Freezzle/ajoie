@@ -156,6 +156,7 @@ public class RegistrationSummaryDocument {
                 nullSafe(stand.getNbTable()),
                 nullSafe(stand.getNbChair()),
                 Boolean.TRUE.equals(stand.getNeedElectricity()),
+                !Boolean.FALSE.equals(stand.getPublishedOnWebsite()),
                 stand.getWebsite(), stand.getInstagram(), stand.getFacebook(),
                 Boolean.TRUE.equals(stand.getShared()),
                 StringUtils.trimToNull(StringUtils.trim(
@@ -166,6 +167,7 @@ public class RegistrationSummaryDocument {
                 stand.getSharedDescription(),
                 categoryLabel(stand.getSharedCategory(), locale),
                 joinSubCategories(stand.getSharedSubCategories()),
+                !Boolean.FALSE.equals(stand.getSharedPublishedOnWebsite()),
                 stand.getSharedWebsite(), stand.getSharedInstagram(), stand.getSharedFacebook());
     }
 
@@ -215,10 +217,11 @@ public class RegistrationSummaryDocument {
 
     /** Vue aplatie d'un stand, pour garder le template Thymeleaf lisible. */
     public record StandView(String dimension, String description, String category, String subCategories,
-                            long nbTable, long nbChair, boolean needElectricity,
+                            long nbTable, long nbChair, boolean needElectricity, boolean publishedOnWebsite,
                             String website, String instagram, String facebook,
                             boolean shared, String sharedName, String sharedTherapistName, String sharedEmail,
                             String sharedDescription, String sharedCategory, String sharedSubCategories,
+                            boolean sharedPublishedOnWebsite,
                             String sharedWebsite, String sharedInstagram, String sharedFacebook) {
     }
 }

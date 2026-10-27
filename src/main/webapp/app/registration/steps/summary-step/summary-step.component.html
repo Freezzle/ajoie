@@ -93,6 +93,10 @@
                     <dt>{{ 'stand.shared' | translate }}</dt>
                     <dd>{{ (standValue.shared ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
                 </div>
+                <div class="summary-row">
+                    <dt>{{ 'stand.publishedOnWebsite' | translate }}</dt>
+                    <dd>{{ (standValue.publishedOnWebsite ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
+                </div>
                 @if (standValue.website) {
                     <div class="summary-row">
                         <dt>{{ 'stand.website' | translate }}</dt>
@@ -160,6 +164,10 @@
                             <dd>{{ standValue.sharedSubCategories?.join(', ') }}</dd>
                         </div>
                     }
+                    <div class="summary-row">
+                        <dt>{{ 'stand.coExhibitor.publishedOnWebsite' | translate }}</dt>
+                        <dd>{{ (standValue.sharedPublishedOnWebsite ? 'registration.services.yes' : 'registration.services.no') | translate }}</dd>
+                    </div>
                     @if (standValue.sharedWebsite) {
                         <div class="summary-row">
                             <dt>{{ 'stand.coExhibitor.website' | translate }}</dt>

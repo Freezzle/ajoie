@@ -36,6 +36,7 @@ export type StandFormGroup = FormGroup<{
     nbChair: FormControl<number | null>;
     needElectricity: FormControl<boolean | null>;
     shared: FormControl<boolean | null>;
+    publishedOnWebsite: FormControl<boolean | null>;
     website: FormControl<string | null>;
     instagram: FormControl<string | null>;
     facebook: FormControl<string | null>;
@@ -46,6 +47,7 @@ export type StandFormGroup = FormGroup<{
     sharedDescription: FormControl<string | null>;
     sharedCategory: FormControl<Category | null>;
     sharedSubCategories: FormControl<string[] | null>;
+    sharedPublishedOnWebsite: FormControl<boolean | null>;
     sharedWebsite: FormControl<string | null>;
     sharedInstagram: FormControl<string | null>;
     sharedFacebook: FormControl<string | null>;
@@ -213,6 +215,7 @@ export class RegistrationFormService {
     createStandGroup(): StandFormGroup {
         const hasPicture = new FormControl(false, {nonNullable: true});
         const hasSharedPicture = new FormControl(false, {nonNullable: true});
+        const publishedOnWebsite = new FormControl<boolean | null>(true);
 
         return new FormGroup({
             description: new FormControl<string | null>(null, [Validators.required, Validators.maxLength(500)]),
@@ -223,6 +226,7 @@ export class RegistrationFormService {
             nbChair: new FormControl<number | null>(0, [Validators.min(0)]),
             needElectricity: new FormControl<boolean | null>(false),
             shared: new FormControl<boolean | null>(false),
+            publishedOnWebsite,
             website: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             instagram: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             facebook: new FormControl<string | null>(null, [Validators.maxLength(100)]),
@@ -233,11 +237,14 @@ export class RegistrationFormService {
             sharedDescription: new FormControl<string | null>(null, [Validators.maxLength(500)]),
             sharedCategory: new FormControl<Category | null>(null),
             sharedSubCategories: new FormControl<string[] | null>([]),
+            sharedPublishedOnWebsite: new FormControl<boolean | null>(true),
             sharedWebsite: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedInstagram: new FormControl<string | null>(null, [Validators.maxLength(100)]),
             sharedFacebook: new FormControl<string | null>(null, [Validators.maxLength(100)]),
+            // L'image n'est exigée que si l'exposant accepte d'être publié ; une image déjà
+            // enregistrée satisfait également l'obligation.
             pictureUpload: new FormControl<ProcessedImageUpload | null>(null,
-                [requiredPictureValidator(() => hasPicture.value)]),
+                [requiredPictureValidator(() => publishedOnWebsite.value === false || hasPicture.value)]),
             sharedPictureUpload: new FormControl<ProcessedImageUpload | null>(null),
             hasPicture,
             hasSharedPicture
@@ -339,6 +346,21 @@ export class RegistrationFormService {
             this.refreshCoExhibitorValidators(services.controls.stand, !!shared);
         });
 
+        services.controls.stand.controls.publishedOnWebsite.valueChanges.subscribe(published => {
+            if (!published) {
+                this.clearPublication(services.controls.stand);
+            }
+            services.controls.stand.controls.pictureUpload.updateValueAndValidity({emitEvent: false});
+        });
+
+        services.controls.stand.controls.sharedPublishedOnWebsite.valueChanges.subscribe(published => {
+            if (!published) {
+                this.clearSharedPublication(services.controls.stand);
+            }
+            this.refreshCoExhibitorValidators(services.controls.stand,
+                !!services.controls.stand.controls.shared.value);
+        });
+
         services.controls.wantConference.valueChanges.subscribe(want => {
             this.toggle(services.controls.conferences, !!want);
             if (want && services.controls.conferences.length === 0) {
@@ -396,6 +418,8 @@ export class RegistrationFormService {
                         nbChair: 0,
                         needElectricity: false,
                         shared: false,
+                        publishedOnWebsite: true,
+                        sharedPublishedOnWebsite: true,
                         website: null,
                         instagram: null,
                         facebook: null,
@@ -425,13 +449,47 @@ export class RegistrationFormService {
         });
 
         stand.controls.sharedPictureUpload.setValidators(
-            shared ? [requiredPictureValidator(() => stand.controls.hasSharedPicture.value)] : []);
+            shared && stand.controls.sharedPublishedOnWebsite.value !== false ?
+                [requiredPictureValidator(() => stand.controls.hasSharedPicture.value)] : []);
         stand.controls.sharedPictureUpload.updateValueAndValidity({emitEvent: false});
+    }
+
+    /**
+     * Efface les informations de l'exposant publiées sur le site web (réseaux sociaux et photo)
+     * lorsqu'il refuse la publication.
+     */
+    private clearPublication(stand: StandFormGroup): void {
+        this.clearControls([
+            stand.controls.website,
+            stand.controls.instagram,
+            stand.controls.facebook,
+            stand.controls.pictureUpload
+        ]);
+    }
+
+    /**
+     * Efface les informations du co-exposant publiées sur le site web (réseaux sociaux et photo)
+     * lorsqu'il refuse la publication.
+     */
+    private clearSharedPublication(stand: StandFormGroup): void {
+        this.clearControls([
+            stand.controls.sharedWebsite,
+            stand.controls.sharedInstagram,
+            stand.controls.sharedFacebook,
+            stand.controls.sharedPictureUpload
+        ]);
+    }
+
+    private clearControls(controls: AbstractControl[]): void {
+        controls.forEach(control => {
+            control.setValue(null, {emitEvent: false});
+            control.markAsUntouched();
+        });
     }
 
     /** Remet à zéro toutes les informations du co-exposant (stand plus partagé). */
     private clearCoExhibitor(stand: StandFormGroup): void {
-        const sharedControls = [
+        this.clearControls([
             stand.controls.sharedFirstName,
             stand.controls.sharedLastName,
             stand.controls.sharedTherapistName,
@@ -442,13 +500,9 @@ export class RegistrationFormService {
             stand.controls.sharedInstagram,
             stand.controls.sharedFacebook,
             stand.controls.sharedPictureUpload
-        ];
+        ]);
 
-        sharedControls.forEach(control => {
-            control.setValue(null, {emitEvent: false});
-            control.markAsUntouched();
-        });
-
+        stand.controls.sharedPublishedOnWebsite.setValue(true, {emitEvent: false});
         stand.controls.sharedSubCategories.setValue([], {emitEvent: false});
         stand.controls.sharedSubCategories.markAsUntouched();
         stand.controls.hasSharedPicture.setValue(false, {emitEvent: false});
@@ -486,6 +540,8 @@ export class RegistrationFormService {
         if (services.controls.wantStand.value) {
             const stand = services.controls.stand.getRawValue();
             const shared = !!stand.shared;
+            const published = stand.publishedOnWebsite !== false;
+            const sharedPublished = shared && stand.sharedPublishedOnWebsite !== false;
             stands.push({
                             description: stand.description ?? '',
                             dimensionId: stand.dimension?.id ?? null,
@@ -495,9 +551,10 @@ export class RegistrationFormService {
                             nbChair: stand.nbChair ?? 0,
                             needElectricity: !!stand.needElectricity,
                             shared,
-                            website: stand.website ?? null,
-                            instagram: stand.instagram ?? null,
-                            facebook: stand.facebook ?? null,
+                            publishedOnWebsite: published,
+                            website: published ? stand.website ?? null : null,
+                            instagram: published ? stand.instagram ?? null : null,
+                            facebook: published ? stand.facebook ?? null : null,
                             sharedFirstName: shared ? stand.sharedFirstName ?? null : null,
                             sharedLastName: shared ? stand.sharedLastName ?? null : null,
                             sharedTherapistName: shared ? stand.sharedTherapistName ?? null : null,
@@ -505,11 +562,12 @@ export class RegistrationFormService {
                             sharedDescription: shared ? stand.sharedDescription ?? null : null,
                             sharedCategory: shared ? stand.sharedCategory ?? null : null,
                             sharedSubCategories: shared ? stand.sharedSubCategories ?? [] : [],
-                            sharedWebsite: shared ? stand.sharedWebsite ?? null : null,
-                            sharedInstagram: shared ? stand.sharedInstagram ?? null : null,
-                            sharedFacebook: shared ? stand.sharedFacebook ?? null : null,
-                            pictureUpload: toImagePayload(stand.pictureUpload),
-                            sharedPictureUpload: shared ? toImagePayload(stand.sharedPictureUpload) : null
+                            sharedPublishedOnWebsite: shared ? stand.sharedPublishedOnWebsite !== false : true,
+                            sharedWebsite: sharedPublished ? stand.sharedWebsite ?? null : null,
+                            sharedInstagram: sharedPublished ? stand.sharedInstagram ?? null : null,
+                            sharedFacebook: sharedPublished ? stand.sharedFacebook ?? null : null,
+                            pictureUpload: published ? toImagePayload(stand.pictureUpload) : null,
+                            sharedPictureUpload: sharedPublished ? toImagePayload(stand.sharedPictureUpload) : null
                         });
         }
 
@@ -604,6 +662,7 @@ export class RegistrationFormService {
                                                    nbChair: stand.nbChair,
                                                    needElectricity: stand.needElectricity,
                                                    shared: stand.shared,
+                                                   publishedOnWebsite: stand.publishedOnWebsite !== false,
                                                    website: stand.website,
                                                    instagram: stand.instagram,
                                                    facebook: stand.facebook,
@@ -614,6 +673,8 @@ export class RegistrationFormService {
                                                    sharedDescription: stand.sharedDescription,
                                                    sharedCategory: stand.sharedCategory,
                                                    sharedSubCategories: stand.sharedSubCategories ?? [],
+                                                   sharedPublishedOnWebsite:
+                                                       stand.sharedPublishedOnWebsite !== false,
                                                    sharedWebsite: stand.sharedWebsite,
                                                    sharedInstagram: stand.sharedInstagram,
                                                    sharedFacebook: stand.sharedFacebook,

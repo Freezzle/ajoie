@@ -1,7 +1,7 @@
 {
   "stand": {
     "card": {
-      "socialNetwork": "Réseau sociaux",
+      "socialNetwork": "Canaux de communication",
       "coExhibitor": "Co-exposant"
     },
     "coExhibitor": {
@@ -14,6 +14,7 @@
       "instagram": "Instagram du co-exposant",
       "lastName": "Nom du co-exposant",
       "picture": "Image du co-exposant",
+      "publishedOnWebsite": "Publication sur les supports marketing ?",
       "subCategories": "Mots-clés",
       "therapistName": "Nom de thérapeute du co-exposant",
       "urlPicture": "Url de l'image du co-exposant",
@@ -47,6 +48,7 @@
     "notFound": "Aucun stand",
     "participation": "Participation",
     "position": "Position",
+    "publishedOnWebsite": "Publication sur les supports marketing ?",
     "shared": "Stand partagé ?",
     "status": {
       "label": "Statut",

@@ -39,4 +39,6 @@
              relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-invoicing-plan-reminder-due-date.xml"
              relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-stand-published.xml"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

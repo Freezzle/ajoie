@@ -64,24 +64,37 @@
 
             <h3 class="registration-subtitle">{{ 'stand.card.socialNetwork' | translate }}</h3>
             <div class="row">
-                <div class="mt-4 col-12 col-lg-4">
-                    <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
-                </div>
-                <div class="mt-4 col-12 col-lg-4">
-                    <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
-                </div>
-                <div class="mt-4 col-12 col-lg-4">
-                    <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
-                </div>
                 <div class="mt-4 col-12">
-                    <image-upload-box [hasExistingPicture]="form.controls.stand.controls.hasPicture.value"
-                                      [requiredField]="true"
-                                      (existingRemoved)="onPictureRemoved()"
-                                      fieldName="pictureUpload"
-                                      formControlName="pictureUpload"
-                                      translateKey="registration.services.standPicture"/>
+                    <checkbox-box [infoKey]="'registration.services.publishedOnWebsiteHint'"
+                                  fieldName="publishedOnWebsite"
+                                  formControlName="publishedOnWebsite"
+                                  translateKey="registration.services.publishedOnWebsiteQuestion"/>
                 </div>
             </div>
+            @if (form.controls.stand.controls.publishedOnWebsite.value) {
+                <div class="registration-reveal">
+                    <div class="row">
+                        <div class="mt-4 col-12 col-lg-4">
+                            <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-4">
+                            <text-box fieldName="instagram" formControlName="instagram"
+                                      translateKey="stand.instagram"/>
+                        </div>
+                        <div class="mt-4 col-12 col-lg-4">
+                            <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
+                        </div>
+                        <div class="mt-4 col-12">
+                            <image-upload-box [hasExistingPicture]="form.controls.stand.controls.hasPicture.value"
+                                              [requiredField]="true"
+                                              (existingRemoved)="onPictureRemoved()"
+                                              fieldName="pictureUpload"
+                                              formControlName="pictureUpload"
+                                              translateKey="registration.services.standPicture"/>
+                        </div>
+                    </div>
+                </div>
+            }
 
             <h3 class="registration-subtitle">{{ 'registration.services.coExhibitorTitle' | translate }}</h3>
             <p class="registration-help">{{ 'registration.services.coExhibitorHelp' | translate }}</p>
@@ -140,29 +153,38 @@
                                        infoKey="registration.services.subCategoriesInfo"
                                        translateKey="stand.coExhibitor.subCategories"/>
                         </div>
-                        <div class="mt-4 col-12 col-lg-4">
-                            <text-box fieldName="sharedWebsite"
-                                      formControlName="sharedWebsite"
-                                      translateKey="stand.website"/>
-                        </div>
-                        <div class="mt-4 col-12 col-lg-4">
-                            <text-box fieldName="sharedInstagram"
-                                      formControlName="sharedInstagram"
-                                      translateKey="stand.instagram"/>
-                        </div>
-                        <div class="mt-4 col-12 col-lg-4">
-                            <text-box fieldName="sharedFacebook"
-                                      formControlName="sharedFacebook"
-                                      translateKey="stand.facebook"/>
-                        </div>
                         <div class="mt-4 col-12">
-                            <image-upload-box [hasExistingPicture]="form.controls.stand.controls.hasSharedPicture.value"
-                                              [requiredField]="true"
-                                              (existingRemoved)="onSharedPictureRemoved()"
-                                              fieldName="sharedPictureUpload"
-                                              formControlName="sharedPictureUpload"
-                                              translateKey="registration.services.coExhibitorPicture"/>
+                            <checkbox-box [infoKey]="'registration.services.coExhibitorPublishedOnWebsiteHint'"
+                                          fieldName="sharedPublishedOnWebsite"
+                                          formControlName="sharedPublishedOnWebsite"
+                                          translateKey="registration.services.coExhibitorPublishedOnWebsiteQuestion"/>
                         </div>
+                        @if (form.controls.stand.controls.sharedPublishedOnWebsite.value) {
+                            <div class="mt-4 col-12 col-lg-4">
+                                <text-box fieldName="sharedWebsite"
+                                          formControlName="sharedWebsite"
+                                          translateKey="stand.website"/>
+                            </div>
+                            <div class="mt-4 col-12 col-lg-4">
+                                <text-box fieldName="sharedInstagram"
+                                          formControlName="sharedInstagram"
+                                          translateKey="stand.instagram"/>
+                            </div>
+                            <div class="mt-4 col-12 col-lg-4">
+                                <text-box fieldName="sharedFacebook"
+                                          formControlName="sharedFacebook"
+                                          translateKey="stand.facebook"/>
+                            </div>
+                            <div class="mt-4 col-12">
+                                <image-upload-box
+                                        [hasExistingPicture]="form.controls.stand.controls.hasSharedPicture.value"
+                                        [requiredField]="true"
+                                        (existingRemoved)="onSharedPictureRemoved()"
+                                        fieldName="sharedPictureUpload"
+                                        formControlName="sharedPictureUpload"
+                                        translateKey="registration.services.coExhibitorPicture"/>
+                            </div>
+                        }
                     </div>
                 </div>
             }

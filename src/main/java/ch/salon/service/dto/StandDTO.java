@@ -16,6 +16,7 @@ public class StandDTO implements Serializable {
 
     private UUID id;
     private String description;
+    private Boolean publishedOnWebsite = true;
     private String website;
     private String instagram;
     private String facebook;
@@ -31,6 +32,7 @@ public class StandDTO implements Serializable {
     private String sharedDescription;
     private Category sharedCategory;
     private Set<String> sharedSubCategories = new HashSet<>();
+    private Boolean sharedPublishedOnWebsite = true;
     private String sharedWebsite;
     private String sharedInstagram;
     private String sharedFacebook;

@@ -156,7 +156,14 @@
             <span th:unless="${stand.shared()}" th:utext="#{document.registration-summary.no}"></span>
           </td>
         </tr>
-        <tr th:if="${stand.website() != null or stand.instagram() != null or stand.facebook() != null}">
+        <tr>
+          <td class="field-label" th:utext="#{document.registration-summary.stand.published}"></td>
+          <td class="field-value">
+            <span th:if="${stand.publishedOnWebsite()}" th:utext="#{document.registration-summary.yes}"></span>
+            <span th:unless="${stand.publishedOnWebsite()}" th:utext="#{document.registration-summary.no}"></span>
+          </td>
+        </tr>
+        <tr th:if="${stand.publishedOnWebsite() and (stand.website() != null or stand.instagram() != null or stand.facebook() != null)}">
           <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
           <td class="field-value">
             <span th:if="${stand.website()}">[[${stand.website()}]]<br /></span>
@@ -197,7 +204,14 @@
                       - [[${stand.sharedSubCategories()}]]</span>
           </td>
         </tr>
-        <tr th:if="${stand.sharedWebsite() != null or stand.sharedInstagram() != null or stand.sharedFacebook() != null}">
+        <tr>
+          <td class="field-label" th:utext="#{document.registration-summary.stand.published}"></td>
+          <td class="field-value">
+            <span th:if="${stand.sharedPublishedOnWebsite()}" th:utext="#{document.registration-summary.yes}"></span>
+            <span th:unless="${stand.sharedPublishedOnWebsite()}" th:utext="#{document.registration-summary.no}"></span>
+          </td>
+        </tr>
+        <tr th:if="${stand.sharedPublishedOnWebsite() and (stand.sharedWebsite() != null or stand.sharedInstagram() != null or stand.sharedFacebook() != null)}">
           <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
           <td class="field-value">
             <span th:if="${stand.sharedWebsite()}">[[${stand.sharedWebsite()}]]<br /></span>
