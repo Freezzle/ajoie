@@ -250,6 +250,8 @@ DONE:        '<circle cx="10" cy="10" r="8.5" fill="currentColor"/><path d="M6.3
   min-height: 40px;
   padding: 5px 8px;
   border-radius: 8px;
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface);
   &:hover { background: var(--app-surface-muted); }
   & + & { box-shadow: 0 -1px 0 var(--app-line); }  // filet entre lignes, pas de cadre
 }
