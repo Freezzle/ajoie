@@ -1,288 +1,233 @@
-import {Component, EventEmitter, inject, Input, OnInit, Output, signal} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    inject,
+    input,
+    model,
+    output,
+    signal
+} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import {ISubtaskInstance, ITaskInstance} from '../model/task-instance.interface';
-import {TaskInstanceService} from '../service/task-instance.service';
-import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {TranslateService} from '@ngx-translate/core';
+import {filter, switchMap} from 'rxjs';
+
+import SharedModule from '../../../shared/shared.module';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
+import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
-import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
-import {SubtaskRowComponent} from './subtask-row.component';
+import {EntityActionsMenuComponent} from '../../../shared/components/entity-list/entity-actions-menu.component';
+import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
+import {EntityHighlightComponent} from '../../../shared/components/entity-list/entity-highlight.component';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {TimeSincePipe} from '../../../shared/pipe/time-since.pipe';
-import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
-import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
-import {Tag} from 'primeng/tag';
-import {TaskFilter} from '../list/task-focus-list.component';
 import {AccountService} from '../../../core/auth/account.service';
+import {ISubtaskInstance, ITaskInstance} from '../model/task-instance.interface';
+import {TaskInstanceService} from '../service/task-instance.service';
+import {SubtaskLineComponent} from './subtask-line.component';
+import {DueLabelComponent} from '../shared/due-label.component';
+import {
+    countSubtasks,
+    isActive,
+    isLate,
+    sortedSubtasks,
+    statusColorOf,
+    urgency
+} from '../shared/task-urgency.utils';
 
+/** Segment de la barre de progression d'une carte : une sous-tâche. */
+interface Segment {
+    id: string;
+    color: string;
+    hint: string;
+}
+
+/**
+ * Carte d'une tâche : en-tête repliable, barre segmentée, rouage d'actions et,
+ * une fois dépliée, les lignes de sous-tâches et l'ajout rapide.
+ */
 @Component({
-    selector: 'app-task-card',
-    templateUrl: './task-card.component.html',
-    styleUrls: ['./task-card.component.scss'],
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        TranslatePipe,
-        MenuBoxComponent,
-        ButtonBoxComponent,
-        TextBoxComponent,
-        TextareaBoxComponent,
-        SubtaskRowComponent,
-        TimeSincePipe,
-        DialogBoxComponent,
-        SubtaskInstanceFormComponent,
-        Tag
-    ]
-})
-export class TaskCardComponent implements OnInit {
-    @Input() task!: ITaskInstance;
-    @Input() activeFilter: TaskFilter = 'active';
-    @Input() salonStartingDate: Date | null = null;
-    @Output() statusChanged = new EventEmitter<void>();
-    @Output() editRequested = new EventEmitter<void>();
+               selector: 'app-task-card',
+               imports: [
+                   SharedModule,
+                   FormsModule,
+                   ReactiveFormsModule,
+                   DialogBoxComponent,
+                   TextBoxComponent,
+                   TextareaBoxComponent,
+                   EntityActionsMenuComponent,
+                   EntityHighlightComponent,
+                   TimeSincePipe,
+                   SubtaskLineComponent,
+                   DueLabelComponent
+               ],
+               templateUrl: './task-card.component.html',
+               styleUrl: './task-card.component.scss',
+               changeDetection: ChangeDetectionStrategy.OnPush
+           })
+export class TaskCardComponent {
+    readonly task = input.required<ITaskInstance>();
+    readonly known = input<string[]>([]);
+    readonly query = input<string>('');
+    /** Actions métier serveur, ajoutées après un séparateur. */
+    readonly extraActions = input<EntityAction[]>([]);
 
-    protected taskInstanceService = inject(TaskInstanceService);
-    private accountService = inject(AccountService);
-    private translateService = inject(TranslateService);
+    readonly expanded = model<boolean>(false);
 
-    showSubtasks = false;
-    showComments = false;
+    readonly changed = output<void>();
+    readonly editRequested = output<ITaskInstance>();
+    readonly subtaskAddRequested = output<ITaskInstance>();
+    readonly subtaskEditRequested = output<ISubtaskInstance>();
+    readonly seeInList = output<ITaskInstance>();
 
-    // Édition inline du responsable
-    editingResponsible = false;
-    editResponsibleValue = '';
+    private readonly taskInstanceService = inject(TaskInstanceService);
+    private readonly translateService = inject(TranslateService);
+    private readonly confirmDialogService = inject(ConfirmDialogService);
+    private readonly accountService = inject(AccountService);
 
-    // Dialog sous-tâche (ajout / édition)
-    showSubtaskDialog = signal(false);
-    editingSubtask: ISubtaskInstance | null = null;
+    readonly showDone = signal<boolean>(false);
+    readonly showComments = signal<boolean>(false);
+    readonly showCommentDialog = signal<boolean>(false);
 
-    // Dialog commentaire
-    showCommentDialog = signal(false);
-    commentForm!: FormGroup;
+    readonly commentForm = new FormGroup({
+                                             authorName: new FormControl('', [Validators.required]),
+                                             body: new FormControl('', [Validators.required])
+                                         });
 
-    ngOnInit(): void {
-        this.commentForm = new FormGroup({
-            authorName: new FormControl('', [Validators.required]),
-            body: new FormControl('', [Validators.required]),
-        });
-    }
+    readonly subtasks = computed(() => sortedSubtasks(this.task()));
 
-    /** Au moins une sous-tâche est IN_PROGRESS */
-    get hasInProgressSubtask(): boolean {
-        return (this.task.subtasks ?? []).some(s => s.status === 'IN_PROGRESS');
-    }
+    readonly activeSubtasks = computed(() => this.subtasks().filter(isActive));
 
-    /** Au moins une sous-tâche est BLOCKED */
-    get hasBlockedSubtask(): boolean {
-        return (this.task.subtasks ?? []).some(s => s.status === 'BLOCKED');
-    }
+    readonly doneSubtasks = computed(() => this.subtasks().filter(subtask => !isActive(subtask)));
 
-    get doneSubtaskCount(): number {
-        return (this.task.subtasks ?? []).filter(s => s.status === 'DONE').length;
-    }
+    readonly counts = computed(() => countSubtasks(this.subtasks()));
 
-    /** Sous-tâches filtrées selon le filtre actif, puis triées par dueDate (nulls en dernier) puis sortOrder */
-    get sortedSubtasks() {
-        const today = new Date().toISOString().split('T')[0];
-        let subtasks = [...(this.task.subtasks ?? [])];
-        const isSnoozed = (s: ISubtaskInstance) => !!s.snoozedUntil && s.snoozedUntil >= today;
+    readonly hasLate = computed(() => this.counts().late > 0);
 
-        switch (this.activeFilter) {
-            case 'active':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED');
-                break;
-            case 'late':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && !!s.dueDate && s.dueDate < today && !isSnoozed(s));
-                break;
-            case 'today':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && s.dueDate === today && !isSnoozed(s));
-                break;
-            case 'in_progress':
-                subtasks = subtasks.filter(s => s.status === 'IN_PROGRESS');
-                break;
-            case 'done':
-                subtasks = subtasks.filter(s => s.status === 'DONE');
-                break;
-            case 'snoozed':
-                subtasks = subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED' && isSnoozed(s));
-                break;
-        }
+    /** Prochaine sous-tâche active, affichée quand la carte est repliée. */
+    readonly next = computed<ISubtaskInstance | null>(() => this.activeSubtasks()[0] ?? null);
 
-        return subtasks.sort((a, b) => {
-            if (!a.dueDate && !b.dueDate) return a.sortOrder - b.sortOrder;
-            if (!a.dueDate) return 1;
-            if (!b.dueDate) return -1;
-            const cmp = a.dueDate.localeCompare(b.dueDate);
-            return cmp !== 0 ? cmp : a.sortOrder - b.sortOrder;
-        });
-    }
+    readonly comments = computed(() => [...(this.task().comments ?? [])]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
 
-    /** Commentaires triés du plus récent au plus ancien */
-    get sortedComments() {
-        return [...(this.task.comments ?? [])].sort((a, b) =>
-            b.createdAt.localeCompare(a.createdAt)
-        );
-    }
+    readonly segments = computed<Segment[]>(() => this.subtasks().map(subtask => ({
+        id: subtask.id,
+        color: this.segmentColor(subtask),
+        hint: `${subtask.title} · ${this.text(`task.status.${subtask.status}`)}`
+    })));
 
-    get dueDateStatus(): 'late' | 'soon' | 'today' | 'ok' | null {
-        const dueDate = this.task.dueDate;
-        if (!dueDate) return null;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const due = new Date(dueDate + 'T00:00:00');
-        const diffDays = Math.round((due.getTime() - today.getTime()) / 86_400_000);
-        if (diffDays < 0) return 'late';
-        if (diffDays === 0) return 'today';
-        if (diffDays <= 7) return 'soon';
-        return 'ok';
-    }
+    readonly actions = computed<EntityAction[]>(() => {
+        const commentCount = this.comments().length;
+        const extra = this.extraActions();
 
-    get accentClass(): string {
-        switch (this.dueDateStatus) {
-            case 'late':  return 'tc--late';
-            case 'today': return 'tc--today';
-            case 'soon':  return 'tc--soon';
-            default:      return 'tc--neutral';
-        }
-    }
-
-    get menuItems(): AppMenuItem[] {
-        const commentCount = (this.task.comments ?? []).length;
-        return [
+        const base: EntityAction[] = [
             {
-                label: this.translateService.instant('task.menu.editTask') as string,
+                labelKey: 'task.menu.editTask',
                 icon: 'pi pi-pencil',
-                command: () => this.editRequested.emit()
+                run: () => this.editRequested.emit(this.task())
             },
-            {separator: true},
             {
-                label: this.translateService.instant('task.menu.addSubtask') as string,
+                labelKey: 'task.menu.addSubtask',
                 icon: 'pi pi-plus',
-                command: () => this.openAddSubtaskDialog()
+                separatorBefore: true,
+                run: () => this.subtaskAddRequested.emit(this.task())
             },
             {
-                label: this.translateService.instant('task.menu.addComment') as string,
+                labelKey: 'task.menu.addComment',
                 icon: 'pi pi-comment',
-                command: () => {
-                    this.commentForm.patchValue({authorName: this.accountService.trackCurrentAccount()()?.login ?? ''});
-                    this.showCommentDialog.set(true);
-                }
+                run: () => this.openCommentDialog()
             },
             {
-                label: commentCount > 0
-                    ? this.translateService.instant('task.menu.commentsWithCount', {count: commentCount}) as string
-                    : this.translateService.instant('task.menu.comments') as string,
+                labelKey: commentCount > 0 ? 'task.menu.commentsWithCount' : 'task.menu.comments',
+                labelParams: {count: commentCount},
                 icon: 'pi pi-inbox',
                 disabled: commentCount === 0,
-                command: () => { this.showComments = !this.showComments; }
+                run: () => this.toggleComments()
             },
-            {separator: true},
             {
-                label: this.translateService.instant('task.menu.deleteTask') as string,
+                labelKey: 'task.menu.deleteTask',
                 icon: 'pi pi-trash',
-                styleClass: 'danger-item',
-                command: () => this.deleteTask()
+                danger: true,
+                separatorBefore: true,
+                run: target => this.deleteTask(target)
             }
         ];
-    }
 
-    /** Appelé quand une sous-tâche change de statut. */
-    onSubtaskChanged(subtaskId: string, newStatus: string): void {
-        const subtask = (this.task.subtasks ?? []).find(s => s.id === subtaskId);
-        if (subtask) subtask.status = newStatus as any;
-        this.statusChanged.emit();
-    }
+        return extra.length > 0
+               ? [...base, ...extra.map((action, index) => index === 0 ? {...action, separatorBefore: true} : action)]
+               : base;
+    });
 
-    // ── Dialog sous-tâche ───────────────────────────────────────────────────
-    openAddSubtaskDialog(): void {
-        this.editingSubtask = null;
-        this.showSubtaskDialog.set(true);
-    }
-
-    openEditSubtaskDialog(subtask: ISubtaskInstance): void {
-        this.editingSubtask = subtask;
-        this.showSubtaskDialog.set(true);
-    }
-
-    onSubtaskDialogConfirm(draft: any): void {
-        if (!draft) return;
-        if (this.editingSubtask) {
-            // Mode édition → PATCH : utilise la réponse pour mettre à jour localement
-            this.taskInstanceService.patchSubtask(this.editingSubtask.id, draft)
-                .subscribe(updated => {
-                    // Mise à jour locale immédiate dans le tableau des sous-tâches
-                    const idx = this.task.subtasks.findIndex(s => s.id === updated.id);
-                    if (idx !== -1) {
-                        this.task.subtasks = [
-                            ...this.task.subtasks.slice(0, idx),
-                            updated,
-                            ...this.task.subtasks.slice(idx + 1)
-                        ];
-                    }
-                    this.editingSubtask = null;
-                    this.statusChanged.emit();
-                });
-        } else {
-            // Mode création → POST
-            this.taskInstanceService.addSubtask(this.task.id, draft)
-                .subscribe(created => {
-                    // Ajout local immédiat
-                    this.task.subtasks = [...this.task.subtasks, created];
-                    this.showSubtasks = true;
-                    this.statusChanged.emit();
-                });
+    toggle(event: Event): void {
+        // Le rouage et son menu ne doivent pas plier la carte.
+        if ((event.target as HTMLElement).closest('entity-actions-menu')) {
+            return;
         }
+
+        this.expanded.set(!this.expanded());
     }
 
-    onSubtaskDialogCancel(): void {
-        this.editingSubtask = null;
+    toggleDone(): void {
+        this.showDone.set(!this.showDone());
     }
 
-    deleteTask(): void {
-        if (!confirm(this.translateService.instant('task.menu.deleteConfirm') as string)) return;
-        this.taskInstanceService.delete(this.task.id)
-            .subscribe(() => this.statusChanged.emit());
+    toggleComments(): void {
+        this.expanded.set(true);
+        this.showComments.set(!this.showComments());
     }
+
     addComment(): void {
-        if (this.commentForm.invalid) return;
+        if (this.commentForm.invalid) {
+            return;
+        }
+
         const raw = this.commentForm.getRawValue();
-        this.taskInstanceService.addComment(this.task.id, {
-            authorName: raw.authorName.trim(),
-            body: raw.body.trim()
-        }).subscribe(newComment => {
+
+        this.taskInstanceService.addComment(this.task().id, {
+            authorName: (raw.authorName ?? '').trim(),
+            body: (raw.body ?? '').trim()
+        }).subscribe(() => {
             this.commentForm.reset();
             this.showCommentDialog.set(false);
-            // Ajouter le commentaire localement sans rechargement complet
-            if (!this.task.comments) this.task.comments = [];
-            this.task.comments = [newComment, ...this.task.comments];
-            this.showComments = true;
+            this.showComments.set(true);
+            this.changed.emit();
         });
     }
 
     deleteComment(commentId: string): void {
-        this.taskInstanceService.deleteComment(commentId).subscribe(() => {
-            this.task.comments = this.task.comments.filter(c => c.id !== commentId);
-        });
+        this.taskInstanceService.deleteComment(commentId).subscribe(() => this.changed.emit());
     }
 
-    saveResponsible(): void {
-        this.taskInstanceService.patch(this.task.id, {responsible: this.editResponsibleValue.trim() || null})
-            .subscribe(updated => {
-                this.task.responsible = updated.responsible;
-                this.editingResponsible = false;
-                this.statusChanged.emit();
-            });
+    openCommentDialog(): void {
+        this.commentForm.patchValue({authorName: this.accountService.trackCurrentAccount()()?.login ?? ''});
+        this.showCommentDialog.set(true);
     }
 
-    cancelResponsible(): void {
-        this.editingResponsible = false;
+    private deleteTask(target: HTMLElement): void {
+        this.confirmDialogService.confirmAction(target, 'task.menu.deleteConfirm')
+            .pipe(
+                filter(confirmed => confirmed),
+                switchMap(() => this.taskInstanceService.delete(this.task().id))
+            )
+            .subscribe(() => this.changed.emit());
     }
 
+    private segmentColor(subtask: ISubtaskInstance): string {
+        if (subtask.status === 'CANCELLED') {
+            return 'var(--app-border)';
+        }
+        if (subtask.status !== 'PENDING') {
+            return statusColorOf(subtask.status);
+        }
+        if (isLate(subtask)) {
+            return 'var(--app-danger)';
+        }
 
-    toggleComments(): void {
-        this.showComments = !this.showComments;
+        return urgency(subtask) === 'TODAY' ? 'var(--app-warning)' : 'var(--app-border)';
+    }
+
+    private text(key: string, params?: object): string {
+        return this.translateService.instant(key, params) as string;
     }
 }

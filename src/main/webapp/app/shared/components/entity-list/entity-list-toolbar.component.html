@@ -11,11 +11,14 @@
                    type="text"/>
         </p-iconfield>
 
-        <entity-group-sort-menu [(groupBy)]="groupBy"
-                                [(sort)]="sort"
-                                [groupOptions]="groupOptions()"
-                                [isDefault]="isDefault()"
-                                [sortOptions]="sortOptions()"/>
+        @if (showGroupSort()) {
+            <entity-group-sort-menu [(groupBy)]="groupBy"
+                                    [(sort)]="sort"
+                                    [groupOptions]="groupOptions()"
+                                    [isDefault]="isDefault()"
+                                    [sortOptions]="sortOptions()"/>
+        }
+      <ng-content select="[toolbarEnd]"></ng-content>
     </div>
 
     @if (visibleGroups().length > 0) {
@@ -37,7 +40,7 @@
                         } @else if (chip.icon) {
                             <fa-icon [icon]="chip.icon"></fa-icon>
                         }
-                        {{ chip.labelKey | translate }}
+                        {{ chip.rawLabel ? chip.labelKey : (chip.labelKey | translate) }}
                         <small>{{ chip.count }}</small>
                     </button>
                 }

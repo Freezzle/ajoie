@@ -1,48 +1,161 @@
-// Pills de filtre (conservées car pas d'équivalent Bootstrap exact) ────────
-.tfl-filter-pill {
-    display: inline-flex;
+/* Bandeau compact d'en-tête : échéance du salon, progression et alerte de dates. */
+.tfl-banner {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 5px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    border: 1.5px solid var(--app-border);
-    background: var(--app-surface);
+    gap: 6px 12px;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--app-surface-muted);
     font-size: var(--app-fs-sm);
-    font-weight: 500;
     color: var(--app-text);
-    cursor: pointer;
-    transition: all 0.12s;
-
-    i { font-size: var(--app-fs-xs); }
-
-    &:hover { border-color: var(--app-secondary); color: var(--app-contrast); }
-
-    &.active {
-        background: var(--app-primary);
-        border-color: var(--app-primary);
-        color: var(--app-surface);
-
-        .tfl-filter-count { background: rgba(255,255,255,0.25); color: var(--app-surface); }
-    }
-
-    &--late.active     { background: var(--app-danger);    border-color: var(--app-danger); }
-    &--today.active    { background: var(--app-warning);   border-color: var(--app-warning); }
-    &--progress.active { background: var(--app-primary);   border-color: var(--app-primary); }
-    &--done.active     { background: var(--app-sucess);    border-color: var(--app-sucess); }
-    &--snooze.active   { background: var(--app-secondary); border-color: var(--app-secondary); }
-    &--active.active   { background: var(--app-primary);   border-color: var(--app-primary); }
 }
 
-.tfl-filter-count {
+.tfl-banner-date {
+    flex: none;
+    white-space: nowrap;
+}
+
+.tfl-progress {
+    display: flex;
+    flex: 1 1 160px;
+    gap: 2px;
+    min-width: 120px;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+
+    i {
+        display: block;
+        min-width: 0;
+    }
+}
+
+.tfl-banner-count {
+    flex: none;
+    font-size: var(--app-fs-xs);
+    font-weight: 600;
+    color: var(--app-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.tfl-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+
+    > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--tfl-color);
+    }
+}
+
+.tfl-desync {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    height: 16px;
-    padding: 0 4px;
-    border-radius: 20px;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--app-warn-soft);
+    color: var(--app-warn);
     font-size: var(--app-fs-xs);
+    font-weight: 600;
+}
+
+/* Bascule Tâches / Sous-tâches, placée en tête de la barre d'outils. */
+.tfl-views {
+    display: inline-flex;
+    flex: none;
+    gap: 2px;
+    height: 42px;
+    padding: 3px;
+    border-radius: 10px;
+    background: var(--app-surface-muted);
+
+    button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        background: none;
+        color: var(--app-text-muted);
+        font-size: var(--app-fs-md);
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    button[aria-pressed='true'] {
+        background: var(--app-surface);
+        color: var(--app-text);
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+    }
+
+    small {
+        font-size: var(--app-fs-xs);
+        opacity: .75;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.tfl-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Mise en avant brève de la carte atteinte depuis la vue Sous-tâches. */
+.tfl-flash {
+    animation: tfl-flash 1.2s ease-out;
+    border-radius: 12px;
+}
+
+@keyframes tfl-flash {
+    0%, 60% {
+        box-shadow: 0 0 0 3px var(--app-primary-soft), 0 0 0 1px var(--app-primary);
+    }
+    100% {
+        box-shadow: none;
+    }
+}
+
+.tfl-undo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tfl-undo-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
     font-weight: 700;
-    background: color-mix(in srgb, var(--app-secondary) 15%, var(--app-surface));
-    color: var(--app-text);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@container el (max-width: 600px) {
+    .tfl-views {
+        flex: 1 1 100%;
+        order: -1;
+
+        button {
+            flex: 1;
+        }
+    }
 }

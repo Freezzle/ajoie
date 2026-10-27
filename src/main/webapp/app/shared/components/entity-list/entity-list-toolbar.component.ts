@@ -33,6 +33,9 @@ export class EntityListToolbarComponent {
     readonly chipGroups = input<FilterChipGroup[]>([]);
     readonly activeChips = model<string[]>([]);
 
+    /** Masque le bouton « Grouper et trier » sur les écrans dont l'ordre est imposé. */
+    readonly showGroupSort = input<boolean>(true);
+
     readonly visibleGroups = computed(() => this.chipGroups()
                                                 .map(group => ({
                                                     ...group,

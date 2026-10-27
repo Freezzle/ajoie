@@ -17,7 +17,9 @@ export interface SortOption {
 /** Puce de filtre de la barre d'outils. */
 export interface FilterChip {
     key: string;
+    /** Clé de traduction du libellé, ou libellé brut si `rawLabel` est vrai. */
     labelKey: string;
+    rawLabel?: boolean;
     /** Icône FontAwesome (sans préfixe), pour les signaux. */
     icon?: string;
     /** Couleur CSS (variable du thème) du point, pour les statuts et les périodes. */
@@ -61,6 +63,8 @@ export interface HighlightedText {
 /** Action proposée par le rouage d'une ligne. */
 export interface EntityAction {
     labelKey: string;
+    /** Paramètres d'interpolation du libellé, par exemple un effectif. */
+    labelParams?: object;
     /** Classe PrimeIcons, par exemple `pi pi-eye`. */
     icon?: string;
     routerLink?: unknown[];

@@ -1,0 +1,149 @@
+/* Styles non encapsulés : le panneau est projeté dans `body` par `p-popover`.
+   Toutes les classes sont préfixées `sp-` pour rester circonscrites au composant. */
+
+.sp-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--app-surface-muted);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--app-primary);
+        outline-offset: 1px;
+    }
+}
+
+.sp-panel {
+    .p-popover-content {
+        width: 260px;
+        max-width: calc(100vw - 24px);
+        padding: 6px;
+    }
+
+    hr {
+        margin: 6px 0;
+        border: 0;
+        border-top: 1px solid var(--app-line);
+    }
+}
+
+.sp-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sp-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    padding: 3px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--app-text);
+    font-size: var(--app-fs-md);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--app-surface-muted);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--app-primary);
+        outline-offset: -2px;
+    }
+}
+
+.sp-option--on {
+    background: var(--app-surface-muted);
+    font-weight: 700;
+}
+
+.sp-line {
+    margin: 0;
+    padding: 2px 8px;
+    font-size: var(--app-fs-sm);
+    color: var(--app-text);
+}
+
+.sp-line--muted {
+    color: var(--app-text-muted);
+    font-size: var(--app-fs-xs);
+}
+
+.sp-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px 2px;
+}
+
+.sp-pills-label {
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+}
+
+.sp-pill {
+    padding: 3px 9px;
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    background: var(--app-surface);
+    color: var(--app-text);
+    font-size: var(--app-fs-xs);
+    cursor: pointer;
+
+    &:hover {
+        border-color: var(--app-primary-line);
+        background: var(--app-primary-soft);
+    }
+}
+
+.sp-pill--on {
+    border-color: var(--app-primary);
+    background: var(--app-primary-soft);
+    color: var(--app-primary);
+    font-weight: 700;
+}
+
+.sp-link {
+    align-self: flex-start;
+    margin: 2px 8px 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--app-primary);
+    font-size: var(--app-fs-sm);
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.sp-link--block {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 6px 8px;
+    border-radius: 8px;
+    text-align: left;
+
+    &:hover {
+        background: var(--app-surface-muted);
+        text-decoration: none;
+    }
+}

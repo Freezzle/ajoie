@@ -1,168 +1,212 @@
 <app-content-page>
     <div appMenuBarStart>
-        <h3 jhiTranslate="task.focusView.title">Tâches</h3>
+        <h3 jhiTranslate="task.focusView.title">Tâches opérationnelles</h3>
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading"
+                    [isDisabled]="isLoading()"
                     [showText]="false"
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
-        <menu-box [items]="menuItems"
-                  [buttonDisabled]="isLoading"
-                  buttonTranslateKey="common.actions"
-                  buttonIcon="pi-list"/>
+
+        <menu-box [buttonDisabled]="isLoading()"
+                  [items]="menuItems()"
+                  buttonIcon="pi-list"
+                  buttonTranslateKey="common.actions"/>
     </div>
 
     <p-confirmpopup/>
-
-    <!-- ── Bandeau date de référence du salon ── -->
-    @if (salon) {
-        <div class="d-flex align-items-center flex-wrap gap-2 p-2 border rounded mb-2 small bg-light" [class.border-warning]="isDatesDesynchronized" [class.bg-warning-subtle]="isDatesDesynchronized">
-            <span class="d-flex align-items-center gap-1 fw-medium text-nowrap">
-                <i class="pi pi-calendar"></i>
-                <span jhiTranslate="task.focusView.referenceDate">Date de référence</span>&nbsp;:
-                <strong>{{ salonStartingDateFormatted }}</strong>
-            </span>
-            @if (isDatesDesynchronized) {
-                <span class="d-flex align-items-center gap-1 text-warning fw-semibold text-xs">
-                    <i class="pi pi-exclamation-triangle"></i>
-                    <span jhiTranslate="task.focusView.referenceDateWarning">Des dates de sous-tâches ne correspondent plus à cette date de référence. Utilisez l'action « Recalculer les dates » dans le menu.</span>
-                </span>
-            }
-        </div>
-    }
-
-    <!-- ── Bandeau progression globale ── -->
-    @if (!isLoading && countAll > 0) {
-        <div class="d-flex align-items-center gap-2 p-2 border rounded mb-2 bg-light">
-            <p-progress-bar [value]="globalProgress"
-                           [showValue]="false"
-                            fluid
-                            [style]="{'flex': '1'}">
-            </p-progress-bar>
-            <span class="fw-semibold text-nowrap text-xs">
-                {{ countDone }}/{{ countAll }} {{ 'task.filter.completed' | translate }}
-            </span>
-        </div>
-
-        <!-- ── Pills de filtre ── -->
-        <div class="d-flex flex-wrap gap-1 mb-3">
-            <!-- Toggle vue cards / vue sous-tâches à plat -->
-            <div class="d-flex align-items-center gap-1 px-1" [title]="flatView() ? ('task.filter.viewSubtasks' | translate) : ('task.filter.viewTasks' | translate)">
-                <i class="pi pi-th-large icon-sm" [style.color]="!flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'"></i>
-                <p-toggleswitch [(ngModel)]="flatViewBool" (ngModelChange)="flatView.set($event)"/>
-                <i class="pi pi-list icon-sm" [style.color]="flatView() ? 'var(--app-primary)' : 'var(--p-surface-400)'"></i>
-            </div>
-
-            <button class="tfl-filter-pill" [class.active]="activeFilter === 'all'"
-                    (click)="activeFilter = 'all'">
-                {{ 'task.filter.all' | translate }} <span class="tfl-filter-count">{{ countAll }}</span>
-            </button>
-            @if (countActive > 0) {
-                <button class="tfl-filter-pill tfl-filter-pill--active" [class.active]="activeFilter === 'active'"
-                        (click)="activeFilter = 'active'">
-                    <i class="pi pi-list-check"></i> {{ 'task.filter.active' | translate }} <span class="tfl-filter-count">{{ countActive }}</span>
-                </button>
-            }
-            @if (countLate > 0) {
-                <button class="tfl-filter-pill tfl-filter-pill--late" [class.active]="activeFilter === 'late'"
-                        (click)="activeFilter = 'late'">
-                    <i class="pi pi-exclamation-triangle"></i> {{ 'task.filter.late' | translate }} <span class="tfl-filter-count">{{ countLate }}</span>
-                </button>
-            }
-            @if (countToday > 0) {
-                <button class="tfl-filter-pill tfl-filter-pill--today" [class.active]="activeFilter === 'today'"
-                        (click)="activeFilter = 'today'">
-                    <i class="pi pi-clock"></i> {{ 'task.filter.today' | translate }} <span class="tfl-filter-count">{{ countToday }}</span>
-                </button>
-            }
-            @if (countInProgress > 0) {
-                <button class="tfl-filter-pill tfl-filter-pill--progress" [class.active]="activeFilter === 'in_progress'"
-                        (click)="activeFilter = 'in_progress'">
-                    <i class="pi pi-play-circle"></i> {{ 'task.filter.inProgress' | translate }} <span class="tfl-filter-count">{{ countInProgress }}</span>
-                </button>
-            }
-            @if (countDone > 0) {
-                <button class="tfl-filter-pill tfl-filter-pill--done" [class.active]="activeFilter === 'done'"
-                        (click)="activeFilter = 'done'">
-                    <i class="pi pi-check-circle"></i> {{ 'task.filter.done' | translate }} <span class="tfl-filter-count">{{ countDone }}</span>
-                </button>
-            }
-            @if (countSnoozed > 0) {
-                <button class="tfl-filter-pill tfl-filter-pill--snooze" [class.active]="activeFilter === 'snoozed'"
-                        (click)="activeFilter = 'snoozed'">
-                    <i class="pi pi-bell-slash"></i> {{ 'task.filter.snoozed' | translate }} <span class="tfl-filter-count">{{ countSnoozed }}</span>
-                </button>
-            }
-        </div>
-    }
-
-    @if (isLoading) {
-        <div class="text-center py-5">
-            <i class="pi pi-spinner pi-spin icon-loader"></i>
-        </div>
-    }
-
-    @if (!isLoading && tasks.length === 0) {
-        <app-card [showHeader]="false">
-            <div appCardBody>
-                <p class="text-muted text-center my-4" jhiTranslate="task.focusView.empty">
-                    Aucune tâche pour ce salon.
-                </p>
-            </div>
-        </app-card>
-    }
-
-    @if (!isLoading && filteredTasks.length === 0 && tasks.length > 0) {
-        <p class="text-muted text-center my-4 small" jhiTranslate="task.filter.noTaskInFilter">Aucune tâche dans ce filtre.</p>
-    }
-
-    @if (!isLoading && flatView()) {
-        <!-- ── Vue sous-tâches à plat ── -->
-        @if (flatSubtasks.length === 0) {
-            <p class="text-muted text-center my-4 small" jhiTranslate="task.filter.noSubtaskInFilter">Aucune sous-tâche dans ce filtre.</p>
-        } @else {
-            <div class="d-flex flex-column gap-1">
-                @for (flat of flatSubtasks; track flat.id) {
-                    <app-subtask-flat-row
-                        [subtask]="flat"
-                        [parentTask]="flat.parentTask"
-                        (changed)="load()"
-                        (editRequested)="openEditSubtaskDialog(flat)"/>
+    <p-toast [key]="undoKey" position="bottom-center">
+        <ng-template #message let-message>
+            <div class="tfl-undo">
+                <span>{{ message.summary }}</span>
+                @if (message.data?.undo) {
+                    <button (click)="message.data.undo()" class="tfl-undo-button" type="button">
+                        {{ 'task.panel.undo' | translate }}
+                    </button>
                 }
             </div>
-        }
-    } @else if (!isLoading && filteredTasks.length > 0) {
-        <!-- ── Vue cards par tâche ── -->
-        <div class="d-flex flex-column gap-2">
-            @for (task of filteredTasks; track task.id) {
-                <app-task-card [task]="task" [activeFilter]="activeFilter" [salonStartingDate]="salonStartingDate" (statusChanged)="load()" (editRequested)="openEditTaskDialog(task)"/>
+        </ng-template>
+    </p-toast>
+
+    @if (salon()) {
+        <div class="tfl-banner">
+            <span class="tfl-banner-date">
+                @if (daysBeforeSalon() !== null) {
+                    <b>{{ 'task.due.days' | translate: {n: daysBeforeSalon()} }}</b>
+                    {{ 'task.list.daysBeforeSalon' | translate }} ·
+                }
+                {{ salonDateLabel() }}
+            </span>
+
+            @if (counts().total > 0) {
+                <span class="tfl-progress">
+                    <i [style.flex]="counts().done" [style.background]="'var(--app-status-validated)'"></i>
+                    <i [style.flex]="counts().inProgress" [style.background]="'var(--app-primary)'"></i>
+                    <i [style.flex]="counts().blocked" [style.background]="'var(--app-offer)'"></i>
+                    <i [style.flex]="counts().late" [style.background]="'var(--app-danger)'"></i>
+                    <i [style.flex]="counts().total - counts().done - counts().inProgress - counts().blocked - counts().late"
+                       [style.background]="'var(--app-border)'"></i>
+                </span>
+                <span class="tfl-banner-count">{{ counts().done }}/{{ counts().total }}</span>
+
+                <span class="tfl-legend">
+                    @if (counts().done > 0) {
+                        <span style="--tfl-color: var(--app-status-validated)">
+                            <i></i>{{ 'task.group.statusKey.DONE' | translate }} {{ counts().done }}
+                        </span>
+                    }
+                    @if (counts().inProgress > 0) {
+                        <span style="--tfl-color: var(--app-primary)">
+                            <i></i>{{ 'task.group.statusKey.IN_PROGRESS' | translate }} {{ counts().inProgress }}
+                        </span>
+                    }
+                    @if (counts().blocked > 0) {
+                        <span style="--tfl-color: var(--app-offer)">
+                            <i></i>{{ 'task.group.statusKey.BLOCKED' | translate }} {{ counts().blocked }}
+                        </span>
+                    }
+                    @if (counts().late > 0) {
+                        <span style="--tfl-color: var(--app-danger)">
+                            <i></i>{{ 'task.chip.late' | translate }} {{ counts().late }}
+                        </span>
+                    }
+                </span>
+            }
+
+            @if (isDatesDesynchronized()) {
+                <span class="tfl-desync">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    {{ 'task.focusView.referenceDateWarning' | translate }}
+                </span>
+                <button-box (clickedEvent)="recalculateDates($event)"
+                            translateKey="task.list.recalculate"
+                            type="secondary"/>
             }
         </div>
     }
+
+    <div class="el-list">
+        <entity-list-toolbar [(activeChips)]="state.activeChips"
+                             [(query)]="state.query"
+                             [(sort)]="state.sort"
+                             (groupByChange)="state.setGroupBy($event)"
+                             [chipGroups]="chipGroups()"
+                             [groupBy]="state.groupBy()"
+                             [groupOptions]="groupOptions"
+                             [isDefault]="state.isDefault"
+                             [showGroupSort]="view() === 'subtasks'"
+                             [sortOptions]="state.sortOptions"
+                             placeholderKey="task.list.searchPlaceholder">
+            <div aria-label="Vue" class="tfl-views" role="group" toolbarEnd>
+                <button (click)="setView('tasks')"
+                        [attr.aria-pressed]="view() === 'tasks'"
+                        type="button">
+                    {{ 'task.list.viewTasks' | translate }}
+                    <small>{{ tasks().length }}</small>
+                </button>
+                <button (click)="setView('subtasks')"
+                        [attr.aria-pressed]="view() === 'subtasks'"
+                        type="button">
+                    {{ 'task.list.viewSubtasks' | translate }}
+                    <small>{{ allSubtasks().length }}</small>
+                </button>
+            </div>
+        </entity-list-toolbar>
+
+        @if (isLoading()) {
+            <div class="el-empty">
+                <i class="pi pi-spin pi-spinner"></i>
+            </div>
+        } @else if (tasks().length === 0) {
+            <div class="el-empty">
+                <b>{{ 'task.focusView.empty' | translate }}</b>
+            </div>
+        } @else if (view() === 'tasks') {
+            @if (filteredTasks().length === 0) {
+                <div class="el-empty">
+                    <b>{{ 'entityList.empty.filtered' | translate }}</b>
+                    <span>{{ 'entityList.empty.hint' | translate }}</span>
+                    <button-box (clickedEvent)="state.clearFilters()"
+                                translateKey="entityList.clearFilters"
+                                type="secondary"/>
+                </div>
+            } @else {
+                <div class="tfl-cards">
+                    @for (task of filteredTasks(); track task.id; let index = $index) {
+                        <app-task-card (changed)="load()"
+                                       (editRequested)="openEditTaskDialog($event)"
+                                       (expandedChange)="setExpanded(task, $event)"
+                                       (seeInList)="seeInList($event)"
+                                       (subtaskAddRequested)="openAddSubtaskDialog($event)"
+                                       (subtaskEditRequested)="openEditSubtaskDialog($event)"
+                                       [class.tfl-flash]="flashedTaskId() === task.id"
+                                       [expanded]="isExpanded(task, index)"
+                                       [extraActions]="taskExtraActions"
+                                       [id]="'task-card-' + task.id"
+                                       [known]="known()"
+                                       [query]="state.query()"
+                                       [task]="task"/>
+                    }
+                </div>
+            }
+        } @else {
+            @if (filteredSubtasks().length === 0) {
+                <div class="el-empty">
+                    <b>{{ 'entityList.empty.filtered' | translate }}</b>
+                    <span>{{ 'entityList.empty.hint' | translate }}</span>
+                    <button-box (clickedEvent)="state.clearFilters()"
+                                translateKey="entityList.clearFilters"
+                                type="secondary"/>
+                </div>
+            } @else {
+                @for (group of groups(); track group.key) {
+                    <entity-list-group (collapsedChange)="setCollapsed(group, $event)"
+                                       [collapsed]="isCollapsed(group)"
+                                       [color]="group.color"
+                                       [count]="group.items.length"
+                                       [label]="group.label"
+                                       [rawLabel]="group.rawLabel ?? false"
+                                       [ratio]="group.ratio">
+                        <span groupSummary>{{ groupSummary(group) }}</span>
+
+                        @for (subtask of group.items; track subtask.id) {
+                            <subtask-line (changed)="load()"
+                                          (editRequested)="openEditSubtaskDialog($event)"
+                                          (taskRequested)="openTaskCard($event)"
+                                          [known]="known()"
+                                          [query]="state.query()"
+                                          [showAvatar]="showAvatar"
+                                          [showTask]="true"
+                                          [subtask]="subtask"
+                                          [task]="subtask.parentTask"/>
+                        }
+                    </entity-list-group>
+                }
+            }
+        }
+    </div>
 </app-content-page>
 
-<!-- ── Dialog : Créer / Modifier une tâche ── -->
 @if (showTaskDialog()) {
     <dialog-box (cancel)="onTaskDialogCancel()"
                 (confirm)="onTaskDialogConfirm($event)"
                 [(visible)]="showTaskDialog"
-                [header]="editingTask ? ('task.dialog.editTask' | translate) : ('task.dialog.addTask' | translate)"
-                [mode]="'edit'"
-                [confirmLabel]="'common.save'">
-        <app-task-instance-form [task]="editingTask"/>
+                [confirmLabel]="'common.save'"
+                [header]="editingTask() ? ('task.dialog.editTask' | translate) : ('task.dialog.addTask' | translate)"
+                [mode]="'edit'">
+        <app-task-instance-form [task]="editingTask()"/>
     </dialog-box>
 }
 
-<!-- ── Dialog : Modifier une sous-tâche (vue flat) ── -->
 @if (showSubtaskDialog()) {
     <dialog-box (cancel)="onSubtaskDialogCancel()"
                 (confirm)="onSubtaskDialogConfirm($event)"
                 [(visible)]="showSubtaskDialog"
-                [header]="'task.dialog.editSubtask' | translate"
-                [mode]="'edit'"
-                [confirmLabel]="'common.save'">
-        <app-subtask-instance-form [subtask]="editingSubtask" [salonStartingDate]="salonStartingDate"/>
+                [confirmLabel]="'common.save'"
+                [header]="editingSubtask() ? ('task.dialog.editSubtask' | translate) : ('task.menu.addSubtask' | translate)"
+                [mode]="'edit'">
+        <app-subtask-instance-form [salonStartingDate]="salon()?.startingDate ?? null"
+                                   [subtask]="editingSubtask()"/>
     </dialog-box>
 }

@@ -60,6 +60,80 @@
             "subtaskPlaceholder": "Titre de la sous-tâche…",
             "clickToEdit": "Cliquer pour modifier"
         },
+        "list": {
+            "viewTasks": "Tâches",
+            "viewSubtasks": "Sous-tâches",
+            "searchPlaceholder": "Rechercher une sous-tâche, une tâche, une personne…",
+            "daysBeforeSalon": "avant le salon",
+            "next": "Prochaine :",
+            "seeInList": "Voir dans la liste",
+            "context": "Contexte",
+            "taskContext": "Tâche : {{title}}",
+            "doneCount": "{{count}} terminée(s)",
+            "addSubtaskPlaceholder": "Ajouter une sous-tâche…",
+            "add": "Ajouter",
+            "openTask": "Ouvrir la carte de la tâche",
+            "viaTask": "via la tâche",
+            "datesToRecalculate": "{{count}} dates à recalculer",
+            "recalculate": "Recalculer"
+        },
+        "group": {
+            "urgency": "Échéance",
+            "responsible": "Responsable",
+            "status": "Statut",
+            "noResponsible": "Sans responsable",
+            "urgencyKey": {
+                "LATE": "En retard",
+                "TODAY": "Aujourd'hui",
+                "WEEK": "Dans les 7 jours",
+                "LATER": "Plus tard",
+                "NODATE": "Sans date",
+                "DONE": "Terminées"
+            },
+            "statusKey": {
+                "BLOCKED": "Bloquées",
+                "IN_PROGRESS": "En cours",
+                "PENDING": "À faire",
+                "DONE": "Terminées"
+            },
+            "inProgress": "{{count}} en cours",
+            "blocked": "{{count}} bloquée(s)"
+        },
+        "chip": {
+            "late": "En retard",
+            "noResponsible": "Sans responsable"
+        },
+        "due": {
+            "none": "sans date",
+            "today": "aujourd'hui",
+            "tomorrow": "demain",
+            "yesterday": "hier",
+            "in": "dans {{n}} j",
+            "late": "{{n}} j de retard",
+            "lateSuffix": "de retard",
+            "inPrefix": "dans",
+            "days": "{{n}} j",
+            "done": "fait {{since}}",
+            "movedTitle": "Limite repoussée de {{n}} j : {{from}} → {{to}}"
+        },
+        "panel": {
+            "status": "Statut",
+            "deadline": "Échéance",
+            "limit": "Limite :",
+            "originalLimit": "Limite d'origine :",
+            "push": "Repousser",
+            "pushDays": "+{{n}} j",
+            "backTo": "Revenir au {{date}}",
+            "assignTo": "Attribuer à",
+            "nobody": "Personne",
+            "noResponsibleYet": "Aucun responsable encore attribué",
+            "edit": "Modifier…",
+            "changeStatus": "Statut : {{status}}. Changer le statut",
+            "statusChanged": "Statut : {{status}}",
+            "pushed": "Limite repoussée : {{label}}",
+            "restored": "Limite d'origine rétablie",
+            "undo": "Annuler"
+        },
         "menu": {
             "editTask": "Modifier la tâche",
             "editDate": "Modifier la date",
@@ -89,29 +163,17 @@
             "bodyPlaceholder": "Votre commentaire…"
         },
         "filter": {
-            "all": "Toutes",
-            "active": "Actives",
-            "late": "En retard",
-            "today": "Aujourd'hui",
-            "inProgress": "En cours",
-            "done": "Terminées",
-            "snoozed": "Snoozées",
-            "completed": "terminées",
-            "noTaskInFilter": "Aucune tâche dans ce filtre.",
-            "noSubtaskInFilter": "Aucune sous-tâche dans ce filtre.",
-            "viewSubtasks": "Vue sous-tâches",
-            "viewTasks": "Vue tâches"
-        },
-        "subtaskRow": {
+            "completed": "terminées"
+        },        "subtaskRow": {
             "dueDatePrefix": "Échéance au",
             "snoozedUntilPrefix": "Reporté au"
         },
         "status": {
-            "PENDING": "En attente",
+            "PENDING": "À faire",
             "IN_PROGRESS": "En cours",
-            "DONE": "Terminé",
-            "CANCELLED": "Annulé",
-            "BLOCKED": "Bloqué"
+            "DONE": "Terminée",
+            "CANCELLED": "Annulée",
+            "BLOCKED": "Bloquée"
         }
     }
 }

@@ -1,0 +1,91 @@
+<button #trigger
+        (click)="open(panel, $event)"
+        (keydown.enter)="open(panel, $event)"
+        [attr.aria-label]="triggerLabel()"
+        [title]="triggerHint()"
+        class="sp-trigger"
+        type="button">
+    <subtask-status-icon [statusKey]="iconKey()"/>
+</button>
+
+<p-popover #panel appendTo="body" styleClass="sp-panel">
+    <div class="sp-section" role="radiogroup" [attr.aria-label]="'task.panel.status' | translate">
+        <div class="el-radio-label">{{ 'task.panel.status' | translate }}</div>
+
+        @for (status of statuses; track status) {
+            <button (click)="selectStatus(panel, status)"
+                    [attr.aria-checked]="isCurrent(status)"
+                    [class.sp-option--on]="isCurrent(status)"
+                    class="sp-option"
+                    role="radio"
+                    type="button">
+                <subtask-status-icon [statusKey]="status"/>
+                <span>{{ statusLabel(status) }}</span>
+            </button>
+        }
+    </div>
+
+    @if (active()) {
+        <hr/>
+
+        <div class="sp-section">
+            <div class="el-radio-label">{{ 'task.panel.deadline' | translate }}</div>
+
+            <p class="sp-line">
+                {{ 'task.panel.limit' | translate }} <b>{{ dueLabel() }}</b> · {{ daysLabel() }}
+            </p>
+
+            @if (moved()) {
+                <p class="sp-line sp-line--muted">
+                    {{ 'task.panel.originalLimit' | translate }} {{ originalDueLabel() }}
+                </p>
+            }
+
+            <div class="sp-pills">
+                <span class="sp-pills-label">{{ 'task.panel.push' | translate }}</span>
+                @for (step of steps; track step) {
+                    <button (click)="snooze(panel, step)" class="sp-pill" type="button">
+                        {{ 'task.panel.pushDays' | translate: {n: step} }}
+                    </button>
+                }
+            </div>
+
+            @if (moved()) {
+                <button (click)="restore(panel)" class="sp-link" type="button">
+                    {{ 'task.panel.backTo' | translate: {date: originalDueLabel()} }}
+                </button>
+            }
+        </div>
+    }
+
+    <hr/>
+
+    <div class="sp-section">
+        <div class="el-radio-label">{{ 'task.panel.assignTo' | translate }}</div>
+
+        @if (known().length === 0) {
+            <p class="sp-line sp-line--muted">{{ 'task.panel.noResponsibleYet' | translate }}</p>
+        } @else {
+            <div class="sp-pills">
+                @for (name of known(); track name) {
+                    <button (click)="assign(panel, name)"
+                            [class.sp-pill--on]="isAssigned(name)"
+                            class="sp-pill"
+                            type="button">{{ name }}</button>
+                }
+
+                @if (subtask().responsible) {
+                    <button (click)="assign(panel, null)" class="sp-pill" type="button">
+                        {{ 'task.panel.nobody' | translate }}
+                    </button>
+                }
+            </div>
+        }
+    </div>
+
+    <hr/>
+
+    <button (click)="edit(panel)" class="sp-link sp-link--block" type="button">
+        {{ 'task.panel.edit' | translate }}
+    </button>
+</p-popover>

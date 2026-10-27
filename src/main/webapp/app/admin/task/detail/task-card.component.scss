@@ -1,55 +1,236 @@
-:host { display: block; }
+:host {
+    display: block;
+}
 
-// ── Accent card (border-left colorée selon urgence) ──────────────────────────
 .tc {
-    display: flex;
-    gap: 0.71rem;
-    padding: 0.25rem;
-    background: var(--app-surface);
     border: 1px solid var(--app-border);
-    border-left: 3px solid var(--app-border);
-    border-radius: 0.57rem;
-
-    &.tc--late   { border-left-color: var(--app-danger);  background: linear-gradient(90deg, color-mix(in srgb, var(--app-danger) 5%, var(--app-surface)) 0%, var(--app-surface) 4.29rem); }
-    &.tc--today  { border-left-color: var(--app-warning); background: linear-gradient(90deg, color-mix(in srgb, var(--app-warning) 5%, var(--app-surface)) 0%, var(--app-surface) 4.29rem); }
-    &.tc--soon   { border-left-color: var(--app-primary); background: linear-gradient(90deg, color-mix(in srgb, var(--app-primary) 5%, var(--app-surface)) 0%, var(--app-surface) 4.29rem); }
-    &.tc--neutral { border-left-color: var(--app-border); }
+    border-radius: 12px;
+    background: var(--app-surface);
+    overflow: hidden;
 }
 
-.tc__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.43rem; }
-.tc__row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.57rem; padding: 0.5rem; border-bottom: 1px solid var(--app-border); margin-bottom: 1rem; }
-.tc__info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.tc__title { font-size: var(--app-fs-md); font-weight: 600; color: var(--app-text); line-height: 1.4; }
-.tc__aside { display: flex; align-items: center; gap: 0.25rem; justify-content: flex-end; }
-.tc__prog { display: flex; align-items: center; gap: 0.36rem; }
-.tc__prog-label { font-size: var(--app-fs-xs); color: var(--app-secondary); white-space: nowrap; min-width: 2rem; text-align: right; }
-.tc__no-subtasks { display: flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.5rem; font-size: var(--app-fs-sm); color: var(--app-secondary); font-style: italic; }
+/* Une tâche comportant du retard est signalée par sa seule bordure. */
+.tc--late {
+    border-color: color-mix(in srgb, var(--app-danger) 45%, var(--app-border));
+}
 
-// ── Commentaires ─────────────────────────────────────────────────────────────
-.tc__comments { margin-top: 0.29rem; border: 1px solid var(--app-border); border-radius: 0.43rem; overflow: hidden; background: color-mix(in srgb, var(--app-secondary) 8%, var(--app-surface)); }
-.tc__comments-header {
-    display: flex; align-items: center; gap: 0.43rem; padding: 0.43rem 0.71rem;
-    background: color-mix(in srgb, var(--app-primary) 6%, var(--app-surface));
-    font-size: var(--app-fs-sm); font-weight: 600; color: var(--app-primary);
-    width: 100%; border: none; border-bottom: 1px solid transparent; cursor: pointer; text-align: left; transition: background 0.15s, border-color 0.15s;
-    &:hover { background: color-mix(in srgb, var(--app-primary) 14%, var(--app-surface)); }
-    i { font-size: var(--app-fs-xs); }
-    span { flex: 1; }
+.tc-head {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--app-surface-muted);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--app-primary);
+        outline-offset: -2px;
+    }
 }
-.tc__comments--open > .tc__comments-header { border-bottom-color: color-mix(in srgb, var(--app-primary) 25%, var(--app-surface)); }
-.tc__comments-list { display: flex; flex-direction: column; }
-.tc__comment-item {
-    padding: 0.57rem 0.86rem; border-bottom: 1px solid var(--app-border);
-    &:last-child { border-bottom: none; }
-    &:hover .tc__comment-delete { opacity: 1; }
+
+.tc-head-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
 }
-.tc__comment-meta { display: flex; align-items: center; gap: 0.57rem; margin-bottom: 0.21rem; }
-.tc__comment-delete {
-    margin-left: auto; background: transparent; border: none; cursor: pointer; color: var(--app-danger);
-    padding: 0; line-height: 1; opacity: 0; transition: opacity 0.15s;
-    i { font-size: 0.65rem; }
-    &:hover { color: color-mix(in srgb, var(--app-danger) 70%, #000); }
+
+.tc-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--app-fs-md);
+    font-weight: 600;
+    color: var(--app-text);
+    overflow-wrap: anywhere;
 }
-.tc__comment-author { display: inline-flex; align-items: center; gap: 0.29rem; font-size: var(--app-fs-xs); font-weight: 600; color: var(--app-text); i { font-size: var(--app-fs-xs); color: var(--app-secondary); } }
-.tc__comment-time { font-size: var(--app-fs-xs); color: var(--p-surface-400); font-style: italic; }
-.tc__comment-body { margin: 0; font-size: var(--app-fs-sm); color: var(--app-text); line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+.tc-count {
+    flex: none;
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.tc-chevron {
+    flex: none;
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+    transition: transform .15s ease;
+}
+
+.tc-chevron--collapsed {
+    transform: rotate(-90deg);
+}
+
+.tc-next {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+    font-size: var(--app-fs-sm);
+    color: var(--app-text-muted);
+}
+
+.tc-next-label {
+    flex: none;
+}
+
+.tc-next-title {
+    flex: 0 1 auto;
+    min-width: 0;
+    color: var(--app-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tc-next-due {
+    flex: none;
+    margin-left: auto;
+}
+
+.tc-foot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tc-bar {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 3px;
+    min-width: 0;
+
+    i {
+        flex: 1 1 0;
+        height: 5px;
+        border-radius: 2px;
+    }
+}
+
+.tc-bar--empty {
+    height: 5px;
+    border-radius: 2px;
+    background: var(--app-surface-muted);
+}
+
+.tc-body {
+    display: flex;
+    flex-direction: column;
+    padding: 2px 12px 12px;
+    border-top: 1px solid var(--app-line);
+}
+
+.tc-description {
+    margin: 8px 0 4px;
+    font-size: var(--app-fs-sm);
+    color: var(--app-text-muted);
+}
+
+.tc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    padding: 4px 0 6px;
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+}
+
+.tc-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--app-primary);
+    font-size: var(--app-fs-xs);
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.tc-done-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--app-text-muted);
+    font-size: var(--app-fs-xs);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--app-surface-muted);
+    }
+
+    i {
+        font-size: 10px;
+        transition: transform .15s ease;
+    }
+}
+
+.tc-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--app-surface-muted);
+}
+
+.tc-comment {
+    p {
+        margin: 0;
+        font-size: var(--app-fs-sm);
+        color: var(--app-text);
+        overflow-wrap: anywhere;
+    }
+}
+
+.tc-comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--app-fs-xs);
+    color: var(--app-text-muted);
+}
+
+.tc-comment-delete {
+    margin-left: auto;
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    color: var(--app-text-muted);
+    cursor: pointer;
+
+    &:hover {
+        color: var(--app-status-refused);
+    }
+}
+
+@container el (max-width: 600px) {
+    .tc-next {
+        flex-wrap: wrap;
+    }
+
+    .tc-next-due {
+        margin-left: 0;
+    }
+
+    .tc-body {
+        padding: 2px 8px 10px;
+    }
+
+    .tc-head {
+        padding: 10px 8px;
+    }
+}

@@ -1,6 +1,6 @@
 export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED' | 'BLOCKED';
 
-export type UrgencyGroup = 'LATE' | 'TODAY' | 'THIS_WEEK' | 'LATER';
+export type UrgencyGroup = 'LATE' | 'TODAY' | 'WEEK' | 'LATER' | 'NODATE' | 'DONE';
 
 export type DateInputType = 'FIXED' | 'OFFSET';
 

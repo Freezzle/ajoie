@@ -1,150 +1,140 @@
-<div class="tc" [ngClass]="accentClass">
+<div [class.tc--late]="hasLate()" class="tc">
+    <div (click)="toggle($event)"
+         (keydown.enter)="toggle($event)"
+         (keydown.space)="$event.preventDefault(); toggle($event)"
+         [attr.aria-expanded]="expanded()"
+         class="tc-head"
+         role="button"
+         tabindex="0">
 
-    <!-- ── Corps principal ── -->
-    <div class="tc__body">
+        <div class="tc-head-row">
+            <span class="tc-title">
+                <entity-highlight [query]="query()" [text]="task().title"/>
+            </span>
 
-        <!-- MAIN ROW -->
-        <div class="tc__row">
+            @if (counts().total > 0) {
+                <span class="tc-count">{{ counts().done }}/{{ counts().total }}</span>
+            }
 
-            <div class="tc__info">
-                <span class="tc__title">
-                    {{ task.title }}
-                    @if (hasInProgressSubtask) {
-                        <p-tag [value]="'task.status.IN_PROGRESS' | translate" severity="warn" [rounded]="true" class="tag-xs"/>
-                    }
-                    @if (hasBlockedSubtask) {
-                        <p-tag [value]="'task.status.BLOCKED' | translate" severity="danger" [rounded]="true" class="tag-xs"/>
-                    }
-                </span>
-
-                @if (task.description) {
-                    <span class="text-desc">{{ task.description }}</span>
-                }
-
-                <!-- Chips : p-tag PrimeNG -->
-                <div class="d-flex flex-wrap gap-1 align-items-center py-1">
-                    @if (task.responsible && !editingResponsible) {
-                        <p-tag icon="pi pi-user" [value]="task.responsible" severity="secondary" [rounded]="true"
-                               class="tag-xs tag-outlined-info clickable" [title]="'task.card.clickToEdit' | translate"
-                               (click)="editResponsibleValue = task.responsible!; editingResponsible = true"/>
-                    }
-                    @if (task.supplierInfo) {
-                        <p-tag icon="pi pi-truck" [value]="task.supplierInfo" severity="secondary" [rounded]="true" class="tag-xs tag-outlined-success"/>
-                    }
-                </div>
-            </div>
-
-            <div class="tc__aside">
-
-                <!-- Progression : p-progressbar PrimeNG -->
-                @if (task.subtasks.length > 0) {
-                    <div class="tc__prog">
-                        <span class="tc__prog-label">{{ doneSubtaskCount }}/{{ task.subtasks.length }}</span>
-                    </div>
-                }
-
-                <div class="menu-btn-ghost">
-                    <menu-box [items]="menuItems" buttonIcon="pi-ellipsis-v"
-                              [buttonTranslateKey]="''" type="secondary" appendTo="body"/>
-                </div>
-            </div>
+            <i [class.tc-chevron--collapsed]="!expanded()" class="pi pi-chevron-down tc-chevron"></i>
         </div>
 
-        <!-- INLINE FORM : changer responsable -->
-        @if (editingResponsible) {
-            <div class="d-flex align-items-center gap-2 px-2">
-                <i class="pi pi-user icon-xs text-primary flex-shrink-0"></i>
-                <input type="text" class="form-control form-control-sm flex-grow-1"
-                       [(ngModel)]="editResponsibleValue"
-                       (keydown.enter)="saveResponsible()" (keydown.escape)="cancelResponsible()"
-                       [placeholder]="'task.menu.responsiblePlaceholder' | translate" autofocus/>
-                <button-box type="primary" primeIcon="pi-check" [showText]="false"
-                            translateKey="common.save" (clickedEvent)="saveResponsible()"/>
-                <button-box type="secondary" primeIcon="pi-times" [showText]="false"
-                            translateKey="common.cancel" (clickedEvent)="cancelResponsible()"/>
+        @if (!expanded() && next()) {
+            <div class="tc-next">
+                <span class="tc-next-label">{{ 'task.list.next' | translate }}</span>
+                <span class="tc-next-title">{{ next()!.title }}</span>
+                <due-label [subtask]="next()!" class="tc-next-due"/>
             </div>
         }
 
-        <!-- SOUS-TÂCHES -->
-        @if (task.subtasks.length > 0) {
-            <div class="d-flex flex-column px-2">
-                @for (subtask of sortedSubtasks; track subtask.id) {
-                    <app-subtask-row [subtask]="subtask"
-                                     (changed)="onSubtaskChanged($event.id, $event.status)"
-                                     (editRequested)="openEditSubtaskDialog(subtask)"/>
-                }
-            </div>
-        } @else {
-            <div class="tc__no-subtasks">
-                <span>{{ 'task.focusView.noSubtask' | translate }}</span>
-            </div>
-        }
+        <div class="tc-foot">
+            @if (segments().length > 0) {
+                <span class="tc-bar">
+                    @for (segment of segments(); track segment.id) {
+                        <i [style.background]="segment.color" [title]="segment.hint"></i>
+                    }
+                </span>
+            } @else {
+                <span class="tc-bar tc-bar--empty"></span>
+            }
 
-        <!-- COMMENTAIRES (collapse) -->
-        @if (task.comments.length > 0) {
-            <div class="tc__comments" [class.tc__comments--open]="showComments">
-                <button class="tc__comments-header" (click)="toggleComments()" type="button">
-                    <i class="pi pi-comment"></i>
-                    <span>{{ 'task.menu.commentsWithCount' | translate: {count: task.comments.length} }}</span>
-                    <i class="pi" [class.pi-chevron-down]="!showComments" [class.pi-chevron-up]="showComments"></i>
-                </button>
-                @if (showComments) {
-                    <div class="tc__comments-list">
-                        @for (comment of sortedComments; track comment.id) {
-                            <div class="tc__comment-item">
-                                <div class="tc__comment-meta">
-                                    <span class="tc__comment-author"><i class="pi pi-user"></i>{{ comment.authorName }}</span>
-                                    <span class="tc__comment-time">{{ comment.createdAt | timeSince }}</span>
-                                    <button class="tc__comment-delete" type="button"
-                                            [title]="'task.menu.deleteCommentTitle' | translate"
-                                            (click)="deleteComment(comment.id)">
-                                        <i class="pi pi-trash"></i>
-                                    </button>
-                                </div>
-                                <p class="tc__comment-body">{{ comment.body }}</p>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-        }
-
+            <entity-actions-menu [actions]="actions()"/>
+        </div>
     </div>
+
+    @if (expanded()) {
+        <div class="tc-body">
+            @if (task().description) {
+                <p class="tc-description">{{ task().description }}</p>
+            }
+
+            <div class="tc-meta">
+                @if (task().responsible) {
+                    <span>{{ 'task.dialog.responsible' | translate }} : {{ task().responsible }}</span>
+                }
+                @if (task().supplierInfo) {
+                    <span>{{ task().supplierInfo }}</span>
+                }
+                @if (comments().length > 0) {
+                    <button (click)="toggleComments()" class="tc-link" type="button">
+                        {{ 'task.menu.commentsWithCount' | translate: {count: comments().length} }}
+                    </button>
+                }
+                <button (click)="seeInList.emit(task())" class="tc-link" type="button">
+                    {{ 'task.list.seeInList' | translate }} →
+                </button>
+            </div>
+
+            @for (subtask of activeSubtasks(); track subtask.id) {
+                <subtask-line (changed)="changed.emit()"
+                              (editRequested)="subtaskEditRequested.emit($event)"
+                              [known]="known()"
+                              [query]="query()"
+                              [subtask]="subtask"
+                              [task]="task()"/>
+            }
+
+            @if (doneSubtasks().length > 0) {
+                <button (click)="toggleDone()" class="tc-done-toggle" type="button">
+                    <i [class.tc-chevron--collapsed]="!showDone()" class="pi pi-chevron-down"></i>
+                    {{ 'task.list.doneCount' | translate: {count: doneSubtasks().length} }}
+                </button>
+
+                @if (showDone()) {
+                    @for (subtask of doneSubtasks(); track subtask.id) {
+                        <subtask-line (changed)="changed.emit()"
+                                      (editRequested)="subtaskEditRequested.emit($event)"
+                                      [known]="known()"
+                                      [query]="query()"
+                                      [subtask]="subtask"
+                                      [task]="task()"/>
+                    }
+                }
+            }
+
+            @if (showComments() && comments().length > 0) {
+                <div class="tc-comments">
+                    @for (comment of comments(); track comment.id) {
+                        <div class="tc-comment">
+                            <div class="tc-comment-meta">
+                                <b>{{ comment.authorName }}</b>
+                                <span>{{ comment.createdAt | timeSince }}</span>
+                                <button (click)="deleteComment(comment.id)"
+                                        [title]="'task.menu.deleteCommentTitle' | translate"
+                                        class="tc-comment-delete"
+                                        type="button">
+                                    <i class="pi pi-trash"></i>
+                                </button>
+                            </div>
+                            <p>{{ comment.body }}</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
 </div>
 
-<!-- ── Dialog : Ajouter un commentaire ── -->
 @if (showCommentDialog()) {
     <dialog-box (cancel)="commentForm.reset(); showCommentDialog.set(false)"
                 (confirm)="addComment()"
                 [(visible)]="showCommentDialog"
-                [header]="'task.comment.addTitle' | translate"
-                [mode]="'edit'"
+                [confirmDisabled]="commentForm.invalid"
                 [confirmLabel]="'common.save'"
-                [confirmDisabled]="commentForm.invalid">
-        <div class="row" [formGroup]="commentForm">
+                [header]="'task.comment.addTitle' | translate"
+                [mode]="'edit'">
+        <div [formGroup]="commentForm" class="row">
             <div class="col-12 mt-3">
                 <text-box fieldName="authorName"
                           formControlName="authorName"
                           translateKey="task.comment.authorLabel"/>
             </div>
             <div class="col-12 mt-3">
-                <textarea-box fieldName="body"
+                <textarea-box [rows]="4"
+                              fieldName="body"
                               formControlName="body"
-                              translateKey="task.comment.bodyLabel"
-                              [rows]="4"/>
+                              translateKey="task.comment.bodyLabel"/>
             </div>
         </div>
-    </dialog-box>
-}
-
-
-@if (showSubtaskDialog()) {
-    <dialog-box (cancel)="onSubtaskDialogCancel()"
-                (confirm)="onSubtaskDialogConfirm($event)"
-                [(visible)]="showSubtaskDialog"
-                [header]="editingSubtask ? ('task.dialog.editSubtask' | translate) : ('task.dialog.addSubtask' | translate)"
-                [mode]="'edit'"
-                [confirmLabel]="'common.save'">
-        <app-subtask-instance-form [subtask]="editingSubtask" [salonStartingDate]="salonStartingDate"/>
     </dialog-box>
 }

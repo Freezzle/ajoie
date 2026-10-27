@@ -43,7 +43,6 @@ export class TaskInstanceService {
     }
 
     patchSubtask(subtaskId: string, data: Partial<ISubtaskInstance>): Observable<ISubtaskInstance> {
-        console.log('Patching subtask', subtaskId, data);
         return this.http.patch<ISubtaskInstance>(`${this.subtaskUrl}/${subtaskId}`, data);
     }
 

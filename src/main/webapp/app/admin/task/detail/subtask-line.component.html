@@ -1,0 +1,29 @@
+<div [class.is-done]="done()" class="st-line">
+    <subtask-status-panel (changed)="changed.emit($event)"
+                          (editRequested)="editRequested.emit(subtask())"
+                          [known]="known()"
+                          [subtask]="subtask()"
+                          [task]="task()"/>
+
+    <div class="st-main">
+        <span [title]="subtask().title" class="st-title">
+            <entity-highlight [query]="query()" [text]="subtask().title"/>
+        </span>
+
+        @if (showTask() && task()) {
+            <button (click)="openTask($event)" [title]="taskHint()" class="st-task" type="button">
+                <entity-highlight [query]="query()" [text]="task()!.title"/>
+            </button>
+        }
+    </div>
+
+    <due-label [subtask]="subtask()" class="st-due"/>
+
+    <span class="st-avatar">
+        @if (showAvatar()) {
+            <responsible-avatar [known]="known()"
+                                [responsible]="subtask().responsible"
+                                [taskResponsible]="task()?.responsible ?? null"/>
+        }
+    </span>
+</div>

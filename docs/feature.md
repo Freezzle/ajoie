@@ -1,467 +1,472 @@
-# Refonte de la liste des factures (plans de facturation)
+# Refonte de la liste des tâches d'un salon
 
-Ce document décrit le remplacement de l'écran `admin/invoicing-plan/list` par une liste bâtie sur le socle `shared/components/entity-list`, le même que celui des participations et des stands. Il est écrit pour être suivi pas à pas par un assistant de code.
-
-Maquette de référence : artifact « Factures exposants, relevé du plan », proposition **1 · Trois cartes** (ouvrir dans un navigateur, basculer Ordinateur / Téléphone).
-
----
-
-## 0. Règles à respecter
-
-1. **Réutiliser le socle `entity-list`** : `entity-list-toolbar`, `entity-list-group`, `entity-row`, `entity-status`, `entity-count`, `entity-foot-item`, `entity-highlight`, `EntityListState` et les utilitaires de `entity-list.utils.ts`. Ne pas recréer de barre de recherche, de puces ni de groupes.
-2. **Ne créer aucune nouvelle couleur.** Utiliser uniquement les variables `--app-*` de `content/scss/_variables.scss` (voir la table de la section 7). Aucun code hexadécimal dans les composants.
-3. **Ne pas créer de nouvelle police.** Les montants utilisent la police du projet avec `font-variant-numeric: tabular-nums`.
-4. **Styles globaux préfixés `el-`** dans `content/scss/_entity-list.scss`, comme le reste du socle (le contenu des lignes est projeté, l'encapsulation Angular ne le couvrirait pas). Les styles propres au détail d'un plan vont dans un nouveau bloc préfixé `el-ip-` (invoicing plan) du même fichier.
-5. **Responsive par container query** `@container el (max-width: 720px)` et `(max-width: 560px)`, comme le socle. Pas de media query sur la largeur de la fenêtre.
-6. **Textes en i18n** (`i18n/fr/invoicingPlan.json` et `common.json`, clé `entityList`). Aucun texte en dur dans les templates.
-7. **Ne pas dupliquer la logique d'actions** de `billing.component.ts` : l'extraire dans un service partagé (section 5.4). L'écran `billing` est supprimé, la liste des factures le remplace.
+> Brief pour l'agent de développement (GitHub Copilot).
+> Écran concerné : `src/main/webapp/app/admin/task/` (route `task-focus-list`).
+> Maquette interactive validée (ordinateur et téléphone) : le lien artifact partagé avec ce fichier.
+> Langue de l'interface : français. Toutes les chaînes passent par `ngx-translate` (`i18n/fr/task.json`).
 
 ---
 
-## 1. Vue d'ensemble de l'écran
+## 1. Objectif
 
-```
-┌ Les factures                                   [←] [⋯]
-│ Participation de Julien Theurillat ·            (sous-titre, si filtré)
-├────────────────────────────────────────────────────────
-│ [🔍 Exposant, n° de facture, stand…      ] [≡ Grouper et trier]
-│ STATUT (À envoyer 5) (Envoyées 6) (Échues 4) (Payées 5) (Annulées 2) │ SIGNAUX (Postale) (Arrangement) (Relancée) (Prix modifié)
-│
-│ ▼ ■ Julien Theurillat  3        facturé 444.00 · payé 300.00 · reste 144.00 · brouillon 244.00
-│ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ (barre : part payée)
-│ ┌───────────────────────────────────────────────────────┐
-│ │ Facture 0127-1                               ● Échue  │
-│ │ 🕑 échéance 12.10                       reste 144.00  │
-│ │ ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄ │
-│ │ ≡ 3 lignes · ✉ · 🔔 1 rappel · 🏷                   ⚙ │
-│ ├───────────────────────────────────────────────────────┤  ← clic sur la ligne = déplier
-│ │ À relancer          [🔔 Envoyer un rappel] [+ Paiement]│  ← bande d'actions
-│ ├───────────────────────────────────────────────────────┤
-│ │  Générée   Envoyée   Échéance   Rappel  ●   Payée     │  ← frise, point doré = aujourd'hui
-│ │    ●─────────●──────────●─────────●─────·┄┄┄┄○        │
-│ │  01.09     12.09      12.10      16.10       —        │
-│ │ ┌ LIGNES DE FACTURE 3 ─────────────────────── [+ Ligne]┐
-│ │ │ Libellé                    Qté    Prix     Montant  │
-│ │ │ Stand 3×2 m ⓘ               1   340.00     340.00   │
-│ │ │ …                                                   │
-│ │ │ Total                                      444.00   │
-│ │ └─────────────────────────────────────────────────────┘
-│ │ ┌ PAIEMENTS 1 ────────────────────────────────────────┐
-│ │ │ Date        Mode       Commentaire        Montant   │
-│ │ │ 30.09.2026  Virement   Acompte             300.00   │
-│ │ │ Payé                                       300.00   │
-│ │ └─────────────────────────────────────────────────────┘
-│ │ ┌─────────────────────────────────────────────────────┐
-│ │ │ Solde dû · échue depuis 13 j          CHF 144.00    │  ← ligne de solde
-│ │ └─────────────────────────────────────────────────────┘
-│ └───────────────────────────────────────────────────────┘
-```
+Remplacer la liste actuelle (cartes `task-card` + vue à plat `subtask-flat-row` + 7 pilules de filtre + `p-toggleswitch`) par un écran construit sur le **socle `entity-list`** déjà utilisé par la liste des stands (`admin/stand/list`) et des participations (`admin/participation/list`).
 
-Aucune bordure colorée sur la carte d'un plan, ouverte ou non : la carte garde `--app-border`. Seuls le statut, la date clé et le solde portent la couleur.
+L'écran a **deux vues**, avec une bascule à libellés :
 
----
-
-## 2. Back-end : enrichir le DTO de liste
-
-Fichiers : `service/dto/InvoicingPlanListDTO.java`, `service/mapper/InvoicingPlanMapper.java`, `service/InvoicingPlanService.java` (`findAllBySalonId`).
-
-Ajouter à `InvoicingPlanListDTO` :
-
-| Champ | Type | Source |
-|---|---|---|
-| `generationDate` | `Instant` | `InvoicingPlan.generationDate` |
-| `issuedDate` | `Instant` | `InvoicingPlan.issuedDate` |
-| `invoiceSendingMethod` | `InvoiceSendingMethod` | `InvoicingPlan.invoiceSendingMethod` |
-| `needArrangement` | `Boolean` | `InvoicingPlan.needArrangement` |
-| `hasCustomPrice` | `Boolean` | vrai si au moins une ligne a `customAmount != defaultAmount` |
-| `reminders` | `List<InvoicingPlanReminderDTO>` | table dédiée `invoicing_plan_reminder` (voir ci-dessous) |
-| `lastPaymentDate` | `Instant` | date du paiement le plus récent, ou `null` |
-| `cancelledDate` | `Instant` | facultatif ; sinon la frise affiche « Annulée » sans date |
-
-Les champs directs se mappent par MapStruct (même nom). `hasCustomPrice` et `lastPaymentDate` passent par `@Mapping(expression = …)`, comme `nbInvoiceLines`.
-
-**Dates de rappel.** Elles sont stockées dans une table dédiée `invoicing_plan_reminder` (`id`, `tenant_id`, `invoicing_plan_id`, `sent_date`, `due_date_at_send`), alimentée par `EmailInvoiceReminderHandler` à chaque envoi réussi. `due_date_at_send` fige l'échéance du plan au moment de l'envoi : l'échéance courante est repoussée après une relance, et la frise a besoin de l'ancienne pour expliquer le rappel (nulle pour les rappels antérieurs à cette colonne). Dans `findAllBySalonId`, charger en **une seule requête** les rappels des plans du salon (`findByInvoicingPlanIdInOrderBySentDateAsc`) puis les grouper par plan. Pas de requête par plan.
-
-> L'historique antérieur n'est pas repris : les plans existants affichent 0 rappel. Les `EventLog` de rappel restent écrits, mais ne servent plus de source de vérité.
-
-Côté front, mettre à jour `IInvoicingPlanList` dans `admin/participation/model/invoicing-plan.interface.ts` avec les mêmes champs (`dayjs.Dayjs` pour les dates, conversion comme les autres services).
-
----
-
-## 3. Routes : filtrer sur une participation
-
-Suivre le modèle de `StandComponent` :
-
-- `participation.routes.ts` : ajouter `{ path: ':idParticipation/invoicing-plans', children: invoicingPlanRoutes }` et rediriger `:idParticipation/billing` vers cette route (l'écran `BillingComponent` est supprimé).
-- Le composant lit `idSalon` **et** `idParticipation` dans `paramMap`. Avec `idParticipation`, il filtre la liste du salon sur `participation.id` (côté client, pas de nouvel endpoint).
-- Sous-titre de page : `entityList.context.participation` (« Participation de {{name}} »), comme les stands.
-- Dans `participation.component.ts`, l'action de ligne « Facturation » (et le pied « factures ») pointe vers cette route.
-- Dans la liste des factures, l'action du rouage « Voir uniquement cette participation » navigue vers la même route.
-
----
-
-## 4. Liste : `InvoicingPlanListComponent`
-
-Réécrire le composant sur le modèle de `participation.component.ts` (signaux, `computed`, `EntityListState`, `connectQueryParams`).
-
-### 4.1 État
-
-```ts
-readonly state = new EntityListState({
-  defaultGroupBy: GROUP_PARTICIPATION_KEY,   // 'participation'
-  defaultSort: SORT_URGENCY_KEY,             // 'urgency'
-  sortOptions: [
-    {key: 'urgency', labelKey: 'invoicingPlan.list.sort.urgency', hintKey: 'invoicingPlan.list.sort.hint.urgency'},
-    {key: SORT_DATE_KEY, labelKey: 'invoicingPlan.list.sort.number'},
-    {key: SORT_ALPHA_KEY, labelKey: 'entityList.sort.alpha', hintKey: 'invoicingPlan.list.sort.hint.exhibitor'},
-    {key: 'balance', labelKey: 'invoicingPlan.list.sort.balance'}
-  ],
-  collapsedByDefault: groupBy => groupBy === GROUP_STATUS_KEY ? ['PAID', 'CANCELLED'] : []
-});
-readonly groupOptions = [
-  {key: 'participation', labelKey: 'invoicingPlan.list.group.participation'},
-  {key: GROUP_STATUS_KEY, labelKey: 'entityList.group.status'},
-  {key: 'due', labelKey: 'invoicingPlan.list.group.due'}
-];
-```
-
-### 4.2 Règles métier (fonctions pures dans `invoicing-plan-helper.service.ts`)
-
-- `isDraft(plan)` : `DRAFT` ou `ISOLATED`.
-- `isExpired(plan)` : existe déjà (état `ISSUED` et échéance passée).
-- `bucket(plan)` : `todo` (brouillons et `IS_ISSUING`), `late` (envoyée et échue), `wait` (envoyée), `PAID`, `CANCELLED`.
-- `urgency(plan)` : nombre de jours avant l'échéance pour `ISSUED` (négatif si échue), 500 pour `todo`, 900 sinon. Le tri « Urgence » est croissant.
-- `stateColor(plan)` : voir la table de la section 7. Remplace `getStateBadgeClass` pour cet écran.
-
-### 4.3 Puces de filtre
-
-Groupe « Statut » (mode `or`) : `todo` À envoyer, `wait` Envoyées, `late` Échues, `PAID` Payées, `CANCELLED` Annulées, chacune avec son point `stateColor`.
-
-Groupe « Signaux » (mode `and`, masquées si effectif nul) :
-
-| Clé | Libellé | Icône FA | Prédicat |
+| Vue | Contenu | Tri | Groupes |
 |---|---|---|---|
-| `postal` | Postale | `envelope` | `invoiceSendingMethod === POSTAL` |
-| `arrangement` | `entityList.signal.arrangement` | `handshake-simple` | `needArrangement` |
-| `reminded` | Relancée | `bell` | `state === ISSUED && reminders.length > 0` |
-| `customPrice` | Prix modifié | `tag` | `hasCustomPrice` |
+| **Tâches** | une carte repliable par tâche | **toujours par urgence** | **aucun** |
+| **Sous-tâches** | toutes les sous-tâches à plat | **toujours par échéance** | Échéance (défaut), Responsable, Statut |
 
-Pas de puce « partiellement payée ».
+Contraintes transverses :
 
-Recherche (`matchesSearch`) sur : `billingNumber`, nom de l'exposant (`getExhibitorFullName`), `participation.therapistName`.
-
-### 4.4 Groupes
-
-- **Participation** (défaut) : un groupe par participation, construit à la main (pas `groupByKey`, l'ordre dépend des montants).
-    - `label` = nom affiché de l'exposant ou du thérapeute, `rawLabel: true`.
-    - Ordre : plus petite urgence des plans du groupe d'abord (les participations en retard en premier) ; tri alpha si le tri choisi est « Alphabet ».
-    - `color` : `--app-status-refused` si un plan est échu, `--app-status-accepted` s'il reste un solde, `--app-text-muted` s'il n'y a que des brouillons, `--app-status-validated` sinon.
-    - `ratio` = payé ÷ (facturé + brouillons), pour que la barre du groupe montre la part payée.
-    - Résumé projeté `[groupSummary]` : `facturé 444.00 · payé 300.00 · reste 144.00 · brouillon 244.00` (le reste en `--app-danger` si échu, le brouillon seulement s'il existe).
-    - Facturé = somme des plans hors brouillons et hors annulés ; payé = somme des `paidAmount` hors annulés ; reste = somme des soldes positifs des plans `ISSUED`.
-- **Statut** : `groupByKey` avec l'ordre `late, todo, wait, PAID, CANCELLED`. Résumé : « reste x » (échues, en attente), « à facturer x » (brouillons), « encaissé x » (payées).
-- **Échéance** : `late` Échues, `week` Échéance dans 7 jours, `later` Plus tard, `nodate` Pas encore envoyées, `closed` Soldées ou annulées.
-
-Quand la liste est filtrée sur une participation (`idParticipation`), forcer l'affichage sans groupe participation (un seul groupe, ou le groupement par statut).
+- **Réutiliser au maximum** les composants, classes `el-*` et variables CSS `--app-*` existantes.
+- Le CSS spécifique va **dans le `.scss` du composant**, jamais dans `content/scss/` sauf s'il est réutilisable par d'autres listes.
+- Aucun changement backend requis (vérifier seulement le point 4.5 sur `snoozedUntil`).
 
 ---
 
-## 5. Ligne d'un plan
+## 2. Fichiers
 
-### 5.1 Faire évoluer `entity-row` (rétro-compatible)
+### À modifier / remplacer
 
-Aujourd'hui `entity-row` exige un `link` et tout clic navigue. Ajouter un mode dépliable sans casser les autres écrans :
+| Fichier | Action |
+|---|---|
+| `admin/task/list/task-focus-list.component.{ts,html,scss}` | Réécrire : socle `entity-list`, deux vues, plus de `TaskFilter`, plus de pilules maison, plus de `p-toggleswitch`. |
+| `admin/task/detail/task-card.component.{ts,html,scss}` | Réécrire (voir § 6). Supprimer les `p-tag` « En cours » / « Bloqué » du titre, la logique `activeFilter`, `accentClass`, l'édition inline du responsable. |
+| `admin/task/detail/subtask-row.component.*` | **Remplacer** par `subtask-line` (§ 7). |
+| `admin/task/detail/subtask-flat-row.component.*` | **Supprimer** (fusionné dans `subtask-line`). |
+| `i18n/fr/task.json` | Ajouter les clés du § 10. Supprimer les clés `task.filter.*` devenues inutiles. |
+
+### À créer
+
+| Fichier | Rôle |
+|---|---|
+| `admin/task/shared/subtask-status-icon.component.ts` | Pastille SVG de statut (§ 5). |
+| `admin/task/shared/subtask-status-panel.component.{ts,html,scss}` | Panneau ouvert au clic sur la pastille : radios de statut + échéance + attribution (§ 8). |
+| `admin/task/detail/subtask-line.component.{ts,html,scss}` | Ligne de sous-tâche, utilisée dans la vue à plat **et** dans les cartes (§ 7). |
+| `admin/task/shared/due-label.component.ts` | Libellé de délai en jours, avec la variante « repoussée » (§ 4.4). |
+| `admin/task/shared/task-urgency.utils.ts` | Fonctions pures : date effective, urgence, tri, groupes (§ 4). Avec tests unitaires. |
+| `admin/task/shared/responsible-avatar.component.ts` | Pastille d'initiales du responsable (§ 7.3). |
+
+---
+
+## 3. Socle `entity-list` à réutiliser
+
+Import depuis `app/shared/components/entity-list` (barrel `index.ts`).
+
+| Élément existant | Usage ici |
+|---|---|
+| `EntityListState` | Un état pour la vue Sous-tâches : `defaultGroupBy: 'urgency'`, `defaultSort: 'due'`, `sortOptions: []` (pas de choix de tri), `collapsedByDefault: g => g === 'urgency' ? ['DONE'] : g === 'status' ? ['DONE'] : []`. Pour la vue Tâches, seuls `query` et `activeChips` servent. Appeler `connectQueryParams(route, router)` comme dans `stand.component.ts` et ajouter un query param `view=tasks|subtasks`. |
+| `entity-list-toolbar` | Recherche + bouton « Grouper » + puces. **Vue Tâches** : le bouton « Grouper et trier » ne doit pas apparaître. Aujourd'hui `entity-list-toolbar` affiche toujours `entity-group-sort-menu` : ajouter un input `showGroupSort = input(true)` au toolbar et un `@if (showGroupSort())` autour du menu (rétrocompatible pour stands/participations). **Vue Sous-tâches** : `groupOptions` = Échéance, Responsable, Statut ; `sortOptions=[]`. |
+| `FilterChipGroup` / `applyChipFilters` | Groupe **Statut** (`mode: 'or'`) : À faire, En cours, Bloquées, Terminées (avec la pastille SVG en icône, cf. § 5). Groupe **Signaux** (`mode: 'and'`) : En retard, Sans responsable. **Pas** de puce « repoussée », **pas** de puce « fournisseur ». `buildStatusChipGroup` est typé sur l'enum `Status` des stands : construire le groupe à la main avec `TaskStatus`. |
+| `entity-list-group` | En-têtes de groupe de la vue Sous-tâches (collant, chevron, point de couleur, compteur, résumé, barre). Le slot `[groupSummary]` affiche « ◐ 2 en cours · ⊖ 1 bloquée » (+ « 3/7 » quand le groupe est Responsable). |
+| `groupByKey(items, order, keyFn, labelFn, colorFn)` | Construire les groupes (§ 4.6). |
+| `matchesSearch` / `entity-highlight` | Recherche sur titre de sous-tâche, titre de tâche, responsable. Surligner dans les titres. |
+| `entity-actions-menu` + `EntityAction` | **Rouage d'actions de la tâche** (§ 6.3), classe `.el-gear` déjà stylée dans `_entity-list.scss`. |
+| `.el-empty`, `button-box translateKey="entityList.clearFilters"` | États vides, comme dans `stand.component.html`. |
+
+Garder dans `appMenuBarEnd` le `menu-box` existant (Nouvelle tâche, Rafraîchir, actions métier serveur dont « Recalculer les dates »).
+
+---
+
+## 4. Règles métier (dans `task-urgency.utils.ts`, testées)
+
+Toutes les dates sont des `LocalDate` (`'YYYY-MM-DD'`). Utiliser `dayjs().startOf('day')` comme dans `days-relative.pipe.ts`.
+
+### 4.1 Sous-tâche active
+
+`active = status !== 'DONE' && status !== 'CANCELLED'`. `CANCELLED` se comporte comme `DONE` (non active) mais n'est jamais proposé dans le panneau de statut.
+
+### 4.2 Échéance effective (« repoussée »)
 
 ```ts
-readonly link = input<unknown[] | null>(null);       // n'est plus required
-readonly expandable = input<boolean>(false);
-readonly expanded = model<boolean>(false);
+isMoved(s)  = active(s) && !!s.snoozedUntil && !!s.dueDate && s.snoozedUntil !== s.dueDate
+effectiveDue(s) = isMoved(s) ? s.snoozedUntil : s.dueDate
 ```
 
-- Si `expandable()` : le titre devient un `<button type="button" class="el-row-link">` avec `aria-expanded`, et un clic bascule `expanded`. Le pseudo-élément `::after` couvre toujours la carte.
-- Nouveau slot `<ng-content select="[rowDetail]">`, rendu **après** le pied, seulement si `expanded()`, dans `<div class="el-row-detail">`. Ce conteneur a `position: relative; z-index: 1` pour passer au-dessus du lien étendu, et occupe `grid-column: 1 / -1`.
-- Sinon, comportement actuel inchangé (`routerLink`).
-- Ajouter le style `.el-row-detail` dans `_entity-list.scss` : marges négatives pour toucher les bords de la carte, fond `--app-surface-muted`, `border-top: 1px solid var(--app-border)`, coins bas arrondis.
+**« Repoussée » n'est pas un statut.** Une sous-tâche peut être Bloquée *et* repoussée. Elle se range partout selon `effectiveDue`.
 
-Vérifier que la liste des participations, des stands, des salons et des tâches s'affiche toujours à l'identique.
+### 4.3 Jours restants
 
-### 5.2 Contenu de la ligne
+`n = effectiveDue − aujourd'hui` en jours.
+
+| n | Libellé (`task.due.*`) |
+|---|---|
+| `null` | sans date |
+| `< -1` | `{{n}} j de retard` |
+| `-1` | hier |
+| `0` | aujourd'hui |
+| `1` | demain |
+| `> 1` | dans `{{n}} j` |
+| sous-tâche terminée | `fait {{timeSince}}` (pipe `timeSince` existant) |
+
+### 4.4 Libellé d'une échéance repoussée (`due-label`)
+
+Une seule ligne, **sans icône**, le mot « dans » **une seule fois**, **seuls les jours sont barrés** :
+
+| Ancien (dueDate) | Nouveau (snoozedUntil) | Rendu HTML |
+|---|---|---|
+| dans 7 j | dans 9 j | `dans <s>7 j</s> 9 j` |
+| 7 j de retard | 3 j de retard | `<s>7 j</s> 3 j de retard` |
+| autres cas (retard → futur, etc.) | | `<s>3 j de retard</s> dans 3 j` |
+
+- `title` (survol) : « Limite repoussée de 6 j : mer. 21 oct. → mar. 27 oct. »
+- Pas de date sous le délai. Date exacte uniquement au survol (`title`), format `fr-CH` (`EEE d MMM`).
+- Couleur du texte = urgence de la **nouvelle** date (§ 9). Le `<s>` est en `--app-text-muted`, poids normal.
+- Envelopper chaque morceau dans `white-space: nowrap` pour que, sur téléphone, la coupure tombe entre l'ancien et le nouveau délai.
+
+### 4.5 Repousser / revenir
+
+- « +1 j / +3 j / +7 j » : `nouvelleDate = max(effectiveDue, aujourd'hui) + N`, puis
+  `taskInstanceService.patchSubtask(id, { snoozeUntilType: 'FIXED', snoozedUntil: nouvelleDate, snoozeOffset: null })`.
+- « Revenir au {{date}} » (visible seulement si `isMoved`) :
+  `patchSubtask(id, { snoozeUntilType: null, snoozedUntil: null, snoozeOffset: null })`.
+- ⚠️ Vérifier que `PATCH /subtasks/{id}` accepte ces champs et ne recalcule pas `snoozedUntil` depuis `snoozeOffset` quand `snoozeUntilType = 'FIXED'`. Sinon, signaler avant d'aller plus loin.
+
+### 4.6 Urgence (clé de groupe et de tri)
+
+```ts
+type Urgency = 'LATE' | 'TODAY' | 'WEEK' | 'LATER' | 'NODATE' | 'DONE'; // UrgencyGroup existe déjà, l'étendre
+urgency(s): !active(s) → 'DONE'; n==null → 'NODATE'; n<0 → 'LATE'; n==0 → 'TODAY'; n<=7 → 'WEEK'; sinon 'LATER'
+```
+
+Ordre des groupes : `LATE, TODAY, WEEK, LATER, NODATE, DONE`. Libellés : En retard, Aujourd'hui, Dans les 7 jours, Plus tard, Sans date, Terminées. `DONE` replié par défaut.
+
+**Groupe Responsable** : `owner(s) = s.responsible ?? task.responsible ?? null`. Ordre : « Sans responsable » en premier, puis alphabétique (`compareAlpha`).
+**Groupe Statut** : ordre `BLOCKED, IN_PROGRESS, PENDING, DONE` (libellés Bloquées, En cours, À faire, Terminées). `DONE` replié.
+
+### 4.7 Tri
+
+- **Sous-tâches** : toujours `effectiveDue` croissante, `null` en dernier, puis `sortOrder`. Pas d'option de tri.
+- **Tâches** : toujours par **score d'urgence** décroissant, puis `effectiveDue` de la prochaine sous-tâche active :
+  ```
+  score = late*100 + blocked*50 + today*30 − (toutes terminées ? 1000 : 0)
+  ```
+  Pas de groupe, pas d'option de tri, pas de tri par titre.
+
+### 4.8 Prochaine sous-tâche d'une tâche
+
+Première sous-tâche active triée par `effectiveDue` (l'interface `INextSubtask` existe déjà).
+
+---
+
+## 5. Pastille de statut (`subtask-status-icon`)
+
+Remplace `p-checkbox` **et** tout libellé de statut dans la ligne. **Un seul indicateur de statut par ligne** : pas de `p-tag`, pas de texte « En cours » / « Bloquée », pas de titre coloré.
+
+SVG 20×20, la **forme** porte l'information (lisible sans couleur) :
+
+| Clé | Forme | Couleur |
+|---|---|---|
+| `PENDING` | cercle vide (trait 2 px) | `--app-text-muted` |
+| `LATE` (= PENDING en retard) | cercle vide + point central | `--app-status-refused` |
+| `IN_PROGRESS` | cercle vide + demi-disque droit plein | `--app-primary` |
+| `BLOCKED` | disque plein + barre horizontale blanche | `--app-offer` |
+| `DONE` | disque plein + coche blanche | `--app-status-validated` |
 
 ```html
-<entity-row [actions]="actionsFor(plan)" [expandable]="true" [(expanded)]="…">
-  <span rowTitle>
-    @if (groupedByParticipation()) { Facture <b>{{ plan.billingNumber }}</b> }
-    @else { <span class="el-ip-num">{{ plan.billingNumber }}</span> <entity-highlight [text]="exhibitorName(plan)" [query]="state.query()"/> }
-  </span>
-  <entity-status rowStatus [color]="stateColor(plan)" [labelKey]="'invoicingPlan.state.' + plan.state"
-                 [strikethrough]="plan.state === 'CANCELLED'"/>
-  <ng-container rowMeta> <!-- une seule date, voir 5.3 --> </ng-container>
-  <span rowSide> <!-- solde, voir 5.3 --> </span>
-  <ng-container rowFoot> <!-- infos, voir 5.3 --> </ng-container>
-  <invoicing-plan-detail rowDetail [planId]="plan.id" [participationId]="plan.participation.id"/>
-</entity-row>
+<!-- extrait : IN_PROGRESS -->
+<svg viewBox="0 0 20 20" aria-hidden="true">
+  <circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/>
+  <path d="M10 4.5a5.5 5.5 0 0 1 0 11z" fill="currentColor"/>
+</svg>
 ```
 
-Pour un plan échu, le statut affiche « Échue » (`invoicingPlan.state.EXPIRED`, à ajouter) en `--app-status-refused`, au lieu de « Envoyée ».
+Formes complètes (copier telles quelles) :
 
-### 5.3 En-tête et pied : le minimum
+```ts
+PENDING:     '<circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/>'
+LATE:        PENDING + '<circle cx="10" cy="10" r="2.6" fill="currentColor"/>'
+IN_PROGRESS: PENDING + '<path d="M10 4.5a5.5 5.5 0 0 1 0 11z" fill="currentColor"/>'
+BLOCKED:     '<circle cx="10" cy="10" r="8.5" fill="currentColor"/><rect x="5.5" y="8.8" width="9" height="2.4" rx="1" fill="var(--app-surface)"/>'
+DONE:        '<circle cx="10" cy="10" r="8.5" fill="currentColor"/><path d="M6.3 10.3l2.5 2.5 4.9-5.2" fill="none" stroke="var(--app-surface)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+```
 
-**Méta (sous le titre) : une seule date courte**, icône `clock`, sans phrase :
-
-| État | Texte | Couleur |
-|---|---|---|
-| Brouillon | `créée 21.10` | `--app-text-muted` |
-| En cours d'envoi | `envoi en cours` | `--app-status-accepted` |
-| Envoyée | `échéance 05.11` | `--app-text` ; `--app-warn` si ≤ 7 jours |
-| Échue | `échéance 12.10` | `--app-danger`, gras |
-| Payée | `payée 24.09` | `--app-status-validated` |
-| Annulée | `annulée 08.09` | `--app-text-muted` |
-
-Ne pas écrire « échue depuis 13 j » dans l'en-tête. Format de date : `dd.MM`, l'année est implicite.
-
-**Côté droit : le solde seul.** Brouillon : `à facturer 244.00`. Envoyée : `reste 144.00` (rouge si échue, vert `0.00` si soldée). Payée : `payée 444.00` en vert (ou `trop-perçu x` en `--app-warn`). Annulée : montant barré en `--app-text-muted`. Pas de total ni de payé dans l'en-tête.
-
-**Pied : des icônes, du texte seulement pour les quantités.**
-
-| Info | Rendu | Composant |
-|---|---|---|
-| Nombre de lignes | icône `list` + « 3 lignes » | `entity-count` |
-| Envoi email / postal | icône `at` (email) / `envelope` (postal, comme dans billing) seule, `title` en tooltip | `entity-foot-item` sans `showLabel` |
-| Arrangement | icône `handshake-simple` seule, couleur `--app-primary` | `entity-foot-item` |
-| Rappels (si `ISSUED`) | icône `bell` + « 1 rappel », couleur `--app-warn` | `entity-count` |
-| Prix modifié | icône `tag` seule, couleur `--app-warn` | `entity-foot-item` |
-
-Rien pour un paiement partiel. Le rouage reste à droite.
-
-Icônes : toutes sont déjà enregistrées dans `config/font-awesome-icons.ts` (`list`, `envelope`, `handshake-simple`, `bell`, `tag`, `clock`, `circle-info`) sauf `at` : ajouter `faAt` (import et `library.addIcons`).
-
-### 5.4 Actions : extraire un service partagé
-
-Créer `admin/invoicing-plan/service/invoicing-plan-actions.service.ts` en y déplaçant depuis `billing.component.ts` : `clickAction`, `openEmailPopup`, `handleBusinessAction`, `executeBusinessAction` et le téléchargement (`getFilenameFromContentDisposition`). Le service renvoie un `Observable<void>` qui se termine quand l'action est faite, pour que l'appelant recharge. `billing.component.ts` est ensuite supprimé.
-
-**Rouage de la ligne (`actionsFor`)** : les `availableActions` du plan, **chargées à la demande** (première ouverture du rouage ou premier dépliage, mises en cache par plan ; un item « Chargement… » désactivé patiente), plus « Voir uniquement cette participation », « Fiche participation », « Fiche client » et « Historique » (`getEventLogs`). Calcul mis en cache dans un `computed`, comme `participation.component.ts`, pour éviter le double clic.
-
-### 5.5 Rafraîchissement après une action asynchrone
-
-Les envois d'email (facture, renvoi, rappel, quittance) se terminent dans un thread serveur bien après la réponse HTTP : la facture resterait affichée « En cours d'envoi » jusqu'à un rafraîchissement manuel. À la fin du traitement, et **après le commit**, `EntityChangeNotifier` publie `{entityType, entityId}` sur `/topic/salon/{idSalon}/entity-changed` (canal découpé par salon : le front connaît déjà cet identifiant, et un salon appartient à un seul locataire).
-
-Côté front, `EntityChangeService.watchSalon(idSalon)` réutilise le client STOMP de `PresenceService` (réabonnement à chaque reconnexion via `connected$`). La liste recharge alors **uniquement** la facture concernée (`GET /api/admin/invoicing-plans/{id}/summary` → `InvoicingPlanListDTO`), remplace la ligne dans son signal et recharge ses actions ; le détail ouvert se recharge grâce à un effet sur `summary()`.
-
-> Filet de sécurité : tant qu'une facture reste en `IS_ISSUING`, un rechargement unique est programmé 20 s plus tard, au cas où la notification n'arriverait jamais (socket coupé, serveur redémarré).
-
-**Attente visible.** `InvoicingPlanActionsService` marque la facture « en attente » dès qu'une action asynchrone est lancée (`invoice-send`, `invoice-send-again`, `invoice-reminder`, `receipt-send`) ; l'attente est levée à l'arrivée de la notification, avec une expiration de secours à 60 s. Une facture est en attente si elle est dans cet état **ou** si son état serveur est `IS_ISSUING`. Pendant ce temps : pastille « Envoi en cours… » avec spinner dans le pied de la ligne, spinner devant le libellé de la bande d'actions du détail, et actions serveur désactivées (le rouage garde la navigation et l'historique) pour éviter un double envoi.
-
-### 5.6 Portée du rafraîchissement d'une action
-
-Chaque action déclare côté serveur ce que l'écran doit relire : `ContextActionType.refreshScope()` renvoie `ENTITY`, `LIST` ou `NONE`, valeur transportée par `ActionAvailable` puis par `AvailableAction` côté front (repli sur `ENTITY`).
-
-| Portée | Effet | Actions |
-|---|---|---|
-| `ENTITY` | relire uniquement cette facture : sa ligne et le détail déplié | toutes les actions métier et emails |
-| `LIST` | recharger la liste | `invoice-split`, `invoice-delete`, `salon-duplicate` |
-| `NONE` | ne rien relire | tous les téléchargements |
-
-`InvoicingPlanActionsService.run()` renvoie donc un `Observable<RefreshScope>` : la liste applique la portée (`applyRefresh`), et le détail émet `refreshed` (ciblé) ou `changed` (liste). Les ajouts et modifications de lignes de facture et de paiements passent aussi en ciblé. Le détail ne se recharge pas lui-même : la liste remplace l'objet de la ligne et l'effet sur `summary()` déclenche l'unique relecture du détail. La vue d'une participation applique la même règle pour ne pas se relire après une action `NONE`.
+- Rendue dans un `<button>` 24×24, `border-radius: 50%`, fond `--app-surface-muted` au survol.
+- `aria-label` : « Statut : En cours. Changer le statut » ; `title` : « En cours » (+ « · en retard »).
+- Réutilisée dans : la ligne, les puces de filtre Statut, le résumé des en-têtes de groupe, le panneau.
 
 ---
 
-## 6. Détail d'un plan : `InvoicingPlanDetailComponent`
+## 6. Vue Tâches : carte `task-card`
 
-Nouveau composant standalone dans `admin/invoicing-plan/detail/`, `OnPush`, à base de signaux. Il est créé seulement quand la ligne est dépliée.
+### 6.1 Structure
 
-### 6.1 Données
+```
+┌──────────────────────────────────────────────────────────┐
+│ Titre de la tâche                                2/5  ▾  │  ← en-tête cliquable (role=button, aria-expanded)
+│ Prochaine : Confirmer les menus   demain                 │  ← seulement si repliée
+│ ▬▬▬▬ ▬▬▬▬ ▬▬▬▬ ▬▬▬▬ ▬▬▬▬                            ⚙  │  ← barre segmentée + rouage d'actions
+├──────────────────────────────────────────────────────────┤
+│ Description (si présente)                                │  ← seulement si dépliée
+│ Resp. Marc · 2 comm. · Voir dans la liste →              │
+│ ◐ Relancer les contrats non signés     4 j de retard  MA │  ← subtask-line (sans nom de tâche)
+│ ◐ Attribuer les emplacements                dans 7 j  MA │
+│ ▸ 2 terminées                                            │  ← terminées repliées
+│ [ Ajouter une sous-tâche…                ] [Ajouter]     │
+└──────────────────────────────────────────────────────────┘
+```
 
-- `participationService.getInvoicingPlans(participationId)` renvoie les `IInvoicingPlan` complets (lignes, paiements). Mettre la réponse en cache par participation dans le composant de liste, pour qu'ouvrir un deuxième plan de la même participation ne relance pas d'appel. Choisir le plan par `planId`.
-- `actionsService.getAvailableActions('billing', planId)`.
-- Après toute action ou modification : vider le cache de la participation, recharger la liste (montants et statut de la ligne) et le détail.
+### 6.2 Règles
 
-### 6.2 Structure (de haut en bas)
+- **Pas de pastilles/badges à côté du titre** (pas de « 2 en retard », « 1 bloquée », « En cours »). La barre segmentée suffit.
+- **Repliée par défaut, sauf la première carte** (la plus urgente après tri). Pendant une recherche (`state.isFiltering`), toutes les cartes qui ont un résultat s'ouvrent. Un clic sur l'en-tête bascule ; l'état choisi par l'utilisateur est conservé (`Map<taskId, boolean>` dans le composant liste).
+- Bordure de carte `color-mix(in srgb, var(--app-danger) 45%, var(--app-border))` si au moins une sous-tâche en retard.
+- **Barre segmentée** : un segment par sous-tâche (triées par `effectiveDue`), hauteur 5 px, `gap: 3px`, `border-radius: 2px`. Couleur : DONE `--app-status-validated`, IN_PROGRESS `--app-primary`, BLOCKED `--app-offer`, PENDING en retard `--app-danger`, PENDING aujourd'hui `--app-warning`, sinon `--app-border`. `title` = « titre · statut ».
+- « Voir dans la liste → » : passe en vue Sous-tâches avec une puce de contexte Tâche : X (filtre sur `taskInstanceId`).
+- Ajout rapide : `taskInstanceService.addSubtask(task.id, { title })`, Entrée pour valider, champ garde le focus.
 
-1. **Bande d'actions** `el-ip-band` : fond `--app-surface`, `border-bottom: 1px solid var(--app-border)`, collée aux bords du détail. À gauche, la prochaine étape en gras : « À envoyer », « À poster », « À relancer » (`--app-danger`), « Attendre le paiement », « À clôturer », « Réglée » (`--app-status-validated`). À droite, les actions principales (6.3) avec `button-box`. En dessous de 520 px, les boutons passent en pleine largeur.
-2. **Frise** `el-ip-timeline` (6.4), sur toute la largeur.
-3. **Carte « Lignes de facture »**.
-4. **Carte « Paiements »**.
-5. **Carte « Solde »** : une seule ligne.
+### 6.3 Rouage d'actions
 
-Les trois cartes utilisent le même style : fond `--app-surface`, bordure `--app-border`, rayon 12 px, en-tête en petites capitales `--app-text-muted` avec un compteur, `thead` sur fond `--app-surface-muted`, pied de tableau sur fond `--app-surface-muted` en gras.
-
-### 6.3 Actions principales par état
-
-N'afficher une action que si elle figure dans `availableActions` et n'est pas `disabled`. Codes = `ContextActionType.code()`.
-
-| État | Action 1 (bouton `primary`) | Action 2 |
-|---|---|---|
-| Brouillon, envoi email | `invoice-send` | `invoice-download` |
-| Brouillon, envoi postal | `invoice-marked-as-issued` | `invoice-download` |
-| En cours d'envoi | aucune | — |
-| Envoyée, solde ≤ 0 | `invoice-marked-as-paid` | — |
-| Échue | `invoice-reminder` (bouton `danger`) | Ajouter un paiement |
-| Envoyée, dans les délais | Ajouter un paiement | `invoice-pay-all-cash` |
-| Payée | `receipt-send` | `receipt-download` |
-| Annulée | aucune | — |
-
-« Ajouter un paiement » n'est pas une `AvailableAction` : il ouvre le `dialog-box` avec `app-payment-form` (comme `billing.component.ts` → `addPayment`), visible si l'état est `ISSUED` et que le plan n'est pas bloqué (`canMutatePlan`).
-
-Toutes les autres actions restent dans le rouage de la ligne.
-
-### 6.4 Frise des dates
-
-Étapes, dans cet ordre puis triées par date (les étapes sans date restent à la fin) :
-
-1. **Générée** : `generationDate`, toujours passée (`ok`).
-2. **Envoyée** : `issuedDate` ; sans date, elle est l'étape en cours (`now`) pour un brouillon et affiche « — ».
-3. **Rappel** : une étape par entrée de `reminders`, style `warn`. Quand `dueDateAtSend` est connue et que le rappel a été envoyé après, le libellé devient « Rappel J+N » et une infobulle rappelle l'échéance dépassée.
-4. **Échéance** : `expirationDate` ; `ok` si payée, `bad` si échue, `now` si envoyée ; « envoi + 30 j » pour un brouillon. Omise si annulée.
-5. **Payée** (`lastPaymentDate`, `ok`), ou **Annulée** (`bad`).
-
-Rendu : une grille de `N` colonnes égales (`minmax(58px, 1fr)`, défilement horizontal si trop étroit). Dans chaque colonne, **le nom de l'étape au-dessus du jalon, la date en dessous** (`dd.MM`). Les jalons sont des cercles de 14 px reliés par un trait de 2 px :
-
-- trait vert `--app-status-validated` entre deux étapes passées ;
-- trait rouge `--app-danger` après l'échéance quand le plan est échu ;
-- trait pointillé `--app-border` vers une étape future.
-
-Couleurs des jalons : `ok` plein `--app-status-validated` ; `now` cerclé `--app-status-accepted` avec un halo `--app-primary-soft` ; `bad` plein `--app-danger` (libellé et date en rouge) ; `warn` (rappel) plein `--app-warn` ; futur cerclé `--app-border`, texte `--app-text-muted`.
-
-Sous 520 px : libellés en 11 px, colonnes de 54 px.
-
-**Point « aujourd'hui »** (seulement pour brouillon, en cours d'envoi, envoyée) :
-
-- Point de 12 px, couleur `--app-status-gold`, halo `--app-warn-soft`, **sans libellé** (`title` et `aria-label` « Aujourd'hui 25.10 »).
-- Position : prendre `a` = dernière étape datée ≤ aujourd'hui, `b` = l'étape suivante. Centre d'une colonne `i` : `(i + 0.5) / N × 100 %`.
-    - Si `b` est datée dans le futur : `f = (aujourd'hui − a) / (b − a)`, borné entre 0,22 et 0,78.
-    - Sinon (aucune date connue après) : `f = 0,35`, c'est-à-dire juste après le dernier jalon, ce qui montre que le délai est dépassé.
-    - `left = centre(a) + f × (centre(b) − centre(a))`.
-- Un trait de progression part du centre de `a` jusqu'au point : `--app-danger` si échue, `--app-status-accepted` si envoyée dans les délais, `--app-text-muted` pour un brouillon.
-
-### 6.5 Carte « Lignes de facture »
-
-- En-tête : « Lignes de facture », compteur, et à droite « + Ligne » seulement si `showCreateInvoice` (brouillon, plan non bloqué).
-- Colonnes : **Libellé**, **Qté**, **Prix**, **Montant**. Pas de colonne Type.
-- Libellé : texte et, en petit `--app-text-muted`, le commentaire (`extraInformation`). Icône `circle-info` en `--app-warn` si `customAmount ≠ defaultAmount`, avec le tooltip existant `invoicingPlan.amount.different`.
-- Montant = `quantity × customAmount`, en gras ; négatif en `--app-danger`.
-- Pied : « Total » et la somme.
-- Si `showInvoiceActions` : toute la ligne est cliquable (et activable au clavier avec Entrée) et ouvre le dialogue d'édition existant (`app-invoice-form`). La suppression (lignes `OTHERS` seulement) se fait depuis ce dialogue.
-- Sous 560 px : Qté et Prix sont masqués et affichés sous le libellé (`2 × 22.00`).
-
-### 6.6 Carte « Paiements »
-
-- En-tête : « Paiements » et compteur. **Pas de bouton d'ajout** ici (l'ajout se fait depuis la bande d'actions).
-- Colonnes : **Date** (`dd.MM.yyyy`), **Mode** (`payment.type.list.*`), **Commentaire**, **Montant** en `--app-status-validated`.
-- Pied : « Payé » et la somme.
-- Lignes cliquables si `showPaymentActions` : dialogue d'édition existant, avec la suppression.
-- Brouillon : texte « Les paiements s'ajoutent une fois la facture envoyée. » ; envoyée sans paiement : « Aucun paiement reçu. »
-- Sous 560 px : Mode et Commentaire passent sous la date.
-
-### 6.7 Carte « Solde »
-
-Une ligne de tableau, même style que les pieds de tableau mais un peu plus haute :
-
-| Cas | Gauche (gras) + sous-texte | Droite | Fond |
-|---|---|---|---|
-| Brouillon | « À facturer » · « envoi par email » / « envoi par la poste » | `CHF 244.00` | `--app-surface-muted` |
-| Envoyée | « Solde dû » · « échéance le 05.11.2026 » | `CHF 144.00` | `--app-surface-muted` |
-| Échue | « Solde dû » · « échue depuis 13 j » | `CHF 144.00` en `--app-danger` | `--app-danger-soft` |
-| Soldée / payée | « Soldé » · « payée le 24.09.2026 » | `0.00` en `--app-status-validated` | `--app-exit-soft` |
-| Trop-perçu | « Trop-perçu » · « à rembourser » | montant en `--app-warn` | `--app-warn-soft` |
-| Annulée | « Plan annulé » · « annulé le … » | « — » | `--app-surface-muted` |
+- Tout **en bas à droite de l'en-tête**, sur la même ligne que la barre segmentée (`display:flex; gap:10px`, barre en `flex:1`).
+- Utiliser **`<entity-actions-menu [actions]="actions()">`** (rendu `.el-gear` + `pi pi-cog`, identique aux stands et participations). Le clic ne doit pas plier/déplier la carte (`$event.stopPropagation()` déjà géré par `openMenu`).
+- Construire les `EntityAction[]` **une fois par jeu de données** (`computed` + `Map`), comme `participation.component.ts > rowActions`, pour éviter le double clic.
+- Actions (reprendre les clés existantes `task.menu.*`) :
+  1. Modifier la tâche — `pi pi-pencil` → ouvre le `dialog-box` + `app-task-instance-form` existant.
+  2. *(séparateur)* Ajouter une sous-tâche — `pi pi-plus` → déplie la carte et focus le champ d'ajout rapide (ou dialog existant).
+  3. Ajouter un commentaire — `pi pi-comment` → dialog commentaire existant.
+  4. Commentaires (n) — `pi pi-inbox`, `disabled` si 0 → affiche la section commentaires repliable existante.
+  5. *(séparateur)* Supprimer la tâche — `pi pi-trash`, `danger: true` → **`ConfirmDialogService.confirmAction(target, 'task.menu.deleteConfirm')`** (remplace le `confirm()` natif actuel).
+- Si des actions serveur existent pour la tâche (`ActionsService.getAvailableActions('task', id, …)`), les ajouter après un séparateur avec `MenuItemBuilderService`, comme pour le menu de la page.
 
 ---
 
-## 7. Couleurs : uniquement les variables du projet
+## 7. Ligne de sous-tâche `subtask-line`
+
+### 7.1 Grille
+
+```
+[pastille 24px] [titre ……… tâche parente…] [délai auto] [avatar 20px]
+```
+
+```scss
+:host { display: block; }
+.st-line {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto 20px;
+  gap: 10px;
+  align-items: center;
+  min-height: 40px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  &:hover { background: var(--app-surface-muted); }
+  & + & { box-shadow: 0 -1px 0 var(--app-line); }  // filet entre lignes, pas de cadre
+}
+.st-main { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.st-title {                       // PRIORITAIRE : ne rétrécit pas avant 75 %
+  flex: 0 0 auto; max-width: 75%;
+  font-size: var(--app-fs-md); font-weight: 500; color: var(--app-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.st-task {                        // SECONDAIRE : rétrécit en premier, ellipsis
+  flex: 0 1 auto; min-width: 0; margin-left: auto; text-align: right;
+  font-size: var(--app-fs-sm); color: var(--app-text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: none; border: 0; padding: 0; cursor: pointer;
+  &:hover { color: var(--app-text); text-decoration: underline; }
+}
+.st-due { min-width: 92px; text-align: right; }
+
+@container el (max-width: 600px) {   // .el-list déclare déjà container-name: el
+  .st-line { align-items: start; gap: 4px 8px; padding: 6px 4px; }
+  .st-main { flex-direction: column; align-items: stretch; gap: 1px; }
+  .st-title { max-width: none; white-space: normal; overflow-wrap: anywhere; line-height: 1.3; }
+  .st-task { margin-left: 0; text-align: left; }
+  .st-due { min-width: 0; max-width: 110px; white-space: normal; }
+}
+.is-done .st-title { text-decoration: line-through; color: var(--app-text-muted); }
+```
+
+### 7.2 Contenu
+
+- **Pastille** (§ 5) → ouvre le panneau (§ 8).
+- **Titre** : `entity-highlight` sur la recherche, `title` = titre complet.
+- **Tâche parente** (`@if (showTask)`) : texte seul, **sans puce de couleur**, ellipsis, `title` = « {{titre}} · ouvrir la carte ». Clic → vue Tâches, carte dépliée et défilée (`scrollIntoView` + courte animation `box-shadow` `--app-primary`). Masquée quand la ligne est dans une carte, ou quand la vue Sous-tâches est groupée par Tâche (non proposé pour l'instant).
+- **Délai** : `due-label` (§ 4.3, 4.4).
+- **Avatar responsable** tout à droite (§ 7.3). Masqué (cellule vide, colonne conservée) quand la vue est groupée par Responsable.
+- **Pas** de menu ⋯ (tout passe par le panneau), **pas** de fournisseur, **pas** de `p-tag`.
+
+### 7.3 Avatar `responsible-avatar`
+
+- 20×20, rond, initiales (2 premières lettres, majuscules), `font-size: 10px; font-weight: 700`.
+- `s.responsible` défini : fond plein, texte `--app-surface`.
+- Seulement `task.responsible` : **contour** 1,5 px de la même couleur, fond transparent (« via la tâche » dans le `title`).
+- Personne : contour **pointillé** `--app-warning`, texte « ? », `title` « Sans responsable ».
+- Couleur stable par personne : index du nom dans la liste triée des responsables, modulo la palette existante :
+  `[--app-primary, --app-accent, --app-offer, --app-amber, --app-share, --app-exit]`.
+
+---
+
+## 8. Panneau de statut `subtask-status-panel`
+
+`p-popover` ancré sur la pastille (`appendTo="body"`), largeur 260 px. Sections séparées par `<hr>` :
+
+1. **STATUT** — `role="radiogroup"`, 4 options en `p-radiobutton` (ou `<input type="radio">` stylé) : À faire, En cours, Bloquée, Terminée, chacune précédée de sa pastille. Statut courant coché + fond `--app-surface-muted` + `font-weight: 700`.
+   Changement → `taskInstanceService.updateSubtaskStatus(id, status)`, fermeture du panneau, toast avec **Annuler** (rétablit l'ancien statut).
+2. **ÉCHÉANCE** (si active) — « Limite : **mar. 27 oct.** · dans 3 j », + « Limite d'origine : mer. 21 oct. » si repoussée. Boutons pilule « Repousser +1 j · +3 j · +7 j » et lien « Revenir au 21 oct. » (§ 4.5).
+3. **ATTRIBUER À** — pilules des responsables connus (union des `responsible` de toutes les tâches/sous-tâches du salon) + « Personne » si déjà attribuée. → `patchSubtask(id, { responsible })`.
+4. « Modifier… » → `dialog-box` + `app-subtask-instance-form` existant.
+
+Clavier : Tab jusqu'à la pastille, Entrée ouvre, focus sur le radio coché, flèches pour changer, Échap ferme.
+
+Styles des titres de section : reprendre `.el-radio-label` (`--app-fs-xs`, `700`, `uppercase`, `letter-spacing: .06em`, `--app-text-muted`).
+
+---
+
+## 9. Couleurs : correspondance avec les variables du projet
+
+**Ne pas créer de nouvelles couleurs.** Utiliser ces variables de `content/scss/_variables.scss` :
 
 | Usage | Variable |
 |---|---|
-| Fond des cartes, de la bande d'actions | `--app-surface` |
-| Fond du détail déplié, en-têtes et pieds de tableau | `--app-surface-muted` |
-| Bordures, traits, jalons futurs | `--app-border` |
-| Texte principal / secondaire | `--app-text` / `--app-text-muted` |
-| Statut Brouillon, Brouillon isolé | `--app-status-neutral` |
-| Statut En cours d'envoi, Envoyée ; jalon « en cours » | `--app-status-accepted` (halo `--app-primary-soft`) |
-| Statut Échue, retard, montant échu | `--app-danger` (texte) ; `--app-status-refused` (pastille de statut) ; fond `--app-danger-soft` |
-| Statut Payée, paiements, jalons passés | `--app-status-validated` ; fond `--app-exit-soft` |
-| Statut Annulée | `--app-status-canceled` (libellé barré) |
-
-> Le statut d'une ligne (`entity-status`) s'affiche en **pastille pleine** : la couleur du statut sert de fond et le libellé est écrit en blanc. La précision éventuelle (« · J-22 ») reste en gris, à l'extérieur de la pastille.
-| Échéance ≤ 7 jours, rappels, prix modifié, trop-perçu | `--app-warn` ; fond `--app-warn-soft` |
-| Arrangement | `--app-primary` |
-| Point « aujourd'hui » | `--app-status-gold` |
-| Bouton principal | `button-box` type `primary` ; « Envoyer un rappel » en type `danger` |
-| Surlignage de recherche | `.el-mark` existant (`--app-warn-soft`) |
+| Fond carte / ligne | `--app-surface` |
+| Survol ligne, fond actif | `--app-surface-muted` |
+| Bordures | `--app-border` ; filets fins `--app-line` |
+| Texte / texte secondaire | `--app-text` / `--app-text-muted` |
+| **En retard** (texte délai, pastille LATE) | `--app-status-refused` ; segment de barre `--app-danger` |
+| **Aujourd'hui** | `--app-warn` (texte) ; segment `--app-warning` |
+| **Dans les 7 jours** | `--app-primary` |
+| Plus tard / sans date | `--app-text-muted` |
+| **En cours** | `--app-primary` (fond doux : `--app-primary-soft`) |
+| **Bloquée** | `--app-offer` |
+| **Terminée** | `--app-status-validated` |
+| Sans responsable | `--app-warning` (pointillé) |
+| Sélection / focus | `--app-primary`, `--app-primary-soft`, `--app-primary-line` |
 | Tailles de texte | `--app-fs-xs`, `--app-fs-sm`, `--app-fs-md` |
 
-Si une teinte manque vraiment, la signaler en commentaire plutôt que d'en inventer une.
+Si un composant a besoin d'un alias, le déclarer **dans son `:host`** :
 
----
-
-## 8. Traductions à ajouter (`i18n/fr/invoicingPlan.json`)
-
-```json
-"state": { "EXPIRED": "Échue" },
-"list": {
-  "searchPlaceholder": "Exposant, n° de facture, stand…",
-  "group": { "participation": "Participation", "due": "Échéance" },
-  "sort": { "urgency": "Urgence", "number": "N° de facture", "balance": "Solde",
-            "hint": { "urgency": "échues puis échéances proches", "exhibitor": "nom de l'exposant" } },
-  "statusGroup": { "late": "Échues", "todo": "À envoyer", "wait": "En attente de paiement", "PAID": "Payées", "CANCELLED": "Annulées" },
-  "dueGroup": { "late": "Échues", "week": "Échéance dans 7 jours", "later": "Échéance plus tard", "nodate": "Pas encore envoyées", "closed": "Soldées ou annulées" },
-  "chip": { "todo": "À envoyer", "wait": "Envoyées", "late": "Échues", "PAID": "Payées", "CANCELLED": "Annulées",
-            "postal": "Postale", "reminded": "Relancée", "customPrice": "Prix modifié" },
-  "summary": { "billed": "facturé", "paid": "payé", "left": "reste", "draft": "brouillon", "toInvoice": "à facturer", "cashed": "encaissé" },
-  "meta": { "created": "créée {{date}}", "issuing": "envoi en cours", "due": "échéance {{date}}", "paid": "payée {{date}}", "cancelled": "annulée {{date}}" },
-  "side": { "toInvoice": "à facturer", "left": "reste", "paid": "payée", "overpaid": "trop-perçu" },
-  "foot": { "lineSingular": "ligne", "linePlural": "lignes", "reminderSingular": "rappel", "reminderPlural": "rappels",
-            "email": "Envoi par email", "postal": "Envoi postal", "arrangement": "Plan avec arrangement", "customPrice": "Un prix diffère du prix par défaut" },
-  "action": { "onlyThisParticipation": "Voir uniquement cette participation", "addPayment": "Ajouter un paiement" }
-},
-"detail": {
-  "next": { "send": "À envoyer", "post": "À poster", "issuing": "Envoi en cours", "remind": "À relancer", "wait": "Attendre le paiement", "close": "À clôturer", "done": "Réglée", "none": "Rien à faire" },
-  "timeline": { "generated": "Générée", "issued": "Envoyée", "reminder": "Rappel", "due": "Échéance", "paid": "Payée", "cancelled": "Annulée", "today": "Aujourd'hui {{date}}", "afterIssue": "envoi + 30 j" },
-  "balance": { "toInvoice": "À facturer", "due": "Solde dû", "settled": "Soldé", "overpaid": "Trop-perçu", "cancelled": "Plan annulé",
-               "byEmail": "envoi par email", "byPost": "envoi par la poste", "dueOn": "échéance le {{date}}",
-               "lateSince": "échue depuis {{days}} j", "paidOn": "payée le {{date}}", "refund": "à rembourser", "cancelledOn": "annulé le {{date}}" },
-  "payments": { "empty": "Aucun paiement reçu.", "notYet": "Les paiements s'ajoutent une fois la facture envoyée." },
-  "columns": { "label": "Libellé", "qty": "Quantité", "price": "Prix", "amount": "Montant", "date": "Date", "mode": "Mode", "comment": "Commentaire" }
+```scss
+:host {
+  --st-late: var(--app-status-refused);
+  --st-progress: var(--app-primary);
+  --st-blocked: var(--app-offer);
+  --st-done: var(--app-status-validated);
 }
 ```
 
-Réutiliser les clés existantes quand elles conviennent : `invoicingPlan.state.*`, `invoicingPlan.invoices.label`, `invoicingPlan.payments.label`, `invoicingPlan.header.*`, `invoicingPlan.amount.different`, `payment.type.list.*`, `entityList.*`.
+Couleurs des groupes (`colorFn` de `groupByKey`) : LATE `--app-danger`, TODAY `--app-warning`, WEEK `--app-primary`, LATER/NODATE `--app-text-muted`, DONE `--app-status-validated` ; Statut : mêmes que ci-dessus ; Responsable : couleur de l'avatar, « Sans responsable » `--app-warning`.
 
 ---
 
-## 9. Fichiers concernés
+## 10. En-tête de page
 
-| Fichier | Changement |
-|---|---|
-| `java/.../service/dto/InvoicingPlanListDTO.java` | nouveaux champs (section 2) |
-| `java/.../service/mapper/InvoicingPlanMapper.java` | mappings `hasCustomPrice`, `lastPaymentDate` |
-| `java/.../service/InvoicingPlanService.java` | `reminders` en une requête, `findOne` |
-| `java/.../domain/InvoicingPlanReminder.java` | **nouveau**, table dédiée des rappels |
-| `java/.../repository/InvoicingPlanReminderRepository.java` | **nouveau** |
-| `webapp/app/admin/invoicing-plan/model/invoicing-plan.interface.ts` | `IInvoicingPlanList` enrichi (déplacé) |
-| `webapp/app/admin/invoicing-plan/service/invoicing-plan-helper.service.ts` | `bucket`, `urgency`, `stateColor`, `isDraft` (déplacé) |
-| `webapp/app/admin/invoicing-plan/service/invoicing-plan-actions.service.ts` | **nouveau**, logique extraite de billing |
-| `webapp/app/admin/participation/billing/billing.component.ts` | **supprimé** |
-| `webapp/app/admin/participation/participation.routes.ts` | route `:idParticipation/invoicing-plans` |
-| `webapp/app/admin/invoicing-plan/list/invoicing-plan-list.component.{ts,html}` | réécrits (section 4 et 5) |
-| `webapp/app/admin/invoicing-plan/detail/invoicing-plan-detail.component.{ts,html}` | **nouveau** (section 6) |
-| `webapp/app/shared/components/entity-list/entity-row.component.{ts,html}` | mode dépliable (5.1) |
-| `webapp/content/scss/_entity-list.scss` | `.el-row-detail` et bloc `el-ip-*` |
-| `webapp/i18n/fr/invoicingPlan.json` | clés (section 8) |
+- Titre `task.focusView.title` dans `appMenuBarStart` (inchangé), menu actions + retour dans `appMenuBarEnd` (inchangé).
+- Bandeau compact (`--app-surface-muted`, `border-radius: 10px`) qui **remplace** les deux bandeaux actuels :
+  - « **21 j** avant le salon · sam. 14 nov. » (jours entre aujourd'hui et `salon.startingDate`).
+  - Barre empilée de progression : terminées `--app-status-validated`, en cours `--app-primary`, bloquées `--app-offer`, en retard `--app-danger`, et « 5/24 ».
+  - Légende avec seulement les compteurs non nuls.
+  - Si `isDatesDesynchronized` : pilule `--app-warn-soft` / `--app-warn` « 3 dates à recalculer » + bouton « Recalculer » qui déclenche l'action métier `salon-recalculate-task-dates` existante.
 
 ---
 
-## 10. Critères d'acceptation
+## 11. Traductions à ajouter (`i18n/fr/task.json`, sous `task`)
 
-- [ ] La liste s'ouvre groupée par participation, triée par urgence ; les participations en retard sont en premier.
-- [ ] Recherche, puces, « Grouper et trier » et groupes repliables fonctionnent comme dans la liste des participations, et l'état se retrouve dans l'URL (`?q=&group=&sort=&f=`).
-- [ ] `…/participations/:id/invoicing-plans` affiche seulement les plans de cette participation, avec le sous-titre « Participation de … ».
-- [ ] En-tête d'un plan : n° (et exposant si non groupé), statut en haut à droite, **une** date courte, le solde. Pied : icônes seules, sauf « n lignes » et « n rappels ». Rien pour un paiement partiel.
-- [ ] Aucune bordure colorée sur la carte d'un plan, ouverte ou fermée.
-- [ ] Le clic sur la ligne la déplie ; le rouage ouvre toujours le menu sans déplier.
-- [ ] Dans le détail : bande d'actions séparée, frise (noms au-dessus, dates dessous, point doré sans libellé bien placé), trois cartes Lignes, Paiements, Solde.
-- [ ] Les actions principales suivent la table 6.3 et n'apparaissent que si le serveur les autorise.
-- [ ] Après une action, la ligne (statut, date, solde, pied) et le détail se mettent à jour.
-- [ ] Lisible à 360 px de large : aucun défilement horizontal de la page (seule la frise peut défiler si nécessaire).
-- [ ] Aucune couleur en dur : `grep -nE "#[0-9a-fA-F]{3,6}"` sur les nouveaux fichiers ne renvoie rien.
-- [ ] L'écran de facturation de la participation n'existe plus : son URL redirige vers la liste filtrée.
-- [ ] Les listes participations, stands, salons et tâches s'affichent comme avant (`entity-row` rétro-compatible).
+```json
+"list": {
+  "viewTasks": "Tâches",
+  "viewSubtasks": "Sous-tâches",
+  "searchPlaceholder": "Rechercher une sous-tâche, une tâche, une personne…",
+  "daysBeforeSalon": "avant le salon",
+  "next": "Prochaine :",
+  "seeInList": "Voir dans la liste",
+  "taskContext": "Tâche : {{title}}",
+  "doneCount": "{{count}} terminée(s)",
+  "addSubtaskPlaceholder": "Ajouter une sous-tâche…",
+  "add": "Ajouter",
+  "openTask": "Ouvrir la carte de la tâche",
+  "datesToRecalculate": "{{count}} dates à recalculer",
+  "recalculate": "Recalculer"
+},
+"group": {
+  "urgency": "Échéance",
+  "responsible": "Responsable",
+  "status": "Statut",
+  "noResponsible": "Sans responsable",
+  "urgencyKey": { "LATE": "En retard", "TODAY": "Aujourd'hui", "WEEK": "Dans les 7 jours", "LATER": "Plus tard", "NODATE": "Sans date", "DONE": "Terminées" },
+  "statusKey": { "BLOCKED": "Bloquées", "IN_PROGRESS": "En cours", "PENDING": "À faire", "DONE": "Terminées" },
+  "inProgress": "{{count}} en cours",
+  "blocked": "{{count}} bloquée(s)"
+},
+"chip": {
+  "late": "En retard",
+  "noResponsible": "Sans responsable"
+},
+"due": {
+  "none": "sans date",
+  "today": "aujourd'hui",
+  "tomorrow": "demain",
+  "yesterday": "hier",
+  "in": "dans {{n}} j",
+  "late": "{{n}} j de retard",
+  "lateSuffix": "de retard",
+  "inPrefix": "dans",
+  "days": "{{n}} j",
+  "done": "fait {{since}}",
+  "movedTitle": "Limite repoussée de {{n}} j : {{from}} → {{to}}"
+},
+"panel": {
+  "status": "Statut",
+  "deadline": "Échéance",
+  "limit": "Limite :",
+  "originalLimit": "Limite d'origine :",
+  "push": "Repousser",
+  "pushDays": "+{{n}} j",
+  "backTo": "Revenir au {{date}}",
+  "assignTo": "Attribuer à",
+  "nobody": "Personne",
+  "edit": "Modifier…",
+  "changeStatus": "Statut : {{status}}. Changer le statut",
+  "statusChanged": "Statut : {{status}}",
+  "pushed": "Limite repoussée : {{label}}",
+  "restored": "Limite d'origine rétablie",
+  "undo": "Annuler"
+}
+```
+
+Et corriger `task.status.PENDING` en « À faire », `BLOCKED` en « Bloquée », `DONE` en « Terminée » (accord avec « sous-tâche »).
+
+---
+
+## 12. À supprimer
+
+- `TaskFilter`, `activeFilter`, les 7 compteurs `countXxx` et `applySubtaskFilter` de `task-focus-list.component.ts` (remplacés par les puces).
+- `p-toggleswitch` et `flatViewBool`.
+- Les deux bandeaux (date de référence, progression) remplacés par le bandeau du § 10.
+- `subtask-flat-row.component.*`.
+- Dans `task-card` : `p-tag` de statut du titre, chips responsable/fournisseur cliquables, édition inline du responsable, `accentClass` / `tc--late…`, `menu-box` ⋮ (remplacé par `entity-actions-menu`).
+- Dans les lignes : `p-checkbox`, `p-tag` de statut, popover de date, `menu-box` ⋮, chips fournisseur.
+- Groupes « Semaine » et « Tâche », groupe/filtre « Fournisseur », groupe/filtre « Reportées / repoussées », tout tri par titre.
+
+---
+
+## 13. Critères d'acceptation
+
+- [ ] Bascule Tâches / Sous-tâches à libellés et compteurs ; conservée dans l'URL (`?view=`).
+- [ ] Vue Tâches : cartes triées par urgence, **sans groupe**, **sans** bouton grouper/trier, **sans** badges près du titre.
+- [ ] Seule la première carte est dépliée au chargement ; plier/déplier par clic sur l'en-tête.
+- [ ] Rouage `.el-gear` en bas à droite de chaque carte, à côté de la barre segmentée, avec les 5 actions ; « Supprimer » passe par `ConfirmDialogService`.
+- [ ] Vue Sous-tâches : triée par échéance effective ; groupes Échéance (défaut) / Responsable / Statut ; Terminées repliées.
+- [ ] Ligne de sous-tâche ≤ 40 px sur ordinateur, une seule ligne ; sur téléphone, titre puis tâche en dessous.
+- [ ] Le **titre de la sous-tâche n'est jamais coupé avant la tâche parente** ; la tâche parente est en ellipsis, sans puce de couleur.
+- [ ] Responsable (initiales) tout à droite, juste après le délai, aligné en colonne.
+- [ ] Un seul indicateur de statut par ligne : la pastille SVG. Clic → panneau radio.
+- [ ] Délai en jours relatifs à aujourd'hui ; repoussée = `dans <s>7 j</s> 9 j` (un seul « dans », jours barrés, pas d'icône, pas de date en dessous).
+- [ ] Repousser +1/+3/+7 et « Revenir au … » fonctionnent et la ligne change de groupe selon la nouvelle date.
+- [ ] Puces : Statut (4) et Signaux (En retard, Sans responsable) uniquement.
+- [ ] Recherche surlignée ; état vide filtré avec « Tout effacer ».
+- [ ] Aucune couleur en dur hors `:host` d'alias ; uniquement des `--app-*`.
+- [ ] Rendu correct à 390 px de large (container query `el`), sans défilement horizontal.
+- [ ] Tests unitaires de `task-urgency.utils.ts` : `effectiveDue`, `isMoved`, `urgency`, libellés du § 4.3/4.4 (cas : futur→futur, retard→retard, retard→futur, aujourd'hui, sans date, terminée), score de tri des tâches.
+
+---
+
+## 14. Ordre de travail conseillé
+
+1. `task-urgency.utils.ts` + tests.
+2. `subtask-status-icon`, `responsible-avatar`, `due-label`.
+3. `subtask-line` + `subtask-status-panel`.
+4. `task-card` réécrite + `entity-actions-menu`.
+5. `task-focus-list` sur le socle `entity-list` (état, barre d'outils, puces, groupes, bascule de vue, bandeau).
+6. Traductions, suppression du code mort, vérification à 390 px et en clavier.

@@ -39,7 +39,7 @@ export class EntityActionsMenuComponent {
             }
 
             items.push({
-                           label: this.translateService.instant(action.labelKey) as string,
+                           label: this.translateService.instant(action.labelKey, action.labelParams) as string,
                            icon: action.icon,
                            routerLink: action.routerLink,
                            disabled: action.disabled,
