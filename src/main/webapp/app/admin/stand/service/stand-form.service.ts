@@ -54,9 +54,13 @@ export class StandFormService {
         const removeSharedPicture = new FormControl(false, {nonNullable: true});
         const hasPicture = (): boolean => !!raw.picture && !removePicture.value;
         const hasSharedPicture = (): boolean => !!raw.sharedPicture && !removeSharedPicture.value;
+        // Déclarés avant le FormGroup : leurs validateurs sont évalués dès la construction
+        // du groupe, donc `form` ne serait pas encore initialisé si on le référençait ici.
+        const publishedOnWebsite = new FormControl(raw.publishedOnWebsite, Validators.required);
+        const sharedPublishedOnWebsite = new FormControl(raw.sharedPublishedOnWebsite, Validators.required);
         // Les images ne sont exigées que si le stand / le co-exposant est publié sur le site web.
-        const published = (): boolean => form.controls.publishedOnWebsite.value !== false;
-        const sharedPublished = (): boolean => form.controls.sharedPublishedOnWebsite.value !== false;
+        const published = (): boolean => publishedOnWebsite.value !== false;
+        const sharedPublished = (): boolean => sharedPublishedOnWebsite.value !== false;
 
         const form = new FormGroup<StandFormGroup>({
                                                  id: new FormControl(raw.id),
@@ -64,8 +68,7 @@ export class StandFormService {
                                                      Validators.required,
                                                      Validators.maxLength(500)
                                                  ]),
-                                                 publishedOnWebsite: new FormControl(raw.publishedOnWebsite,
-                                                     Validators.required),
+                                                 publishedOnWebsite,
                                                  website: new FormControl(raw.website),
                                                  instagram: new FormControl(raw.instagram),
                                                  facebook: new FormControl(raw.facebook),
@@ -88,8 +91,7 @@ export class StandFormService {
                                                      Validators.maxLength(500)),
                                                  sharedCategory: new FormControl(raw.sharedCategory),
                                                  sharedSubCategories: new FormControl(raw.sharedSubCategories),
-                                                 sharedPublishedOnWebsite: new FormControl(
-                                                     raw.sharedPublishedOnWebsite, Validators.required),
+                                                 sharedPublishedOnWebsite,
                                                  sharedWebsite: new FormControl(raw.sharedWebsite),
                                                  sharedInstagram: new FormControl(raw.sharedInstagram),
                                                  sharedFacebook: new FormControl(raw.sharedFacebook),
