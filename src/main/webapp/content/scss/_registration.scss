@@ -73,6 +73,10 @@
     overflow-wrap: break-word;
     word-break: normal;
     hyphens: manual;
+    max-height: 20rem;
+    overflow-y: auto;
+    border: 1px solid var(--app-border);
+    padding: 1rem;
 
     p,
     li,
