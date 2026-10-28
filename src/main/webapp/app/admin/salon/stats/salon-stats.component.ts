@@ -554,48 +554,6 @@ export class SalonStatsComponent implements OnInit {
     this.ensureSources(new Set(sources));
   }
 
-  // ── Import Google Forms (inchangé) ──────────────────────────────────────
-
-  importFile(event: FileUploadHandlerEvent): void {
-    const file = event.files[0];
-    const idSalon = this.salon()?.id;
-    if (!file || !idSalon) {
-      return;
-    }
-
-    this.salonService.generate(idSalon, file).subscribe((participationsNew) => {
-      const detailMessage = participationsNew.map((part) => {
-        const therapistName =
-          part.therapistName?.length > 10
-            ? part.therapistName.slice(0, 10) + '...'
-            : part.therapistName;
-        return (
-          '<' +
-          therapistName +
-          '> inscrit le ' +
-          (part.registrationDate
-            ? formatDate(part.registrationDate, 'dd.MM.yyyy HH:mm', this.locale)
-            : '-')
-        );
-      });
-
-      this.messageService.add({
-        severity: 'info',
-        summary: 'Résultat',
-        detail:
-          "Nombre d'inscriptions importées : " +
-          participationsNew.length +
-          '\n\n' +
-          detailMessage.join('\n'),
-        closable: true,
-        sticky: true,
-      });
-
-      this.fileUploader.clear();
-      this.reload();
-    });
-  }
-
   previousState(): void {
     window.history.back();
   }

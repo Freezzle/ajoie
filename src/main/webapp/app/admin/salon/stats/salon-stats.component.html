@@ -258,33 +258,6 @@
                     <span>{{ 'salon.dashboard.metrics.emptyCount' | translate: {n: metricCount} }}</span>
                 </button>
             }
-
-            <!-- Importation d'un Google Forms (inchangé) -->
-            <div class="c12">
-                <app-card>
-                    <div appCardHeader>
-                        <h4>Importation d'un Google Forms</h4>
-                    </div>
-                    <div appCardBody>
-                        <div class="mt-4">
-                            <p-fileupload
-                                    #fileUploader
-                                    mode="advanced"
-                                    [customUpload]="true"
-                                    [multiple]="false"
-                                    (uploadHandler)="importFile($event)"
-                                    accept=".csv,.xls,.xlsx"
-                                    chooseLabel="Choisir"
-                                    uploadLabel="Importer"
-                                    [showCancelButton]="false">
-                                <ng-template #empty>
-                                    <div>Glisse et relâche un fichier ici.</div>
-                                </ng-template>
-                            </p-fileupload>
-                        </div>
-                    </div>
-                </app-card>
-            </div>
         </div>
     }
 </app-content-page>
@@ -399,6 +372,7 @@
 
 <!-- ═══════════ Gabarit : graphique en courbe ═══════════ -->
 <ng-template #lineChart let-chart="chart" let-amount="amount">
+  <div class="chart-wrap">
     <svg class="line-chart" [attr.viewBox]="'0 0 ' + chart.width + ' ' + chart.height"
          preserveAspectRatio="none"
          (mousemove)="onChartMove($event, chart)" (mouseleave)="onChartLeave()">
@@ -447,4 +421,5 @@
             }
         </div>
     }
+  </div>
 </ng-template>

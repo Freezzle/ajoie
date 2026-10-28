@@ -33,10 +33,13 @@ app-salon-stats {
     // ── Chronologie ─────────────────────────────────────────────────────────────
     .chart-head { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; b { font-size: 13.5px; } }
     .line-chart { width: 100%; display: block; }
+    .chart-wrap { position: relative; }
     .axis-label { fill: var(--app-text-muted); font-size: 9px; }
     .chart-tip {
-        display: inline-flex; flex-direction: column; gap: 2px; padding: 6px 10px; margin-top: 4px;
+        position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 5;
+        display: inline-flex; flex-direction: column; gap: 2px; padding: 6px 10px;
         background: var(--app-surface); border: 1px solid var(--app-line); border-radius: 8px; font-size: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); pointer-events: none; white-space: nowrap;
         b { color: var(--app-text); }
     }
     .masked {
