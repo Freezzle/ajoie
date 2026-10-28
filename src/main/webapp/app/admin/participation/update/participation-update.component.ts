@@ -10,8 +10,6 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ParticipationService} from '../service/participation.service';
 import {getFormattedParticipationName, IParticipation} from '../model/participation.interface';
 import {ParticipationFormGroup, ParticipationFormService} from '../service/participation-form.service';
-import ColorStatusPipe from '../../../shared/pipe/color-status.pipe';
-import StatusPipe from '../../../shared/pipe/status.pipe';
 import {ConferenceService} from '../../conference/service/conference.service';
 import {IStand} from '../../stand/model/stand.interface';
 import {StandService} from '../../stand/service/stand.service';
@@ -47,23 +45,23 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {Badge} from 'primeng/badge';
-import {Tag} from 'primeng/tag';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {TranslateService} from '@ngx-translate/core';
-import {TableModule} from 'primeng/table';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.component';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
+import {categoryColor, EntityAction, EntityFootItemComponent, EntityRowComponent, EntityStatusComponent, statusColor} from '../../../shared/components/entity-list';
+import {Category, formatterCategory} from '../../enumerations/category.model';
 
 @Component({
                selector: 'app-participation-update',
                templateUrl: './participation-update.component.html',
-               imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ColorStatusPipe, StatusPipe,
+               imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule,
                          ButtonBoxComponent, LinkBoxComponent, SelectBoxComponent, DateBoxComponent,
-                         NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent,  ConfirmPopup,  Tab, TabList, Tabs, TabPanels, TabPanel, Badge, Tag, CardComponent, ContentPageComponent, MenuBoxComponent, TableModule, RatingBoxComponent]
+                         NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent, AlertErrorComponent,  ConfirmPopup,  Tab, TabList, Tabs, TabPanels, TabPanel, Badge, CardComponent, ContentPageComponent, MenuBoxComponent, RatingBoxComponent, EntityRowComponent, EntityStatusComponent, EntityFootItemComponent]
            })
 export class ParticipationUpdateComponent implements OnInit {
     tabActive = '0';
@@ -101,6 +99,20 @@ export class ParticipationUpdateComponent implements OnInit {
     protected readonly formatterModePaymentMeals = formatterModePaymentMeals;
     protected readonly formatterInvoiceMethod = formatterInvoiceMethod;
     protected readonly selectFilterExhibitor = selectFilterExhibitor;
+    protected readonly statusColor = statusColor;
+    protected readonly categoryColor = categoryColor;
+    protected readonly formatterCategory = formatterCategory;
+    protected readonly Category = Category;
+    protected readonly Status = Status;
+
+    /**
+     * Les actions d'une ligne sont mémoïsées par identifiant : le composant est en
+     * détection de changement par défaut, et recréer un tableau à chaque cycle
+     * reconstruirait le menu sous le curseur (obligeant à cliquer deux fois).
+     */
+    private readonly standActionsCache = new Map<string, EntityAction[]>();
+    private readonly conferenceActionsCache = new Map<string, EntityAction[]>();
+    private readonly workshopActionsCache = new Map<string, EntityAction[]>();
 
     ngOnInit(): void {
         const data = this.activatedRoute.snapshot.data;
@@ -209,6 +221,45 @@ export class ParticipationUpdateComponent implements OnInit {
                 switchMap(() => type === 'conference' ? this.conferenceService.delete(entity.id) : type === 'stand' ? this.standService.delete(entity.id) : this.workshopService.delete(entity.id)),
                 switchMap(() => this.participationService.find(participationId)))
             .subscribe((participation) => this.load(participation.body, this.isReadOnly));
+    }
+
+    standActions(stand: IStand): EntityAction[] {
+        return this.cachedActions(this.standActionsCache, stand.id,
+                                  () => this.deleteAction(target => this.deleteEntity(target, stand, 'stand')));
+    }
+
+    conferenceActions(conference: IConference): EntityAction[] {
+        return this.cachedActions(this.conferenceActionsCache, conference.id,
+                                  () => this.deleteAction(target => this.deleteEntity(target, conference, 'conference')));
+    }
+
+    workshopActions(workshop: IWorkshop): EntityAction[] {
+        return this.cachedActions(this.workshopActionsCache, workshop.id,
+                                  () => this.deleteAction(target => this.deleteEntity(target, workshop, 'workshop')));
+    }
+
+    statusLabelKey(type: 'conference' | 'stand' | 'workshop', status: Status): string {
+        return `${type}.list.status.${status}`;
+    }
+
+    private cachedActions(cache: Map<string, EntityAction[]>, id: string, build: () => EntityAction[]): EntityAction[] {
+        let actions = cache.get(id);
+        if (!actions) {
+            actions = build();
+            cache.set(id, actions);
+        }
+        return actions;
+    }
+
+    private deleteAction(run: (target: HTMLElement) => void): EntityAction[] {
+        return [
+            {
+                labelKey: 'entityList.action.delete',
+                icon: 'pi pi-trash',
+                danger: true,
+                run
+            }
+        ];
     }
 
     clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
@@ -346,6 +397,9 @@ export class ParticipationUpdateComponent implements OnInit {
         this.stands$ = undefined;
         this.conferences$ = undefined;
         this.workshops$ = undefined;
+        this.standActionsCache.clear();
+        this.conferenceActionsCache.clear();
+        this.workshopActionsCache.clear();
 
         this.initialParticipation = participation;
         this.editForm = this.participationFormService.createParticipationFormGroup(this.initialParticipation);

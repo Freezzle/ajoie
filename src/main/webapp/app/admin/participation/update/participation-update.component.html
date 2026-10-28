@@ -241,193 +241,151 @@
                             </p-tablist>
                             <p-tabpanels>
                                 <p-tabpanel value="0">
-                                    <p-table #standTable
-                                             [loading]="isLoading"
-                                             [paginator]="true"
-                                             [rowsPerPageOptions]="[10, 25, 50]"
-                                             [rows]="10"
-                                             [sortOrder]="-1"
-                                             [value]="stands"
-                                             class="mt-2"
-                                             dataKey="id"
-                                             sortField="registrationDate">
-                                        <ng-template #header>
-                                            <tr>
-                                                <th>{{ 'stand.description' | translate }}</th>
-                                                <th>{{ 'stand.dimension' | translate }}</th>
-                                                <th>{{ 'stand.status.label' | translate }}</th>
-                                                <th>&nbsp;</th>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #body let-stand>
-                                            <tr>
-                                                <td [routerLink]="['../stands', stand.id, 'view']"
-                                                    class="clickable truncate">
-                                                    {{ stand.description }}
-                                                    @if (stand.subCategories.length > 0) {
-                                                        <div>
-                                                            @for (subCategory of stand.subCategories; track subCategory) {
-                                                                <p-tag [value]="subCategory"/>
-                                                            }
-                                                        </div>
-                                                    }
-                                                </td>
-                                                <td [routerLink]="['../stands', stand.id, 'view']"
-                                                    class="clickable truncate-medium">{{ stand.dimension.dimension }}
-                                                </td>
-                                                <td [routerLink]="['../stands', stand.id, 'view']"
-                                                    class="clickable">
-                                                    <fa-icon [class]="stand.status | colorStatus"
-                                                             [icon]="stand.status | status"
-                                                             [title]="'stand.status.list.' + stand.status | translate"></fa-icon>
-                                                </td>
-                                                <td class="text-end">
-                                                    <div class="btn-group">
-                                        <button-box
-                                                (clickedEvent)="deleteEntity($event, stand, 'stand')"
-                                                [showText]="false"
-                                                primeIcon="pi-times"
-                                                translateKey="common.delete"
-                                                type="danger"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #emptymessage>
-                                            <tr>
-                                                <td colspan="5">{{ 'stand.notFound' | translate }}</td>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #footer>
-                                            <tr>
-                                                <td colspan="4">
-                                                    <button-box [links]="['../stands/new']"
-                                                                [modeLink]="true"
-                                                                primeIcon="pi-plus"
-                                                                translateKey="participation.newStand"
-                                                                type="success"/>
-                                                </td>
-                                            </tr>
-                                        </ng-template>
-                                    </p-table>
+                                    @if (stands.length === 0) {
+                                        <div class="el-empty">
+                                            <b>{{ 'stand.notFound' | translate }}</b>
+                                        </div>
+                                    } @else {
+                                        <div class="el-list mt-2">
+                                            @for (stand of stands; track stand.id) {
+                                                <entity-row [actions]="standActions(stand)"
+                                                            [link]="['../stands', stand.id, 'view']"
+                                                            [linkLabel]="'stand.list.open' | translate">
+                                                    <span rowTitle>{{ stand.description }}</span>
+
+                                                    <entity-status rowStatus
+                                                                   [color]="statusColor(stand.status)"
+                                                                   [labelKey]="statusLabelKey('stand', stand.status)"
+                                                                   [strikethrough]="stand.status === Status.CANCELED"/>
+
+                                                    <span rowSide class="el-category" [style.--el-color]="categoryColor(stand.category)">
+                                                        <i class="el-square"></i>{{ formatterCategory(stand.category) | translate }}
+                                                    </span>
+
+                                                    <ng-container rowFoot>
+                                                        @if (stand.dimension.dimension) {
+                                                            <entity-foot-item [label]="stand.dimension.dimension"
+                                                                              [showLabel]="true"
+                                                                              icon="ruler-combined"/>
+                                                        }
+
+                                                        @if (stand.shared) {
+                                                            <entity-foot-item color="var(--app-share)"
+                                                                              icon="people-arrows"
+                                                                              labelKey="stand.list.sharedWithCoExhibitor"/>
+                                                        }
+
+                                                        @if (stand.needElectricity) {
+                                                            <entity-foot-item color="var(--app-warn)"
+                                                                              icon="bolt"
+                                                                              labelKey="entityList.signal.electricity"/>
+                                                        }
+
+                                                        @if (stand.subCategories.length > 0) {
+                                                            <span class="el-foot-item">
+                                                                @for (subCategory of stand.subCategories; track subCategory) {
+                                                                    <span class="el-tag">{{ subCategory }}</span>
+                                                                }
+                                                            </span>
+                                                        }
+
+                                                        @if (stand.extraInformation) {
+                                                            <entity-foot-item [detail]="stand.extraInformation"
+                                                                              [showLabel]="true"
+                                                                              icon="note-sticky"
+                                                                              labelKey="entityList.internalComment"/>
+                                                        }
+                                                    </ng-container>
+                                                </entity-row>
+                                            }
+                                        </div>
+                                    }
+
+                                    <div class="mt-2">
+                                        <button-box [links]="['../stands/new']"
+                                                    [modeLink]="true"
+                                                    primeIcon="pi-plus"
+                                                    translateKey="participation.newStand"
+                                                    type="success"/>
+                                    </div>
                                 </p-tabpanel>
                                 <p-tabpanel value="1">
-                                    <p-table #conferenceTable
-                                             [loading]="isLoading"
-                                             [paginator]="true"
-                                             [rowsPerPageOptions]="[10, 25, 50]"
-                                             [rows]="10"
-                                             [sortOrder]="-1"
-                                             [value]="conferences"
-                                             class="mt-2"
-                                             dataKey="id"
-                                             sortField="registrationDate">
-                                        <ng-template #header>
-                                            <tr>
-                                                <th>{{ 'conference.titleField' | translate }}</th>
-                                                <th>{{ 'conference.status.label' | translate }}</th>
-                                                <th>&nbsp;</th>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #body let-conference>
-                                            <tr>
-                                                <td [routerLink]="['../conferences', conference.id, 'view']"
-                                                    class="clickable truncate text-nowrap">{{ conference.title }}
-                                                </td>
-                                                <td [routerLink]="['../conferences', conference.id, 'view']"
-                                                    class="clickable">
-                                                    <fa-icon [class]="conference.status | colorStatus"
-                                                             [icon]="conference.status | status"
-                                                             [title]="'conference.status.list.' + conference.status | translate"></fa-icon>
-                                                </td>
-                                                <td class="text-end">
-                                                    <div class="btn-group">
-                                                        <button-box
-                                                                (clickedEvent)="deleteEntity($event, conference, 'conference')"
-                                                                [showText]="false"
-                                                                primeIcon="pi-plus"
-                                                                translateKey="common.delete"
-                                                                type="danger"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #emptymessage>
-                                            <tr>
-                                                <td colspan="5">{{ 'conference.notFound' | translate }}</td>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #footer>
-                                            <tr>
-                                                <td colspan="3">
-                                                    <button-box [links]="['../conferences/new']"
-                                                                [modeLink]="true"
-                                                                primeIcon="pi-plus"
-                                                                translateKey="participation.newConference"
-                                                                type="success"/>
-                                                </td>
-                                            </tr>
-                                        </ng-template>
-                                    </p-table>
+                                    @if (conferences.length === 0) {
+                                        <div class="el-empty">
+                                            <b>{{ 'conference.notFound' | translate }}</b>
+                                        </div>
+                                    } @else {
+                                        <div class="el-list mt-2">
+                                            @for (conference of conferences; track conference.id) {
+                                                <entity-row [actions]="conferenceActions(conference)"
+                                                            [link]="['../conferences', conference.id, 'view']"
+                                                            [linkLabel]="'conference.list.open' | translate">
+                                                    <span rowTitle>{{ conference.title }}</span>
+
+                                                    <entity-status rowStatus
+                                                                   [color]="statusColor(conference.status)"
+                                                                   [labelKey]="statusLabelKey('conference', conference.status)"
+                                                                   [strikethrough]="conference.status === Status.CANCELED"/>
+
+                                                    <ng-container rowFoot>
+                                                        @if (conference.extraInformation) {
+                                                            <entity-foot-item [detail]="conference.extraInformation"
+                                                                              [showLabel]="true"
+                                                                              icon="note-sticky"
+                                                                              labelKey="entityList.internalComment"/>
+                                                        }
+                                                    </ng-container>
+                                                </entity-row>
+                                            }
+                                        </div>
+                                    }
+
+                                    <div class="mt-2">
+                                        <button-box [links]="['../conferences/new']"
+                                                    [modeLink]="true"
+                                                    primeIcon="pi-plus"
+                                                    translateKey="participation.newConference"
+                                                    type="success"/>
+                                    </div>
                                 </p-tabpanel>
                                 <p-tabpanel value="2">
-                                    <p-table #workshopTable
-                                             [loading]="isLoading"
-                                             [paginator]="true"
-                                             [rowsPerPageOptions]="[10, 25, 50]"
-                                             [rows]="10"
-                                             [sortOrder]="-1"
-                                             [value]="workshops"
-                                             class="mt-2"
-                                             dataKey="id"
-                                             sortField="registrationDate">
-                                        <ng-template #header>
-                                            <tr>
-                                                <th>{{ 'workshop.titleField' | translate }}</th>
-                                                <th>{{ 'workshop.status.label' | translate }}</th>
-                                                <th>&nbsp;</th>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #body let-workshop>
-                                            <tr>
-                                                <td [routerLink]="['../workshops', workshop.id, 'view']"
-                                                    class="clickable truncate text-nowrap">{{ workshop.title }}
-                                                </td>
-                                                <td [routerLink]="['../workshops', workshop.id, 'view']"
-                                                    class="clickable">
-                                                    <fa-icon [class]="workshop.status | colorStatus"
-                                                             [icon]="workshop.status | status"
-                                                             [title]="'workshop.status.list.' + workshop.status | translate"></fa-icon>
-                                                </td>
-                                                <td class="text-end">
-                                                    <div class="btn-group">
-                                        <button-box
-                                                (clickedEvent)="deleteEntity($event, workshop, 'workshop')"
-                                                [showText]="false"
-                                                primeIcon="pi-times"
-                                                translateKey="common.delete"
-                                                type="danger"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #emptymessage>
-                                            <tr>
-                                                <td colspan="5">{{ 'workshop.notFound' | translate }}</td>
-                                            </tr>
-                                        </ng-template>
-                                        <ng-template #footer>
-                                            <tr>
-                                                <td colspan="3">
-                                                    <button-box [links]="['../workshops/new']"
-                                                                [modeLink]="true"
-                                                                primeIcon="pi-plus"
-                                                                translateKey="participation.newWorkshop"
-                                                                type="success"/>
-                                                </td>
-                                            </tr>
-                                        </ng-template>
-                                    </p-table>
+                                    @if (workshops.length === 0) {
+                                        <div class="el-empty">
+                                            <b>{{ 'workshop.notFound' | translate }}</b>
+                                        </div>
+                                    } @else {
+                                        <div class="el-list mt-2">
+                                            @for (workshop of workshops; track workshop.id) {
+                                                <entity-row [actions]="workshopActions(workshop)"
+                                                            [link]="['../workshops', workshop.id, 'view']"
+                                                            [linkLabel]="'workshop.list.open' | translate">
+                                                    <span rowTitle>{{ workshop.title }}</span>
+
+                                                    <entity-status rowStatus
+                                                                   [color]="statusColor(workshop.status)"
+                                                                   [labelKey]="statusLabelKey('workshop', workshop.status)"
+                                                                   [strikethrough]="workshop.status === Status.CANCELED"/>
+
+                                                    <ng-container rowFoot>
+                                                        @if (workshop.extraInformation) {
+                                                            <entity-foot-item [detail]="workshop.extraInformation"
+                                                                              [showLabel]="true"
+                                                                              icon="note-sticky"
+                                                                              labelKey="entityList.internalComment"/>
+                                                        }
+                                                    </ng-container>
+                                                </entity-row>
+                                            }
+                                        </div>
+                                    }
+
+                                    <div class="mt-2">
+                                        <button-box [links]="['../workshops/new']"
+                                                    [modeLink]="true"
+                                                    primeIcon="pi-plus"
+                                                    translateKey="participation.newWorkshop"
+                                                    type="success"/>
+                                    </div>
                                 </p-tabpanel>
                             </p-tabpanels>
                         </p-tabs>
