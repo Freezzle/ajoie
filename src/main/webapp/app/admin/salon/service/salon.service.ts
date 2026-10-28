@@ -12,6 +12,7 @@ import {ISalonStats} from '../model/salon-stats.interface';
 import {IPriceStandSalon} from '../model/price-stand-salon.interface';
 import {IParticipation} from '../../participation/model/participation.interface';
 import {PlanningTalksDto} from '../../talks-planning/update/talks-planning-model';
+import {ISalonDashboard} from '../model/salon-dashboard.interface';
 
 @Injectable({providedIn: 'root'})
 export class SalonService {
@@ -49,6 +50,21 @@ export class SalonService {
 
     getPlanningTalks(idSalon: string): Observable<PlanningTalksDto> {
         return this.http.get<PlanningTalksDto>(`${this.resourceUrl}/${idSalon}/planning-talks`);
+    }
+
+    /** Données agrégées du tableau de bord (voir docs/feature.md §9). */
+    dashboard(idSalon: string): Observable<ISalonDashboard> {
+        return this.http.get<ISalonDashboard>(`${this.resourceUrl}/${idSalon}/dashboard`);
+    }
+
+    /** Choix des métriques affichées dans « Mes indicateurs », partagé par salon. */
+    getDashboardMetrics(idSalon: string): Observable<string[]> {
+        return this.http.get<string[]>(`${this.resourceUrl}/${idSalon}/settings/dashboard-metrics`);
+    }
+
+    /** Enregistre le choix des métriques affichées dans « Mes indicateurs ». */
+    saveDashboardMetrics(idSalon: string, metrics: string[]): Observable<string[]> {
+        return this.http.put<string[]>(`${this.resourceUrl}/${idSalon}/settings/dashboard-metrics`, metrics);
     }
 
     savePlanningTalks(idSalon: string, payload: PlanningTalksDto): Observable<void> {

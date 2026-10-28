@@ -166,6 +166,15 @@ public class ParticipationService {
                     "Le statut de la participation a changé en '" + participation.getStatus().name().toLowerCase() +
                             "'", EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
                     Map.of("old_status", existingParticipation.getStatus().name().toLowerCase()));
+
+            // Le passage au statut REFUSED n'a pas de handler dédié : la transition se fait via cette mise à
+            // jour générique. On trace alors l'action « Participation refusée » comme les autres décisions
+            // (ActionAcceptHandler, ActionCancelHandler), notamment pour le calcul du délai de vérification.
+            if (participation.getStatus() == Status.REFUSED) {
+                this.eventLogService.eventFromSystem("Participation refusée", EventType.ACTION,
+                        EntityType.PARTICIPATION, participation.getId(),
+                        Map.of("old_status", existingParticipation.getStatus().name()));
+            }
         }
 
         return participationRepository.save(participation);

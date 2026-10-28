@@ -64,7 +64,7 @@
 
                     @for (salon of group.items; track salon.id) {
                         <entity-row [actions]="actionsFor(salon)"
-                                    [link]="['./', salon.id, 'view']"
+                                    [link]="['./', salon.id, 'stats']"
                                     [linkLabel]="'salon.list.open' | translate">
                             <entity-highlight rowTitle
                                               [query]="state.query()"

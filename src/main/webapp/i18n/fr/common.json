@@ -138,6 +138,8 @@
       "alerts": "Alertes",
       "expiredInvoice": "Facture échue",
       "toInvoice": "À facturer",
+      "hasDraft": "Facture en brouillon",
+      "toWatch": "À surveiller",
       "crushOfHeart": "Coup de cœur",
       "guestOfHonor": "Invité d'honneur",
       "arrangement": "Arrangement",
@@ -152,7 +154,7 @@
       "participation": "Participation",
       "participations": "Participations",
       "billing": "Facturation",
-      "stats": "Statistiques",
+      "stats": "Dashboard",
       "copyEmail": "Copier l'e-mail",
       "delete": "Supprimer"
     },

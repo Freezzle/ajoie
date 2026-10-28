@@ -101,6 +101,7 @@
         },
         "chip": {
             "late": "En retard",
+            "next14": "2 prochaines semaines",
             "noResponsible": "Sans responsable"
         },
         "due": {

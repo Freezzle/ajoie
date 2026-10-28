@@ -3,6 +3,208 @@
     "bankAccount": "Coordonnées bancaires",
     "conferences": "Les conférences",
     "create": "Nouveau salon",
+    "dashboard": {
+      "goCatalogue": "Aller sur le catalogue",
+      "goDashboard": "Aller sur le tableau de bord",
+      "see": "Voir",
+      "loading": "Chargement…",
+      "timeline": {
+        "title": "Chronologie",
+        "subtitle": "du {{start}} au {{end}} · de la première à la dernière inscription ou paiement",
+        "registrations": "Inscriptions",
+        "registrationsTotal": "{{n}} au total",
+        "payments": "Montants payés",
+        "paymentsHeader": "{{paid}} sur {{expected}} · {{pct}} %",
+        "expected": "attendu {{amount}}",
+        "empty": "Pas encore d'inscription ni de paiement",
+        "masked": "Montants masqués",
+        "maskedHint": "Le mode discret est actif.",
+        "weekOf": "Semaine du {{date}}",
+        "tooltipReg": "Inscriptions cumulées",
+        "tooltipPay": "Montants payés cumulés",
+        "figRegistrations": "inscriptions",
+        "figPaid": "payés",
+        "figRemaining": "restant à payer"
+      },
+      "todo": {
+        "title": "À traiter",
+        "subtitle": "chaque ligne ouvre la liste filtrée",
+        "toVerify": "Participations à vérifier",
+        "toVerifyDetail": "statut à vérifier",
+        "toInvoice": "Participations à facturer",
+        "toInvoiceDetail": "{{n}} brouillons au total",
+        "toWatch": "Participations à surveiller",
+        "toWatchBlocked": "{{n}} bloquées",
+        "toWatchDuplicate": "{{n}} en double",
+        "toWatchExpired": "{{n}} factures en retard",
+        "lateTasks": "Tâches en retard",
+        "nextTasks": "Prochaines tâches",
+        "nextDetail": "dans les 2 semaines"
+      },
+      "metrics": {
+        "title": "Mes indicateurs",
+        "subtitle": "{{n}} choisis, regroupés par thème",
+        "addOrRemove": "Ajouter ou retirer",
+        "add": "+ Ajouter",
+        "shown": "✓ Affiché",
+        "remove": "Retirer {{title}}",
+        "zoneCount": "{{n}} indicateur(s)",
+        "emptyAdd": "Ajouter un indicateur",
+        "emptyCount": "{{n}} disponibles"
+      },
+      "theme": {
+        "participations": "Participations",
+        "billing": "Facturation",
+        "stands": "Stands",
+        "logistics": "Programme et logistique"
+      },
+      "catalogue": {
+        "title": "Catalogue de métriques",
+        "subtitle": "Choisissez celles qui s'affichent dans « Mes indicateurs ». {{n}} sur {{total}} affichées.",
+        "all": "Toutes"
+      },
+      "status": {
+        "sub": "{{total}} {{type}}",
+        "activeF": "Actives",
+        "activeM": "Actifs",
+        "discardedF": "Écartées",
+        "discardedM": "Écartés",
+        "hint": "Cliquez sur un statut pour la liste filtrée",
+        "shortParticipation": "Particip.",
+        "shortStand": "Stands",
+        "shortConference": "Conf.",
+        "shortWorkshop": "Ateliers",
+        "longParticipation": "Participations",
+        "longStand": "Stands",
+        "longConference": "Conférences",
+        "longWorkshop": "Ateliers"
+      },
+      "gauge": {
+        "confirmed": "Confirmés",
+        "verification": "« +n » = en vérification, non comptés"
+      },
+      "bucket": {
+        "verif0": "< 1 sem.",
+        "verif1": "1–2 sem.",
+        "verif2": "2–4 sem.",
+        "verif3": "> 4 sem.",
+        "pay0": "< 10 j",
+        "pay1": "10–30 j",
+        "pay2": "> 30 j"
+      },
+      "service": {
+        "STAND": "Stands",
+        "SHARED": "Partages",
+        "CONFERENCE": "Conférences",
+        "WORKSHOP": "Ateliers",
+        "MEALS": "Repas",
+        "ELECTRICITY": "Électricité",
+        "POSTAL_FEE": "Frais de port",
+        "OTHERS": "Autres"
+      },
+      "billing": {
+        "DRAFT": "Brouillon",
+        "ISSUED": "Émise",
+        "PARTIAL": "Payée en partie",
+        "PAID": "Payée"
+      },
+      "aging": {
+        "notDue": "Pas encore échu",
+        "under30": "Échu < 30 j",
+        "over30": "Échu > 30 j"
+      },
+      "metric": {
+        "status": {
+          "title": "État actuel"
+        },
+        "loyalty": {
+          "title": "Nouveaux et fidèles",
+          "value": "{{n}} fidèles",
+          "sub": "{{m}} nouveaux exposants cette année",
+          "returning": "Déjà venus",
+          "new": "Nouveaux"
+        },
+        "channel": {
+          "title": "Canal d'inscription",
+          "value": "{{n}} en ligne",
+          "sub": "{{m}} par l'admin",
+          "online": "En ligne",
+          "admin": "Par l'admin"
+        },
+        "verificationDelay": {
+          "title": "Délai de vérification",
+          "value": "{{n}} j",
+          "sub": "médiane entre l'inscription et l'acceptation ou le refus"
+        },
+        "revenueByService": {
+          "title": "Recettes par prestation",
+          "sub": "participations acceptées, validées et clôturées"
+        },
+        "discounts": {
+          "title": "Réductions accordées",
+          "sub": "{{x}} % du total des prestations"
+        },
+        "paymentDelay": {
+          "title": "Délai de paiement",
+          "value": "{{n}} j",
+          "sub": "médiane entre l'émission et le paiement"
+        },
+        "mealPayment": {
+          "title": "Paiement des repas",
+          "value": "{{n}} avec la facture",
+          "sub": "{{m}} directement sur place"
+        },
+        "billingProgress": {
+          "title": "Avancement de la facturation",
+          "value": "{{done}} / {{total}}",
+          "sub": "factures payées"
+        },
+        "receivablesAging": {
+          "title": "Restant à encaisser par ancienneté",
+          "sub": "dont {{amount}} échus"
+        },
+        "categories": {
+          "title": "Catégories",
+          "sub": "stands confirmés"
+        },
+        "dimensions": {
+          "title": "Dimensions",
+          "sub": "stands confirmés"
+        },
+        "freeStands": {
+          "title": "Stands libres",
+          "value": "{{n}}",
+          "sub": "sur {{n}} stands confirmés, pas encore placés sur le plan",
+          "placed": "Placés",
+          "unplaced": "Non placés"
+        },
+        "talksPlanned": {
+          "title": "Programme planifié",
+          "value": "{{done}} / {{total}}",
+          "sub": "conférences et ateliers confirmés avec un créneau",
+          "planned": "Planifiés",
+          "unplanned": "Sans créneau"
+        },
+        "meals": {
+          "title": "Repas exposants",
+          "value": "{{n}}",
+          "sub": "pour les participations confirmées"
+        },
+        "volunteers": {
+          "title": "Créneaux bénévoles couverts",
+          "value": "{{n}} %",
+          "sub": "{{n}} places encore à pourvoir"
+        },
+        "tasks": {
+          "title": "Avancement des tâches",
+          "value": "{{done}} / {{total}}",
+          "sub": "sous-tâches terminées",
+          "done": "Terminées",
+          "todo": "À faire",
+          "late": "En retard"
+        }
+      }
+    },
     "delete": {
       "question": "Voulez-vous archiver le salon \"{{id}}\" ? Il ne sera plus visible dans la liste."
     },
@@ -41,7 +243,7 @@
     },
     "stands": "Les stands",
     "startingDate": "Date de début",
-    "statistiques": "Statistiques du salon",
+    "statistiques": "Dashboard du salon",
     "list": {
       "searchPlaceholder": "Rechercher un salon, une référence",
       "open": "Ouvrir la fiche du salon",
@@ -81,7 +283,7 @@
       "standInVerification": "En vérification",
       "standRefused": "Refusé",
       "stands": "Stands",
-      "title": "Statistiques"
+      "title": "Dashboard"
     },
     "talksPlanning": "Planning des animations",
     "tasks": "Les tâches",

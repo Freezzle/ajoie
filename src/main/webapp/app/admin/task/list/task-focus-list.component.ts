@@ -50,6 +50,7 @@ import {
     isLate,
     knownResponsibles,
     NO_RESPONSIBLE_KEY,
+    next14Predicate,
     ownerOf,
     responsibleColor,
     statusColorOf,
@@ -157,6 +158,7 @@ export class TaskFocusListComponent implements OnInit {
 
         const predicates: Record<string, (subtask: IFlatSubtask) => boolean> = {
             late: subtask => isLate(subtask),
+            next14: subtask => next14Predicate(subtask),
             noResponsible: subtask => !ownerOf(subtask, subtask.parentTask),
             [CHIP_TASK_CONTEXT]: subtask => subtask.parentTask.id === contextTaskId
         };
@@ -216,6 +218,13 @@ export class TaskFocusListComponent implements OnInit {
                                 icon: 'triangle-exclamation',
                                 color: 'var(--app-danger)',
                                 count: items.filter(predicates['late']).length
+                            },
+                            {
+                                key: 'next14',
+                                labelKey: 'task.chip.next14',
+                                icon: 'calendar-days',
+                                color: 'var(--app-primary)',
+                                count: items.filter(predicates['next14']).length
                             },
                             {
                                 key: 'noResponsible',

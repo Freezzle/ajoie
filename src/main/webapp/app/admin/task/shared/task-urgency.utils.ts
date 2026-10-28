@@ -71,6 +71,12 @@ export function daysLeft(subtask: ISubtaskInstance): number | null {
     return daysUntil(effectiveDue(subtask));
 }
 
+/** Vrai si la sous-tâche est active et échoit dans les 14 prochains jours (aujourd'hui inclus). */
+export function next14Predicate(subtask: ISubtaskInstance): boolean {
+    const d = daysLeft(subtask);
+    return isActive(subtask) && d !== null && d >= 0 && d <= 14;
+}
+
 /** Urgence d'une sous-tâche, calculée sur son échéance effective. */
 export function urgency(subtask: ISubtaskInstance): Urgency {
     if (!isActive(subtask)) {

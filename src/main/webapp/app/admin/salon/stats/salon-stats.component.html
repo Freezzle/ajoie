@@ -1,281 +1,450 @@
 <app-content-page>
     <div appMenuBarStart>
         <h3 jhiTranslate="salon.statistiques">Statistiques</h3>
+        @if (salonSubline()) {
+            <div class="sub-head">{{ salonSubline() }}</div>
+        }
     </div>
     <div appMenuBarEnd>
-        <button-box (clickedEvent)="previousState()" [showText]="false" primeIcon="pi-arrow-left" translateKey="common.back"/>
+        <button-box (clickedEvent)="previousState()"
+                    [showText]="false"
+                    primeIcon="pi-arrow-left"
+                    translateKey="common.back"/>
+
+        <menu-box [items]="menuItems()"
+                  buttonIcon="pi-list"
+                  buttonTranslateKey="common.actions"/>
     </div>
-    <app-alert-error></app-alert-error>
 
     <p-toast/>
 
-    <p-confirmpopup/>
-    <app-card [showHeader]="false">
-        <div appCardBody>
-            @if (combinedStats$ | async; as combinedStats) {
-                <div class="row">
-                    <div class="col-lg-6 table-responsive table-entities">
-                        <table aria-describedby="page-heading" class="table table-hover">
-                            <thead class="thead-primary">
-                            <tr>
-                                <th class="width-80">
-                                    <span>Participations</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>En cours</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>Accepté/Payé</span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Nombre de stands</td>
-                                <td class="text-center">{{ combinedStats[0].nbStands }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbStands }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre de conférences</td>
-                                <td class="text-center">{{ combinedStats[0].nbConference }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbConference }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre d'ateliers</td>
-                                <td class="text-center">{{ combinedStats[0].nbWorkshop }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbWorkshop }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre de co-exposants</td>
-                                <td class="text-center">{{ combinedStats[0].nbCoExhibitors }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbCoExhibitors }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre de coups de coeur</td>
-                                <td class="text-center">{{ combinedStats[0].nbCrushOfHeart }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbCrushOfHeart }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre d'invités d'honneur</td>
-                                <td class="text-center">{{ combinedStats[0].nbGuestOfHonor }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbGuestOfHonor }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    @if (!navigationService.hideSensibleInformation()) {
-                        <div class="col-lg-6 table-responsive table-entities">
-                            <table aria-describedby="page-heading" class="table table-hover">
-                                <thead class="thead-primary">
-                                <tr>
-                                    <th class="width-80">
-                                        <span>Facturations</span>
-                                    </th>
-                                    <th class="width-10 text-center">
-                                        <span>En cours</span>
-                                    </th>
-                                    <th class="width-10 text-center">
-                                        <span>Accepté/Payé</span>
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Totaux des prestations</td>
-                                    <td class="text-center">{{ (combinedStats[0].facturation.total > 0) ? (combinedStats[0].facturation.total | currency : 'CHF') : '-' }}</td>
-                                    <td class="text-center">{{ (combinedStats[1].facturation.total > 0) ? (combinedStats[1].facturation.total | currency : 'CHF') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Réductions appliquées</td>
-                                    <td class="text-center">{{ (combinedStats[0].facturation.discount > 0) ? (combinedStats[0].facturation.discount | currency : 'CHF') : '-' }}</td>
-                                    <td class="text-center">{{ (combinedStats[1].facturation.discount > 0) ? (combinedStats[1].facturation.discount | currency : 'CHF') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Totaux réels attendus</td>
-                                    <td class="text-center">{{ (combinedStats[0].facturation.expected > 0) ? (combinedStats[0].facturation.expected | currency : 'CHF') : '-' }}</td>
-                                    <td class="text-center">{{ (combinedStats[1].facturation.expected > 0) ? (combinedStats[1].facturation.expected | currency : 'CHF') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Paiements réels</td>
-                                    <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.paid | currency : 'CHF') : '-' }}</td>
-                                    <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.paid | currency : 'CHF') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Restant à payer</td>
-                                    <td class="text-center">{{ (combinedStats[0].facturation.paid > 0) ? (combinedStats[0].facturation.remaining | currency : 'CHF') : '-' }}</td>
-                                    <td class="text-center">{{ (combinedStats[1].facturation.paid > 0) ? (combinedStats[1].facturation.remaining | currency : 'CHF') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    @if (calculateFacturation(combinedStats[1].facturation); as factuGraph) {
-                                        <td class="text-center">
-                                            @if (factuGraph[0] || factuGraph[1] || factuGraph[2]) {
-                                                <ngb-progressbar-stacked>
-                                                    <ngb-progressbar [striped]="false"
-                                                                     [title]="'réduction [' + factuGraph[2].toFixed(2) + '%]'"
-                                                                     [value]="factuGraph[2]"
-                                                                     type="success"></ngb-progressbar>
-                                                    <ngb-progressbar [striped]="false"
-                                                                     [title]="'payé [' + factuGraph[1].toFixed(2) + '%]'"
-                                                                     [value]="factuGraph[1]"
-                                                                     type="primary"></ngb-progressbar>
-                                                    <ngb-progressbar [striped]="false"
-                                                                     [title]="'restant [' + factuGraph[0].toFixed(2) + '%]'"
-                                                                     [value]="factuGraph[0]"
-                                                                     class="custom-remaining"></ngb-progressbar>
-                                                </ngb-progressbar-stacked>
-                                            }
-                                        </td>
-                                    }
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    <div class="col-lg-6 table-responsive table-entities">
-                        <table aria-describedby="page-heading" class="table table-hover">
-                            <thead class="thead-primary">
-                            <tr>
-                                <th class="width-80">
-                                    <span>Organisation</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>En cours</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>Accepté/Payé</span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>Nombre de tables</td>
-                                <td class="text-center">{{ combinedStats[0].standInfo.nbTable }}</td>
-                                <td class="text-center">{{ combinedStats[1].standInfo.nbTable }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre de chaises</td>
-                                <td class="text-center">{{ combinedStats[0].standInfo.nbChair }}</td>
-                                <td class="text-center">{{ combinedStats[1].standInfo.nbChair }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre d'électricité</td>
-                                <td class="text-center">{{ combinedStats[0].standInfo.nbElectricity }}</td>
-                                <td class="text-center">{{ combinedStats[1].standInfo.nbElectricity }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre d'offres</td>
-                                <td class="text-center">{{ combinedStats[0].standInfo.nbOffer }}</td>
-                                <td class="text-center">{{ combinedStats[1].standInfo.nbOffer }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre de repas samedi midi</td>
-                                <td class="text-center">{{ combinedStats[0].nbMeal1 }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbMeal1 }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre de repas samedi soir</td>
-                                <td class="text-center">{{ combinedStats[0].nbMeal2 }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbMeal2 }}</td>
-                            </tr>
-                            <tr>
-                                <td>Nombre de repas dimanche midi</td>
-                                <td class="text-center">{{ combinedStats[0].nbMeal3 }}</td>
-                                <td class="text-center">{{ combinedStats[1].nbMeal3 }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-lg-6 table-responsive table-entities">
-                        <table aria-describedby="page-heading" class="table table-hover">
-                            <thead class="thead-primary">
-                            <tr>
-                                <th class="width-80">
-                                    <span>Catégories des stands</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>En cours</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>Accepté/Payé</span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                @for (category of packStatsByKey(combinedStats[0].categoriesStands, combinedStats[1].categoriesStands, combinedStats[2].categoriesStands); track $index) {
-                                    <tr>
-                                        <td>{{ 'stand.category.list.' + category[0] | translate }}</td>
-                                        <td class="text-center">{{ category[1][2] }}</td>
-                                        <td class="text-center">{{ category[1][0] }}</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-lg-6 table-responsive table-entities">
-                        <table aria-describedby="page-heading" class="table table-hover">
-                            <thead class="thead-primary">
-                            <tr>
-                                <th class="width-80">
-                                    <span>Dimensions des stands</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>En cours</span>
-                                </th>
-                                <th class="width-10 text-center">
-                                    <span>Accepté/Payé</span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                @for (dimension of packStatsByKey(combinedStats[0].dimensionStands, combinedStats[1].dimensionStands, combinedStats[2].dimensionStands); track $index) {
-                                    <tr>
-                                        <td>{{ dimension[0] }}</td>
-                                        <td class="text-center">{{ dimension[1][2] }}</td>
-                                        <td class="text-center">{{ dimension[1][0] }}</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+    @if (view() === 'catalogue') {
+        <!-- ─────────────── Catalogue ─────────────── -->
+        <div class="cat-head">
+            <div>
+                <h3 jhiTranslate="salon.dashboard.catalogue.title">Catalogue de métriques</h3>
+                <div class="sub-head">
+                    {{ 'salon.dashboard.catalogue.subtitle' | translate: {n: chosen().length, total: metricCount} }}
                 </div>
+            </div>
+            <div class="seg" role="group">
+                <button type="button"
+                        [attr.aria-pressed]="catalogueTheme() === 'all'"
+                        (click)="setCatalogueTheme('all')">
+                    {{ 'salon.dashboard.catalogue.all' | translate }}
+                </button>
+                @for (theme of themeOrder; track theme) {
+                    <button type="button"
+                            [attr.aria-pressed]="catalogueTheme() === theme"
+                            (click)="setCatalogueTheme(theme)">
+                        {{ 'salon.dashboard.theme.' + theme | translate }}
+                    </button>
+                }
+            </div>
+        </div>
+
+        @for (section of catalogueSections(); track section.theme) {
+            <div class="cat-section">
+                <div class="cat-section-title">{{ 'salon.dashboard.theme.' + section.theme | translate }}</div>
+                <div class="cat-grid">
+                    @for (def of section.defs; track trackMetric($index, def)) {
+                        @if (metric(def.id); as m) {
+                            <div class="metric" [class.metric-shown]="isShown(def.id)">
+                                <div class="metric-theme">{{ 'salon.dashboard.theme.' + def.theme | translate }}</div>
+                                <ng-container *ngTemplateOutlet="metricBody; context: {m: m, id: def.id}"/>
+                                <div class="metric-foot">
+                                    @if (isShown(def.id)) {
+                                        <button type="button" class="btn-shown" (click)="toggleMetric(def.id)">
+                                            {{ 'salon.dashboard.metrics.shown' | translate }}
+                                        </button>
+                                    } @else {
+                                        <button type="button" class="btn-add" (click)="toggleMetric(def.id)">
+                                            {{ 'salon.dashboard.metrics.add' | translate }}
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    } @else {
+        <!-- ─────────────── Tableau de bord ─────────────── -->
+        <div class="dash-grid">
+            <!-- Chronologie -->
+            <div class="c8">
+                <app-card [showHeader]="false">
+                    <div appCardBody>
+                        <div class="card-title">{{ 'salon.dashboard.timeline.title' | translate }}</div>
+                        @if (timeline(); as tl) {
+                            @if (timelineSub(); as sub) {
+                                <div class="sub-head">
+                                    {{ 'salon.dashboard.timeline.subtitle' | translate: {start: sub.start, end: sub.end} }}
+                                </div>
+                            }
+
+                            <!-- Inscriptions -->
+                            <div class="chart-head">
+                                <b>{{ 'salon.dashboard.timeline.registrations' | translate }}</b>
+                                <span class="muted">{{ 'salon.dashboard.timeline.registrationsTotal' | translate: {n: tl.totalRegistrations} }}</span>
+                            </div>
+                            @if (registrationsChart(); as chart) {
+                                <ng-container *ngTemplateOutlet="lineChart; context: {chart: chart, amount: false}"/>
+                            }
+
+                            <!-- Montants payés -->
+                            @if (navigationService.hideSensibleInformation()) {
+                                <div class="masked">
+                                    <b>{{ 'salon.dashboard.timeline.masked' | translate }}</b>
+                                    <span class="muted">{{ 'salon.dashboard.timeline.maskedHint' | translate }}</span>
+                                </div>
+                            } @else {
+                                <div class="chart-head">
+                                    <b>{{ 'salon.dashboard.timeline.payments' | translate }}</b>
+                                    <span class="muted">
+                                        {{ 'salon.dashboard.timeline.paymentsHeader' | translate: {paid: (paidAmount() | currency: 'CHF'), expected: (expectedAmount() | currency: 'CHF'), pct: paidPct()} }}
+                                    </span>
+                                </div>
+                                @if (paymentsChart(); as chart) {
+                                    <ng-container *ngTemplateOutlet="lineChart; context: {chart: chart, amount: true}"/>
+                                }
+                            }
+
+                            <!-- Chiffres sous les graphiques -->
+                            <div class="figures">
+                                <div class="fig">
+                                    <b>{{ tl.totalRegistrations }}</b>
+                                    <span class="muted">{{ 'salon.dashboard.timeline.figRegistrations' | translate }}</span>
+                                </div>
+                                <div class="fig">
+                                    <b>{{ navigationService.hideSensibleInformation() ? '•••' : (paidAmount() | currency: 'CHF') }}</b>
+                                    <span class="muted">{{ 'salon.dashboard.timeline.figPaid' | translate }}</span>
+                                </div>
+                                <div class="fig">
+                                    <b>{{ navigationService.hideSensibleInformation() ? '•••' : (remainingAmount() | currency: 'CHF') }}</b>
+                                    <span class="muted">{{ 'salon.dashboard.timeline.figRemaining' | translate }}</span>
+                                </div>
+                            </div>
+                        } @else {
+                            <div class="empty">{{ 'salon.dashboard.timeline.empty' | translate }}</div>
+                        }
+                    </div>
+                </app-card>
+            </div>
+
+            <!-- À traiter -->
+            <div class="c4">
+                <app-card [showHeader]="false">
+                    <div appCardBody>
+                        <div class="card-title">{{ 'salon.dashboard.todo.title' | translate }}</div>
+                        <div class="sub-head">{{ 'salon.dashboard.todo.subtitle' | translate }}</div>
+
+                        @if (todo(); as t) {
+                            <div class="todo-list">
+                                <!-- 1. À vérifier -->
+                                <a class="todo-row"
+                                   [routerLink]="['..', 'participations']"
+                                   [queryParams]="{f: 'st_IN_VERIFICATION'}">
+                                    <span class="todo-n" [class.zero]="t.toVerify === 0"
+                                          [style.color]="'var(--app-status-verification)'">{{ t.toVerify }}</span>
+                                    <span class="todo-mid">
+                                        <b>{{ 'salon.dashboard.todo.toVerify' | translate }}</b>
+                                        <small>{{ 'salon.dashboard.todo.toVerifyDetail' | translate }}</small>
+                                    </span>
+                                    <i class="pi pi-chevron-right"></i>
+                                </a>
+
+                                <!-- 2. À facturer -->
+                                <a class="todo-row"
+                                   [routerLink]="['..', 'participations']"
+                                   [queryParams]="{f: 'hasDraft'}">
+                                    <span class="todo-n" [class.zero]="t.toInvoice === 0"
+                                          [style.color]="'var(--app-status-accepted)'">{{ t.toInvoice }}</span>
+                                    <span class="todo-mid">
+                                        <b>{{ 'salon.dashboard.todo.toInvoice' | translate }}</b>
+                                        <small>{{ 'salon.dashboard.todo.toInvoiceDetail' | translate: {n: t.toInvoiceDrafts} }}</small>
+                                    </span>
+                                    <i class="pi pi-chevron-right"></i>
+                                </a>
+
+                                <!-- 3. À surveiller -->
+                                <a class="todo-row"
+                                   [class.critical]="t.toWatch > 0"
+                                   [routerLink]="['..', 'participations']"
+                                   [queryParams]="{f: 'toWatch'}">
+                                    <span class="todo-n" [class.zero]="t.toWatch === 0"
+                                          [style.color]="'var(--app-danger)'">{{ t.toWatch }}</span>
+                                    <span class="todo-mid">
+                                        <b>{{ 'salon.dashboard.todo.toWatch' | translate }}</b>
+                                        <small>
+                                            @if (t.watchBlocked > 0) { {{ 'salon.dashboard.todo.toWatchBlocked' | translate: {n: t.watchBlocked} }} }
+                                            @if (t.watchDuplicate > 0) { · {{ 'salon.dashboard.todo.toWatchDuplicate' | translate: {n: t.watchDuplicate} }} }
+                                            @if (t.watchExpired > 0) { · {{ 'salon.dashboard.todo.toWatchExpired' | translate: {n: t.watchExpired} }} }
+                                        </small>
+                                    </span>
+                                    <i class="pi pi-chevron-right"></i>
+                                </a>
+
+                                <!-- 4. Tâches en retard -->
+                                <a class="todo-row"
+                                   [class.critical]="t.lateTasks > 0"
+                                   [routerLink]="['..', 'tasks']"
+                                   [queryParams]="{view: 'subtasks', f: 'late'}">
+                                    <span class="todo-n" [class.zero]="t.lateTasks === 0"
+                                          [style.color]="'var(--app-danger)'">{{ t.lateTasks }}</span>
+                                    <span class="todo-mid">
+                                        <b>{{ 'salon.dashboard.todo.lateTasks' | translate }}</b>
+                                        <small class="clamp">{{ t.lateTitles.join(' · ') }}</small>
+                                    </span>
+                                    <i class="pi pi-chevron-right"></i>
+                                </a>
+
+                                <!-- 5. Prochaines tâches -->
+                                <a class="todo-row"
+                                   [routerLink]="['..', 'tasks']"
+                                   [queryParams]="{view: 'subtasks', f: 'next14'}">
+                                    <span class="todo-n" [class.zero]="t.nextTasks === 0"
+                                          [style.color]="'var(--app-status-accepted)'">{{ t.nextTasks }}</span>
+                                    <span class="todo-mid">
+                                        <b>{{ 'salon.dashboard.todo.nextTasks' | translate }}</b>
+                                        <small class="clamp">{{ 'salon.dashboard.todo.nextDetail' | translate }}{{ t.nextOwners.length ? ' · ' + t.nextOwners.join(', ') : '' }}</small>
+                                    </span>
+                                    <i class="pi pi-chevron-right"></i>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </app-card>
+            </div>
+
+            <!-- Mes indicateurs -->
+            <div class="section-head">
+                <h3>{{ 'salon.dashboard.metrics.title' | translate }}</h3>
+                <span class="muted">{{ 'salon.dashboard.metrics.subtitle' | translate: {n: chosen().length} }}</span>
+                <button type="button" class="link" (click)="goToCatalogue()">
+                    {{ 'salon.dashboard.metrics.addOrRemove' | translate }} →
+                </button>
+            </div>
+
+            @if (hasChosen()) {
+                @for (zone of zones(); track zone.theme) {
+                    <div class="zone" [class.c6]="!zone.wide" [class.c12]="zone.wide">
+                        <div class="zone-head">
+                            <span class="zone-icon"><i class="fa fa-{{ themeIcon[zone.theme] }}"></i></span>
+                            <h4>{{ 'salon.dashboard.theme.' + zone.theme | translate }}</h4>
+                            <span class="count">{{ 'salon.dashboard.metrics.zoneCount' | translate: {n: zone.ids.length} }}</span>
+                            <button type="button" class="link" (click)="goToCatalogue(zone.theme)">
+                                {{ 'salon.dashboard.metrics.add' | translate }}
+                            </button>
+                        </div>
+                        <div class="zone-grid" [style.--cols]="zone.cols">
+                            @for (id of zone.ids; track trackId($index, id)) {
+                                @if (metric(id); as m) {
+                                    <div class="metric">
+                                        <button type="button" class="remove"
+                                                [attr.aria-label]="'salon.dashboard.metrics.remove' | translate: {title: ('salon.dashboard.metric.' + id + '.title' | translate)}"
+                                                (click)="removeMetric(id)">×</button>
+                                        <ng-container *ngTemplateOutlet="metricBody; context: {m: m, id: id}"/>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            } @else {
+                <button type="button" class="add-metric" (click)="goToCatalogue()">
+                    <b>{{ 'salon.dashboard.metrics.emptyAdd' | translate }}</b>
+                    <span>{{ 'salon.dashboard.metrics.emptyCount' | translate: {n: metricCount} }}</span>
+                </button>
+            }
+
+            <!-- Importation d'un Google Forms (inchangé) -->
+            <div class="c12">
+                <app-card>
+                    <div appCardHeader>
+                        <h4>Importation d'un Google Forms</h4>
+                    </div>
+                    <div appCardBody>
+                        <div class="mt-4">
+                            <p-fileupload
+                                    #fileUploader
+                                    mode="advanced"
+                                    [customUpload]="true"
+                                    [multiple]="false"
+                                    (uploadHandler)="importFile($event)"
+                                    accept=".csv,.xls,.xlsx"
+                                    chooseLabel="Choisir"
+                                    uploadLabel="Importer"
+                                    [showCancelButton]="false">
+                                <ng-template #empty>
+                                    <div>Glisse et relâche un fichier ici.</div>
+                                </ng-template>
+                            </p-fileupload>
+                        </div>
+                    </div>
+                </app-card>
+            </div>
+        </div>
+    }
+</app-content-page>
+
+<!-- ═══════════ Gabarit : corps d'une carte de métrique ═══════════ -->
+<ng-template #metricBody let-m="m" let-id="id">
+    <h4>{{ 'salon.dashboard.metric.' + id + '.title' | translate }}</h4>
+
+    <!-- Valeur principale -->
+    @if (m.valueKind === 'amount') {
+        <div class="value" [class.warn]="m.warn">
+            {{ (m.financial && navigationService.hideSensibleInformation()) ? '•••' : (m.valueAmount | currency: 'CHF') }}
+        </div>
+    } @else if (m.valueKind === 'text') {
+        <div class="value" [class.warn]="m.warn">
+            {{ 'salon.dashboard.metric.' + id + '.value' | translate: m.valueParams }}
+        </div>
+    }
+
+    <!-- Sous-titre -->
+    @if (m.financial && navigationService.hideSensibleInformation() && m.subParams) {
+        <div class="sub">{{ 'salon.dashboard.metric.' + id + '.sub' | translate: {amount: '•••', x: '•••'} }}</div>
+    } @else {
+        <div class="sub">{{ 'salon.dashboard.metric.' + id + '.sub' | translate: m.subParams }}</div>
+    }
+
+    <!-- Visualisation : barres de statut -->
+    @if (m.visual === 'status' && m.status) {
+        <div class="seg seg-status" role="group">
+            @for (type of statusTypes; track type.type) {
+                <button type="button"
+                        [attr.aria-pressed]="statusType() === type.type"
+                        (click)="statusType.set(type.type)">
+                    {{ type.shortKey | translate }}
+                </button>
             }
         </div>
-    </app-card>
-    <app-card>
-        <div appCardHeader>
-            <h4>Ligne de temps des inscriptions</h4>
-        </div>
-        <div appCardBody>
-            @if (timelineStart(); as start) {
-                @if (timelineEnd(); as end) {
-                    <timeline-dot [endDate]="end" [points]="points()" [startDate]="start"/>
+        @for (st of m.status; track st.type) {
+            @if (st.type === statusType()) {
+                <div class="status-rows">
+                    @for (row of st.rows; track row.status) {
+                        <a class="status-row"
+                           [style.opacity]="row.count === 0 ? 0.5 : 1"
+                           [routerLink]="['..', st.dest]"
+                           [queryParams]="{f: row.filter}">
+                            <span class="dot" [class.hatch]="row.hatch" [style.background]="row.colorVar"></span>
+                            <span class="status-label">{{ st.type + '.list.statusGroup.' + row.status | translate }}</span>
+                            <span class="status-bar"><i [style.width.%]="row.barWidth" [style.background]="row.colorVar" [class.hatch]="row.hatch"></i></span>
+                            <span class="status-val"><b>{{ row.count }}</b><small>{{ row.pct }} %</small></span>
+                        </a>
+                    }
+                </div>
+                <div class="status-foot muted">
+                    {{ (st.type === 'participation' || st.type === 'conference' ? 'salon.dashboard.status.activeF' : 'salon.dashboard.status.activeM') | translate }}
+                    <b>{{ st.active }}</b> ·
+                    {{ (st.type === 'participation' || st.type === 'conference' ? 'salon.dashboard.status.discardedF' : 'salon.dashboard.status.discardedM') | translate }}
+                    <b>{{ st.discarded }}</b>
+                </div>
+            }
+        }
+    }
+
+    <!-- Visualisation : barre 100 % -->
+    @if (m.visual === 'stack' && m.segments) {
+        <div class="stack">
+            @for (seg of m.segments; track seg.labelKey || seg.label) {
+                @if (seg.value > 0) {
+                    <i [style.flex]="seg.value" [style.background]="seg.colorVar"></i>
                 }
             }
         </div>
-    </app-card>
-    <app-card>
-        <div appCardHeader>
-            <h4>Importation d'un Google Forms</h4>
+        <div class="legend">
+            @for (seg of m.segments; track seg.labelKey || seg.label) {
+                <span><i [style.background]="seg.colorVar"></i>{{ (seg.labelKey ? (seg.labelKey | translate) : seg.label) }} <b>{{ seg.value }}</b></span>
+            }
         </div>
-        <div appCardBody>
-            <div class="mt-4">
-                <p-fileupload
-                        #fileUploader
-                        mode="advanced"
-                        [customUpload]="true"
-                        [multiple]="false"
-                        (uploadHandler)="importFile($event)"
-                        accept=".csv,.xls,.xlsx"
-                        chooseLabel="Choisir"
-                        uploadLabel="Importer"
-                        [showCancelButton]="false">
-                    <ng-template #empty>
-                        <div>Glisse et relâche un fichier ici.</div>
-                    </ng-template>
-                </p-fileupload>
+    }
+
+    <!-- Visualisation : barres horizontales -->
+    @if (m.visual === 'bars' && m.bars) {
+        <div class="bars">
+            @for (bar of m.bars; track bar.labelKey || bar.label) {
+                <div class="bar">
+                    <span class="label">{{ (bar.labelKey ? (bar.labelKey | translate) : bar.label) }}</span>
+                    <span class="track"><i [style.width.%]="bar.barWidth" [style.background]="bar.colorVar"></i></span>
+                    <span class="val">
+                        @if (bar.amount) {
+                            {{ (m.financial && navigationService.hideSensibleInformation()) ? '•••' : (bar.value | currency: 'CHF') }}
+                        } @else {
+                            {{ bar.value }}{{ bar.suffix || '' }}
+                        }
+                        @if (bar.extra) { <small>+{{ bar.extra }}</small> }
+                    </span>
+                </div>
+            }
+        </div>
+        @if (m.barsLegend) {
+            <div class="muted bars-legend">
+                {{ 'salon.dashboard.gauge.confirmed' | translate }} <b>{{ m.barsLegend.ok }}</b> ·
+                {{ 'salon.dashboard.gauge.verification' | translate }} (<b>{{ m.barsLegend.ver }}</b>)
             </div>
+        }
+    }
+
+    <!-- Lien « Voir → » -->
+    @if (m.link === 'stands') {
+        <a class="link see" [routerLink]="['..', 'stands']">{{ 'salon.dashboard.see' | translate }} →</a>
+    } @else if (m.link === 'floorPlan') {
+        <a class="link see" [routerLink]="['..', 'floor-plan']">{{ 'salon.dashboard.see' | translate }} →</a>
+    }
+</ng-template>
+
+<!-- ═══════════ Gabarit : graphique en courbe ═══════════ -->
+<ng-template #lineChart let-chart="chart" let-amount="amount">
+    <svg class="line-chart" [attr.viewBox]="'0 0 ' + chart.width + ' ' + chart.height"
+         preserveAspectRatio="none"
+         (mousemove)="onChartMove($event, chart)" (mouseleave)="onChartLeave()">
+        <!-- Grille horizontale + graduations -->
+        @for (tick of chart.yTicks; track tick.y) {
+            <line [attr.x1]="chart.left" [attr.x2]="chart.width - chart.right"
+                  [attr.y1]="tick.y" [attr.y2]="tick.y"
+                  stroke="var(--app-line)" stroke-width="1"/>
+            <text [attr.x]="0" [attr.y]="tick.y - 2" class="axis-label">{{ tick.label }}</text>
+        }
+        <!-- Ligne attendu -->
+        @if (chart.refLine) {
+            <line [attr.x1]="chart.left" [attr.x2]="chart.width - chart.right"
+                  [attr.y1]="chart.refLine.y" [attr.y2]="chart.refLine.y"
+                  stroke="var(--app-text-muted)" stroke-width="1" stroke-dasharray="4 3"/>
+            <text [attr.x]="chart.width - chart.right" [attr.y]="chart.refLine.y - 2"
+                  class="axis-label" text-anchor="end">
+                {{ 'salon.dashboard.timeline.expected' | translate: {amount: (chart.refLine.amount | currency: 'CHF')} }}
+            </text>
+        }
+        <!-- Aire + courbe -->
+        <path [attr.d]="chart.areaPath" [attr.fill]="chart.color" fill-opacity="0.11" stroke="none"/>
+        <path [attr.d]="chart.linePath" fill="none" [attr.stroke]="chart.color" stroke-width="2.25"/>
+        <!-- Dernier point -->
+        @if (chart.last) {
+            <circle [attr.cx]="chart.last.x" [attr.cy]="chart.last.y" r="3.5" [attr.fill]="chart.color"/>
+        }
+        <!-- Libellés de mois -->
+        @for (xl of chart.xLabels; track xl.x) {
+            <text [attr.x]="xl.x" [attr.y]="chart.height - 2" class="axis-label" text-anchor="middle">{{ xl.label }}</text>
+        }
+        <!-- Survol -->
+        @if (hovered() !== null) {
+            <line [attr.x1]="hoverX(chart)" [attr.x2]="hoverX(chart)"
+                  [attr.y1]="chart.top" [attr.y2]="chart.height - chart.bottom"
+                  stroke="var(--app-text-muted)" stroke-width="1"/>
+            <circle [attr.cx]="hoverX(chart)" [attr.cy]="hoverY(chart)" r="3" [attr.fill]="chart.color"/>
+        }
+    </svg>
+    @if (hovered() !== null && hoveredWeek(); as week) {
+        <div class="chart-tip">
+            <b>{{ 'salon.dashboard.timeline.weekOf' | translate: {date: hoveredWeekLabel()} }}</b>
+            <span>{{ 'salon.dashboard.timeline.tooltipReg' | translate }} : <b>{{ week.registrations }}</b></span>
+            @if (!navigationService.hideSensibleInformation()) {
+                <span>{{ 'salon.dashboard.timeline.tooltipPay' | translate }} : <b>{{ week.payments | currency: 'CHF' }}</b></span>
+            }
         </div>
-    </app-card>
-</app-content-page>
+    }
+</ng-template>

@@ -5,7 +5,6 @@ import {
     Category,
     computeTimeSlots,
     Day,
-    IntervalMinutes,
     Planning,
     TimeSlot,
     Tool,
@@ -21,6 +20,7 @@ import {
     dayStats,
     getNeed,
     NAME_COLUMN_WIDTH,
+    planningFromDto,
     Run,
     SLOT_WIDTH,
     volunteerHours
@@ -575,27 +575,7 @@ export class VolunteerPlanningStore {
     }
 
     private fromPlanningVolunteersDto(dto: PlanningVolunteersDto): Planning {
-        const globalInterval = dto.configuration.intervalMinutes ?? 60;
-        return {
-            volunteers: dto.volunteers.map(v => ({id: v.id, label: v.label})),
-            categories: dto.configuration.categories.map(c => ({
-                id: c.id,
-                label: c.label,
-                icon: c.icon,
-                color: c.color
-            })),
-            days: dto.configuration.days.map(d => ({
-                id: d.id,
-                label: d.label,
-                startTime: new Date(d.startTime),
-                endTime: new Date(d.endTime),
-                intervalMinutes: (d.intervalMinutes ?? globalInterval) as IntervalMinutes,
-                assignedVolunteerIds: d.assignedVolunteerIds ?? [],
-                cells: d.cells ?? [],
-                unavailableCells: d.unavailableCells ?? [],
-                needs: d.needs ?? []
-            }))
-        };
+        return planningFromDto(dto);
     }
 }
 

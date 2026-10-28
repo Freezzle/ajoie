@@ -1,6 +1,35 @@
-import {Category, computeTimeSlots, Day, DayCell, Tool, UnavailableCell} from './volunteer-planning-model';
+import {Category, computeTimeSlots, Day, DayCell, IntervalMinutes, Planning, Tool, UnavailableCell} from './volunteer-planning-model';
+import {PlanningVolunteersDto} from '../volunteer-planning.service';
 
 export const cellKey = (volunteerId: string, slotIndex: number): string => `${volunteerId}::${slotIndex}`;
+
+/**
+ * Convertit le DTO du planning des bénévoles en modèle `Planning`. Extraite du store
+ * (`VolunteerPlanningStore`) pour être réutilisée par le tableau de bord, sans changer le comportement.
+ */
+export function planningFromDto(dto: PlanningVolunteersDto): Planning {
+    const globalInterval = dto.configuration.intervalMinutes ?? 60;
+    return {
+        volunteers: dto.volunteers.map(v => ({id: v.id, label: v.label})),
+        categories: dto.configuration.categories.map(c => ({
+            id: c.id,
+            label: c.label,
+            icon: c.icon,
+            color: c.color
+        })),
+        days: dto.configuration.days.map(d => ({
+            id: d.id,
+            label: d.label,
+            startTime: new Date(d.startTime),
+            endTime: new Date(d.endTime),
+            intervalMinutes: (d.intervalMinutes ?? globalInterval) as IntervalMinutes,
+            assignedVolunteerIds: d.assignedVolunteerIds ?? [],
+            cells: d.cells ?? [],
+            unavailableCells: d.unavailableCells ?? [],
+            needs: d.needs ?? []
+        }))
+    };
+}
 
 /** Largeur fixe d'un créneau, en px, quelle que soit la durée de l'intervalle. */
 export const SLOT_WIDTH = 45;

@@ -47,6 +47,7 @@ import {copyToClipboard} from 'app/core/util/utils';
 import {Status} from '../../enumerations/status.model';
 import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
 import {getFormattedParticipationName, IParticipationList} from '../model/participation.interface';
+import {hasDraftPredicate, toWatchPredicate} from '../model/participation-predicates';
 import {ParticipationService} from '../service/participation.service';
 
 /** Nombre de lignes affichées avant le bouton « Afficher plus ». */
@@ -137,6 +138,8 @@ export class ParticipationComponent implements OnInit {
         alert: p => !!p.exhibitor?.redFlag || !!p.exhibitor?.duplicateDetected,
         expiredInvoice: p => this.nbExpired(p) > 0,
         toInvoice: p => this.isActive(p) && this.nbInvoices(p) === 0,
+        hasDraft: p => hasDraftPredicate(p),
+        toWatch: p => toWatchPredicate(p),
         crushOfHeart: p => !!p.crushOfHeart,
         guestOfHonor: p => !!p.guestOfHonor,
         arrangement: p => !!p.needArrangement,
@@ -176,6 +179,20 @@ export class ParticipationComponent implements OnInit {
                         icon: 'file-invoice',
                         color: 'var(--app-status-verification)',
                         count: count('toInvoice')
+                    },
+                    {
+                        key: 'hasDraft',
+                        labelKey: 'entityList.signal.hasDraft',
+                        icon: 'file-invoice',
+                        color: 'var(--app-status-verification)',
+                        count: count('hasDraft')
+                    },
+                    {
+                        key: 'toWatch',
+                        labelKey: 'entityList.signal.toWatch',
+                        icon: 'triangle-exclamation',
+                        color: 'var(--app-danger)',
+                        count: count('toWatch')
                     },
                     {
                         key: 'comment',

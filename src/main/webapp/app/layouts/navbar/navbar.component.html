@@ -35,19 +35,19 @@
                     <ul *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']" [class.show]="salon" class="dropdown-list">
                         <hr class="hr-navbar"/>
                         <div class="title-navbar"><h6>{{ salon.place }}</h6></div>
+                      <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
+                          [routerLinkActiveOptions]="{ exact: true }"
+                          class="ms-3"
+                          routerLink="/admin/salons/{{salon.id}}/stats"
+                          routerLinkActive="active">
+                        <a><i class="pi pi-chart-bar"></i> {{ 'salon.stats.title' | translate }}</a>
+                      </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"
                             class="ms-3"
                             routerLink="/admin/salons/{{salon.id}}/view"
                             routerLinkActive="active">
                             <a><i class="pi pi-pencil"></i> {{ 'salon.edit' | translate }}</a>
-                        </li>
-                        <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
-                            [routerLinkActiveOptions]="{ exact: true }"
-                            class="ms-3"
-                            routerLink="/admin/salons/{{salon.id}}/stats"
-                            routerLinkActive="active">
-                            <a><i class="pi pi-chart-bar"></i> {{ 'salon.stats.title' | translate }}</a>
                         </li>
                         <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                             [routerLinkActiveOptions]="{ exact: true }"

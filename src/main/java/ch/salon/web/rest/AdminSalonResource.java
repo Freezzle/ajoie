@@ -5,6 +5,7 @@ import ch.salon.domain.FloorPlanSettingsData;
 import ch.salon.domain.Participation;
 import ch.salon.domain.PlanningTalksSalon;
 import ch.salon.domain.PlanningVolunteerSalon;
+import ch.salon.domain.SalonSettings;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.Importation2026Service;
@@ -179,6 +180,30 @@ public class AdminSalonResource {
             @RequestBody FloorPlanSettingsData settings) {
         FloorPlanSettings updated = salonService.updateFloorPlanSettings(idSalon, settings);
         return ResourceUtil.updated("floorPlanSettings", idSalon).body(updated.getData());
+    }
+
+    @GetMapping("/{idSalon}/dashboard")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<SalonDashboard> getDashboard(
+            @PathVariable(value = "idSalon") final UUID idSalon) {
+        log.debug("REST request to get dashboard from Salon : {}", idSalon);
+        return ResponseEntity.ok(salonService.getDashboard(idSalon));
+    }
+
+    @GetMapping("/{idSalon}/settings/dashboard-metrics")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<List<String>> getDashboardMetrics(
+            @PathVariable(value = "idSalon") final UUID idSalon) {
+        return ResponseEntity.ok(salonService.getSalonSettings(idSalon).getData().getDashboardMetrics());
+    }
+
+    @PutMapping("/{idSalon}/settings/dashboard-metrics")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<List<String>> updateDashboardMetrics(
+            @PathVariable(value = "idSalon") final UUID idSalon,
+            @RequestBody List<String> metrics) {
+        SalonSettings updated = salonService.updateDashboardMetrics(idSalon, metrics);
+        return ResourceUtil.updated("salonSettings", idSalon).body(updated.getData().getDashboardMetrics());
     }
 
     @PutMapping("/{idSalon}/planning-talks")

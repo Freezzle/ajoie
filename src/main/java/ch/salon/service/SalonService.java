@@ -3,13 +3,19 @@ package ch.salon.service;
 import ch.salon.domain.*;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.InvoiceNature;
 import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
+import ch.salon.domain.enumeration.Type;
 import ch.salon.repository.*;
+import ch.salon.service.dto.Aging;
+import ch.salon.service.dto.DatedAmount;
+import ch.salon.service.dto.DelayStats;
 import ch.salon.service.dto.FloorPlanSalonDTO;
 import ch.salon.service.dto.FloorPlanBatchRequestDTO;
 import ch.salon.service.dto.FloorPlanBatchResponseDTO;
 import ch.salon.service.dto.PriceStandDTO;
+import ch.salon.service.dto.SalonDashboard;
 import ch.salon.service.dto.SalonDTO;
 import ch.salon.service.mapper.FloorPlanSalonMapper;
 import ch.salon.service.mapper.PriceStandMapper;
@@ -21,8 +27,11 @@ import ch.salon.web.rest.errors.BadRequestAlertException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -39,6 +48,7 @@ public class SalonService {
     private final InvoicingPlanRepository invoicingPlanRepository;
     private final FloorPlanSalonRepository floorPlanSalonRepository;
     private final FloorPlanSettingsRepository floorPlanSettingsRepository;
+    private final SalonSettingsRepository salonSettingsRepository;
     private final FloorPlanMigrator floorPlanMigrator;
     private final SalonMapper salonMapper;
     private final FloorPlanSalonMapper floorPlanSalonMapper;
@@ -205,6 +215,50 @@ public class SalonService {
      * Réglages du plan de la salle. Un salon qui n'en a pas encore reçoit les valeurs par
      * défaut, dont la grille reprend le pas des anciens plans quand il y en a un.
      */
+    /**
+     * Réglages d'un salon partagés par tous les administrateurs. Un salon qui n'en a pas
+     * encore reçoit les valeurs par défaut.
+     */
+    public SalonSettings getSalonSettings(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        return this.salonSettingsRepository.findBySalonId(idSalon)
+                .orElseGet(() -> {
+                    SalonSettings settings = new SalonSettings();
+                    settings.setData(SalonSettingsData.defaults());
+                    return settings;
+                });
+    }
+
+    /**
+     * Enregistre le choix des métriques affichées dans le tableau de bord. La liste est
+     * partagée par tous les administrateurs du salon.
+     */
+    public SalonSettings updateDashboardMetrics(UUID idSalon, List<String> metrics) {
+        if (idSalon == null || metrics == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        Salon salon = this.salonRepository.findById(idSalon).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        SalonSettings settings = this.salonSettingsRepository.findBySalonId(idSalon)
+                .orElseGet(() -> {
+                    SalonSettings created = new SalonSettings();
+                    created.setSalon(salon);
+                    created.setData(new SalonSettingsData());
+                    return created;
+                });
+
+        SalonSettingsData data = settings.getData() != null ? settings.getData() : new SalonSettingsData();
+        data.setDashboardMetrics(new ArrayList<>(metrics));
+        settings.setData(data);
+
+        return this.salonSettingsRepository.save(settings);
+    }
+
     public FloorPlanSettings getFloorPlanSettings(UUID idSalon) {
         if (idSalon == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -454,6 +508,280 @@ public class SalonService {
         stats.setFacturation(facturationStats);
 
         return stats;
+    }
+
+    private static final List<Status> CONFIRMED_STATUSES =
+            List.of(Status.ACCEPTED, Status.VALIDATED, Status.CLOSED);
+
+    @org.springframework.transaction.annotation.Transactional
+    @SuppressWarnings({"java:S3776", "java:S6541"})
+    public SalonDashboard getDashboard(UUID idSalon) {
+        if (idSalon == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        Salon salon = salonRepository.findById(idSalon).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        SalonDashboard dashboard = new SalonDashboard();
+
+        List<Status> allStatuses = Arrays.asList(Status.values());
+
+        // All invoicing plans of the salon.
+        List<InvoicingPlan> allPlans = invoicingPlanRepository.findByParticipation_Salon_Id(idSalon);
+        List<InvoicingPlan> nonCancelledPlans = allPlans.stream()
+                .filter(plan -> plan != null && plan.getState() != State.CANCELLED)
+                .toList();
+
+        // 9. payments : date + amount of every payment of non-cancelled plans.
+        List<DatedAmount> payments = new ArrayList<>();
+        for (InvoicingPlan plan : nonCancelledPlans) {
+            for (Payment payment : plan.getPayments()) {
+                payments.add(new DatedAmount(payment.getBillingDate(), payment.getAmount()));
+            }
+        }
+        dashboard.setPayments(payments);
+
+        // 7.1 statusCounts : count stands / conferences / workshops per status (the 6).
+        List<Stand> allStands = standRepository.findByStatusInAndParticipation_SalonId(allStatuses, idSalon);
+        List<Conference> allConferences =
+                conferenceRepository.findByStatusInAndParticipation_SalonId(allStatuses, idSalon);
+        List<Workshop> allWorkshops =
+                workshopRepository.findByStatusInAndParticipation_SalonId(allStatuses, idSalon);
+
+        Map<String, Map<Status, Long>> statusCounts = new LinkedHashMap<>();
+        statusCounts.put("STAND", countByStatus(allStands.stream().map(Stand::getStatus)));
+        statusCounts.put("CONFERENCE", countByStatus(allConferences.stream().map(Conference::getStatus)));
+        statusCounts.put("WORKSHOP", countByStatus(allWorkshops.stream().map(Workshop::getStatus)));
+        dashboard.setStatusCounts(statusCounts);
+
+        // 7.2 loyalty : over active participations, count distinct exhibitors new vs returning.
+        List<Participation> activeParticipations =
+                participationRepository.findBySalonIdAndStatusIn(idSalon, Arrays.asList(Status.getActiveStatuses()));
+        long loyalReturning = 0;
+        long loyalNew = 0;
+        Set<UUID> seenExhibitors = new HashSet<>();
+        for (Participation participation : activeParticipations) {
+            Exhibitor exhibitor = participation.getExhibitor();
+            if (exhibitor == null || !seenExhibitors.add(exhibitor.getId())) {
+                continue;
+            }
+            if (isReturningExhibitor(exhibitor.getId(), idSalon, salon.getStartingDate())) {
+                loyalReturning++;
+            } else {
+                loyalNew++;
+            }
+        }
+        dashboard.setLoyalReturning(loyalReturning);
+        dashboard.setLoyalNew(loyalNew);
+
+        // Confirmed participations and their non-cancelled plans.
+        Set<UUID> confirmedParticipationIds =
+                participationRepository.findBySalonIdAndStatusIn(idSalon, CONFIRMED_STATUSES).stream()
+                        .map(Participation::getId).collect(Collectors.toSet());
+        List<InvoicingPlan> confirmedPlans = nonCancelledPlans.stream()
+                .filter(plan -> plan.getParticipation() != null &&
+                        confirmedParticipationIds.contains(plan.getParticipation().getId()))
+                .toList();
+
+        // 7.5 revenueByService : sum of SERVICE invoice lines of confirmed plans, grouped by type.
+        Map<String, Double> revenueByService = new LinkedHashMap<>();
+        for (InvoicingPlan plan : confirmedPlans) {
+            for (Invoice invoice : plan.getInvoices()) {
+                if (invoice.getNature() != InvoiceNature.SERVICE) {
+                    continue;
+                }
+                revenueByService.merge(mapTypeToKey(invoice.getType()), invoice.getTotalAmount(), Double::sum);
+            }
+        }
+        dashboard.setRevenueByService(revenueByService);
+
+        // 7.7 paymentDelay : days between issuedDate and last payment for PAID plans.
+        List<Long> paymentDelays = new ArrayList<>();
+        for (InvoicingPlan plan : nonCancelledPlans) {
+            if (plan.getState() != State.PAID || plan.getIssuedDate() == null) {
+                continue;
+            }
+            Instant lastPayment = plan.getPayments().stream().map(Payment::getBillingDate)
+                    .filter(Objects::nonNull).max(Comparator.naturalOrder()).orElse(null);
+            if (lastPayment == null) {
+                continue;
+            }
+            paymentDelays.add(ChronoUnit.DAYS.between(plan.getIssuedDate(), lastPayment));
+        }
+        dashboard.setPaymentDelay(buildDelayStats(paymentDelays, 10, 31));
+
+        // 7.4 verificationDelay : days between registrationDate and first decision.
+        List<Long> verificationDelays = new ArrayList<>();
+        List<Participation> allParticipations =
+                participationRepository.findBySalonIdAndStatusIn(idSalon, allStatuses);
+        for (Participation participation : allParticipations) {
+            if (participation.getStatus() == Status.IN_VERIFICATION ||
+                    participation.getRegistrationDate() == null) {
+                continue;
+            }
+            Instant decision = firstDecisionDate(participation.getId());
+            if (decision == null) {
+                continue;
+            }
+            verificationDelays.add(ChronoUnit.DAYS.between(participation.getRegistrationDate(), decision));
+        }
+        dashboard.setVerificationDelay(buildDelayStats(verificationDelays, 7, 14, 29));
+
+        // 7.9 billingProgress : classify confirmed non-cancelled plans.
+        Map<String, Long> billingProgress = new LinkedHashMap<>();
+        billingProgress.put("DRAFT", 0L);
+        billingProgress.put("ISSUED", 0L);
+        billingProgress.put("PARTIAL", 0L);
+        billingProgress.put("PAID", 0L);
+        for (InvoicingPlan plan : confirmedPlans) {
+            billingProgress.merge(classifyBillingProgress(plan), 1L, Long::sum);
+        }
+        dashboard.setBillingProgress(billingProgress);
+
+        // 7.10 receivables : remaining amount of issued and not yet paid plans by age.
+        Aging receivables = new Aging();
+        Instant now = Instant.now();
+        for (InvoicingPlan plan : nonCancelledPlans) {
+            if (plan.getState() != State.ISSUED && plan.getState() != State.IS_ISSUING) {
+                continue;
+            }
+            double remaining = plan.getInvoicesTotal() - plan.getPaymentTotal();
+            if (remaining <= 0) {
+                continue;
+            }
+            Instant expiration = plan.getExpirationDate();
+            if (expiration == null || !expiration.isBefore(now)) {
+                receivables.setNotDue(receivables.getNotDue() + remaining);
+            } else if (ChronoUnit.DAYS.between(expiration, now) < 30) {
+                receivables.setOverdueUnder30(receivables.getOverdueUnder30() + remaining);
+            } else {
+                receivables.setOverdueOver30(receivables.getOverdueOver30() + remaining);
+            }
+        }
+        dashboard.setReceivables(receivables);
+
+        // 7.13 confirmedStandIds and 7.14 confirmedTalkIds.
+        dashboard.setConfirmedStandIds(allStands.stream()
+                .filter(stand -> CONFIRMED_STATUSES.contains(stand.getStatus()))
+                .map(Stand::getId).toList());
+        dashboard.setConfirmedTalkIds(Stream.concat(
+                allConferences.stream().filter(c -> CONFIRMED_STATUSES.contains(c.getStatus())).map(Conference::getId),
+                allWorkshops.stream().filter(w -> CONFIRMED_STATUSES.contains(w.getStatus())).map(Workshop::getId)
+        ).toList());
+
+        return dashboard;
+    }
+
+    private Map<Status, Long> countByStatus(Stream<Status> statuses) {
+        Map<Status, Long> counts = new EnumMap<>(Status.class);
+        for (Status status : Status.values()) {
+            counts.put(status, 0L);
+        }
+        statuses.forEach(status -> counts.merge(status, 1L, Long::sum));
+        return counts;
+    }
+
+    private boolean isReturningExhibitor(UUID exhibitorId, UUID currentSalonId, Instant currentStartingDate) {
+        List<Participation> participations =
+                participationRepository.findByExhibitorIdOrderByRegistrationDateDesc(exhibitorId);
+        for (Participation participation : participations) {
+            Salon otherSalon = participation.getSalon();
+            if (otherSalon == null || Objects.equals(otherSalon.getId(), currentSalonId)) {
+                continue;
+            }
+            if (!CONFIRMED_STATUSES.contains(participation.getStatus())) {
+                continue;
+            }
+            if (otherSalon.getStartingDate() != null && currentStartingDate != null &&
+                    otherSalon.getStartingDate().isBefore(currentStartingDate)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String mapTypeToKey(Type type) {
+        if (type == null) {
+            return "OTHERS";
+        }
+        return switch (type) {
+            case STAND -> "STAND";
+            case SHARED -> "SHARED";
+            case CONFERENCE -> "CONFERENCE";
+            case WORKSHOP -> "WORKSHOP";
+            case MEAL1, MEAL2, MEAL3 -> "MEALS";
+            case ELECTRICITY -> "ELECTRICITY";
+            case POSTAL_FEE -> "POSTAL_FEE";
+            case OTHERS -> "OTHERS";
+        };
+    }
+
+    private Instant firstDecisionDate(UUID participationId) {
+        List<EventLog> logs = eventLogService.findAllEventLog(EntityType.PARTICIPATION, participationId);
+        for (EventLog log : logs) {
+            if (log.getType() == EventType.ACTION && isDecisionLabel(log.getLabel())) {
+                return log.getReferenceDate();
+            }
+        }
+        return null;
+    }
+
+    private boolean isDecisionLabel(String label) {
+        return "Participation acceptée".equals(label) || "Participation annulée".equals(label) ||
+                "Participation refusée".equals(label);
+    }
+
+    private String classifyBillingProgress(InvoicingPlan plan) {
+        State state = plan.getState();
+        if (state == State.DRAFT || state == State.ISOLATED) {
+            return "DRAFT";
+        }
+        if (state == State.IS_ISSUING) {
+            return "ISSUED";
+        }
+        if (state == State.ISSUED) {
+            double paid = plan.getPaymentTotal();
+            if (paid <= 0) {
+                return "ISSUED";
+            }
+            return paid < plan.getInvoicesTotal() ? "PARTIAL" : "PAID";
+        }
+        return "PAID";
+    }
+
+    /**
+     * Buckets delays into {@code thresholds.length + 1} ordered counts : index {@code i} holds the
+     * number of delays strictly lower than {@code thresholds[i]}, the last index holds the rest.
+     */
+    private DelayStats buildDelayStats(List<Long> days, long... thresholds) {
+        List<Long> buckets = new ArrayList<>(Collections.nCopies(thresholds.length + 1, 0L));
+        for (long day : days) {
+            int index = thresholds.length;
+            for (int i = 0; i < thresholds.length; i++) {
+                if (day < thresholds[i]) {
+                    index = i;
+                    break;
+                }
+            }
+            buckets.set(index, buckets.get(index) + 1);
+        }
+        DelayStats stats = new DelayStats();
+        stats.setMedianDays(median(days));
+        stats.setBuckets(buckets);
+        return stats;
+    }
+
+    private Double median(List<Long> values) {
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+        List<Long> sorted = values.stream().sorted().toList();
+        int size = sorted.size();
+        if (size % 2 == 1) {
+            return (double) sorted.get(size / 2);
+        }
+        return (sorted.get(size / 2 - 1) + sorted.get(size / 2)) / 2.0;
     }
 
     @org.springframework.transaction.annotation.Transactional
