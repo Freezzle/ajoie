@@ -115,7 +115,8 @@
       },
       "metric": {
         "status": {
-          "title": "État actuel"
+          "title": "État actuel",
+          "sub": "État des éléments du salon"
         },
         "loyalty": {
           "title": "Nouveaux et fidèles",
