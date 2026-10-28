@@ -142,6 +142,7 @@ export class ParticipationComponent implements OnInit {
         toWatch: p => toWatchPredicate(p),
         crushOfHeart: p => !!p.crushOfHeart,
         guestOfHonor: p => !!p.guestOfHonor,
+        onHold: p => !!p.onHold,
         arrangement: p => !!p.needArrangement,
         offer: p => !!p.hasOffer,
         comment: p => !!p.extraInformation
@@ -193,6 +194,13 @@ export class ParticipationComponent implements OnInit {
                         icon: 'triangle-exclamation',
                         color: 'var(--app-danger)',
                         count: count('toWatch')
+                    },
+                    {
+                        key: 'onHold',
+                        labelKey: 'entityList.signal.onHold',
+                        icon: 'hand',
+                        color: 'var(--app-status-verification)',
+                        count: count('onHold')
                     },
                     {
                         key: 'comment',

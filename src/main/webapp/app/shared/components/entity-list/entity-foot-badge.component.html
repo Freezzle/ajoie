@@ -1,10 +1,21 @@
 @if (count() > 0) {
     @let text = labelKey() | translate;
 
-    <span [style.--el-color]="color()" [title]="text" class="el-foot-item el-foot-badge">
+    <span [appFootHelp]="help" [style.--el-color]="color()" [title]="text" class="el-foot-item el-foot-badge">
         <fa-icon [attr.aria-label]="text" [icon]="icon()"></fa-icon>
         @if (count() > 1) {
             <b>{{ count() }}</b>
         }
     </span>
+
+    <p-popover #help [baseZIndex]="9999" appendTo="body">
+        <div class="el-foot-help">
+            <span class="el-foot-help-text">
+                @if (count() > 1) {
+                    {{ count() }}
+                }
+                {{ text }}
+            </span>
+        </div>
+    </p-popover>
 }

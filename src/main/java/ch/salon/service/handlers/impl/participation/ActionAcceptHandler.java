@@ -82,6 +82,7 @@ public class ActionAcceptHandler implements BusinessActionHandler<Participation>
 
         Status oldStatus = Status.valueOf(payload.getStatus().name());
         payload.setStatus(Status.ACCEPTED);
+        payload.setOnHold(false);
         eventLogService.eventFromSystem("Participation acceptée", EventType.ACTION, EntityType.PARTICIPATION,
                 payload.getId(), Map.of("old_status", oldStatus.name()));
     }

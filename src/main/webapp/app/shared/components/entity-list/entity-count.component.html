@@ -1,12 +1,23 @@
 @if (count() > 0) {
-    <span class="el-foot-item el-foot-count">
+    @let text = (count() > 1 ? pluralKey() : singularKey()) | translate;
+
+    <span [appFootHelp]="help" class="el-foot-item el-foot-count">
         @if (icon(); as icon) {
             <fa-icon [icon]="icon"></fa-icon>
         }
         <b>{{ count() }}</b>
-        <span>{{ (count() > 1 ? pluralKey() : singularKey()) | translate }}</span>
+        <span>{{ text }}</span>
         @if (detail()) {
             <em>{{ detail() }}</em>
         }
     </span>
+
+    <p-popover #help [baseZIndex]="9999" appendTo="body">
+        <div class="el-foot-help">
+            <span class="el-foot-help-text">{{ count() }} {{ text }}</span>
+            @if (detail()) {
+                <em class="el-foot-help-detail">{{ detail() }}</em>
+            }
+        </div>
+    </p-popover>
 }

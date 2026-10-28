@@ -25,8 +25,12 @@ public enum ContextActionType {
     RECEIPT_DOWNLOAD("billing", "receipt-download"),
     PARTICIPATION_MARK_AS_CANCELLED("participation", "participation-marked-as-cancelled"),
     PARTICIPATION_MARK_AS_VERIFICATION("participation", "participation-marked-as-verification"),
+    PARTICIPATION_MARK_AS_ON_HOLD("participation", "participation-marked-as-on-hold"),
     PARTICIPATION_MARK_AS_ACCEPTED("participation", "participation-marked-as-accepted"),
+    PARTICIPATION_MARK_AS_REFUSED("participation", "participation-marked-as-refused"),
     PARTICIPATION_ACCEPTATION_EMAIL("participation", "participation-acceptation-email"),
+    PARTICIPATION_ON_HOLD_EMAIL("participation", "participation-on-hold-email"),
+    PARTICIPATION_REFUSAL_EMAIL("participation", "participation-refusal-email"),
     PARTICIPATION_VALIDATION_EMAIL("participation", "participation-validation-email"),
     PARTICIPATION_CLOSING_EMAIL("participation", "participation-closing-email"),
     PARTICIPATION_NEUTRAL_EMAIL("participation", "participation-neutral-email"),
@@ -89,6 +93,7 @@ public enum ContextActionType {
         return switch (this) {
             // === PARTICIPATION - Actions de progression du workflow ===
             case PARTICIPATION_MARK_AS_VERIFICATION -> 10;  // Mettre en vérification (début du processus)
+            case PARTICIPATION_MARK_AS_ON_HOLD -> 16;        // Mettre la participation en attente (pendant la vérification)
             case PARTICIPATION_MARK_AS_ACCEPTED -> 11;       // Accepter la participation
             case PARTICIPATION_MARK_AS_VALIDATED -> 12;      // Valider la participation
             case PARTICIPATION_MARK_AS_CLOSED -> 13;         // Clôturer la participation (fin du processus)
@@ -107,6 +112,7 @@ public enum ContextActionType {
             case INVOICE_SWITCH_TO_POSTAL -> 35;             // Changer pour envoyer par la poste
 
             // === PARTICIPATION - Emails principaux liés au workflow ===
+            case PARTICIPATION_ON_HOLD_EMAIL -> 39;          // Email de mise en attente
             case PARTICIPATION_ACCEPTATION_EMAIL -> 40;      // Email d'acceptation
             case PARTICIPATION_VALIDATION_EMAIL -> 41;       // Email de validation
             case PARTICIPATION_CLOSING_EMAIL -> 42;          // Email de clôture
@@ -116,6 +122,7 @@ public enum ContextActionType {
             case RECEIPT_SEND -> 44;                         // Envoyer le reçu
 
             // === PARTICIPATION - Email libre/spontané ===
+            case PARTICIPATION_REFUSAL_EMAIL -> 48;          // Email de refus
             case PARTICIPATION_NEUTRAL_EMAIL -> 49;          // Email libre sans contexte métier
 
             // === BILLING - Emails secondaires (rappels) ===
@@ -137,6 +144,7 @@ public enum ContextActionType {
             // === Actions d'annulation (destructives mais réversibles) ===
             case PARTICIPATION_MARK_AS_CANCELLED -> 90;      // Annuler la participation
             case INVOICE_MARK_AS_CANCELLED -> 91;            // Annuler la facture
+            case PARTICIPATION_MARK_AS_REFUSED -> 92;        // Refuser la participation
 
             // === Actions destructives (irréversibles - toujours à la fin) ===
             case INVOICE_DELETE -> 95;                       // Supprimer la facture

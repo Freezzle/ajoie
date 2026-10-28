@@ -129,6 +129,8 @@ public class ParticipationService {
         // Champs gérés uniquement par l'inscription publique : ne jamais les perdre lors d'une mise à jour admin
         participation.setRegistrationToken(existingParticipation.getRegistrationToken());
         participation.setPublicRegistration(existingParticipation.isPublicRegistration());
+        // Flag « en attente » géré uniquement via l'action dédiée : ne jamais l'écraser depuis le formulaire admin
+        participation.setOnHold(existingParticipation.getOnHold());
 
         if (Participation.diffArrangement(participation, existingParticipation)) {
             if (participation.getNeedArrangement()) {
@@ -167,9 +169,10 @@ public class ParticipationService {
                             "'", EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
                     Map.of("old_status", existingParticipation.getStatus().name().toLowerCase()));
 
-            // Le passage au statut REFUSED n'a pas de handler dédié : la transition se fait via cette mise à
-            // jour générique. On trace alors l'action « Participation refusée » comme les autres décisions
-            // (ActionAcceptHandler, ActionCancelHandler), notamment pour le calcul du délai de vérification.
+            // Le passage au statut REFUSED peut aussi se faire ici via la mise à jour générique du
+            // formulaire (en plus de l'action dédiée ActionRefuseHandler). On trace alors l'action
+            // « Participation refusée » comme les autres décisions (ActionAcceptHandler, ActionCancelHandler),
+            // notamment pour le calcul du délai de vérification.
             if (participation.getStatus() == Status.REFUSED) {
                 this.eventLogService.eventFromSystem("Participation refusée", EventType.ACTION,
                         EntityType.PARTICIPATION, participation.getId(),

@@ -1,0 +1,117 @@
+package ch.salon.service.handlers.impl.participation;
+
+import ch.salon.domain.Participation;
+import ch.salon.domain.enumeration.EntityType;
+import ch.salon.domain.enumeration.EventType;
+import ch.salon.repository.ParticipationRepository;
+import ch.salon.security.tenant.TenantContextHolder;
+import ch.salon.security.tenant.TransactionalTenantOperation;
+import ch.salon.service.EventLogService;
+import ch.salon.service.handlers.ActionMetadataProvider;
+import ch.salon.service.handlers.ActionSupport;
+import ch.salon.service.handlers.EmailActionHandler;
+import ch.salon.service.handlers.EmailMessage;
+import ch.salon.service.handlers.enums.ContextActionType;
+import ch.salon.service.mail.EmailCreator;
+import ch.salon.utils.DateUtils;
+import tools.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.context.Context;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+
+@Component
+@RequiredArgsConstructor
+public class EmailOnHoldHandler implements EmailActionHandler<Participation>, ActionMetadataProvider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailOnHoldHandler.class);
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final EmailCreator emailCreator;
+    private final EventLogService eventLogService;
+    private final ParticipationRepository repository;
+    private final TransactionalTenantOperation transactionalOps;
+
+    @Value("${spring.mail.username:}")
+    private String senderEmail;
+
+    @Autowired
+    @Lazy
+    private EmailOnHoldHandler self;
+
+    @Override
+    public ActionSupport supports(Participation payload, Map<String, Object> context) {
+        if (payload != null && Boolean.TRUE.equals(payload.getOnHold())) {
+            return ActionSupport.allowed("action.participation-on-hold-email.help");
+        }
+        return ActionSupport.rejected();
+    }
+
+
+    @Override
+    public EmailMessage buildTemplate(Participation payload, Map<String, Object> context) {
+        Locale locale = (Locale) context.getOrDefault("locale", Locale.FRENCH);
+
+        String subject = this.emailCreator.getTranslatedText("email.participation-on-hold.title", locale,
+                payload.getSalon().getPlace());
+
+        EmailMessage emailMessage = new EmailMessage();
+        emailMessage.setFrom(senderEmail);
+        emailMessage.setTo(payload.getExhibitor().getEmail());
+        emailMessage.setSubject(subject);
+
+        Context thymeleafCtxt = new Context(locale);
+        thymeleafCtxt.setVariable("salon", payload.getSalon().getPlace());
+        thymeleafCtxt.setVariable("startDate", DateUtils.instantToIso(payload.getSalon().getStartingDate()));
+        thymeleafCtxt.setVariable("endDate", DateUtils.instantToIso(payload.getSalon().getEndingDate()));
+        emailMessage.setBody(this.emailCreator.getContentHtml("participation/on-hold", thymeleafCtxt));
+
+        return emailMessage;
+    }
+
+    @Override
+    public void handle(Participation payload, Map<String, Object> context) throws Exception {
+        self.prepareAndSendInTenant(payload.getId(), context, payload.getTenantId());
+    }
+
+    @Async
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void prepareAndSendInTenant(UUID idParticipation, Map<String, Object> context, UUID tenantId) throws Exception {
+        TenantContextHolder.runAsTenant(tenantId, () -> {
+            transactionalOps.execute(() -> {
+                Participation payload = this.repository.getReferenceById(idParticipation);
+                Object raw = context.get("emailMessage");
+                EmailMessage emailMessage = objectMapper.convertValue(raw, EmailMessage.class);
+                if (emailMessage == null) {
+                    emailMessage = buildTemplate(payload, context);
+                }
+
+                try {
+                    emailCreator.send(emailMessage, null);
+
+                    eventLogService.eventFromSystem("Email de mise en attente envoyé", EventType.EMAIL,
+                            EntityType.PARTICIPATION, payload.getId(), null);
+                } catch (Exception e) {
+                    LOGGER.error("Problem during sending email : on-hold.html", e);
+                    eventLogService.eventFromSystem("Problème d'envoi : on-hold.html", EventType.EMAIL,
+                            EntityType.PARTICIPATION, payload.getId(), null);
+                }
+            });
+        });
+    }
+
+    @Override
+    public ContextActionType getActionType() {
+        return ContextActionType.PARTICIPATION_ON_HOLD_EMAIL;
+    }
+}

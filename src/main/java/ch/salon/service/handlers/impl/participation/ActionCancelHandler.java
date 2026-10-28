@@ -98,6 +98,7 @@ public class ActionCancelHandler implements BusinessActionHandler<Participation>
 
         Status oldStatus = Status.valueOf(payload.getStatus().name());
         payload.setStatus(Status.CANCELED);
+        payload.setOnHold(false);
         eventLogService.eventFromSystem("Participation annulée", EventType.ACTION, EntityType.PARTICIPATION,
                 payload.getId(), Map.of("old_status", oldStatus.name()));
     }

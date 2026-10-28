@@ -1,7 +1,7 @@
 @if (labelKey() || label()) {
     @let text = labelKey() ? (labelKey()! | translate) : label();
 
-    <span [style.--el-color]="color()" [title]="text" class="el-foot-item">
+    <span [appFootHelp]="help" [style.--el-color]="color()" [title]="text" class="el-foot-item">
         @if (icon(); as icon) {
             <fa-icon [animation]="spin() ? 'spin' : undefined"
                      [attr.aria-label]="text"
@@ -15,4 +15,13 @@
           }
         }
     </span>
+
+    <p-popover #help [baseZIndex]="9999" appendTo="body">
+        <div class="el-foot-help">
+            <span class="el-foot-help-text">{{ text }}</span>
+            @if (detail()) {
+                <em class="el-foot-help-detail">{{ detail() }}</em>
+            }
+        </div>
+    </p-popover>
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Mise en attente d'une participation (flag géré uniquement via l'action dédiée) -->
+    <changeSet id="0.0.2-202610-participation-on-hold" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="participation"/>
+        </preConditions>
+
+        <addColumn tableName="participation">
+            <column name="on_hold" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="participation" columnName="on_hold"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

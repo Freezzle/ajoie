@@ -466,6 +466,8 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
 
 .el-row-foot {
   grid-area: foot;
+  position: relative;
+  z-index: 1;
   margin: 6px 0 0;
   padding: 4px 0 0;
   border-top: 1px dashed var(--app-border);
@@ -558,6 +560,7 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   color: var(--el-color, var(--app-text));
   max-width: 100%;
   min-width: 0;
+  cursor: help;
 
   fa-icon {
     color: var(--el-color, var(--app-text-muted));
@@ -586,6 +589,26 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
 
   b {
     font-weight: 700;
+  }
+}
+
+/* Contenu du popover expliquant la signification d'une icône de pied. */
+.el-foot-help {
+  padding: 0.5rem 0.75rem;
+  max-width: 280px;
+  line-height: 1.4;
+  word-wrap: break-word;
+
+  .el-foot-help-text {
+    font-weight: 500;
+  }
+
+  .el-foot-help-detail {
+    display: block;
+    margin-top: 0.25rem;
+    font-style: normal;
+    font-weight: 400;
+    color: var(--app-text-muted);
   }
 }
 

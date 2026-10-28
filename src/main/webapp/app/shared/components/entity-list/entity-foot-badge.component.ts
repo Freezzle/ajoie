@@ -1,6 +1,8 @@
 import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {Popover} from 'primeng/popover';
 
 import SharedModule from '../../shared.module';
+import {FootHelpDirective} from './foot-help.directive';
 
 /**
  * Élément du pied d'une ligne réduit à une icône colorée, accompagnée d'une
@@ -9,7 +11,7 @@ import SharedModule from '../../shared.module';
  */
 @Component({
                selector: 'entity-foot-badge',
-               imports: [SharedModule],
+               imports: [SharedModule, Popover, FootHelpDirective],
                templateUrl: './entity-foot-badge.component.html',
                changeDetection: ChangeDetectionStrategy.OnPush
            })

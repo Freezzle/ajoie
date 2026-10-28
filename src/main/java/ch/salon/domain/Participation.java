@@ -108,6 +108,9 @@ public class Participation implements Serializable, TenantOwned {
     @Column(name = "public_registration", nullable = false)
     private boolean publicRegistration = false;
 
+    @Column(name = "on_hold", nullable = false)
+    private Boolean onHold = false;
+
     public static boolean diffMeal(int indexMeal, Participation part1, Participation part2) {
         if (part1 == null && part2 != null) {
             return true;

@@ -24,6 +24,7 @@ export interface IParticipation {
     additionnalInformation: string | null;
     status: Status;
     publicRegistration: boolean;
+    onHold: boolean;
     extraInformation: string | null;
     exhibitor: IExhibitor;
     salon: ISalon;

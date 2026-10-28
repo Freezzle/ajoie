@@ -145,6 +145,12 @@
                                                       labelKey="entityList.signal.guestOfHonor"/>
                                 }
 
+                                @if (participation.onHold) {
+                                    <entity-foot-item color="var(--app-status-verification)"
+                                                      icon="hand"
+                                                      labelKey="entityList.signal.onHold"/>
+                                }
+
                                 @if (participation.crushOfHeart) {
                                     <entity-foot-item color="var(--app-heart)"
                                                       icon="heart"
