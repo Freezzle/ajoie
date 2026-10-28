@@ -63,7 +63,6 @@ const STORAGE_KEY = 'salon-dashboard.metrics';
 @Component({
     selector: 'app-salon-stats',
     templateUrl: './salon-stats.component.html',
-    styleUrl: './salon-stats.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SharedModule,
