@@ -12,13 +12,14 @@ import {IPublicDimension, IPublicSalonInfo, IRegistrationPrices, IRegistrationRe
 import {RegistrationFormGroup, RegistrationFormService} from './registration-form.service';
 import {RegistrationDraftStorageService} from './registration-draft-storage.service';
 import {RegistrationService} from './registration.service';
-import {StepDescriptor, StepProgressComponent, StepState} from './step-progress/step-progress.component';
+import {StepDescriptor, StepProgressComponent, StepState} from '../shared/components/step-progress/step-progress.component';
 import {ExhibitorStepComponent} from './steps/exhibitor-step/exhibitor-step.component';
 import {ParticipationStepComponent} from './steps/participation-step/participation-step.component';
 import {ServicesStepComponent} from './steps/services-step/services-step.component';
 import {SummaryStepComponent} from './steps/summary-step/summary-step.component';
 import {TurnstileBoxComponent} from './turnstile-box.component';
-import {RegistrationCardComponent} from './registration-card/registration-card.component';
+import {RegistrationCardComponent} from '../shared/components/registration-card/registration-card.component';
+import {SalonBannerComponent} from '../shared/components/salon-banner/salon-banner.component';
 import {formatSalonDateRange} from './registration-date-range.util';
 import RichTextPipe from '../shared/pipe/rich-text.pipe';
 import {prepareRichTextHtml} from '../shared/utils/rich-text.util';
@@ -47,6 +48,7 @@ const STEPS: StepDescriptor[] = [
                    SummaryStepComponent,
                    TurnstileBoxComponent,
                    RegistrationCardComponent,
+                   SalonBannerComponent,
                    RichTextPipe
                ],
                templateUrl: './registration.component.html',

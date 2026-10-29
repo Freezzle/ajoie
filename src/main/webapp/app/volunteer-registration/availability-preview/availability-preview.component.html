@@ -1,0 +1,65 @@
+<div class="prev">
+    <div class="prev-head">
+        <volunteer-avatar [volunteerId]="name()" [label]="name()" [size]="34"/>
+        <div class="prev-id">
+            <div class="prev-name">{{ name() || ('volunteerRegistration.preview.you' | translate) }}</div>
+            <div class="prev-sub">{{ 'volunteerRegistration.preview.subtitle' | translate }}</div>
+        </div>
+        <div class="prev-total">
+            <strong>{{ totalHours() }} h</strong>
+            <small>{{ 'volunteerRegistration.preview.onDays' | translate: {count: availableDayCount()} }}</small>
+        </div>
+    </div>
+
+    <div class="prev-axis" aria-hidden="true">
+        @for (tick of ticks(); track tick.left) {
+            <span class="prev-tick" [style.left.%]="tick.left">{{ tick.label }}</span>
+        }
+    </div>
+
+    @for (day of days(); track day.id) {
+        <div class="prev-row">
+            <div class="prev-day">
+                <span class="prev-day-label">{{ day.shortLabel }}</span>
+                @switch (day.state) {
+                    @case ('available') {
+                        <small class="ok">{{ day.ranges.length ? totalOf(day) + ' h' : '' }}</small>
+                    }
+                    @case ('no') {
+                        <small class="muted">{{ 'volunteerRegistration.preview.no' | translate }}</small>
+                    }
+                    @default {
+                        <small class="todo">{{ 'volunteerRegistration.preview.toAnswer' | translate }}</small>
+                    }
+                }
+            </div>
+
+            <div class="prev-track">
+                <div class="prev-open"
+                     [style.left.%]="openingLeft(day)"
+                     [style.width.%]="openingWidth(day)"></div>
+
+                @if (day.state === 'no') {
+                    <div class="prev-hatch"
+                         [style.left.%]="openingLeft(day)"
+                         [style.width.%]="openingWidth(day)"
+                         [title]="'volunteerRegistration.preview.notAvailable' | translate"></div>
+                }
+
+                @for (bar of barsOf(day); track bar.left) {
+                    <div class="prev-bar" [style.left.%]="bar.left" [style.width.%]="bar.width">
+                        @if (bar.showLabel) {
+                            <span>{{ bar.label }}</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="prev-legend" aria-hidden="true">
+        <span class="lg"><i class="sw bar"></i>{{ 'volunteerRegistration.preview.legend.hours' | translate }}</span>
+        <span class="lg"><i class="sw open"></i>{{ 'volunteerRegistration.preview.legend.opening' | translate }}</span>
+        <span class="lg"><i class="sw hatch"></i>{{ 'volunteerRegistration.preview.legend.unavailable' | translate }}</span>
+    </div>
+</div>

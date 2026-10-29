@@ -1,0 +1,137 @@
+{
+  "volunteerRegistration": {
+    "title": "Inscription bénévole",
+    "loading": "Chargement…",
+    "loadError": "Impossible de charger les informations. Réessayez plus tard.",
+    "welcome": {
+      "start": "Commencer"
+    },
+    "closed": {
+      "DISABLED": "Les inscriptions bénévoles ne sont pas disponibles pour cet évènement.",
+      "NOT_YET_OPEN": "Les inscriptions bénévoles ne sont pas encore ouvertes.",
+      "CLOSED": "Les inscriptions bénévoles sont closes. L'équipe prépare le planning."
+    },
+    "actions": {
+      "submit": "Envoyer mon inscription"
+    },
+    "errors": {
+      "incomplete": "Quelques points sont à compléter avant de continuer.",
+      "server": "Une erreur est survenue. Réessayez plus tard."
+    },
+    "steps": {
+      "contact": {
+        "short": "Vous",
+        "label": "Vous",
+        "title": "Faisons connaissance",
+        "intro": "Quelques informations pour que l'équipe bénévoles puisse vous contacter."
+      },
+      "availability": {
+        "short": "Disponibilités",
+        "label": "Disponibilités",
+        "title": "Quand pouvez-vous venir ?",
+        "intro": "Répondez pour chaque jour. Si vous venez, glissez sur la frise pour choisir vos heures."
+      },
+      "preferences": {
+        "short": "Préférences",
+        "label": "Préférences",
+        "title": "Où aimeriez-vous aider ?",
+        "intro": "Laissez l'équipe vous placer là où il y a besoin, ou choisissez vos zones préférées."
+      },
+      "summary": {
+        "short": "Récapitulatif",
+        "label": "Récapitulatif",
+        "title": "Tout est correct ?",
+        "intro": "Relisez avant d'envoyer : vos disponibilités arrivent directement dans le planning."
+      }
+    },
+    "contact": {
+      "cardTitle": "Vos coordonnées",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "E-mail",
+      "emailHelp": "Vous y recevrez la confirmation et votre lien pour modifier.",
+      "phone": "Téléphone (facultatif)",
+      "phoneHelp": "Pour vous joindre pendant le salon."
+    },
+    "day": {
+      "answerRequired": "Merci de répondre pour ce jour",
+      "hoursRequired": "Choisissez au moins une heure",
+      "notComing": "Vous ne venez pas ce jour-là."
+    },
+    "frise": {
+      "preset": {
+        "all": "Toute la journée",
+        "morning": "Matin",
+        "afternoon": "Après-midi"
+      },
+      "trackAria": "Heures du {{day}}",
+      "removeRange": "Retirer cette plage",
+      "empty": "Glissez sur la frise ou utilisez un raccourci."
+    },
+    "preview": {
+      "you": "Vous",
+      "subtitle": "Votre ligne dans le planning des bénévoles",
+      "onDays": "sur {{count}} jours",
+      "no": "non",
+      "toAnswer": "à répondre",
+      "notAvailable": "Pas disponible",
+      "legend": {
+        "hours": "Vos heures",
+        "opening": "Heures d'ouverture",
+        "unavailable": "Pas disponible"
+      }
+    },
+    "preferences": {
+      "cardTitle": "Vos préférences",
+      "anyTitle": "Là où on a besoin de moi",
+      "anySubtitle": "L'équipe me place selon les besoins",
+      "chooseTitle": "Je préfère choisir",
+      "chooseSubtitle": "Une ou plusieurs zones",
+      "anyBanner": "Merci ! L'équipe vous placera là où il manque du monde pendant vos heures.",
+      "zoneRequired": "Choisissez au moins une zone.",
+      "notes": "Remarques"
+    },
+    "summary": {
+      "contact": "Vous",
+      "availability": "Disponibilités",
+      "preferences": "Préférences",
+      "edit": "Modifier",
+      "nameLabel": "Nom",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Téléphone",
+      "zonesLabel": "Où aider",
+      "notesLabel": "Remarques",
+      "linkInfo": "Après l'envoi, vous recevrez un e-mail avec un lien personnel pour modifier votre inscription jusqu'au {{date}}.",
+      "consent": "J'accepte d'être contacté·e par l'équipe bénévoles",
+      "consentHint": "Vos données servent uniquement à l'organisation du salon"
+    },
+    "done": {
+      "title": "Merci {{name}}, c'est envoyé !",
+      "text": "Vos disponibilités sont dans le planning. Un e-mail vient de partir à {{email}} avec votre lien personnel pour revenir les modifier."
+    },
+    "manage": {
+      "title": "Mon inscription bénévole",
+      "hello": "Bonjour {{name}}",
+      "subtitle": "Votre inscription bénévole au salon",
+      "back": "Mon inscription",
+      "editInfo": "Rien n'est encore envoyé. Validez cette section, puis cliquez sur « Envoyer les modifications ». Vous pouvez modifier plusieurs sections avant d'envoyer.",
+      "cancel": "Annuler",
+      "validate": "Valider",
+      "noChange": "Aucun changement",
+      "changeReady": "Modification prête : pensez à l'envoyer",
+      "modified": "Modifié",
+      "unsubscribe": "Je ne peux plus venir · me désinscrire",
+      "rejoinHint": "Changé d'avis ? Votre lien reste actif jusqu'à la clôture.",
+      "rejoin": "Me réinscrire avec les mêmes disponibilités",
+      "sentConfirm": "✓ Modifications envoyées. Un e-mail de confirmation vient de partir.",
+      "closedBanner": "Les inscriptions sont closes. L'équipe prépare le planning ; vous recevrez vos horaires définitifs par e-mail.",
+      "cancelledBanner": "Vous êtes désinscrit·e.",
+      "changedCount": "{{count}} section(s) modifiée(s), pas encore envoyée(s)",
+      "changedHint": "Rien n'est enregistré tant que vous n'envoyez pas. Un seul e-mail de confirmation partira.",
+      "discard": "Annuler les modifications",
+      "send": "Envoyer les modifications",
+      "linkInvalid": "Ce lien n'est pas valide. Vérifiez qu'il est complet, ou contactez l'équipe.",
+      "removed": "Votre inscription a été retirée par l'équipe. Contactez-la pour toute question."
+    }
+  }
+}

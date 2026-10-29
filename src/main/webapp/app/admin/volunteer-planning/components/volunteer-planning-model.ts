@@ -7,6 +7,7 @@ export type Category = {
     label: string;
     icon?: string;      // ex: "pi pi-shop" — optionnel
     color: string;      // ex: "#FFDDC1"
+    description?: string;
 };
 
 export type DayCell = {
@@ -29,6 +30,8 @@ export type NeedCell = {
 export type Day = {
     id: string;         // non visible
     label: string;
+    date?: string;      // ISO yyyy-MM-dd — pastille/titre public
+    description?: string; // sous-titre public du jour
     startTime: Date;    // time-only
     endTime: Date;      // time-only
     intervalMinutes: IntervalMinutes;
@@ -39,6 +42,7 @@ export type Day = {
 };
 
 export type Planning = {
+    version?: number;
     volunteers: Volunteer[];
     days: Day[];
     categories: Category[];

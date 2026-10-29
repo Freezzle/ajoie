@@ -1,0 +1,22 @@
+<div class="yn" role="radiogroup" [attr.aria-labelledby]="labelledBy()">
+    <button type="button"
+            role="radio"
+            class="yn-opt"
+            [class.on]="value() === true"
+            [attr.aria-checked]="value() === true"
+            [disabled]="disabled()"
+            (click)="select(true)">
+        <i class="pi pi-check" aria-hidden="true"></i>
+        <span>{{ yesKey() | translate }}</span>
+    </button>
+    <button type="button"
+            role="radio"
+            class="yn-opt"
+            [class.on]="value() === false"
+            [attr.aria-checked]="value() === false"
+            [disabled]="disabled()"
+            (click)="select(false)">
+        <i class="pi pi-times" aria-hidden="true"></i>
+        <span>{{ noKey() | translate }}</span>
+    </button>
+</div>

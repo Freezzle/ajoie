@@ -242,6 +242,14 @@
       "chartText": "Texte de la charte d'inscription",
       "salonChartText": "Texte de la charte du salon"
     },
+    "volunteerRegistration": {
+      "title": "Inscription des bénévoles",
+      "enabled": "Inscriptions bénévoles ouvertes",
+      "openingDate": "Ouverture des inscriptions bénévoles",
+      "closingDate": "Fermeture des inscriptions bénévoles",
+      "welcomeTitle": "Titre de la page d'accueil bénévoles",
+      "welcomeText": "Texte d'accueil des bénévoles"
+    },
     "stands": "Les stands",
     "startingDate": "Date de début",
     "statistiques": "Dashboard du salon",

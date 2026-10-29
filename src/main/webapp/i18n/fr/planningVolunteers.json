@@ -4,6 +4,36 @@
     "manageVolunteers": "Bénévoles",
     "manageDay": "Configuration",
     "removeDay": "Voulez-vous supprimer le jour ?",
+    "conflict": "Le planning a été modifié entre-temps (par exemple une nouvelle inscription bénévole). Rechargez pour voir la dernière version.",
+    "day": {
+      "date": "Date du jour",
+      "description": "Description (affichée aux bénévoles)"
+    },
+    "category": {
+      "description": "Description de la zone"
+    },
+    "onlineInfo": {
+      "open": "Voir les informations transmises en ligne",
+      "title": "Inscription en ligne",
+      "loading": "Chargement…",
+      "none": "Aucune information d'inscription en ligne.",
+      "contact": "Coordonnées",
+      "availability": "Disponibilités",
+      "zones": "Zones préférées",
+      "zonesAny": "Là où on a besoin de moi",
+      "notes": "Remarques",
+      "notAvailable": "Pas disponible",
+      "resend": "Renvoyer le lien",
+      "remove": "Retirer l'inscription",
+      "removeConfirm": "Retirer cette inscription du planning ? Le bénévole sera notifié qu'il a été retiré par l'équipe.",
+      "linkSent": "Le lien a été renvoyé par e-mail.",
+      "removed": "Inscription retirée.",
+      "status": {
+        "active": "Inscrit en ligne",
+        "cancelled": "Désinscrit",
+        "removed": "Retiré par l'équipe"
+      }
+    },
     "interval": {
       "label": "Intervalle",
       "5": "5 min",

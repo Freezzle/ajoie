@@ -21,6 +21,7 @@ import ch.salon.service.EventLogService;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.RefreshInvoicingPlansService;
 import ch.salon.service.StandPictureService;
+import ch.salon.service.util.SecureTokens;
 import ch.salon.service.dto.ImageUploadDTO;
 import ch.salon.service.dto.registration.PublicDimensionDTO;
 import ch.salon.service.dto.registration.PublicPricesDTO;
@@ -39,9 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -65,8 +64,6 @@ public class PublicRegistrationService {
     public static final String ENTITY_NAME = "registration";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PublicRegistrationService.class);
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final int TOKEN_BYTES = 32;
 
     private final SalonRepository salonRepository;
     private final StandRepository standRepository;
@@ -158,7 +155,7 @@ public class PublicRegistrationService {
         participation.setRegistrationDate(now);
         participation.setStatus(Status.IN_VERIFICATION);
         participation.setPublicRegistration(true);
-        participation.setRegistrationToken(generateToken());
+        participation.setRegistrationToken(SecureTokens.generate());
         participation.setCrushOfHeart(false);
         participation.setGuestOfHonor(false);
         participation.setNeedArrangement(false);
@@ -241,10 +238,7 @@ public class PublicRegistrationService {
                 () -> new BadRequestAlertException("Inscription introuvable", ENTITY_NAME,
                         "registration.link-invalid"));
 
-        boolean validToken = StringUtils.isNotBlank(token) &&
-                StringUtils.isNotBlank(participation.getRegistrationToken()) &&
-                java.security.MessageDigest.isEqual(participation.getRegistrationToken().getBytes(),
-                        token.getBytes());
+        boolean validToken = SecureTokens.matches(participation.getRegistrationToken(), token);
 
         if (!validToken || participation.getSalon() == null ||
                 !salonId.equals(participation.getSalon().getId())) {
@@ -716,12 +710,6 @@ public class PublicRegistrationService {
     }
 
     // -------------------- UTILS --------------------
-
-    private static String generateToken() {
-        byte[] bytes = new byte[TOKEN_BYTES];
-        SECURE_RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
 
     private static String normalizeEmail(String email) {
         return StringUtils.defaultString(email).trim().toLowerCase(Locale.ROOT);

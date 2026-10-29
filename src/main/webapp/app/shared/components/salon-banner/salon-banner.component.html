@@ -1,0 +1,18 @@
+<!-- Rappel permanent du salon concerné : visible à chaque écran des parcours publics. -->
+<div class="registration-salon-banner"
+     [attr.aria-label]="'registration.salonBanner.aria' | translate: {place: place(), dates: dates() ?? ''}"
+     role="note">
+    <div class="registration-salon-banner-inner">
+        <span class="registration-salon-banner-item">
+            <i aria-hidden="true" class="pi pi-map-marker"></i>
+            <span>{{ 'registration.salonBanner.salon' | translate: {place: place()} }}</span>
+        </span>
+        @if (dates(); as d) {
+            <span aria-hidden="true" class="registration-salon-banner-separator">·</span>
+            <span class="registration-salon-banner-item">
+                <i aria-hidden="true" class="pi pi-calendar"></i>
+                <span>{{ d }}</span>
+            </span>
+        }
+    </div>
+</div>

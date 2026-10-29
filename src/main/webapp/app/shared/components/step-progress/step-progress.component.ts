@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
-import SharedModule from '../../shared/shared.module';
+import SharedModule from '../../shared.module';
 
 export type StepState = 'cur' | 'done' | 'warn' | 'todo';
 

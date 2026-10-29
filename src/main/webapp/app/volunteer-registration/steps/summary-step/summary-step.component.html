@@ -1,0 +1,103 @@
+<div class="registration-step">
+    <h1 tabindex="-1">{{ 'volunteerRegistration.steps.summary.title' | translate }}</h1>
+    <p class="step-intro">{{ 'volunteerRegistration.steps.summary.intro' | translate }}</p>
+
+    <section class="registration-summary">
+        <!-- Bloc Vous -->
+        <div class="summary-card">
+            <div class="summary-card-head">
+                <h3>{{ 'volunteerRegistration.summary.contact' | translate }}</h3>
+                <button-box (clickedEvent)="editStep.emit(0)"
+                            primeIcon="pi-pencil"
+                            translateKey="volunteerRegistration.summary.edit"
+                            type="secondary"/>
+            </div>
+            <dl class="summary-list">
+                <div class="summary-row">
+                    <dt>{{ 'volunteerRegistration.summary.nameLabel' | translate }}</dt>
+                    <dd>{{ name }}</dd>
+                </div>
+                <div class="summary-row">
+                    <dt>{{ 'volunteerRegistration.summary.emailLabel' | translate }}</dt>
+                    <dd>{{ contact().controls.email.value }}</dd>
+                </div>
+                <div class="summary-row">
+                    <dt>{{ 'volunteerRegistration.summary.phoneLabel' | translate }}</dt>
+                    <dd>{{ phoneDisplay }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Bloc Disponibilités -->
+        <div class="summary-card">
+            <div class="summary-card-head">
+                <h3>{{ 'volunteerRegistration.summary.availability' | translate }}</h3>
+                <button-box (clickedEvent)="editStep.emit(1)"
+                            primeIcon="pi-pencil"
+                            translateKey="volunteerRegistration.summary.edit"
+                            type="secondary"/>
+            </div>
+            <dl class="summary-list">
+                @for (line of daySummaryLines; track line.label) {
+                    <div class="summary-row">
+                        <dt>{{ line.label }}</dt>
+                        <dd>{{ line.value }}</dd>
+                    </div>
+                }
+            </dl>
+            <div class="mt-3">
+                <app-availability-preview [name]="name" [days]="previewDays"/>
+            </div>
+        </div>
+
+        <!-- Bloc Préférences -->
+        <div class="summary-card">
+            <div class="summary-card-head">
+                <h3>{{ 'volunteerRegistration.summary.preferences' | translate }}</h3>
+                <button-box (clickedEvent)="editStep.emit(2)"
+                            primeIcon="pi-pencil"
+                            translateKey="volunteerRegistration.summary.edit"
+                            type="secondary"/>
+            </div>
+            <dl class="summary-list">
+                <div class="summary-row">
+                    <dt>{{ 'volunteerRegistration.summary.zonesLabel' | translate }}</dt>
+                    <dd>
+                        @if (zoneMode === 'ANY') {
+                            {{ 'volunteerRegistration.preferences.anyTitle' | translate }}
+                        } @else {
+                            {{ zoneLabels }}
+                        }
+                    </dd>
+                </div>
+                @if (notes) {
+                    <div class="summary-row">
+                        <dt>{{ 'volunteerRegistration.summary.notesLabel' | translate }}</dt>
+                        <dd>{{ notes }}</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+
+        <!-- Lien de modification + consentement + captcha -->
+        <div class="summary-card" [formGroup]="consents()">
+            <div class="info-box">
+                <i class="pi pi-info-circle" aria-hidden="true"></i>
+                <span>{{ 'volunteerRegistration.summary.linkInfo' | translate: {date: closingDate() || ''} }}</span>
+            </div>
+
+            <div class="mt-3">
+                <checkbox-box fieldName="acceptContact"
+                              formControlName="acceptContact"
+                              translateKey="volunteerRegistration.summary.consent"
+                              hint="{{ 'volunteerRegistration.summary.consentHint' | translate }}"/>
+            </div>
+
+            @if (captchaEnabled() && captchaSiteKey()) {
+                <div class="mt-3">
+                    <app-turnstile-box [siteKey]="captchaSiteKey()" (tokenChange)="captchaToken.emit($event)"/>
+                </div>
+            }
+        </div>
+    </section>
+</div>

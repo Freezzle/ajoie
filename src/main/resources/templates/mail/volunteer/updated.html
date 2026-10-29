@@ -1,0 +1,25 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Bonjour <strong th:text="${firstName}">Prénom</strong>,
+    </p>
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Tes modifications ont bien été enregistrées pour l'évènement <strong>[[${salon}]]</strong>.
+        Voici tes disponibilités à jour dans le planning :
+    </p>
+    <ul style="margin:0 0 8px 0; line-height:1.5;">
+        <li th:each="day : ${days}" th:text="${day}">Jeudi : 13:00–18:00</li>
+    </ul>
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Où aider : <strong th:text="${zones}">là où on a besoin de moi</strong>.
+    </p>
+    <p style="margin:0 0 8px 0; line-height:1.5;" th:if="${manageLink}">
+        Besoin d'ajuster encore ? Utilise ton lien personnel :
+        <a th:href="${manageLink}">Gérer mon inscription</a><br/>
+        Ce lien est personnel, merci de ne pas le partager. Tu peux l'utiliser
+        <span th:if="${closingDate}">jusqu'au <strong th:text="${closingDate}">06.11.2026</strong>, </span>
+        ensuite l'équipe t'enverra ton planning définitif.
+    </p>
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Merci pour ton engagement !
+    </p>
+</div>

@@ -45,4 +45,6 @@
              relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/0.0.2/0.0.2_202610-participation-on-hold.xml"
              relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/0.0.2/0.0.2_202611-volunteer-registration.xml"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

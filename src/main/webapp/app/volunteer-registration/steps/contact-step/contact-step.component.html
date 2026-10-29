@@ -1,0 +1,31 @@
+<div class="registration-step" [formGroup]="form()">
+    <h1 tabindex="-1">{{ 'volunteerRegistration.steps.contact.title' | translate }}</h1>
+    <p class="step-intro">{{ 'volunteerRegistration.steps.contact.intro' | translate }}</p>
+
+    <app-registration-card titleKey="volunteerRegistration.contact.cardTitle">
+        <div class="row">
+            <div class="col-12 col-lg-6 mt-3">
+                <text-box fieldName="firstName"
+                          formControlName="firstName"
+                          translateKey="volunteerRegistration.contact.firstName"/>
+            </div>
+            <div class="col-12 col-lg-6 mt-3">
+                <text-box fieldName="lastName"
+                          formControlName="lastName"
+                          translateKey="volunteerRegistration.contact.lastName"/>
+            </div>
+            <div class="col-12 mt-3">
+                <text-box fieldName="email"
+                          formControlName="email"
+                          translateKey="volunteerRegistration.contact.email"/>
+                <small class="field-help">{{ 'volunteerRegistration.contact.emailHelp' | translate }}</small>
+            </div>
+            <div class="col-12 mt-3">
+                <text-box fieldName="phoneNumber"
+                          formControlName="phoneNumber"
+                          translateKey="volunteerRegistration.contact.phone"/>
+                <small class="field-help">{{ 'volunteerRegistration.contact.phoneHelp' | translate }}</small>
+            </div>
+        </div>
+    </app-registration-card>
+</div>

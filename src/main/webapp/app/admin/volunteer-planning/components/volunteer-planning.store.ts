@@ -1,4 +1,5 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
+import {HttpErrorResponse} from '@angular/common/http';
 import {finalize} from 'rxjs';
 
 import {
@@ -32,6 +33,8 @@ import {
     VolunteerPlanningService
 } from '../volunteer-planning.service';
 import {ActionsService} from '../../common/actions.service';
+import {AlertService} from '../../../core/util/alert.service';
+import {VolunteerRegistrationAdminService} from '../volunteer-registration-admin.service';
 import {AvailableAction} from '../../../shared/model/available-action';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
@@ -67,11 +70,41 @@ export class VolunteerPlanningStore {
     readonly mobilePaintMode = signal<boolean>(false);
     readonly history = signal<Day[]>([]);
     readonly downloadMenuItems = signal<AppMenuItem[]>([]);
+    /** Ids (planningVolunteerId) des bénévoles inscrits en ligne : pour l'icône popin. */
+    readonly onlineVolunteerIds = signal<Set<string>>(new Set());
+    /** Bénévole dont la popin d'infos en ligne est ouverte (null = fermée). */
+    readonly infoVolunteerId = signal<string | null>(null);
 
     private readonly volunteerPlanningService = inject(VolunteerPlanningService);
     private readonly actionsService = inject(ActionsService);
     private readonly menuItemBuilderService = inject(MenuItemBuilderService);
+    private readonly alertService = inject(AlertService);
+    private readonly volunteerRegistrationAdminService = inject(VolunteerRegistrationAdminService);
     private idSalon = '';
+
+    get salonId(): string {
+        return this.idSalon;
+    }
+
+    isOnlineVolunteer(volunteerId: string): boolean {
+        return this.onlineVolunteerIds().has(volunteerId);
+    }
+
+    openVolunteerInfo(volunteerId: string): void {
+        this.infoVolunteerId.set(volunteerId);
+    }
+
+    closeVolunteerInfo(): void {
+        this.infoVolunteerId.set(null);
+    }
+
+    refreshOnlineVolunteerIds(): void {
+        if (!this.idSalon) {
+            return;
+        }
+        this.volunteerRegistrationAdminService.getActivePlanningVolunteerIds(this.idSalon)
+            .subscribe(ids => this.onlineVolunteerIds.set(new Set(ids)));
+    }
 
     // ---------- computed ----------
 
@@ -284,6 +317,7 @@ export class VolunteerPlanningStore {
                 this.resetTransientState();
                 this.selectDefaultTool();
                 this.loadDownloadActions();
+                this.refreshOnlineVolunteerIds();
                 onLoaded?.();
             });
     }
@@ -291,6 +325,7 @@ export class VolunteerPlanningStore {
     save(onSaved?: () => void): void {
         const planning = this.planning();
         const payload: PlanningVolunteersDto = {
+            version: planning.version,
             configuration: this.toPlanningConfigurationDto(planning),
             volunteers: planning.volunteers.map(v => ({id: v.id, label: v.label}))
         };
@@ -298,9 +333,21 @@ export class VolunteerPlanningStore {
         this.isLoading.set(true);
         this.volunteerPlanningService.savePlanningVolunteers(this.idSalon, payload)
             .pipe(finalize(() => this.isLoading.set(false)))
-            .subscribe(() => {
-                this.history.set([]);
-                onSaved?.();
+            .subscribe({
+                next: (saved: PlanningVolunteersDto) => {
+                    // Met à jour la version locale pour permettre d'autres enregistrements successifs.
+                    this.planning.update(p => ({...p, version: saved?.version ?? p.version}));
+                    this.history.set([]);
+                    onSaved?.();
+                },
+                error: (err: HttpErrorResponse) => {
+                    if (err.status === 409) {
+                        this.alertService.addAlert({
+                            type: 'danger',
+                            translationKey: 'planningVolunteers.conflict'
+                        });
+                    }
+                }
             });
     }
 
@@ -549,11 +596,14 @@ export class VolunteerPlanningStore {
                 id: c.id,
                 label: c.label,
                 icon: c.icon,
-                color: c.color
+                color: c.color,
+                description: c.description
             })),
             days: planning.days.map(d => ({
                 id: d.id,
                 label: d.label,
+                date: d.date,
+                description: d.description,
                 startTime: d.startTime.toISOString(),
                 endTime: d.endTime.toISOString(),
                 intervalMinutes: d.intervalMinutes,

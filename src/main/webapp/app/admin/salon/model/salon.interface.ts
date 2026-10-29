@@ -27,6 +27,11 @@ export interface ISalon {
     registrationWelcomeText: string | null;
     registrationChartText: string | null;
     registrationSalonChartText: string | null;
+    volunteerRegistrationEnabled: boolean;
+    volunteerRegistrationOpeningDate: Date | null;
+    volunteerRegistrationClosingDate: Date | null;
+    volunteerRegistrationWelcomeTitle: string | null;
+    volunteerRegistrationWelcomeText: string | null;
     sourceSalonId?: string | null;
     /** Compteurs du pied de la liste : prestations écartées exclues. */
     nbParticipations?: number;

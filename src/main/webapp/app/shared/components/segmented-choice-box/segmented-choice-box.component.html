@@ -1,0 +1,17 @@
+<div class="seg" role="radiogroup" [attr.aria-labelledby]="labelledBy()" (keydown)="onKeydown($event)">
+    @for (opt of options(); track opt.value) {
+        <button type="button"
+                role="radio"
+                class="seg-opt"
+                [class.on]="value() === opt.value"
+                [attr.aria-checked]="value() === opt.value"
+                [tabindex]="value() === opt.value ? 0 : -1"
+                [disabled]="disabled()"
+                (click)="select(opt.value)">
+            <span class="seg-title">{{ opt.titleKey | translate }}</span>
+            @if (opt.subtitleKey) {
+                <span class="seg-sub">{{ opt.subtitleKey | translate }}</span>
+            }
+        </button>
+    }
+</div>

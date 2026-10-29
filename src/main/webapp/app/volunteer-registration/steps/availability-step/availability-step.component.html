@@ -1,0 +1,23 @@
+<div class="registration-step">
+    <h1 tabindex="-1">{{ 'volunteerRegistration.steps.availability.title' | translate }}</h1>
+    <p class="step-intro">{{ 'volunteerRegistration.steps.availability.intro' | translate }}</p>
+
+    <div class="day-cards">
+        @for (day of days(); track day.id) {
+            @if (groupFor(day.id); as group) {
+                <app-volunteer-day-card [group]="group"
+                                        [slots]="slotsFor(day.id)"
+                                        [title]="title(day)"
+                                        [dateAbbrev]="abbrev(day)"
+                                        [dateNum]="num(day)"
+                                        [description]="day.description"
+                                        [openingLabel]="openingLabel(day)"
+                                        [showErrors]="showErrors()"/>
+            }
+        }
+    </div>
+
+    <div class="mt-4">
+        <app-availability-preview [name]="volunteerName()" [days]="previewDays"/>
+    </div>
+</div>

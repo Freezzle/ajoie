@@ -1,0 +1,70 @@
+<dialog-box [visible]="visible()"
+            (closed)="close()"
+            [header]="'planningVolunteers.onlineInfo.title' | translate"
+            mode="view">
+
+    @if (loading()) {
+        <p>{{ 'planningVolunteers.onlineInfo.loading' | translate }}</p>
+    } @else if (registration(); as reg) {
+        <div class="row">
+            <div class="col-12">
+                <h5 class="mb-1">{{ reg.firstName }} {{ reg.lastName }}</h5>
+                <small class="text-muted">
+                    @switch (reg.status) {
+                        @case ('ACTIVE') { {{ 'planningVolunteers.onlineInfo.status.active' | translate }} }
+                        @case ('CANCELLED') { {{ 'planningVolunteers.onlineInfo.status.cancelled' | translate }} }
+                        @default { {{ 'planningVolunteers.onlineInfo.status.removed' | translate }} }
+                    }
+                    @if (reg.registrationDate) {
+                        · {{ reg.registrationDate | date: 'dd.MM.yyyy' }}
+                    }
+                </small>
+            </div>
+
+            <div class="col-12 col-md-6 mt-4">
+                <label>{{ 'planningVolunteers.onlineInfo.email' | translate }}</label>
+                <div>{{ reg.email }}</div>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <label>{{ 'planningVolunteers.onlineInfo.phone' | translate }}</label>
+                <div>{{ reg.phoneNumber || '—' }}</div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <label>{{ 'planningVolunteers.onlineInfo.availability' | translate }}</label>
+                @for (line of availabilityLines(); track line.label) {
+                    <div><strong>{{ line.label }}</strong> : {{ line.value }}</div>
+                }
+            </div>
+
+            <div class="col-12 mt-4">
+                <label>{{ 'planningVolunteers.onlineInfo.zones' | translate }}</label>
+                <div>{{ zoneLabels() || ('planningVolunteers.onlineInfo.zonesAny' | translate) }}</div>
+            </div>
+
+            @if (reg.notes) {
+                <div class="col-12 mt-4">
+                    <label>{{ 'planningVolunteers.onlineInfo.notes' | translate }}</label>
+                    <div>{{ reg.notes }}</div>
+                </div>
+            }
+
+            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                <button-box (clickedEvent)="resendLink()"
+                            [loading]="actionLoading()"
+                            primeIcon="pi-send"
+                            translateKey="planningVolunteers.onlineInfo.resend"
+                            type="secondary"/>
+                <button-box (clickedEvent)="confirmRemove()"
+                            [loading]="actionLoading()"
+                            primeIcon="pi-trash"
+                            translateKey="planningVolunteers.onlineInfo.remove"
+                            type="danger"/>
+            </div>
+        </div>
+    } @else {
+        <p>{{ 'planningVolunteers.onlineInfo.none' | translate }}</p>
+    }
+</dialog-box>
+
+<p-confirmDialog/>

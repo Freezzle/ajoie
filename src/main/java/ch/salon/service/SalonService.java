@@ -24,6 +24,7 @@ import ch.salon.web.rest.dto.FacturationStats;
 import ch.salon.web.rest.dto.SalonStatistiques;
 import ch.salon.web.rest.dto.StandInfoStats;
 import ch.salon.web.rest.errors.BadRequestAlertException;
+import ch.salon.web.rest.errors.ConflictAlertException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -410,6 +411,12 @@ public class SalonService {
         var planning = this.getPlanningVolunteers(idSalon);
 
         if (planning != null) {
+            // Verrou optimiste : refuse un enregistrement basé sur une version obsolète (ex. une
+            // inscription bénévole arrivée pendant l'édition du planning).
+            if (dto.getVersion() != null && !dto.getVersion().equals(planning.getVersion())) {
+                throw new ConflictAlertException("Le planning a été modifié entre-temps", ENTITY_NAME,
+                        "planning-volunteers.conflict");
+            }
             planning.setConfiguration(dto.getConfiguration());
             planning.setVolunteers(dto.getVolunteers());
         } else {

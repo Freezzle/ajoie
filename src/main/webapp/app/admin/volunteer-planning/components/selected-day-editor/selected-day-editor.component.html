@@ -9,6 +9,26 @@
                (keydown.enter)="commitDayLabel()"/>
     </div>
 
+    <div class="mt-4 col-12">
+        <label>{{ 'planningVolunteers.day.date' | translate }}</label>
+        <p-datepicker [fluid]="true"
+                      [ngModel]="dateValue()"
+                      (ngModelChange)="updateDate($event)"
+                      dateFormat="dd.mm.yy"
+                      [showButtonBar]="true"
+                      appendTo="body"></p-datepicker>
+    </div>
+
+    <div class="mt-4 col-12">
+        <label>{{ 'planningVolunteers.day.description' | translate }}</label>
+        <textarea pTextarea
+                  [fluid]="true"
+                  rows="2"
+                  [ngModel]="dayDescription()"
+                  (ngModelChange)="setDayDescriptionDraft($event)"
+                  (blur)="commitDayDescription()"></textarea>
+    </div>
+
     <div class="mt-4 col-6">
         <div>Début</div>
         <p-datepicker [fluid]="true"

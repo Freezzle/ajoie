@@ -14,8 +14,8 @@ export class VolunteerPlanningService {
         return this.http.get<PlanningVolunteersDto>(`${this.resourceUrl}/${idSalon}/planning-volunteers`);
     }
 
-    savePlanningVolunteers(idSalon: string, payload: PlanningVolunteersDto): Observable<void> {
-        return this.http.put<void>(`${this.resourceUrl}/${idSalon}/planning-volunteers`, payload);
+    savePlanningVolunteers(idSalon: string, payload: PlanningVolunteersDto): Observable<PlanningVolunteersDto> {
+        return this.http.put<PlanningVolunteersDto>(`${this.resourceUrl}/${idSalon}/planning-volunteers`, payload);
     }
 }
 
@@ -29,6 +29,7 @@ export interface CategoryDto {
     label: string;
     icon?: string;
     color: string;
+    description?: string;
 }
 
 export interface VolunteerPlanningCellDto {
@@ -46,6 +47,8 @@ export interface VolunteerPlanningNeedDto {
 export interface VolunteerPlanningDayDto {
     id: string;
     label: string;
+    date?: string;
+    description?: string;
     startTime: string;
     endTime: string;
     intervalMinutes?: number;
@@ -63,6 +66,7 @@ export interface VolunteerPlanningConfigurationDto {
 
 export interface PlanningVolunteersDto {
     id?: string;
+    version?: number;
     configuration: VolunteerPlanningConfigurationDto;
     volunteers: VolunteerPlanningDto[];
 }

@@ -119,7 +119,11 @@ export class SalonService {
             registrationOpeningDate: salon.registrationOpeningDate ?
                                      dayjs(salon.registrationOpeningDate).toJSON() : null,
             registrationClosingDate: salon.registrationClosingDate ?
-                                     dayjs(salon.registrationClosingDate).toJSON() : null
+                                     dayjs(salon.registrationClosingDate).toJSON() : null,
+            volunteerRegistrationOpeningDate: salon.volunteerRegistrationOpeningDate ?
+                                              dayjs(salon.volunteerRegistrationOpeningDate).toJSON() : null,
+            volunteerRegistrationClosingDate: salon.volunteerRegistrationClosingDate ?
+                                              dayjs(salon.volunteerRegistrationClosingDate).toJSON() : null
         };
     }
 
@@ -131,7 +135,11 @@ export class SalonService {
             registrationOpeningDate: restSalon.registrationOpeningDate ?
                                      dayjs(restSalon.registrationOpeningDate).toDate() : null,
             registrationClosingDate: restSalon.registrationClosingDate ?
-                                     dayjs(restSalon.registrationClosingDate).toDate() : null
+                                     dayjs(restSalon.registrationClosingDate).toDate() : null,
+            volunteerRegistrationOpeningDate: restSalon.volunteerRegistrationOpeningDate ?
+                                              dayjs(restSalon.volunteerRegistrationOpeningDate).toDate() : null,
+            volunteerRegistrationClosingDate: restSalon.volunteerRegistrationClosingDate ?
+                                              dayjs(restSalon.volunteerRegistrationClosingDate).toDate() : null
         };
     }
 }

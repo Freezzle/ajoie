@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, computed, input} from '@angular/core';
 
-import {hueFromId, initials} from '../volunteer-planning-utils';
+import {hueFromId, initials} from '../../../admin/volunteer-planning/components/volunteer-planning-utils';
 
 @Component({
                selector: 'volunteer-avatar',

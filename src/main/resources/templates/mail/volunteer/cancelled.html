@@ -1,0 +1,15 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Bonjour <strong th:text="${firstName}">Prénom</strong>,
+    </p>
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Ta désinscription comme bénévole pour l'évènement <strong>[[${salon}]]</strong> est bien
+        confirmée. Tes disponibilités ont été retirées du planning.
+    </p>
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Changé d'avis ? Pas de souci : réponds simplement à cet e-mail et l'équipe te réinscrira.
+    </p>
+    <p style="margin:0 0 8px 0; line-height:1.5;">
+        Merci et à une prochaine fois !
+    </p>
+</div>

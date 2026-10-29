@@ -89,6 +89,21 @@ public class Salon implements Serializable, TenantOwned {
     @Column(name = "registration_salon_chart_text", columnDefinition = "text")
     private String registrationSalonChartText;
 
+    @Column(name = "volunteer_registration_enabled", nullable = false)
+    private boolean volunteerRegistrationEnabled = false;
+
+    @Column(name = "volunteer_registration_opening_date")
+    private Instant volunteerRegistrationOpeningDate;
+
+    @Column(name = "volunteer_registration_closing_date")
+    private Instant volunteerRegistrationClosingDate;
+
+    @Column(name = "volunteer_registration_welcome_title")
+    private String volunteerRegistrationWelcomeTitle;
+
+    @Column(name = "volunteer_registration_welcome_text", columnDefinition = "text")
+    private String volunteerRegistrationWelcomeText;
+
     @Column(name = "source_salon_id")
     private UUID sourceSalonId;
 

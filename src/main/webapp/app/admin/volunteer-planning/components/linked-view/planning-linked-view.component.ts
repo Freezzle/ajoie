@@ -5,13 +5,14 @@ import {PlanningTimelineComponent} from './planning-timeline.component';
 import {PlanningZonesComponent} from './planning-zones.component';
 import {CoverageRowsComponent} from './coverage-rows.component';
 import {ZoneAssignPanelComponent} from './zone-assign-panel.component';
+import {VolunteerInfoDialogComponent} from './volunteer-info-dialog.component';
 import {VolunteerPlanningStore} from '../volunteer-planning.store';
 import {slotTime} from '../volunteer-planning-utils';
 
 @Component({
                selector: 'planning-linked-view',
                standalone: true,
-               imports: [PlanningTimelineComponent, PlanningZonesComponent, CoverageRowsComponent, ZoneAssignPanelComponent, TranslatePipe],
+               imports: [PlanningTimelineComponent, PlanningZonesComponent, CoverageRowsComponent, ZoneAssignPanelComponent, VolunteerInfoDialogComponent, TranslatePipe],
                templateUrl: './planning-linked-view.component.html',
                styleUrls: ['./planning-linked-view.component.scss'],
                changeDetection: ChangeDetectionStrategy.OnPush

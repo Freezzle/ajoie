@@ -9,52 +9,6 @@
   padding-bottom: 2rem;
 }
 
-// Rappel du salon et de ses dates, affiché au-dessus de tous les écrans du parcours d'inscription.
-.registration-salon-banner {
-  background: var(--p-surface-0, #fff);
-  border-bottom: 1px solid var(--p-surface-200, #e7e0d6);
-  padding: 0.6rem 1rem;
-}
-
-.registration-salon-banner-inner {
-  max-width: 660px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem 0.6rem;
-  color: var(--p-text-muted-color, #6b655d);
-  font-size: 0.88rem;
-  text-align: center;
-}
-
-.registration-salon-banner-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-
-  i {
-    font-size: 0.85rem;
-    color: var(--p-primary-color);
-  }
-}
-
-.registration-salon-banner-separator {
-  opacity: 0.5;
-}
-
-@media (max-width: 480px) {
-  .registration-salon-banner-inner {
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  .registration-salon-banner-separator {
-    display: none;
-  }
-}
-
 .registration-shell {
   max-width: 660px;
   margin: 0 auto;

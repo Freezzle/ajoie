@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 
-import SharedModule from '../../shared/shared.module';
+import SharedModule from '../../shared.module';
 
 /**
  * Carte de regroupement réutilisable : titre, aide optionnelle et contenu projeté.

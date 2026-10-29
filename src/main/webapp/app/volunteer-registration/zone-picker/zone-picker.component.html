@@ -1,0 +1,25 @@
+<div class="zones">
+    @for (zone of zones(); track zone.id) {
+        <div class="zone-wrap">
+            <button type="button"
+                    class="zone"
+                    [class.on]="isSelected(zone.id)"
+                    [style.--zc]="zone.color"
+                    [attr.aria-pressed]="isSelected(zone.id)"
+                    [disabled]="disabled()"
+                    (click)="toggle(zone.id)">
+                @if (isSelected(zone.id)) {
+                    <span class="zone-check"><i class="pi pi-check"></i></span>
+                }
+                <span class="zone-bar"></span>
+                <span class="zone-name">{{ zone.label }}</span>
+                @if (zone.description) {
+                    <span class="zone-desc">{{ zone.description }}</span>
+                }
+            </button>
+            @if (isSelected(zone.id) && zone.warning) {
+                <p class="zone-warn">{{ zone.warning }}</p>
+            }
+        </div>
+    }
+</div>

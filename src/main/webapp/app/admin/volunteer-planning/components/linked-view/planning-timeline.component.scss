@@ -24,6 +24,24 @@
     white-space: nowrap;
 }
 
+.tl-info-btn {
+    border: none;
+    background: transparent;
+    padding: 2px;
+    margin-left: 4px;
+    cursor: pointer;
+    color: var(--p-primary-color);
+    line-height: 1;
+
+    i {
+        font-size: 13px;
+    }
+
+    &:hover {
+        opacity: 0.75;
+    }
+}
+
 .tl-name small.warn {
     color: var(--vp-over);
     font-weight: 700;

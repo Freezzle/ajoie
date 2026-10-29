@@ -12,6 +12,7 @@
                     <th>Icon</th>
                     <th>Couleur</th>
                     <th>Label</th>
+                    <th>Description</th>
                     <th></th>
                 </tr>
             </ng-template>
@@ -51,6 +52,15 @@
                                (ngModelChange)="setCategoryLabelDraft(c.id, $event)"
                                (blur)="commitCategoryLabel(c.id)"
                                (keydown.enter)="commitCategoryLabel(c.id)"/>
+                    </td>
+
+                    <td>
+                        <input pInputText
+                               [fluid]="true"
+                               [ngModel]="categoryDescription(c)"
+                               (ngModelChange)="setCategoryDescriptionDraft(c.id, $event)"
+                               (blur)="commitCategoryDescription(c.id)"
+                               (keydown.enter)="commitCategoryDescription(c.id)"/>
                     </td>
 
                     <td class="text-end">

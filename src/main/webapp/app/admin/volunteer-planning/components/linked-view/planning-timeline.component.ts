@@ -12,7 +12,7 @@ import {
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {MessageService} from 'primeng/api';
 
-import {VolunteerAvatarComponent} from './volunteer-avatar.component';
+import {VolunteerAvatarComponent} from '../../../../shared/components/volunteer-avatar/volunteer-avatar.component';
 import {VolunteerPlanningStore} from '../volunteer-planning.store';
 import {Category, Day} from '../volunteer-planning-model';
 import {

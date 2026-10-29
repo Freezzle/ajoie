@@ -10,6 +10,14 @@
                  (click)="onNameClick(v.id)">
                 <volunteer-avatar [volunteerId]="v.id" [label]="v.label"/>
                 <span class="lbl">{{ v.label }}</span>
+                @if (store.isOnlineVolunteer(v.id)) {
+                    <button type="button"
+                            class="tl-info-btn"
+                            [title]="'planningVolunteers.onlineInfo.open' | translate"
+                            (click)="$event.stopPropagation(); store.openVolunteerInfo(v.id)">
+                        <i class="pi pi-info-circle"></i>
+                    </button>
+                }
                 <small [class.warn]="isOvertime(v.id)">{{ hoursOf(v.id) }}</small>
             </div>
 

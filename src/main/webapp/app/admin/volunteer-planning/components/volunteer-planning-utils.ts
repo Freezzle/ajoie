@@ -10,16 +10,20 @@ export const cellKey = (volunteerId: string, slotIndex: number): string => `${vo
 export function planningFromDto(dto: PlanningVolunteersDto): Planning {
     const globalInterval = dto.configuration.intervalMinutes ?? 60;
     return {
+        version: dto.version,
         volunteers: dto.volunteers.map(v => ({id: v.id, label: v.label})),
         categories: dto.configuration.categories.map(c => ({
             id: c.id,
             label: c.label,
             icon: c.icon,
-            color: c.color
+            color: c.color,
+            description: c.description
         })),
         days: dto.configuration.days.map(d => ({
             id: d.id,
             label: d.label,
+            date: d.date,
+            description: d.description,
             startTime: new Date(d.startTime),
             endTime: new Date(d.endTime),
             intervalMinutes: (d.intervalMinutes ?? globalInterval) as IntervalMinutes,

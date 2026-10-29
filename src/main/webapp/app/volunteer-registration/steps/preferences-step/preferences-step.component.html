@@ -1,0 +1,30 @@
+<div class="registration-step" [formGroup]="form()">
+    <h1 tabindex="-1">{{ 'volunteerRegistration.steps.preferences.title' | translate }}</h1>
+    <p class="step-intro">{{ 'volunteerRegistration.steps.preferences.intro' | translate }}</p>
+
+    <app-registration-card titleKey="volunteerRegistration.preferences.cardTitle">
+        <segmented-choice-box [options]="zoneModeOptions" formControlName="zoneMode"/>
+
+        @if (mode === 'ANY') {
+            <div class="any-banner mt-3">
+                {{ 'volunteerRegistration.preferences.anyBanner' | translate }}
+            </div>
+        } @else {
+            <div class="mt-3">
+                <app-zone-picker [zones]="zones()" formControlName="categoryIds"/>
+                @if (zonesInvalid) {
+                    <p class="field-error mt-2">{{ 'volunteerRegistration.preferences.zoneRequired' | translate }}</p>
+                }
+            </div>
+        }
+
+        <div class="mt-3">
+            <textarea-box fieldName="notes"
+                          formControlName="notes"
+                          [rows]="3"
+                          [showCounter]="true"
+                          [maxLength]="500"
+                          translateKey="volunteerRegistration.preferences.notes"/>
+        </div>
+    </app-registration-card>
+</div>

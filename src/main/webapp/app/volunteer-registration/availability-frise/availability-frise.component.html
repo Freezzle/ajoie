@@ -1,0 +1,69 @@
+<div class="frise">
+    @if (presets().length > 1) {
+        <div class="frise-presets">
+            @for (p of presets(); track p.key) {
+                <button type="button"
+                        class="chip"
+                        [class.on]="isPresetActive(p)"
+                        [disabled]="isDisabled()"
+                        (click)="togglePreset(p)">
+                    @if (isPresetActive(p)) {
+                        <i class="pi pi-check" aria-hidden="true"></i>
+                    }
+                    <span>{{ 'volunteerRegistration.frise.preset.' + p.key | translate }}</span>
+                    @if (p.key === 'all') {
+                        <small>{{ presetRangeLabel(p) }}</small>
+                    }
+                </button>
+            }
+        </div>
+    }
+
+    <div #track
+         class="frise-track"
+         role="group"
+         [attr.aria-label]="'volunteerRegistration.frise.trackAria' | translate: {day: dayLabel()}"
+         [style.grid-template-columns]="'repeat(' + slots().length + ', 1fr)'"
+         (pointermove)="onPointerMove($event)"
+         (pointerup)="onPointerUp()"
+         (pointercancel)="onPointerUp()">
+        @for (slot of slots(); track slot.index) {
+            <button type="button"
+                    class="cell"
+                    [class.on]="isSelected(slot.index)"
+                    [class.jl]="joinedLeft(slot.index)"
+                    [class.jr]="joinedRight(slot.index)"
+                    [attr.data-index]="slot.index"
+                    [attr.aria-pressed]="isSelected(slot.index)"
+                    [attr.aria-label]="slot.start + ' à ' + slot.end"
+                    [tabindex]="focusedIndex() === slot.index ? 0 : -1"
+                    [disabled]="isDisabled()"
+                    (pointerdown)="onPointerDown($event, slot.index)"
+                    (click)="onClick($event)"
+                    (keydown)="onKeydown($event, slot.index)"></button>
+        }
+    </div>
+
+    <div class="frise-grad" aria-hidden="true">
+        @for (slot of slots(); track slot.index) {
+            <span class="grad" [class.alt]="slot.index % 2 === 1">{{ slot.label }}</span>
+        }
+    </div>
+
+    @if (pills().length) {
+        <div class="frise-pills">
+            @for (pill of pills(); track pill.from) {
+                <span class="pill">
+                    <span>{{ pill.label }} · {{ pill.hours }} h</span>
+                    <button type="button"
+                            class="pill-x"
+                            [attr.aria-label]="'volunteerRegistration.frise.removeRange' | translate"
+                            [disabled]="isDisabled()"
+                            (click)="removePill(pill)">×</button>
+                </span>
+            }
+        </div>
+    } @else {
+        <p class="frise-empty">{{ 'volunteerRegistration.frise.empty' | translate }}</p>
+    }
+</div>

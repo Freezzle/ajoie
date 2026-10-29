@@ -27,6 +27,10 @@ public class PlanningVolunteerSalon implements Serializable, TenantOwned {
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "configuration", nullable = false, columnDefinition = "jsonb")
     private VolunteerPlanningConfiguration configuration;

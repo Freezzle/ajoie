@@ -8,4 +8,5 @@ public class VolunteerPlanningCategory {
     private String label;
     private String icon;
     private String color;
+    private String description;
 }

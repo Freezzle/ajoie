@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <!-- Paramètres d'inscription publique des bénévoles sur un salon -->
+    <changeSet id="0.0.2-202611-salon-volunteer-registration" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon"/>
+        </preConditions>
+
+        <addColumn tableName="salon">
+            <column name="volunteer_registration_enabled" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="volunteer_registration_opening_date" type="timestamp"/>
+            <column name="volunteer_registration_closing_date" type="timestamp"/>
+            <column name="volunteer_registration_welcome_title" type="varchar(255)"/>
+            <column name="volunteer_registration_welcome_text" type="text"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="salon" columnName="volunteer_registration_enabled"/>
+            <dropColumn tableName="salon" columnName="volunteer_registration_opening_date"/>
+            <dropColumn tableName="salon" columnName="volunteer_registration_closing_date"/>
+            <dropColumn tableName="salon" columnName="volunteer_registration_welcome_title"/>
+            <dropColumn tableName="salon" columnName="volunteer_registration_welcome_text"/>
+        </rollback>
+    </changeSet>
+
+    <!-- Verrou optimiste sur le planning bénévoles pour éviter d'écraser une inscription concurrente -->
+    <changeSet id="0.0.2-202611-planning-volunteer-version" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="salon_volunteer_planning"/>
+        </preConditions>
+
+        <addColumn tableName="salon_volunteer_planning">
+            <column name="version" type="bigint" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="salon_volunteer_planning" columnName="version"/>
+        </rollback>
+    </changeSet>
+
+    <!-- Table des inscriptions bénévoles -->
+    <changeSet id="0.0.2-202611-volunteer-registration-table" author="freezzle">
+        <createTable tableName="volunteer_registration">
+            <column name="id" type="${uuidType}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salon_id" type="${uuidType}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(255)"/>
+            <column name="zone_mode" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_ids" type="jsonb"/>
+            <column name="notes" type="text"/>
+            <column name="availability" type="jsonb"/>
+            <column name="status" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token" type="varchar(64)"/>
+            <column name="planning_volunteer_id" type="varchar(255)"/>
+            <column name="accepted_contact_at" type="timestamp"/>
+            <column name="registration_date" type="timestamp"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="volunteer_registration" baseColumnNames="salon_id"
+                                 constraintName="fk_volunteer_registration_salon"
+                                 referencedTableName="salon" referencedColumnNames="id"
+                                 onDelete="CASCADE" onUpdate="CASCADE"/>
+
+        <createIndex indexName="ux_volunteer_registration_salon_email" tableName="volunteer_registration"
+                     unique="true">
+            <column name="salon_id"/>
+            <column name="email"/>
+        </createIndex>
+
+        <createIndex indexName="idx_volunteer_registration_salon_status" tableName="volunteer_registration">
+            <column name="salon_id"/>
+            <column name="status"/>
+        </createIndex>
+
+        <rollback>
+            <dropTable tableName="volunteer_registration"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

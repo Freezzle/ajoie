@@ -97,6 +97,21 @@ export class SalonUpdateComponent implements OnInit {
             () => this.alertService.addAlert({type: 'success', translationKey: 'salon.registration.linkCopied'}),
             () => this.alertService.addAlert({type: 'danger', translationKey: 'salon.registration.linkCopyFailed'}));
     }
+
+    get volunteerRegistrationLink(): string {
+        const salonId = this.editForm.controls.id.value;
+        return salonId ? `${window.location.origin}/benevoles/${salonId}` : '';
+    }
+
+    copyVolunteerRegistrationLink(): void {
+        const link = this.volunteerRegistrationLink;
+        if (!link) {
+            return;
+        }
+        navigator.clipboard.writeText(link).then(
+            () => this.alertService.addAlert({type: 'success', translationKey: 'salon.registration.linkCopied'}),
+            () => this.alertService.addAlert({type: 'danger', translationKey: 'salon.registration.linkCopyFailed'}));
+    }
     ngOnInit(): void {
         this.activateReadOnlyMode(false);
         this.activatedRoute.data

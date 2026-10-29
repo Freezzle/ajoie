@@ -3,6 +3,7 @@ import {FormsModule} from '@angular/forms';
 
 import {SelectModule} from 'primeng/select';
 import {InputTextModule} from 'primeng/inputtext';
+import {TextareaModule} from 'primeng/textarea';
 import {DatePickerModule} from 'primeng/datepicker';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
@@ -13,7 +14,7 @@ import {DialogDraftService} from '../../../../shared/services/dialog-draft.servi
 @Component({
                selector: 'selected-day-editor',
                standalone: true,
-               imports: [FormsModule, SelectModule, InputTextModule, DatePickerModule, TranslatePipe],
+               imports: [FormsModule, SelectModule, InputTextModule, TextareaModule, DatePickerModule, TranslatePipe],
                templateUrl: './selected-day-editor.component.html'
            })
 export class SelectedDayEditorComponent implements OnInit, OnDestroy {
@@ -35,6 +36,9 @@ export class SelectedDayEditorComponent implements OnInit, OnDestroy {
     interval = computed<IntervalMinutes>(() => this._draft()?.day?.intervalMinutes ?? 60);
 
     private dayLabelDraft = signal<string | null>(null);
+    private dayDescriptionDraft = signal<string | null>(null);
+    // Référence Date stable pour le p-datepicker (évite de recréer un objet à chaque détection).
+    readonly dateModel = signal<Date | null>(null);
 
     @Input({required: true})
     set data(value: DayConfigSlice) {
@@ -53,6 +57,8 @@ export class SelectedDayEditorComponent implements OnInit, OnDestroy {
 
         this._draft.set(normalized);
         this.dayLabelDraft.set(null);
+        this.dayDescriptionDraft.set(null);
+        this.dateModel.set(this.parseIsoDate(normalized.day.date ?? null));
     }
 
     ngOnInit() {
@@ -93,6 +99,50 @@ export class SelectedDayEditorComponent implements OnInit, OnDestroy {
         });
 
         this.dayLabelDraft.set(null);
+    }
+
+    dayDescription(): string {
+        return this.dayDescriptionDraft() ?? this.day()?.description ?? '';
+    }
+
+    setDayDescriptionDraft(v: string) {
+        this.dayDescriptionDraft.set(v);
+    }
+
+    commitDayDescription() {
+        const raw = this.dayDescriptionDraft();
+        if (raw == null) {
+            return;
+        }
+        const v = raw.trim();
+        this.commit(next => {
+            next.day.description = v || undefined;
+        });
+        this.dayDescriptionDraft.set(null);
+    }
+
+    dateValue(): Date | null {
+        return this.dateModel();
+    }
+
+    updateDate(value: Date | null) {
+        this.dateModel.set(value ?? null);
+        this.commit(next => {
+            next.day.date = value ? this.toIsoDate(value) : undefined;
+        });
+    }
+
+    private parseIsoDate(date: string | null): Date | null {
+        if (!date) {
+            return null;
+        }
+        const parts = date.split('-').map(Number);
+        return parts.length === 3 ? new Date(parts[0], parts[1] - 1, parts[2]) : null;
+    }
+
+    private toIsoDate(d: Date): string {
+        const pad = (n: number) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     }
 
     updateInterval(value: IntervalMinutes) {

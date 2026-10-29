@@ -9,6 +9,8 @@ import java.util.List;
 public class VolunteerPlanningDay {
     private String id;
     private String label;
+    private String date;
+    private String description;
     private String startTime;
     private String endTime;
     private Integer intervalMinutes;

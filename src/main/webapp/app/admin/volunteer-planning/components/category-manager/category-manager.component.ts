@@ -35,6 +35,7 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
     _draft = signal<Category[] | null>(null);
     categories = computed(() => this._draft() ?? []);
     private labelDraft = signal<Record<string, string>>({});
+    private descriptionDraft = signal<Record<string, string>>({});
 
     iconOptions = [
         {label: 'Aucune', value: ''},
@@ -52,6 +53,7 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
     set data(value: Category[]) {
         this._draft.set(structuredClone(value));
         this.labelDraft.set({});
+        this.descriptionDraft.set({});
     }
 
     ngOnInit() {
@@ -102,6 +104,33 @@ export class CategoryManagerComponent implements OnInit, OnDestroy {
         this.commit(next =>
                         next.push({id: this.generateUUID(), label: 'Nouvelle catégorie', color: '#ffe8b5'})
         );
+    }
+
+    categoryDescription(c: Category): string {
+        return this.descriptionDraft()[c.id] ?? c.description ?? '';
+    }
+
+    setCategoryDescriptionDraft(categoryId: string, value: string) {
+        this.descriptionDraft.update(m => ({...m, [categoryId]: value}));
+    }
+
+    commitCategoryDescription(categoryId: string) {
+        const value = this.descriptionDraft()[categoryId];
+        if (value === undefined) {
+            return;
+        }
+        const v = value.trim();
+        this.commit(next => {
+            const found = next.find(x => x.id === categoryId);
+            if (found) {
+                found.description = v || undefined;
+            }
+        });
+        this.descriptionDraft.update(m => {
+            const copy = {...m};
+            delete copy[categoryId];
+            return copy;
+        });
     }
 
     updateIcon(categoryId: string, icon: string) {

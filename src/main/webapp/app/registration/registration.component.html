@@ -1,23 +1,6 @@
 <div class="registration-page">
     @if (salonInfo(); as info) {
-        <!-- Rappel permanent du salon concerné : rendu hors du @if d'état, donc visible à chaque écran. -->
-        <div class="registration-salon-banner"
-             [attr.aria-label]="'registration.salonBanner.aria' | translate: {place: info.place, dates: salonDateRange ?? ''}"
-             role="note">
-            <div class="registration-salon-banner-inner">
-                <span class="registration-salon-banner-item">
-                    <i aria-hidden="true" class="pi pi-map-marker"></i>
-                    <span>{{ 'registration.salonBanner.salon' | translate: {place: info.place} }}</span>
-                </span>
-                @if (salonDateRange; as dates) {
-                    <span aria-hidden="true" class="registration-salon-banner-separator">·</span>
-                    <span class="registration-salon-banner-item">
-                        <i aria-hidden="true" class="pi pi-calendar"></i>
-                        <span>{{ dates }}</span>
-                    </span>
-                }
-            </div>
-        </div>
+        <app-salon-banner [place]="info.place" [dates]="salonDateRange"/>
     }
 
     @if (loading()) {

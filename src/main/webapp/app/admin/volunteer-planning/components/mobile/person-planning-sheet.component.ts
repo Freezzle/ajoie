@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
 import {TranslatePipe} from '@ngx-translate/core';
 
-import {VolunteerAvatarComponent} from '../linked-view/volunteer-avatar.component';
+import {VolunteerAvatarComponent} from '../../../../shared/components/volunteer-avatar/volunteer-avatar.component';
 import {VolunteerPlanningStore} from '../volunteer-planning.store';
 import {formatHours, Run, slotTime} from '../volunteer-planning-utils';
 

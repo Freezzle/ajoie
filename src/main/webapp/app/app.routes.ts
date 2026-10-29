@@ -41,6 +41,10 @@ const routes: Routes = [
         path: 'inscription',
         loadChildren: () => import('./registration/registration.routes')
     },
+    {
+        path: 'benevoles',
+        loadChildren: () => import('./volunteer-registration/volunteer-registration.routes')
+    },
     ...errorRoute
 ];
 

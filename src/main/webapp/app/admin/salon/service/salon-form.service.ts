@@ -35,6 +35,11 @@ export type SalonFormGroup = {
     registrationWelcomeText: FormControl<ISalon['registrationWelcomeText'] | null>;
     registrationChartText: FormControl<ISalon['registrationChartText'] | null>;
     registrationSalonChartText: FormControl<ISalon['registrationSalonChartText'] | null>;
+    volunteerRegistrationEnabled: FormControl<ISalon['volunteerRegistrationEnabled'] | null>;
+    volunteerRegistrationOpeningDate: FormControl<ISalon['volunteerRegistrationOpeningDate'] | string | null>;
+    volunteerRegistrationClosingDate: FormControl<ISalon['volunteerRegistrationClosingDate'] | string | null>;
+    volunteerRegistrationWelcomeTitle: FormControl<ISalon['volunteerRegistrationWelcomeTitle'] | null>;
+    volunteerRegistrationWelcomeText: FormControl<ISalon['volunteerRegistrationWelcomeText'] | null>;
 };
 
 @Injectable({providedIn: 'root'})
@@ -84,7 +89,17 @@ export class SalonFormService {
                                                  registrationChartText: new FormControl(
                                                      raw.registrationChartText ?? null),
                                                  registrationSalonChartText: new FormControl(
-                                                     raw.registrationSalonChartText ?? null)
+                                                     raw.registrationSalonChartText ?? null),
+                                                 volunteerRegistrationEnabled: new FormControl(
+                                                     raw.volunteerRegistrationEnabled ?? false),
+                                                 volunteerRegistrationOpeningDate: new FormControl(
+                                                     raw.volunteerRegistrationOpeningDate ?? null),
+                                                 volunteerRegistrationClosingDate: new FormControl(
+                                                     raw.volunteerRegistrationClosingDate ?? null),
+                                                 volunteerRegistrationWelcomeTitle: new FormControl(
+                                                     raw.volunteerRegistrationWelcomeTitle ?? null, Validators.maxLength(255)),
+                                                 volunteerRegistrationWelcomeText: new FormControl(
+                                                     raw.volunteerRegistrationWelcomeText ?? null)
                                              });
     }
 

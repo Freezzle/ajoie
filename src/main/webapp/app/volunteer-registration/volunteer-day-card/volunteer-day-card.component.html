@@ -1,0 +1,37 @@
+<div class="dc" [formGroup]="group()" [class.yes]="available === true" [class.err]="hasError">
+    <div class="dc-head">
+        <div class="dc-date">
+            <span class="dc-abbr">{{ dateAbbrev() }}</span>
+            <span class="dc-num">{{ dateNum() }}</span>
+        </div>
+        <div class="dc-main">
+            <div class="dc-title">
+                <span>{{ title() }}</span>
+                @if (available === true && hours > 0) {
+                    <span class="dc-hours">✓ {{ hours }} h</span>
+                }
+            </div>
+            @if (description()) {
+                <p class="dc-desc">{{ description() }}</p>
+            }
+            <p class="dc-open">{{ openingLabel() }}</p>
+        </div>
+        <div class="dc-yn">
+            <yes-no-box formControlName="available"/>
+        </div>
+    </div>
+
+    @if (answerRequired) {
+        <p class="dc-error">{{ 'volunteerRegistration.day.answerRequired' | translate }}</p>
+    } @else if (hoursRequired) {
+        <p class="dc-error">{{ 'volunteerRegistration.day.hoursRequired' | translate }}</p>
+    }
+
+    @if (available === true) {
+        <div class="dc-body">
+            <app-availability-frise formControlName="slots" [slots]="slots()" [dayLabel]="title()"/>
+        </div>
+    } @else if (available === false) {
+        <p class="dc-no">{{ 'volunteerRegistration.day.notComing' | translate }}</p>
+    }
+</div>

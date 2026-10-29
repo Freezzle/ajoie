@@ -9,7 +9,7 @@ import {CounterBoxComponent} from '../../../shared/components/counter-box/counte
 import {RadioBoxComponent} from '../../../shared/components/radio-box/radio-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
-import {RegistrationCardComponent} from '../../registration-card/registration-card.component';
+import {RegistrationCardComponent} from '../../../shared/components/registration-card/registration-card.component';
 import {
     InvoiceSendingMethod
 } from '../../../admin/enumerations/invoice-sending-method.model';
