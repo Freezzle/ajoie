@@ -155,7 +155,7 @@ public class VolunteerPlanningSyncService {
         Optional<VolunteerPlanningData> found = planning.getVolunteers().stream()
                 .filter(v -> volunteerId.equals(v.getId())).findFirst();
         if (found.isPresent()) {
-            found.get().setLabel(label);
+            found.orElseThrow().setLabel(label);
         } else {
             VolunteerPlanningData data = new VolunteerPlanningData();
             data.setId(volunteerId);
