@@ -3,6 +3,59 @@
   width: 100%;
 }
 
+// Le contenu est injecté via [innerHTML] : ::ng-deep nécessaire pour styliser le HTML brut non compilé par Angular.
+// `overflow-wrap: break-word` + `word-break: normal` : seuls les mots qui ne tiennent pas seuls sur une ligne
+// sont coupés, les mots courants restent entiers (le HTML est au préalable normalisé par le pipe `richText`,
+// qui supprime les espaces insécables empêchant les retours à la ligne).
+:host ::ng-deep .registration-welcome-text {
+  color: var(--p-text-muted-color, #6b655d);
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+
+  p,
+  li,
+  td,
+  th,
+  blockquote,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  p {
+    margin: 0 0 1rem;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+}
+
 .registration-page {
   min-height: 100dvh;
   background: var(--p-surface-50, #fbfaf7);
@@ -15,6 +68,14 @@
   padding: 2rem;
   border: 1px solid var(--app-border, #e7e0d6);
   border-top: none;
+}
+
+.registration-welcome {
+  .registration-welcome-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
 }
 
 .sr-focus {

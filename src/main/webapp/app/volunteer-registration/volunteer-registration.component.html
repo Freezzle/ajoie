@@ -1,113 +1,114 @@
 <div class="registration-page">
-    @if (salonInfo(); as info) {
-        <app-salon-banner [place]="info.place" [dates]="salonDateRange"/>
-    }
+  @if (salonInfo(); as info) {
+    <app-salon-banner [place]="info.place" [dates]="salonDateRange" />
+  }
 
-    @if (loading()) {
-        <div class="registration-shell">
-            <app-registration-card titleKey="volunteerRegistration.title">
-                <p>{{ 'volunteerRegistration.loading' | translate }}</p>
-            </app-registration-card>
+  @if (loading()) {
+    <div class="registration-shell">
+      <app-registration-card titleKey="volunteerRegistration.title">
+        <p>{{ 'volunteerRegistration.loading' | translate }}</p>
+      </app-registration-card>
+    </div>
+  } @else if (loadError()) {
+    <div class="registration-shell">
+      <app-registration-card titleKey="volunteerRegistration.title">
+        <p>{{ 'volunteerRegistration.loadError' | translate }}</p>
+      </app-registration-card>
+    </div>
+  } @else if (!registrationOpen()) {
+    <div class="registration-shell">
+      <app-registration-card titleKey="volunteerRegistration.title">
+        <p>{{ 'volunteerRegistration.closed.' + (closedReason() || 'CLOSED') | translate }}</p>
+      </app-registration-card>
+    </div>
+  } @else if (submitted()) {
+    <div class="registration-shell">
+      <app-registration-card>
+        <div class="done">
+          <div class="done-check"><i class="pi pi-check"></i></div>
+          <h1
+            tabindex="-1">{{ 'volunteerRegistration.done.title' | translate: { name: confirmation()?.firstName } }}</h1>
+          <p>{{ 'volunteerRegistration.done.text' | translate: { email: confirmation()?.email } }}</p>
         </div>
-    } @else if (loadError()) {
-        <div class="registration-shell">
-            <app-registration-card titleKey="volunteerRegistration.title">
-                <p>{{ 'volunteerRegistration.loadError' | translate }}</p>
-            </app-registration-card>
+        <div class="mt-3">
+          <app-availability-preview [name]="volunteerName" [days]="previewDays" />
         </div>
-    } @else if (!registrationOpen()) {
-        <div class="registration-shell">
-            <app-registration-card titleKey="volunteerRegistration.title">
-                <p>{{ 'volunteerRegistration.closed.' + (closedReason() || 'CLOSED') | translate }}</p>
-            </app-registration-card>
+      </app-registration-card>
+    </div>
+  } @else if (!started()) {
+    <div class="registration-shell registration-welcome">
+      <app-registration-card
+        [title]="salonInfo()?.welcomeTitle || ('registration.welcome.title' | translate)">
+        <div class="registration-welcome-text"
+             [innerHTML]="salonInfo()?.welcomeText | richText"></div>
+        <div class="registration-welcome-actions">
+          <button-box (clickedEvent)="start()"
+                      translateKey="volunteerRegistration.welcome.start"
+                      type="primary" />
         </div>
-    } @else if (submitted()) {
-        <div class="registration-shell">
-            <app-registration-card>
-                <div class="done">
-                    <div class="done-check"><i class="pi pi-check"></i></div>
-                    <h1 tabindex="-1">{{ 'volunteerRegistration.done.title' | translate: {name: confirmation()?.firstName} }}</h1>
-                    <p>{{ 'volunteerRegistration.done.text' | translate: {email: confirmation()?.email} }}</p>
-                </div>
-                <div class="mt-3">
-                    <app-availability-preview [name]="volunteerName" [days]="previewDays"/>
-                </div>
-            </app-registration-card>
-        </div>
-    } @else if (!started()) {
-        <div class="registration-shell">
-            <app-registration-card [title]="salonInfo()?.welcomeTitle || ('volunteerRegistration.title' | translate)">
-                @if (salonInfo()?.welcomeText; as text) {
-                    <div [innerHTML]="text"></div>
-                }
-                <div class="mt-3">
-                    <button-box (clickedEvent)="start()"
-                                translateKey="volunteerRegistration.welcome.start"
-                                type="primary"/>
-                </div>
-            </app-registration-card>
-        </div>
-    } @else {
-        <app-step-progress [steps]="steps"
-                           [states]="stepStates()"
-                           [current]="currentStep()"
-                           [progress]="stepProgress()"
-                           (stepClick)="onStepClick($event)"/>
+      </app-registration-card>
+    </div>
+  } @else {
+    <app-step-progress [steps]="steps"
+                       [states]="stepStates()"
+                       [current]="currentStep()"
+                       [progress]="stepProgress()"
+                       (stepClick)="onStepClick($event)" />
 
-        <div class="registration-shell">
-            <div #stepHeading tabindex="-1" class="sr-focus"></div>
+    <div class="registration-shell">
+      <div #stepHeading tabindex="-1" class="sr-focus"></div>
 
-            @switch (currentStep()) {
-                @case (0) {
-                    <app-volunteer-contact-step [form]="form.controls.contact"/>
-                }
-                @case (1) {
-                    <app-volunteer-availability-step [availability]="form.controls.availability"
-                                                     [days]="salonInfo()!.days"
-                                                     [slotsByDay]="slotsByDay"
-                                                     [showErrors]="showStepErrors()"
-                                                     [volunteerName]="volunteerName"/>
-                }
-                @case (2) {
-                    <app-volunteer-preferences-step [form]="form.controls.preferences"
-                                                    [zones]="zoneCards()"
-                                                    [showErrors]="showStepErrors()"/>
-                }
-                @case (3) {
-                    <app-volunteer-summary-step [contact]="form.controls.contact"
-                                                [availability]="form.controls.availability"
-                                                [preferences]="form.controls.preferences"
-                                                [consents]="form.controls.consents"
-                                                [days]="salonInfo()!.days"
-                                                [slotsByDay]="slotsByDay"
-                                                [zones]="salonInfo()!.zones"
-                                                [closingDate]="salonInfo()!.registrationClosingDate"
-                                                [captchaEnabled]="captchaEnabled()"
-                                                [captchaSiteKey]="captchaSiteKey()"
-                                                (editStep)="onEditStep($event)"
-                                                (captchaToken)="onCaptchaToken($event)"/>
-                }
-            }
+      @switch (currentStep()) {
+        @case (0) {
+          <app-volunteer-contact-step [form]="form.controls.contact" />
+        }
+        @case (1) {
+          <app-volunteer-availability-step [availability]="form.controls.availability"
+                                           [days]="salonInfo()!.days"
+                                           [slotsByDay]="slotsByDay"
+                                           [showErrors]="showStepErrors()"
+                                           [volunteerName]="volunteerName" />
+        }
+        @case (2) {
+          <app-volunteer-preferences-step [form]="form.controls.preferences"
+                                          [zones]="zoneCards()"
+                                          [showErrors]="showStepErrors()" />
+        }
+        @case (3) {
+          <app-volunteer-summary-step [contact]="form.controls.contact"
+                                      [availability]="form.controls.availability"
+                                      [preferences]="form.controls.preferences"
+                                      [consents]="form.controls.consents"
+                                      [days]="salonInfo()!.days"
+                                      [slotsByDay]="slotsByDay"
+                                      [zones]="salonInfo()!.zones"
+                                      [closingDate]="salonInfo()!.registrationClosingDate"
+                                      [captchaEnabled]="captchaEnabled()"
+                                      [captchaSiteKey]="captchaSiteKey()"
+                                      (editStep)="onEditStep($event)"
+                                      (captchaToken)="onCaptchaToken($event)" />
+        }
+      }
 
-            <div class="registration-actions">
-                @if (currentStep() > 0) {
-                    <button-box (clickedEvent)="previous()"
-                                primeIcon="pi-arrow-left"
-                                [showText]="false"
-                                translateKey="registration.actions.previous"
-                                type="secondary"/>
-                }
-                @if (currentStep() < steps.length - 1) {
-                    <button-box (clickedEvent)="next()"
-                                translateKey="registration.actions.continue"
-                                type="primary"/>
-                } @else {
-                    <button-box (clickedEvent)="submit()"
-                                [loading]="submitting()"
-                                translateKey="volunteerRegistration.actions.submit"
-                                type="primary"/>
-                }
-            </div>
-        </div>
-    }
+      <div class="registration-actions">
+        @if (currentStep() > 0) {
+          <button-box (clickedEvent)="previous()"
+                      primeIcon="pi-arrow-left"
+                      [showText]="false"
+                      translateKey="registration.actions.previous"
+                      type="secondary" />
+        }
+        @if (currentStep() < steps.length - 1) {
+          <button-box (clickedEvent)="next()"
+                      translateKey="registration.actions.continue"
+                      type="primary" />
+        } @else {
+          <button-box (clickedEvent)="submit()"
+                      [loading]="submitting()"
+                      translateKey="volunteerRegistration.actions.submit"
+                      type="primary" />
+        }
+      </div>
+    </div>
+  }
 </div>
