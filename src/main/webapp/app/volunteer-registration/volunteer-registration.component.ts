@@ -142,7 +142,6 @@ export default class VolunteerRegistrationComponent implements OnInit {
     if (!info) {
       return [];
     }
-    const availableDayIds = this.availableDayIds();
     return info.zones.map((zone) => {
       const daysLabel = zone.dayIds
         .map((id) => {
@@ -151,34 +150,16 @@ export default class VolunteerRegistrationComponent implements OnInit {
         })
         .filter(Boolean)
         .join(', ');
-      const hasAnyAvailable = zone.dayIds.some((id) => availableDayIds.includes(id));
-      const warning =
-        zone.dayIds.length > 0 && !hasAnyAvailable
-          ? "Vous n'êtes pas disponible ces jours-là"
-          : null;
       return {
         id: zone.id,
         label: zone.label,
         color: zone.color,
         icon: zone.icon,
         description: zone.description,
-        daysLabel,
-        warning,
+        daysLabel
       };
     });
   }
-
-  private availableDayIds(): string[] {
-    if (!this.form) {
-      return [];
-    }
-    return this.form.controls.availability.controls
-      .filter(
-        (c) => c.controls.available.value === true && (c.controls.slots.value?.length ?? 0) > 0,
-      )
-      .map((c) => c.controls.dayId.value);
-  }
-
   // -------------------- NAVIGATION --------------------
 
   start(): void {
