@@ -65,7 +65,6 @@ hr.separator {
   border: 0;
   border-top: 4px solid #cccccc;
   margin: 0;
-  width: 100%;
 }
 
 /* ========== UTILITAIRES ========== */
@@ -151,7 +150,6 @@ div.footer {
   position: running(footer);
   margin-top: 0.5cm;
   height: 2cm;
-  width: 100%;
   text-align: center;
 }
 
@@ -267,6 +265,145 @@ div.body {
 
 .rich-text pre {
   white-space: pre-wrap;
+}
+
+/* ========== EN-TÊTE DE PAGE (documents internes sans papier à lettre) ========== */
+
+.page-header {
+  margin-bottom: 14px;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+.page-header td {
+  vertical-align: middle;
+}
+
+.page-header .page-subtitle {
+  margin: 0;
+  color: #555555;
+}
+
+.page-header hr.separator {
+  margin-top: 5px;
+}
+
+/* ========== AGENDA (planning des animations) ========== */
+
+.agenda td {
+  padding: 0;
+}
+
+.agenda .agenda-time {
+  width: 60px;
+  font-weight: bold;
+}
+
+.agenda .agenda-description {
+  margin-top: 5px;
+}
+
+/* ========== GRILLE (planning des bénévoles) ========== */
+
+table.grid {
+  table-layout: fixed;
+}
+
+.grid th,
+.grid td {
+  border: 1px solid #cccccc;
+  padding: 0;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.grid thead th {
+  background-color: #cae164;
+  font-weight: bold;
+  padding: 0 0 0 1mm;
+  height: 7mm;
+}
+
+.grid .grid-label {
+  width: 20mm;
+  font-size: 10px;
+  padding-left: 1mm;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.grid .grid-slot {
+  font-size: 8px;
+}
+
+.grid .grid-cell {
+  height: 7mm;
+}
+
+/* Créneau avec catégorie : badge coloré (couleur fournie par les données) */
+.grid .cell-fill {
+  display: block;
+  margin: 1mm;
+  border: 1px solid #9e9e9e;
+}
+
+/* Créneau non disponible : gris plein */
+.grid .cell-unavailable {
+  display: block;
+  height: 7mm;
+  background-color: #9e9e9e;
+}
+
+.grid tr.grid-total-first td {
+  border-top: 2px solid #555555;
+}
+
+.grid .grid-total {
+  height: 5.5mm;
+  font-size: 9px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Couverture des créneaux (couleurs d'état, propres à ce planning) */
+.grid .cov-under {
+  background-color: #fdeaf0;
+  color: #d6336c;
+}
+
+.grid .cov-ok {
+  background-color: #e7f5ea;
+  color: #2b8a3e;
+}
+
+.grid .cov-over {
+  background-color: #fff1e6;
+  color: #d9480f;
+}
+
+.grid .cov-none {
+  color: #9aa1ad;
+}
+
+/* Légende des catégories */
+.legend-item {
+  margin-left: 8px;
+  font-size: 10px;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 2px;
+  border: 1px solid #aaaaaa;
+  vertical-align: middle;
+}
+
+.legend-swatch.unavailable {
+  background-color: #9e9e9e;
 }
 
 /* ========== BULLETIN DE VERSEMENT QR (facture) ========== */

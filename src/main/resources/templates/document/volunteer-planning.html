@@ -1,244 +1,70 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <style>
-        @page {
-            size: A4 landscape;
-            margin: 10mm 12mm;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 9pt;
-            color: #222;
-        }
-
-        .page {
-            page-break-after: always;
-        }
-
-        .page-last {
-            page-break-after: avoid;
-        }
-
-        .page-header {
-            display: table;
-            width: 100%;
-            margin-bottom: 5mm;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 3mm;
-        }
-
-        .header-left {
-            display: table-cell;
-            vertical-align: middle;
-            width: 55%;
-        }
-
-        .header-right {
-            display: table-cell;
-            vertical-align: middle;
-            width: 45%;
-            text-align: right;
-        }
-
-        .day-title {
-            font-size: 15pt;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 0 0 1mm 0;
-        }
-
-        .day-meta {
-            font-size: 8.5pt;
-            color: #555;
-            margin: 0;
-        }
-
-        .legend-item {
-            display: inline-block;
-            margin-left: 8px;
-            font-size: 8pt;
-            vertical-align: middle;
-        }
-
-        .legend-swatch {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            vertical-align: middle;
-            margin-right: 2px;
-            border: 0.5px solid #aaa;
-        }
-
-        table.grid {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-
-        table.grid th,
-        table.grid td {
-            border: 0.5px solid #ccc;
-            padding: 0;
-            vertical-align: middle;
-            overflow: hidden;
-        }
-
-        .col-label {
-            width: 20mm;
-            font-weight: bold;
-            font-size: 7.5pt;
-            text-align: left;
-            padding-left: 1mm !important;
-            background: #f5f5f5;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        th.col-header-label {
-            background: #2c3e50;
-            color: white;
-            font-size: 7.5pt;
-            text-align: left;
-            padding: 1mm 2mm;
-            width: 20mm;
-        }
-
-        th.col-slot {
-            font-size: 6pt;
-            font-weight: bold;
-            background: #2c3e50;
-            text-align: left !important;
-            padding-left: 1mm !important;
-            color: white;
-            height: 7mm;
-        }
-
-        td.slot {
-            height: 7mm;
-            padding: 0;
-        }
-
-        /* Cellule avec catégorie : petit padding visible */
-        .cell-fill {
-            margin: 1mm;
-            display: block;
-            border-radius: 1px;
-            border: 1px solid #9e9e9e;
-        }
-
-        /* Cellule non disponible : gris plein sans padding */
-        .cell-unavailable {
-            width: 100%;
-            height: 7mm;
-            display: block;
-            background-color: #9e9e9e;
-        }
-
-        tr.total-first td {
-            border-top: 1.5px solid #2c3e50;
-        }
-
-        td.total-label {
-            width: 20mm;
-            font-size: 7pt;
-            font-weight: bold;
-            text-align: left;
-            padding-left: 1mm !important;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        td.total-cell {
-            height: 5.5mm;
-            font-size: 6.5pt;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        td.cov-under {
-            background-color: #fdeaf0;
-            color: #d6336c;
-        }
-
-        td.cov-ok {
-            background-color: #e7f5ea;
-            color: #2b8a3e;
-        }
-
-        td.cov-over {
-            background-color: #fff1e6;
-            color: #d9480f;
-        }
-
-        td.cov-none {
-            color: #9aa1ad;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <link href="styles.css" media="all" rel="stylesheet" type="text/css" />
+  <!-- Document interne sans en-tête : grille en paysage, marges réduites -->
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 10mm 12mm;
+    }
+  </style>
 </head>
+
 <body>
-<div th:each="page, pageStat : ${pages}" th:class="${pageStat.last} ? 'page page-last' : 'page'">
-
-    <div class="page-header">
-        <div class="header-left">
-            <p class="day-title" th:text="${page.dayLabel}">Samedi</p>
-            <p class="day-meta">
-                <span th:text="${page.timeRange}">08:00 - 18:00</span>
-                &#160;&#183;&#160;
-                <span th:text="${page.volunteerCount}">0</span> benevole(s)
-            </p>
-        </div>
-        <div class="header-right">
-            <span th:each="cat : ${page.categories}" class="legend-item">
+<div th:each="page, pageStat : ${pages}" th:classappend="${!pageStat.last} ? 'page-break'">
+  <div class="page-header">
+    <table>
+      <tr>
+        <td>
+          <h1 th:text="${page.dayLabel}">Samedi</h1>
+          <p class="page-subtitle">
+            [[${page.timeRange}]] &#183; [[${page.volunteerCount}]] bénévole(s)
+          </p>
+        </td>
+        <td class="text-right">
+              <span class="legend-item" th:each="cat : ${page.categories}">
                 <span class="legend-swatch" th:style="'background-color: ' + ${cat.color} + ';'">&#160;</span>
-                <span th:text="${cat.label}">Categorie</span>
-            </span>
-            <span class="legend-item">
-                <span class="legend-swatch" style="background-color: #9e9e9e;">&#160;</span>
+                <span th:text="${cat.label}">Catégorie</span>
+              </span>
+          <span class="legend-item">
+                <span class="legend-swatch unavailable">&#160;</span>
                 <span>Non disponible</span>
-            </span>
-        </div>
-    </div>
-
-    <table class="grid">
-        <thead>
-            <tr>
-                <th class="col-header-label">&#160;</th>
-                <th th:each="slot : ${page.slotLabels}" class="col-slot" th:text="${slot}">08:00</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="row : ${page.rows}">
-                <td class="col-label" th:text="${row.label}">Benevole</td>
-                <td th:each="cell : ${row.cells}" class="slot">
-                    <!-- Cellule non disponible : gris plein -->
-                    <span th:if="${cell.unavailable}"
-                          class="cell-unavailable">&#160;</span>
-                    <!-- Cellule avec catégorie : badge coloré avec padding -->
-                    <span th:if="${!cell.unavailable and cell.color != null}"
-                          class="cell-fill"
-                          th:style="'background-color: ' + ${cell.color} + ';'">&#160;</span>
-                    <!-- Cellule vide -->
-                    <span th:if="${!cell.unavailable and cell.color == null}">&#160;</span>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot th:if="${!page.totals.isEmpty()}">
-            <tr th:each="total, totalStat : ${page.totals}"
-                th:class="${totalStat.first} ? 'total-first' : ''">
-                <td class="total-label"
-                    th:style="'background-color: ' + ${total.category.color} + ';'"
-                    th:text="${total.category.label}">Categorie</td>
-                <td th:each="cell : ${total.counts}"
-                    th:class="'total-cell cov-' + ${cell.state}"
-                    th:text="${cell.label}">0/0</td>
-            </tr>
-        </tfoot>
+              </span>
+        </td>
+      </tr>
     </table>
+    <hr class="separator" />
+  </div>
 
+  <table class="grid">
+    <thead>
+    <tr>
+      <th class="grid-label">&#160;</th>
+      <th class="grid-slot" th:each="slot : ${page.slotLabels}" th:text="${slot}">08:00</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${page.rows}">
+      <td class="grid-label" th:text="${row.label}">Bénévole</td>
+      <td class="grid-cell" th:each="cell : ${row.cells}">
+        <span class="cell-unavailable" th:if="${cell.unavailable}">&#160;</span>
+        <span class="cell-fill" th:if="${!cell.unavailable and cell.color != null}"
+              th:style="'background-color: ' + ${cell.color} + ';'">&#160;</span>
+        <span th:if="${!cell.unavailable and cell.color == null}">&#160;</span>
+      </td>
+    </tr>
+    </tbody>
+    <tfoot th:if="${!page.totals.isEmpty()}">
+    <tr th:each="total, totalStat : ${page.totals}" th:classappend="${totalStat.first} ? 'grid-total-first'">
+      <td class="grid-label" th:style="'background-color: ' + ${total.category.color} + ';'"
+          th:text="${total.category.label}">Catégorie</td>
+      <td th:each="cell : ${total.counts}" th:class="'grid-total cov-' + ${cell.state}"
+          th:text="${cell.label}">0/0</td>
+    </tr>
+    </tfoot>
+  </table>
 </div>
 </body>
 </html>
