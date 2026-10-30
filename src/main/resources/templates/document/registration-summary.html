@@ -11,57 +11,27 @@
       margin-top: 14px;
     }
 
-    .summary-chart-text {
-      max-width: 100%;
-      overflow-wrap: break-word;
-      word-break: normal;
-      hyphens: manual;
-
-      p,
-      li,
-      td,
-      th,
-      blockquote,
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        overflow-wrap: break-word;
-        word-break: normal;
-      }
-
-      p {
-        margin: 0 0 0.75rem;
-      }
-
-      ul,
-      ol {
-        margin: 0 0 0.75rem;
-        padding-left: 1.5rem;
-      }
-
-      img {
-        max-width: 100%;
-        height: auto;
-      }
-
-      table {
-        display: block;
-        max-width: 100%;
-        overflow-x: auto;
-      }
-
-      pre {
-        white-space: pre-wrap;
-        overflow-wrap: break-word;
-      }
-
-      > :last-child {
-        margin-bottom: 0;
-      }
+    .summary-chart-text,
+    .summary-chart-text p,
+    .summary-chart-text li,
+    .summary-chart-text td,
+    .summary-chart-text th,
+    .summary-chart-text blockquote,
+    .summary-chart-text h1,
+    .summary-chart-text h2,
+    .summary-chart-text h3,
+    .summary-chart-text h4,
+    .summary-chart-text h5,
+    .summary-chart-text h6,
+    .summary-chart-text pre {
+      word-wrap: break-word;
     }
+
+    .summary-chart-text p { margin: 0 0 0.75rem; }
+    .summary-chart-text ul,
+    .summary-chart-text ol { margin: 0 0 0.75rem; padding-left: 1.5rem; }
+    .summary-chart-text img { max-width: 100%; height: auto; }
+    .summary-chart-text pre { white-space: pre-wrap; }
 
     .field-label {
       width: 35%;
