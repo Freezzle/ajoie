@@ -16,8 +16,6 @@
       overflow-wrap: break-word;
       word-break: normal;
       hyphens: manual;
-      max-height: 20rem;
-      overflow-y: auto;
 
       p,
       li,
@@ -217,7 +215,8 @@
             <span th:unless="${stand.publishedOnWebsite()}" th:utext="#{document.registration-summary.no}"></span>
           </td>
         </tr>
-        <tr th:if="${stand.publishedOnWebsite() and (stand.website() != null or stand.instagram() != null or stand.facebook() != null)}">
+        <tr
+          th:if="${stand.publishedOnWebsite() and (stand.website() != null or stand.instagram() != null or stand.facebook() != null)}">
           <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
           <td class="field-value">
             <span th:if="${stand.website()}">[[${stand.website()}]]<br /></span>
@@ -265,7 +264,8 @@
             <span th:unless="${stand.sharedPublishedOnWebsite()}" th:utext="#{document.registration-summary.no}"></span>
           </td>
         </tr>
-        <tr th:if="${stand.sharedPublishedOnWebsite() and (stand.sharedWebsite() != null or stand.sharedInstagram() != null or stand.sharedFacebook() != null)}">
+        <tr
+          th:if="${stand.sharedPublishedOnWebsite() and (stand.sharedWebsite() != null or stand.sharedInstagram() != null or stand.sharedFacebook() != null)}">
           <td class="field-label" th:utext="#{document.registration-summary.stand.links}"></td>
           <td class="field-value">
             <span th:if="${stand.sharedWebsite()}">[[${stand.sharedWebsite()}]]<br /></span>
@@ -381,20 +381,20 @@
   <!-- CHARTES -->
   <div th:if="${chartText != null or salonChartText != null}">
     <div class="section-title" th:utext="#{document.registration-summary.charts.title}"></div>
-    <div class="block">
-    <div th:if="${chartText}">
-      <h3 th:utext="#{document.registration-summary.charts.registration}"></h3>
-      <div class="chart-text" th:utext="${chartText}"></div>
-      <p th:if="${acceptedContract}" th:utext="#{document.registration-summary.charts.accepted}"></p>
-    </div>
+    <div class="block summary-chart-text">
+      <div th:if="${chartText}">
+        <h3 th:utext="#{document.registration-summary.charts.registration}"></h3>
+        <div class="chart-text summary-chart-text" th:utext="${chartText}"></div>
+        <p th:if="${acceptedContract}" th:utext="#{document.registration-summary.charts.accepted}"></p>
+      </div>
 
-    <div th:if="${salonChartText}">
-      <h3 th:utext="#{document.registration-summary.charts.salon}"></h3>
-      <div class="chart-text summary-chart-text" th:utext="${salonChartText}"></div>
-      <p th:if="${acceptedChart}" th:utext="#{document.registration-summary.charts.accepted}"></p>
+      <div th:if="${salonChartText}">
+        <h3 th:utext="#{document.registration-summary.charts.salon}"></h3>
+        <div class="chart-text summary-chart-text" th:utext="${salonChartText}"></div>
+        <p th:if="${acceptedChart}" th:utext="#{document.registration-summary.charts.accepted}"></p>
+      </div>
     </div>
   </div>
-</div>
 </div>
 </body>
 </html>
