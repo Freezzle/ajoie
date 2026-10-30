@@ -59,12 +59,16 @@
   transition: background 0.12s;
 
   &:hover:not(:disabled):not(.on) {
-    background: color-mix(in srgb, var(--p-green-600, #2f7d5b) 14%, var(--p-surface-100, #f1ece3));
+    background: color-mix(in srgb, var(--p-green-600, #2f7d5b) 20%, var(--p-surface-100, #f1ece3));
+  }
+
+  &:hover:not(:disabled).on {
+    background: color-mix(in srgb, var(--p-green-600, #2f7d5b) 50%, var(--p-surface-100, #f1ece3));
   }
 
   &.on {
     background:
-            color-mix(in srgb, var(--p-green-600, #2f7d5b) 20%, transparent);
+            color-mix(in srgb, var(--p-green-600, #2f7d5b) 80%, transparent);
   }
 
   // Barre continue : retire les arrondis entre cases choisies voisines.
