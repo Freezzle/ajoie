@@ -35,6 +35,13 @@ public final class HtmlSanitizer {
 
     private static final Pattern SAFE_HREF = Pattern.compile("^(https?://|mailto:)", Pattern.CASE_INSENSITIVE);
 
+    /** Espaces insécables produites par l'éditeur (entités, U+00A0, U+202F, U+2007). */
+    private static final Pattern NO_BREAK_SPACES = Pattern.compile("&nbsp;|&#160;|&#[xX]0*[aA]0;|[\u00A0\u202F\u2007]");
+
+    /** Ponctuation haute française : on y remet une insécable, le groupe reste court. */
+    private static final Pattern PUNCTUATION_AFTER = Pattern.compile(" +([:;!?»])");
+    private static final Pattern PUNCTUATION_BEFORE = Pattern.compile("(«) +");
+
     private HtmlSanitizer() {
     }
 
@@ -55,8 +62,23 @@ public final class HtmlSanitizer {
         }
         matcher.appendTail(result);
 
-        String sanitized = result.toString();
+        String sanitized = normalizeSpaces(result.toString());
         return hasText(sanitized) ? sanitized : null;
+    }
+
+    private static String normalizeSpaces(String html) {
+        StringBuilder out = new StringBuilder();
+        for (String segment : html.split("(?=<)|(?<=>)")) {
+            if (segment.startsWith("<")) {
+                out.append(segment);
+            } else {
+                String text = NO_BREAK_SPACES.matcher(segment).replaceAll(" ");
+                text = PUNCTUATION_AFTER.matcher(text).replaceAll("\u00A0$1");
+                text = PUNCTUATION_BEFORE.matcher(text).replaceAll("$1\u00A0");
+                out.append(text);
+            }
+        }
+        return out.toString();
     }
 
     private static String rewriteTag(Matcher matcher) {
