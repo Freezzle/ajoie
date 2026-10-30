@@ -45,6 +45,10 @@
       padding: 2px 0;
     }
 
+    .margin-line {
+      margin-bottom: 4px;
+    }
+
     .block {
       border: 1px solid #cccccc;
       padding: 5px;
@@ -313,7 +317,7 @@
     <div class="section-title" th:utext="#{document.registration-summary.cost.title}"></div>
     <div class="block">
       <table class="padding-all-5">
-        <thead class="bg">
+        <thead>
         <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40">
           <span th:utext="#{document.registration-summary.cost.description}"></span>
         </td>
@@ -327,7 +331,7 @@
           <span th:utext="#{document.registration-summary.cost.amount}"></span>
         </td>
         </thead>
-        <tr th:each="line: ${costLines}">
+        <tr class="margin-line" th:each="line: ${costLines}">
           <td class="center-left padding-left-5">[[${line.label()}]]</td>
           <td class="center-right">[[${#numbers.formatDecimal(line.unitPrice(), 1, 2, 'POINT')}]]</td>
           <td class="center-center">[[${line.quantity()}]]</td>
@@ -335,7 +339,7 @@
             [[${#numbers.formatDecimal(line.amount(), 1, 2, 'POINT')}]]
           </td>
         </tr>
-        <tr class="bg">
+        <tr>
           <td class="top-left padding-left-5 padding-bottom-5 padding-top-5" colspan="3">
             <span th:utext="#{document.registration-summary.cost.total}"></span>
           </td>
