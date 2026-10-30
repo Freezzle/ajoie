@@ -3,109 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <link href="styles.css" media="all" rel="stylesheet" type="text/css" />
-  <style>
-    .section-title {
-      background-color: #cae164;
-      padding: 4px 5px;
-      font-weight: bold;
-      margin-top: 14px;
-    }
-
-    .summary-chart-text,
-    .summary-chart-text p,
-    .summary-chart-text li,
-    .summary-chart-text td,
-    .summary-chart-text th,
-    .summary-chart-text blockquote,
-    .summary-chart-text h1,
-    .summary-chart-text h2,
-    .summary-chart-text h3,
-    .summary-chart-text h4,
-    .summary-chart-text h5,
-    .summary-chart-text h6,
-    .summary-chart-text pre {
-      word-wrap: break-word;
-    }
-
-    .summary-chart-text p { margin: 0 0 0.75rem; }
-    .summary-chart-text ul,
-    .summary-chart-text ol { margin: 0 0 0.75rem; padding-left: 1.5rem; }
-    .summary-chart-text img { max-width: 100%; height: auto; }
-    .summary-chart-text pre { white-space: pre-wrap; }
-
-    .field-label {
-      width: 35%;
-      vertical-align: top;
-      padding: 2px 5px 2px 0;
-      color: #555555;
-    }
-
-    .field-value {
-      vertical-align: top;
-      padding: 2px 0;
-    }
-
-    .margin-line {
-      margin-bottom: 4px;
-    }
-
-    .block {
-      border: 1px solid #cccccc;
-      padding: 10px;
-      margin-bottom: 6px;
-    }
-
-    .chart-text {
-      padding: 2px 0;
-    }
-
-    .chart-text p {
-      margin: 0 0 6px;
-    }
-
-    .chart-text ul, .chart-text ol {
-      margin: 0 0 6px;
-      padding-left: 18px;
-    }
-
-    .disclaimer {
-      color: #555555;
-      font-style: italic;
-    }
-  </style>
 </head>
 <body>
 <div class="header" th:include="common/header::header"></div>
 <div class="letterhead" th:include="common/letterhead::letterhead"></div>
 <div class="body">
 
-  <table class="padding-all-5">
+  <table class="doc-meta">
     <tr>
-      <td class="top-left">
+      <td>
         <span th:utext="#{document.registration-summary.salon}"></span>
         [[${salonPlace}]]<br />
         <span th:utext="#{document.registration-summary.dates}"></span>
-        [[${startDate}]] - [[${endDate}]]<br />
+        [[${startDate}]] - [[${endDate}]]
       </td>
-      <td class="top-right">
-                <span th:if="${reference}">
-                    <span th:utext="#{document.registration-summary.reference}"></span>
-                    [[${reference}]]<br />
-                </span>
+      <td class="text-right">
+        <span th:if="${reference}">
+          <span th:utext="#{document.registration-summary.reference}"></span>
+          [[${reference}]]<br />
+        </span>
         <span th:if="${registrationDate}">
-                    <span th:utext="#{document.registration-summary.registration-date}"></span>
-                    [[${registrationDate}]]
-                </span>
+          <span th:utext="#{document.registration-summary.registration-date}"></span>
+          [[${registrationDate}]]
+        </span>
       </td>
     </tr>
   </table>
 
-  <p class="disclaimer" th:utext="#{document.registration-summary.intro}"></p>
+  <p class="muted" th:utext="#{document.registration-summary.intro}"></p>
 
   <!-- EXPOSANT -->
   <div class="section-title" th:utext="#{document.registration-summary.exhibitor.title}"></div>
   <div class="block">
-    <table>
+    <table class="fields">
       <tr>
         <td class="field-label" th:utext="#{document.registration-summary.exhibitor.name}"></td>
         <td class="field-value">[[${firstName}]] [[${lastName}]]</td>
@@ -149,7 +79,7 @@
 
   <div th:each="stand: ${stands}">
     <div class="block">
-      <table>
+      <table class="fields">
         <tr>
           <td class="field-label" th:utext="#{document.registration-summary.stand.dimension}"></td>
           <td class="field-value">[[${stand.dimension()}]]</td>
@@ -202,11 +132,9 @@
     </div>
 
     <div class="block" th:if="${stand.shared()}">
-      <table>
+      <table class="fields">
         <tr>
-          <td colspan="2" class="padding-bottom-5">
-            <b th:utext="#{document.registration-summary.stand.co-exhibitor}"></b>
-          </td>
+          <td colspan="2" class="block-title" th:utext="#{document.registration-summary.stand.co-exhibitor}"></td>
         </tr>
         <tr th:if="${stand.sharedName()}">
           <td class="field-label" th:utext="#{document.registration-summary.exhibitor.name}"></td>
@@ -252,7 +180,7 @@
   </div>
 
   <div class="block" th:each="conference: ${conferences}">
-    <table>
+    <table class="fields">
       <tr>
         <td class="field-label" th:utext="#{document.registration-summary.conference}"></td>
         <td class="field-value"><b>[[${conference.getTitle()}]]</b></td>
@@ -265,7 +193,7 @@
   </div>
 
   <div class="block" th:each="workshop: ${workshops}">
-    <table>
+    <table class="fields">
       <tr>
         <td class="field-label" th:utext="#{document.registration-summary.workshop}"></td>
         <td class="field-value"><b>[[${workshop.getTitle()}]]</b></td>
@@ -280,7 +208,7 @@
   <!-- PARTICIPATION -->
   <div class="section-title" th:utext="#{document.registration-summary.participation.title}"></div>
   <div class="block">
-    <table>
+    <table class="fields">
       <tr>
         <td class="field-label" th:utext="#{document.registration-summary.meals.saturday-midday}"></td>
         <td class="field-value">[[${nbMeal1}]]</td>
@@ -316,59 +244,53 @@
   <div th:if="${hasCost}">
     <div class="section-title" th:utext="#{document.registration-summary.cost.title}"></div>
     <div class="block">
-      <table class="padding-all-5">
+      <table class="lines">
         <thead>
-        <td class="bottom-left padding-left-5 padding-top-5 padding-bottom-5 width-40">
-          <span th:utext="#{document.registration-summary.cost.description}"></span>
-        </td>
-        <td class="bottom-right width-20 padding-top-5 padding-bottom-5">
-          <span th:utext="#{document.registration-summary.cost.price}"></span>
-        </td>
-        <td class="bottom-center width-10 padding-top-5 padding-bottom-5">
-          <span th:utext="#{document.registration-summary.cost.quantity}"></span>
-        </td>
-        <td class="bottom-right padding-right-5 width-30 padding-top-5 padding-bottom-5">
-          <span th:utext="#{document.registration-summary.cost.amount}"></span>
-        </td>
-        </thead>
-        <tr class="margin-line" th:each="line: ${costLines}">
-          <td class="center-left padding-left-5">[[${line.label()}]]</td>
-          <td class="center-right">[[${#numbers.formatDecimal(line.unitPrice(), 1, 2, 'POINT')}]]</td>
-          <td class="center-center">[[${line.quantity()}]]</td>
-          <td class="center-right padding-right-5">
-            [[${#numbers.formatDecimal(line.amount(), 1, 2, 'POINT')}]]
-          </td>
-        </tr>
         <tr>
-          <td class="top-left padding-left-5 padding-bottom-5 padding-top-5" colspan="3">
-            <span th:utext="#{document.registration-summary.cost.total}"></span>
-          </td>
-          <td class="top-right padding-right-5 padding-bottom-5 padding-top-5">
-            <b>CHF [[${#numbers.formatDecimal(costTotal, 1, 2, 'POINT')}]]</b>
-          </td>
+          <th class="col-label" th:utext="#{document.registration-summary.cost.description}"></th>
+          <th class="col-price text-right" th:utext="#{document.registration-summary.cost.price}"></th>
+          <th class="col-quantity text-center" th:utext="#{document.registration-summary.cost.quantity}"></th>
+          <th class="col-amount text-right" th:utext="#{document.registration-summary.cost.amount}"></th>
         </tr>
+        </thead>
+        <tbody>
+        <tr class="lines-gap"><td colspan="4">&nbsp;</td></tr>
+        <tr th:each="line: ${costLines}">
+          <td>[[${line.label()}]]</td>
+          <td class="text-right">[[${#numbers.formatDecimal(line.unitPrice(), 1, 2, 'POINT')}]]</td>
+          <td class="text-center">[[${line.quantity()}]]</td>
+          <td class="text-right">[[${#numbers.formatDecimal(line.amount(), 1, 2, 'POINT')}]]</td>
+        </tr>
+        <tr class="lines-gap"><td colspan="4">&nbsp;</td></tr>
+        <tr class="lines-total">
+          <td colspan="3" th:utext="#{document.registration-summary.cost.total}"></td>
+          <td class="text-right">CHF [[${#numbers.formatDecimal(costTotal, 1, 2, 'POINT')}]]</td>
+        </tr>
+        </tbody>
       </table>
-      <p class="disclaimer" th:utext="#{document.registration-summary.cost.disclaimer}"></p>
+      <p class="muted spaced" th:utext="#{document.registration-summary.cost.disclaimer}"></p>
     </div>
   </div>
 
   <!-- CHARTES -->
   <div th:if="${chartText != null or salonChartText != null}">
     <div class="section-title" th:utext="#{document.registration-summary.charts.title}"></div>
-    <div class="block summary-chart-text">
+    <div class="block">
       <div th:if="${chartText}">
         <h3 th:utext="#{document.registration-summary.charts.registration}"></h3>
-        <div class="chart-text summary-chart-text" th:utext="${chartText}"></div>
+        <div class="rich-text" th:utext="${chartText}"></div>
         <p th:if="${acceptedContract}" th:utext="#{document.registration-summary.charts.accepted}"></p>
       </div>
 
       <div th:if="${salonChartText}">
         <h3 th:utext="#{document.registration-summary.charts.salon}"></h3>
-        <div class="chart-text summary-chart-text" th:utext="${salonChartText}"></div>
+        <div class="rich-text" th:utext="${salonChartText}"></div>
         <p th:if="${acceptedChart}" th:utext="#{document.registration-summary.charts.accepted}"></p>
       </div>
     </div>
   </div>
 </div>
+
+<div class="footer" th:include="common/footer::footer"></div>
 </body>
 </html>

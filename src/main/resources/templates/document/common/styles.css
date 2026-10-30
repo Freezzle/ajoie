@@ -1,15 +1,21 @@
-/* GLOBAL */
-body {
-  font-family: sans-serif;
-  font-size: 12px;
-}
+/*
+ * Styles communs des documents PDF (rendu Flying Saucer : CSS 2.1 uniquement,
+ * pas de variables CSS ni de flexbox).
+ *
+ * Palette (à réutiliser telle quelle, ne pas introduire d'autres teintes) :
+ *   accent       #cae164  fonds de titres, en-têtes et totaux de tableaux
+ *   bordure      #cccccc  séparateurs et cadres
+ *   texte atténué #555555 libellés, mentions
+ *
+ * Espacements : 5px (intérieur des cellules), 10px (intérieur des cadres),
+ * 14px (entre blocs).
+ */
+
+/* ========== PAGE ========== */
 
 @page {
-  @bottom-left {
-    content: element(footer);
-    vertical-align: top;
-    padding-top: 10px;
-  }
+  size: A4 portrait;
+  margin: 3.5cm 2cm 2.5cm 2cm;
 
   @top-right {
     content: element(header);
@@ -17,135 +23,76 @@ body {
     padding-bottom: 10px;
   }
 
-  margin-top: 3.5cm;
-  margin-left: 2cm;
-  margin-right: 2cm;
-  margin-bottom: 2.5cm;
+  @bottom-left {
+    content: element(footer);
+    vertical-align: top;
+    padding-top: 10px;
+  }
+}
 
-  size: A4 portrait;
+@font-face {
+  font-family: 'Bar-Code 39';
+  src: url(Code39.ttf) format('truetype');
+}
+
+/* ========== ÉLÉMENTS DE BASE ========== */
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 12px;
 }
 
 h1 {
   font-size: 21px;
 }
 
-p {
-  font-size: 12px;
-}
-
-.padding-all-5 {
-  padding: 5px;
-}
-
-.padding-top-5 {
-  padding-top: 5px;
-}
-
-.padding-left-5 {
-  padding-left: 5px;
-}
-
-.padding-right-5 {
-  padding-right: 5px;
-}
-
-.padding-bottom-5 {
-  padding-bottom: 5px;
-}
-
-.top-left {
-  text-align: left;
-  vertical-align: top;
-}
-
-.top-center {
-  text-align: center;
-  vertical-align: top;
-}
-
-.top-right {
-  text-align: right;
-  vertical-align: top;
-}
-
-.center-left {
-  text-align: left;
-  vertical-align: middle;
-}
-
-.center-center {
-  text-align: center;
-  vertical-align: middle;
-}
-
-.center-right {
-  text-align: right;
-  vertical-align: middle;
-}
-
-.bottom-left {
-  text-align: left;
-  vertical-align: bottom;
-}
-
-.bottom-center {
-  text-align: center;
-  vertical-align: bottom;
-}
-
-.bottom-right {
-  text-align: right;
-  vertical-align: bottom;
-}
-
 table {
-  /** border: 0.5px solid #888888; **/
   width: 100%;
   border-collapse: collapse;
 }
 
-.width-5 {
-  width: 5%;
+td,
+th {
+  text-align: left;
+  vertical-align: top;
+  font-weight: normal;
 }
 
-.width-10 {
-  width: 10%;
+/* Séparateur gris utilisé par l'en-tête, le bloc destinataire et le pied de page */
+hr.separator {
+  height: 0;
+  border: 0;
+  border-top: 4px solid #cccccc;
+  margin: 0;
+  width: 100%;
 }
 
-.width-15 {
-  width: 15%;
+/* ========== UTILITAIRES ========== */
+
+.text-left {
+  text-align: left;
 }
 
-.width-20 {
-  width: 20%;
+.text-center {
+  text-align: center;
 }
 
-.width-30 {
-  width: 30%;
+.text-right {
+  text-align: right;
 }
 
-.width-40 {
-  width: 40%;
+.muted {
+  color: #555555;
+  font-style: italic;
 }
 
-.width-60 {
-  width: 60%;
+.spaced {
+  margin-top: 14px;
 }
 
-.width-70 {
-  width: 70%;
-}
-
-.bg {
-  background-color: #cae164;
-}
-
-.border-thin {
-  border: 1px solid #cae164;
-}
-
-.border-grey-thick {
-  border: 2px solid #cccccc;
+.indent {
+  padding-left: 5px;
 }
 
 .page-break {
@@ -156,51 +103,186 @@ table {
   page-break-before: always;
 }
 
-@font-face {
-  font-family: 'Bar-Code 39';
-  src: url(Code39.ttf) format('truetype');
-}
-
-/* HEADER */
+/* ========== EN-TÊTE (common/header.html) ========== */
 
 div.header {
-  /** border: 0.5px solid indianred; **/
   position: running(header);
   margin-top: 1cm;
   height: 3cm;
 }
 
-.header-td-logo {
+.header-table td {
+  vertical-align: middle;
+}
+
+.header-table .header-logo-cell {
   width: 70px;
 }
 
-.header-logo {
+.header-table .header-logo {
   width: 60px;
 }
 
-/* BODY */
+.header-table .header-title-cell {
+  width: 30%;
+}
+
+div.header hr.separator {
+  margin-bottom: 14px;
+}
+
+/* ========== DESTINATAIRE (common/letterhead.html) ========== */
+
+.letterhead-table {
+  margin-bottom: 14px;
+}
+
+.letterhead-table .letterhead-address {
+  width: 30%;
+}
+
+div.letterhead hr.separator {
+  margin-bottom: 14px;
+}
+
+/* ========== PIED DE PAGE (common/footer.html) ========== */
+
+div.footer {
+  position: running(footer);
+  margin-top: 0.5cm;
+  height: 2cm;
+  width: 100%;
+  text-align: center;
+}
+
+/* ========== CORPS ========== */
 
 div.body {
   display: block;
 }
 
-/* FOOTER */
-
-div.footer {
-  margin-top: 0.5cm;
-  position: running(footer);
-  height: 2cm;
-  text-align: center;
+/* Infos du document : références / dates à gauche, contacts à droite */
+.doc-meta {
+  margin-bottom: 14px;
 }
 
-#footer-pagenumber:before {
-  content: counter(page);
+.doc-meta td {
+  padding: 5px 0;
 }
 
-#footer-pagecount:before {
-  content: counter(pages);
+/* Titre de section (bandeau vert) */
+.section-title {
+  background-color: #cae164;
+  padding: 5px;
+  font-weight: bold;
+  margin-top: 14px;
 }
 
-.footer-page-count {
-  text-align: right;
+/* Cadre gris regroupant un ensemble d'informations */
+.block {
+  border: 1px solid #cccccc;
+  padding: 10px;
+  margin-bottom: 6px;
+}
+
+.block-title {
+  font-weight: bold;
+  padding-bottom: 5px;
+}
+
+/* Liste libellé / valeur */
+.fields .field-label {
+  width: 35%;
+  padding: 2px 5px 2px 0;
+  color: #555555;
+}
+
+.fields .field-value {
+  padding: 2px 0;
+}
+
+/* ========== TABLEAU DE LIGNES (facture, quittance, estimation) ========== */
+
+.lines th,
+.lines td {
+  padding: 3px 5px;
+  vertical-align: middle;
+}
+
+.lines thead th {
+  background-color: #cae164;
+  padding: 5px;
+  vertical-align: bottom;
+}
+
+.lines .col-label {
+  width: 40%;
+}
+
+.lines .col-price {
+  width: 20%;
+}
+
+.lines .col-quantity {
+  width: 10%;
+}
+
+.lines .col-amount {
+  width: 30%;
+}
+
+/* Ligne vide séparant les groupes (lignes, paiements, total) */
+.lines tr.lines-gap td {
+  padding: 0;
+}
+
+.lines tr.lines-total td {
+  background-color: #cae164;
+  padding: 5px;
+  vertical-align: top;
+  font-weight: bold;
+}
+
+/* ========== TEXTE RICHE (contenu HTML saisi par l'utilisateur) ========== */
+
+.rich-text {
+  padding: 2px 0;
+  word-wrap: break-word;
+}
+
+.rich-text p {
+  margin: 0 0 6px;
+}
+
+.rich-text ul,
+.rich-text ol {
+  margin: 0 0 6px;
+  padding-left: 18px;
+}
+
+.rich-text img {
+  max-width: 100%;
+  height: auto;
+}
+
+.rich-text pre {
+  white-space: pre-wrap;
+}
+
+/* ========== BULLETIN DE VERSEMENT QR (facture) ========== */
+
+/* Réserve la place du bulletin en bas de page pour que le contenu ne passe pas dessous */
+.body.with-qr-bill {
+  padding-bottom: 300px;
+}
+
+.qr-bill {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.qr-bill img {
+  width: 100%;
 }

@@ -1,16 +1,15 @@
 <div th:fragment="header">
-  <hr class="border-grey-thick" />
-  <br />
-  <table>
+  <hr class="separator" />
+  <table class="header-table">
     <tr>
-      <td class="header-td-logo"><img alt="logo" class="header-logo" src="logo.jpg" /></td>
-      <td class="center-left">
+      <td class="header-logo-cell"><img alt="logo" class="header-logo" src="logo.jpg" /></td>
+      <td>
         <b>[[${sender.getEnterpriseName()}]]</b><br />
         [[${sender.getStreetLine()}]]<br />
         [[${sender.getCityLine()}]]<br />
-        [[${sender.getWebsite()}]]<br />
+        [[${sender.getWebsite()}]]
       </td>
-      <td class="width-30"><h1>[[${headerTitle}]]</h1></td>
+      <td class="header-title-cell"><h1>[[${headerTitle}]]</h1></td>
     </tr>
   </table>
 </div>
