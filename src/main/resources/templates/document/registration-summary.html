@@ -11,6 +11,60 @@
       margin-top: 14px;
     }
 
+    .summary-chart-text {
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-break: normal;
+      hyphens: manual;
+      max-height: 20rem;
+      overflow-y: auto;
+
+      p,
+      li,
+      td,
+      th,
+      blockquote,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        overflow-wrap: break-word;
+        word-break: normal;
+      }
+
+      p {
+        margin: 0 0 0.75rem;
+      }
+
+      ul,
+      ol {
+        margin: 0 0 0.75rem;
+        padding-left: 1.5rem;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+
+      pre {
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+      }
+
+      > :last-child {
+        margin-bottom: 0;
+      }
+    }
+
     .field-label {
       width: 35%;
       vertical-align: top;
@@ -336,7 +390,7 @@
 
     <div th:if="${salonChartText}">
       <h3 th:utext="#{document.registration-summary.charts.salon}"></h3>
-      <div class="chart-text" th:utext="${salonChartText}"></div>
+      <div class="chart-text summary-chart-text" th:utext="${salonChartText}"></div>
       <p th:if="${acceptedChart}" th:utext="#{document.registration-summary.charts.accepted}"></p>
     </div>
   </div>
