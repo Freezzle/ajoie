@@ -38,6 +38,8 @@ import {TaskCardComponent} from '../detail/task-card.component';
 import {SubtaskLineComponent} from '../detail/subtask-line.component';
 import {TaskInstanceFormComponent} from '../dialog/task-instance-form.component';
 import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
+import {TaskCalendarComponent} from '../calendar/task-calendar.component';
+import {DEFAULT_WEEKS, normalizeWeeks, WEEK_OPTIONS, WEEKS_STORAGE_KEY} from '../calendar/task-calendar.utils';
 import {UNDO_TOAST_KEY} from '../shared/subtask-status-panel.component';
 import {
     compareSubtasks,
@@ -62,8 +64,8 @@ import {
     urgencyColor
 } from '../shared/task-urgency.utils';
 
-/** Les deux vues de l'écran, conservées dans l'URL (`?view=`). */
-export type TaskView = 'tasks' | 'subtasks';
+/** Les trois vues de l'écran, conservées dans l'URL (`?view=`). Calendrier par défaut. */
+export type TaskView = 'tasks' | 'subtasks' | 'calendar';
 
 const GROUP_URGENCY = 'urgency';
 const GROUP_RESPONSIBLE = 'responsible';
@@ -91,7 +93,8 @@ const CHIP_STATUSES: TaskStatus[] = ['PENDING', 'IN_PROGRESS', 'BLOCKED', 'DONE'
                    TaskCardComponent,
                    SubtaskLineComponent,
                    TaskInstanceFormComponent,
-                   SubtaskInstanceFormComponent
+                   SubtaskInstanceFormComponent,
+                   TaskCalendarComponent
                ],
                templateUrl: './task-focus-list.component.html',
                styleUrl: './task-focus-list.component.scss',
@@ -101,7 +104,9 @@ export class TaskFocusListComponent implements OnInit {
     readonly tasks = signal<ITaskInstance[]>([]);
     readonly salon = signal<ISalon | null>(null);
     readonly isLoading = signal<boolean>(false);
-    readonly view = signal<TaskView>('tasks');
+    readonly view = signal<TaskView>('calendar');
+    readonly weeks = signal<number>(DEFAULT_WEEKS);
+    readonly weekOptions = WEEK_OPTIONS;
     readonly undoKey = UNDO_TOAST_KEY;
 
     /** Plié/déplié choisi par l'utilisateur, qui prime sur la règle par défaut. */
@@ -345,19 +350,31 @@ export class TaskFocusListComponent implements OnInit {
         this.state.connectQueryParams(this.activatedRoute, this.router);
 
         const view = this.activatedRoute.snapshot.queryParamMap.get('view');
-        if (view === 'subtasks' || view === 'tasks') {
+        if (view === 'subtasks' || view === 'tasks' || view === 'calendar') {
             this.view.set(view);
         }
 
+        // Nombre de semaines : `?weeks=`, sinon la dernière préférence locale, sinon le défaut.
+        const weeksParam = Number(this.activatedRoute.snapshot.queryParamMap.get('weeks'));
+        const storedWeeks = Number(localStorage.getItem(WEEKS_STORAGE_KEY));
+        this.weeks.set(normalizeWeeks(weeksParam || storedWeeks || DEFAULT_WEEKS));
+
         effect(() => {
             const current = this.view();
+            const weeks = this.weeks();
 
-            untracked(() => void this.router.navigate([], {
-                relativeTo: this.activatedRoute,
-                queryParams: {view: current === 'tasks' ? null : current},
-                queryParamsHandling: 'merge',
-                replaceUrl: true
-            }));
+            untracked(() => {
+                localStorage.setItem(WEEKS_STORAGE_KEY, String(weeks));
+                void this.router.navigate([], {
+                    relativeTo: this.activatedRoute,
+                    queryParams: {
+                        view: current === 'calendar' ? null : current,
+                        weeks: current === 'calendar' ? weeks : null
+                    },
+                    queryParamsHandling: 'merge',
+                    replaceUrl: true
+                });
+            });
         });
 
         // Décocher la puce de contexte la fait disparaître : le contexte est abandonné.
@@ -394,6 +411,10 @@ export class TaskFocusListComponent implements OnInit {
 
     setView(view: TaskView): void {
         this.view.set(view);
+    }
+
+    setWeeks(weeks: number): void {
+        this.weeks.set(normalizeWeeks(weeks));
     }
 
     // ── Vue Tâches ──────────────────────────────────────────────────────────

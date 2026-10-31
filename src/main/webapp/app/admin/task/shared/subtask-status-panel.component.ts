@@ -62,6 +62,7 @@ export class SubtaskStatusPanelComponent {
     private readonly translateService = inject(TranslateService);
     private readonly messageService = inject(MessageService);
     private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
+    private readonly popover = viewChild<Popover>('panel');
 
     readonly statuses = SELECTABLE_STATUSES;
     readonly steps = SNOOZE_STEPS;
@@ -100,6 +101,12 @@ export class SubtaskStatusPanelComponent {
     open(popover: Popover, event: Event): void {
         event.stopPropagation();
         popover.toggle(event, this.trigger()?.nativeElement);
+    }
+
+    /** Ouvre le panneau depuis un déclencheur externe (titre, carte…), ancré sur la pastille. */
+    openExternally(event: Event): void {
+        event.stopPropagation();
+        this.popover()?.toggle(event, this.trigger()?.nativeElement);
     }
 
     isCurrent(status: TaskStatus): boolean {

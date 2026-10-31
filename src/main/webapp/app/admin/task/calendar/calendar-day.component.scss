@@ -1,0 +1,133 @@
+:host {
+    display: block;
+    min-width: 0;
+    height: 100%;
+}
+
+.cd {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100%;
+    min-height: 118px;
+    padding: 6px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: var(--app-surface-muted);
+    transition: border-color .12s, background .12s;
+}
+
+.cd-weekend {
+    background: var(--cal-weekend, var(--app-surface-muted));
+}
+
+.cd-past {
+    background: transparent;
+    border: 1px dashed var(--app-line);
+    opacity: .75;
+}
+
+.cd-today {
+    background: var(--app-primary-soft);
+    border-color: var(--app-primary);
+}
+
+.cd-salon {
+    box-shadow: inset 0 3px 0 var(--app-amber);
+}
+
+/* Cible valide pendant un glissement. */
+.cd.cdk-drop-list-receiving {
+    border-style: dashed;
+    border-color: var(--app-primary);
+}
+
+.cd-h {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 20px;
+    margin-bottom: 5px;
+}
+
+.cd-n {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.cd-today .cd-n {
+    color: var(--app-primary);
+}
+
+.cd-m {
+    font-size: 11px;
+    color: var(--app-text-muted);
+}
+
+.cd-tag {
+    padding: 0 6px;
+    line-height: 16px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.cd-tag--today {
+    background: var(--app-primary);
+    color: var(--app-surface);
+}
+
+.cd-tag--dday {
+    background: var(--app-amber);
+    color: var(--app-surface);
+}
+
+.cd-tag--salon {
+    background: var(--app-warn-soft);
+    color: var(--app-warn);
+}
+
+.cd-count {
+    margin-left: auto;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--app-text-muted);
+}
+
+.cd-count--load {
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--app-warn-soft);
+    color: var(--app-warn);
+}
+
+app-calendar-item {
+    margin-bottom: 4px;
+}
+
+.cd-more {
+    margin-top: auto;
+    padding: 3px 4px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--app-primary);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--app-surface);
+    }
+}
+
+/* Aperçu de l'élément pendant le glissement. */
+::ng-deep .cdk-drag-preview app-calendar-item {
+    box-shadow: 0 6px 18px rgba(20, 40, 25, .22);
+}
+
+.cdk-drag-placeholder {
+    opacity: .35;
+}

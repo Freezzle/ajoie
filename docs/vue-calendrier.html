@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tâches · vue Calendrier</title>
+<style>
+/* ============================================================
+   Variables : mêmes NOMS que content/scss/_variables.scss du projet.
+   (valeurs de démonstration ; dans le projet, ne pas les redéclarer)
+   ============================================================ */
+:root{
+  --app-surface:#fff; --app-surface-muted:#f3f5f2; --app-bg:#eef1ec;
+  --app-border:#dfe4dd; --app-line:#e9ece7;
+  --app-text:#1f2a22; --app-text-muted:#6b756d;
+  --app-primary:#3f7a52; --app-primary-soft:#e6f0e8; --app-primary-line:#b9d3bf;
+  --app-accent:#2f6f9f; --app-offer:#8b5cf6; --app-amber:#c98a12; --app-share:#0f8b8d; --app-exit:#b4536b;
+  --app-status-refused:#c2410c; --app-danger:#dc2626;
+  --app-warn:#a16207; --app-warning:#f59e0b; --app-warn-soft:#fef6e4;
+  --app-status-validated:#15803d;
+  --app-fs-xs:11px; --app-fs-sm:12.5px; --app-fs-md:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"DM Sans",Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--app-bg);color:var(--app-text);font-size:var(--app-fs-md)}
+button{font:inherit;color:inherit;cursor:pointer}
+svg.ic{width:20px;height:20px;display:block}
+
+/* ---------- Barre d'aperçu (maquette uniquement) ---------- */
+.preview{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;background:#1f2a22;color:#cfd8d0;font-size:12.5px}
+.preview b{color:#fff}
+.dseg{display:inline-flex;border:1px solid #3d4f41;border-radius:8px;overflow:hidden}
+.dseg button{background:transparent;border:0;color:#cfd8d0;padding:6px 12px;font-size:12.5px}
+.dseg button[aria-pressed="true"]{background:var(--app-primary);color:#fff}
+.preview .hint{opacity:.8}
+.stage{padding:20px;display:flex;justify-content:center}
+.frame{width:100%;max-width:1240px;background:var(--app-surface);border-radius:14px;box-shadow:0 10px 30px rgba(20,40,25,.08);overflow:hidden;transition:max-width .25s}
+.frame.phone{max-width:390px}
+
+/* ---------- En-tête existant (inchangé dans le projet) ---------- */
+.appbar{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--app-line)}
+.appbar h1{font-size:17px;margin:0}
+.appbar .sub{color:var(--app-text-muted);font-size:var(--app-fs-sm)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:8px;padding:8px 13px;font-weight:600;font-size:13px;background:var(--app-primary);color:#fff}
+.btn.ghost{background:var(--app-surface);color:var(--app-text);border:1px solid var(--app-border)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.appbar .btn{margin-left:auto}
+.band{margin:14px 18px 0;background:var(--app-surface-muted);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:var(--app-fs-sm)}
+.band b{font-size:15px}
+.stack{flex:1;min-width:160px;height:8px;border-radius:6px;background:#e2e7e0;display:flex;overflow:hidden}
+.stack i{display:block;height:100%}
+
+/* ---------- Socle entity-list (existant) ---------- */
+.el-list{container-type:inline-size;container-name:el;padding:14px 18px 22px}
+.el-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vseg{display:inline-flex;background:var(--app-surface-muted);border-radius:9px;padding:3px;gap:2px}
+.vseg button{border:0;background:transparent;border-radius:7px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--app-text-muted);display:flex;align-items:center;gap:6px}
+.vseg button small{font-size:11px;font-weight:700;background:var(--app-surface);border-radius:999px;padding:0 6px;color:var(--app-text-muted)}
+.vseg button[aria-pressed="true"]{background:var(--app-surface);color:var(--app-text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.vseg button.new{position:relative}
+.vseg button.new:after{content:"nouveau";position:absolute;top:-9px;right:-6px;font-size:9px;font-weight:700;background:var(--app-primary);color:#fff;border-radius:999px;padding:0 5px;letter-spacing:.02em}
+.search{flex:1;min-width:180px;display:flex;align-items:center;gap:8px;border:1px solid var(--app-border);border-radius:8px;padding:6px 10px;color:var(--app-text-muted)}
+.search input{border:0;outline:0;font:inherit;flex:1;min-width:0;background:transparent;color:var(--app-text)}
+.chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.chl{font-size:var(--app-fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--app-text-muted);margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--app-border);background:var(--app-surface);border-radius:999px;padding:3px 9px 3px 6px;font-size:12px}
+.chip svg.ic{width:15px;height:15px}
+.chip small{color:var(--app-text-muted);font-weight:700}
+.chip.on{background:var(--app-primary-soft);border-color:var(--app-primary-line);color:var(--app-primary)}
+.chsep{width:1px;height:18px;background:var(--app-border);margin:0 4px}
+.linkbtn{border:0;background:none;color:var(--app-primary);font-size:12px;text-decoration:underline}
+.placeholder{margin-top:12px;border:1px dashed var(--app-border);border-radius:10px;padding:40px 16px;text-align:center;color:var(--app-text-muted)}
+
+/* ---------- Pastille de statut (subtask-status-icon) ---------- */
+.ic.PENDING{color:var(--app-text-muted)} .ic.LATE{color:var(--app-status-refused)}
+.ic.IN_PROGRESS{color:var(--app-primary)} .ic.BLOCKED{color:var(--app-offer)} .ic.DONE{color:var(--app-status-validated)}
+.st-btn{width:24px;height:24px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;padding:0;flex-shrink:0}
+.st-btn:hover{background:var(--app-surface-muted)}
+.st-btn:focus-visible{outline:2px solid var(--app-primary);outline-offset:1px}
+
+/* ---------- Avatar responsable (responsible-avatar) ---------- */
+.av{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:9.5px;font-weight:700;color:var(--app-surface);flex-shrink:0;letter-spacing:-.02em}
+.av.inh{background:transparent!important;border:1.5px solid currentColor}
+.av.none{background:transparent;border:1.5px dashed var(--app-warning);color:var(--app-warn)}
+
+/* ============================================================
+   NOUVEAU : vue Calendrier (task-calendar)
+   ============================================================ */
+.cal{margin-top:12px}
+.cal-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cal-head .lbl{font-size:var(--app-fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--app-text-muted)}
+.wseg{display:inline-flex;border:1px solid var(--app-border);border-radius:8px;overflow:hidden}
+.wseg button{border:0;background:var(--app-surface);padding:5px 10px;font-size:12.5px;min-width:34px}
+.wseg button+button{border-left:1px solid var(--app-border)}
+.wseg button[aria-pressed="true"]{background:var(--app-primary);color:#fff;font-weight:700}
+.wsel{display:none;font:inherit;font-size:13px;border:1px solid var(--app-border);border-radius:8px;padding:6px 8px;background:var(--app-surface)}
+.cal-range,.cal-unit{font-size:var(--app-fs-sm);color:var(--app-text-muted)}
+.cal-range:before{content:"· ";}
+.cal-sum{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--app-surface-muted);color:var(--app-text-muted);white-space:nowrap}
+.pill.late{background:#fdeee6;color:var(--app-status-refused)}
+.pill.today{background:var(--app-warn-soft);color:var(--app-warn)}
+
+/* bandes « En retard » / « Sans date » */
+.tray{display:flex;gap:8px;align-items:stretch;border-radius:10px;padding:8px 10px;margin-bottom:8px;overflow-x:auto}
+.tray.late{background:#fdf1ec;border:1px solid #f6d6c6}
+.tray.nodate{background:var(--app-surface-muted);border:1px solid var(--app-line)}
+.tray .tt{min-width:104px;display:flex;flex-direction:column;justify-content:center;font-size:12px;font-weight:700}
+.tray.late .tt{color:var(--app-status-refused)}
+.tray .tt small{font-weight:500;color:var(--app-text-muted);font-size:11px}
+.tray .ci{min-width:220px;max-width:260px;margin:0}
+.tray.drop{outline:2px dashed var(--app-primary);outline-offset:2px}
+
+/* grille */
+.cal-wd{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:6px 0 4px}
+.cal-wd div{font-size:var(--app-fs-xs);font-weight:700;color:var(--app-text-muted);text-transform:uppercase;letter-spacing:.06em;padding-left:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cd{background:var(--app-surface-muted);border-radius:10px;padding:6px;min-height:118px;min-width:0;border:2px solid transparent;transition:border-color .12s,background .12s;display:flex;flex-direction:column}
+.cd.we{background:#e9ede7}
+.cd.past{background:transparent;border:1px dashed var(--app-line);opacity:.75}
+.cd.today{background:var(--app-primary-soft);border-color:var(--app-primary)}
+.cd.salon{box-shadow:inset 0 3px 0 var(--app-amber)}
+.cd.over{border-color:var(--app-primary);border-style:dashed;background:#eef6ef}
+.cd-h{display:flex;align-items:center;gap:5px;margin-bottom:5px;min-height:20px}
+.cd-n{font-weight:700;font-size:13px}
+.cd-m{font-size:11px;color:var(--app-text-muted)}
+.cd.today .cd-n{color:var(--app-primary)}
+.tag{font-size:10px;font-weight:700;border-radius:999px;padding:0 6px;line-height:16px;white-space:nowrap}
+.tag.td{background:var(--app-primary);color:#fff}
+.tag.jj{background:var(--app-amber);color:#fff}
+.tag.sl{background:var(--app-warn-soft);color:var(--app-warn)}
+.cd-c{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--app-text-muted)}
+.cd-c.load{color:var(--app-warn);background:var(--app-warn-soft);border-radius:999px;padding:0 6px}
+.cd-add{border:1px solid var(--app-border);background:var(--app-surface);border-radius:6px;width:20px;height:20px;line-height:16px;padding:0;color:var(--app-primary);font-weight:700;opacity:0;transition:opacity .12s}
+.cd:hover .cd-add,.cd-add:focus-visible{opacity:1}
+.cd-more{margin-top:auto;border:0;background:transparent;color:var(--app-primary);font-size:11.5px;font-weight:700;text-align:left;padding:3px 4px;border-radius:6px}
+.cd-more:hover{background:var(--app-surface)}
+
+/* élément (une sous-tâche) */
+.ci{display:flex;align-items:flex-start;gap:5px;background:var(--app-surface);border-radius:7px;padding:5px 6px 5px 3px;margin-bottom:4px;box-shadow:0 1px 2px rgba(25,45,30,.07);cursor:grab;font-size:12px;min-width:0}
+.ci:hover{box-shadow:0 3px 10px rgba(25,45,30,.13)}
+.ci.dragging{opacity:.35}
+.ci.flash{box-shadow:0 0 0 2px var(--app-primary)}
+.ci .st-btn{margin-top:-2px}
+.ci-main{flex:1;min-width:0;cursor:pointer}
+.ci-t{font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.ci-p{font-size:10.5px;color:var(--app-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.ci-p .mv{color:var(--app-text-muted)}
+.ci .av{margin-top:1px}
+.ci.is-done .ci-t{text-decoration:line-through;color:var(--app-text-muted);font-weight:500}
+.ci.is-done{opacity:.7}
+
+.qa{display:flex;flex-direction:column;gap:4px;margin-bottom:5px}
+.qa input,.qa select{font:inherit;font-size:12px;border:1px solid var(--app-primary);border-radius:6px;padding:4px 6px;outline:0;width:100%;background:var(--app-surface)}
+.cal-foot{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--app-text-muted);margin-top:10px}
+
+/* ---------- Agenda (largeur ≤ 600 px, via container query + JS) ---------- */
+.dstrip{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none;scroll-snap-type:x proximity}
+.dstrip::-webkit-scrollbar{display:none}
+.dp{flex:0 0 auto;width:50px;border:1px solid var(--app-border);background:var(--app-surface);border-radius:12px;padding:6px 0 5px;display:flex;flex-direction:column;align-items:center;gap:1px;scroll-snap-align:start;position:relative}
+.dp small{font-size:10.5px;color:var(--app-text-muted)}
+.dp b{font-size:17px;line-height:1.1}
+.dp .k{font-size:10px;font-weight:700;min-width:18px;height:16px;border-radius:999px;display:grid;place-items:center;background:var(--app-surface-muted);color:var(--app-text-muted);padding:0 5px}
+.dp .k.load{background:var(--app-warn-soft);color:var(--app-warn)}
+.dp .k.z{visibility:hidden}
+.dp.today{border-color:var(--app-primary)}
+.dp.salon:before{content:"";position:absolute;top:-1px;left:10px;right:10px;height:3px;border-radius:0 0 3px 3px;background:var(--app-amber)}
+.dp[aria-pressed="true"]{background:var(--app-primary);border-color:var(--app-primary);color:#fff}
+.dp[aria-pressed="true"] small,.dp[aria-pressed="true"] .k{color:#fff}
+.dp[aria-pressed="true"] .k{background:rgba(255,255,255,.25)}
+.ag-h{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--app-text-muted);margin:12px 2px 6px}
+.ag-h.today{color:var(--app-primary)}
+.ag .ci{font-size:13.5px;padding:9px 8px 9px 5px;margin-bottom:6px;cursor:pointer}
+.ag .ci .st-btn{width:32px;height:32px;margin:-4px 0}
+.ag .ci-t{-webkit-line-clamp:3}
+.ag .ci-p{font-size:11.5px}
+.ag .ci .av{width:22px;height:22px;font-size:10px}
+.ag-empty{text-align:center;color:var(--app-text-muted);padding:22px 10px;background:var(--app-surface-muted);border-radius:10px;font-size:13px}
+.ag-add{width:100%;border:1px dashed var(--app-primary-line);background:var(--app-surface);color:var(--app-primary);border-radius:10px;padding:10px;font-weight:600;font-size:13px;margin-top:4px}
+.ag .cd-more{font-size:13px;padding:8px 4px}
+details.tray-m{border-radius:10px;padding:9px 12px;margin-bottom:8px}
+details.tray-m.late{background:#fdf1ec;border:1px solid #f6d6c6}
+details.tray-m.nodate{background:var(--app-surface-muted);border:1px solid var(--app-line)}
+details.tray-m summary{list-style:none;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer}
+details.tray-m.late summary{color:var(--app-status-refused)}
+details.tray-m summary::-webkit-details-marker{display:none}
+details.tray-m summary:after{content:"▾";margin-left:auto}
+details.tray-m[open] summary{margin-bottom:8px}
+
+@container el (max-width:600px){
+  .el-toolbar .search{order:3;flex-basis:100%}
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto}
+  .wseg,.cal-unit{display:none}.wsel{display:inline-block}
+  .cal-range:before{content:""}
+  .vseg{width:100%}.vseg button{flex:1;justify-content:center;padding:6px 6px;white-space:nowrap;font-size:12.5px}
+  .cal-sum{margin-left:0;width:100%}
+}
+
+/* ---------- Panneau de statut (subtask-status-panel) ---------- */
+.panel{position:absolute;z-index:60;width:264px;background:var(--app-surface);border:1px solid var(--app-border);border-radius:10px;box-shadow:0 12px 32px rgba(20,35,25,.18);padding:6px;display:none}
+.panel.open{display:block}
+.panel .ph{padding:6px 8px 4px}
+.panel .ph b{display:block;font-size:13px;line-height:1.3}
+.panel .ph span{font-size:11.5px;color:var(--app-text-muted)}
+.panel hr{border:0;border-top:1px solid var(--app-line);margin:6px 0}
+.el-radio-label{font-size:var(--app-fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--app-text-muted);padding:4px 8px}
+.sr{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:13px}
+.sr:hover{background:var(--app-surface-muted)}
+.sr.on{background:var(--app-surface-muted);font-weight:700}
+.sr input{accent-color:var(--app-primary);margin:0}
+.dl{font-size:12.5px;padding:2px 8px 6px}
+.dl small{display:block;color:var(--app-text-muted);font-size:11.5px;margin-top:2px}
+.pushrow{display:flex;gap:5px;flex-wrap:wrap;padding:0 8px 4px;align-items:center}
+.pp{border:1px solid var(--app-border);background:var(--app-surface);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}
+.pp:hover{border-color:var(--app-primary);color:var(--app-primary)}
+.pp.on{background:var(--app-primary-soft);border-color:var(--app-primary-line);color:var(--app-primary)}
+.pdate{font:inherit;font-size:12px;border:1px solid var(--app-border);border-radius:999px;padding:2px 8px;color:var(--app-text)}
+.back{border:0;background:none;color:var(--app-primary);font-size:12px;text-decoration:underline;padding:2px 8px}
+.edit{display:block;width:100%;text-align:left;border:0;background:none;padding:7px 8px;border-radius:7px;font-size:13px}
+.edit:hover{background:var(--app-surface-muted)}
+.panel-bg{display:none}
+@media(max-width:600px){
+  .panel{position:fixed;left:0!important;right:0;top:auto!important;bottom:0;width:auto;border-radius:16px 16px 0 0;padding:10px 10px calc(14px + env(safe-area-inset-bottom))}
+  .panel .sr{padding:10px 8px;font-size:14px}
+  .panel .pp{padding:6px 12px;font-size:13px}
+  .panel-bg.open{display:block;position:fixed;inset:0;background:rgba(20,30,22,.35);z-index:55}
+  .stage{padding:0}.frame{border-radius:0}
+}
+
+/* toast avec Annuler */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1f2a22;color:#fff;border-radius:9px;padding:9px 12px 9px 14px;font-size:13px;display:flex;gap:12px;align-items:center;z-index:70;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}
+.toast button{border:0;background:none;color:#a7d7b0;font-weight:700;padding:2px 4px}
+</style>
+</head>
+<body>
+
+<div class="preview">
+  <b>Maquette · vue Calendrier</b>
+  <div class="dseg" role="group" aria-label="Aperçu"><button data-dev="desk" aria-pressed="true">Ordinateur</button><button data-dev="phone" aria-pressed="false">Téléphone</button></div>
+  <span class="hint">Cliquez une pastille de statut ou une sous-tâche · glissez une sous-tâche sur un autre jour · « +N autres » déplie un jour chargé.</span>
+</div>
+
+<div class="stage"><div class="frame" id="frame">
+  <div class="appbar"><div><h1>Tâches</h1><div class="sub">Marché de Noël artisanal · Édition 2026</div></div><button class="btn">+ Nouvelle tâche</button></div>
+  <div class="band" id="band"></div>
+  <div class="el-list" id="el">
+    <div class="el-toolbar" id="toolbar"></div>
+    <div class="chips" id="chips"></div>
+    <div id="body"></div>
+  </div>
+</div></div>
+
+<div class="panel-bg" id="panelBg"></div>
+<div class="panel" id="panel" role="dialog" aria-label="Statut et échéance"></div>
+
+<script>
+/* =====================================================================
+   DONNÉES DE DÉMONSTRATION (dans le projet : ITaskInstance / ISubtaskInstance)
+   ===================================================================== */
+const TODAY = "2026-10-31";
+const SALON = { name: "Marché de Noël artisanal", start: "2026-11-27", end: "2026-11-29" };
+const TASKS = [
+  { id: 1, title: "Plan des stands", responsible: "Dylan" },
+  { id: 2, title: "Pain pour la buvette", responsible: "Julie" },
+  { id: 3, title: "Communication exposants", responsible: "Julie" },
+  { id: 4, title: "Sécurité & technique", responsible: "Marc" },
+  { id: 5, title: "Décoration", responsible: "Sophie" },
+  { id: 6, title: "Buvette & repas", responsible: "Marc" },
+  { id: 7, title: "Finances", responsible: "Dylan" },
+  { id: 8, title: "Animations", responsible: null },
+  { id: 9, title: "Montage / démontage", responsible: "Marc" },
+  { id: 10, title: "Dossiers exposants", responsible: "Dylan" },
+];
+// [tâche, titre, dueDate, statut, responsable propre, snoozedUntil]
+const RAW = [
+  [3, "Rédiger le modèle d'email « infos pratiques »", "2026-10-26", "DONE"],
+  [10, "Valider les dossiers de la catégorie Bijoux", "2026-10-27", "DONE"],
+  [1, "Attribuer les 6 stands restants", "2026-10-28", "PENDING"],
+  [10, "Relancer Chocolats Brodard (dossier incomplet)", "2026-10-29", "IN_PROGRESS", "Julie"],
+  [7, "Payer la facture de l'imprimeur (flyers)", "2026-10-30", "PENDING"],
+  [6, "Choisir le menu du repas exposants", "2026-10-31", "PENDING"],
+  [5, "Inventaire des guirlandes", "2026-10-31", "DONE"],
+  [8, "Contacter l'animateur « Père Noël »", "2026-11-01", "PENDING", "Sophie"],
+  [10, "Valider les 2 derniers dossiers", "2026-11-02", "PENDING"],
+  [7, "Importer le fichier camt.054", "2026-11-02", "PENDING"],
+  [4, "Demander le plan électrique de la salle", "2026-11-02", "IN_PROGRESS"],
+  [3, "Préparer l'email de relance", "2026-11-02", "PENDING"],
+  [2, "Demander le devis à la Boulangerie Clément", "2026-11-02", "PENDING"],
+  [6, "Réserver la vaisselle", "2026-11-02", "PENDING", "Julie"],
+  [1, "Envoyer le plan à l'imprimeur", "2026-11-01", "PENDING", null, "2026-11-03"],
+  [7, "2e rappel aux 4 factures ouvertes", "2026-11-03", "PENDING"],
+  [8, "Confirmer la chorale", "2026-11-03", "PENDING"],
+  [4, "Commander les extincteurs", "2026-11-04", "BLOCKED"],
+  [5, "Commander les sapins", "2026-11-04", "PENDING"],
+  [3, "Publier la liste des exposants sur le site", "2026-11-05", "PENDING"],
+  [9, "Réserver la camionnette", "2026-11-05", "PENDING"],
+  [6, "Commander les boissons", "2026-11-06", "PENDING"],
+  [7, "Payer l'acompte de la salle", "2026-11-06", "PENDING"],
+  [2, "Valider les quantités de pain", "2026-11-06", "PENDING"],
+  [10, "Envoyer les confirmations de stand", "2026-11-06", "PENDING"],
+  [5, "Acheter les rubans", "2026-11-06", "PENDING"],
+  [8, "Atelier bricolage : acheter le matériel", "2026-11-07", "PENDING", "Sophie"],
+  [4, "Tester la sono", "2026-11-09", "PENDING"],
+  [9, "Planning des bénévoles du montage", "2026-11-09", "IN_PROGRESS"],
+  [3, "Email « infos pratiques » aux exposants", "2026-11-10", "PENDING"],
+  [7, "Facturer les exposants retardataires", "2026-11-10", "PENDING"],
+  [5, "Choisir l'affiche", "2026-11-11", "PENDING"],
+  [1, "Imprimer les numéros de stand", "2026-11-12", "PENDING"],
+  [3, "Envoi groupé : horaires de montage", "2026-11-13", "PENDING"],
+  [6, "Confirmer le traiteur", "2026-11-13", "PENDING"],
+  [4, "Vérifier les assurances", "2026-11-16", "PENDING"],
+  [8, "Programme des animations", "2026-11-16", "PENDING"],
+  [2, "Commander le pain", "2026-11-18", "PENDING"],
+  [9, "Louer les barrières", "2026-11-19", "PENDING"],
+  [5, "Livraison des sapins", "2026-11-20", "PENDING"],
+  [7, "Préparer le fonds de caisse", "2026-11-20", "PENDING"],
+  [3, "Communiqué de presse", "2026-11-23", "PENDING"],
+  [9, "Récupérer les clés de la salle", "2026-11-25", "PENDING"],
+  [4, "Installer l'éclairage", "2026-11-25", "PENDING"],
+  [9, "Montage des stands", "2026-11-26", "PENDING"],
+  [6, "Installer la buvette", "2026-11-26", "PENDING"],
+  [1, "Marquer les emplacements au sol", "2026-11-26", "PENDING"],
+  [5, "Décorer l'entrée", "2026-11-26", "PENDING"],
+  [4, "Contrôle sécurité avec la commune", "2026-11-26", "PENDING"],
+  [2, "Aller chercher le pain (7 h)", "2026-11-27", "PENDING"],
+  [7, "Caisse du soir · vendredi", "2026-11-27", "PENDING"],
+  [7, "Caisse du soir · samedi", "2026-11-28", "PENDING"],
+  [9, "Démontage", "2026-11-29", "PENDING"],
+  [3, "Questionnaire de satisfaction", "2026-12-02", "PENDING"],
+  [7, "Payer la facture de la boulangerie", "2026-12-05", "PENDING"],
+  [8, "Trouver un sponsor pour les animations", null, "PENDING"],
+];
+let SUBS = RAW.map((r, i) => ({ id: i + 1, taskId: r[0], title: r[1], dueDate: r[2], status: r[3], responsible: r[4] ?? null, snoozedUntil: r[5] ?? null, doneAgo: r[3] === "DONE" ? "il y a 2 j" : null }));
+const taskOf = s => TASKS.find(t => t.id === s.taskId);
+
+/* =====================================================================
+   RÈGLES MÉTIER  (dans le projet : task-urgency.utils.ts, déjà spécifié)
+   ===================================================================== */
+const D = s => new Date(s + "T00:00:00");
+const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const addDays = (s, n) => { const d = D(s); d.setDate(d.getDate() + n); return iso(d); };
+const diff = (a, b) => Math.round((D(a) - D(b)) / 864e5);
+const fmtLong = s => D(s).toLocaleDateString("fr-CH", { weekday: "short", day: "numeric", month: "short" });
+const fmtShort = s => D(s).toLocaleDateString("fr-CH", { day: "numeric", month: "short" });
+const active = s => s.status !== "DONE" && s.status !== "CANCELLED";
+const isMoved = s => active(s) && !!s.snoozedUntil && !!s.dueDate && s.snoozedUntil !== s.dueDate;
+const effectiveDue = s => (isMoved(s) ? s.snoozedUntil : s.dueDate);
+const daysLeft = s => (effectiveDue(s) == null ? null : diff(effectiveDue(s), TODAY));
+const isLate = s => active(s) && daysLeft(s) != null && daysLeft(s) < 0;
+const owner = s => s.responsible ?? taskOf(s).responsible ?? null;
+const relLabel = n => n == null ? "sans date" : n < -1 ? `${-n} j de retard` : n === -1 ? "hier" : n === 0 ? "aujourd'hui" : n === 1 ? "demain" : `dans ${n} j`;
+const STATUS_L = { PENDING: "À faire", IN_PROGRESS: "En cours", BLOCKED: "Bloquée", DONE: "Terminée" };
+const iconKey = s => (s.status === "PENDING" && isLate(s) ? "LATE" : s.status);
+
+/* Pastille SVG (formes copiées du brief TASK_LIST_REDESIGN.md § 5) */
+const P = '<circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/>';
+const ICON = {
+  PENDING: P,
+  LATE: P + '<circle cx="10" cy="10" r="2.6" fill="currentColor"/>',
+  IN_PROGRESS: P + '<path d="M10 4.5a5.5 5.5 0 0 1 0 11z" fill="currentColor"/>',
+  BLOCKED: '<circle cx="10" cy="10" r="8.5" fill="currentColor"/><rect x="5.5" y="8.8" width="9" height="2.4" rx="1" fill="var(--app-surface)"/>',
+  DONE: '<circle cx="10" cy="10" r="8.5" fill="currentColor"/><path d="M6.3 10.3l2.5 2.5 4.9-5.2" fill="none" stroke="var(--app-surface)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+};
+const icon = k => `<svg class="ic ${k}" viewBox="0 0 20 20" aria-hidden="true">${ICON[k]}</svg>`;
+
+/* Avatar (brief § 7.3) */
+const PALETTE = ["var(--app-primary)", "var(--app-accent)", "var(--app-offer)", "var(--app-amber)", "var(--app-share)", "var(--app-exit)"];
+const people = () => [...new Set([...TASKS.map(t => t.responsible), ...SUBS.map(s => s.responsible)].filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
+const personColor = n => PALETTE[people().indexOf(n) % PALETTE.length];
+function avatar(s) {
+  if (s.responsible) return `<span class="av" style="background:${personColor(s.responsible)}" title="Resp. ${s.responsible}">${s.responsible.slice(0, 2).toUpperCase()}</span>`;
+  const t = taskOf(s).responsible;
+  if (t) return `<span class="av inh" style="color:${personColor(t)}" title="Resp. ${t} (via la tâche)">${t.slice(0, 2).toUpperCase()}</span>`;
+  return `<span class="av none" title="Sans responsable">?</span>`;
+}
+
+/* =====================================================================
+   ÉTAT DE LA LISTE (dans le projet : EntityListState + query params)
+   ===================================================================== */
+const state = {
+  view: "calendar",             // ?view=tasks|subtasks|calendar
+  q: "",
+  chips: new Set(),              // statuts (OU) + signaux (ET)
+  weeks: +(localStorage.getItem("task.calendar.weeks") || 2), // ?weeks=
+  expanded: new Set(),           // jours dépliés (au-delà de 4)
+  addDay: null,
+  mDay: TODAY, mMode: "day",     // agenda (largeur ≤ 600 px)
+  flash: null,
+};
+const MAX_PER_DAY = 4;
+const WEEK_OPTIONS = [1, 2, 3, 4, 6, 8];
+const STATUS_CHIPS = ["PENDING", "IN_PROGRESS", "BLOCKED", "DONE"];
+const STATUS_CHIP_L = { PENDING: "À faire", IN_PROGRESS: "En cours", BLOCKED: "Bloquées", DONE: "Terminées" };
+const norm = x => x.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+function visible(s) {
+  const st = STATUS_CHIPS.filter(k => state.chips.has(k));
+  if (st.length && !st.includes(s.status)) return false;
+  if (state.chips.has("late") && !isLate(s)) return false;
+  if (state.chips.has("nores") && owner(s)) return false;
+  if (state.q) { const q = norm(state.q); if (![s.title, taskOf(s).title, owner(s) || ""].some(v => norm(v).includes(q))) return false; }
+  return true;
+}
+
+/* =====================================================================
+   RENDU : en-tête, barre d'outils, puces (existants, adaptés)
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+function renderBand() {
+  const n = diff(SALON.start, TODAY), all = SUBS.length;
+  const c = k => SUBS.filter(k).length;
+  const done = c(s => !active(s)), prog = c(s => active(s) && s.status === "IN_PROGRESS"), blk = c(s => active(s) && s.status === "BLOCKED"), late = c(isLate);
+  const w = x => (x / all * 100) + "%";
+  $("#band").innerHTML = `<span><b>${n} j</b> avant le salon · ${fmtLong(SALON.start)}</span>
+    <span class="stack"><i style="width:${w(done)};background:var(--app-status-validated)"></i><i style="width:${w(prog)};background:var(--app-primary)"></i><i style="width:${w(blk)};background:var(--app-offer)"></i><i style="width:${w(late)};background:var(--app-danger)"></i></span>
+    <span>${done}/${all}</span>`;
+}
+function renderToolbar() {
+  const tasksN = TASKS.length, subsN = SUBS.filter(active).length;
+  $("#toolbar").innerHTML = `<div class="vseg" role="group" aria-label="Vue">
+      <button data-view="tasks" aria-pressed="${state.view === "tasks"}">Tâches <small>${tasksN}</small></button>
+      <button data-view="subtasks" aria-pressed="${state.view === "subtasks"}">Sous-tâches <small>${subsN}</small></button>
+      <button data-view="calendar" class="new" aria-pressed="${state.view === "calendar"}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Calendrier</button>
+    </div>
+    <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" type="search" placeholder="Rechercher une sous-tâche, une tâche, une personne…" value="${state.q}"></label>`;
+}
+function renderChips() {
+  const sc = STATUS_CHIPS.map(k => `<button class="chip ${state.chips.has(k) ? "on" : ""}" data-chip="${k}" aria-pressed="${state.chips.has(k)}">${icon(k)}${STATUS_CHIP_L[k]}<small>${SUBS.filter(s => s.status === k).length}</small></button>`).join("");
+  const sig = [["late", "En retard", SUBS.filter(isLate).length], ["nores", "Sans responsable", SUBS.filter(s => active(s) && !owner(s)).length]]
+    .map(([k, l, n]) => `<button class="chip ${state.chips.has(k) ? "on" : ""}" data-chip="${k}" aria-pressed="${state.chips.has(k)}">${l}<small>${n}</small></button>`).join("");
+  $("#chips").innerHTML = `<span class="chl">Statut</span>${sc}<span class="chsep"></span><span class="chl">Signaux</span>${sig}${state.chips.size || state.q ? `<button class="linkbtn" data-clear>Effacer</button>` : ""}`;
+}
+
+/* =====================================================================
+   NOUVEAU COMPOSANT : task-calendar
+   ===================================================================== */
+const mondayOf = s => { const d = D(s); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return iso(d); };
+function range() {
+  const start = mondayOf(TODAY), end = addDays(start, state.weeks * 7 - 1);
+  return { start, end, days: [...Array(state.weeks * 7)].map((_, i) => addDays(start, i)) };
+}
+const isSalonDay = d => d >= SALON.start && d <= SALON.end;
+const sortDay = (a, b) => (!active(a) - !active(b)) || ((a.status === "BLOCKED" ? 0 : a.status === "IN_PROGRESS" ? 1 : 2) - (b.status === "BLOCKED" ? 0 : b.status === "IN_PROGRESS" ? 1 : 2)) || a.id - b.id;
+function itemsOf(day) {
+  return SUBS.filter(s => visible(s) && effectiveDue(s) === day && !(day < TODAY && active(s))).sort(sortDay);
+}
+function item(s, opts = {}) {
+  const t = taskOf(s), k = iconKey(s);
+  const moved = isMoved(s) ? ` title="Limite repoussée : ${fmtLong(s.dueDate)} → ${fmtLong(s.snoozedUntil)}"` : "";
+  return `<div class="ci ${active(s) ? "" : "is-done"} ${state.flash === s.id ? "flash" : ""}" draggable="true" data-id="${s.id}"${moved}>
+    <button class="st-btn" data-st="${s.id}" aria-label="Statut : ${STATUS_L[s.status]}. Changer le statut" title="${STATUS_L[s.status]}${isLate(s) ? " · en retard" : ""}">${icon(k)}</button>
+    <div class="ci-main" data-open="${s.id}"><div class="ci-t">${s.title}</div><div class="ci-p">${opts.withDate ? (s.dueDate ? relLabel(daysLeft(s)) + " · " : "") : ""}${t.title}</div></div>
+    ${avatar(s)}</div>`;
+}
+function dayCell(day) {
+  const its = itemsOf(day), open = its.filter(active).length, dt = D(day);
+  const we = dt.getDay() === 0 || dt.getDay() === 6, past = day < TODAY;
+  const exp = state.expanded.has(day), shown = exp ? its : its.slice(0, MAX_PER_DAY), hidden = its.length - shown.length;
+  const tags = (day === TODAY ? `<span class="tag td">Aujourd'hui</span>` : "") + (day === SALON.start ? `<span class="tag jj">Jour J</span>` : isSalonDay(day) ? `<span class="tag sl">Salon</span>` : "");
+  return `<div class="cd ${we ? "we" : ""} ${past ? "past" : ""} ${day === TODAY ? "today" : ""} ${isSalonDay(day) ? "salon" : ""}" data-day="${day}">
+    <div class="cd-h"><span class="cd-n">${dt.getDate()}</span>${dt.getDate() === 1 || day === range().start ? `<span class="cd-m">${dt.toLocaleDateString("fr-CH", { month: "short" })}</span>` : ""}${tags}
+      ${open ? `<span class="cd-c ${open > MAX_PER_DAY ? "load" : ""}" title="${open} à faire">${open}</span>` : `<span class="cd-c"></span>`}
+      ${past ? "" : `<button class="cd-add" data-add="${day}" title="Ajouter une sous-tâche" aria-label="Ajouter une sous-tâche le ${fmtLong(day)}">+</button>`}</div>
+    ${state.addDay === day ? quickAdd() : ""}
+    ${shown.map(s => item(s)).join("")}
+    ${hidden > 0 ? `<button class="cd-more" data-more="${day}" aria-expanded="false">+${hidden} autre${hidden > 1 ? "s" : ""}</button>` : exp && its.length > MAX_PER_DAY ? `<button class="cd-more" data-less="${day}" aria-expanded="true">Réduire</button>` : ""}
+  </div>`;
+}
+const quickAdd = () => `<div class="qa"><input id="qaIn" placeholder="Nouvelle sous-tâche… (Entrée)" enterkeyhint="done"><select id="qaT" aria-label="Tâche parente">${TASKS.map(t => `<option value="${t.id}">${t.title}</option>`).join("")}</select></div>`;
+
+function calHeader(r, late, open, todayN) {
+  return `<div class="cal-head">
+      <span class="lbl">Afficher</span>
+      <div class="wseg" role="group" aria-label="Nombre de semaines">${WEEK_OPTIONS.map(w => `<button data-weeks="${w}" aria-pressed="${state.weeks === w}">${w}</button>`).join("")}</div>
+      <select class="wsel" id="wsel" aria-label="Nombre de semaines">${WEEK_OPTIONS.map(w => `<option value="${w}" ${state.weeks === w ? "selected" : ""}>${w} semaine${w > 1 ? "s" : ""}</option>`).join("")}</select>
+      <span class="cal-unit">semaine${state.weeks > 1 ? "s" : ""}</span><span class="cal-range">du ${fmtLong(r.start)} au ${fmtLong(r.end)}</span>
+      <span class="cal-sum"><span class="pill">${open} à faire</span>${todayN ? `<span class="pill today">${todayN} aujourd'hui</span>` : ""}${late.length ? `<span class="pill late">${late.length} en retard</span>` : ""}</span>
+    </div>`;
+}
+function renderCalendar(narrow) {
+  const r = range();
+  const late = SUBS.filter(s => visible(s) && isLate(s)).sort((a, b) => effectiveDue(a) < effectiveDue(b) ? -1 : 1);
+  const nodate = SUBS.filter(s => visible(s) && active(s) && effectiveDue(s) == null);
+  const inRange = SUBS.filter(s => visible(s) && active(s) && effectiveDue(s) >= TODAY && effectiveDue(s) <= r.end);
+  const todayN = inRange.filter(s => effectiveDue(s) === TODAY).length;
+  let html = `<div class="cal">${calHeader(r, late, inRange.length, todayN)}`;
+  if (!narrow) {
+    if (late.length) html += `<div class="tray late" data-tray="late"><div class="tt">En retard · ${late.length}<small>glissez sur un jour pour replanifier</small></div>${late.map(s => item(s, { withDate: true })).join("")}</div>`;
+    if (nodate.length) html += `<div class="tray nodate" data-tray="nodate"><div class="tt">Sans date · ${nodate.length}<small>glissez sur un jour pour dater</small></div>${nodate.map(s => item(s)).join("")}</div>`;
+    html += `<div class="cal-wd">${["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(d => `<div>${d}</div>`).join("")}</div>`;
+    html += `<div class="cal-grid">${r.days.map(dayCell).join("")}</div>`;
+    html += `<div class="cal-foot"><span>Pastille = statut, échéance, attribution</span><span>Glisser-déposer = repousser la limite</span><span>« + » au survol d'un jour = ajout rapide</span><span><b style="color:var(--app-amber)">▬</b> jours du salon</span></div>`;
+  } else {
+    html += agenda(r, late, nodate);
+  }
+  return html + `</div>`;
+}
+function agenda(r, late, nodate) {
+  const days = r.days.filter(d => d >= TODAY);
+  if (!days.includes(state.mDay)) state.mDay = days[0];
+  const block = (day, title) => {
+    const its = itemsOf(day), exp = state.expanded.has(day), shown = exp ? its : its.slice(0, MAX_PER_DAY), hidden = its.length - shown.length;
+    return `${title}${shown.map(s => item(s)).join("")}${hidden > 0 ? `<button class="cd-more" data-more="${day}">+${hidden} autre${hidden > 1 ? "s" : ""}</button>` : exp && its.length > MAX_PER_DAY ? `<button class="cd-more" data-less="${day}">Réduire</button>` : ""}`;
+  };
+  const dname = d => { if (d === TODAY) return "Aujourd'hui"; const x = D(d).toLocaleDateString("fr-CH", { weekday: "long", day: "numeric", month: "long" }); return x[0].toUpperCase() + x.slice(1); };
+  const tag = d => d === SALON.start ? `<span class="tag jj">Jour J</span>` : isSalonDay(d) ? `<span class="tag sl">Salon</span>` : "";
+  let h = "";
+  if (late.length) h += `<details class="tray-m late ag"><summary>En retard · ${late.length}</summary>${late.map(s => item(s, { withDate: true })).join("")}</details>`;
+  if (nodate.length) h += `<details class="tray-m nodate ag"><summary>Sans date · ${nodate.length}</summary>${nodate.map(s => item(s)).join("")}</details>`;
+  h += `<div class="vseg" role="group" aria-label="Affichage" style="margin:4px 0 8px"><button data-mmode="day" aria-pressed="${state.mMode === "day"}">Par jour</button><button data-mmode="list" aria-pressed="${state.mMode === "list"}">Liste</button></div>`;
+  if (state.mMode === "day") {
+    h += `<div class="dstrip" id="dstrip">${days.map(d => { const dt = D(d), n = itemsOf(d).filter(active).length;
+      return `<button class="dp ${d === TODAY ? "today" : ""} ${isSalonDay(d) ? "salon" : ""}" data-mday="${d}" aria-pressed="${d === state.mDay}"><small>${d === TODAY ? "auj." : dt.toLocaleDateString("fr-CH", { weekday: "short" })}</small><b>${dt.getDate()}</b><span class="k ${n > MAX_PER_DAY ? "load" : ""} ${n ? "" : "z"}">${n}</span></button>`; }).join("")}</div>`;
+    const its = itemsOf(state.mDay);
+    h += `<div class="ag">${block(state.mDay, `<div class="ag-h ${state.mDay === TODAY ? "today" : ""}">${dname(state.mDay)}${its.length ? ` · ${its.filter(active).length} à faire` : ""} ${tag(state.mDay)}</div>`)}
+      ${its.length ? "" : `<div class="ag-empty">Rien de prévu ce jour</div>`}
+      ${state.addDay === state.mDay ? `<div style="margin-top:8px">${quickAdd()}</div>` : `<button class="ag-add" data-add="${state.mDay}">+ Ajouter une sous-tâche</button>`}</div>`;
+  } else {
+    h += `<div class="ag">${days.map(d => itemsOf(d).length ? block(d, `<div class="ag-h ${d === TODAY ? "today" : ""}">${dname(d)} · ${itemsOf(d).filter(active).length} ${tag(d)}</div>`) : "").join("") || `<div class="ag-empty">Aucune sous-tâche sur la période</div>`}</div>`;
+  }
+  return h;
+}
+
+/* =====================================================================
+   RENDU GLOBAL
+   ===================================================================== */
+let narrow = false;
+function render() {
+  const lateOpen = !!document.querySelector("details.tray-m.late[open]"), ndOpen = !!document.querySelector("details.tray-m.nodate[open]");
+  const strip = $("#dstrip"), sx = strip ? strip.scrollLeft : null;
+  renderBand(); renderChips();
+  // la barre d'outils n'est redessinée que si nécessaire (garde le focus de la recherche)
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === state.view));
+  const body = $("#body");
+  if (state.view === "calendar") body.innerHTML = renderCalendar(narrow);
+  else body.innerHTML = `<div class="placeholder">Vue « ${state.view === "tasks" ? "Tâches" : "Sous-tâches"} » existante, inchangée.<br><small>Revenez sur « Calendrier » pour la nouvelle vue.</small></div>`;
+  if (lateOpen) { const d = document.querySelector("details.tray-m.late"); d && (d.open = true); }
+  if (ndOpen) { const d = document.querySelector("details.tray-m.nodate"); d && (d.open = true); }
+  const st2 = $("#dstrip"); if (st2) { if (sx !== null) st2.scrollLeft = sx; else { const on = st2.querySelector('[aria-pressed="true"]'); on && (st2.scrollLeft = on.offsetLeft - 8); } }
+  if (state.addDay) { const q = $("#qaIn"); q && q.focus(); }
+}
+
+/* =====================================================================
+   ACTIONS  (dans le projet : taskInstanceService.updateSubtaskStatus / patchSubtask)
+   ===================================================================== */
+let lastUndo = null;
+const snap = s => ({ status: s.status, snoozedUntil: s.snoozedUntil, dueDate: s.dueDate, responsible: s.responsible, doneAgo: s.doneAgo });
+function toast(msg, undo) {
+  document.querySelectorAll(".toast").forEach(t => t.remove());
+  lastUndo = undo || null;
+  const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status");
+  t.innerHTML = `<span>${msg}</span>${undo ? `<button type="button">Annuler</button>` : ""}`;
+  const b = t.querySelector("button"); if (b) b.onclick = () => { lastUndo && lastUndo(); lastUndo = null; t.remove(); render(); };
+  document.body.appendChild(t); setTimeout(() => t.remove(), 4000);
+}
+function flash(id) { state.flash = id; render(); setTimeout(() => { state.flash = null; render(); }, 1300); }
+function setStatus(s, st) {
+  if (s.status === st) return;
+  const prev = snap(s); s.status = st; if (st === "DONE") s.doneAgo = "à l'instant";
+  toast(st === "DONE" ? "Sous-tâche terminée" : `Statut : ${STATUS_L[st]}`, () => Object.assign(s, prev));
+}
+function moveTo(s, day) {
+  const prev = snap(s);
+  if (!s.dueDate) { s.dueDate = day; s.snoozedUntil = null; toast(`Datée au ${fmtLong(day)}`, () => Object.assign(s, prev)); return; }
+  s.snoozedUntil = day === s.dueDate ? null : day;
+  toast(day === s.dueDate ? "Limite d'origine rétablie" : `Limite repoussée : ${relLabel(diff(day, TODAY))} (${fmtShort(day)})`, () => Object.assign(s, prev));
+}
+function push(s, n) {
+  const base = effectiveDue(s) && effectiveDue(s) > TODAY ? effectiveDue(s) : TODAY;
+  moveTo(s, addDays(base, n));
+}
+function assign(s, who) { const prev = snap(s); s.responsible = who; toast(who ? `Attribuée à ${who}` : "Responsable retiré", () => Object.assign(s, prev)); }
+
+/* ---------- Panneau radio (subtask-status-panel) ---------- */
+const panel = $("#panel"), panelBg = $("#panelBg");
+let panelFor = null, panelAnchor = null;
+function openPanel(id, anchor) {
+  const s = SUBS.find(x => x.id === id); panelFor = id; panelAnchor = anchor;
+  const radios = ["PENDING", "IN_PROGRESS", "BLOCKED", "DONE"].map(st => {
+    const k = st === "PENDING" && isLate(s) ? "LATE" : st;
+    return `<label class="sr ${s.status === st ? "on" : ""}"><input type="radio" name="st-${id}" value="${st}" data-setst ${s.status === st ? "checked" : ""}>${icon(k)}${STATUS_L[st]}</label>`;
+  }).join("");
+  let due;
+  if (!active(s)) due = `<div class="dl">Terminée ${s.doneAgo || ""}</div>`;
+  else if (!effectiveDue(s)) due = `<div class="dl">Pas de limite</div><div class="pushrow"><input type="date" class="pdate" data-date aria-label="Choisir une date"></div>`;
+  else due = `<div class="dl">Limite : <b>${fmtLong(effectiveDue(s))}</b> · ${relLabel(daysLeft(s))}${isMoved(s) ? `<small>Limite d'origine : ${fmtLong(s.dueDate)}</small>` : ""}</div>
+      <div class="pushrow"><span style="font-size:12px;color:var(--app-text-muted)">Repousser</span>${[1, 3, 7].map(n => `<button class="pp" data-push="${n}">+${n} j</button>`).join("")}<input type="date" class="pdate" data-date value="${effectiveDue(s)}" aria-label="Choisir une date"></div>
+      ${isMoved(s) ? `<button class="back" data-back>Revenir au ${fmtShort(s.dueDate)}</button>` : ""}`;
+  const who = people().map(p => `<button class="pp ${s.responsible === p ? "on" : ""}" data-assign="${p}">${p}</button>`).join("") + (s.responsible ? `<button class="pp" data-assign="">Personne</button>` : "");
+  panel.innerHTML = `<div class="ph"><b>${s.title}</b><span>${taskOf(s).title}</span></div><hr>
+    <div class="el-radio-label">Statut</div><div role="radiogroup" aria-label="Statut">${radios}</div><hr>
+    <div class="el-radio-label">Échéance</div>${due}<hr>
+    <div class="el-radio-label">Attribuer à</div><div class="pushrow">${who}</div><hr>
+    <button class="edit" data-edit>Modifier…</button>`;
+  panel.classList.add("open");
+  if (matchMedia("(max-width:600px)").matches) panelBg.classList.add("open");
+  else {
+    const r = anchor.getBoundingClientRect();
+    let left = r.left + window.scrollX, top = r.bottom + window.scrollY + 6;
+    if (left + 270 > window.scrollX + document.documentElement.clientWidth) left = window.scrollX + document.documentElement.clientWidth - 276;
+    const ph = panel.offsetHeight;
+    if (r.bottom + ph + 12 > window.innerHeight && r.top - ph - 6 > 0) top = r.top + window.scrollY - ph - 6;
+    panel.style.left = Math.max(8, left) + "px"; panel.style.top = top + "px";
+  }
+  const c = panel.querySelector("input[data-setst]:checked"); c && c.focus({ preventScroll: true });
+}
+function closePanel() { panel.classList.remove("open"); panelBg.classList.remove("open"); panelFor = null; }
+panel.addEventListener("change", e => {
+  const s = SUBS.find(x => x.id === panelFor); if (!s) return;
+  if (e.target.matches("[data-setst]")) { setStatus(s, e.target.value); closePanel(); render(); }
+  if (e.target.matches("[data-date]") && e.target.value) { moveTo(s, e.target.value); closePanel(); flash(s.id); }
+});
+panel.addEventListener("click", e => {
+  const s = SUBS.find(x => x.id === panelFor); if (!s) return;
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.push) { push(s, +b.dataset.push); closePanel(); flash(s.id); }
+  else if ("back" in b.dataset) { moveTo(s, s.dueDate); closePanel(); flash(s.id); }
+  else if ("assign" in b.dataset) { assign(s, b.dataset.assign || null); closePanel(); render(); }
+  else if ("edit" in b.dataset) { closePanel(); toast("→ Formulaire existant app-subtask-instance-form (dialog-box)"); }
+});
+panelBg.addEventListener("click", closePanel);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && panelFor) { const a = panelAnchor; closePanel(); a && a.focus && a.focus(); } });
+document.addEventListener("click", e => { if (panelFor && !panel.contains(e.target) && !e.target.closest("[data-st],[data-open]")) closePanel(); });
+
+/* ---------- Délégation d'événements ---------- */
+const frame = $("#frame");
+frame.addEventListener("click", e => {
+  const t = e.target;
+  const v = t.closest("[data-view]"); if (v) { state.view = v.dataset.view; closePanel(); render(); return; }
+  const ch = t.closest("[data-chip]"); if (ch) { const k = ch.dataset.chip; state.chips.has(k) ? state.chips.delete(k) : state.chips.add(k); render(); return; }
+  if (t.closest("[data-clear]")) { state.chips.clear(); state.q = ""; $("#q").value = ""; render(); return; }
+  const w = t.closest("[data-weeks]"); if (w) { setWeeks(+w.dataset.weeks); return; }
+  const more = t.closest("[data-more]"); if (more) { state.expanded.add(more.dataset.more); render(); return; }
+  const less = t.closest("[data-less]"); if (less) { state.expanded.delete(less.dataset.less); render(); return; }
+  const md = t.closest("[data-mday]"); if (md) { state.mDay = md.dataset.mday; state.addDay = null; render(); return; }
+  const mm = t.closest("[data-mmode]"); if (mm) { state.mMode = mm.dataset.mmode; render(); return; }
+  const add = t.closest("[data-add]"); if (add) { state.addDay = state.addDay === add.dataset.add ? null : add.dataset.add; render(); return; }
+  const st = t.closest("[data-st]"); if (st) { e.stopPropagation(); panelFor === +st.dataset.st ? closePanel() : openPanel(+st.dataset.st, st); return; }
+  const op = t.closest("[data-open]"); if (op) { const btn = op.parentElement.querySelector("[data-st]"); panelFor === +op.dataset.open ? closePanel() : openPanel(+op.dataset.open, btn); return; }
+});
+frame.addEventListener("input", e => { if (e.target.id === "q") { state.q = e.target.value; render(); } });
+frame.addEventListener("change", e => { if (e.target.id === "wsel") setWeeks(+e.target.value); });
+frame.addEventListener("keydown", e => {
+  if (e.target.id !== "qaIn") return;
+  if (e.key === "Escape") { state.addDay = null; render(); }
+  if (e.key === "Enter" && e.target.value.trim()) {
+    const s = { id: SUBS.length + 1, taskId: +$("#qaT").value, title: e.target.value.trim(), dueDate: state.addDay, status: "PENDING", responsible: null, snoozedUntil: null };
+    SUBS.push(s); const d = state.addDay; state.addDay = null; toast(`Sous-tâche ajoutée le ${fmtLong(d)}`, () => { SUBS = SUBS.filter(x => x !== s); }); flash(s.id);
+  }
+});
+function setWeeks(n) { state.weeks = n; localStorage.setItem("task.calendar.weeks", n); state.expanded.clear(); render(); }
+
+/* Glisser-déposer (ordinateur) */
+frame.addEventListener("dragstart", e => { const c = e.target.closest(".ci[data-id]"); if (!c) return; e.dataTransfer.setData("text/plain", c.dataset.id); e.dataTransfer.effectAllowed = "move"; c.classList.add("dragging"); closePanel(); });
+frame.addEventListener("dragend", e => { const c = e.target.closest(".ci"); c && c.classList.remove("dragging"); document.querySelectorAll(".cd.over").forEach(x => x.classList.remove("over")); });
+frame.addEventListener("dragover", e => { const c = e.target.closest(".cd[data-day]"); if (!c || c.classList.contains("past")) return; e.preventDefault(); document.querySelectorAll(".cd.over").forEach(x => x !== c && x.classList.remove("over")); c.classList.add("over"); });
+frame.addEventListener("dragleave", e => { const c = e.target.closest(".cd"); if (c && !c.contains(e.relatedTarget)) c.classList.remove("over"); });
+frame.addEventListener("drop", e => {
+  const c = e.target.closest(".cd[data-day]"); if (!c || c.classList.contains("past")) return; e.preventDefault();
+  const s = SUBS.find(x => x.id === +e.dataTransfer.getData("text/plain")); c.classList.remove("over");
+  if (s && effectiveDue(s) !== c.dataset.day) { moveTo(s, c.dataset.day); flash(s.id); }
+});
+
+/* Largeur du conteneur (équivalent JS de la container query « el ») */
+new ResizeObserver(([en]) => { const n = en.contentRect.width <= 600; if (n !== narrow) { narrow = n; closePanel(); render(); } }).observe($("#el"));
+
+/* Aperçu ordinateur / téléphone (maquette uniquement) */
+document.querySelector(".dseg").addEventListener("click", e => { const b = e.target.closest("[data-dev]"); if (!b) return;
+  document.querySelectorAll("[data-dev]").forEach(x => x.setAttribute("aria-pressed", x === b)); frame.classList.toggle("phone", b.dataset.dev === "phone"); closePanel(); });
+
+renderToolbar();
+narrow = $("#el").clientWidth <= 600;
+render();
+</script>
+</body>
+</html>

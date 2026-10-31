@@ -1,0 +1,22 @@
+<div [class.is-done]="done()" [class.ci-flash]="flashed()" [title]="movedHint()" class="ci">
+    <subtask-status-panel (changed)="changed.emit($event)"
+                          (editRequested)="editRequested.emit(subtask())"
+                          [known]="known()"
+                          [subtask]="subtask()"
+                          [task]="subtask().parentTask"/>
+
+    <button (click)="openPanel($event)" class="ci-main" type="button">
+        <span [title]="subtask().title" class="ci-title">{{ subtask().title }}</span>
+        <span class="ci-parent">
+            @if (showDelay() && delayLabel()) {
+                <span class="ci-delay">{{ delayLabel() }}</span> ·
+            }
+            {{ subtask().parentTask.title }}
+        </span>
+    </button>
+
+    <responsible-avatar [known]="known()"
+                        [responsible]="subtask().responsible"
+                        [taskResponsible]="subtask().parentTask.responsible"
+                        class="ci-avatar"/>
+</div>

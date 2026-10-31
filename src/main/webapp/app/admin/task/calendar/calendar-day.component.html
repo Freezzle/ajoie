@@ -1,0 +1,58 @@
+<div [attr.aria-label]="ariaLabel()"
+     [class.cd-past]="past()"
+     [class.cd-salon]="salon()"
+     [class.cd-today]="isToday()"
+     [class.cd-weekend]="weekend()"
+     [cdkDropListData]="day()"
+     [cdkDropListEnterPredicate]="enterPredicate"
+     (cdkDropListDropped)="onDrop($event)"
+     cdkDropList
+     class="cd"
+     role="group">
+    <div class="cd-h">
+        <span class="cd-n">{{ number() }}</span>
+
+        @if (withMonth()) {
+            <span class="cd-m">{{ month() }}</span>
+        }
+
+        @if (isToday()) {
+            <span class="cd-tag cd-tag--today">{{ 'task.calendar.todayTag' | translate }}</span>
+        } @else if (isSalonStart()) {
+            <span class="cd-tag cd-tag--dday">{{ 'task.calendar.dDay' | translate }}</span>
+        } @else if (salon()) {
+            <span class="cd-tag cd-tag--salon">{{ 'task.calendar.salonDay' | translate }}</span>
+        }
+
+        @if (activeTotal() > 0) {
+            <span [class.cd-count--load]="overloaded()" class="cd-count">{{ activeTotal() }}</span>
+        }
+    </div>
+
+    @for (item of shownItems(); track item.id) {
+        <app-calendar-item (changed)="changed.emit($event)"
+                           (editRequested)="editRequested.emit($event)"
+                           [cdkDragData]="item"
+                           [cdkDragDisabled]="narrow()"
+                           [flashed]="flashedId() === item.id"
+                           [known]="known()"
+                           [subtask]="item"
+                           cdkDrag/>
+    }
+
+    @if (hiddenCount() > 0) {
+        <button (click)="toggleExpand.emit(day())"
+                [attr.aria-expanded]="false"
+                class="cd-more"
+                type="button">
+            {{ 'task.calendar.more' | translate: {count: hiddenCount()} }}
+        </button>
+    } @else if (canReduce()) {
+        <button (click)="toggleExpand.emit(day())"
+                [attr.aria-expanded]="true"
+                class="cd-more"
+                type="button">
+            {{ 'task.calendar.less' | translate }}
+        </button>
+    }
+</div>

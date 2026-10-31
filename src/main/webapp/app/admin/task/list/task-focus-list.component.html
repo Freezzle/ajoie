@@ -111,6 +111,12 @@
                     {{ 'task.list.viewSubtasks' | translate }}
                     <small>{{ allSubtasks().length }}</small>
                 </button>
+                <button (click)="setView('calendar')"
+                        [attr.aria-pressed]="view() === 'calendar'"
+                        type="button">
+                    <i class="pi pi-calendar"></i>
+                    {{ 'task.list.viewCalendar' | translate }}
+                </button>
             </div>
         </entity-list-toolbar>
 
@@ -162,6 +168,14 @@
                     }
                 </div>
             }
+        } @else if (view() === 'calendar') {
+            <app-task-calendar (changed)="load()"
+                               (editRequested)="openEditSubtaskDialog($event)"
+                               (weeksChange)="setWeeks($event)"
+                               [known]="known()"
+                               [salon]="salon()"
+                               [subtasks]="filteredSubtasks()"
+                               [weeks]="weeks()"/>
         } @else {
             @if (filteredSubtasks().length === 0) {
                 <div class="el-empty">

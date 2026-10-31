@@ -1,0 +1,387 @@
+:host {
+    display: block;
+    container-type: inline-size;
+    container-name: el;
+
+    /* Alias dérivés des variables du thème, jamais de couleur en dur. */
+    --cal-weekend: color-mix(in srgb, var(--app-surface-muted) 85%, var(--app-text) 4%);
+    --cal-late-bg: color-mix(in srgb, var(--app-status-refused) 7%, var(--app-surface));
+    --cal-late-line: color-mix(in srgb, var(--app-status-refused) 22%, var(--app-surface));
+}
+
+.cal {
+    margin-top: 12px;
+}
+
+/* ── En-tête de la vue ─────────────────────────────────────────────────── */
+.cal-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.cal-label {
+    font-size: var(--app-fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--app-text-muted);
+}
+
+.cal-wseg {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+
+    button {
+        min-width: 34px;
+        padding: 5px 10px;
+        border: 0;
+        background: var(--app-surface);
+        font-size: 12.5px;
+        cursor: pointer;
+
+        & + button {
+            border-left: 1px solid var(--app-border);
+        }
+
+        &[aria-pressed='true'] {
+            background: var(--app-primary);
+            color: var(--app-surface);
+            font-weight: 700;
+        }
+    }
+}
+
+.cal-wsel {
+    padding: 6px 8px;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background: var(--app-surface);
+    font: inherit;
+    font-size: 13px;
+}
+
+.cal-unit,
+.cal-range {
+    font-size: var(--app-fs-sm);
+    color: var(--app-text-muted);
+}
+
+.cal-sum {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+.cal-pill {
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--app-surface-muted);
+    color: var(--app-text-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.cal-pill--today {
+    background: var(--app-warn-soft);
+    color: var(--app-warn);
+}
+
+.cal-pill--late {
+    background: var(--cal-late-bg, var(--app-warn-soft));
+    color: var(--app-status-refused);
+}
+
+/* ── Bande « En retard » (grille) ──────────────────────────────────────── */
+.cal-tray {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    overflow-x: auto;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+}
+
+.cal-tray--late {
+    background: var(--cal-late-bg, var(--app-warn-soft));
+    border: 1px solid var(--cal-late-line, var(--app-border));
+}
+
+.cal-tray-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 104px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--app-status-refused);
+
+    small {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--app-text-muted);
+    }
+}
+
+.cal-tray-item {
+    flex: 0 0 auto;
+    min-width: 220px;
+    max-width: 260px;
+}
+
+/* ── Grille ────────────────────────────────────────────────────────────── */
+.cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    margin: 6px 0 4px;
+
+    div {
+        padding-left: 6px;
+        font-size: var(--app-fs-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--app-text-muted);
+    }
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 6px;
+}
+
+.cal-foot {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: var(--app-text-muted);
+}
+
+.cal-foot-salon::before {
+    content: '▬ ';
+    color: var(--app-amber);
+}
+
+.cal-empty {
+    margin-top: 12px;
+    padding: 40px 16px;
+    border: 1px dashed var(--app-border);
+    border-radius: 10px;
+    text-align: center;
+    color: var(--app-text-muted);
+}
+
+/* ── Agenda (≤ 600 px) ─────────────────────────────────────────────────── */
+.cal-tray-m {
+    margin-bottom: 8px;
+    padding: 9px 12px;
+    border-radius: 10px;
+
+    summary {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::after {
+            content: '▾';
+            margin-left: auto;
+        }
+    }
+
+    &[open] summary {
+        margin-bottom: 8px;
+    }
+}
+
+.cal-tray-m--late {
+    background: var(--cal-late-bg, var(--app-warn-soft));
+    border: 1px solid var(--cal-late-line, var(--app-border));
+
+    summary {
+        color: var(--app-status-refused);
+    }
+}
+
+.cal-mseg {
+    display: inline-flex;
+    gap: 2px;
+    margin: 4px 0 8px;
+    padding: 3px;
+    border-radius: 9px;
+    background: var(--app-surface-muted);
+
+    button {
+        padding: 6px 12px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--app-text-muted);
+        cursor: pointer;
+
+        &[aria-pressed='true'] {
+            background: var(--app-surface);
+            color: var(--app-text);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+        }
+    }
+}
+
+.cal-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 2px 2px 8px;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.cal-dp {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    width: 50px;
+    padding: 6px 0 5px;
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    background: var(--app-surface);
+    scroll-snap-align: start;
+    cursor: pointer;
+
+    small {
+        font-size: 10.5px;
+        color: var(--app-text-muted);
+    }
+
+    b {
+        font-size: 17px;
+        line-height: 1.1;
+    }
+}
+
+.cal-k {
+    display: grid;
+    place-items: center;
+    min-width: 18px;
+    height: 16px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--app-surface-muted);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--app-text-muted);
+}
+
+.cal-k--load {
+    background: var(--app-warn-soft);
+    color: var(--app-warn);
+}
+
+.cal-k--empty {
+    visibility: hidden;
+}
+
+.cal-dp--today {
+    border-color: var(--app-primary);
+}
+
+.cal-dp--salon::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 10px;
+    right: 10px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--app-amber);
+}
+
+.cal-dp[aria-pressed='true'] {
+    background: var(--app-primary);
+    border-color: var(--app-primary);
+    color: var(--app-surface);
+
+    small,
+    .cal-k {
+        color: var(--app-surface);
+    }
+
+    .cal-k {
+        background: rgba(255, 255, 255, .25);
+    }
+}
+
+.cal-ag {
+    margin-top: 4px;
+}
+
+.cal-ag-h {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 2px 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--app-text-muted);
+}
+
+.cal-ag-h--today {
+    color: var(--app-primary);
+}
+
+.cal-ag-empty {
+    padding: 22px 10px;
+    border-radius: 10px;
+    background: var(--app-surface-muted);
+    text-align: center;
+    font-size: 13px;
+    color: var(--app-text-muted);
+}
+
+/* Pastilles de jour réutilisées dans les en-têtes d'agenda. */
+.cd-tag {
+    padding: 0 6px;
+    line-height: 16px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.cd-tag--dday {
+    background: var(--app-amber);
+    color: var(--app-surface);
+}
+
+.cd-tag--salon {
+    background: var(--app-warn-soft);
+    color: var(--app-warn);
+}
