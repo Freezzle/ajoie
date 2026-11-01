@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, computed, input, output, signal} from '@angular/core';
-import {CdkDrag, CdkDragEnd, CdkDragPreview, CdkDropList} from '@angular/cdk/drag-drop';
+import {CdkDrag, CdkDragEnd, CdkDragPreview, CdkDropList, DragRef, Point} from '@angular/cdk/drag-drop';
 import SharedModule from '../../../../../shared/shared.module';
 import {ButtonBoxComponent} from '../../../../../shared/components/button-box/button-box.component';
 import {TabsModule} from 'primeng/tabs';
@@ -12,10 +12,14 @@ import {
     formatSize,
     getColorStand,
     getColorStatus,
+    IFloorElement,
+    IFloorLocation,
     IFloorPlan,
     IFloorPlanSettings
 } from '../../../floor-plan.model';
 import {elementTypeKey} from '../../../floor-plan.conflicts';
+import {aabb} from '../../../floor-plan.geometry';
+import {FloorPlanCanvasComponent} from '../floor-plan-canvas/floor-plan-canvas.component';
 import {IStand} from '../../../../stand/model/stand.interface';
 import {IPriceStandSalon} from '../../../../salon/model/price-stand-salon.interface';
 import {getFormattedParticipationName} from '../../../../participation/model/participation.interface';
@@ -32,6 +36,8 @@ export interface PaletteExhibitor {
     statusColor: string;
     categoryKey: string;
     dimensionLabel: string;
+    widthMeter: number;
+    depthMeter: number;
 }
 
 /** Une dimension vendue, avec son avancement de pose. */
@@ -64,13 +70,25 @@ export interface PaletteDrop {
     clientY: number;
 }
 
+/** Mini-plan à un seul objet, rendu dans l'aperçu de glissé pour refléter l'entité posée. */
+export interface PalettePreview {
+    plan: IFloorPlan;
+    standsById: Map<string, IStand>;
+}
+
+/** Encombrement de l'objet en cours de glissé, pour caler l'aperçu sur la grille. */
+export interface PaletteFootprint {
+    widthMeter: number;
+    depthMeter: number;
+}
+
 /** Palette de gauche : exposants à placer, emplacements vides et éléments de salle. */
 @Component({
                selector: 'floor-plan-palette',
                templateUrl: './floor-plan-palette.component.html',
                styleUrl: './floor-plan-palette.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush,
-               imports: [SharedModule, ButtonBoxComponent, TabsModule, CdkDropList, CdkDrag, CdkDragPreview]
+               imports: [SharedModule, ButtonBoxComponent, TabsModule, CdkDropList, CdkDrag, CdkDragPreview, FloorPlanCanvasComponent]
            })
 export class FloorPlanPaletteComponent {
     readonly plans = input.required<IFloorPlan[]>();
@@ -79,9 +97,13 @@ export class FloorPlanPaletteComponent {
     readonly dimensions = input.required<IPriceStandSalon[]>();
     readonly standsById = input.required<Map<string, IStand>>();
     readonly nextAngleDeg = input(0);
+    readonly pixelsPerMeter = input(30);
     readonly disabled = input(false);
+    /** Calage de l'aperçu sur le pas de déplacement quand il survole la grille. */
+    readonly constrainPosition =
+        input<(point: Point, dragRef: DragRef, dimensions: DOMRect, pickup: Point) => Point>();
 
-    readonly dragStarted = output<void>();
+    readonly dragStarted = output<PaletteFootprint>();
     readonly dropped = output<PaletteDrop>();
     readonly nextAngleChanged = output<number>();
 
@@ -99,15 +121,20 @@ export class FloorPlanPaletteComponent {
         const needle = removeAccents(this.filter().trim().toLowerCase());
 
         return this.unassignedStands()
-                   .map(stand => ({
-                       stand,
-                       name: getFormattedParticipationName(stand.participation),
-                       person: getExhibitorFullName(stand.participation.exhibitor),
-                       color: getColorStand(stand),
-                       statusColor: getColorStatus(stand.status),
-                       categoryKey: formatterCategory(stand.category),
-                       dimensionLabel: stand.dimension?.dimension ?? ''
-                   }))
+                   .map(stand => {
+                       const size = stand.dimension ? dimensionSizeOf(stand.dimension) : {widthMeter: 1, depthMeter: 1};
+                       return {
+                           stand,
+                           name: getFormattedParticipationName(stand.participation),
+                           person: getExhibitorFullName(stand.participation.exhibitor),
+                           color: getColorStand(stand),
+                           statusColor: getColorStatus(stand.status),
+                           categoryKey: formatterCategory(stand.category),
+                           dimensionLabel: stand.dimension?.dimension ?? '',
+                           widthMeter: size.widthMeter,
+                           depthMeter: size.depthMeter
+                       };
+                   })
                    .filter(exhibitor => !needle
                        || removeAccents(`${exhibitor.name} ${exhibitor.person}`.toLowerCase()).includes(needle))
                    .sort((a, b) => a.categoryKey.localeCompare(b.categoryKey) || a.name.localeCompare(b.name));
@@ -149,8 +176,8 @@ export class FloorPlanPaletteComponent {
 
     readonly toPlaceCount = computed(() => this.unassignedStands().length);
 
-    onDragStarted(): void {
-        this.dragStarted.emit();
+    onDragStarted(footprint: PaletteFootprint): void {
+        this.dragStarted.emit(footprint);
     }
 
     /**
@@ -171,6 +198,97 @@ export class FloorPlanPaletteComponent {
         return {
             width: Math.max(6, widthMeter * scale),
             height: Math.max(6, depthMeter * scale)
+        };
+    }
+
+    /** Aperçu de glissé d'un exposant : l'emplacement avec son stand, tel qu'il sera posé. */
+    exhibitorPreview(exhibitor: PaletteExhibitor): PalettePreview {
+        const location: IFloorLocation = {
+            id: 'preview',
+            idDimension: exhibitor.stand.dimension?.id ?? '',
+            centerX: 0,
+            centerY: 0,
+            widthMeter: exhibitor.widthMeter,
+            depthMeter: exhibitor.depthMeter,
+            rotationDeg: this.nextAngleDeg(),
+            position: null,
+            stand: {id: exhibitor.stand.id},
+            prereserved: null
+        };
+        return {
+            plan: this.previewPlan(exhibitor.widthMeter, exhibitor.depthMeter, [location], []),
+            standsById: new Map([[exhibitor.stand.id, exhibitor.stand]])
+        };
+    }
+
+    /** Aperçu de glissé d'un emplacement vide, tel qu'il sera posé. */
+    dimensionPreview(card: PaletteDimension): PalettePreview {
+        const location: IFloorLocation = {
+            id: 'preview',
+            idDimension: card.dimension.id ?? '',
+            centerX: 0,
+            centerY: 0,
+            widthMeter: card.widthMeter,
+            depthMeter: card.depthMeter,
+            rotationDeg: this.nextAngleDeg(),
+            position: null,
+            stand: null,
+            prereserved: null
+        };
+        return {
+            plan: this.previewPlan(card.widthMeter, card.depthMeter, [location], []),
+            standsById: new Map()
+        };
+    }
+
+    /** Aperçu de glissé d'un élément de salle, tel qu'il sera posé. */
+    elementPreview(element: PaletteElement): PalettePreview {
+        const floorElement: IFloorElement = {
+            id: 'preview',
+            type: element.type,
+            label: null,
+            centerX: 0,
+            centerY: 0,
+            widthMeter: element.widthMeter,
+            depthMeter: element.depthMeter,
+            rotationDeg: this.nextAngleDeg(),
+            blockingOverride: null
+        };
+        return {
+            plan: this.previewPlan(element.widthMeter, element.depthMeter, [], [floorElement]),
+            standsById: new Map()
+        };
+    }
+
+    /**
+     * Construit un plan temporaire dimensionné à la boîte englobante de l'objet tourné, l'objet
+     * étant centré. Le canvas « nu » le rend alors exactement comme à la dépose.
+     */
+    private previewPlan(widthMeter: number, depthMeter: number,
+                        locations: IFloorLocation[], elements: IFloorElement[]): IFloorPlan {
+        const box = aabb({x: 0, y: 0, w: widthMeter, h: depthMeter, rot: this.nextAngleDeg()});
+        const planWidth = box.x1 - box.x0;
+        const planHeight = box.y1 - box.y0;
+        const centerX = planWidth / 2;
+        const centerY = planHeight / 2;
+
+        for (const location of locations) {
+            location.centerX = centerX;
+            location.centerY = centerY;
+        }
+        for (const element of elements) {
+            element.centerX = centerX;
+            element.centerY = centerY;
+        }
+
+        return {
+            id: null,
+            position: 0,
+            name: '',
+            widthMeter: planWidth,
+            heightMeter: planHeight,
+            locations,
+            elements
         };
     }
 

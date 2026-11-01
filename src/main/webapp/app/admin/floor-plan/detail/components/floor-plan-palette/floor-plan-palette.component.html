@@ -21,7 +21,8 @@
                 <div cdkDropList cdkDropListSortingDisabled class="fp-drop-source">
                     @for (exhibitor of exhibitors(); track exhibitor.stand.id) {
                         <div (cdkDragEnded)="onDragEnded($event, {kind: 'EXHIBITOR', stand: exhibitor.stand})"
-                             (cdkDragStarted)="onDragStarted()"
+                             (cdkDragStarted)="onDragStarted({widthMeter: exhibitor.widthMeter, depthMeter: exhibitor.depthMeter})"
+                             [cdkDragConstrainPosition]="constrainPosition()"
                              [cdkDragDisabled]="disabled()"
                              cdkDrag
                              class="fp-card">
@@ -36,10 +37,15 @@
                                 <span class="fp-card-meta">{{ exhibitor.dimensionLabel }}</span>
                             </span>
 
-                            <div *cdkDragPreview class="fp-drag-preview">
-                                <span [style.background-color]="exhibitor.color" class="fp-card-swatch"></span>
-                                <span class="text-ellipsis">{{ exhibitor.name }}</span>
-                            </div>
+                            <ng-container *cdkDragPreview>
+                                @let p = exhibitorPreview(exhibitor);
+                                <floor-plan-canvas [bare]="true"
+                                                   [pixelsPerMeter]="pixelsPerMeter()"
+                                                   [plan]="p.plan"
+                                                   [readOnly]="true"
+                                                   [settings]="settings()"
+                                                   [standsById]="p.standsById"/>
+                            </ng-container>
                         </div>
                     } @empty {
                         <p class="text-desc" jhiTranslate="floorPlan.palette.noExhibitor"></p>
@@ -53,7 +59,8 @@
                     @for (card of dimensionCards(); track card.dimension.id) {
                         @let preview = previewSize(card.widthMeter, card.depthMeter);
                         <div (cdkDragEnded)="onDragEnded($event, {kind: 'DIMENSION', dimension: card.dimension})"
-                             (cdkDragStarted)="onDragStarted()"
+                             (cdkDragStarted)="onDragStarted({widthMeter: card.widthMeter, depthMeter: card.depthMeter})"
+                             [cdkDragConstrainPosition]="constrainPosition()"
                              [cdkDragDisabled]="disabled()"
                              cdkDrag
                              class="fp-card">
@@ -77,12 +84,15 @@
                                 </span>
                             }
 
-                            <div *cdkDragPreview class="fp-drag-preview">
-                                <span [style.height.px]="preview.height"
-                                      [style.width.px]="preview.width"
-                                      class="fp-preview-rect"></span>
-                                <span>{{ card.dimension.dimension }}</span>
-                            </div>
+                            <ng-container *cdkDragPreview>
+                                @let p = dimensionPreview(card);
+                                <floor-plan-canvas [bare]="true"
+                                                   [pixelsPerMeter]="pixelsPerMeter()"
+                                                   [plan]="p.plan"
+                                                   [readOnly]="true"
+                                                   [settings]="settings()"
+                                                   [standsById]="p.standsById"/>
+                            </ng-container>
                         </div>
                     }
                 </div>
@@ -94,7 +104,8 @@
                     @for (element of elements(); track element.type) {
                         @let preview = previewSize(element.widthMeter, element.depthMeter);
                         <div (cdkDragEnded)="onDragEnded($event, {kind: 'ELEMENT', type: element.type})"
-                             (cdkDragStarted)="onDragStarted()"
+                             (cdkDragStarted)="onDragStarted({widthMeter: element.widthMeter, depthMeter: element.depthMeter})"
+                             [cdkDragConstrainPosition]="constrainPosition()"
                              [cdkDragDisabled]="disabled()"
                              cdkDrag
                              class="fp-card fp-card-element">
@@ -114,13 +125,15 @@
                                 </span>
                             </span>
 
-                            <div *cdkDragPreview class="fp-drag-preview">
-                                <span [class.non-blocking]="!element.blocking"
-                                      [style.height.px]="preview.height"
-                                      [style.width.px]="preview.width"
-                                      class="fp-preview-rect"></span>
-                                <span>{{ elementTypeKey(element.type) | translate }}</span>
-                            </div>
+                            <ng-container *cdkDragPreview>
+                                @let p = elementPreview(element);
+                                <floor-plan-canvas [bare]="true"
+                                                   [pixelsPerMeter]="pixelsPerMeter()"
+                                                   [plan]="p.plan"
+                                                   [readOnly]="true"
+                                                   [settings]="settings()"
+                                                   [standsById]="p.standsById"/>
+                            </ng-container>
                         </div>
                     }
                 </div>

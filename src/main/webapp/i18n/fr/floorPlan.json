@@ -46,7 +46,7 @@
       "standName": "Afficher le nom du stand",
       "sensible": "Afficher les informations sensibles",
       "snap": "Caler au pas",
-      "fit": "Tout voir",
+      "fit": "Vue par défaut",
       "togglePalette": "Afficher ou masquer la palette",
       "toggleInspector": "Afficher ou masquer le panneau de détail"
     },

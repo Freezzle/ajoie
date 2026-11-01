@@ -37,20 +37,23 @@
     </defs>
 
     <!-- Sol, grille -->
-    <g class="fp-floor-layer">
-        <rect [attr.height]="plan().heightMeter"
-              [attr.stroke-width]="hairline() * 3"
-              [attr.width]="plan().widthMeter"
-              class="fp-floor"
-              x="0"
-              y="0"/>
-        <rect [attr.height]="plan().heightMeter" [attr.width]="plan().widthMeter" fill="url(#fp-grid)" x="0" y="0"/>
-        <rect [attr.height]="plan().heightMeter" [attr.width]="plan().widthMeter" fill="url(#fp-grid-strong)" x="0"
-              y="0"/>
-    </g>
+    @if (!bare()) {
+        <g class="fp-floor-layer">
+            <rect [attr.height]="plan().heightMeter"
+                  [attr.stroke-width]="hairline() * 3"
+                  [attr.width]="plan().widthMeter"
+                  class="fp-floor"
+                  x="0"
+                  y="0"/>
+            <rect [attr.height]="plan().heightMeter" [attr.width]="plan().widthMeter" fill="url(#fp-grid)" x="0" y="0"/>
+            <rect [attr.height]="plan().heightMeter" [attr.width]="plan().widthMeter" fill="url(#fp-grid-strong)" x="0"
+                  y="0"/>
+        </g>
+    }
 
     <!-- Règles graduées -->
-    <g class="fp-rulers">
+    @if (!bare()) {
+        <g class="fp-rulers">
         @for (tick of ticksX(); track tick.position) {
             <line [attr.stroke-width]="hairline()"
                   [attr.x1]="tick.position"
@@ -88,7 +91,8 @@
               [attr.y]="plan().heightMeter + rulerMeter() * 0.8"
               class="fp-scale-label">{{ scaleLabel() }}
         </text>
-    </g>
+        </g>
+    }
 
     <!-- Objets du plan -->
     @for (item of items(); track item.id) {

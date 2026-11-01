@@ -160,6 +160,7 @@ export class FloorPlanCanvasComponent {
     readonly displayHeader = input(true);
     readonly displaySensibleInformation = input(true);
     readonly readOnly = input(true);
+    readonly bare = input(false);
 
     readonly pointerDownOnObject = output<{ event: PointerEvent; object: FloorObject }>();
     readonly pointerDownOnBackground = output<PointerEvent>();
@@ -173,16 +174,16 @@ export class FloorPlanCanvasComponent {
 
     readonly viewBox = computed(() => {
         const plan = this.plan();
-        const ruler = this.rulerMeter();
+        const ruler = this.bare() ? 0 : this.rulerMeter();
         return `${-ruler} ${-ruler} ${plan.widthMeter + ruler * 2} ${plan.heightMeter + ruler * 2}`;
     });
 
     readonly svgWidth = computed(() =>
-        (this.plan().widthMeter + this.rulerMeter() * 2) * this.pixelsPerMeter()
+        (this.plan().widthMeter + (this.bare() ? 0 : this.rulerMeter() * 2)) * this.pixelsPerMeter()
     );
 
     readonly svgHeight = computed(() =>
-        (this.plan().heightMeter + this.rulerMeter() * 2) * this.pixelsPerMeter()
+        (this.plan().heightMeter + (this.bare() ? 0 : this.rulerMeter() * 2)) * this.pixelsPerMeter()
     );
 
     readonly gridMeter = computed(() => this.settings().gridMeter);
@@ -670,6 +671,23 @@ export class FloorPlanCanvasComponent {
         return {
             x: (clientX - bounds.left) / ppm - ruler,
             y: (clientY - bounds.top) / ppm - ruler
+        };
+    }
+
+    /** Convertit des coordonnées du plan (mètres) en coordonnées écran. */
+    planPointToClient(planX: number, planY: number): Point {
+        const svg = this.svgRef()?.nativeElement;
+        if (!svg) {
+            return {x: 0, y: 0};
+        }
+
+        const bounds = svg.getBoundingClientRect();
+        const ruler = this.rulerMeter();
+        const ppm = this.pixelsPerMeter();
+
+        return {
+            x: (planX + ruler) * ppm + bounds.left,
+            y: (planY + ruler) * ppm + bounds.top
         };
     }
 

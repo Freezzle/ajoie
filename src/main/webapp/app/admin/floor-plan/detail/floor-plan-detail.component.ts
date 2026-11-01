@@ -38,6 +38,7 @@ import {FloorPlanCanvasComponent} from './components/floor-plan-canvas/floor-pla
 import {
     FloorPlanPaletteComponent,
     PaletteDrop,
+    PaletteFootprint,
     PaletteTemplate
 } from './components/floor-plan-palette/floor-plan-palette.component';
 import {FloorPlanInspectorComponent} from './components/floor-plan-inspector/floor-plan-inspector.component';
@@ -60,6 +61,7 @@ import {
     sortedDimensions
 } from '../floor-plan.model';
 import {
+    aabb,
     angleTo,
     clamp,
     FREE_STEP,
@@ -226,6 +228,8 @@ export class FloorPlanDetailComponent {
     readonly searchStandControl = new FormControl<IStand | null>(null);
 
     private drag: DragState | null = null;
+    /** Encombrement de la carte en cours de glissé depuis la palette, pour caler l'aperçu. */
+    private dragFootprint: PaletteFootprint | null = null;
     private history: HistoryEntry[] = [];
     private future: HistoryEntry[] = [];
     private readonly historyVersion = signal(0);
@@ -536,12 +540,44 @@ export class FloorPlanDetailComponent {
     }
 
     /** Le glissé depuis la palette referme le tiroir mobile pour dégager le plan. */
-    onPaletteDragStarted(): void {
+    onPaletteDragStarted(footprint: PaletteFootprint): void {
+        this.dragFootprint = footprint;
         this.drawerOpen.set(false);
     }
 
+    /**
+     * Cale l'aperçu de glissé de la palette sur le pas de déplacement quand il survole la grille,
+     * exactement comme un objet déjà posé. Hors de la salle, le glissé reste libre.
+     */
+    readonly constrainPalettePreview = (point: Point, _dragRef: unknown, _dimensions: unknown, pickup: Point): Point => {
+        const canvas = this.canvas();
+        const footprint = this.dragFootprint;
+        if (!canvas || !footprint) {
+            return point;
+        }
+
+        const planPoint = canvas.clientToPlanPoint(point.x, point.y);
+        if (!canvas.containsPlanPoint(planPoint)) {
+            // Hors de la salle : glissé libre, en conservant le décalage de préhension.
+            return {x: point.x - pickup.x, y: point.y - pickup.y};
+        }
+
+        const rect: Rect = {
+            x: planPoint.x - footprint.widthMeter / 2,
+            y: planPoint.y - footprint.depthMeter / 2,
+            w: footprint.widthMeter,
+            h: footprint.depthMeter,
+            rot: this.nextAngleDeg()
+        };
+        placeAt(rect, planPoint.x, planPoint.y, this.placementOptions());
+
+        const box = aabb(rect);
+        return canvas.planPointToClient(box.x0, box.y0);
+    };
+
     /** Dépôt d'une carte de la palette sur le plan. */
     onPaletteDropped(drop: PaletteDrop): void {
+        this.dragFootprint = null;
         const canvas = this.canvas();
         const plan = this.activePlan();
         if (!canvas || !plan) {
@@ -1133,11 +1169,14 @@ export class FloorPlanDetailComponent {
         if (!viewport || !plan) {
             return;
         }
-        const ppm = Math.min(
-            (viewport.clientWidth - 60) / Math.max(plan.widthMeter, 1),
-            (viewport.clientHeight - 60) / Math.max(plan.heightMeter, 1)
-        );
-        this.pixelsPerMeter.set(clamp(Math.floor(ppm), MIN_PPM, MAX_PPM));
+        const applyFit = (): void => {
+            const rulerPx = 26 * 2;
+            const ppm = (viewport.clientHeight - rulerPx) / Math.max(plan.heightMeter, 1);
+            this.pixelsPerMeter.set(Math.max(Math.floor(ppm * 100) / 100, MIN_PPM));
+        };
+        applyFit();
+        // A horizontal scrollbar may appear after the resize and shrink clientHeight: measure again.
+        requestAnimationFrame(() => requestAnimationFrame(applyFit));
     }
 
     onWheel(event: WheelEvent): void {

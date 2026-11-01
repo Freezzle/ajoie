@@ -147,7 +147,7 @@
                                         primeIcon="pi-minus"
                                         translateKey="common.zoomOut"
                                         type="secondary"/>
-                            <span class="fp-zoom-value">{{ pixelsPerMeter() }} px/m</span>
+                            <span class="fp-zoom-value">{{ pixelsPerMeter() | number: '1.0-0' }} px/m</span>
                             <button-box (clickedEvent)="zoom(1.12)"
                                         [showText]="false"
                                         primeIcon="pi-plus"
@@ -195,12 +195,14 @@
 
                     @if (showLeftPanel()) {
                         <aside class="fp-panel fp-panel-left">
-                            <floor-plan-palette (dragStarted)="onPaletteDragStarted()"
+                            <floor-plan-palette (dragStarted)="onPaletteDragStarted($event)"
                                                 (dropped)="onPaletteDropped($event)"
                                                 (nextAngleChanged)="onNextAngleChanged($event)"
+                                                [constrainPosition]="constrainPalettePreview"
                                                 [dimensions]="dimensions()"
                                                 [disabled]="isLoading()"
                                                 [nextAngleDeg]="nextAngleDeg()"
+                                                [pixelsPerMeter]="pixelsPerMeter()"
                                                 [plans]="floorPlans()"
                                                 [settings]="settings()"
                                                 [standsById]="standsById()"
