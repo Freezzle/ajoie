@@ -5,8 +5,11 @@
     <p>
         C'est avec plaisir que nous te confirmons que <strong>ton inscription est acceptée</strong> !
     </p>
-    <p>
-        Tu recevras très prochainement un email contenant ta facture.
+    <p th:if="${invoiceByEmail}">
+        Tu recevras très prochainement ta facture par email.
+    </p>
+    <p th:unless="${invoiceByEmail}">
+      Tu recevras très prochainement ta facture par courrier.
     </p>
     <p>
         On se réjouit sincèrement de t’accueillir parmi nous. D'ici là, nous te souhaitons une magnifique semaine remplie de belles énergies. ⭐⭐⭐

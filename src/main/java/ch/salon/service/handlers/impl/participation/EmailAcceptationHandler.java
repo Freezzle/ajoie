@@ -3,6 +3,7 @@ package ch.salon.service.handlers.impl.participation;
 import ch.salon.domain.Participation;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.InvoiceSendingMethod;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ParticipationRepository;
 import ch.salon.security.tenant.TenantContextHolder;
@@ -76,6 +77,7 @@ public class EmailAcceptationHandler implements EmailActionHandler<Participation
         thymeleafCtxt.setVariable("salon", payload.getSalon().getPlace());
         thymeleafCtxt.setVariable("startDate", DateUtils.instantToIso(payload.getSalon().getStartingDate()));
         thymeleafCtxt.setVariable("endDate", DateUtils.instantToIso(payload.getSalon().getEndingDate()));
+        thymeleafCtxt.setVariable("invoiceByEmail", payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL);
         emailMessage.setBody(this.emailCreator.getContentHtml("participation/accepted", thymeleafCtxt));
 
         return emailMessage;
