@@ -23,6 +23,11 @@
         }
     }
 
+    &__download {
+        display: block;
+        cursor: pointer;
+    }
+
     &__details {
         display: flex;
         flex-direction: column;

@@ -70,6 +70,7 @@
       "unreadable": "Cette image n'a pas pu être lue."
     },
     "existing": "Image enregistrée",
+    "download": "Cliquer pour télécharger",
     "hint": "Format JPG ou PNG et jusqu'à 2.5 Mo maximum.",
     "remove": "Supprimer l'image"
   },

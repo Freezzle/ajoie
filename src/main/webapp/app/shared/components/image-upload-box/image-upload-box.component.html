@@ -17,9 +17,15 @@
                     <span class="image-upload-box__meta">{{ value.width }}&times;{{ value.height }} px</span>
                 </div>
             } @else if (existingPictureUrl) {
-                <img [src]="existingPictureUrl" alt="{{ 'global.image.existing' | translate }}"/>
+                <a class="image-upload-box__download"
+                   [href]="downloadUrl"
+                   [title]="'global.image.download' | translate"
+                   download>
+                    <img [src]="existingPictureUrl" alt="{{ 'global.image.existing' | translate }}"/>
+                </a>
                 <div class="image-upload-box__details">
                     <span class="image-upload-box__filename">{{ 'global.image.existing' | translate }}</span>
+                    <span class="image-upload-box__meta">{{ 'global.image.download' | translate }}</span>
                 </div>
             } @else {
                 <div class="image-upload-box__details">

@@ -106,6 +106,15 @@ export class ImageUploadBoxComponent implements ControlValueAccessor, OnChanges 
         return this.value !== null || this.showsExisting;
     }
 
+    /** Lien de téléchargement de l'image enregistrée (administration uniquement : l'URL n'y est pas exposée en public). */
+    get downloadUrl(): string | null {
+        if (!this.existingPictureUrl) {
+            return null;
+        }
+        const separator = this.existingPictureUrl.includes('?') ? '&' : '?';
+        return `${this.existingPictureUrl}${separator}download=true`;
+    }
+
     /**
      * Une image existante qui réapparaît (annulation de l'édition, rechargement du parent) annule
      * la suppression locale, sans quoi la zone de dépôt resterait affichée à tort.
