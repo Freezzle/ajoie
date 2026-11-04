@@ -1,21 +1,21 @@
 <div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
-    <p style="margin:0 0 8px 0; line-height:1.5;">
+    <p>
         Bonjour <strong th:text="${firstName}">Prénom</strong>,
     </p>
-    <p style="margin:0 0 8px 0; line-height:1.5;">
+    <p>
         Ton inscription a bien été prise en compte pour l'évènement <strong>[[${salon}]]</strong>
         qui se déroulera du <strong>[[${startDate}]]</strong> au <strong>[[${endDate}]]</strong> !
     </p>
-    <p style="margin:0 0 8px 0; line-height:1.5;">
+    <p>
         Nous allons <strong>examiner</strong> les informations que tu nous as transmises. Tu recevras des nouvelles dans les deux prochaines semaines. Si certaines données venaient à être incomplètes, nous te contacterons au plus vite.
     </p>
-    <p style="margin:0 0 8px 0; line-height:1.5;" th:if="${editLink}">
+    <p th:if="${editLink}">
         Tant que ton inscription est <strong>en cours de vérification</strong>, tu peux la modifier à tout moment
         en suivant ce lien personnel : <a th:href="${editLink}">Mon inscription</a><br/>
         Ce lien t'est réservé, merci de ne pas le partager. Une fois ton inscription traitée par l'équipe,
         il ne te sera plus possible de modifier tes informations.
     </p>
-    <p style="margin:0 0 8px 0; line-height:1.5;">
+    <p>
         L’équipe reste disponible si tu as la moindre question ou demande à nous transmettre.
     </p>
 </div>
