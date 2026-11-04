@@ -182,9 +182,13 @@ export function placeAt(rect: Rect, centerX: number, centerY: number, options: P
     const clampedX = clamp(centerX, halfW, Math.max(halfW, options.planWidthMeter - halfW));
     const clampedY = clamp(centerY, halfH, Math.max(halfH, options.planHeightMeter - halfH));
 
-    if (angleOf(rect) === 0) {
-        rect.x = snap(clampedX - rect.w / 2, options.moveStepMeter, options.snapEnabled);
-        rect.y = snap(clampedY - rect.h / 2, options.moveStepMeter, options.snapEnabled);
+    if (isQuarterTurn(angleOf(rect))) {
+        // On cale le bord visible (boîte englobante), pas le centre : sinon un objet tourné
+        // dont les dimensions ne sont pas des multiples du pas sort de la grille.
+        const left = snap(clampedX - halfW, options.moveStepMeter, options.snapEnabled);
+        const top = snap(clampedY - halfH, options.moveStepMeter, options.snapEnabled);
+        rect.x = round3(left + halfW - rect.w / 2);
+        rect.y = round3(top + halfH - rect.h / 2);
     } else {
         const snappedX = snap(clampedX, options.moveStepMeter, options.snapEnabled);
         const snappedY = snap(clampedY, options.moveStepMeter, options.snapEnabled);
@@ -196,6 +200,11 @@ export function placeAt(rect: Rect, centerX: number, centerY: number, options: P
         magnet(rect, options);
     }
     return rect;
+}
+
+/** L'angle est-il un multiple de 90° (boîte englobante = rectangle visible) ? */
+export function isQuarterTurn(deg: number): boolean {
+    return Math.abs(deg - Math.round(deg / 90) * 90) < 1e-6;
 }
 
 export function clamp(value: number, min: number, max: number): number {
@@ -250,11 +259,24 @@ export function magnet(rect: Rect, options: PlacementOptions): Rect {
         }
     }
 
-    if (angle === 0) {
-        bestU = consider(rect.w / 2, local.x, bestU);
-        bestU = consider(options.planWidthMeter - rect.w / 2, local.x, bestU);
-        bestV = consider(rect.h / 2, local.y, bestV);
-        bestV = consider(options.planHeightMeter - rect.h / 2, local.y, bestV);
+    if (isQuarterTurn(angle)) {
+        const box = aabb(rect);
+        const halfW = (box.x1 - box.x0) / 2;
+        const halfH = (box.y1 - box.y0) / 2;
+        const wallsX = [halfW, options.planWidthMeter - halfW];
+        const wallsY = [halfH, options.planHeightMeter - halfH];
+        const c0 = Math.round(cos);
+        const s0 = Math.round(sin);
+
+        // Selon l'angle, l'axe local u suit le monde en x (0/180°) ou en y (90/270°).
+        const [uWalls, uSign] = c0 !== 0 ? [wallsX, c0] : [wallsY, s0];
+        const [vWalls, vSign] = c0 !== 0 ? [wallsY, c0] : [wallsX, -s0];
+        for (const wall of uWalls) {
+            bestU = consider(uSign * wall, local.x, bestU);
+        }
+        for (const wall of vWalls) {
+            bestV = consider(vSign * wall, local.y, bestV);
+        }
     }
 
     if (!bestU && !bestV) {

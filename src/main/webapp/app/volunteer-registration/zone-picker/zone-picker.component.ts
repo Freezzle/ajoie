@@ -20,7 +20,6 @@ export interface ZoneCard {
                selector: 'app-zone-picker',
                standalone: true,
                changeDetection: ChangeDetectionStrategy.OnPush,
-               imports: [TranslatePipe],
                providers: [{
                    provide: NG_VALUE_ACCESSOR,
                    useExisting: forwardRef(() => ZonePickerComponent),

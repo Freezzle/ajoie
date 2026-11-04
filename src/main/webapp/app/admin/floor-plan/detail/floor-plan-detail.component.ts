@@ -762,6 +762,9 @@ export class FloorPlanDetailComponent {
         } else if (drag.mode === 'ROTATE') {
             const center = {x: drag.origin.x + drag.origin.w / 2, y: drag.origin.y + drag.origin.h / 2};
             rect.rot = snapAngle(angleTo(center, point) + 90, settings.rotationStepDeg, event.shiftKey);
+            if (!event.shiftKey) {
+                this.resnap(rect, drag.objectId);
+            }
         } else {
             rect.w = round3(Math.max(0.1, point.x - drag.origin.x));
             // Un mur ne change que de longueur.
@@ -946,17 +949,20 @@ export class FloorPlanDetailComponent {
         if (!object) {
             return;
         }
-        this.applyRectToObject(object.id, {
-            ...object.rect,
-            rot: normalizeAngle((object.rect.rot ?? 0) + deltaDeg)
-        });
+        this.setSelectedAngle((object.rect.rot ?? 0) + deltaDeg);
     }
 
     setSelectedAngle(angle: number): void {
         const object = this.selectedObject();
         if (object) {
-            this.applyRectToObject(object.id, {...object.rect, rot: normalizeAngle(angle)});
+            const rect: Rect = {...object.rect, rot: normalizeAngle(angle)};
+            this.resnap(rect, object.id);
+            this.applyRectToObject(object.id, rect);
         }
+    }
+
+    private resnap(rect: Rect, objectId: string): void {
+        placeAt(rect, rect.x + rect.w / 2, rect.y + rect.h / 2, this.placementOptions(objectId));
     }
 
     moveSelected(dx: number, dy: number): void {

@@ -4,7 +4,7 @@ import {formatDate} from '@angular/common';
 
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
-import {FileUpload, FileUploadHandlerEvent} from 'primeng/fileupload';
+import {FileUpload} from 'primeng/fileupload';
 
 import SharedModule from 'app/shared/shared.module';
 import {CardComponent} from '../../../shared/components/card/card.component';
@@ -69,7 +69,6 @@ const STORAGE_KEY = 'salon-dashboard.metrics';
     SharedModule,
     RouterModule,
     ToastModule,
-    FileUpload,
     CardComponent,
     ContentPageComponent,
     ButtonBoxComponent,
