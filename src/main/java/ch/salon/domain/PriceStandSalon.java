@@ -10,12 +10,17 @@ import lombok.Data;
 import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.UUID;
 
 @Entity
 @Table(name = "price_stand_salon")
 @Data
 public class PriceStandSalon implements Serializable, TenantOwned {
+    public static final Comparator<PriceStandSalon> DISPLAY_ORDER = Comparator
+            .comparing(PriceStandSalon::getSortOrder, Comparator.nullsLast(Comparator.<Integer>naturalOrder()))
+            .thenComparing(PriceStandSalon::getDimension, Comparator.nullsLast(String::compareToIgnoreCase));
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -41,6 +46,10 @@ public class PriceStandSalon implements Serializable, TenantOwned {
     @NotNull
     @Column(name = "height_meter", nullable = false)
     private Double heightMeter;
+
+    @NotNull
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder = 0;
 
     @Column(name="nb_selling_side")
     private Long nbSellingSide;

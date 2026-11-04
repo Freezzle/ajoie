@@ -28,6 +28,7 @@
       "too-large": "L'image dépasse la taille maximale de 2.5 Mo.",
       "too-many-pixels": "Les dimensions de cette image sont trop grandes."
     },
+    "dimensioninuse": "Cette dimension est utilisée par des stands et ne peut pas être supprimée.",
     "idinvalid": "Invalid Id",
     "idnotfound": "ID cannot be found",
     "idnull": "Identifiant invalide",

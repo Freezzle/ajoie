@@ -9,6 +9,7 @@ export type PriceStandGroup = {
     dimension: FormControl<IPriceStandSalon['dimension'] | null>;
     heightMeter: FormControl<IPriceStandSalon['heightMeter'] | null>;
     widthMeter: FormControl<IPriceStandSalon['widthMeter'] | null>;
+    sortOrder: FormControl<IPriceStandSalon['sortOrder'] | null>;
 };
 
 export type SalonFormGroup = {
@@ -113,12 +114,18 @@ export class SalonFormService {
                                                   price: new FormControl(raw.price, Validators.required),
                                                   dimension: new FormControl(raw.dimension, Validators.required),
                                                   widthMeter: new FormControl(raw.widthMeter, Validators.required),
-                                                  heightMeter: new FormControl(raw.heightMeter, Validators.required)
+                                                  heightMeter: new FormControl(raw.heightMeter, Validators.required),
+                                                  sortOrder: new FormControl(raw.sortOrder ?? 0)
                                               });
     }
 
     getSalon(form: FormGroup<SalonFormGroup>): ISalon {
-        return form.getRawValue() as ISalon;
+        const salon = form.getRawValue() as ISalon;
+        salon.priceStandSalons = (salon.priceStandSalons ?? []).map((priceStand, index) => ({
+            ...priceStand,
+            sortOrder: index
+        }));
+        return salon;
     }
 
     private getDefaultSalonFormValue(): Pick<ISalon,

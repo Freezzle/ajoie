@@ -110,7 +110,15 @@ public class SalonService {
                 .collect(Collectors.toMap(PriceStandSalon::getId, p -> p));
 
         // Supprimer les éléments qui ne sont plus présents (orphanRemoval)
-        salon.getPriceStandSalons().removeIf(priceStand -> !dtoMap.containsKey(priceStand.getId()));
+        salon.getPriceStandSalons().removeIf(priceStand -> {
+            if (dtoMap.containsKey(priceStand.getId())) {
+                return false;
+            }
+            if (standRepository.existsByDimensionId(priceStand.getId())) {
+                throw new BadRequestAlertException("Dimension used by stands", ENTITY_NAME, "dimensioninuse");
+            }
+            return true;
+        });
 
         // Mettre à jour ou ajouter les PriceStandSalon
         for (PriceStandDTO dto : priceStandDtos) {
@@ -198,7 +206,9 @@ public class SalonService {
         Salon salon = this.salonRepository.findById(idSalon).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        return salon.getPriceStandSalons().stream().map(priceStandMapper::toDto).toList();
+        return salon.getPriceStandSalons().stream()
+                .sorted(PriceStandSalon.DISPLAY_ORDER)
+                .map(priceStandMapper::toDto).toList();
     }
 
     public List<FloorPlanSalonDTO> getFloorPlanSalon(UUID idSalon) {
@@ -834,6 +844,7 @@ public class SalonService {
                     newPss.setWidthMeter(pss.getWidthMeter());
                     newPss.setHeightMeter(pss.getHeightMeter());
                     newPss.setNbSellingSide(pss.getNbSellingSide());
+                    newPss.setSortOrder(pss.getSortOrder());
                     newPrices.add(newPss);
                 }
                 newSalon.setPriceStandSalons(newPrices);

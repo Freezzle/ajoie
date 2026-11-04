@@ -10,6 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface PriceStandSalonRepository extends JpaRepository<PriceStandSalon, UUID> {
-    @Query("SELECT p FROM PriceStandSalon p WHERE p.id IN (SELECT ps.id FROM Salon s JOIN s.priceStandSalons ps WHERE s.id = :salonId)")
+    @Query("SELECT p FROM PriceStandSalon p WHERE p.id IN (SELECT ps.id FROM Salon s JOIN s.priceStandSalons ps WHERE s.id = :salonId) ORDER BY p.sortOrder, LOWER(p.dimension)")
     List<PriceStandSalon> findBySalonId(UUID salonId);
 }

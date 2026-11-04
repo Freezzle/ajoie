@@ -108,7 +108,8 @@
       "invoicePostalHome": "A l'adresse de courrier",
       "offerTitle": "Tirage au sort RFJ",
       "offerTitleHelp": "Souhaitez-vous offrir un soin ou un cadeau pour le tirage au sort de la radio RFJ ?",
-      "additionalTitle": "Dernières précisions"
+      "additionalTitle": "Dernières précisions",
+      "additionalTitleHelp": "Pour toutes remarques ou restrictions particulières, faites-le nous savoir ici."
     },
     "summary": {
       "edit": "Modifier",

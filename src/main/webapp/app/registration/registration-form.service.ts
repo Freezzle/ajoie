@@ -128,14 +128,14 @@ export function requiredAddressValidator(options?: {requireFullName?: boolean}):
 export function atLeastOneServiceValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
         const group = control as ServicesFormGroup;
-        const answered = [group.controls.wantStand, group.controls.wantConference, group.controls.wantWorkshop]
+        const answered = [group.controls.wantStand, group.controls.wantConference/*, group.controls.wantWorkshop*/]
             .every(c => c.value !== null);
 
         if (!answered) {
-            return {serviceAnswerMissing: true};
+            return { serviceAnswerMissing: true };
         }
 
-        const chosen = [group.controls.wantStand, group.controls.wantConference, group.controls.wantWorkshop]
+        const chosen = [group.controls.wantStand, group.controls.wantConference/*, group.controls.wantWorkshop*/]
             .some(c => c.value === true);
 
         return chosen ? null : {noServiceChosen: true};

@@ -286,8 +286,7 @@ public class PublicRegistrationService {
         // Les dimensions sont toujours exposées : elles restent nécessaires lorsqu'un exposant
         // modifie son inscription après la fermeture des inscriptions.
         dto.setDimensions(salon.getPriceStandSalons().stream()
-                               .sorted(Comparator.comparing(PriceStandSalon::getDimension,
-                                       Comparator.nullsLast(String::compareToIgnoreCase)))
+                               .sorted(PriceStandSalon.DISPLAY_ORDER)
                                .map(d -> new PublicDimensionDTO(d.getId(), d.getDimension(), d.getWidthMeter(),
                                        d.getHeightMeter(), d.getPrice()))
                                .toList());

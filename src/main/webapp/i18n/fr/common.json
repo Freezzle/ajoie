@@ -64,6 +64,8 @@
     },
     "create": "Créer",
     "delete": "Supprimer",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
     "deleted": "Sélection supprimé",
     "duplicate": "Dupliquer",
     "edit": "Editer",

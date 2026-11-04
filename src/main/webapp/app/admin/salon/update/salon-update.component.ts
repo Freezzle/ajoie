@@ -1,4 +1,4 @@
-﻿import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {finalize, filter} from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
@@ -79,6 +79,8 @@ export class SalonUpdateComponent implements OnInit {
     private readonly modalService = inject(NgbModal);
     private readonly confirmDialogService = inject(ConfirmDialogService);
     private readonly alertService = inject(AlertService);
+    priceStandRows: FormGroup<PriceStandGroup>[] = [];
+
     get priceStandSalons(): FormArray<FormGroup<PriceStandGroup>> {
         return this.editForm.controls.priceStandSalons;
     }
@@ -120,6 +122,7 @@ export class SalonUpdateComponent implements OnInit {
                 this.isReadOnly = data['readonly'];
                 this.processSalonData();
                 this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
+                this.refreshPriceStandRows();
                 if (this.isReadOnly) {
                     this.activateReadOnlyMode();
                 } else {
@@ -185,6 +188,7 @@ export class SalonUpdateComponent implements OnInit {
         this.isReadOnly = true;
         if (reset) {
             this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
+            this.refreshPriceStandRows();
         }
         this.editForm.disable();
     }
@@ -209,7 +213,31 @@ export class SalonUpdateComponent implements OnInit {
     }
     addPriceStand(): void {
         this.editForm.controls['priceStandSalons'].push(this.salonFormService.createPriceStand(null));
+        this.refreshPriceStandRows();
     }
+    movePriceStand(index: number, offset: -1 | 1): void {
+        const target = index + offset;
+        const array = this.priceStandSalons;
+        if (target < 0 || target >= array.length) {
+            return;
+        }
+        const control = array.at(index);
+        array.removeAt(index);
+        array.insert(target, control);
+        array.markAsDirty();
+        this.refreshPriceStandRows();
+    }
+
+    removePriceStand(index: number): void {
+        this.priceStandSalons.removeAt(index);
+        this.priceStandSalons.markAsDirty();
+        this.refreshPriceStandRows();
+    }
+
+    private refreshPriceStandRows(): void {
+        this.priceStandRows = [...this.priceStandSalons.controls];
+    }
+
     private processSalonData(): void {
         if (!this.initialSalon) {
             this.initialSalon = {} as ISalon;

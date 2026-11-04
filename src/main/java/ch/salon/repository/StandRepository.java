@@ -24,5 +24,7 @@ public interface StandRepository extends JpaRepository<Stand, UUID> {
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress", "dimension"})
     List<Stand> findByStatusInAndParticipation_SalonId(List<Status> statuses, UUID participationId);
 
+    boolean existsByDimensionId(UUID dimensionId);
+
     boolean existsStandByParticipationIdAndStatusIn(UUID participationId, Status... statuses);
 }
