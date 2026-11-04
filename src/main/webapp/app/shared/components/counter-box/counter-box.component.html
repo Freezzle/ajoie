@@ -1,4 +1,4 @@
-<div class="counter-box">
+<div class="counter-box" [class.is-invalid]="isInvalid">
     @if (translateKey) {
         <div class="counter-box-labels">
             <label class="counter-box-label" [for]="'field_' + fieldName">{{ translateKey | translate }}</label>

@@ -1,4 +1,4 @@
-<div class="radio-box" role="radiogroup" [attr.aria-labelledby]="'label_' + fieldName">
+<div class="radio-box" [class.is-invalid]="isInvalid" role="radiogroup" [attr.aria-labelledby]="'label_' + fieldName">
     @if (translateKey) {
         <div class="radio-box-label" [id]="'label_' + fieldName">{{ translateKey | translate }}</div>
     }

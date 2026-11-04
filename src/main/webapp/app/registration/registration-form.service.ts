@@ -416,7 +416,7 @@ export class RegistrationFormService {
                         subCategories: [],
                         nbTable: 0,
                         nbChair: 0,
-                        needElectricity: false,
+                        needElectricity: true,
                         shared: false,
                         publishedOnWebsite: true,
                         sharedPublishedOnWebsite: true,

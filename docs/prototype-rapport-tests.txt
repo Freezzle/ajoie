@@ -1,0 +1,138 @@
+▸ Annulation d'une participation
+  ✔ avant toute facture → rien à émettre, aucune trace
+  ✔ annulation avec frais retenus (règle salon) → note de crédit nette, remboursement du reste
+  ✔ annulée puis rétablie APRÈS la note de crédit → nouvelle facture des prestations
+  ✔ annulée puis rétablie avant émission de la note de crédit → rien à faire
+  ✔ facture payée → note de crédit, avoir annoncé, remboursement, dossier soldé
+  ✔ facture émise mais impayée → note de crédit qui la solde, aucun argent ne bouge
+  ✔ facture partiellement payée → la note de crédit règle le reste dû, l'acompte versé devient avoir
+▸ Référence créancier RF (ISO 11649) pour la QR-facture
+  ✔ génération à partir du numéro de document, toujours valide
+  ✔ exemple officiel de la norme reconnu valide
+  ✔ une référence modifiée d'un caractère est détectée
+▸ Émission des documents
+  ▸ Conformité
+    ✔ l'adresse est figée dans le document : un déménagement ne réécrit pas l'historique
+    ✔ chaque émission publie un événement DocumentIssued
+    ✔ un document émis est immuable (lignes non modifiables)
+    ✔ adresse incomplète (QR type S : nom, localité, pays) → émission refusée, aucun numéro consommé
+    ✔ le total d'un document est exactement la somme de ses lignes
+  ▸ Type et contenu
+    ✔ total négatif → note de crédit, sans échéance
+    ✔ une réduction (geste commercial) apparaît comme ligne négative de la facture
+    ✔ émettre un groupe ne touche pas aux autres groupes
+    ✔ la référence QR est une référence créancier RF valide, propre au document
+    ✔ total nul (changement de libellé au même prix) → facture rectificative à 0, réglée d'office
+  ▸ Échéances (règles fournies par l'appelant)
+    ✔ avec arrangement → échéance à la date du salon
+    ✔ sans arrangement → délai par défaut de 30 jours
+    ✔ une échéance antérieure à l'émission est refusée
+  ▸ Numérotation
+    ✔ suite continue entre dossiers, séparée par type de document
+    ✔ rien à facturer → aucun document et aucun numéro consommé
+    ✔ la numérotation repart à 1 chaque année
+▸ Annulation d'une participation selon l'état de la facturation
+  ▸ Acompte
+    ✔ acompte payé, facture finale émise et payée en partie, acompte conservé → remboursement du reste
+    ✔ acompte payé, conservé (règlement) → facture « frais » 100 − déduction 100 = 0, aucun remboursement
+    ✔ acompte payé, on rembourse tout → note de crédit, avoir remboursé
+    ✔ acompte payé en partie (40), conservé → frais 40, solde d'acompte annulé
+    ✔ acompte émis, impayé → annulé par note de crédit, rien n'est dû
+  ▸ Garde-fous
+    ✔ salon commencé → annulation refusée
+    ✔ les documents émis avant l'annulation restent intacts (seules des notes de crédit s'ajoutent)
+    ✔ annuler deux fois → refusé
+  ▸ Factures émises (processus normal)
+    ✔ frais supérieurs à ce qui a été payé → il reste une facture de frais à encaisser
+    ✔ principal payé, repas impayés, frais 50.– → les avoirs se compensent, remboursement du net
+    ✔ factures payées, frais de 50.– → note de crédit nette, remboursement de 480.–
+    ✔ factures émises, impayées → notes de crédit qui les soldent, aucun argent ne bouge
+  ▸ Rien d'émis
+    ✔ acceptée (normal), brouillon seulement → le brouillon disparaît, aucun document
+    ✔ acceptée (normal) avec frais d'annulation → facture des frais seuls
+    ✔ en vérification → annulée, aucun dossier de facturation
+▸ Participation ↔ facturation : processus, statuts et événements
+  ▸ Processus avec acompte
+    ✔ acceptation : sous-objets acceptés, prestations « à facturer », facture d'acompte émise
+    ✔ montant d'acompte selon la règle salon : 100.– par stand accepté
+    ✔ acompte supérieur à la facture → déduction plafonnée, le reste est déduit plus tard
+    ✔ acompte en retard → signalé à la participation, puis validée au paiement tardif
+    ✔ acompte payé → participation ET sous-objets validés
+    ✔ parcours complet : acompte, changements, facture finale avec déduction, soldé, clôturé
+    ✔ en vérification : rien n'est envoyé à la facturation
+    ✔ acompte payé en partie → reste « acceptée »
+    ✔ acompte partiellement payé puis facture finale → solde d'acompte annulé, seul le versé est déduit
+  ▸ Facturation générique (autres sources)
+    ✔ une facture de sponsoring passe par le même moteur ; les participations ignorent ses événements
+  ▸ Sous-objets ajoutés en cours de route
+    ✔ participation refusée : aucun dossier de facturation n'est jamais créé
+    ✔ stand demandé après validation : non facturé tant qu'il est en vérification, puis validé et facturé
+  ▸ Choix du processus
+    ✔ avant acceptation : librement modifiable
+    ✔ acompte → normal, acompte déjà payé : refusé
+    ✔ acompte → normal, acompte impayé : il est annulé par note de crédit, rien n'est dû
+    ✔ normal → acompte après acceptation : l'acompte est émis tout de suite
+  ▸ Processus normal (sans acompte)
+    ✔ acceptation : brouillon de facturation seulement, aucun document
+    ✔ avec arrangement → validée dès l'émission de la facture
+    ✔ l'admin peut forcer la validation avant paiement
+    ✔ facture principale payée → validée
+▸ Paiements, affectation et avoir
+  ▸ Affectation
+    ✔ sans référence → factures ouvertes de la plus ancienne à la plus récente
+    ✔ un seul virement pour deux factures → les deux sont réglées
+    ✔ trop-perçu → avoir, annoncé, puis utilisé automatiquement par la facture suivante
+    ✔ paiement reçu AVANT la facture (prépaiement) → avoir, consommé à l'émission
+    ✔ paiement avec la référence d'une facture déjà payée → va sur la plus ancienne facture ouverte
+  ▸ Import bancaire (camt.054)
+    ✔ le même avis importé deux fois n'est compté qu'une fois
+    ✔ la référence est reconnue même imprimée avec des espaces
+    ✔ référence inconnue → reste à traiter à la main, rien n'est enregistré
+  ▸ Remboursements et garde-fous
+    ✔ arrondi aux 5 centimes pour l'encaissement en espèces
+    ✔ montant nul ou négatif refusé
+    ✔ solde « factures ouvertes − avoir » = solde comptable, à chaque étape
+    ✔ on ne rembourse pas plus que l'avoir
+  ▸ Statuts calculés
+    ✔ en retard après l'échéance, payé dès qu'il est soldé même en retard
+    ✔ ouvert → partiellement payé → payé
+▸ Robustesse : séquences aléatoires d'opérations
+    (exploré : 1214 factures, 5122 notes de crédit, 2170 acomptes, 98 déductions, 1588 annulations, 282 modifications, 178 remboursements, 551 paiements partiels/en trop)
+  ✔ 300 vies aléatoires : invariants à chaque pas, convergence et solde final à zéro
+▸ Scénarios de la vie réelle
+  ✔ arrangement : rien n'est en retard avant la date du salon
+  ✔ plusieurs changements après facture, regroupés en UNE facture complémentaire
+  ✔ le jour du salon : une table ajoutée sur place, facturée et payée en espèces immédiatement
+  ✔ invité d'honneur accordé après facture → note de crédit du geste commercial
+  ✔ beaucoup d'hésitations avant la facture → un seul document avec l'état final
+  ✔ les repas ne sont plus facturés à part → note de crédit « repas » + facture « principal », compensées
+  ✔ deux participations du même exposant : dossiers étanches, l'argent ne passe pas de l'un à l'autre
+  ✔ changement de stand (nouvel emplacement = nouvelle clé) → annulation de l'ancien + nouveau
+  ✔ passage à l'envoi postal après facture → frais postaux sur la facture suivante
+▸ Scénario de référence : inscription → changements → facturation → paiements → soldé
+  ✔ Dupont : 3 factures, 1 note de crédit, 3 paiements, solde 0 et prestations = documents = paiements = 625.–
+▸ Synchronisation : attendu − déjà facturé = à facturer
+  ▸ Après émission
+    ✔ liste vide (tout retiré) → annulation de tout ce qui a été facturé
+    ✔ les repas changent de groupe → annulation dans « repas », nouvelle ligne dans « principal »
+    ✔ seul le prix catalogue change → rien à refacturer
+    ✔ tout est facturé : plus rien en attente
+    ✔ retirer puis remettre avant la prochaine émission → rien à facturer
+    ✔ le prix seul change → annulation + nouvelle ligne au nouveau prix
+    ✔ seule la quantité change → ligne de différence qui cite la facture d'origine
+    ✔ un poste retiré après émission → ligne d'annulation négative
+    ✔ la prestation change (dimension) → annulation de l'ancienne ligne + nouvelle ligne
+  ▸ Avant toute émission
+    ✔ envoyer deux fois la même liste ne change rien (idempotence)
+    ✔ l'ordre des postes envoyés n'a pas d'importance
+    ✔ ajouter puis retirer avant émission ne laisse aucune trace
+    ✔ un poste retiré avant émission disparaît simplement
+    ✔ une modification met à jour la ligne à facturer, sans créer de document
+  ▸ Postes refusés à l'entrée
+    ✔ clé, libellé ou groupe vides
+    ✔ clé en double dans la liste
+    ✔ prix négatif hors réduction, ou réduction à prix positif
+    ✔ un refus ne modifie pas l'état attendu précédent
+    ✔ quantité nulle ou négative
+
+105 réussis, 0 échoués

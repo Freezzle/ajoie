@@ -40,6 +40,12 @@ export class RadioBoxComponent implements ControlValueAccessor {
         return this.controlDir?.control as FormControl<any> | null;
     }
 
+    /** Vrai quand le champ est en erreur et a déjà été visité par l'utilisateur. */
+    get isInvalid(): boolean {
+        const control = this.control;
+        return !!control && control.invalid && control.touched;
+    }
+
     onChange = (_: any) => {
     };
 

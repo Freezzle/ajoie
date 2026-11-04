@@ -35,6 +35,15 @@ const STEPS: StepDescriptor[] = [
     {key: 'summary', shortLabelKey: 'registration.steps.shortSummary', labelKey: 'registration.steps.summary'}
 ];
 
+/**
+ * Erreurs repérables dans le DOM d'une étape : contrôles Angular invalides, composants maison
+ * marqués `is-invalid` (switch, compteur, import d'image, carte de prestation) et messages
+ * d'erreur affichés hors formulaire.
+ */
+const INVALID_SELECTOR = '.ng-invalid, .is-invalid, .registration-error';
+
+const FOCUSABLE_SELECTOR = 'input:not([type="hidden"]), select, textarea, button, [tabindex]:not([tabindex="-1"])';
+
 @Component({
                selector: 'app-registration',
                imports: [
@@ -226,7 +235,7 @@ export default class RegistrationComponent implements OnInit {
             return;
         }
 
-        if (this.validateStep(this.currentStep())) {
+        if (this.validateStep(this.currentStep(), true)) {
             this.goTo(this.currentStep() + 1);
         }
     }
@@ -248,6 +257,8 @@ export default class RegistrationComponent implements OnInit {
         for (let i = this.currentStep(); i < target; i++) {
             if (!this.validateStep(i)) {
                 this.goTo(i);
+                this.showStepErrors.set(true);
+                this.scheduleFocusFirstInvalid();
                 return;
             }
         }
@@ -281,7 +292,7 @@ export default class RegistrationComponent implements OnInit {
 
     // -------------------- VALIDATION --------------------
 
-    private validateStep(index: number): boolean {
+    private validateStep(index: number, scrollToError: boolean = false): boolean {
         const group = this.stepGroup(index);
         group.markAllAsTouched();
         group.updateValueAndValidity();
@@ -299,7 +310,9 @@ export default class RegistrationComponent implements OnInit {
                                        translationParams: {count}
                                    });
 
-        setTimeout(() => this.focusFirstInvalid());
+        if (scrollToError) {
+            this.scheduleFocusFirstInvalid();
+        }
         return false;
     }
 
@@ -325,10 +338,42 @@ export default class RegistrationComponent implements OnInit {
         return typeof missingCount === 'number' && missingCount > 0 ? missingCount : 1;
     }
 
+    /**
+     * Programmé en macrotâche pour laisser l'étape se rendre, et pour passer *après* le
+     * `window.scrollTo(0)` que `goTo()` planifie lorsqu'on revient sur une étape invalide.
+     */
+    private scheduleFocusFirstInvalid(): void {
+        setTimeout(() => this.focusFirstInvalid());
+    }
+
+    /**
+     * Amène la première erreur de l'étape courante dans le champ de vision.
+     *
+     * Les conteneurs de groupe (`[formGroup]`, `[formGroupName]`) portent eux aussi `ng-invalid` :
+     * sans filtrage on viserait la section entière, donc le haut de l'étape. On ne retient donc
+     * que les éléments qui ne contiennent pas eux-mêmes une erreur, et qui sont réellement
+     * affichés (un champ d'une section repliée n'a aucune boîte de rendu).
+     */
     private focusFirstInvalid(): void {
-        const element = document.querySelector<HTMLElement>('.registration-step .ng-invalid:not(form)');
-        element?.scrollIntoView({block: 'center'});
-        element?.focus?.();
+        const root = document.querySelector('.registration-step');
+        if (!root) {
+            return;
+        }
+
+        const first = Array.from(root.querySelectorAll<HTMLElement>(INVALID_SELECTOR))
+                           .find(element => !element.querySelector(INVALID_SELECTOR)
+                               && element.getClientRects().length > 0);
+
+        if (!first) {
+            return;
+        }
+
+        first.scrollIntoView({block: 'center', behavior: 'smooth'});
+
+        const focusable = first.matches(FOCUSABLE_SELECTOR)
+                          ? first
+                          : first.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+        focusable?.focus({preventScroll: true});
     }
 
     private refreshStates(): void {
@@ -438,6 +483,7 @@ export default class RegistrationComponent implements OnInit {
             if (!this.validateStep(i)) {
                 this.goTo(i);
                 this.showStepErrors.set(true);
+                this.scheduleFocusFirstInvalid();
                 return;
             }
         }

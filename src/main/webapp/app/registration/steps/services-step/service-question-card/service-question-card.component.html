@@ -1,4 +1,4 @@
-<div class="service-card" [class.is-open]="answer === true">
+<div class="service-card" [class.is-open]="answer === true" [class.is-invalid]="showError && answer === null">
     <div class="service-card-head">
         <div class="service-card-question" [id]="'question_' + name">
             <i class="pi {{ icon }}" aria-hidden="true"></i>

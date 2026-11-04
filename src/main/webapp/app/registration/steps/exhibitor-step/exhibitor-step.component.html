@@ -32,16 +32,18 @@
         </h4>
         <app-address-form [required]="true" [showFormalFields]="false" formControlName="homeAddress"/>
 
+        <h4 class="registration-subtitle mt-4">
+            {{ 'exhibitor.billingAddress' | translate }}
+          <info-icon textKey="registration.exhibitor.billingAddressInfo"/>
+        </h4>
         <div class="mt-4">
             <checkbox-box fieldName="differentBillingAddress"
                           formControlName="differentBillingAddress"
-                          infoKey="registration.exhibitor.billingAddressInfo"
                           translateKey="registration.exhibitor.differentBillingAddress"/>
         </div>
 
         @if (form.controls.differentBillingAddress.value) {
             <div class="registration-reveal">
-                <h4 class="registration-subtitle">{{ 'exhibitor.billingAddress' | translate }}</h4>
                 <app-address-form [required]="true"
                                   [requireFullName]="true"
                                   [showFormalFields]="true"

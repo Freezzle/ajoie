@@ -63,9 +63,9 @@
       "addressTitle": "Vos adresses",
       "preferencesTitle": "Vos préférences",
       "therapistNameHelp": "Nom affiché pendant le salon. Si vide, le nom et prénom seront utilisés.",
-      "homeAddressInfo": "Nous vous transmettrons les documents/éléments physiques via cette adresse, si aucune adresse de facturation.",
-      "differentBillingAddress": "Utilisez-vous une adresse de facturation ?",
-      "billingAddressInfo": "L'adresse sera mentionnée sur la facture, QR code. Les documents/éléments physiques seront également envoyés via cette adresse.",
+      "homeAddressInfo": "Nous vous transmettrons les documents/éléments physiques via cette adresse, si aucune adresse de facturation n'est renseignée.",
+      "differentBillingAddress": "Diffère de l'adresse de courrier ?",
+      "billingAddressInfo": "Cette adresse sera mentionnée sur la facture. Les documents/éléments physiques seront également envoyés via cette adresse.",
       "emailLocked": "L'adresse e-mail ne peut pas être modifiée : votre lien personnel y est rattaché."
     },
     "services": {
@@ -80,19 +80,19 @@
       "addWorkshop": "Ajouter un autre atelier",
       "remove": "Retirer",
       "subCategoriesInfo": "Permet de citer quelques mots-clés sur ce que propose votre stand.",
-      "standDescription": "Description de votre stand",
-      "standPicture": "Image de votre entité (logo, photo profil, photo du stand, ...)",
+      "standDescription": "Description du stand (activité, produits, services, ...)",
+      "standPicture": "Image (logo, photo de profil, photo du stand, ...)",
       "publishedOnWebsiteQuestion": "J'accepte d'apparaître sur les supports marketing de L'Ajoie de mieux vivre",
-      "publishedOnWebsiteHint": "Votre nom, description de stand, réseaux sociaux et photo seront publiés sur notre site internet et instagram afin de vous donner de la visibilité.",
+      "publishedOnWebsiteHint": "Votre nom, description de stand, réseaux sociaux et photo seront publiés sur notre site internet, facebook et instagram afin de vous donner de la visibilité.",
       "coExhibitorDescription": "Description du stand du co-exposant",
-      "coExhibitorPicture": "Image de l'entité co-exposant (logo, photo profil, photo du stand, ...)",
+      "coExhibitorPicture": "Image pour le co-exposant (logo, photo profil, photo du stand, ...)",
       "coExhibitorPublishedOnWebsiteQuestion": "Le co-exposant accepte d'apparaître sur les supports marketing de L'Ajoie de mieux vivre?",
-      "coExhibitorPublishedOnWebsiteHint": "Son nom, description de stand, réseaux sociaux et photo seront publiés sur notre site internet et instagram afin de lui donner de la visibilité.",
+      "coExhibitorPublishedOnWebsiteHint": "Son nom, description de stand, réseaux sociaux et photo seront publiés sur notre site internet, facebook et instagram afin de lui donner de la visibilité.",
       "logisticsTitle": "Logistique",
-      "logisticsHelp": "Que désirez-vous avoir dans votre stand à votre arrivée ?",
+      "logisticsHelp": "Que désirez-vous que le salon vous installe sur votre emplacement ?",
       "tableSizeHint": "180 cm x 70 cm",
       "coExhibitorTitle": "Stand partagé avec un co-exposant",
-      "coExhibitorHelp": "Si vous partagez votre stand avec une personne qui exerce une autre activité principale."
+      "coExhibitorHelp": "Si vous partagez votre stand avec une personne qui exerce une autre activité principale, veuillez cocher cette option."
     },
     "participation": {
       "mealsTitle": "Les repas",
@@ -146,7 +146,7 @@
     "status": {
       "title": "Statut de l'inscription",
       "detail": {
-        "IN_VERIFICATION": "Votre inscription est en cours de vérification par l'organisation. Vous pouvez encore la modifier grâce à ce lien tant qu'elle n'a pas été traitée.",
+        "IN_VERIFICATION": "Votre inscription est en cours de vérification par l'organisation. Vous pouvez encore la modifier tant qu'elle n'a pas été traitée par l'organisation.",
         "ACCEPTED": "Bonne nouvelle, votre inscription a été acceptée ! Vous ne pouvez plus la modifier depuis ce lien, mais vous recevrez prochainement toutes les informations utiles pour le salon.",
         "VALIDATED": "Votre inscription est validée, votre participation au salon est confirmée. Elle n'est plus modifiable depuis ce lien.",
         "CLOSED": "Votre inscription est terminée. Merci pour votre participation au salon !",

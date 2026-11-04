@@ -85,6 +85,19 @@ export class ImageUploadBoxComponent implements ControlValueAccessor, OnChanges 
         return this.requiredField || (this.control?.hasValidator(Validators.required) ?? false);
     }
 
+    /**
+     * Vrai lorsque le champ doit signaler une erreur : soit le formControl est invalide et a déjà
+     * été visité, soit le fichier choisi a été rejeté (taille, type, image illisible).
+     */
+    get isInvalid(): boolean {
+        if (this.errorKey) {
+            return true;
+        }
+
+        const control = this.control;
+        return !!control && control.invalid && control.touched;
+    }
+
     get showsExisting(): boolean {
         return (this.hasExistingPicture || !!this.existingPictureUrl) && !this.existingRemovedFlag;
     }

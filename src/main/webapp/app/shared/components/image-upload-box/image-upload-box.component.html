@@ -1,4 +1,4 @@
-<div class="image-upload-box">
+<div class="image-upload-box" [class.is-invalid]="isInvalid">
     @if (translateKey) {
         <label class="image-upload-box__label" [for]="'field_' + fieldName">
             {{ translateKey | translate }}

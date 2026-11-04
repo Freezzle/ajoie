@@ -1,6 +1,83 @@
 // Styles partagés par les étapes du stepper d'inscription.
 // Déclarés globalement pour éviter la duplication dans chaque composant d'étape.
 
+// Les erreurs de saisie des parcours publics utilisent --app-danger : le preset Material fait
+// pointer `form.field.invalid.border.color` sur {red.300}, une teinte trop pâle de #fd7658 pour
+// être repérée. La surcharge est scopée à .registration-page pour ne pas toucher l'administration.
+.registration-page {
+  // Les variables --p-form-field-* sont résolues au niveau de :root par PrimeNG : les surcharger
+  // ici n'aurait aucun effet. On cible donc directement les tokens de chaque composant.
+  --p-inputtext-invalid-border-color: var(--app-danger);
+  --p-inputtext-invalid-placeholder-color: var(--app-danger);
+  --p-textarea-invalid-border-color: var(--app-danger);
+  --p-textarea-invalid-placeholder-color: var(--app-danger);
+  --p-select-invalid-border-color: var(--app-danger);
+  --p-select-invalid-placeholder-color: var(--app-danger);
+  --p-toggleswitch-invalid-border-color: var(--app-danger);
+  --p-checkbox-invalid-border-color: var(--app-danger);
+  --p-radiobutton-invalid-border-color: var(--app-danger);
+  --p-message-error-color: var(--app-danger);
+  --p-message-error-border-color: var(--app-danger);
+  --p-message-error-simple-color: var(--app-danger);
+
+  // Une bordure de 1 px reste discrète sur fond clair : on épaissit et on ajoute un anneau.
+  .p-inputtext.p-invalid,
+  .p-textarea.p-invalid,
+  .p-select.p-invalid,
+  .p-datepicker.p-invalid .p-inputtext {
+    border-color: var(--app-danger);
+    border-width: 2px;
+  }
+
+  // La piste du toggleswitch Material ne fait que 2,75 × 1 rem : la bordure d'erreur y est
+  // imperceptible. On signale donc l'erreur sur toute la carte et on cercle le switch.
+  .checkbox-box.is-invalid {
+    border: 2px solid var(--app-danger);
+
+    .p-toggleswitch {
+      border-radius: 30px;
+    }
+
+    .p-toggleswitch.p-invalid:not(.p-toggleswitch-checked) > .p-toggleswitch-slider {
+      background: color-mix(in srgb, var(--app-danger) 45%, white);
+    }
+  }
+
+  .radio-box.is-invalid {
+    .radio-box-label {
+      color: var(--app-danger);
+    }
+
+    .radio-box-option:not(.selected) {
+      border-color: var(--app-danger);
+    }
+  }
+
+  .counter-box.is-invalid {
+    .counter-box-value,
+    .counter-box-button {
+      border-color: var(--app-danger);
+    }
+
+    .counter-box-value {
+      border-width: 2px;
+    }
+  }
+
+  // Zone d'import d'image : l'erreur est portée par le bloc PrimeNG `p-fileupload` (ou par
+  // l'aperçu quand une image est déjà présente), pas par un input que `.p-invalid` atteindrait.
+  .image-upload-box.is-invalid {
+    .p-fileupload,
+    .image-upload-box__preview {
+      border: 2px solid var(--app-danger);
+    }
+  }
+}
+
+.registration-error {
+  color: var(--app-danger);
+}
+
 .registration-subtitle {
   font-size: 1.4rem !important;
   margin: 2rem 0 0.85rem;

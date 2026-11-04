@@ -10,6 +10,14 @@
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--p-primary-color) 10%, transparent);
   }
 
+  &.is-invalid {
+    border-color: var(--app-danger);
+
+    .service-card-answer {
+      border-color: var(--app-danger);
+    }
+  }
+
   .service-card-head {
     display: flex;
     align-items: center;
@@ -68,7 +76,7 @@
 
   .service-card-error {
     margin: 0.75rem 0 0;
-    color: var(--p-red-500, #d9534f);
+    color: var(--app-danger);
     font-size: 0.85rem;
   }
 

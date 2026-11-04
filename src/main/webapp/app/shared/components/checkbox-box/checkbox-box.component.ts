@@ -41,6 +41,12 @@ export class CheckboxBoxComponent implements ControlValueAccessor, OnInit {
         return this.controlDir.control as FormControl<any>;
     }
 
+    /** Vrai quand le champ est piloté par un formControl en erreur déjà visité par l'utilisateur. */
+    get isInvalid(): boolean {
+        const control = this.isFormControlUsed ? this.controlDir?.control : null;
+        return !!control && control.invalid && control.touched;
+    }
+
     onChange = (_: any) => {
     };
 
