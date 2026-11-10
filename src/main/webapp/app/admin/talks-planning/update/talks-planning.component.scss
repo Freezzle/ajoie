@@ -5,10 +5,10 @@
     --tp-danger: var(--app-danger, #fd7658);
     --tp-warning: var(--app-warning, #e89d0e);
     --tp-conference: #94dfff;
-    --tp-conference-bg: color-mix(in srgb, var(--tp-conference) 95%, transparent);
+    --tp-conference-bg: color-mix(in srgb, var(--tp-conference) 80%, transparent);
     --tp-conference-border: color-mix(in srgb, var(--app-text) 95%, transparent);
     --tp-workshop: #f6b936;
-    --tp-workshop-bg: color-mix(in srgb, var(--tp-workshop) 95%, transparent);
+    --tp-workshop-bg: color-mix(in srgb, var(--tp-workshop) 80%, transparent);
     --tp-workshop-border: color-mix(in srgb, var(--app-text) 95%, transparent);
     --tp-hatch: color-mix(in srgb, var(--app-text) 30%, transparent);
     /* non défini globalement : repli local, hérité par tous les sous-composants */

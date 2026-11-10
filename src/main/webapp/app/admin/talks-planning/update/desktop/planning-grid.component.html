@@ -13,8 +13,15 @@
 
         <div class="tp-axis" [style.height.px]="heightPx()">
             @for (line of axisLines(); track line.minute) {
-                <div class="tp-axis-line small" [class.fw-bold]="line.full" [style.top.px]="line.top">
-                    {{ line.full ? line.label : '' }}
+                <div class="tp-axis-line small"
+                     [class.fw-bold]="line.full"
+                     [class.is-first]="$first"
+                     [class.is-last]="$last"
+                     [style.top.px]="line.top">
+                    @if (line.full) {
+                        <span class="tp-axis-label">{{ line.label }}</span>
+                        <span class="tp-axis-tick"></span>
+                    }
                 </div>
             }
         </div>
