@@ -78,7 +78,6 @@ export class TalksPlanningStore {
     readonly selectedTalkKey = signal<string | null>(null);
     readonly focusTherapist = signal<string | null>(null);
     readonly panelFolded = signal<boolean>(false);
-    readonly showConflicts = signal<boolean>(false);
     readonly trayFilter = signal<TrayFilter>('ALL');
     readonly trayQuery = signal<string>('');
     readonly menuItems = signal<AppMenuItem[]>([]);
@@ -300,7 +299,6 @@ export class TalksPlanningStore {
         this.selectedSlot.set(null);
         this.selectedTalkKey.set(null);
         this.focusTherapist.set(null);
-        this.showConflicts.set(false);
         this.toast.set(null);
     }
 

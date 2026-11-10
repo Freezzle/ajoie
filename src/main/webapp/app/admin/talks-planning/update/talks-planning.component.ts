@@ -12,11 +12,10 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
-import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {BottomSheetComponent} from '../../../shared/components/bottom-sheet/bottom-sheet.component';
 
-import {ConflictLine, PlanningDayBarComponent} from './desktop/planning-day-bar.component';
+import {PlanningDayBarComponent} from './desktop/planning-day-bar.component';
 import {PlaceEvent, PlanningGridComponent, SlotEvent} from './desktop/planning-grid.component';
 import {PlanningSidePanelComponent} from './desktop/planning-side-panel.component';
 import {TalkTrayComponent} from './desktop/talk-tray.component';
@@ -50,7 +49,6 @@ type MobileSheet = 'NONE' | 'TRAY' | 'SLOT' | 'DETAIL';
                    ButtonBoxComponent,
                    AlertErrorComponent,
                    CardComponent,
-                   MenuBoxComponent,
                    DialogBoxComponent,
                    BottomSheetComponent,
 
@@ -147,23 +145,6 @@ export class TalksPlanningComponent implements OnInit {
             titles.set(talkKey(talk), reasons.map(reason => this.translateReason(reason)).join(' · '));
         }
         return titles;
-    });
-
-    readonly conflictLines = computed<ConflictLine[]>(() => {
-        const config = this.store.configuration();
-        if (!config) {
-            return [];
-        }
-        const talks = this.store.talks();
-        return this.store.conflicts().map(talk => {
-            const day = config.days.find(entry => entry.id === talk.dayId);
-            return {
-                key: talkKey(talk),
-                title: talk.title,
-                position: `${day?.label ?? ''} · ${hhmm(talk.startMinute ?? 0)}`,
-                reason: this.translateReason(issuesOf(talk, talks, config)[0])
-            };
-        });
     });
 
     readonly slotTitle = computed(() => {

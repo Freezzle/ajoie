@@ -1,16 +1,8 @@
 <div class="d-flex flex-column gap-2 min-h-0">
-    <div class="btn-group btn-group-sm w-100" role="group">
-        @for (entry of filters; track entry.value) {
-            <button type="button"
-                    class="btn"
-                    [class.btn-primary]="entry.value === filter()"
-                    [class.btn-outline-secondary]="entry.value !== filter()"
-                    (click)="filterChanged.emit(entry.value)">
-                {{ entry.key | translate }}
-                <span class="badge text-bg-light ms-1">{{ countOf(entry.value) }}</span>
-            </button>
-        }
-    </div>
+    <switch-box [fullWidth]="true"
+                [options]="filterOptions()"
+                [value]="filter()"
+                (valueChange)="onFilterChange($event)"/>
 
     <input type="search"
            class="form-control form-control-sm"

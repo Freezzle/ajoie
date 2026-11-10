@@ -17,6 +17,7 @@ import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
+import {SwitchBoxComponent, SwitchBoxOption} from '../../../shared/components/switch-box/switch-box.component';
 
 import {CategoryManagerComponent} from './category-manager/category-manager.component';
 import {SelectedDayAssignmentsComponent} from './selected-day-assignments/selected-day-assignments.component';
@@ -48,6 +49,7 @@ import {ViewMode, VolunteerPlanningStore} from './volunteer-planning.store';
                    CardComponent,
                    MenuBoxComponent,
                    DialogBoxComponent,
+                   SwitchBoxComponent,
 
                    CategoryManagerComponent,
                    SelectedDayAssignmentsComponent,
@@ -84,10 +86,10 @@ export class VolunteerPlanningComponent implements OnInit {
     readonly manageDayCreateMode = signal(false);
     readonly manageDaySelectedDayId = signal<string>('');
 
-    readonly viewOptions: { mode: ViewMode; icon: string; key: string }[] = [
-        {mode: 'both', icon: 'pi pi-window-maximize', key: 'planningVolunteers.view.both'},
-        {mode: 'person', icon: 'pi pi-user', key: 'planningVolunteers.view.persons'},
-        {mode: 'zone', icon: 'pi pi-th-large', key: 'planningVolunteers.view.zones'}
+    readonly viewOptions: SwitchBoxOption[] = [
+        {value: 'both', icon: 'pi pi-window-maximize', labelKey: 'planningVolunteers.view.both'},
+        {value: 'person', icon: 'pi pi-user', labelKey: 'planningVolunteers.view.persons'},
+        {value: 'zone', icon: 'pi pi-th-large', labelKey: 'planningVolunteers.view.zones'}
     ];
 
     readonly plannedHoursLabel = computed(() => formatHours(this.store.stats().plannedHours));
@@ -180,7 +182,8 @@ export class VolunteerPlanningComponent implements OnInit {
 
     // ---------- vue ----------
 
-    setViewMode(mode: ViewMode): void {
+    setViewMode(value: string): void {
+        const mode = value as ViewMode;
         this.store.viewMode.set(mode);
         this.store.blockSelection.set(null);
         if (mode === 'person') {

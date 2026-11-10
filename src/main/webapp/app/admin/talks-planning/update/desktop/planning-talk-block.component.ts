@@ -50,6 +50,7 @@ import {hhmm, isUnsettledStatus, statusLabelKey, Talk} from '../talks-planning-m
                    '[class.is-workshop]': 'talk().type === "WORKSHOP"',
                    '[class.has-conflict]': 'hasConflict()',
                    '[class.is-dimmed]': 'dimmed()',
+                   '[class.is-moving]': 'moving()',
                    '[class.is-highlighted]': 'highlighted()',
                    '[class.is-draggable]': 'draggable()'
                },
@@ -62,6 +63,8 @@ export class PlanningTalkBlockComponent {
     readonly dimmed = input<boolean>(false);
     readonly highlighted = input<boolean>(false);
     readonly draggable = input<boolean>(false);
+    /** Bloc d'origine d'une intervention en cours de déplacement : estompé au profit de l'aperçu. */
+    readonly moving = input<boolean>(false);
 
     readonly blockClick = output<void>();
 

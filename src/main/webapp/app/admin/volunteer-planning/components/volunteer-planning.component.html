@@ -106,16 +106,9 @@
 
                 @if (!isMobile()) {
                     <div class="vp-viewbar">
-                        <div class="vswitch">
-                            @for (opt of viewOptions; track opt.mode) {
-                                <button type="button"
-                                        [class.on]="store.viewMode() === opt.mode"
-                                        (click)="setViewMode(opt.mode)">
-                                    <i [class]="opt.icon"></i>
-                                    <span>{{ opt.key | translate }}</span>
-                                </button>
-                            }
-                        </div>
+                        <switch-box [options]="viewOptions"
+                                    [value]="store.viewMode()"
+                                    (valueChange)="setViewMode($event)"/>
 
                         @if (store.focusVolunteerId()) {
                             <span class="vhint">

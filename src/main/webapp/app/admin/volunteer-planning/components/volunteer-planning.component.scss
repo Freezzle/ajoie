@@ -56,38 +56,6 @@
     align-items: center;
 }
 
-.vswitch {
-    display: inline-flex;
-    background: var(--app-surface);
-    border: 1px solid var(--app-border);
-    border-radius: 12px;
-    padding: 4px;
-    gap: 4px;
-}
-
-.vswitch button {
-    border: 0;
-    background: none;
-    border-radius: 9px;
-    padding: 8px 16px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    color: var(--app-text-muted);
-    font-weight: 600;
-    font-size: 13.5px;
-    cursor: pointer;
-}
-
-.vswitch button i {
-    font-size: 17px;
-}
-
-.vswitch button.on {
-    background: var(--vp-accent);
-    color: #fff;
-}
-
 .vhint {
     color: var(--app-text-muted);
     font-size: 12.5px;

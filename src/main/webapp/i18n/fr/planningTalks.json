@@ -1,10 +1,5 @@
 {
   "planningTalks": {
-    "status": {
-      "toPlan": "{{count}} à planifier",
-      "allPlaced": "Tout est placé",
-      "conflicts": "{{count}} conflit(s)"
-    },
     "tray": {
       "title": "À planifier",
       "all": "Toutes",

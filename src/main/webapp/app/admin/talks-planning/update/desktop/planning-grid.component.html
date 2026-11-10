@@ -46,6 +46,7 @@
                                          [dimmed]="isDimmed(block.talk)"
                                          [draggable]="isEditing()"
                                          [highlighted]="isHighlighted(block.talk)"
+                                         [moving]="isMoving(block.key)"
                                          [pxPerMinute]="pxPerMinute()"
                                          [style.height.px]="block.height"
                                          [style.top.px]="block.top"

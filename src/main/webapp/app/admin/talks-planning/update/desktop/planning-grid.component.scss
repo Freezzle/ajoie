@@ -93,13 +93,12 @@
 
 .tp-preview {
     position: absolute;
-    left: 5px;
-    right: 5px;
+    left: 0;
+    right: 0;
     z-index: 3;
     pointer-events: none;
-    border-radius: 8px;
-    border: 2px dashed var(--tp-ok);
-    background: var(--tp-ok-bg);
+    border: 2px dashed var(--app-text);
+    background: color-mix(in srgb, var(--tp-ok) 30%, var(--app-surface, #fff));
     color: var(--app-text);
     display: flex;
     flex-direction: column;
@@ -111,5 +110,5 @@
 
 .tp-preview.is-bad {
     border-color: var(--tp-danger);
-    background: var(--tp-danger-bg);
+    background: color-mix(in srgb, var(--tp-danger) 30%, var(--app-surface, #fff));
 }

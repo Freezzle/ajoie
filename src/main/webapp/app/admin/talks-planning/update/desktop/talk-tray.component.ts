@@ -1,10 +1,14 @@
-import {ChangeDetectionStrategy, Component, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, input, output} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {TranslatePipe} from '@ngx-translate/core';
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 
 import StatusPipe from '../../../../shared/pipe/status.pipe';
 import ColorStatusPipe from '../../../../shared/pipe/color-status.pipe';
+import {
+    SwitchBoxComponent,
+    SwitchBoxOption
+} from '../../../../shared/components/switch-box/switch-box.component';
 import {isUnsettledStatus, statusLabelKey, Talk} from '../talks-planning-model';
 import {TrayFilter} from '../talks-planning.store';
 
@@ -12,7 +16,7 @@ import {TrayFilter} from '../talks-planning.store';
 @Component({
                selector: 'talk-tray',
                standalone: true,
-               imports: [FormsModule, TranslatePipe, FaIconComponent, StatusPipe, ColorStatusPipe],
+               imports: [FormsModule, TranslatePipe, FaIconComponent, StatusPipe, ColorStatusPipe, SwitchBoxComponent],
                templateUrl: './talk-tray.component.html',
                styleUrl: './talk-tray.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush
@@ -31,14 +35,21 @@ export class TalkTrayComponent {
     readonly talkChosen = output<Talk>();
     readonly talkDragStart = output<{ talk: Talk; event: PointerEvent }>();
 
-    readonly filters: { value: TrayFilter; key: string }[] = [
+    private readonly filters: { value: TrayFilter; key: string }[] = [
         {value: 'ALL', key: 'planningTalks.tray.all'},
         {value: 'CONFERENCE', key: 'planningTalks.tray.conferences'},
         {value: 'WORKSHOP', key: 'planningTalks.tray.workshops'}
     ];
 
-    countOf(filter: TrayFilter): number {
-        return this.counts()[filter];
+    /** Les compteurs par type remplacent les icônes dans le sélecteur de filtre. */
+    readonly filterOptions = computed<SwitchBoxOption[]>(() => this.filters.map(entry => ({
+        value: entry.value,
+        labelKey: entry.key,
+        count: this.counts()[entry.value]
+    })));
+
+    onFilterChange(value: string): void {
+        this.filterChanged.emit(value as TrayFilter);
     }
 
     /** Les statuts « aboutis » ne sont pas affichés : seuls les autres méritent d'être signalés. */

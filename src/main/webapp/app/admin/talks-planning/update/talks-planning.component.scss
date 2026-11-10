@@ -2,17 +2,15 @@
     /* Jetons locaux, repris du thème : aucun code couleur en dur dans les composants enfants. */
     --tp-accent: var(--p-primary-color, #325d88);
     --tp-ok: var(--p-primary-color, #325d88);
-    --tp-ok-bg: color-mix(in srgb, var(--p-primary-color, #325d88) 12%, transparent);
     --tp-danger: var(--app-danger, #fd7658);
-    --tp-danger-bg: color-mix(in srgb, var(--app-danger, #fd7658) 14%, transparent);
     --tp-warning: var(--app-warning, #e89d0e);
-    --tp-conference: #7c5cff;
-    --tp-conference-bg: color-mix(in srgb, #7c5cff 10%, transparent);
-    --tp-conference-border: color-mix(in srgb, #7c5cff 35%, transparent);
-    --tp-workshop: #16a3a3;
-    --tp-workshop-bg: color-mix(in srgb, #16a3a3 10%, transparent);
-    --tp-workshop-border: color-mix(in srgb, #16a3a3 35%, transparent);
-    --tp-hatch: color-mix(in srgb, var(--app-text, #575757) 18%, transparent);
+    --tp-conference: #94dfff;
+    --tp-conference-bg: color-mix(in srgb, var(--tp-conference) 95%, transparent);
+    --tp-conference-border: color-mix(in srgb, var(--app-text) 95%, transparent);
+    --tp-workshop: #f6b936;
+    --tp-workshop-bg: color-mix(in srgb, var(--tp-workshop) 95%, transparent);
+    --tp-workshop-border: color-mix(in srgb, var(--app-text) 95%, transparent);
+    --tp-hatch: color-mix(in srgb, var(--app-text) 30%, transparent);
     /* non défini globalement : repli local, hérité par tous les sous-composants */
     --app-text-muted: #9aa1ad;
 }

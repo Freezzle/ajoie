@@ -15,22 +15,7 @@
                         [showText]="false"
                         primeIcon="pi-pencil"
                         translateKey="common.edit"/>
-            @if (store.menuItems().length > 0) {
-                <menu-box [items]="store.menuItems()" buttonIcon="pi-list" buttonTranslateKey="common.actions"/>
-            }
         } @else {
-            <button-box (clickedEvent)="store.undo()"
-                        [isDisabled]="store.isLoading() || !store.canUndo()"
-                        [showText]="false"
-                        primeIcon="pi-undo"
-                        translateKey="planningTalks.undo"
-                        type="secondary"/>
-            <button-box (clickedEvent)="configDialogVisible.set(true)"
-                        [isDisabled]="store.isLoading()"
-                        [showText]="false"
-                        primeIcon="pi-sliders-h"
-                        translateKey="planningTalks.config.title"
-                        type="secondary"/>
             <button-box (clickedEvent)="store.activateReadOnlyMode()"
                         [isDisabled]="store.isLoading()"
                         [showText]="false"
@@ -66,16 +51,16 @@
                     </div>
                 }
             } @else {
-                <planning-day-bar [conflictLines]="conflictLines()"
-                                  [conflicts]="store.conflicts()"
+                <planning-day-bar [canUndo]="store.canUndo()"
                                   [conflictsByDay]="store.conflictsByDay()"
                                   [days]="store.days()"
-                                  [expanded]="store.showConflicts()"
+                                  [isLoading]="store.isLoading()"
+                                  [isReadOnly]="store.isReadOnly()"
+                                  [menuItems]="store.menuItems()"
                                   [selectedDayId]="store.selectedDay()?.id ?? null"
-                                  [unplacedCount]="store.unplacedCount()"
-                                  (conflictSelected)="onTalkClick($event)"
-                                  (conflictsToggled)="store.showConflicts.set(!store.showConflicts())"
-                                  (daySelected)="store.selectDay($event)"/>
+                                  (configRequested)="configDialogVisible.set(true)"
+                                  (daySelected)="store.selectDay($event)"
+                                  (undoRequested)="store.undo()"/>
 
                 @if (store.talkInHandValue()) {
                     <div class="alert alert-secondary d-flex align-items-center flex-wrap gap-2 py-2 px-3 mb-2 small"

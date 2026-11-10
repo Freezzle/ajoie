@@ -169,6 +169,13 @@ export class PlanningGridComponent {
         return focus !== null && talk.participation.therapistName !== focus;
     }
 
+    /** Clé de l'intervention en cours de déplacement, qu'elle soit glissée ou « en main ». */
+    readonly movingKey = computed(() => this.dragKey() ?? this.talkInHand());
+
+    isMoving(key: string): boolean {
+        return this.movingKey() === key;
+    }
+
     isHighlighted(talk: Talk): boolean {
         const focus = this.focusTherapist();
         return focus !== null && talk.participation.therapistName === focus;

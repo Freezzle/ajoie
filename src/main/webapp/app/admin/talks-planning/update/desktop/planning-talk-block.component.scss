@@ -2,16 +2,13 @@
 
 :host {
     position: absolute;
-    left: 4px;
-    right: 4px;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-radius: 8px;
     border: 1px solid var(--tp-type-border);
-    border-left: 3px solid var(--tp-type-line);
     background: var(--tp-type-bg);
-    color: var(--app-text);
     cursor: pointer;
     transition: opacity .15s, box-shadow .15s;
 }
@@ -37,6 +34,12 @@
     opacity: .28;
 }
 
+/* Position d'origine pendant un déplacement : neutralisée, l'aperçu porte l'information. */
+:host(.is-moving) {
+    opacity: .3;
+    filter: grayscale(1);
+}
+
 :host(.is-highlighted) {
     box-shadow: 0 0 0 2px var(--tp-accent);
 }
@@ -52,8 +55,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    color: var(--app-text-muted);
-    text-transform: uppercase;
+    color: var(--app-text);
     letter-spacing: .04em;
     background-image: repeating-linear-gradient(135deg, var(--tp-hatch) 0 4px, transparent 4px 8px);
 }
