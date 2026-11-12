@@ -28,6 +28,14 @@ export class EmailDialogComponent implements OnInit {
     private readonly actionsService = inject(ActionsService);
     private pendingHtml?: string;
 
+    /**
+     * Les envois groupés n'ont pas de destinataire direct : la liste est calculée côté serveur
+     * et seul le nombre de destinataires en copie cachée est affiché.
+     */
+    get isBulkSending(): boolean {
+        return this.template.recipientsCount != null;
+    }
+
     constructor(private fb: FormBuilder, public activeModal: NgbActiveModal) {
     }
 
@@ -37,7 +45,8 @@ export class EmailDialogComponent implements OnInit {
                                           value: this.template.from,
                                           disabled: true
                                       }, [Validators.required, Validators.email]],
-                                      to: [this.template.to, [Validators.required, Validators.email]],
+                                      to: [this.template.to,
+                                           this.isBulkSending ? [] : [Validators.required, Validators.email]],
                                       subject: [this.template.subject, Validators.required],
                                       body: [this.template.body, Validators.required],
                                       attachments: [this.template.attachments]

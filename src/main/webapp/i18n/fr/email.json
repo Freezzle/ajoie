@@ -2,6 +2,7 @@
   "email": {
     "from": "Expéditeur",
     "subject": "Titre",
-    "to": "Destinataire"
+    "to": "Destinataire",
+    "recipientsBcc": "{{count}} destinataire(s) en copie cachée"
   }
 }

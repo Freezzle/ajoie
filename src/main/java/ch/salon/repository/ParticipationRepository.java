@@ -34,6 +34,11 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
     @EntityGraph(attributePaths = {"exhibitor"})
     List<Participation> findByStatusIn(List<Status> statuses);
 
+    /** Emails (en minuscules) des clients déjà inscrits à un salon, pour les statuts donnés. */
+    @Query("SELECT LOWER(p.exhibitor.email) FROM Participation p "
+            + "WHERE p.salon.id = :idSalon AND p.exhibitor.email IS NOT NULL")
+    List<String> findExhibitorEmailsBySalonId(@Param("idSalon") UUID idSalon);
+
     /** Nombre de participations actives par salon : [idSalon, compteur]. */
     @Query("SELECT p.salon.id, COUNT(p) FROM Participation p WHERE p.status NOT IN :statuses GROUP BY p.salon.id")
     List<Object[]> countBySalonExcludingStatuses(@Param("statuses") List<Status> statuses);

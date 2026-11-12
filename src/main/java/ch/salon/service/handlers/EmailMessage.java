@@ -9,6 +9,8 @@ import java.util.List;
 public class EmailMessage {
     private String from;
     private String to;
+    private List<String> bcc = new ArrayList<>();
+    private Integer recipientsCount;
     private String subject;
     private String body;
     private List<EmailAttachment> attachments = new ArrayList<>();

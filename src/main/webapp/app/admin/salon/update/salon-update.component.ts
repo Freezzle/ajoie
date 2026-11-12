@@ -32,6 +32,8 @@ import {AvailableAction} from '../../../shared/model/available-action';
 import {TranslateService} from '@ngx-translate/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
+import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.component';
+import {EmailMessage} from '../../../shared/email-dialog/email-message';
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {AlertService} from '../../../core/util/alert.service';
 @Component({
@@ -152,7 +154,33 @@ export class SalonUpdateComponent implements OnInit {
     clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
         if (action.type === 'BUSINESS') {
             this.handleBusinessAction(action, htmlElement);
+        } else if (action.type === 'EMAIL') {
+            this.openEmailPopup(action);
+        } else {
+            console.warn('Action type unknown : ' + action.type);
         }
+    }
+
+    openEmailPopup(action: AvailableAction): void {
+        const salonId = this.initialSalon?.id;
+        if (!salonId) {
+            return;
+        }
+        this.actionsService.templateEmailAction(action.contextCode, salonId).subscribe(template => {
+            const modalRef = this.modalService.open(EmailDialogComponent, {size: 'xl'});
+            modalRef.componentInstance.template = template;
+            modalRef.componentInstance.context = action.contextCode;
+            modalRef.componentInstance.entityId = salonId;
+
+            modalRef.result.then((result: EmailMessage) => {
+                if (result) {
+                    this.isLoading = true;
+                    this.actionsService.emailAction(action.contextCode, salonId, result)
+                        .pipe(finalize(() => this.isLoading = false))
+                        .subscribe(() => this.loadActions());
+                }
+            }).catch(() => { /* dismissed */ });
+        });
     }
     private handleBusinessAction(action: AvailableAction, htmlElement?: HTMLElement): void {
         const salonId = this.initialSalon?.id;

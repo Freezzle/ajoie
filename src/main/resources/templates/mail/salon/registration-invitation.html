@@ -1,0 +1,29 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+  <p>
+    Bonjour,
+  </p>
+  <p>
+    Nous avons le plaisir de t'annoncer que les inscriptions exposants pour
+    <strong>[[${salon}]]</strong> sont ouvertes.
+  </p>
+  <p th:if="${startDate != null and endDate != null}">
+    Nous nous retrouverons du <strong>[[${startDate}]]</strong> au <strong>[[${endDate}]]</strong>.
+  </p>
+  <p>
+    Ce salon, c'est avant tout une histoire de rencontres : des exposants qui partagent ce qu'ils aiment,
+    des visiteurs curieux, et des moments d'échange simples et sincères.
+    Nous serions vraiment heureux que tu en fasses partie et que tu viennes y apporter
+    ton univers.
+  </p>
+  <p>
+    Si tu veux faire partie de l'aventure, tu peux t'inscrire via ce formulaire : <a th:href="${registrationLink}">Formulaire d'inscription</a>
+  </p>
+  <p>
+    Et si tu as la moindre question ou simplement envie d'en discuter avant de te lancer,
+    n'hésite pas à nous écrire : on prendra le temps de te répondre.
+  </p>
+  <p>
+    En espérant te retrouver bientôt,<br/>
+    <strong>L'équipe du salon</strong>
+  </p>
+</div>

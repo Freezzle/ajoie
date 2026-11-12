@@ -9,7 +9,12 @@
                 <text-box fieldName="from" formControlName="from" translateKey="email.from"/>
             </div>
             <div class="mt-4 col-12 col-sm-6">
-                <text-box fieldName="to" formControlName="to" translateKey="email.to"/>
+                @if (isBulkSending) {
+                    <div class="fw-bold" jhiTranslate="email.to">Destinataire</div>
+                    <div>{{ 'email.recipientsBcc' | translate: {count: template.recipientsCount} }}</div>
+                } @else {
+                    <text-box fieldName="to" formControlName="to" translateKey="email.to"/>
+                }
             </div>
             <div class="mt-4 col-12">
                 <text-box fieldName="subject" formControlName="subject" translateKey="email.subject"/>

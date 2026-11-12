@@ -18,6 +18,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -90,7 +91,14 @@ public class EmailCreator {
         if (StringUtils.hasText(redirectionAllTo)) {
             message.setTo(redirectionAllTo);
         } else {
-            message.setTo(emailMessage.getTo());
+            if (StringUtils.hasText(emailMessage.getTo())) {
+                message.setTo(emailMessage.getTo());
+            }
+
+            List<String> bcc = emailMessage.getBcc();
+            if (bcc != null && !bcc.isEmpty()) {
+                message.setBcc(bcc.toArray(new String[0]));
+            }
         }
 
         message.setSubject(emailMessage.getSubject());
