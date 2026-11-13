@@ -1,0 +1,21 @@
+<div class="row g-3">
+    <div class="col-12 col-sm-5">
+        <text-box [formControl]="offsetControl"
+                  [maxLength]="8"
+                  fieldName="dueDateOffsetText"
+                  translateKey="task.quickAdd.dueOffset"/>
+    </div>
+
+    <div class="col-12 col-sm-7">
+        <date-box [formControl]="dateControl"
+                  fieldName="dueDateDisplay"
+                  translateKey="task.quickAdd.dueDate"/>
+    </div>
+
+    <div class="col-12">
+        <checkbox-box [formControl]="linkedControl"
+                      [hint]="'task.quickAdd.linkedHint' | translate"
+                      fieldName="dueDateLinked"
+                      translateKey="task.quickAdd.linked"/>
+    </div>
+</div>

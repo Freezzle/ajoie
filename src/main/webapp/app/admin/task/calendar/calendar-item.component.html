@@ -1,6 +1,6 @@
 <div [class.is-done]="done()" [class.ci-flash]="flashed()" [title]="movedHint()" class="ci">
     <subtask-status-panel (changed)="changed.emit($event)"
-                          (editRequested)="editRequested.emit(subtask())"
+                          (editRequested)="requestEdit()"
                           [known]="known()"
                           [subtask]="subtask()"
                           [task]="subtask().parentTask"/>

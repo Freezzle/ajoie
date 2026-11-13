@@ -60,9 +60,6 @@
                         {{ 'task.menu.commentsWithCount' | translate: {count: comments().length} }}
                     </button>
                 }
-                <button (click)="seeInList.emit(task())" class="tc-link" type="button">
-                    {{ 'task.list.seeInList' | translate }} →
-                </button>
             </div>
 
             @for (subtask of activeSubtasks(); track subtask.id) {

@@ -5,35 +5,51 @@
 }
 
 .cd {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
     height: 100%;
     min-height: 118px;
     padding: 6px;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    background: var(--app-surface-muted);
-    transition: border-color .12s, background .12s;
+    border: 1px dashed var(--app-border);
+    border-radius: 5px;
+    background: var(--app-surface);
+    cursor: pointer;
+
+    &:hover {
+        border: 1px solid var(--app-primary);
+    }
 }
 
-.cd-weekend {
-    background: var(--cal-weekend, var(--app-surface-muted));
-}
-
+/* Jour passé : gris net, bien distinct du blanc des jours à venir. */
 .cd-past {
-    background: transparent;
-    border: 1px dashed var(--app-line);
-    opacity: .75;
+    background: color-mix(in srgb, var(--app-text) 12%, var(--app-surface));
+}
+
+.cd-past .cd-n,
+.cd-past .cd-first {
+    color: var(--app-text-muted);
+}
+
+/* Jour affiché mais hors du mois de référence : hachures discrètes. */
+.cd-out {
+    background: repeating-linear-gradient(-45deg,
+    var(--app-surface-muted) 0 6px,
+    color-mix(in srgb, var(--app-text) 7%, var(--app-surface)) 6px 12px);
+}
+
+.cd-out app-calendar-item {
+    opacity: .55;
 }
 
 .cd-today {
-    background: var(--app-primary-soft);
-    border-color: var(--app-primary);
+    outline: 2px solid var(--app-primary);
+    outline-offset: -2px;
 }
 
 .cd-salon {
-    box-shadow: inset 0 3px 0 var(--app-amber);
+    background: color-mix(in srgb, var(--app-amber) 14%, var(--app-surface));
 }
 
 /* Cible valide pendant un glissement. */
@@ -62,6 +78,14 @@
 .cd-m {
     font-size: 11px;
     color: var(--app-text-muted);
+}
+
+/* « 1ᵉʳ décembre » sur le premier jour du mois. */
+.cd-first {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--app-primary);
+    white-space: nowrap;
 }
 
 .cd-tag {
@@ -121,6 +145,32 @@ app-calendar-item {
     &:hover {
         background: var(--app-surface);
     }
+}
+
+/* « + ajouter » : visible au survol de la case ou au clavier. */
+.cd-add {
+    margin-top: auto;
+    padding: 2px 4px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--app-primary);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .12s;
+}
+
+.cd:hover .cd-add,
+.cd-add:focus-visible {
+    opacity: 1;
+}
+
+/* Quand « +N autres » occupe déjà le bas, le bouton le suit simplement. */
+.cd-more ~ .cd-add {
+    margin-top: 4px;
 }
 
 /* Aperçu de l'élément pendant le glissement. */

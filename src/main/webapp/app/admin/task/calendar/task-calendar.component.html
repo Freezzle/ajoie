@@ -1,198 +1,213 @@
-<div class="cal">
-    <div class="cal-head">
-        <span class="cal-label">{{ 'task.calendar.show' | translate }}</span>
+<app-card>
+  <div appCardHeader class="cal-head">
+    <div class="cal-head-left">
+      <h4 class="cal-title">{{ title() }}</h4>
 
-        @if (narrow()) {
-            <select (ngModelChange)="selectWeeks($event)"
-                    [ngModel]="weeks()"
-                    [attr.aria-label]="'task.calendar.weekUnit' | translate"
-                    class="cal-wsel">
-                @for (option of weekOptions; track option) {
-                    <option [ngValue]="option">{{ 'task.calendar.weeks' | translate: {count: option} }}</option>
-                }
-            </select>
-        } @else {
-            <div [attr.aria-label]="'task.calendar.weekUnit' | translate" class="cal-wseg" role="group">
-                @for (option of weekOptions; track option) {
-                    <button (click)="selectWeeks(option)"
-                            [attr.aria-pressed]="isSelectedWeeks(option)"
-                            type="button">{{ option }}</button>
-                }
-            </div>
-            <span class="cal-unit">{{ 'task.calendar.weekUnit' | translate }}</span>
-        }
-
-        <span class="cal-range">{{ rangeLabel() }}</span>
-
-        <span class="cal-sum">
-            <span class="cal-pill">{{ 'task.calendar.toDo' | translate: {count: counts().toDo} }}</span>
-            @if (counts().today > 0) {
-                <span class="cal-pill cal-pill--today">
-                    {{ 'task.calendar.today' | translate: {count: counts().today} }}
-                </span>
-            }
-            @if (counts().late > 0) {
-                <span class="cal-pill cal-pill--late">
-                    {{ 'task.calendar.late' | translate: {count: counts().late} }}
-                </span>
-            }
-        </span>
+      <div class="cal-nav" role="group">
+        <button (click)="shift(-1)"
+                [attr.aria-label]="previousLabelKey | translate"
+                class="cal-arrow"
+                type="button">‹
+        </button>
+        <button (click)="shift(1)"
+                [attr.aria-label]="nextLabelKey | translate"
+                class="cal-arrow"
+                type="button">›
+        </button>
+      </div>
+      @if (!onToday()) {
+        <button (click)="goToday()" class="cal-jump" type="button">
+          {{ 'task.calendar.goToday' | translate }}
+        </button>
+      }
+      @if (canGoSalon()) {
+        <button (click)="goSalon()" class="cal-jump cal-jump--salon" type="button">
+          {{ 'task.calendar.goSalon' | translate }}
+        </button>
+      }
     </div>
 
+    <div class="cal-head-right">
+      @if (!narrow()) {
+        <segmented-choice-box (ngModelChange)="selectView($event)"
+                              [ngModel]="view()"
+                              [options]="viewOptions" />
+      }
+    </div>
+  </div>
+
+  <div appCardBody>
     @if (!narrow()) {
-        <div cdkDropListGroup>
-            @if (late().length > 0) {
-                <div [cdkDropListData]="'late'"
-                     [cdkDropListEnterPredicate]="never"
-                     cdkDropList
-                     class="cal-tray cal-tray--late">
-                    <div class="cal-tray-title">
-                        {{ 'task.calendar.lateTray' | translate }} · {{ late().length }}
-                        <small>{{ 'task.calendar.lateTrayHint' | translate }}</small>
-                    </div>
-                    @for (item of late(); track item.id) {
-                        <app-calendar-item (changed)="onChanged($event)"
-                                           (editRequested)="onEdit($event)"
-                                           [cdkDragData]="item"
-                                           [cdkDragDisabled]="narrow()"
-                                           [flashed]="flashedId() === item.id"
-                                           [known]="known()"
-                                           [showDelay]="true"
-                                           [subtask]="item"
-                                           cdkDrag
-                                           class="cal-tray-item"/>
-                    }
-                </div>
-            }
-
-            <div class="cal-weekdays">
-                @for (label of weekdayHeaders(); track $index) {
-                    <div>{{ label }}</div>
-                }
-            </div>
-
-            <div class="cal-grid">
-                @for (cell of grouped(); track cell.day) {
-                    <app-calendar-day (changed)="onChanged($event)"
-                                      (dropped)="onDrop($event)"
-                                      (editRequested)="onEdit($event)"
-                                      (toggleExpand)="toggleExpand($event)"
-                                      [day]="cell.day"
-                                      [expanded]="isExpanded(cell.day)"
-                                      [flashedId]="flashedId()"
-                                      [items]="cell.items"
-                                      [known]="known()"
-                                      [narrow]="narrow()"
-                                      [range]="range()"
-                                      [salonEnd]="salonEnd()"
-                                      [salonStart]="salonStart()"
-                                      [todayDate]="todayDate"/>
-                }
-            </div>
-
-            <div class="cal-foot">
-                <span>{{ 'task.calendar.legendPanel' | translate }}</span>
-                <span>{{ 'task.calendar.legendDrag' | translate }}</span>
-                <span class="cal-foot-salon">{{ 'task.calendar.legendSalon' | translate }}</span>
-            </div>
-        </div>
-    } @else {
-        <!-- Agenda mobile (≤ 600 px) -->
+      <div cdkDropListGroup>
         @if (late().length > 0) {
-            <details class="cal-tray-m cal-tray-m--late">
-                <summary>{{ 'task.calendar.lateTray' | translate }} · {{ late().length }}</summary>
-                @for (item of late(); track item.id) {
-                    <app-calendar-item (changed)="onChanged($event)"
-                                       (editRequested)="onEdit($event)"
-                                       [flashed]="flashedId() === item.id"
-                                       [known]="known()"
-                                       [showDelay]="true"
-                                       [subtask]="item"/>
-                }
-            </details>
+          <div [cdkDropListData]="'late'"
+               [cdkDropListEnterPredicate]="never"
+               cdkDropList
+               class="cal-tray cal-tray--late">
+            <div class="cal-tray-title">
+              {{ 'task.calendar.lateTray' | translate }} · {{ late().length }}
+              <small>{{ 'task.calendar.lateTrayHint' | translate }}</small>
+            </div>
+            @for (item of late(); track item.id) {
+              <app-calendar-item (changed)="onChanged($event)"
+                                 (editRequested)="onEdit($event)"
+                                 [cdkDragData]="item"
+                                 [cdkDragDisabled]="narrow()"
+                                 [flashed]="flashedId() === item.id"
+                                 [known]="known()"
+                                 [showDelay]="true"
+                                 [subtask]="item"
+                                 cdkDrag
+                                 class="cal-tray-item" />
+            }
+          </div>
         }
 
-        <div [attr.aria-label]="'task.calendar.byDay' | translate" class="cal-mseg" role="group">
-            <button (click)="setAgendaMode('day')"
-                    [attr.aria-pressed]="agendaMode() === 'day'"
-                    type="button">{{ 'task.calendar.byDay' | translate }}</button>
-            <button (click)="setAgendaMode('list')"
-                    [attr.aria-pressed]="agendaMode() === 'list'"
-                    type="button">{{ 'task.calendar.list' | translate }}</button>
+        <div class="cal-weekdays">
+          @for (header of weekdayHeaders(); track $index) {
+            <div class="cal-wd">
+              <span class="cal-wd-name">{{ header.label }}</span>
+              @if (header.date) {
+                <small class="cal-wd-date">{{ header.date }}</small>
+              }
+            </div>
+          }
         </div>
 
-        @if (agendaMode() === 'day') {
-            <div class="cal-strip">
-                @for (day of agendaDays(); track day) {
-                    <button (click)="selectAgendaDay(day)"
-                            [attr.aria-pressed]="day === agendaDay()"
-                            [class.cal-dp--salon]="isAgendaSalon(day)"
-                            [class.cal-dp--today]="day === todayDate"
-                            class="cal-dp"
-                            type="button">
-                        <small>{{ agendaShortDay(day) }}</small>
-                        <b>{{ dayNumberOf(day) }}</b>
-                        @if (agendaActiveCount(day) > 0) {
-                            <span [class.cal-k--load]="agendaActiveCount(day) > max" class="cal-k">
-                                {{ agendaActiveCount(day) }}
-                            </span>
-                        } @else {
-                            <span class="cal-k cal-k--empty">0</span>
-                        }
-                    </button>
-                }
+        <div class="cal-grid">
+          @for (cell of grouped(); track cell.day) {
+            <app-calendar-day (addRequested)="onAddRequested($event)"
+                              (changed)="onChanged($event)"
+                              (dropped)="onDrop($event)"
+                              (editRequested)="onEdit($event)"
+                              (toggleExpand)="toggleExpand($event)"
+                              [day]="cell.day"
+                              [expanded]="isExpanded(cell.day)"
+                              [flashedId]="flashedId()"
+                              [items]="cell.items"
+                              [known]="known()"
+                              [narrow]="narrow()"
+                              [range]="range()"
+                              [salonEnd]="salonEnd()"
+                              [salonStart]="salonStart()"
+                              [todayDate]="todayDate" />
+          }
+        </div>
+      </div>
+    } @else {
+      <!-- Agenda mobile (≤ 600 px) -->
+      @if (late().length > 0) {
+        <details class="cal-tray-m cal-tray-m--late">
+          <summary>{{ 'task.calendar.lateTray' | translate }} · {{ late().length }}</summary>
+          @for (item of late(); track item.id) {
+            <app-calendar-item (changed)="onChanged($event)"
+                               (editRequested)="onEdit($event)"
+                               [flashed]="flashedId() === item.id"
+                               [known]="known()"
+                               [showDelay]="true"
+                               [subtask]="item" />
+          }
+        </details>
+      }
+
+      <div [attr.aria-label]="'task.calendar.byDay' | translate" class="cal-mseg" role="group">
+        <button (click)="setAgendaMode('day')"
+                [attr.aria-pressed]="agendaMode() === 'day'"
+                type="button">{{ 'task.calendar.byDay' | translate }}
+        </button>
+        <button (click)="setAgendaMode('list')"
+                [attr.aria-pressed]="agendaMode() === 'list'"
+                type="button">{{ 'task.calendar.list' | translate }}
+        </button>
+      </div>
+
+      @if (agendaMode() === 'day') {
+        <div class="cal-strip">
+          @for (day of agendaDays(); track day) {
+            <button (click)="selectAgendaDay(day)"
+                    [attr.aria-pressed]="day === agendaDay()"
+                    [class.cal-dp--salon]="isAgendaSalon(day)"
+                    [class.cal-dp--today]="day === todayDate"
+                    class="cal-dp"
+                    type="button">
+              <small>{{ agendaShortDay(day) }}</small>
+              <b>{{ dayNumberOf(day) }}</b>
+              @if (agendaActiveCount(day) > 0) {
+                <span [class.cal-k--load]="agendaActiveCount(day) > max" class="cal-k">
+                                    {{ agendaActiveCount(day) }}
+                                </span>
+              } @else {
+                <span class="cal-k cal-k--empty">0</span>
+              }
+            </button>
+          }
+        </div>
+
+        <div class="cal-ag">
+          <div [class.cal-ag-h--today]="agendaDay() === todayDate" class="cal-ag-h">
+            {{ agendaDayLabel(agendaDay()) }}
+            @if (agendaDayItems().length > 0) {
+              · {{ 'task.calendar.toDo' | translate: { count: agendaActiveCount(agendaDay()) } }}
+            }
+            @if (isAgendaSalonStart(agendaDay())) {
+              <span class="cd-tag cd-tag--dday">{{ 'task.calendar.dDay' | translate }}</span>
+            } @else if (isAgendaSalon(agendaDay())) {
+              <span class="cd-tag cd-tag--salon">{{ 'task.calendar.salonDay' | translate }}</span>
+            }
+          </div>
+
+          @for (item of agendaDayItems(); track item.id) {
+            <app-calendar-item (changed)="onChanged($event)"
+                               (editRequested)="onEdit($event)"
+                               [flashed]="flashedId() === item.id"
+                               [known]="known()"
+                               [subtask]="item" />
+          }
+
+          @if (agendaDayItems().length === 0) {
+            <div class="cal-ag-empty">{{ 'task.calendar.emptyDay' | translate }}</div>
+          }
+
+          <button #agendaAdd
+                  (click)="onAddRequested({day: agendaDay(), element: agendaAdd})"
+                  class="cal-ag-add"
+                  type="button">
+            {{ 'task.calendar.addOn' | translate: { date: agendaDayLabel(agendaDay()) } }}
+          </button>
+        </div>
+      } @else {
+        <div class="cal-ag">
+          @for (cell of agendaListDays(); track cell.day) {
+            <div [class.cal-ag-h--today]="cell.day === todayDate" class="cal-ag-h">
+              {{ agendaDayLabel(cell.day) }} · {{ agendaActiveCount(cell.day) }}
+              @if (isAgendaSalonStart(cell.day)) {
+                <span class="cd-tag cd-tag--dday">{{ 'task.calendar.dDay' | translate }}</span>
+              } @else if (isAgendaSalon(cell.day)) {
+                <span class="cd-tag cd-tag--salon">{{ 'task.calendar.salonDay' | translate }}</span>
+              }
             </div>
 
-            <div class="cal-ag">
-                <div [class.cal-ag-h--today]="agendaDay() === todayDate" class="cal-ag-h">
-                    {{ agendaDayLabel(agendaDay()) }}
-                    @if (agendaDayItems().length > 0) {
-                        · {{ 'task.calendar.toDo' | translate: {count: agendaActiveCount(agendaDay())} }}
-                    }
-                    @if (isAgendaSalonStart(agendaDay())) {
-                        <span class="cd-tag cd-tag--dday">{{ 'task.calendar.dDay' | translate }}</span>
-                    } @else if (isAgendaSalon(agendaDay())) {
-                        <span class="cd-tag cd-tag--salon">{{ 'task.calendar.salonDay' | translate }}</span>
-                    }
-                </div>
+            @for (item of cell.items; track item.id) {
+              <app-calendar-item (changed)="onChanged($event)"
+                                 (editRequested)="onEdit($event)"
+                                 [flashed]="flashedId() === item.id"
+                                 [known]="known()"
+                                 [subtask]="item" />
+            }
+          }
 
-                @for (item of agendaDayItems(); track item.id) {
-                    <app-calendar-item (changed)="onChanged($event)"
-                                       (editRequested)="onEdit($event)"
-                                       [flashed]="flashedId() === item.id"
-                                       [known]="known()"
-                                       [subtask]="item"/>
-                }
+          @if (agendaListDays().length === 0) {
+            <div class="cal-ag-empty">{{ 'task.calendar.emptyRange' | translate }}</div>
+          }
+        </div>
+      }
 
-                @if (agendaDayItems().length === 0) {
-                    <div class="cal-ag-empty">{{ 'task.calendar.emptyDay' | translate }}</div>
-                }
-            </div>
-        } @else {
-            <div class="cal-ag">
-                @for (cell of agendaListDays(); track cell.day) {
-                    <div [class.cal-ag-h--today]="cell.day === todayDate" class="cal-ag-h">
-                        {{ agendaDayLabel(cell.day) }} · {{ agendaActiveCount(cell.day) }}
-                        @if (isAgendaSalonStart(cell.day)) {
-                            <span class="cd-tag cd-tag--dday">{{ 'task.calendar.dDay' | translate }}</span>
-                        } @else if (isAgendaSalon(cell.day)) {
-                            <span class="cd-tag cd-tag--salon">{{ 'task.calendar.salonDay' | translate }}</span>
-                        }
-                    </div>
-
-                    @for (item of cell.items; track item.id) {
-                        <app-calendar-item (changed)="onChanged($event)"
-                                           (editRequested)="onEdit($event)"
-                                           [flashed]="flashedId() === item.id"
-                                           [known]="known()"
-                                           [subtask]="item"/>
-                    }
-                }
-
-                @if (agendaListDays().length === 0) {
-                    <div class="cal-ag-empty">{{ 'task.calendar.emptyRange' | translate }}</div>
-                }
-            </div>
-        }
+      <button #fab
+              (click)="onAddRequested({day: agendaDay(), element: fab})"
+              [attr.aria-label]="'task.calendar.addOn' | translate: {date: agendaDayLabel(agendaDay())}"
+              class="cal-fab"
+              type="button">＋
+      </button>
     }
-</div>
+  </div>
+</app-card>

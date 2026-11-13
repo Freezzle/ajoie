@@ -17,9 +17,9 @@
 
     <!-- Responsable -->
     <div class="col-12 col-sm-6 mt-3">
-        <text-box fieldName="responsible"
-                  formControlName="responsible"
-                  translateKey="task.dialog.responsible"/>
+        <responsible-field formControlName="responsible"
+                           [inheritedFrom]="taskResponsible"
+                           [known]="known"/>
     </div>
 
     <!-- Informations fournisseur -->
@@ -47,45 +47,7 @@
             <div class="popover-hint">{{ 'task.dialog.dueDateHint' | translate }}</div>
         </p-popover>
 
-        <div class="mb-3">
-            <p-select-button formControlName="dueDateType"
-                             [options]="dueDateTypeOptions"
-                             optionLabel="label"
-                             optionValue="value"/>
-        </div>
-
-        @if (dueDateType === 'FIXED') {
-            <date-box fieldName="dueDateFixed"
-                      formControlName="dueDateFixed"
-                      [required]="true"
-                      translateKey="task.dialog.dueDate"/>
-        }
-        @if (dueDateType === 'OFFSET') {
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div class="w-7r">
-                    <number-box fieldName="dueDateOffsetAbs"
-                                formControlName="dueDateOffsetAbs"
-                                [required]="true"
-                                [minValue]="0"
-                                [maxValue]="999"/>
-                </div>
-                <span class="text-secondary">{{ 'task.dialog.days' | translate }}</span>
-                <div class="w-8r">
-                    <select-box fieldName="dueDateOffsetDir"
-                                formControlName="dueDateOffsetDir"
-                                [options]="offsetDirectionOptions"
-                                [formatterFunction]="formatterDirection"
-                                [needTranslation]="true"/>
-                </div>
-            </div>
-            @if (estimatedDueDate) {
-                <div class="mt-3">
-                    <span>{{ 'task.dialog.estimatedDueDatePrefix' | translate }}
-                        <span class="fw-semibold text-primary">{{ estimatedDueDate }}</span>
-                    </span>
-                </div>
-            }
-        }
+        <due-date-field [form]="dueDateForm" [salonStart]="salonStartDay"/>
     </div>
 
 

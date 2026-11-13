@@ -310,3 +310,36 @@ export function formatShortDate(date: string | null | undefined): string {
         month: 'short'
     });
 }
+
+/** « J-14 » → -14, « J+2 » → 2, « Jour J » / « J0 » → 0, sinon `null`. */
+export function parseSalonOffset(value: string | null | undefined): number | null {
+    const normalized = (value ?? '').trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+
+    if (['j', 'j0', 'jj', 'jour j', 'jourj'].includes(normalized)) {
+        return 0;
+    }
+
+    const match = /^j\s*([+-])\s*(\d{1,3})$/.exec(normalized);
+    if (match) {
+        return (match[1] === '-' ? -1 : 1) * Number(match[2]);
+    }
+
+    // Saisie abrégée : « -14 » ou « 3 », sans le « J ».
+    const bare = /^([+-]?\d{1,3})$/.exec(normalized);
+
+    return bare ? Number(bare[1]) : null;
+}
+
+/** -14 → « J-14 », 2 → « J+2 », 0 → « Jour J ». */
+export function formatSalonOffset(offset: number | null | undefined): string {
+    if (offset == null) {
+        return '';
+    }
+
+    return offset === 0 ? 'Jour J' : offset < 0 ? `J${offset}` : `J+${offset}`;
+}
+
+/** Nombre de jours entre la date du salon et une date (« J± »). */
+export function offsetFromSalon(date: string, salonStart: string): number {
+    return dayjs(date).startOf('day').diff(dayjs(salonStart).startOf('day'), 'day');
+}

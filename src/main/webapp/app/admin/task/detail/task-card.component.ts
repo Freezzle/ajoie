@@ -79,7 +79,6 @@ export class TaskCardComponent {
     readonly editRequested = output<ITaskInstance>();
     readonly subtaskAddRequested = output<ITaskInstance>();
     readonly subtaskEditRequested = output<ISubtaskInstance>();
-    readonly seeInList = output<ITaskInstance>();
 
     private readonly taskInstanceService = inject(TaskInstanceService);
     private readonly translateService = inject(TranslateService);

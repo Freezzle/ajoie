@@ -13,9 +13,8 @@
     </div>
 
     <div class="col-12 col-sm-6 mt-3">
-        <text-box fieldName="responsible"
-                  formControlName="responsible"
-                  translateKey="task.dialog.responsible"/>
+        <responsible-field formControlName="responsible"
+                           [known]="known"/>
     </div>
 
     <div class="col-12 col-sm-6 mt-3">

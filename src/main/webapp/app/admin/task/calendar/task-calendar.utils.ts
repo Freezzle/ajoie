@@ -3,26 +3,32 @@ import dayjs from 'dayjs/esm';
 import {IFlatSubtask, ISubtaskInstance} from '../model/task-instance.interface';
 import {effectiveDue, isActive, today} from '../shared/task-urgency.utils';
 
-/** Choix de durée proposés dans l'en-tête, en semaines. */
-export const WEEK_OPTIONS: number[] = [1, 2, 3, 4, 6, 8];
-
-/** Nombre de semaines par défaut quand aucune préférence n'existe. */
-export const DEFAULT_WEEKS = 2;
-
 /** Au-delà de ce nombre d'éléments, un jour propose « +N autres ». */
-export const MAX_PER_DAY = 4;
+export const MAX_PER_DAY = 2;
 
-/** Clé de préférence locale du nombre de semaines choisi. */
-export const WEEKS_STORAGE_KEY = 'task.calendar.weeks';
+/** Découpage du temps proposé dans l'en-tête du calendrier. */
+export type CalendarView = 'week' | 'month';
+
+/** Vue utilisée quand aucune préférence n'existe. */
+export const DEFAULT_VIEW: CalendarView = 'month';
+
+/** Clé de préférence locale de la vue choisie (la date n'est jamais mémorisée). */
+export const VIEW_STORAGE_KEY = 'task.calendar.view';
 
 /** Période affichée : lundi de départ, dimanche de fin et la liste des jours. */
 export interface CalendarRange {
-    /** Lundi de la semaine en cours (`YYYY-MM-DD`). */
+    /** Premier lundi affiché (`YYYY-MM-DD`). */
     start: string;
     /** Dernier dimanche affiché (`YYYY-MM-DD`). */
     end: string;
-    /** `weeks × 7` jours, du lundi au dimanche. */
+    /** Jours affichés, du lundi au dimanche. */
     days: string[];
+    /** Mois de référence (0–11) en vue Mois, `null` en vue Semaine. */
+    month: number | null;
+    /** 1ᵉʳ du mois de référence en vue Mois, `null` en vue Semaine. */
+    monthDate: string | null;
+    /** Numéro de semaine ISO en vue Semaine, `null` en vue Mois. */
+    weekNumber: number | null;
 }
 
 /** Compteurs de l'en-tête de la vue. */
@@ -38,9 +44,9 @@ export interface CalendarCounts {
 /** Ordre de tri des statuts dans une case : le plus bloquant d'abord. */
 const DAY_STATUS_ORDER: Record<string, number> = {BLOCKED: 0, IN_PROGRESS: 1, PENDING: 2};
 
-/** Ramène un nombre de semaines à une valeur autorisée, sinon le défaut. */
-export function normalizeWeeks(weeks: number | null | undefined): number {
-    return weeks != null && WEEK_OPTIONS.includes(weeks) ? weeks : DEFAULT_WEEKS;
+/** Ramène une valeur quelconque sur une vue connue, sinon la vue par défaut. */
+export function normalizeView(view: string | null | undefined): CalendarView {
+    return view === 'week' || view === 'month' ? view : DEFAULT_VIEW;
 }
 
 /** Lundi (`YYYY-MM-DD`) de la semaine contenant `date`. */
@@ -49,6 +55,62 @@ export function mondayOf(date: string): string {
     const weekday = (d.day() + 6) % 7; // 0 = lundi, 6 = dimanche
 
     return d.subtract(weekday, 'day').format('YYYY-MM-DD');
+}
+
+/** Premier jour du mois de `date`. */
+export function startOfMonth(date: string): string {
+    return dayjs(date).startOf('month').format('YYYY-MM-DD');
+}
+
+/** Dernier jour du mois de `date`. */
+export function endOfMonth(date: string): string {
+    return dayjs(date).endOf('month').format('YYYY-MM-DD');
+}
+
+/**
+ * Numéro de semaine ISO 8601 : la semaine 1 est celle qui contient le jeudi.
+ * Calculé à la main pour ne pas dépendre d'un plugin dayjs chargé ailleurs.
+ */
+export function isoWeekNumber(date: string): number {
+    const thursday = dayjs(mondayOf(date)).add(3, 'day');
+    // Le 4 janvier appartient toujours à la semaine 1.
+    const fourthOfJanuary = thursday.startOf('year').add(3, 'day').format('YYYY-MM-DD');
+    const firstThursday = dayjs(mondayOf(fourthOfJanuary)).add(3, 'day');
+
+    return thursday.diff(firstThursday, 'week') + 1;
+}
+
+/** Période affichée pour une vue et une date d'ancrage. */
+export function calendarRange(view: CalendarView, anchor: string = today()): CalendarRange {
+    const monthView = view === 'month';
+    const start = monthView ? mondayOf(startOfMonth(anchor)) : mondayOf(anchor);
+    const end = monthView ? addDays(mondayOf(endOfMonth(anchor)), 6) : addDays(start, 6);
+    const count = dayjs(end).diff(dayjs(start), 'day') + 1;
+    const days = Array.from({length: count}, (_, index) => addDays(start, index));
+
+    return {
+        start,
+        end,
+        days,
+        month: monthView ? dayjs(anchor).month() : null,
+        monthDate: monthView ? startOfMonth(anchor) : null,
+        weekNumber: monthView ? null : isoWeekNumber(start)
+    };
+}
+
+/** Vrai si le jour appartient au mois de référence (toujours vrai en vue Semaine). */
+export function isInMonth(day: string, range: CalendarRange): boolean {
+    return range.month === null || dayjs(day).month() === range.month;
+}
+
+/**
+ * Nouvelle ancre après un clic sur ‹ ou › : ±1 semaine, ou ±1 mois en revenant
+ * au 1ᵉʳ du mois pour éviter les sauts du 31 au 28.
+ */
+export function shiftAnchor(view: CalendarView, anchor: string, direction: -1 | 1): string {
+    return view === 'week'
+           ? addDays(mondayOf(anchor), 7 * direction)
+           : dayjs(startOfMonth(anchor)).add(direction, 'month').format('YYYY-MM-DD');
 }
 
 /** Date `YYYY-MM-DD` décalée de `n` jours. */
@@ -61,16 +123,6 @@ export function isWeekend(day: string): boolean {
     const weekday = dayjs(day).day();
 
     return weekday === 0 || weekday === 6;
-}
-
-/** Période affichée pour un nombre de semaines donné, à partir d'aujourd'hui. */
-export function calendarRange(weeks: number, from: string = today()): CalendarRange {
-    const count = normalizeWeeks(weeks) * 7;
-    const start = mondayOf(from);
-    const end = addDays(start, count - 1);
-    const days = Array.from({length: count}, (_, index) => addDays(start, index));
-
-    return {start, end, days};
 }
 
 /** Tri des sous-tâches dans une case : actives d'abord, puis statut, sortOrder, id. */
@@ -95,29 +147,22 @@ export function compareInDay(a: IFlatSubtask, b: IFlatSubtask): number {
 /**
  * Sous-tâches placées dans la case d'un jour donné.
  *
- * Les `CANCELLED` sont ignorées. Une sous-tâche active n'apparaît jamais dans une
- * case passée (elle rejoint la bande « En retard ») ; une terminée y reste.
+ * Les `CANCELLED` sont ignorées. Une sous-tâche active en retard reste affichée dans
+ * sa case passée ; la bande « En retard » la reprend en tête de grille.
  */
-export function subtasksForDay(subtasks: IFlatSubtask[],
-                               day: string,
-                               todayDate: string = today()): IFlatSubtask[] {
-    const past = day < todayDate;
-
+export function subtasksForDay(subtasks: IFlatSubtask[], day: string): IFlatSubtask[] {
     return subtasks
         .filter(subtask => subtask.status !== 'CANCELLED')
         .filter(subtask => effectiveDue(subtask) === day)
-        .filter(subtask => !(past && isActive(subtask)))
         .sort(compareInDay);
 }
 
 /** Répartition par jour sur toute la période, indexée par date. */
-export function groupByDay(subtasks: IFlatSubtask[],
-                          range: CalendarRange,
-                          todayDate: string = today()): Record<string, IFlatSubtask[]> {
+export function groupByDay(subtasks: IFlatSubtask[], range: CalendarRange): Record<string, IFlatSubtask[]> {
     const map: Record<string, IFlatSubtask[]> = {};
 
     range.days.forEach(day => {
-        map[day] = subtasksForDay(subtasks, day, todayDate);
+        map[day] = subtasksForDay(subtasks, day);
     });
 
     return map;
@@ -180,9 +225,21 @@ export function dayNumber(day: string): number {
     return dayjs(day).date();
 }
 
-/** Vrai le 1ᵉʳ du mois ou pour le tout premier jour affiché (on ajoute le mois). */
-export function showsMonth(day: string, range: CalendarRange): boolean {
-    return dayNumber(day) === 1 || day === range.start;
+/** Vrai le 1ᵉʳ du mois. */
+export function isFirstOfMonth(day: string): boolean {
+    return dayNumber(day) === 1;
+}
+
+/** Mois en toutes lettres avec l'année, par exemple « Janvier 2027 ». */
+export function monthTitle(day: string): string {
+    const label = new Date(`${day}T00:00:00`).toLocaleDateString('fr-CH', {month: 'long', year: 'numeric'});
+
+    return label.charAt(0).toLocaleUpperCase('fr') + label.slice(1);
+}
+
+/** Mois en toutes lettres seul, par exemple « décembre ». */
+export function longMonthLabel(day: string): string {
+    return new Date(`${day}T00:00:00`).toLocaleDateString('fr-CH', {month: 'long'});
 }
 
 /** Jour long localisé avec majuscule initiale, par exemple « Lundi 2 novembre ». */
@@ -199,4 +256,16 @@ export function longDayLabel(day: string): string {
 /** Jour abrégé localisé, par exemple « lun. ». */
 export function shortWeekday(day: string): string {
     return new Date(`${day}T00:00:00`).toLocaleDateString('fr-CH', {weekday: 'short'});
+}
+
+/** Jour de la semaine en toutes lettres avec majuscule, par exemple « Lundi ». */
+export function longWeekday(day: string): string {
+    const label = new Date(`${day}T00:00:00`).toLocaleDateString('fr-CH', {weekday: 'long'});
+
+    return label.charAt(0).toLocaleUpperCase('fr') + label.slice(1);
+}
+
+/** Jour et mois abrégés, par exemple « 28 déc. ». */
+export function shortDayMonth(day: string): string {
+    return new Date(`${day}T00:00:00`).toLocaleDateString('fr-CH', {day: 'numeric', month: 'short'});
 }

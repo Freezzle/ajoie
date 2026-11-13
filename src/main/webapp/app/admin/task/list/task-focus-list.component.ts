@@ -35,11 +35,15 @@ import {SalonService} from '../../salon/service/salon.service';
 import {IFlatSubtask, ISubtaskInstance, ITaskInstance, TaskStatus} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {TaskCardComponent} from '../detail/task-card.component';
-import {SubtaskLineComponent} from '../detail/subtask-line.component';
 import {TaskInstanceFormComponent} from '../dialog/task-instance-form.component';
 import {SubtaskInstanceFormComponent} from '../dialog/subtask-instance-form.component';
 import {TaskCalendarComponent} from '../calendar/task-calendar.component';
-import {DEFAULT_WEEKS, normalizeWeeks, WEEK_OPTIONS, WEEKS_STORAGE_KEY} from '../calendar/task-calendar.utils';
+import {
+    CalendarQuickAddComponent,
+    QuickAddRequest,
+    SubtaskEditRequest
+} from '../calendar/calendar-quick-add.component';
+import {CalendarView, DEFAULT_VIEW, normalizeView, VIEW_STORAGE_KEY} from '../calendar/task-calendar.utils';
 import {UNDO_TOAST_KEY} from '../shared/subtask-status-panel.component';
 import {
     compareSubtasks,
@@ -51,28 +55,22 @@ import {
     isActive,
     isLate,
     knownResponsibles,
-    NO_RESPONSIBLE_KEY,
     next14Predicate,
     ownerOf,
     responsibleColor,
     statusColorOf,
-    TASK_STATUS_ORDER,
     taskUrgency,
     toLocalDate,
-    urgency,
+    today as todayDate,
     URGENCY_ORDER,
     urgencyColor
 } from '../shared/task-urgency.utils';
 
-/** Les trois vues de l'écran, conservées dans l'URL (`?view=`). Calendrier par défaut. */
-export type TaskView = 'tasks' | 'subtasks' | 'calendar';
+/** Les deux vues de l'écran, conservées dans l'URL (`?view=`). Calendrier par défaut. */
+export type TaskView = 'tasks' | 'calendar';
 
 const GROUP_URGENCY = 'urgency';
 const GROUP_RESPONSIBLE = 'responsible';
-const GROUP_STATUS = 'status';
-
-/** Clé de la puce de contexte « Tâche : X ». */
-const CHIP_TASK_CONTEXT = 'ctx_task';
 
 /** Statuts proposés en puces de filtre. */
 const CHIP_STATUSES: TaskStatus[] = ['PENDING', 'IN_PROGRESS', 'BLOCKED', 'DONE'];
@@ -91,10 +89,10 @@ const CHIP_STATUSES: TaskStatus[] = ['PENDING', 'IN_PROGRESS', 'BLOCKED', 'DONE'
                    EntityListToolbarComponent,
                    EntityListGroupComponent,
                    TaskCardComponent,
-                   SubtaskLineComponent,
                    TaskInstanceFormComponent,
                    SubtaskInstanceFormComponent,
-                   TaskCalendarComponent
+                   TaskCalendarComponent,
+                   CalendarQuickAddComponent
                ],
                templateUrl: './task-focus-list.component.html',
                styleUrl: './task-focus-list.component.scss',
@@ -105,16 +103,14 @@ export class TaskFocusListComponent implements OnInit {
     readonly salon = signal<ISalon | null>(null);
     readonly isLoading = signal<boolean>(false);
     readonly view = signal<TaskView>('calendar');
-    readonly weeks = signal<number>(DEFAULT_WEEKS);
-    readonly weekOptions = WEEK_OPTIONS;
+    /** Découpage du calendrier : Semaine ou Mois. */
+    readonly calendarView = signal<CalendarView>(DEFAULT_VIEW);
+    /** Date d'ancrage de la période affichée. */
+    readonly calendarAnchor = signal<string>(todayDate());
     readonly undoKey = UNDO_TOAST_KEY;
 
     /** Plié/déplié choisi par l'utilisateur, qui prime sur la règle par défaut. */
     private readonly cardOverrides = signal<Record<string, boolean>>({});
-    /** Tâche mise en avant après un retour depuis la vue Sous-tâches. */
-    readonly flashedTaskId = signal<string | null>(null);
-    /** Tâche servant de contexte à la puce « Tâche : X ». */
-    readonly contextTaskId = signal<string | null>(null);
 
     readonly showTaskDialog = signal<boolean>(false);
     readonly showSubtaskDialog = signal<boolean>(false);
@@ -141,37 +137,38 @@ export class TaskFocusListComponent implements OnInit {
                                              defaultSort: 'due',
                                              sortOptions: [],
                                              collapsedByDefault: groupBy =>
-                                                 groupBy === GROUP_URGENCY || groupBy === GROUP_STATUS ? ['DONE'] : []
+                                                 groupBy === GROUP_URGENCY ? ['DONE'] : []
                                          });
-
-    readonly groupOptions = [
-        {key: GROUP_URGENCY, labelKey: 'task.group.urgency'},
-        {key: GROUP_RESPONSIBLE, labelKey: 'task.group.responsible'},
-        {key: GROUP_STATUS, labelKey: 'task.group.status'}
-    ];
 
     /** Responsables du salon, triés : ils fixent la couleur des avatars. */
     readonly known = computed(() => knownResponsibles(this.tasks()));
 
     readonly allSubtasks = computed<IFlatSubtask[]>(() => flatten(this.tasks()));
 
-    readonly contextTask = computed(() =>
-        this.tasks().find(task => task.id === this.contextTaskId()) ?? null);
+    /** Responsable de la tâche parente de la sous-tâche en cours d'édition ou d'ajout. */
+    readonly subtaskTaskResponsible = computed(() => {
+        const editing = this.editingSubtask();
+        const parent = editing
+                       ? this.tasks().find(task => task.subtasks?.some(sub => sub.id === editing.id)) ?? null
+                       : this.newSubtaskParentTask();
+        return parent?.responsible ?? null;
+    });
 
     private readonly predicates = computed<Record<string, (subtask: IFlatSubtask) => boolean>>(() => {
-        const contextTaskId = this.contextTaskId();
-
         const predicates: Record<string, (subtask: IFlatSubtask) => boolean> = {
             late: subtask => isLate(subtask),
             next14: subtask => next14Predicate(subtask),
-            noResponsible: subtask => !ownerOf(subtask, subtask.parentTask),
-            [CHIP_TASK_CONTEXT]: subtask => subtask.parentTask.id === contextTaskId
+            noResponsible: subtask => !ownerOf(subtask, subtask.parentTask)
         };
 
         CHIP_STATUSES.forEach(status => {
             predicates[`st_${status}`] = subtask => status === 'DONE'
                                                     ? !isActive(subtask)
                                                     : subtask.status === status;
+        });
+
+        this.known().forEach(name => {
+            predicates[`resp_${name}`] = subtask => ownerOf(subtask, subtask.parentTask) === name;
         });
 
         return predicates;
@@ -181,23 +178,6 @@ export class TaskFocusListComponent implements OnInit {
         const items = this.allSubtasks();
         const predicates = this.predicates();
         const groups: FilterChipGroup[] = [];
-
-        const contextTask = this.contextTask();
-        if (contextTask) {
-            groups.push({
-                            key: 'context',
-                            labelKey: 'task.list.context',
-                            mode: 'and',
-                            chips: [{
-                                key: CHIP_TASK_CONTEXT,
-                                labelKey: contextTask.title,
-                                rawLabel: true,
-                                dotColor: 'var(--app-primary)',
-                                count: items.filter(predicates[CHIP_TASK_CONTEXT]).length,
-                                alwaysVisible: true
-                            }]
-                        });
-        }
 
         groups.push({
                         key: 'status',
@@ -241,6 +221,22 @@ export class TaskFocusListComponent implements OnInit {
                         ]
                     });
 
+        const known = this.known();
+        if (known.length) {
+            groups.push({
+                            key: GROUP_RESPONSIBLE,
+                            labelKey: 'task.list.filterResponsible',
+                            mode: 'or',
+                            chips: known.map(name => ({
+                                key: `resp_${name}`,
+                                labelKey: name,
+                                rawLabel: true,
+                                dotColor: responsibleColor(name, known),
+                                count: items.filter(predicates[`resp_${name}`]).length
+                            }))
+                        });
+        }
+
         return groups;
     });
 
@@ -260,27 +256,6 @@ export class TaskFocusListComponent implements OnInit {
                                           this.predicates());
 
         return [...filtered].sort(compareSubtasks);
-    });
-
-    readonly groups = computed<EntityGroup<IFlatSubtask>[]>(() => {
-        const items = this.filteredSubtasks();
-
-        switch (this.state.groupBy()) {
-            case GROUP_RESPONSIBLE:
-                return this.responsibleGroups(items);
-            case GROUP_STATUS:
-                return groupByKey(items,
-                                  TASK_STATUS_ORDER,
-                                  subtask => isActive(subtask) ? subtask.status : 'DONE',
-                                  key => `task.group.statusKey.${key}`,
-                                  key => statusColorOf(key));
-            default:
-                return groupByKey(items,
-                                  URGENCY_ORDER,
-                                  subtask => urgency(subtask),
-                                  key => `task.group.urgencyKey.${key}`,
-                                  key => urgencyColor(key));
-        }
     });
 
     /** Tâches filtrées par la recherche et les puces, triées par urgence. */
@@ -350,41 +325,39 @@ export class TaskFocusListComponent implements OnInit {
         this.state.connectQueryParams(this.activatedRoute, this.router);
 
         const view = this.activatedRoute.snapshot.queryParamMap.get('view');
-        if (view === 'subtasks' || view === 'tasks' || view === 'calendar') {
+        if (view === 'tasks' || view === 'calendar') {
             this.view.set(view);
         }
 
-        // Nombre de semaines : `?weeks=`, sinon la dernière préférence locale, sinon le défaut.
-        const weeksParam = Number(this.activatedRoute.snapshot.queryParamMap.get('weeks'));
-        const storedWeeks = Number(localStorage.getItem(WEEKS_STORAGE_KEY));
-        this.weeks.set(normalizeWeeks(weeksParam || storedWeeks || DEFAULT_WEEKS));
+        // Vue du calendrier : `?cal=`, sinon la dernière préférence locale, sinon le défaut.
+        // Un ancien `?weeks=` est simplement ignoré.
+        const calendarViewParam = this.activatedRoute.snapshot.queryParamMap.get('cal');
+        this.calendarView.set(normalizeView(calendarViewParam ?? localStorage.getItem(VIEW_STORAGE_KEY)));
+
+        // Date d'ancrage : jamais mémorisée, seulement reprise de l'URL.
+        const anchorParam = this.activatedRoute.snapshot.queryParamMap.get('date');
+        if (anchorParam && /^\d{4}-\d{2}-\d{2}$/.test(anchorParam)) {
+            this.calendarAnchor.set(anchorParam);
+        }
 
         effect(() => {
             const current = this.view();
-            const weeks = this.weeks();
+            const calendarView = this.calendarView();
+            const anchor = this.calendarAnchor();
 
             untracked(() => {
-                localStorage.setItem(WEEKS_STORAGE_KEY, String(weeks));
+                localStorage.setItem(VIEW_STORAGE_KEY, calendarView);
                 void this.router.navigate([], {
                     relativeTo: this.activatedRoute,
                     queryParams: {
                         view: current === 'calendar' ? null : current,
-                        weeks: current === 'calendar' ? weeks : null
+                        cal: current === 'calendar' ? calendarView : null,
+                        date: current === 'calendar' ? anchor : null,
+                        weeks: null
                     },
                     queryParamsHandling: 'merge',
                     replaceUrl: true
                 });
-            });
-        });
-
-        // Décocher la puce de contexte la fait disparaître : le contexte est abandonné.
-        effect(() => {
-            const chips = this.state.activeChips();
-
-            untracked(() => {
-                if (this.contextTaskId() && !chips.includes(CHIP_TASK_CONTEXT)) {
-                    this.contextTaskId.set(null);
-                }
             });
         });
     }
@@ -413,8 +386,33 @@ export class TaskFocusListComponent implements OnInit {
         this.view.set(view);
     }
 
-    setWeeks(weeks: number): void {
-        this.weeks.set(normalizeWeeks(weeks));
+    setCalendarView(view: CalendarView): void {
+        this.calendarView.set(view);
+    }
+
+    setCalendarAnchor(anchor: string): void {
+        this.calendarAnchor.set(anchor);
+    }
+
+    // ── Ajout rapide depuis le calendrier ───────────────────────────────────
+
+    /** Jour cliqué ou sous-tâche à modifier, avec l'élément d'ancrage de la popin. */
+    readonly quickAddRequest = signal<QuickAddRequest | null>(null);
+
+    /** Début du salon au format `YYYY-MM-DD`, pour l'échéance « J± ». */
+    readonly salonStartDay = computed(() => toLocalDate(this.salon()?.startingDate));
+
+    get salonIdValue(): string {
+        return this.salonId;
+    }
+
+    openQuickAdd(request: {day: string; element: HTMLElement}): void {
+        this.quickAddRequest.set({mode: 'add', ...request});
+    }
+
+    /** Modification d'une sous-tâche depuis le calendrier : même popin que l'ajout. */
+    openQuickEdit(request: SubtaskEditRequest): void {
+        this.quickAddRequest.set({mode: 'edit', ...request});
     }
 
     // ── Vue Tâches ──────────────────────────────────────────────────────────
@@ -433,25 +431,6 @@ export class TaskFocusListComponent implements OnInit {
         this.cardOverrides.update(overrides => ({...overrides, [task.id]: expanded}));
     }
 
-    /** Passe en vue Sous-tâches en ne gardant que celles de la tâche choisie. */
-    seeInList(task: ITaskInstance): void {
-        this.contextTaskId.set(task.id);
-        this.state.activeChips.set([...new Set([...this.state.activeChips(), CHIP_TASK_CONTEXT])]);
-        this.view.set('subtasks');
-    }
-
-    /** Revient à la vue Tâches, carte dépliée, défilée et brièvement mise en avant. */
-    openTaskCard(task: ITaskInstance): void {
-        this.view.set('tasks');
-        this.setExpanded(task, true);
-        this.flashedTaskId.set(task.id);
-
-        setTimeout(() => {
-            document.getElementById(`task-card-${task.id}`)?.scrollIntoView({behavior: 'smooth', block: 'center'});
-            setTimeout(() => this.flashedTaskId.set(null), 1200);
-        });
-    }
-
     // ── Groupes ──────────────────────────────────────────────────────────────
 
     isCollapsed(group: EntityGroup<unknown>): boolean {
@@ -464,12 +443,7 @@ export class TaskFocusListComponent implements OnInit {
 
     /** Résumé d'un en-tête de groupe de tâches : effectifs de ses sous-tâches. */
     taskGroupSummary(group: EntityGroup<ITaskInstance>): string {
-        return this.groupSummary({...group, items: flatten(group.items)}, false);
-    }
-
-    /** Résumé d'un en-tête de groupe : « 2 en cours · 1 bloquée » (+ « 3/7 »). */
-    groupSummary(group: EntityGroup<IFlatSubtask>, withTotal = this.state.groupBy() === GROUP_RESPONSIBLE): string {
-        const counts = countSubtasks(group.items);
+        const counts = countSubtasks(flatten(group.items));
         const parts: string[] = [];
 
         if (counts.inProgress > 0) {
@@ -478,16 +452,8 @@ export class TaskFocusListComponent implements OnInit {
         if (counts.blocked > 0) {
             parts.push(this.text('task.group.blocked', {count: counts.blocked}));
         }
-        if (withTotal) {
-            parts.push(`${counts.done}/${counts.total}`);
-        }
 
         return parts.join(' · ');
-    }
-
-    /** La colonne du responsable est masquée quand elle sert déjà de groupe. */
-    get showAvatar(): boolean {
-        return this.state.groupBy() !== GROUP_RESPONSIBLE;
     }
 
     // ── Dialogues ───────────────────────────────────────────────────────────
@@ -641,20 +607,6 @@ export class TaskFocusListComponent implements OnInit {
     }
 
     /** Groupes par responsable : « Sans responsable » en tête, puis l'ordre alphabétique. */
-    private responsibleGroups(items: IFlatSubtask[]): EntityGroup<IFlatSubtask>[] {
-        const known = this.known();
-        const order = [NO_RESPONSIBLE_KEY, ...known];
-
-        return groupByKey(items,
-                          order,
-                          subtask => ownerOf(subtask, subtask.parentTask) ?? NO_RESPONSIBLE_KEY,
-                          key => key === NO_RESPONSIBLE_KEY ? this.text('task.group.noResponsible') : key,
-                          key => key === NO_RESPONSIBLE_KEY
-                                 ? 'var(--app-warning)'
-                                 : responsibleColor(key, known))
-            .map(group => ({...group, rawLabel: true}));
-    }
-
     private text(key: string, params?: object): string {
         return this.translateService.instant(key, params) as string;
     }

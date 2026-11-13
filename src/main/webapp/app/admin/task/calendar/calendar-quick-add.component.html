@@ -1,0 +1,91 @@
+<ng-template #body>
+    <div [formGroup]="form()" class="qa">
+        <div class="qa-head">
+            <span class="qa-day">{{ dayLabel() }}</span>
+            <button-box (clickedEvent)="close()"
+                        [showText]="false"
+                        primeIcon="pi-times"
+                        translateKey="common.close"
+                        type="secondary"/>
+        </div>
+
+        <!-- Tâche de rattachement -->
+        @if (creatingTask()) {
+            <text-box [formControl]="newTaskControl"
+                      fieldName="quickAddNewTask"
+                      translateKey="task.quickAdd.newTask"/>
+            <button-box (clickedEvent)="cancelCreatingTask()"
+                        primeIcon="pi-arrow-left"
+                        translateKey="task.quickAdd.pickTask"
+                        type="secondary"/>
+        } @else {
+            <select-box [enableFilter]="true"
+                        [formControl]="taskControl"
+                        [formatterFunction]="taskLabel"
+                        [hintFunction]="taskHint"
+                        [options]="taskOptions()"
+                        fieldName="quickAddTask"
+                        translateKey="task.quickAdd.task"/>
+            @if (!editing()) {
+                <button-box (clickedEvent)="startCreatingTask()"
+                            primeIcon="pi-plus"
+                            translateKey="task.quickAdd.createTask"
+                            type="secondary"/>
+            }
+        }
+
+        <!-- Titre de la sous-tâche : Entrée valide (et enchaîne à l'ajout) -->
+        <div (keydown.enter)="onTitleEnter($event)">
+            <text-box [translateKey]="editing() ? 'task.dialog.title' : 'task.quickAdd.subtaskTitle'"
+                      fieldName="quickAddTitle"
+                      formControlName="title"/>
+        </div>
+
+        <due-date-field [form]="dueDateForm()" [salonStart]="salonStart()"/>
+
+        <responsible-field [known]="known()" formControlName="responsible"/>
+
+        <button-box (clickedEvent)="showMore.set(!showMore())"
+                    [primeIcon]="showMore() ? 'pi-chevron-up' : 'pi-chevron-down'"
+                    translateKey="task.quickAdd.moreOptions"
+                    type="secondary"/>
+
+        @if (showMore()) {
+            <textarea-box [rows]="2"
+                          fieldName="description"
+                          formControlName="description"
+                          translateKey="task.dialog.description"/>
+            <text-box fieldName="supplierInfo"
+                      formControlName="supplierInfo"
+                      translateKey="task.dialog.supplierInfo"/>
+            <checkbox-box fieldName="recurring"
+                          formControlName="recurring"
+                          translateKey="task.dialog.recurring"/>
+        }
+
+        <div class="qa-actions">
+            <button-box (clickedEvent)="close()"
+                        translateKey="common.cancel"
+                        type="secondary"/>
+            <button-box (clickedEvent)="save(false)"
+                        [isDisabled]="!canSave()"
+                        [loading]="saving()"
+                        [translateKey]="editing() ? 'common.save' : (creatingTask() ? 'task.quickAdd.addWithTask' : 'task.quickAdd.add')"
+                        primeIcon="pi-check"/>
+        </div>
+    </div>
+</ng-template>
+
+@if (request()) {
+    @if (mobile()) {
+        <div class="qa-sheet-host">
+            <bottom-sheet (closed)="close()">
+                <ng-container *ngTemplateOutlet="body"/>
+            </bottom-sheet>
+        </div>
+    } @else {
+        <p-popover #popover (onHide)="closed.emit()" styleClass="qa-pop">
+            <ng-container *ngTemplateOutlet="body"/>
+        </p-popover>
+    }
+}

@@ -9,93 +9,137 @@
     --cal-late-line: color-mix(in srgb, var(--app-status-refused) 22%, var(--app-surface));
 }
 
-.cal {
-    margin-top: 12px;
-}
-
 /* ── En-tête de la vue ─────────────────────────────────────────────────── */
 .cal-head {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
 }
 
-.cal-label {
-    font-size: var(--app-fs-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--app-text-muted);
+/* Titre et navigation à gauche, le reste des commandes à droite. */
+.cal-head-left,
+.cal-head-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.cal-wseg {
+/* Navigation ‹ › */
+.cal-nav {
     display: inline-flex;
     overflow: hidden;
     border: 1px solid var(--app-border);
     border-radius: 8px;
+}
 
-    button {
-        min-width: 34px;
-        padding: 5px 10px;
-        border: 0;
-        background: var(--app-surface);
-        font-size: 12.5px;
-        cursor: pointer;
+.cal-arrow {
+    min-width: 32px;
+    padding: 4px 10px;
+    border: 0;
+    background: var(--app-surface);
+    font-size: 17px;
+    line-height: 1.1;
+    cursor: pointer;
 
-        & + button {
-            border-left: 1px solid var(--app-border);
-        }
+    & + .cal-arrow {
+        border-left: 1px solid var(--app-border);
+    }
 
-        &[aria-pressed='true'] {
-            background: var(--app-primary);
-            color: var(--app-surface);
-            font-weight: 700;
-        }
+    &:hover {
+        background: var(--app-surface-muted);
     }
 }
 
-.cal-wsel {
-    padding: 6px 8px;
+.cal-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.cal-jump {
+    padding: 4px 10px;
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    background: var(--app-surface);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--app-primary);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--app-surface-muted);
+    }
+}
+
+.cal-jump--salon {
+    color: var(--app-amber);
+}
+
+.cal-legend-btn {
+    margin-left: auto;
+    padding: 4px 8px;
     border: 1px solid var(--app-border);
     border-radius: 8px;
     background: var(--app-surface);
-    font: inherit;
-    font-size: 13px;
-}
-
-.cal-unit,
-.cal-range {
-    font-size: var(--app-fs-sm);
     color: var(--app-text-muted);
+    cursor: pointer;
 }
 
-.cal-sum {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-left: auto;
+.cal-legend {
+    min-width: 230px;
+    font-size: 12.5px;
 }
 
-.cal-pill {
-    padding: 2px 9px;
-    border-radius: 999px;
-    background: var(--app-surface-muted);
-    color: var(--app-text-muted);
-    font-size: 11.5px;
+.cal-legend-title {
+    margin-bottom: 6px;
     font-weight: 700;
-    white-space: nowrap;
 }
 
-.cal-pill--today {
-    background: var(--app-warn-soft);
-    color: var(--app-warn);
+.cal-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0;
+    color: var(--app-text-muted);
 }
 
-.cal-pill--late {
-    background: var(--cal-late-bg, var(--app-warn-soft));
-    color: var(--app-status-refused);
+.cal-legend-sep {
+    margin: 6px 0;
+    border-top: 1px solid var(--app-border);
+}
+
+.cal-sw {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    border: 1px solid var(--app-border);
+    border-radius: 4px;
+}
+
+.cal-sw--future {
+    background: var(--app-surface);
+}
+
+.cal-sw--past {
+    background: color-mix(in srgb, var(--app-text) 12%, var(--app-surface));
+}
+
+.cal-sw--out {
+    background: repeating-linear-gradient(-45deg,
+    var(--app-surface-muted) 0 4px,
+    color-mix(in srgb, var(--app-text) 7%, var(--app-surface)) 4px 8px);
+}
+
+.cal-sw--salon {
+    background: color-mix(in srgb, var(--app-amber) 14%, var(--app-surface));
+}
+
+.cal-sw--today {
+    background: var(--app-surface);
+    border: 2px solid var(--app-primary);
 }
 
 /* ── Bande « En retard » (grille) ──────────────────────────────────────── */
@@ -142,36 +186,32 @@
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 6px;
     margin: 6px 0 4px;
+}
 
-    div {
-        padding-left: 6px;
-        font-size: var(--app-fs-xs);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        color: var(--app-text-muted);
-    }
+.cal-wd {
+    display: flex;
+    align-items: baseline;
+    align-content: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--app-border);
+    background: var(--app-surface);
+}
+
+.cal-wd-name {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.cal-wd-date {
+    font-size: 11.5px;
+    color: var(--app-text-muted);
 }
 
 .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    grid-auto-rows: 1fr;
     gap: 6px;
-}
-
-.cal-foot {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    font-size: 11.5px;
-    color: var(--app-text-muted);
-}
-
-.cal-foot-salon::before {
-    content: '▬ ';
-    color: var(--app-amber);
 }
 
 .cal-empty {
@@ -364,6 +404,39 @@
     text-align: center;
     font-size: 13px;
     color: var(--app-text-muted);
+}
+
+/* « Ajouter une sous-tâche le … », sous la liste du jour. */
+.cal-ag-add {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px dashed var(--app-primary);
+    border-radius: 10px;
+    background: transparent;
+    font-size: 16px; /* évite le zoom automatique d'iOS */
+    font-weight: 700;
+    color: var(--app-primary);
+    cursor: pointer;
+}
+
+/* Bouton flottant ＋ de l'agenda mobile. */
+.cal-fab {
+    position: sticky;
+    bottom: 16px;
+    float: right;
+    width: 52px;
+    height: 52px;
+    margin-top: 12px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--app-primary);
+    color: var(--app-surface);
+    font-size: 22px;
+    line-height: 1;
+    box-shadow: 0 6px 18px rgba(20, 40, 25, .28);
+    cursor: pointer;
+    z-index: 5;
 }
 
 /* Pastilles de jour réutilisées dans les en-têtes d'agenda. */

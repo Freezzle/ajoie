@@ -11,8 +11,6 @@ export type SubtaskInstanceFormGroup = {
     dueDateType: FormControl<DateInputType>;
     dueDateFixed: FormControl<Date | null>;
     dueDateOffset: FormControl<number | null>;
-    dueDateOffsetAbs: FormControl<number | null>;
-    dueDateOffsetDir: FormControl<string>;
     snoozeUntilType: FormControl<DateInputType | null>;
     snoozeFixed: FormControl<Date | null>;
     snoozeOffset: FormControl<number | null>;
@@ -34,8 +32,6 @@ export class SubtaskInstanceFormService {
             dueDateType: new FormControl<DateInputType>(s?.dueDateType ?? 'OFFSET', {nonNullable: true}),
             dueDateFixed: new FormControl(s?.dueDateType === 'FIXED' && s?.dueDate ? new Date(s.dueDate + 'T00:00:00') : null),
             dueDateOffset: new FormControl(s?.dueDateType === 'OFFSET' ? s.dueDateOffset : null, [Validators.min(-999), Validators.max(999)]),
-            dueDateOffsetAbs: new FormControl(s?.dueDateType === 'OFFSET' && s.dueDateOffset != null ? Math.abs(s.dueDateOffset) : null, [Validators.min(0), Validators.max(999)]),
-            dueDateOffsetDir: new FormControl(s?.dueDateType === 'OFFSET' && (s.dueDateOffset ?? 0) < 0 ? 'BEFORE' : 'AFTER', {nonNullable: true, validators: [Validators.required]}),
             snoozeUntilType: new FormControl<DateInputType | null>(s?.snoozeUntilType ?? null),
             snoozeFixed: new FormControl(s?.snoozeUntilType === 'FIXED' && s?.snoozedUntil ? new Date(s.snoozedUntil + 'T00:00:00') : null),
             snoozeOffset: new FormControl(s?.snoozeUntilType === 'OFFSET' ? s.snoozeOffset : null, [Validators.min(0), Validators.max(999)]),
@@ -45,39 +41,25 @@ export class SubtaskInstanceFormService {
     }
 
     /**
-     * Registers value-change subscriptions for offset sync and conditional validators.
+     * Registers value-change subscriptions for conditional validators and snooze sync.
      * Returns a Subscription that the caller must unsubscribe on destroy.
      */
     registerSyncSubscriptions(form: FormGroup<SubtaskInstanceFormGroup>): Subscription {
         const subscriptions = new Subscription();
 
-        // Sync dueDateOffsetAbs + dueDateOffsetDir → dueDateOffset (signed)
-        const syncDueDate = () => {
-            const abs = form.get('dueDateOffsetAbs')?.value;
-            const dir = form.get('dueDateOffsetDir')?.value;
-            if (abs == null) {
-                form.get('dueDateOffset')?.setValue(null, {emitEvent: false});
-            } else {
-                const signed = Number(abs) * (dir === 'BEFORE' ? -1 : 1);
-                form.get('dueDateOffset')?.setValue(signed, {emitEvent: false});
-            }
-        };
-        subscriptions.add(form.get('dueDateOffsetAbs')!.valueChanges.subscribe(syncDueDate));
-        subscriptions.add(form.get('dueDateOffsetDir')!.valueChanges.subscribe(syncDueDate));
-
         // Dynamic validators based on dueDateType
         const updateDueDateValidators = (type: string) => {
             const fixedCtrl = form.get('dueDateFixed')!;
-            const absCtrl = form.get('dueDateOffsetAbs')!;
+            const offsetCtrl = form.get('dueDateOffset')!;
             if (type === 'FIXED') {
                 fixedCtrl.setValidators([Validators.required]);
-                absCtrl.setValidators([]);
+                offsetCtrl.setValidators([Validators.min(-999), Validators.max(999)]);
             } else {
                 fixedCtrl.setValidators([]);
-                absCtrl.setValidators([Validators.required, Validators.min(0), Validators.max(999)]);
+                offsetCtrl.setValidators([Validators.required, Validators.min(-999), Validators.max(999)]);
             }
             fixedCtrl.updateValueAndValidity({emitEvent: false});
-            absCtrl.updateValueAndValidity({emitEvent: false});
+            offsetCtrl.updateValueAndValidity({emitEvent: false});
         };
         updateDueDateValidators(form.get('dueDateType')!.value);
         subscriptions.add(form.get('dueDateType')!.valueChanges.subscribe(updateDueDateValidators));

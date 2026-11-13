@@ -1,19 +1,24 @@
-<div [attr.aria-label]="ariaLabel()"
+<div #cell
+     [attr.aria-label]="ariaLabel()"
+     [class.cd-out]="!inMonth()"
      [class.cd-past]="past()"
      [class.cd-salon]="salon()"
      [class.cd-today]="isToday()"
-     [class.cd-weekend]="weekend()"
      [cdkDropListData]="day()"
      [cdkDropListEnterPredicate]="enterPredicate"
      (cdkDropListDropped)="onDrop($event)"
+     (click)="onBackgroundClick($event, cell)"
      cdkDropList
      class="cd"
      role="group">
     <div class="cd-h">
-        <span class="cd-n">{{ number() }}</span>
-
-        @if (withMonth()) {
-            <span class="cd-m">{{ month() }}</span>
+        @if (firstOfMonth()) {
+            <span class="cd-first">{{ firstOfMonthLabel() }}</span>
+        } @else {
+            <span class="cd-n">{{ number() }}</span>
+            @if (!inMonth()) {
+                <span class="cd-m">{{ month() }}</span>
+            }
         }
 
         @if (isToday()) {
@@ -55,4 +60,11 @@
             {{ 'task.calendar.less' | translate }}
         </button>
     }
+
+    <button (click)="onAddClick($event, cell)"
+            [attr.aria-label]="addLabel()"
+            class="cd-add"
+            type="button">
+        {{ 'task.calendar.addHere' | translate }}
+    </button>
 </div>

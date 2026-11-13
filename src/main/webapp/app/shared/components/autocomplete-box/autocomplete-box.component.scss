@@ -1,0 +1,11 @@
+.ac-option {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    width: 100%;
+    min-width: 0;
+}
+
+:host ::ng-deep .p-autocomplete {
+    width: 100%;
+}

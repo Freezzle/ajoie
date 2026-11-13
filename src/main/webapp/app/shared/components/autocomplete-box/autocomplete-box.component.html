@@ -1,0 +1,57 @@
+@if (translateKey) {
+    <p-iftalabel>
+        <p-autocomplete [dropdown]="dropdown"
+                        [forceSelection]="false"
+                        [inputId]="'field_' + fieldName"
+                        [invalid]="(control?.invalid ?? false) && (control?.touched ?? false)"
+                        [maxlength]="maxLength"
+                        [ngModel]="value"
+                        [ngModelOptions]="{ standalone: true }"
+                        [placeholder]="placeholder ?? ''"
+                        [suggestions]="filtered"
+                        [disabled]="disabled"
+                        (completeMethod)="search($event)"
+                        (ngModelChange)="handleInput($event)"
+                        (onBlur)="handleBlur()"
+                        appendTo="body"
+                        fluid>
+            @if (optionTemplate) {
+                <ng-template let-item pTemplate="item">
+                    <ng-container *ngTemplateOutlet="optionTemplate; context: {$implicit: item}"/>
+                </ng-template>
+            }
+        </p-autocomplete>
+        <label [for]="'field_' + fieldName">
+            {{ translateKey | translate }}
+            @if (isRequired) {
+                <span class="text-danger">*</span>
+            }
+        </label>
+    </p-iftalabel>
+} @else {
+    <p-autocomplete [dropdown]="dropdown"
+                    [forceSelection]="false"
+                    [inputId]="'field_' + fieldName"
+                    [invalid]="(control?.invalid ?? false) && (control?.touched ?? false)"
+                    [maxlength]="maxLength"
+                    [ngModel]="value"
+                    [ngModelOptions]="{ standalone: true }"
+                    [placeholder]="placeholder ?? ''"
+                    [suggestions]="filtered"
+                    [disabled]="disabled"
+                    (completeMethod)="search($event)"
+                    (ngModelChange)="handleInput($event)"
+                    (onBlur)="handleBlur()"
+                    appendTo="body"
+                    fluid>
+        @if (optionTemplate) {
+            <ng-template let-item pTemplate="item">
+                <ng-container *ngTemplateOutlet="optionTemplate; context: {$implicit: item}"/>
+            </ng-template>
+        }
+    </p-autocomplete>
+}
+
+@if (control?.errors) {
+    <error-box [formControlElement]="control"/>
+}

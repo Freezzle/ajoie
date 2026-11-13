@@ -117,21 +117,6 @@
     gap: 10px;
 }
 
-/* Mise en avant brève de la carte atteinte depuis la vue Sous-tâches. */
-.tfl-flash {
-    animation: tfl-flash 1.2s ease-out;
-    border-radius: 12px;
-}
-
-@keyframes tfl-flash {
-    0%, 60% {
-        box-shadow: 0 0 0 3px var(--app-primary-soft), 0 0 0 1px var(--app-primary);
-    }
-    100% {
-        box-shadow: none;
-    }
-}
-
 .tfl-undo {
     display: flex;
     align-items: center;

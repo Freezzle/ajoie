@@ -93,10 +93,7 @@
                              (groupByChange)="state.setGroupBy($event)"
                              [chipGroups]="chipGroups()"
                              [groupBy]="state.groupBy()"
-                             [groupOptions]="groupOptions"
-                             [isDefault]="state.isDefault"
-                             [showGroupSort]="view() === 'subtasks'"
-                             [sortOptions]="state.sortOptions"
+                             [showGroupSort]="false"
                              placeholderKey="task.list.searchPlaceholder">
             <div aria-label="Vue" class="tfl-views" role="group" toolbarEnd>
                 <button (click)="setView('tasks')"
@@ -104,12 +101,6 @@
                         type="button">
                     {{ 'task.list.viewTasks' | translate }}
                     <small>{{ tasks().length }}</small>
-                </button>
-                <button (click)="setView('subtasks')"
-                        [attr.aria-pressed]="view() === 'subtasks'"
-                        type="button">
-                    {{ 'task.list.viewSubtasks' | translate }}
-                    <small>{{ allSubtasks().length }}</small>
                 </button>
                 <button (click)="setView('calendar')"
                         [attr.aria-pressed]="view() === 'calendar'"
@@ -153,10 +144,8 @@
                                 <app-task-card (changed)="load()"
                                                (editRequested)="openEditTaskDialog($event)"
                                                (expandedChange)="setExpanded(task, $event)"
-                                               (seeInList)="seeInList($event)"
                                                (subtaskAddRequested)="openAddSubtaskDialog($event)"
                                                (subtaskEditRequested)="openEditSubtaskDialog($event)"
-                                               [class.tfl-flash]="flashedTaskId() === task.id"
                                                [expanded]="isExpanded(task)"
                                                [extraActions]="taskExtraActions"
                                                [id]="'task-card-' + task.id"
@@ -168,51 +157,28 @@
                     }
                 </div>
             }
-        } @else if (view() === 'calendar') {
-            <app-task-calendar (changed)="load()"
-                               (editRequested)="openEditSubtaskDialog($event)"
-                               (weeksChange)="setWeeks($event)"
+        } @else {
+            <app-task-calendar (addRequested)="openQuickAdd($event)"
+                               (anchorChange)="setCalendarAnchor($event)"
+                               (changed)="load()"
+                               (editRequested)="openQuickEdit($event)"
+                               (viewChange)="setCalendarView($event)"
+                               [anchor]="calendarAnchor()"
                                [known]="known()"
                                [salon]="salon()"
                                [subtasks]="filteredSubtasks()"
-                               [weeks]="weeks()"/>
-        } @else {
-            @if (filteredSubtasks().length === 0) {
-                <div class="el-empty">
-                    <b>{{ 'entityList.empty.filtered' | translate }}</b>
-                    <span>{{ 'entityList.empty.hint' | translate }}</span>
-                    <button-box (clickedEvent)="state.clearFilters()"
-                                translateKey="entityList.clearFilters"
-                                type="secondary"/>
-                </div>
-            } @else {
-                @for (group of groups(); track group.key) {
-                    <entity-list-group (collapsedChange)="setCollapsed(group, $event)"
-                                       [collapsed]="isCollapsed(group)"
-                                       [color]="group.color"
-                                       [count]="group.items.length"
-                                       [label]="group.label"
-                                       [rawLabel]="group.rawLabel ?? false"
-                                       [ratio]="group.ratio">
-                        <span groupSummary>{{ groupSummary(group) }}</span>
-
-                        @for (subtask of group.items; track subtask.id) {
-                            <subtask-line (changed)="load()"
-                                          (editRequested)="openEditSubtaskDialog($event)"
-                                          (taskRequested)="openTaskCard($event)"
-                                          [known]="known()"
-                                          [query]="state.query()"
-                                          [showAvatar]="showAvatar"
-                                          [showTask]="true"
-                                          [subtask]="subtask"
-                                          [task]="subtask.parentTask"/>
-                        }
-                    </entity-list-group>
-                }
-            }
+                               [view]="calendarView()"/>
         }
     </div>
 </app-content-page>
+
+<app-calendar-quick-add [known]="known()"
+                        [request]="quickAddRequest()"
+                        [salonId]="salonIdValue"
+                        [salonStart]="salonStartDay()"
+                        [tasks]="tasks()"
+                        (closed)="quickAddRequest.set(null)"
+                        (saved)="load()"/>
 
 @if (showTaskDialog()) {
     <dialog-box (cancel)="onTaskDialogCancel()"
@@ -221,7 +187,7 @@
                 [confirmLabel]="'common.save'"
                 [header]="editingTask() ? ('task.dialog.editTask' | translate) : ('task.dialog.addTask' | translate)"
                 [mode]="'edit'">
-        <app-task-instance-form [task]="editingTask()"/>
+        <app-task-instance-form [task]="editingTask()" [known]="known()"/>
     </dialog-box>
 }
 
@@ -233,6 +199,8 @@
                 [header]="editingSubtask() ? ('task.dialog.editSubtask' | translate) : ('task.menu.addSubtask' | translate)"
                 [mode]="'edit'">
         <app-subtask-instance-form [salonStartingDate]="salon()?.startingDate ?? null"
+                                   [known]="known()"
+                                   [taskResponsible]="subtaskTaskResponsible()"
                                    [subtask]="editingSubtask()"/>
     </dialog-box>
 }

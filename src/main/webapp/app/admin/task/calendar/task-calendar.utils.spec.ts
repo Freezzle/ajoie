@@ -6,12 +6,15 @@ import {
     calendarRange,
     compareInDay,
     groupByDay,
+    isFirstOfMonth,
+    isInMonth,
+    isoWeekNumber,
     isSalonDay,
     isWeekend,
     lateSubtasks,
     mondayOf,
-    normalizeWeeks,
-    showsMonth,
+    normalizeView,
+    shiftAnchor,
     subtasksForDay
 } from './task-calendar.utils';
 
@@ -56,15 +59,16 @@ function sub(partial: Partial<IFlatSubtask> & {id: string; status: TaskStatus}):
 }
 
 describe('task-calendar.utils', () => {
-    describe('normalizeWeeks', () => {
-        it('garde une valeur autorisée', () => {
-            expect(normalizeWeeks(4)).toBe(4);
+    describe('normalizeView', () => {
+        it('garde une vue connue', () => {
+            expect(normalizeView('week')).toBe('week');
+            expect(normalizeView('month')).toBe('month');
         });
 
-        it('replie une valeur inconnue sur le défaut 2', () => {
-            expect(normalizeWeeks(5)).toBe(2);
-            expect(normalizeWeeks(null)).toBe(2);
-            expect(normalizeWeeks(undefined)).toBe(2);
+        it('replie une valeur inconnue sur le mois', () => {
+            expect(normalizeView('quarter')).toBe('month');
+            expect(normalizeView(null)).toBe('month');
+            expect(normalizeView(undefined)).toBe('month');
         });
     });
 
@@ -83,29 +87,63 @@ describe('task-calendar.utils', () => {
     });
 
     describe('calendarRange', () => {
-        it('commence au lundi et finit au dimanche sur 2 semaines', () => {
-            const range = calendarRange(2, TODAY);
+        it('en semaine, va du lundi au dimanche', () => {
+            const range = calendarRange('week', TODAY);
             expect(range.start).toBe('2026-10-26');
-            expect(range.end).toBe('2026-11-08');
-            expect(range.days).toHaveLength(14);
-            expect(range.days[0]).toBe('2026-10-26');
-            expect(range.days[13]).toBe('2026-11-08');
+            expect(range.end).toBe('2026-11-01');
+            expect(range.days).toHaveLength(7);
+            expect(range.month).toBeNull();
+            expect(range.weekNumber).toBe(44);
         });
 
-        it('produit weeks × 7 jours pour chaque option', () => {
-            [1, 2, 3, 4, 6, 8].forEach(weeks => {
-                expect(calendarRange(weeks, TODAY).days).toHaveLength(weeks * 7);
-            });
+        it('en mois, complète les semaines autour de décembre 2026', () => {
+            const range = calendarRange('month', '2026-12-10');
+            expect(range.start).toBe('2026-11-30');
+            expect(range.end).toBe('2027-01-03');
+            expect(range.days).toHaveLength(35);
+            expect(range.month).toBe(11);
+            expect(range.monthDate).toBe('2026-12-01');
         });
 
         it('traverse un changement de mois', () => {
-            const range = calendarRange(1, TODAY);
+            const range = calendarRange('week', TODAY);
             expect(range.days).toContain('2026-10-31');
             expect(range.days).toContain('2026-11-01');
         });
+    });
 
-        it('replie un nombre de semaines invalide', () => {
-            expect(calendarRange(5, TODAY).days).toHaveLength(2 * 7);
+    describe('isoWeekNumber', () => {
+        it('numérote la semaine 53 de 2026', () => {
+            expect(isoWeekNumber('2026-12-28')).toBe(53);
+        });
+
+        it('repart à 1 en janvier 2027', () => {
+            expect(isoWeekNumber('2027-01-04')).toBe(1);
+        });
+    });
+
+    describe('shiftAnchor', () => {
+        it('décale d\'une semaine en repartant du lundi', () => {
+            expect(shiftAnchor('week', '2026-10-31', 1)).toBe('2026-11-02');
+            expect(shiftAnchor('week', '2026-10-31', -1)).toBe('2026-10-19');
+        });
+
+        it('décale d\'un mois sans déborder sur février', () => {
+            expect(shiftAnchor('month', '2027-01-31', 1)).toBe('2027-02-01');
+        });
+    });
+
+    describe('isInMonth / isFirstOfMonth', () => {
+        it('distingue les jours du mois affiché', () => {
+            const range = calendarRange('month', '2026-12-10');
+            expect(isInMonth('2026-12-01', range)).toBe(true);
+            expect(isInMonth('2026-11-30', range)).toBe(false);
+            expect(isInMonth('2027-01-01', range)).toBe(false);
+        });
+
+        it('repère le 1er du mois', () => {
+            expect(isFirstOfMonth('2026-12-01')).toBe(true);
+            expect(isFirstOfMonth('2026-12-02')).toBe(false);
         });
     });
 
@@ -127,28 +165,28 @@ describe('task-calendar.utils', () => {
     describe('subtasksForDay', () => {
         it('place une active à son échéance effective', () => {
             const items = [sub({id: '1', status: 'PENDING', dueDate: '2026-11-02'})];
-            expect(subtasksForDay(items, '2026-11-02', TODAY).map(s => s.id)).toEqual(['1']);
+            expect(subtasksForDay(items, '2026-11-02').map(s => s.id)).toEqual(['1']);
         });
 
         it('place une repoussée à sa nouvelle date, pas à l\'origine', () => {
             const items = [sub({id: '1', status: 'PENDING', dueDate: '2026-11-01', snoozedUntil: '2026-11-03'})];
-            expect(subtasksForDay(items, '2026-11-01', TODAY)).toHaveLength(0);
-            expect(subtasksForDay(items, '2026-11-03', TODAY).map(s => s.id)).toEqual(['1']);
+            expect(subtasksForDay(items, '2026-11-01')).toHaveLength(0);
+            expect(subtasksForDay(items, '2026-11-03').map(s => s.id)).toEqual(['1']);
         });
 
-        it('exclut une active d\'une case passée (elle ira en retard)', () => {
+        it('garde une active en retard dans sa case passée', () => {
             const items = [sub({id: '1', status: 'PENDING', dueDate: '2026-10-28'})];
-            expect(subtasksForDay(items, '2026-10-28', TODAY)).toHaveLength(0);
+            expect(subtasksForDay(items, '2026-10-28').map(s => s.id)).toEqual(['1']);
         });
 
         it('garde une terminée dans une case passée', () => {
             const items = [sub({id: '1', status: 'DONE', dueDate: '2026-10-28'})];
-            expect(subtasksForDay(items, '2026-10-28', TODAY).map(s => s.id)).toEqual(['1']);
+            expect(subtasksForDay(items, '2026-10-28').map(s => s.id)).toEqual(['1']);
         });
 
         it('ignore les CANCELLED', () => {
             const items = [sub({id: '1', status: 'CANCELLED', dueDate: '2026-11-02'})];
-            expect(subtasksForDay(items, '2026-11-02', TODAY)).toHaveLength(0);
+            expect(subtasksForDay(items, '2026-11-02')).toHaveLength(0);
         });
     });
 
@@ -192,12 +230,12 @@ describe('task-calendar.utils', () => {
 
     describe('groupByDay', () => {
         it('indexe les jours de la période et exclut le hors-période', () => {
-            const range = calendarRange(1, TODAY);
+            const range = calendarRange('week', TODAY);
             const items = [
                 sub({id: 'in', status: 'PENDING', dueDate: '2026-11-01'}),
                 sub({id: 'out', status: 'PENDING', dueDate: '2026-11-20'})
             ];
-            const map = groupByDay(items, range, TODAY);
+            const map = groupByDay(items, range);
             expect(map['2026-11-01'].map(s => s.id)).toEqual(['in']);
             expect(Object.values(map).flat().map(s => s.id)).not.toContain('out');
         });
@@ -215,12 +253,12 @@ describe('task-calendar.utils', () => {
 
     describe('calendarCounts', () => {
         it('compte à faire / aujourd\'hui / en retard', () => {
-            const range = calendarRange(2, TODAY);
+            const range = calendarRange('month', TODAY);
             const items = [
                 sub({id: 'today', status: 'PENDING', dueDate: TODAY}),
-                sub({id: 'soon', status: 'PENDING', dueDate: '2026-11-02'}),
+                sub({id: 'soon', status: 'PENDING', dueDate: '2026-11-01'}),
                 sub({id: 'late', status: 'PENDING', dueDate: '2026-10-28'}),
-                sub({id: 'out', status: 'PENDING', dueDate: '2026-12-01'}),
+                sub({id: 'out', status: 'PENDING', dueDate: '2026-12-15'}),
                 sub({id: 'done', status: 'DONE', dueDate: TODAY})
             ];
             expect(calendarCounts(items, range, TODAY)).toEqual({toDo: 2, today: 1, late: 1});
@@ -236,15 +274,6 @@ describe('task-calendar.utils', () => {
 
         it('est faux sans dates de salon', () => {
             expect(isSalonDay('2026-11-27', null, null)).toBe(false);
-        });
-    });
-
-    describe('showsMonth', () => {
-        it('est vrai le 1er du mois et au premier jour affiché', () => {
-            const range = calendarRange(2, TODAY);
-            expect(showsMonth('2026-11-01', range)).toBe(true);
-            expect(showsMonth(range.start, range)).toBe(true);
-            expect(showsMonth('2026-11-05', range)).toBe(false);
         });
     });
 });

@@ -5,6 +5,7 @@ import {TextBoxComponent} from '../../../shared/components/text-box/text-box.com
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
 import {DialogDraftService} from '../../../shared/services/dialog-draft.service';
 import {ITaskInstance} from '../model/task-instance.interface';
+import {ResponsibleFieldComponent} from '../shared/responsible-field.component';
 import {TaskInstanceFormGroup, TaskInstanceFormService} from '../service/task-instance-form.service';
 
 @Component({
@@ -14,12 +15,15 @@ import {TaskInstanceFormGroup, TaskInstanceFormService} from '../service/task-in
         SharedModule,
         ReactiveFormsModule,
         TextBoxComponent,
-        TextareaBoxComponent
+        TextareaBoxComponent,
+        ResponsibleFieldComponent
     ]
 })
 export class TaskInstanceFormComponent implements OnInit, OnDestroy {
     /** Données existantes en mode édition, null en mode création. */
     @Input() task: ITaskInstance | null = null;
+    /** Responsables déjà connus du salon, proposés dans la liste. */
+    @Input() known: string[] = [];
 
     form!: FormGroup<TaskInstanceFormGroup>;
 

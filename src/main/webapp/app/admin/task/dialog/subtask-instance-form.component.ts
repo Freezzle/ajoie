@@ -7,10 +7,12 @@ import {TextareaBoxComponent} from '../../../shared/components/textarea-box/text
 import {DateBoxComponent} from '../../../shared/components/date-box/date-box.component';
 import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
-import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {DialogDraftService} from '../../../shared/services/dialog-draft.service';
 import {DateInputType, ISubtaskInstance} from '../model/task-instance.interface';
 import {SubtaskInstanceFormGroup, SubtaskInstanceFormService} from '../service/subtask-instance-form.service';
+import {DueDateControls, DueDateFieldComponent} from '../shared/due-date-field.component';
+import {ResponsibleFieldComponent} from '../shared/responsible-field.component';
+import {toLocalDate} from '../shared/task-urgency.utils';
 import {SelectButton} from 'primeng/selectbutton';
 import {Popover} from 'primeng/popover';
 import {TranslateService} from '@ngx-translate/core';
@@ -26,7 +28,8 @@ import {TranslateService} from '@ngx-translate/core';
         DateBoxComponent,
         NumberBoxComponent,
         CheckboxBoxComponent,
-        SelectBoxComponent,
+        DueDateFieldComponent,
+        ResponsibleFieldComponent,
         SelectButton,
         Popover
     ]
@@ -36,18 +39,27 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
     @Input() subtask: ISubtaskInstance | null = null;
     /** Date de début du salon (objet Date), utilisée pour prévisualiser la date estimée en mode OFFSET. */
     @Input() salonStartingDate: Date | null = null;
+    /** Responsables déjà connus du salon, proposés dans la liste. */
+    @Input() known: string[] = [];
+    /** Responsable de la tâche parente, affiché quand le champ est vide. */
+    @Input() taskResponsible: string | null = null;
 
     form!: FormGroup<SubtaskInstanceFormGroup>;
     private syncSubscription!: Subscription;
 
-    /** Options Avant / Après pour le select de direction d'offset. */
-    readonly offsetDirectionOptions: string[] = ['BEFORE', 'AFTER'];
-
-    readonly formatterDirection = (v: string | null) => v === 'BEFORE' ? 'task.dialog.offsetBefore' : v === 'AFTER' ? 'task.dialog.offsetAfter' : '';
-
     private readonly subtaskFormService = inject(SubtaskInstanceFormService);
     private readonly draftService = inject(DialogDraftService);
     private readonly translate = inject(TranslateService);
+
+    /** Début du salon au format `YYYY-MM-DD`, pour le champ d'échéance. */
+    get salonStartDay(): string | null {
+        return toLocalDate(this.salonStartingDate);
+    }
+
+    /** Vue restreinte du formulaire passée au champ d'échéance. */
+    get dueDateForm(): FormGroup<DueDateControls> {
+        return this.form as unknown as FormGroup<DueDateControls>;
+    }
 
     get dueDateType(): DateInputType {
         return this.form?.get('dueDateType')?.value ?? 'FIXED';
@@ -57,28 +69,12 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
         return this.form?.get('snoozeUntilType')?.value ?? null;
     }
 
-    get dueDateTypeOptions() {
-        return [
-            {label: this.translate.instant('task.dialog.dueDateJN'), value: 'OFFSET'},
-            {label: this.translate.instant('task.dialog.dueDateFixed'), value: 'FIXED'}
-        ];
-    }
-
     get snoozeTypeOptions() {
         return [
             {label: this.translate.instant('task.dialog.snoozeNone'), value: null},
             {label: this.translate.instant('task.dialog.dueDateJN'), value: 'OFFSET'},
             {label: this.translate.instant('task.dialog.dueDateFixed'), value: 'FIXED'}
         ];
-    }
-
-    /** Date estimée calculée à partir de salonStartingDate + offset (null si données insuffisantes). */
-    get estimatedDueDate(): string | null {
-        const offset = this.form?.get('dueDateOffset')?.value;
-        if (offset == null || !this.salonStartingDate) return null;
-        const d = new Date(this.salonStartingDate);
-        d.setDate(d.getDate() + Number(offset));
-        return d.toLocaleDateString('fr-CH', {day: '2-digit', month: '2-digit', year: 'numeric'});
     }
 
     /** Date estimée du snooze = date d'échéance calculée + snoozeOffset (null si données insuffisantes). */

@@ -5,6 +5,7 @@ import {
     computed,
     effect,
     ElementRef,
+    HostListener,
     inject,
     input,
     OnDestroy,
@@ -18,6 +19,11 @@ import {MessageService} from 'primeng/api';
 import {TranslateService} from '@ngx-translate/core';
 
 import SharedModule from '../../../shared/shared.module';
+import {CardComponent} from '../../../shared/components/card/card.component';
+import {
+    SegmentedChoiceBoxComponent,
+    SegmentedChoiceOption
+} from '../../../shared/components/segmented-choice-box/segmented-choice-box.component';
 import {ISalon} from '../../salon/model/salon.interface';
 import {IFlatSubtask, ISubtaskInstance} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
@@ -25,17 +31,21 @@ import {UNDO_TOAST_KEY} from '../shared/subtask-status-panel.component';
 import {effectiveDue, formatShortDate, toLocalDate, today} from '../shared/task-urgency.utils';
 import {CalendarDayComponent} from './calendar-day.component';
 import {CalendarItemComponent} from './calendar-item.component';
+import {SubtaskEditRequest} from './calendar-quick-add.component';
 import {
     activeCount,
-    calendarCounts,
+    CalendarView,
     calendarRange,
     isSalonDay,
     lateSubtasks,
     longDayLabel,
+    longWeekday,
     MAX_PER_DAY,
+    monthTitle,
+    shiftAnchor,
+    shortDayMonth,
     shortWeekday,
-    subtasksForDay,
-    WEEK_OPTIONS
+    subtasksForDay
 } from './task-calendar.utils';
 
 /** Largeur en dessous de laquelle la grille laisse place à l'agenda. */
@@ -46,14 +56,17 @@ type AgendaMode = 'day' | 'list';
 
 /**
  * Vue Calendrier : place les sous-tâches (déjà filtrées par l'écran parent) sur une
- * grille de jours, du lundi de la semaine en cours à N semaines plus tard. En dessous
- * de 600 px, bascule sur un agenda. Glisser-déposer sur ordinateur pour replanifier.
+ * grille de jours, par semaine ou par mois, autour d'une date d'ancrage. En dessous
+ * de 600 px, bascule sur un agenda de 7 jours. Glisser-déposer sur ordinateur pour
+ * replanifier.
  */
 @Component({
                selector: 'app-task-calendar',
                imports: [
                    SharedModule,
                    FormsModule,
+                   CardComponent,
+                   SegmentedChoiceBoxComponent,
                    CdkDropListGroup,
                    CdkDropList,
                    CdkDrag,
@@ -68,22 +81,25 @@ export class TaskCalendarComponent implements AfterViewInit, OnDestroy {
     readonly subtasks = input<IFlatSubtask[]>([]);
     readonly salon = input<ISalon | null>(null);
     readonly known = input<string[]>([]);
-    readonly weeks = input.required<number>();
+    readonly view = input.required<CalendarView>();
+    readonly anchor = input.required<string>();
 
-    readonly weeksChange = output<number>();
+    readonly viewChange = output<CalendarView>();
+    readonly anchorChange = output<string>();
     readonly changed = output<ISubtaskInstance>();
-    readonly editRequested = output<ISubtaskInstance>();
+    readonly editRequested = output<SubtaskEditRequest>();
+    /** Demande d'ajout d'une sous-tâche sur un jour, ancrée sur un élément. */
+    readonly addRequested = output<{day: string; element: HTMLElement}>();
 
     private readonly elementRef = inject(ElementRef<HTMLElement>);
     private readonly taskInstanceService = inject(TaskInstanceService);
     private readonly translateService = inject(TranslateService);
     private readonly messageService = inject(MessageService);
 
-    readonly weekOptions = WEEK_OPTIONS;
     readonly max = MAX_PER_DAY;
     readonly todayDate = today();
 
-    /** Jours dépliés (au-delà de 4) ; remis à zéro quand le nombre de semaines change. */
+    /** Jours dépliés (au-delà de 4) ; remis à zéro quand la période change. */
     private readonly expandedDays = signal<Set<string>>(new Set());
     readonly narrow = signal<boolean>(false);
     readonly flashedId = signal<string | null>(null);
@@ -97,10 +113,26 @@ export class TaskCalendarComponent implements AfterViewInit, OnDestroy {
     readonly salonStart = computed(() => toLocalDate(this.salon()?.startingDate));
     readonly salonEnd = computed(() => toLocalDate(this.salon()?.endingDate));
 
-    readonly range = computed(() => calendarRange(this.weeks(), this.todayDate));
+    /** Sur mobile, la bande ne couvre jamais qu'une semaine. */
+    readonly effectiveView = computed<CalendarView>(() => this.narrow() ? 'week' : this.view());
 
+    readonly range = computed(() => calendarRange(this.effectiveView(), this.anchor()));
+
+    /** Titre unique de l'en-tête : « Janvier 2027 » ou « Semaine 53 ». */
+    readonly title = computed(() => {
+        const range = this.range();
+
+        return range.monthDate !== null
+               ? monthTitle(range.monthDate)
+               : this.text('task.calendar.weekTitle', {n: range.weekNumber});
+    });
+
+    /** En-têtes de colonnes : jour en toutes lettres, avec la date en vue Semaine. */
     readonly weekdayHeaders = computed(() =>
-        this.range().days.slice(0, 7).map(day => this.capitalize(shortWeekday(day))));
+        this.range().days.slice(0, 7).map(day => ({
+            label: longWeekday(day),
+            date: this.effectiveView() === 'week' ? shortDayMonth(day) : null
+        })));
 
     readonly grouped = computed(() => {
         const range = this.range();
@@ -108,46 +140,39 @@ export class TaskCalendarComponent implements AfterViewInit, OnDestroy {
 
         return range.days.map(day => ({
             day,
-            items: subtasksForDay(subtasks, day, this.todayDate)
+            items: subtasksForDay(subtasks, day)
         }));
     });
 
     readonly late = computed(() => lateSubtasks(this.subtasks(), this.todayDate));
 
-    readonly counts = computed(() => calendarCounts(this.subtasks(), this.range(), this.todayDate));
-
-    readonly rangeLabel = computed(() =>
-        this.translateService.instant('task.calendar.range', {
-            from: formatShortDate(this.range().start),
-            to: formatShortDate(this.range().end)
-        }) as string);
-
     readonly isEmpty = computed(() =>
         this.late().length === 0 && this.grouped().every(cell => cell.items.length === 0));
 
-    /** Jours de l'agenda : d'aujourd'hui à la fin de la période. */
-    readonly agendaDays = computed(() => this.range().days.filter(day => day >= this.todayDate));
+    /** Agenda mobile : les 7 jours de la semaine affichée. */
+    readonly agendaDays = computed(() => this.range().days);
 
-    readonly agendaDayItems = computed(() => subtasksForDay(this.subtasks(), this.agendaDay(), this.todayDate));
+    readonly agendaDayItems = computed(() => subtasksForDay(this.subtasks(), this.agendaDay()));
 
     readonly agendaListDays = computed(() =>
         this.agendaDays()
-            .map(day => ({day, items: subtasksForDay(this.subtasks(), day, this.todayDate)}))
+            .map(day => ({day, items: subtasksForDay(this.subtasks(), day)}))
             .filter(cell => cell.items.length > 0));
 
     constructor() {
-        // Changer le nombre de semaines replie tous les jours.
+        // Changer de période replie tous les jours.
         effect(() => {
-            this.weeks();
+            this.view();
+            this.anchor();
             untracked(() => this.expandedDays.set(new Set()));
         });
 
-        // Garder le jour d'agenda dans la période affichée.
+        // Garder le jour d'agenda dans la semaine affichée.
         effect(() => {
             const days = this.agendaDays();
             untracked(() => {
                 if (!days.includes(this.agendaDay())) {
-                    this.agendaDay.set(days[0] ?? this.todayDate);
+                    this.agendaDay.set(days.includes(this.todayDate) ? this.todayDate : days[0]);
                 }
             });
         });
@@ -172,16 +197,79 @@ export class TaskCalendarComponent implements AfterViewInit, OnDestroy {
     /** Un jour passé n'accepte aucun dépôt. */
     readonly never = (): boolean => false;
 
-    // ── Semaines ─────────────────────────────────────────────────────────────
+    // ── Navigation ───────────────────────────────────────────────────────────
 
-    isSelectedWeeks(weeks: number): boolean {
-        return this.weeks() === weeks;
+    readonly viewOptions: SegmentedChoiceOption[] = [
+        {value: 'week', titleKey: 'task.calendar.viewWeek'},
+        {value: 'month', titleKey: 'task.calendar.viewMonth'}
+    ];
+
+    /** Vrai quand la période affichée contient aujourd'hui. */
+    readonly onToday = computed(() => {
+        const range = this.range();
+
+        return this.todayDate >= range.start && this.todayDate <= range.end;
+    });
+
+    /** Vrai quand le salon a une date et n'est pas déjà affiché. */
+    readonly canGoSalon = computed(() => {
+        const start = this.salonStart();
+        const range = this.range();
+
+        return !!start && !(start >= range.start && start <= range.end);
+    });
+
+    get previousLabelKey(): string {
+        return this.effectiveView() === 'week' ? 'task.calendar.previousWeek' : 'task.calendar.previousMonth';
     }
 
-    selectWeeks(weeks: number): void {
-        if (weeks !== this.weeks()) {
-            this.weeksChange.emit(weeks);
+    get nextLabelKey(): string {
+        return this.effectiveView() === 'week' ? 'task.calendar.nextWeek' : 'task.calendar.nextMonth';
+    }
+
+    selectView(view: string | null): void {
+        if ((view === 'week' || view === 'month') && view !== this.view()) {
+            this.viewChange.emit(view);
         }
+    }
+
+    shift(direction: -1 | 1): void {
+        this.anchorChange.emit(shiftAnchor(this.effectiveView(), this.anchor(), direction));
+    }
+
+    goToday(): void {
+        this.anchorChange.emit(this.todayDate);
+    }
+
+    goSalon(): void {
+        const start = this.salonStart();
+        if (start) {
+            this.anchorChange.emit(start);
+        }
+    }
+
+    /** ← et → changent de période, sauf pendant une saisie ou dans un panneau. */
+    @HostListener('document:keydown', ['$event'])
+    onKeydown(event: KeyboardEvent): void {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+            return;
+        }
+        if (event.altKey || event.ctrlKey || event.metaKey || this.isTypingTarget(event.target)) {
+            return;
+        }
+
+        event.preventDefault();
+        this.shift(event.key === 'ArrowLeft' ? -1 : 1);
+    }
+
+    private isTypingTarget(target: EventTarget | null): boolean {
+        if (!(target instanceof HTMLElement)) {
+            return false;
+        }
+
+        return target.isContentEditable ||
+               ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) ||
+               target.closest('[role="radiogroup"], .p-overlay, .p-popover, .p-datepicker, .p-select') !== null;
     }
 
     // ── Jours dépliés ────────────────────────────────────────────────────────
@@ -222,7 +310,7 @@ export class TaskCalendarComponent implements AfterViewInit, OnDestroy {
     }
 
     agendaActiveCount(day: string): number {
-        return activeCount(subtasksForDay(this.subtasks(), day, this.todayDate));
+        return activeCount(subtasksForDay(this.subtasks(), day));
     }
 
     dayNumberOf(day: string): number {
@@ -278,13 +366,17 @@ export class TaskCalendarComponent implements AfterViewInit, OnDestroy {
 
     // ── Relais des évènements d'un élément ──────────────────────────────────
 
+    onAddRequested(event: {day: string; element: HTMLElement}): void {
+        this.addRequested.emit(event);
+    }
+
     onChanged(subtask: ISubtaskInstance): void {
         this.flash(subtask.id);
         this.changed.emit(subtask);
     }
 
-    onEdit(subtask: ISubtaskInstance): void {
-        this.editRequested.emit(subtask);
+    onEdit(request: SubtaskEditRequest): void {
+        this.editRequested.emit(request);
     }
 
     private flash(id: string): void {
