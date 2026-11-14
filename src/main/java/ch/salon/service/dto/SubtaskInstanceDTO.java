@@ -36,4 +36,16 @@ public class SubtaskInstanceDTO implements Serializable {
     private Integer snoozeOffset;
     /** Indique si la sous-tâche est récurrente. Défaut true. */
     private Boolean recurring = true;
+
+    /**
+     * Nombre total d'occurrences à créer (répétition), uniquement à la création.
+     * Null ou 1 = une seule sous-tâche. Non persisté.
+     */
+    private Integer repeatCount;
+
+    /**
+     * Intervalle entre deux occurrences : 'DAY' | 'WEEK' | 'MONTH'.
+     * Requis dès que repeatCount > 1. Non persisté.
+     */
+    private String repeatUnit;
 }

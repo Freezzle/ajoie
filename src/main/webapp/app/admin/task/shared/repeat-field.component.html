@@ -1,0 +1,32 @@
+<div [formGroup]="form()">
+    <checkbox-box fieldName="repeatEnabled"
+                  formControlName="repeatEnabled"
+                  [hint]="'task.repeat.enableHint' | translate"
+                  translateKey="task.repeat.enable"/>
+
+    @if (enabled()) {
+        <div class="row g-3 mt-1">
+            <div class="col-12">
+                <number-box fieldName="repeatCount"
+                            formControlName="repeatCount"
+                            [minValue]="2"
+                            [maxValue]="maxCount"
+                            translateKey="task.repeat.count"/>
+            </div>
+
+            <div class="col-12">
+                <select-box fieldName="repeatUnit"
+                            formControlName="repeatUnit"
+                            [options]="unitOptions"
+                            [formatterFunction]="unitLabel"
+                            translateKey="task.repeat.unit"/>
+            </div>
+
+            @if (summary(); as text) {
+                <div class="col-12">
+                    <span class="text-secondary">{{ text }}</span>
+                </div>
+            }
+        </div>
+    }
+</div>

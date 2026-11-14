@@ -4,6 +4,9 @@ export type UrgencyGroup = 'LATE' | 'TODAY' | 'WEEK' | 'LATER' | 'NODATE' | 'DON
 
 export type DateInputType = 'FIXED' | 'OFFSET';
 
+/** Intervalle de répétition d'une sous-tâche à la création. */
+export type RepeatUnit = 'DAY' | 'WEEK' | 'MONTH';
+
 export interface ISubtaskInstance {
     id: string;
     taskInstanceId: string;
@@ -26,6 +29,13 @@ export interface ISubtaskInstance {
     supplierInfo: string | null;
     /** Indique si la sous-tâche est récurrente. Défaut true. */
     recurring: boolean;
+    /**
+     * Nombre total d'occurrences à créer (répétition). Envoyé uniquement à la création,
+     * jamais renvoyé par l'API.
+     */
+    repeatCount?: number | null;
+    /** Intervalle entre deux occurrences, requis si repeatCount > 1. */
+    repeatUnit?: RepeatUnit | null;
 }
 
 export interface ITaskComment {

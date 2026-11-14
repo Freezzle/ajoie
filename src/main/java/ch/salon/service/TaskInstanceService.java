@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,10 @@ public class TaskInstanceService {
 
     public static final String ENTITY_NAME = "taskInstance";
     private static final String SUBTASK_ENTITY_NAME = "subtaskInstance";
+
+    /** Nombre maximal d'occurrences créées en une fois par la répétition. */
+    private static final int MAX_REPEAT_COUNT = 12;
+    private static final Set<String> REPEAT_UNITS = Set.of("DAY", "WEEK", "MONTH");
 
     private final TaskInstanceRepository taskInstanceRepository;
     private final SubtaskInstanceRepository subtaskInstanceRepository;
@@ -242,8 +247,16 @@ public class TaskInstanceService {
     // =========================================================================
     // Subtask instance — add ad hoc + status
     // =========================================================================
+    /**
+     * Crée une sous-tâche et, si une répétition est demandée (repeatCount > 1), les
+     * occurrences suivantes espacées de repeatUnit (DAY / WEEK / MONTH).
+     * Les occurrences sont des sous-tâches indépendantes : aucun lien n'est conservé
+     * avec la première.
+     *
+     * @return les sous-tâches créées, dans l'ordre chronologique.
+     */
     @Transactional
-    public SubtaskInstanceDTO addSubtask(UUID taskInstanceId, SubtaskInstanceDTO dto) {
+    public List<SubtaskInstanceDTO> addSubtask(UUID taskInstanceId, SubtaskInstanceDTO dto) {
         if (dto == null) {
             throw new BadRequestAlertException("Invalid object", SUBTASK_ENTITY_NAME, ErrorBusinessKey.OBJ_NULL);
         }
@@ -251,6 +264,35 @@ public class TaskInstanceService {
         TaskInstance task = taskInstanceRepository.findWithSubtasksById(taskInstanceId).orElseThrow(
                 () -> new BadRequestAlertException("Task instance not found", SUBTASK_ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND));
 
+        int occurrences = resolveRepeatCount(dto);
+        String repeatUnit = resolveRepeatUnit(dto, occurrences);
+
+        // Auto sort_order: max + 1
+        int nextSort = task.getSubtasks().stream()
+                .mapToInt(SubtaskInstance::getSortOrder)
+                .max().orElse(-1) + 1;
+
+        List<SubtaskInstance> toCreate = new ArrayList<>();
+        SubtaskInstance first = buildSubtask(task, dto, nextSort++);
+        toCreate.add(first);
+
+        // Sans date d'échéance, la répétition n'a pas de sens : une seule occurrence.
+        LocalDate base = first.getDueDate();
+        if (base != null) {
+            for (int n = 1; n < occurrences; n++) {
+                SubtaskInstance next = buildSubtask(task, dto, nextSort++);
+                shiftOccurrence(next, task.getSalon(), shiftDate(base, repeatUnit, n));
+                toCreate.add(next);
+            }
+        }
+
+        return subtaskInstanceRepository.saveAll(toCreate).stream()
+                .map(subtaskInstanceMapper::toDto)
+                .toList();
+    }
+
+    /** Construit une sous-tâche (non persistée) à partir du DTO d'ajout. */
+    private SubtaskInstance buildSubtask(TaskInstance task, SubtaskInstanceDTO dto, int sortOrder) {
         SubtaskInstance entity = subtaskInstanceMapper.toEntity(dto);
         entity.setTaskInstance(task);
         entity.setStatus(TaskStatus.PENDING);
@@ -277,14 +319,71 @@ public class TaskInstanceService {
             entity.setSnoozedUntil(dto.getSnoozedUntil());
         }
 
-        // Auto sort_order: max + 1
-        int nextSort = task.getSubtasks().stream()
-                .mapToInt(SubtaskInstance::getSortOrder)
-                .max().orElse(-1) + 1;
-        entity.setSortOrder(nextSort);
+        entity.setSortOrder(sortOrder);
+        return entity;
+    }
 
-        SubtaskInstance saved = subtaskInstanceRepository.save(entity);
-        return subtaskInstanceMapper.toDto(saved);
+    /**
+     * Repositionne une occurrence sur une nouvelle date d'échéance.
+     * En mode OFFSET, l'offset est recalculé pour que l'occurrence reste liée au salon ;
+     * si l'offset résultant sort de la plage autorisée, l'occurrence bascule en date fixe.
+     */
+    private void shiftOccurrence(SubtaskInstance entity, Salon salon, LocalDate dueDate) {
+        entity.setDueDate(dueDate);
+
+        if ("OFFSET".equals(entity.getDueDateType())) {
+            LocalDate salonStart = salon != null && salon.getStartingDate() != null
+                    ? salon.getStartingDate().atZone(ZoneId.systemDefault()).toLocalDate() : null;
+            long offset = salonStart != null ? ChronoUnit.DAYS.between(salonStart, dueDate) : Long.MAX_VALUE;
+            if (offset >= -365 && offset <= 365) {
+                entity.setDueDateOffset((int) offset);
+            } else {
+                entity.setDueDateType("FIXED");
+                entity.setDueDateOffset(null);
+            }
+        }
+
+        if ("OFFSET".equals(entity.getSnoozeUntilType()) && entity.getSnoozeOffset() != null) {
+            entity.setSnoozedUntil(dueDate.plusDays(entity.getSnoozeOffset()));
+        }
+    }
+
+    /** Date de la n-ième occurrence à partir de la date de la première. */
+    private LocalDate shiftDate(LocalDate base, String repeatUnit, int n) {
+        return switch (repeatUnit) {
+            case "DAY" -> base.plusDays(n);
+            case "WEEK" -> base.plusWeeks(n);
+            case "MONTH" -> base.plusMonths(n);
+            default -> base;
+        };
+    }
+
+    /** Nombre total d'occurrences demandé : 1 par défaut, 12 au maximum. */
+    private int resolveRepeatCount(SubtaskInstanceDTO dto) {
+        Integer count = dto.getRepeatCount();
+        if (count == null) {
+            return 1;
+        }
+        if (count < 1 || count > MAX_REPEAT_COUNT) {
+            throw new BadRequestAlertException(
+                    "Repeat count must be between 1 and " + MAX_REPEAT_COUNT, SUBTASK_ENTITY_NAME,
+                    ErrorBusinessKey.INVALID_REPEAT);
+        }
+        return count;
+    }
+
+    /** Intervalle de répétition, obligatoire et validé dès qu'il y a plusieurs occurrences. */
+    private String resolveRepeatUnit(SubtaskInstanceDTO dto, int occurrences) {
+        if (occurrences <= 1) {
+            return null;
+        }
+        String unit = dto.getRepeatUnit();
+        if (!REPEAT_UNITS.contains(unit)) {
+            throw new BadRequestAlertException(
+                    "Repeat unit must be one of " + REPEAT_UNITS, SUBTASK_ENTITY_NAME,
+                    ErrorBusinessKey.INVALID_REPEAT);
+        }
+        return unit;
     }
 
     @Transactional

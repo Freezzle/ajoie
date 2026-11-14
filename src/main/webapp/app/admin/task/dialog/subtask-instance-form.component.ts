@@ -11,6 +11,7 @@ import {DialogDraftService} from '../../../shared/services/dialog-draft.service'
 import {DateInputType, ISubtaskInstance} from '../model/task-instance.interface';
 import {SubtaskInstanceFormGroup, SubtaskInstanceFormService} from '../service/subtask-instance-form.service';
 import {DueDateControls, DueDateFieldComponent} from '../shared/due-date-field.component';
+import {RepeatControls, RepeatFieldComponent} from '../shared/repeat-field.component';
 import {ResponsibleFieldComponent} from '../shared/responsible-field.component';
 import {toLocalDate} from '../shared/task-urgency.utils';
 import {SelectButton} from 'primeng/selectbutton';
@@ -30,6 +31,7 @@ import {TranslateService} from '@ngx-translate/core';
         CheckboxBoxComponent,
         DueDateFieldComponent,
         ResponsibleFieldComponent,
+        RepeatFieldComponent,
         SelectButton,
         Popover
     ]
@@ -59,6 +61,11 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
     /** Vue restreinte du formulaire passée au champ d'échéance. */
     get dueDateForm(): FormGroup<DueDateControls> {
         return this.form as unknown as FormGroup<DueDateControls>;
+    }
+
+    /** Vue restreinte du formulaire passée au champ de répétition. */
+    get repeatForm(): FormGroup<RepeatControls> {
+        return this.form as unknown as FormGroup<RepeatControls>;
     }
 
     get dueDateType(): DateInputType {

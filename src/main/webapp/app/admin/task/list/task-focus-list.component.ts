@@ -5,7 +5,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {Toast} from 'primeng/toast';
-import {filter} from 'rxjs';
+import {filter, Observable} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -503,7 +503,7 @@ export class TaskFocusListComponent implements OnInit {
 
         const editing = this.editingSubtask();
         const parentTask = this.newSubtaskParentTask();
-        const request = editing
+        const request: Observable<unknown> | null = editing
                         ? this.taskInstanceService.patchSubtask(editing.id, draft)
                         : parentTask
                           ? this.taskInstanceService.addSubtask(parentTask.id, draft)

@@ -34,8 +34,12 @@ export class TaskInstanceService {
         return this.http.delete<void>(`${this.instanceUrl}/${id}`);
     }
 
-    addSubtask(taskInstanceId: string, subtask: Partial<ISubtaskInstance>): Observable<ISubtaskInstance> {
-        return this.http.post<ISubtaskInstance>(`${this.instanceUrl}/${taskInstanceId}/subtasks`, subtask);
+    /**
+     * Crée une sous-tâche et, en cas de répétition, ses occurrences suivantes.
+     * Renvoie toujours la liste des sous-tâches créées.
+     */
+    addSubtask(taskInstanceId: string, subtask: Partial<ISubtaskInstance>): Observable<ISubtaskInstance[]> {
+        return this.http.post<ISubtaskInstance[]>(`${this.instanceUrl}/${taskInstanceId}/subtasks`, subtask);
     }
 
     updateSubtaskStatus(subtaskId: string, status: TaskStatus): Observable<ISubtaskInstance> {

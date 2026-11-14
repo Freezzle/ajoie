@@ -85,7 +85,13 @@
 
     <hr/>
 
-    <button (click)="edit(panel)" class="sp-link sp-link--block" type="button">
-        {{ 'task.panel.edit' | translate }}
-    </button>
+    <div class="sp-actions">
+        <button (click)="edit(panel)" class="sp-link sp-action" type="button">
+            <i class="pi pi-pencil icon-sm"></i>{{ 'task.panel.edit' | translate }}
+        </button>
+
+        <button (click)="remove(panel, $event)" class="sp-link sp-action sp-action--danger" type="button">
+            <i class="pi pi-trash icon-sm"></i>{{ 'task.panel.delete' | translate }}
+        </button>
+    </div>
 </p-popover>

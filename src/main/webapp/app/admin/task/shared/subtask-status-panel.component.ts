@@ -12,8 +12,10 @@ import {
 import {MessageService} from 'primeng/api';
 import {Popover} from 'primeng/popover';
 import {TranslateService} from '@ngx-translate/core';
+import {filter} from 'rxjs';
 
 import SharedModule from '../../../shared/shared.module';
+import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {ISubtaskInstance, ITaskInstance, TaskStatus} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {StatusIconKey, SubtaskStatusIconComponent} from './subtask-status-icon.component';
@@ -61,6 +63,7 @@ export class SubtaskStatusPanelComponent {
     private readonly taskInstanceService = inject(TaskInstanceService);
     private readonly translateService = inject(TranslateService);
     private readonly messageService = inject(MessageService);
+    private readonly confirmDialogService = inject(ConfirmDialogService);
     private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
     private readonly popover = viewChild<Popover>('panel');
 
@@ -157,6 +160,23 @@ export class SubtaskStatusPanelComponent {
     edit(popover: Popover): void {
         popover.hide();
         this.editRequested.emit();
+    }
+
+    /**
+     * Supprime la sous-tâche après confirmation. `changed` est émis pour que le
+     * parent (calendrier ou liste) recharge ses données.
+     */
+    remove(popover: Popover, event: Event): void {
+        event.stopPropagation();
+
+        const subtask = this.subtask();
+        const target = this.trigger()?.nativeElement ?? event.currentTarget as HTMLElement;
+        popover.hide();
+
+        this.confirmDialogService.delete(target, 'task.panel.deleteConfirm', {title: subtask.title})
+            .pipe(filter(confirmed => confirmed))
+            .subscribe(() => this.taskInstanceService.deleteSubtask(subtask.id)
+                                 .subscribe(() => this.changed.emit(subtask)));
     }
 
     private patch(popover: Popover, data: Partial<ISubtaskInstance>, message: string | null): void {

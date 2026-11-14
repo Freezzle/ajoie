@@ -39,8 +39,20 @@
             "daysBeforeDueDate": "jours avant l'échéance",
             "estimatedDueDateSnoozedPrefix": "Date d'échéance reporté : ",
             "status": "Statut",
-            "recurring": "Sous-tâche récurrente",
+            "recurring": "Reprendre à la prochaine édition",
             "days": "jours"
+        },
+        "repeat": {
+            "enable": "Répétition",
+            "enableHint": "Crée plusieurs sous-tâches indépendantes d'un coup. Elles ne sont pas liées entre elles : en modifier ou en déplacer une n'a aucun effet sur les autres.",
+            "count": "Nombre total de sous-tâches",
+            "unit": "Intervalle",
+            "unitDay": "Tous les jours",
+            "unitWeek": "Toutes les semaines",
+            "unitMonth": "Tous les mois",
+            "summaryDay": "{{ count }} sous-tâches au total seront créées, une par jour à partir de l'échéance choisie.",
+            "summaryWeek": "{{ count }} sous-tâches au total seront créées, une par semaine à partir de l'échéance choisie.",
+            "summaryMonth": "{{ count }} sous-tâches au total seront créées, une par mois à partir de l'échéance choisie."
         },
         "quickAdd": {
             "task": "Tâche",
@@ -60,6 +72,7 @@
             "add": "Ajouter",
             "addWithTask": "Créer et ajouter",
             "added": "« {{ title }} » ajoutée",
+            "addedRepeated": "« {{ title }} » ajoutée ({{ count }} sous-tâches)",
             "taskFailed": "La tâche n'a pas pu être créée.",
             "subtaskFailed": "La tâche a été créée mais la sous-tâche a échoué : réessayez."
         },
@@ -183,6 +196,8 @@
             "nobody": "Personne",
             "noResponsibleYet": "Aucun responsable encore attribué",
             "edit": "Modifier…",
+            "delete": "Supprimer",
+            "deleteConfirm": "Supprimer la sous-tâche « {{ title }} » ? Cette action est définitive.",
             "changeStatus": "Statut : {{status}}. Changer le statut",
             "statusChanged": "Statut : {{status}}",
             "pushed": "Limite repoussée : {{label}}",

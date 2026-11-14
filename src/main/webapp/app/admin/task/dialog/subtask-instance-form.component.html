@@ -36,6 +36,13 @@
                       translateKey="task.dialog.recurring"/>
     </div>
 
+    <!-- ── Répétition (création uniquement) ──────────────────────────── -->
+    @if (!subtask) {
+        <div class="col-12 mt-3">
+            <repeat-field [form]="repeatForm"/>
+        </div>
+    }
+
     <!-- ── Date d'échéance ────────────────────────────────────────────── -->
     <div class="col-12 mt-3">
         <label class="form-label fw-semibold">

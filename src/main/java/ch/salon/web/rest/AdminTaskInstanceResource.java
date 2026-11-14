@@ -90,11 +90,11 @@ public class AdminTaskInstanceResource {
 
     @PostMapping("/task-instances/{taskInstanceId}/subtasks")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
-    public ResponseEntity<SubtaskInstanceDTO> addSubtask(@PathVariable("taskInstanceId") UUID taskInstanceId,
+    public ResponseEntity<List<SubtaskInstanceDTO>> addSubtask(@PathVariable("taskInstanceId") UUID taskInstanceId,
                                                           @Valid @RequestBody SubtaskInstanceDTO dto) {
         log.debug("REST request to add SubtaskInstance to TaskInstance : {}", taskInstanceId);
-        SubtaskInstanceDTO result = taskInstanceService.addSubtask(taskInstanceId, dto);
-        return ResourceUtil.created("subtaskInstance", result.getId(), "/api/admin/subtask-instances").body(result);
+        List<SubtaskInstanceDTO> result = taskInstanceService.addSubtask(taskInstanceId, dto);
+        return ResourceUtil.created("subtaskInstance", result.getFirst().getId(), "/api/admin/subtask-instances").body(result);
     }
 
     @PatchMapping("/subtask-instances/{id}/status")

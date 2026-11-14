@@ -1,11 +1,11 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, output, signal, viewChild} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NgTemplateOutlet} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {MessageService} from 'primeng/api';
 import {Popover} from 'primeng/popover';
-import {switchMap} from 'rxjs';
+import {forkJoin, Subscription, switchMap} from 'rxjs';
 
 import {BottomSheetComponent} from '../../../shared/components/bottom-sheet/bottom-sheet.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
@@ -17,6 +17,7 @@ import {IFlatSubtask, ISubtaskInstance, ITaskInstance} from '../model/task-insta
 import {SubtaskInstanceFormGroup, SubtaskInstanceFormService} from '../service/subtask-instance-form.service';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {DueDateControls, DueDateFieldComponent} from '../shared/due-date-field.component';
+import {RepeatControls, RepeatFieldComponent} from '../shared/repeat-field.component';
 import {ResponsibleFieldComponent} from '../shared/responsible-field.component';
 import {UNDO_TOAST_KEY} from '../shared/subtask-status-panel.component';
 import {offsetFromSalon} from '../shared/task-urgency.utils';
@@ -62,7 +63,8 @@ export type QuickAddRequest =
                    TextBoxComponent,
                    TextareaBoxComponent,
                    DueDateFieldComponent,
-                   ResponsibleFieldComponent
+                   ResponsibleFieldComponent,
+                   RepeatFieldComponent
                ],
                changeDetection: ChangeDetectionStrategy.OnPush
            })
@@ -88,6 +90,9 @@ export class CalendarQuickAddComponent {
 
     readonly form = signal<FormGroup<SubtaskInstanceFormGroup>>(this.formService.createFormGroup(null));
 
+    /** Abonnement de cohérence de la répétition, refait à chaque nouveau formulaire. */
+    private repeatSync: Subscription = this.formService.registerRepeatSync(this.form());
+
     /** Tâche de rattachement choisie. */
     readonly taskControl = new FormControl<ITaskInstance | null>(null, [Validators.required]);
     /** Titre de la tâche à créer, en mode « nouvelle tâche ». */
@@ -109,6 +114,8 @@ export class CalendarQuickAddComponent {
     private readonly newTaskTitle = toSignal(this.newTaskControl.valueChanges, {initialValue: ''});
 
     constructor() {
+        inject(DestroyRef).onDestroy(() => this.repeatSync.unsubscribe());
+
         effect(() => {
             const request = this.request();
             if (!request) {
@@ -131,6 +138,9 @@ export class CalendarQuickAddComponent {
 
     /** Vue restreinte du formulaire passée au champ d'échéance. */
     readonly dueDateForm = computed(() => this.form() as unknown as FormGroup<DueDateControls>);
+
+    /** Vue restreinte du formulaire passée au champ de répétition. */
+    readonly repeatForm = computed(() => this.form() as unknown as FormGroup<RepeatControls>);
 
     /** « vendredi 12 décembre » en ajout, « Modifier la sous-tâche » en modification. */
     readonly dayLabel = computed(() => {
@@ -265,10 +275,17 @@ export class CalendarQuickAddComponent {
         setTimeout(() => document.getElementById('field_quickAddTitle')?.focus(), 50);
     }
 
+    /** Remplace le formulaire courant et réaccroche la cohérence de la répétition. */
+    private setForm(form: FormGroup<SubtaskInstanceFormGroup>): void {
+        this.repeatSync.unsubscribe();
+        this.form.set(form);
+        this.repeatSync = this.formService.registerRepeatSync(form);
+    }
+
     /** Formulaire vierge dont l'échéance tombe sur le jour cliqué. */
     private reset(day: string): void {
         const form = this.formService.createFormGroup(null);
-        this.form.set(form);
+        this.setForm(form);
         this.editing.set(null);
         this.taskControl.enable({emitEvent: false});
         this.creatingTask.set(false);
@@ -288,7 +305,7 @@ export class CalendarQuickAddComponent {
 
     /** Formulaire prérempli avec la sous-tâche à modifier ; la tâche parente est figée. */
     private resetForEdit(subtask: IFlatSubtask): void {
-        this.form.set(this.formService.createFormGroup(subtask));
+        this.setForm(this.formService.createFormGroup(subtask));
         this.editing.set(subtask);
         this.creatingTask.set(false);
         this.newTaskControl.setValue('');
@@ -334,7 +351,7 @@ export class CalendarQuickAddComponent {
                        });
     }
 
-    private onCreated(taskId: string, created: ISubtaskInstance, keepOpen: boolean): void {
+    private onCreated(taskId: string, created: ISubtaskInstance[], keepOpen: boolean): void {
         this.saving.set(false);
         this.rememberTask(taskId);
         this.saved.emit();
@@ -351,19 +368,30 @@ export class CalendarQuickAddComponent {
         form.controls.title.setValue('');
         form.controls.description.setValue(null);
         form.controls.supplierInfo.setValue(null);
+        form.controls.repeatEnabled.setValue(false);
         form.markAsUntouched();
         this.focusTitle();
     }
 
-    private toastAdded(created: ISubtaskInstance): void {
+    /** Toast d'ajout ; l'annulation supprime toutes les occurrences créées. */
+    private toastAdded(created: ISubtaskInstance[]): void {
+        const first = created[0];
+        if (!first) {
+            return;
+        }
+
+        const summary = created.length > 1
+                        ? this.text('task.quickAdd.addedRepeated', {title: first.title, count: created.length})
+                        : this.text('task.quickAdd.added', {title: first.title});
+
         this.messageService.add({
                                     key: UNDO_TOAST_KEY,
                                     severity: 'success',
-                                    summary: this.text('task.quickAdd.added', {title: created.title}),
+                                    summary,
                                     life: 6000,
                                     data: {
-                                        undo: () => this.taskInstanceService.deleteSubtask(created.id)
-                                                        .subscribe(() => this.saved.emit())
+                                        undo: () => forkJoin(created.map(subtask => this.taskInstanceService.deleteSubtask(subtask.id)))
+                                            .subscribe(() => this.saved.emit())
                                     }
                                 });
     }

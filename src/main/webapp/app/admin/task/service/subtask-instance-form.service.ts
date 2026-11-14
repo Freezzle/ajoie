@@ -1,7 +1,12 @@
 import {Injectable} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 import {Subscription} from 'rxjs';
-import {DateInputType, ISubtaskInstance} from '../model/task-instance.interface';
+import {DateInputType, ISubtaskInstance, RepeatUnit} from '../model/task-instance.interface';
+
+/** Nombre maximal d'occurrences créées en une fois (aligné sur le backend). */
+export const MAX_REPEAT_COUNT = 12;
+/** Nombre d'occurrences proposé par défaut quand la répétition est activée. */
+export const DEFAULT_REPEAT_COUNT = 2;
 
 export type SubtaskInstanceFormGroup = {
     title: FormControl<string>;
@@ -16,6 +21,11 @@ export type SubtaskInstanceFormGroup = {
     snoozeOffset: FormControl<number | null>;
     snoozeOffsetAbs: FormControl<number | null>;
     recurring: FormControl<boolean>;
+    /** Répétition activée : plusieurs sous-tâches indépendantes seront créées. */
+    repeatEnabled: FormControl<boolean>;
+    /** Nombre total d'occurrences, occurrence initiale comprise. */
+    repeatCount: FormControl<number | null>;
+    repeatUnit: FormControl<RepeatUnit>;
 };
 
 @Injectable({providedIn: 'root'})
@@ -37,6 +47,24 @@ export class SubtaskInstanceFormService {
             snoozeOffset: new FormControl(s?.snoozeUntilType === 'OFFSET' ? s.snoozeOffset : null, [Validators.min(0), Validators.max(999)]),
             snoozeOffsetAbs: new FormControl(s?.snoozeUntilType === 'OFFSET' ? s.snoozeOffset : null, [Validators.min(0), Validators.max(999)]),
             recurring: new FormControl(s?.recurring ?? true, {nonNullable: true}),
+            repeatEnabled: new FormControl(false, {nonNullable: true}),
+            repeatCount: new FormControl<number | null>(DEFAULT_REPEAT_COUNT, [repeatCountValidator]),
+            repeatUnit: new FormControl<RepeatUnit>('WEEK', {nonNullable: true, validators: [Validators.required]}),
+        });
+    }
+
+    /**
+     * Garde le nombre d'occurrences cohérent avec l'activation de la répétition.
+     * À souscrire par l'appelant, qui doit se désabonner.
+     */
+    registerRepeatSync(form: FormGroup<SubtaskInstanceFormGroup>): Subscription {
+        const count = form.controls.repeatCount;
+
+        return form.controls.repeatEnabled.valueChanges.subscribe(enabled => {
+            if (enabled && count.value == null) {
+                count.setValue(DEFAULT_REPEAT_COUNT);
+            }
+            count.updateValueAndValidity();
         });
     }
 
@@ -69,6 +97,8 @@ export class SubtaskInstanceFormService {
             form.get('snoozeOffset')?.setValue(v == null ? null : Number(v), {emitEvent: false});
         }));
 
+        subscriptions.add(this.registerRepeatSync(form));
+
         return subscriptions;
     }
 
@@ -76,6 +106,7 @@ export class SubtaskInstanceFormService {
         const raw = form.getRawValue();
         const dueDateType: DateInputType = raw.dueDateType ?? 'FIXED';
         const snoozeUntilType: DateInputType | null = raw.snoozeUntilType || null;
+        const repeatCount = raw.repeatEnabled && raw.repeatCount && raw.repeatCount > 1 ? raw.repeatCount : null;
 
         return {
             title: raw.title?.trim(),
@@ -89,6 +120,8 @@ export class SubtaskInstanceFormService {
             snoozedUntil: snoozeUntilType === 'FIXED' && raw.snoozeFixed ? this.formatDate(raw.snoozeFixed) : null,
             snoozeOffset: snoozeUntilType === 'OFFSET' ? raw.snoozeOffset : null,
             recurring: raw.recurring ?? true,
+            repeatCount,
+            repeatUnit: repeatCount ? raw.repeatUnit : null,
         };
     }
 
@@ -100,3 +133,17 @@ export class SubtaskInstanceFormService {
         return `${y}-${m}-${d}`;
     }
 }
+
+/** Le nombre d'occurrences n'est exigé (2 à 12) que si la répétition est activée. */
+const repeatCountValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    if (!control.parent?.get('repeatEnabled')?.value) {
+        return null;
+    }
+
+    const value = control.value as number | null;
+    if (value == null) {
+        return {required: true};
+    }
+
+    return value < 2 || value > MAX_REPEAT_COUNT ? {repeatCount: true} : null;
+};

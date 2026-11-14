@@ -8,6 +8,8 @@ import org.mapstruct.*;
 public interface SubtaskInstanceMapper {
 
     @Mapping(target = "taskInstanceId", source = "taskInstance.id")
+    @Mapping(target = "repeatCount", ignore = true)
+    @Mapping(target = "repeatUnit", ignore = true)
     SubtaskInstanceDTO toDto(SubtaskInstance entity);
 
     @Mapping(target = "tenantId", ignore = true)

@@ -147,3 +147,28 @@
         text-decoration: none;
     }
 }
+
+.sp-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.sp-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    margin: 0;
+    padding: 6px 8px;
+    border-radius: 8px;
+    text-align: left;
+
+    &:hover {
+        background: var(--app-surface-muted);
+        text-decoration: none;
+    }
+}
+
+.sp-action--danger {
+    color: var(--app-danger);
+}
