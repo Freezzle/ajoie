@@ -34,6 +34,9 @@ export const RESPONSIBLE_PALETTE: string[] = [
 /** Clé du groupe « Sans responsable », placé en tête. */
 export const NO_RESPONSIBLE_KEY = '__none__';
 
+/** Fuseau métier du salon, aligné sur le backend (`DateUtils.SALON_ZONE`). */
+export const SALON_TIME_ZONE = 'Europe/Zurich';
+
 /** Aujourd'hui au format `YYYY-MM-DD`, minuit local. */
 export function today(): string {
     return dayjs().startOf('day').format('YYYY-MM-DD');
@@ -296,6 +299,28 @@ export function snoozeTarget(subtask: ISubtaskInstance, days: number): string {
 /** Normalise une date (chaîne ISO ou `Date`) au format `YYYY-MM-DD`. */
 export function toLocalDate(value: string | Date | null | undefined): string | null {
     return value ? dayjs(value).format('YYYY-MM-DD') : null;
+}
+
+/**
+ * Date civile suisse d'un instant venant de l'API (début/fin de salon).
+ *
+ * Les bornes du salon sont stockées en `Instant` et le backend les relit toujours
+ * dans le fuseau du salon (`Europe/Zurich`). Les lire ici dans le fuseau du
+ * navigateur décalerait les échéances « J± » d'un jour dès que l'utilisateur n'est
+ * pas en heure suisse.
+ */
+export function salonDay(value: string | Date | null | undefined): string | null {
+    if (!value) {
+        return null;
+    }
+
+    // `en-CA` produit directement `YYYY-MM-DD`.
+    return new Intl.DateTimeFormat('en-CA', {
+        timeZone: SALON_TIME_ZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).format(new Date(value));
 }
 
 /** Date courte localisée, par exemple « mar. 27 oct. ». */

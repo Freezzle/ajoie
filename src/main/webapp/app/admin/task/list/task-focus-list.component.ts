@@ -58,9 +58,9 @@ import {
     next14Predicate,
     ownerOf,
     responsibleColor,
+    salonDay,
     statusColorOf,
     taskUrgency,
-    toLocalDate,
     today as todayDate,
     URGENCY_ORDER,
     urgencyColor
@@ -400,7 +400,7 @@ export class TaskFocusListComponent implements OnInit {
     readonly quickAddRequest = signal<QuickAddRequest | null>(null);
 
     /** Début du salon au format `YYYY-MM-DD`, pour l'échéance « J± ». */
-    readonly salonStartDay = computed(() => toLocalDate(this.salon()?.startingDate));
+    readonly salonStartDay = computed(() => salonDay(this.salon()?.startingDate));
 
     get salonIdValue(): string {
         return this.salonId;
@@ -543,7 +543,7 @@ export class TaskFocusListComponent implements OnInit {
     }
 
     private salonStartingDate(): string | null {
-        return toLocalDate(this.salon()?.startingDate);
+        return salonDay(this.salon()?.startingDate);
     }
 
     private loadSalon(): void {

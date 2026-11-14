@@ -28,7 +28,7 @@ import {ISalon} from '../../salon/model/salon.interface';
 import {IFlatSubtask, ISubtaskInstance} from '../model/task-instance.interface';
 import {TaskInstanceService} from '../service/task-instance.service';
 import {UNDO_TOAST_KEY} from '../shared/subtask-status-panel.component';
-import {effectiveDue, formatShortDate, toLocalDate, today} from '../shared/task-urgency.utils';
+import {effectiveDue, formatShortDate, salonDay, today} from '../shared/task-urgency.utils';
 import {CalendarDayComponent} from './calendar-day.component';
 import {CalendarItemComponent} from './calendar-item.component';
 import {SubtaskEditRequest} from './calendar-quick-add.component';
@@ -110,8 +110,8 @@ export class TaskCalendarComponent implements AfterViewInit, OnDestroy {
 
     private resizeObserver?: ResizeObserver;
 
-    readonly salonStart = computed(() => toLocalDate(this.salon()?.startingDate));
-    readonly salonEnd = computed(() => toLocalDate(this.salon()?.endingDate));
+    readonly salonStart = computed(() => salonDay(this.salon()?.startingDate));
+    readonly salonEnd = computed(() => salonDay(this.salon()?.endingDate));
 
     /** Sur mobile, la bande ne couvre jamais qu'une semaine. */
     readonly effectiveView = computed<CalendarView>(() => this.narrow() ? 'week' : this.view());

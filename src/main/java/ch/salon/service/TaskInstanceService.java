@@ -7,6 +7,7 @@ import ch.salon.service.dto.*;
 import ch.salon.service.mapper.SubtaskInstanceMapper;
 import ch.salon.service.mapper.TaskCommentMapper;
 import ch.salon.service.mapper.TaskInstanceMapper;
+import ch.salon.utils.DateUtils;
 import ch.salon.web.rest.errors.BadRequestAlertException;
 import ch.salon.web.rest.errors.ErrorBusinessKey;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -89,7 +89,7 @@ public class TaskInstanceService {
     @Transactional(readOnly = true)
     public List<TaskFocusViewDTO> getFocusView(UUID salonId) {
         List<TaskInstance> instances = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(salonId);
-        LocalDate today = LocalDate.now();
+        LocalDate today = DateUtils.salonToday();
 
         return instances.stream().map(task -> {
             TaskFocusViewDTO dto = new TaskFocusViewDTO();
@@ -332,8 +332,7 @@ public class TaskInstanceService {
         entity.setDueDate(dueDate);
 
         if ("OFFSET".equals(entity.getDueDateType())) {
-            LocalDate salonStart = salon != null && salon.getStartingDate() != null
-                    ? salon.getStartingDate().atZone(ZoneId.systemDefault()).toLocalDate() : null;
+            LocalDate salonStart = salon != null ? DateUtils.toSalonDate(salon.getStartingDate()) : null;
             long offset = salonStart != null ? ChronoUnit.DAYS.between(salonStart, dueDate) : Long.MAX_VALUE;
             if (offset >= -365 && offset <= 365) {
                 entity.setDueDateOffset((int) offset);
@@ -453,7 +452,7 @@ public class TaskInstanceService {
      * Retourne null si aucune sous-tâche active n'a de date.
      */
     private LocalDate computeTaskDueDate(TaskInstance instance) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = DateUtils.salonToday();
         return instance.getSubtasks().stream()
                 .filter(s -> s.getStatus() != TaskStatus.DONE && s.getStatus() != TaskStatus.CANCELLED)
                 .filter(s -> s.getSnoozedUntil() == null || s.getSnoozedUntil().isBefore(today))
@@ -513,8 +512,8 @@ public class TaskInstanceService {
      */
     private LocalDate resolveOffset(Salon salon, Integer offset) {
         if (salon == null || offset == null) return null;
-        LocalDate base = salon.getStartingDate()
-                .atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate base = DateUtils.toSalonDate(salon.getStartingDate());
+        if (base == null) return null;
         return base.plusDays(offset);
     }
 
@@ -594,8 +593,7 @@ public class TaskInstanceService {
             throw new BadRequestAlertException("Salon has no starting date", ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND);
         }
 
-        int targetYear = salon.getStartingDate()
-                .atZone(ZoneId.systemDefault()).toLocalDate().getYear();
+        int targetYear = DateUtils.toSalonDate(salon.getStartingDate()).getYear();
 
         List<TaskInstance> tasks = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(salonId);
         for (TaskInstance task : tasks) {
@@ -639,8 +637,7 @@ public class TaskInstanceService {
         salonRepository.findById(sourceSalonId).orElseThrow(
                 () -> new BadRequestAlertException("Source salon not found", ENTITY_NAME, ErrorBusinessKey.ENTITY_NOTFOUND));
 
-        int targetYear = targetSalon.getStartingDate()
-                .atZone(ZoneId.systemDefault()).toLocalDate().getYear();
+        int targetYear = DateUtils.toSalonDate(targetSalon.getStartingDate()).getYear();
 
         List<TaskInstance> sourceTasks = taskInstanceRepository.findBySalonIdOrderBySortOrderAsc(sourceSalonId);
 

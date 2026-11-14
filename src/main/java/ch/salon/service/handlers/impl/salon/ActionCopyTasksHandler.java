@@ -86,8 +86,7 @@ public class ActionCopyTasksHandler implements BusinessActionHandler<Salon>, Act
         for (Salon salon : otherSalons) {
             String label = salon.getPlace();
             if (salon.getStartingDate() != null) {
-                java.time.LocalDate date = salon.getStartingDate()
-                        .atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+                java.time.LocalDate date = ch.salon.utils.DateUtils.toSalonDate(salon.getStartingDate());
                 label += " — " + date.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             }
             salonOptions.add(Map.of("id", salon.getId().toString(), "label", label));

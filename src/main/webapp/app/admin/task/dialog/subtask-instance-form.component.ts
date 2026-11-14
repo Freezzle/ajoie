@@ -13,7 +13,7 @@ import {SubtaskInstanceFormGroup, SubtaskInstanceFormService} from '../service/s
 import {DueDateControls, DueDateFieldComponent} from '../shared/due-date-field.component';
 import {RepeatControls, RepeatFieldComponent} from '../shared/repeat-field.component';
 import {ResponsibleFieldComponent} from '../shared/responsible-field.component';
-import {toLocalDate} from '../shared/task-urgency.utils';
+import {salonDay} from '../shared/task-urgency.utils';
 import {SelectButton} from 'primeng/selectbutton';
 import {Popover} from 'primeng/popover';
 import {TranslateService} from '@ngx-translate/core';
@@ -55,7 +55,7 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
 
     /** Début du salon au format `YYYY-MM-DD`, pour le champ d'échéance. */
     get salonStartDay(): string | null {
-        return toLocalDate(this.salonStartingDate);
+        return salonDay(this.salonStartingDate);
     }
 
     /** Vue restreinte du formulaire passée au champ d'échéance. */
@@ -91,8 +91,9 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
         let baseDate: Date | null = null;
         if (this.dueDateType === 'OFFSET') {
             const dueOffset = this.form?.get('dueDateOffset')?.value;
-            if (dueOffset != null && this.salonStartingDate) {
-                baseDate = new Date(this.salonStartingDate);
+            const start = this.salonStartDay;
+            if (dueOffset != null && start) {
+                baseDate = new Date(`${start}T00:00:00`);
                 baseDate.setDate(baseDate.getDate() + Number(dueOffset));
             }
         } else if (this.dueDateType === 'FIXED') {
@@ -106,8 +107,9 @@ export class SubtaskInstanceFormComponent implements OnInit, OnDestroy {
 
     /** Date de début du salon formatée en jj.mm.yyyy (null si absente). */
     get salonStartingDateFormatted(): string | null {
-        if (!this.salonStartingDate) return null;
-        return this.salonStartingDate.toLocaleDateString('fr-CH', {day: '2-digit', month: '2-digit', year: 'numeric'});
+        const day = this.salonStartDay;
+        if (!day) return null;
+        return new Date(`${day}T00:00:00`).toLocaleDateString('fr-CH', {day: '2-digit', month: '2-digit', year: 'numeric'});
     }
 
     ngOnInit(): void {
