@@ -1,15 +1,17 @@
 import {ChangeDetectionStrategy, Component, effect, input} from '@angular/core';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {
     AbstractControl,
     FormControl,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
+    TouchedChangeEvent,
     ValidationErrors,
     Validators
 } from '@angular/forms';
 import {TranslatePipe} from '@ngx-translate/core';
+import {filter, switchMap} from 'rxjs';
 
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {DateBoxComponent} from '../../../shared/components/date-box/date-box.component';
@@ -77,6 +79,22 @@ export class DueDateFieldComponent {
             .pipe(takeUntilDestroyed())
             .subscribe(linked => this.onLinkedChange(linked));
 
+        // L'erreur du champ date ne s'affiche qu'une fois « visité » : on reprend
+        // l'état du formulaire parent, marqué entièrement au clic sur « Enregistrer ».
+        toObservable(this.form)
+            .pipe(
+                switchMap(form => form.controls.dueDateFixed.events),
+                filter((event): event is TouchedChangeEvent => event instanceof TouchedChangeEvent),
+                takeUntilDestroyed()
+            )
+            .subscribe(event => {
+                if (event.touched) {
+                    this.dateControl.markAsTouched();
+                } else {
+                    this.dateControl.markAsUntouched();
+                }
+            });
+
         // Reprend l'état du formulaire à l'ouverture et à chaque changement de sous-tâche.
         effect(() => {
             const form = this.form();
@@ -107,7 +125,10 @@ export class DueDateFieldComponent {
         });
     }
 
-    /** Le J± n'est saisissable, et obligatoire, que si l'échéance suit le salon. */
+    /**
+     * Le J± n'est saisissable, et obligatoire, que si l'échéance suit le salon.
+     * Sinon c'est la date qui devient obligatoire, le J± n'étant plus disponible.
+     */
     private applyOffsetState(linked: boolean): void {
         this.offsetControl.setValidators(linked
                                          ? [Validators.required, salonOffsetValidator]
@@ -120,6 +141,13 @@ export class DueDateFieldComponent {
         }
 
         this.offsetControl.updateValueAndValidity({emitEvent: false});
+
+        this.dateControl.setValidators(linked ? [] : [Validators.required]);
+        this.dateControl.updateValueAndValidity({emitEvent: false});
+
+        const fixed = this.form().controls.dueDateFixed;
+        fixed.setValidators(linked ? [] : [Validators.required]);
+        fixed.updateValueAndValidity({emitEvent: false});
     }
 
     /** Saisie « J-14 » : met à jour l'offset et la date affichée. */
