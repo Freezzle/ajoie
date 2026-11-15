@@ -29,6 +29,8 @@ import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.serv
 import {AppMenuItem} from 'app/shared/utils/app-menu-item.model';
 import {MenuItemBuilderService} from 'app/shared/utils/menu-item-builder.service';
 import {AvailableAction} from 'app/shared/model/available-action';
+import {EmailDialogComponent} from 'app/shared/email-dialog/email-dialog.component';
+import {EmailMessage} from 'app/shared/email-dialog/email-message';
 import {ActionsService} from '../../common/actions.service';
 import {ISalon} from '../../salon/model/salon.interface';
 import {SalonService} from '../../salon/service/salon.service';
@@ -564,6 +566,11 @@ export class TaskFocusListComponent implements OnInit {
     }
 
     private clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
+        if (action.type === 'EMAIL') {
+            this.openEmailPopup(action);
+            return;
+        }
+
         if (action.type !== 'BUSINESS') {
             return;
         }
@@ -593,6 +600,30 @@ export class TaskFocusListComponent implements OnInit {
             .confirmAction(target, confirmationKey, {actionLabel: this.text(action.labelKey)})
             .pipe(filter(confirmed => confirmed))
             .subscribe(() => this.executeBusinessAction(action.contextCode));
+    }
+
+    private openEmailPopup(action: AvailableAction): void {
+        if (!this.salonId) {
+            return;
+        }
+
+        this.actionsService.templateEmailAction(action.contextCode, this.salonId).subscribe(template => {
+            const modalRef = this.modalService.open(EmailDialogComponent, {size: 'xl'});
+            modalRef.componentInstance.template = template;
+            modalRef.componentInstance.context = action.contextCode;
+            modalRef.componentInstance.entityId = this.salonId;
+
+            modalRef.result.then((result: EmailMessage) => {
+                if (result) {
+                    this.isLoading.set(true);
+                    this.actionsService.emailAction(action.contextCode, this.salonId, result)
+                        .pipe(finalize(() => this.isLoading.set(false)))
+                        .subscribe(() => this.loadActions());
+                }
+            }).catch(() => {
+                // Fenêtre fermée sans validation.
+            });
+        });
     }
 
     private executeBusinessAction(context: string, payload?: Map<string, unknown>): void {

@@ -41,6 +41,7 @@ public enum ContextActionType {
     VOLUNTEER_PLANNING_DOWNLOAD("salon", "volunteer-planning-download", "volunteer-planning"),
     SALON_COPY_TASKS("salon", "salon-copy-tasks", "task-list"),
     SALON_RECALCULATE_TASK_DATES("salon", "salon-recalculate-task-dates", "task-list"),
+    SALON_WEEKLY_TASK_DIGEST_EMAIL("salon", "salon-weekly-task-digest-email", "task-list"),
     SALON_DUPLICATE("salon", "salon-duplicate", "salon"),
     SALON_REGISTRATION_INVITATION_EMAIL("salon", "salon-registration-invitation-email", "salon");
 
@@ -140,6 +141,7 @@ public enum ContextActionType {
             // === SALON - Actions métier ===
             case SALON_COPY_TASKS -> 20;                     // Copier les tâches récurrentes depuis un autre salon
             case SALON_RECALCULATE_TASK_DATES -> 21;         // Recalculer les dates des sous-tâches
+            case SALON_WEEKLY_TASK_DIGEST_EMAIL -> 46;       // Envoyer le récap hebdomadaire par email
             case SALON_DUPLICATE -> 10;                      // Dupliquer un salon
             case SALON_REGISTRATION_INVITATION_EMAIL -> 45;  // Inviter l'annuaire à s'inscrire
 
@@ -167,7 +169,7 @@ public enum ContextActionType {
                  VOLUNTEER_PLANNING_DOWNLOAD -> RefreshScope.NONE;
 
             // Envoi de masse : le salon lui-même n'est pas modifié.
-            case SALON_REGISTRATION_INVITATION_EMAIL -> RefreshScope.NONE;
+            case SALON_REGISTRATION_INVITATION_EMAIL, SALON_WEEKLY_TASK_DIGEST_EMAIL -> RefreshScope.NONE;
 
             // Le nombre d'entités change : la liste doit être rechargée.
             case INVOICE_SPLIT, INVOICE_DELETE, SALON_DUPLICATE -> RefreshScope.LIST;

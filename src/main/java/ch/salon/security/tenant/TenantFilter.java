@@ -3,7 +3,6 @@ package ch.salon.security.tenant;
 import ch.salon.domain.User;
 import ch.salon.repository.UserRepository;
 import ch.salon.security.SecurityUtils;
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,11 +31,9 @@ public class TenantFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(TenantFilter.class);
     private final UserRepository userRepository;
-    private final EntityManager entityManager;
 
-    public TenantFilter(UserRepository userRepository, EntityManager entityManager) {
+    public TenantFilter(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.entityManager = entityManager;
     }
 
     @Override
