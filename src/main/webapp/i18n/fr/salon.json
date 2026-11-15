@@ -1,7 +1,7 @@
 {
   "salon": {
     "bankAccount": "Coordonnées bancaires",
-    "conferences": "Les conférences",
+    "conferences": "Conférences",
     "create": "Nouveau salon",
     "dashboard": {
       "goCatalogue": "Aller sur le catalogue",
@@ -217,9 +217,9 @@
     "floorPlan": "Gestion de la salle",
     "headquartersAddress": "Adresse du siège social",
     "eventAddress": "Adresse de l'évènement",
-    "invoicingPlans": "Les factures",
+    "invoicingPlans": "Factures",
     "notFound": "Aucun salon",
-    "participations": "Les participations",
+    "participations": "Participations",
     "place": "Nom du salon",
     "priceConference": "Conférence",
     "priceMeal1": "Repas samedi midi",
@@ -250,9 +250,9 @@
       "welcomeTitle": "Titre de la page d'accueil bénévoles",
       "welcomeText": "Texte d'accueil des bénévoles"
     },
-    "stands": "Les stands",
+    "stands": "Stands",
     "startingDate": "Date de début",
-    "statistiques": "Dashboard du salon",
+    "statistiques": "Tableau de bord du salon",
     "list": {
       "searchPlaceholder": "Rechercher un salon, une référence",
       "open": "Ouvrir la fiche du salon",
@@ -292,12 +292,12 @@
       "standInVerification": "En vérification",
       "standRefused": "Refusé",
       "stands": "Stands",
-      "title": "Dashboard"
+      "title": "Tableau de bord"
     },
     "talksPlanning": "Planning des animations",
-    "tasks": "Les tâches",
-    "title": "Les salons",
+    "tasks": "Tâches",
+    "title": "Salons",
     "volunteersPlanning": "Planning des bénévoles",
-    "workshops": "Les ateliers"
+    "workshops": "Ateliers"
   }
 }

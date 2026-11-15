@@ -67,6 +67,7 @@ import {
     URGENCY_ORDER,
     urgencyColor
 } from '../shared/task-urgency.utils';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 /** Les deux vues de l'écran, conservées dans l'URL (`?view=`). Calendrier par défaut. */
 export type TaskView = 'tasks' | 'calendar';
@@ -122,6 +123,7 @@ export class TaskFocusListComponent implements OnInit {
     readonly newSubtaskParentTask = signal<ITaskInstance | null>(null);
 
     private readonly availableActions = signal<AvailableAction[]>([]);
+    private readonly routeSalonId = signal<string | null>(null);
     private salonId = '';
 
     private readonly activatedRoute = inject(ActivatedRoute);
@@ -133,6 +135,7 @@ export class TaskFocusListComponent implements OnInit {
     private readonly confirmDialogService = inject(ConfirmDialogService);
     private readonly translateService = inject(TranslateService);
     private readonly modalService = inject(NgbModal);
+    private readonly navigationStateService = inject(NavigationStateService);
 
     readonly state = new EntityListState({
                                              defaultGroupBy: GROUP_URGENCY,
@@ -146,6 +149,7 @@ export class TaskFocusListComponent implements OnInit {
     readonly known = computed(() => knownResponsibles(this.tasks()));
 
     readonly allSubtasks = computed<IFlatSubtask[]>(() => flatten(this.tasks()));
+    readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.routeSalonId()));
 
     /** Responsable de la tâche parente de la sous-tâche en cours d'édition ou d'ajout. */
     readonly subtaskTaskResponsible = computed(() => {
@@ -367,6 +371,7 @@ export class TaskFocusListComponent implements OnInit {
     ngOnInit(): void {
         this.activatedRoute.paramMap.subscribe(params => {
             this.salonId = params.get('idSalon') ?? '';
+            this.routeSalonId.set(this.salonId || null);
             this.loadSalon();
             this.load();
             this.loadActions();

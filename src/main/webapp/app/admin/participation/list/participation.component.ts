@@ -249,7 +249,7 @@ export class ParticipationComponent implements OnInit {
                           key => statusColor(key as Status));
     });
 
-    readonly subtitle = computed(() => this.currentSalon()?.place ?? '');
+    readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.idSalon()));
 
     /** « J-x » avant l'ouverture du salon, vide si le salon a commencé. */
     readonly daysBeforeOpening = computed(() => {

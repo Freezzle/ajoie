@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, computed, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {filter, Observable, of, switchMap, tap} from 'rxjs';
@@ -104,6 +104,7 @@ export class ParticipationUpdateComponent implements OnInit {
     protected readonly formatterCategory = formatterCategory;
     protected readonly Category = Category;
     protected readonly Status = Status;
+    readonly subtitle = computed(() => this.stateService.currentSalonPlace(this.eventId));
 
     /**
      * Les actions d'une ligne sont mémoïsées par identifiant : le composant est en

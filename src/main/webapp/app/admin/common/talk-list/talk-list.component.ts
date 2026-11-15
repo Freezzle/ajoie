@@ -190,10 +190,7 @@ export class TalkListComponent {
                                                  {name: participationName}) as string;
         }
 
-        const salon = this.navigationStateService.salon();
-        const idSalon = this.idSalon();
-
-        return !salon || (idSalon && salon.id !== idSalon) ? '' : salon.place;
+        return this.navigationStateService.currentSalonPlace(this.idSalon());
     });
 
     readonly countLabel = computed(() => {

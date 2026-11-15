@@ -1,6 +1,11 @@
 <app-content-page>
     <div appMenuBarStart>
         <h3>{{ 'salon.volunteersPlanning' | translate }}</h3>
+        <div class="el-subtitle">
+            @if (subtitle()) {
+                <b>{{ subtitle() }}</b>
+            }
+        </div>
     </div>
 
     <div appMenuBarEnd>

@@ -30,6 +30,7 @@ import {DayConfigSlice} from './volunteer-planning-slices';
 import {Day} from './volunteer-planning-model';
 import {deleteRun, formatHours} from './volunteer-planning-utils';
 import {ViewMode, VolunteerPlanningStore} from './volunteer-planning.store';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 @Component({
                selector: 'app-volunteer-planning',
@@ -70,8 +71,9 @@ export class VolunteerPlanningComponent implements OnInit {
     private readonly breakpointObserver = inject(BreakpointObserver);
     private readonly messageService = inject(MessageService);
     private readonly translate = inject(TranslateService);
+    private readonly navigationStateService = inject(NavigationStateService);
 
-    private idSalon = '';
+    private readonly idSalon = signal<string | null>(null);
 
     readonly isMobile = toSignal(
         this.breakpointObserver.observe('(max-width: 991.98px)').pipe(map(state => state.matches)),
@@ -107,12 +109,13 @@ export class VolunteerPlanningComponent implements OnInit {
     });
 
     readonly dayMenus = computed(() => new Map(this.store.days().map(d => [d.id, this.dayActionItems()])));
+    readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.idSalon()));
 
     ngOnInit(): void {
         this.activatedRoute.paramMap
             .pipe(map(params => params.get('idSalon')!))
             .subscribe(idSalon => {
-                this.idSalon = idSalon;
+                this.idSalon.set(idSalon);
                 this.store.load(idSalon);
             });
     }
@@ -129,7 +132,10 @@ export class VolunteerPlanningComponent implements OnInit {
 
     cancelEdition(): void {
         this.store.activateReadOnlyMode();
-        this.store.load(this.idSalon);
+        const idSalon = this.idSalon();
+        if (idSalon) {
+            this.store.load(idSalon);
+        }
     }
 
     save(): void {

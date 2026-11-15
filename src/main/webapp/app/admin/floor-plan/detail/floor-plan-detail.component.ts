@@ -215,6 +215,7 @@ export class FloorPlanDetailComponent {
             {label: this.translateService.instant('floorPlan.view.technical') as string, value: true}
         ];
     });
+    readonly subtitle = computed(() => this.navigationService.currentSalonPlace(this.salon()?.id));
 
     readonly settingsDialogVisible = signal(false);
     readonly settingsDialogNewPlanName = signal<string | null>(null);

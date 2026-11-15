@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, computed, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {of} from 'rxjs';
@@ -24,6 +24,7 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 @Component({
                selector: 'app-conference-update',
@@ -43,10 +44,12 @@ export class ConferenceUpdateComponent implements OnInit {
     protected conferenceFormService = inject(ConferenceFormService);
     editForm: FormGroup<ConferenceFormGroup> = this.conferenceFormService.createConferenceFormGroup(null);
     protected participationService = inject(ParticipationService);
+    protected navigationStateService = inject(NavigationStateService);
     protected activatedRoute = inject(ActivatedRoute);
     protected readonly formatterParticipation = formatterParticipation;
     protected readonly formatterStatus = formatterStatus;
     protected readonly selectFilterParticipation = selectFilterParticipation;
+    readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.eventId));
 
     ngOnInit(): void {
         const data = this.activatedRoute.snapshot.data;

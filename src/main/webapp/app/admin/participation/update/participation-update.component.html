@@ -5,6 +5,11 @@
         } @else {
             <h3>{{ 'participation.create' | translate }}</h3>
         }
+        <div class="el-subtitle">
+            @if (subtitle()) {
+                <b>{{ subtitle() }}</b>
+            }
+        </div>
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"

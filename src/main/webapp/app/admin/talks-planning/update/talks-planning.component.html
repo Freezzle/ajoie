@@ -1,6 +1,11 @@
 <app-content-page [talkInHandGhost]="store.talkInHandValue()">
     <div appMenuBarStart>
         <h3>{{ 'salon.talksPlanning' | translate }}</h3>
+        <div class="el-subtitle">
+            @if (subtitle()) {
+                <b>{{ subtitle() }}</b>
+            }
+        </div>
     </div>
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"

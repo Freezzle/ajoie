@@ -190,11 +190,7 @@ export class SalonStatsComponent implements OnInit {
     if (!salon) {
       return '';
     }
-    const dates = salon.startingDate
-      ? formatDate(salon.startingDate, 'dd.MM.yyyy', this.locale) +
-        (salon.endingDate ? ' – ' + formatDate(salon.endingDate, 'dd.MM.yyyy', this.locale) : '')
-      : '';
-    return [salon.place, dates].filter((part) => !!part).join(' · ');
+    return this.navigationService.currentSalonPlace(salon.id);
   });
 
   readonly menuItems = computed<AppMenuItem[]>(() => {

@@ -20,6 +20,16 @@ export class NavigationStateService {
         this._salon.set(salon);
     }
 
+    currentSalonPlace(idSalon: string | null | undefined): string {
+        if (!idSalon) {
+            return '';
+        }
+
+        const salon = this._salon();
+
+        return salon?.id === idSalon ? salon.place : '';
+    }
+
     isSameContext(idSalon: string): boolean {
         // on lit le signal via la computed salonId()
         return this.salonId() === idSalon;

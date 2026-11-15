@@ -35,6 +35,7 @@ import {
     issuesOf,
     startCandidates
 } from './talks-planning-utils';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 type MobileSheet = 'NONE' | 'TRAY' | 'SLOT' | 'DETAIL';
 
@@ -74,6 +75,8 @@ export class TalksPlanningComponent implements OnInit {
     private readonly breakpointObserver = inject(BreakpointObserver);
     private readonly messageService = inject(MessageService);
     private readonly translate = inject(TranslateService);
+    private readonly navigationStateService = inject(NavigationStateService);
+    private readonly idSalon = signal<string | null>(null);
 
     readonly isMobile = toSignal(
         this.breakpointObserver.observe('(max-width: 991.98px)').pipe(map(state => state.matches)),
@@ -82,6 +85,7 @@ export class TalksPlanningComponent implements OnInit {
 
     readonly configDialogVisible = signal(false);
     readonly mobileSheet = signal<MobileSheet>('NONE');
+    readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.idSalon()));
 
     constructor() {
         // Les messages du store sont traduits ici : la logique métier reste hors de l'UI.
@@ -118,7 +122,10 @@ export class TalksPlanningComponent implements OnInit {
     ngOnInit(): void {
         this.activatedRoute.paramMap
             .pipe(map(params => params.get('idSalon')!))
-            .subscribe(idSalon => this.store.load(idSalon));
+            .subscribe(idSalon => {
+                this.idSalon.set(idSalon);
+                this.store.load(idSalon);
+            });
     }
 
     // ---------- en-tête ----------

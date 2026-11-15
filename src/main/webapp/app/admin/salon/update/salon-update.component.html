@@ -7,6 +7,11 @@
             @if (!editForm.controls.id.value) {
                 <h3 jhiTranslate="salon.create">Nouveau salon</h3>
             }
+            <div class="el-subtitle">
+                @if (subtitle()) {
+                    <b>{{ subtitle() }}</b>
+                }
+            </div>
         </div>
         <div appMenuBarEnd>
             <button-box (clickedEvent)="previousState()"

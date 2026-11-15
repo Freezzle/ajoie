@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, computed, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
 import {ActivatedRoute} from '@angular/router';
 import {forkJoin, of} from 'rxjs';
@@ -36,6 +36,7 @@ import {ChipsBoxComponent} from '../../../shared/components/chips-box/chips-box.
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {ImageUploadBoxComponent} from '../../../shared/components/image-upload-box/image-upload-box.component';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 
 @Component({
                selector: 'app-stand-update',
@@ -77,6 +78,7 @@ export class StandUpdateComponent implements OnInit {
     protected standFormService = inject(StandFormService);
     editForm: FormGroup<StandFormGroup> = this.standFormService.createStandFormGroup(null);
     protected participationService = inject(ParticipationService);
+    protected navigationStateService = inject(NavigationStateService);
     protected activatedRoute = inject(ActivatedRoute);
     protected readonly formatterParticipation = formatterParticipation;
     protected readonly formatterDimensionStand = formatterDimensionStand;
@@ -84,6 +86,7 @@ export class StandUpdateComponent implements OnInit {
     protected readonly formatterCategory = formatterCategory;
     protected readonly selectFilterDimension = selectFilterDimension;
     protected readonly selectFilterParticipation = selectFilterParticipation;
+    readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.eventId));
 
     ngOnInit(): void {
         const data = this.activatedRoute.snapshot.data;

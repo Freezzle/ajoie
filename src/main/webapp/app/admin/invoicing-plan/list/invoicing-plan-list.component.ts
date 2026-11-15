@@ -277,10 +277,7 @@ export class InvoicingPlanListComponent implements OnInit {
             return '';
         }
 
-        const salon = this.navigationStateService.salon();
-        const idSalon = this.idSalon();
-
-        return !salon || (idSalon && salon.id !== idSalon) ? '' : salon.place;
+        return this.navigationStateService.currentSalonPlace(this.idSalon());
     });
 
     /**

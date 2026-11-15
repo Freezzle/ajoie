@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {finalize, filter} from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
@@ -36,6 +36,7 @@ import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.co
 import {EmailMessage} from '../../../shared/email-dialog/email-message';
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {AlertService} from '../../../core/util/alert.service';
+import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 @Component({
                selector: 'app-salon-update',
                templateUrl: './salon-update.component.html',
@@ -81,6 +82,9 @@ export class SalonUpdateComponent implements OnInit {
     private readonly modalService = inject(NgbModal);
     private readonly confirmDialogService = inject(ConfirmDialogService);
     private readonly alertService = inject(AlertService);
+    private readonly navigationStateService = inject(NavigationStateService);
+    private readonly idSalon = signal<string | null>(null);
+    readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.idSalon()));
     priceStandRows: FormGroup<PriceStandGroup>[] = [];
 
     get priceStandSalons(): FormArray<FormGroup<PriceStandGroup>> {
@@ -118,6 +122,7 @@ export class SalonUpdateComponent implements OnInit {
     }
     ngOnInit(): void {
         this.activateReadOnlyMode(false);
+        this.idSalon.set(this.activatedRoute.snapshot.paramMap.get('idSalon'));
         this.activatedRoute.data
             .subscribe((data) => {
                 this.initialSalon = data['salon'] as ISalon;

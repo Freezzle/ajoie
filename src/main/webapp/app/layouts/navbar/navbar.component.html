@@ -22,13 +22,13 @@
                         [routerLinkActiveOptions]="{ exact: true }"
                         routerLink="/admin/exhibitors"
                         routerLinkActive="active">
-                        <a><i class="pi pi-book"></i> L'annuaire client</a>
+                        <a><i class="pi pi-book"></i>{{ 'exhibitor.title' | translate }}</a>
                     </li>
                     <li (click)="closeMobile()" *jhiHasAnyAuthority="['ROLE_ADMIN_BUSINESS']"
                         [routerLinkActiveOptions]="{ exact: true }"
                         routerLink="/admin/salons"
                         routerLinkActive="active">
-                        <a><i class="pi pi-calendar"></i> Les salons</a>
+                        <a><i class="pi pi-calendar"></i>{{ 'salon.title' | translate }}</a>
                     </li>
                 </ul>
                 @if (navigationService.salon(); as salon) {
