@@ -32,8 +32,7 @@
 
     <div th:unless="${salons != null and !#lists.isEmpty(salons)}">
         <p style="margin:0 0 12px 0; font-size:14px; line-height:22px; color:#2d2d2d;">
-            Bonjour <strong th:text="${firstName}">Prénom</strong> 👋<br/>
-            Voici le résumé des sous-tâches à traiter pour le salon <strong th:text="${salon}">Nom du salon</strong>.
+          Voici le résumé <a th:href="${tasksLink}" href="#" style="color:#004d40; font-weight:bold;">des sous-tâches à traiter</a> cette semaine pour le salon <strong th:text="${salon}">Nom du salon</strong>.
         </p>
 
         <table role="presentation" style="width:100%; border-spacing:0; border-collapse:collapse; font-size:14px; line-height:22px; margin:0 0 16px 0;">
@@ -46,9 +45,5 @@
                 </td>
             </tr>
         </table>
-
-        <p style="margin:0;">
-            👉 <a th:href="${tasksLink}" href="#" style="color:#004d40; font-weight:bold;">Voir la liste des tâches</a>
-        </p>
     </div>
 </div>
