@@ -1,8 +1,6 @@
 import {Component, computed, inject, OnInit} from '@angular/core';
-import {HttpResponse} from '@angular/common/http';
 import {ActivatedRoute} from '@angular/router';
-import {of} from 'rxjs';
-import {catchError, finalize, map} from 'rxjs/operators';
+import {finalize} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -25,6 +23,7 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
+import {loadParticipationOptions} from '../../common/participation/participation-options.util';
 
 @Component({
                selector: 'app-workshop-update',
@@ -100,18 +99,12 @@ export class WorkshopUpdateComponent implements OnInit {
     }
 
     private loadRelationshipsOptions(eventId: string, participationId: string | null): void {
-        this.participationService.query(eventId)
-            .pipe(
-                map((res: HttpResponse<IParticipation[]>) => res.body ?? []),
-                map((participations) => {
-                    if (participationId) {
-                        this.editForm.get('participation')?.setValue(
-                            participations.find(p => p.id === participationId) ?? null
-                        );
-                    }
-                    return participations;
-                }),
-                catchError(() => of([])))
+        loadParticipationOptions(
+            eventId,
+            participationId,
+            this.participationService,
+            participation => this.editForm.get('participation')?.setValue(participation)
+        )
             .subscribe((participations) => (this.participationsOptions = participations));
     }
 }

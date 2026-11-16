@@ -14,13 +14,9 @@
                     primeIcon="pi-arrow-left"
                     translateKey="common.back"/>
 
-        <menu-box [buttonDisabled]="isLoading()"
-                  [items]="pageMenuItems()"
-                  buttonIcon="pi-ellipsis-h"
-                  type="secondary"/>
-
         <button-box (clickedEvent)="create()"
                     [isDisabled]="isLoading()"
+                    [showText]="false"
                     primeIcon="pi-plus"
                     translateKey="common.create"/>
     </div>
@@ -30,7 +26,11 @@
 
     <div class="el-list">
         <entity-list-toolbar [(activeChips)]="state.activeChips"
+                             (refreshRequested)="refreshRequested.emit()"
                              [(query)]="state.query"
+                             [refreshDisabled]="isLoading()"
+                             [refreshLoading]="isLoading()"
+                             [showRefresh]="true"
                              [chipGroups]="chipGroups()"
                              [groupBy]="state.groupBy()"
                              (groupByChange)="state.setGroupBy($event)"

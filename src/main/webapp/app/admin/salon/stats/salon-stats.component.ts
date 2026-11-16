@@ -39,7 +39,9 @@ import {
     DashboardContext,
     LineChart,
     MetricStatusType,
-    MetricVM
+    MetricVM,
+    TimelineGranularity,
+    TimelinePoint
 } from './salon-dashboard.utils';
 import {
     DashboardSource,
@@ -58,6 +60,7 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 
 type DashboardView = 'dashboard' | 'catalogue';
+type TimelineOption = 'day' | 'week' | 'month';
 
 const STORAGE_KEY = 'salon-dashboard.metrics';
 
@@ -118,12 +121,19 @@ export class SalonStatsComponent implements OnInit {
   readonly statusType = signal<MetricStatusType>('participation');
   /** Largeur d'affichage courante pour choisir la hauteur des graphiques. */
   readonly isMobile = signal<boolean>(typeof window !== 'undefined' && window.innerWidth <= 720);
-  /** Semaine survolée dans la chronologie. */
+  /** Point survolé dans la chronologie. */
   readonly hovered = signal<number | null>(null);
+  /** Intervalle choisi manuellement dans la chronologie (null = défaut auto). */
+  readonly timelineIntervalOverride = signal<TimelineOption | null>(null);
 
   protected readonly themeOrder = THEME_ORDER;
   protected readonly themeIcon = THEME_ICON;
   protected readonly metricCount = METRIC_COUNT;
+  protected readonly timelineIntervals: { value: TimelineOption; key: string }[] = [
+    { value: 'day', key: 'salon.dashboard.timeline.intervalDay' },
+    { value: 'week', key: 'salon.dashboard.timeline.intervalWeek' },
+    { value: 'month', key: 'salon.dashboard.timeline.intervalMonth' },
+  ];
 
   protected readonly statusTypes: { type: MetricStatusType; shortKey: string }[] = [
     { type: 'participation', shortKey: 'salon.dashboard.status.shortParticipation' },
@@ -244,6 +254,23 @@ export class SalonStatsComponent implements OnInit {
     };
   });
 
+  readonly activeTimelineInterval = computed<TimelineOption>(() => {
+    const timeline = this.timeline();
+    if (!timeline) {
+      return 'week';
+    }
+    return this.timelineIntervalOverride() ?? this.defaultTimelineInterval(timeline.startDate, timeline.endDate);
+  });
+
+  readonly timelinePoints = computed<TimelinePoint[]>(() => {
+    const timeline = this.timeline();
+    if (!timeline) {
+      return [];
+    }
+    const interval = this.activeTimelineInterval();
+    return timeline.series[interval];
+  });
+
   readonly expectedAmount = computed(() => this.statsConfirmed()?.facturation.expected ?? 0);
   readonly paidAmount = computed(() => this.statsConfirmed()?.facturation.paid ?? 0);
   readonly remainingAmount = computed(() => this.statsConfirmed()?.facturation.remaining ?? 0);
@@ -253,13 +280,13 @@ export class SalonStatsComponent implements OnInit {
   });
 
   readonly registrationsChart = computed<LineChart | null>(() => {
-    const timeline = this.timeline();
-    if (!timeline) {
+    const points = this.timelinePoints();
+    if (points.length === 0) {
       return null;
     }
     return buildLineChart(
-      timeline.weeks,
-      timeline.weeks.map((week) => week.registrations),
+      points,
+      points.map((point) => point.registrations),
       {
         width: 600,
         height: this.isMobile() ? 190 : 150,
@@ -271,13 +298,13 @@ export class SalonStatsComponent implements OnInit {
   });
 
   readonly paymentsChart = computed<LineChart | null>(() => {
-    const timeline = this.timeline();
-    if (!timeline) {
+    const points = this.timelinePoints();
+    if (points.length === 0) {
       return null;
     }
     return buildLineChart(
-      timeline.weeks,
-      timeline.weeks.map((week) => week.payments),
+      points,
+      points.map((point) => point.payments),
       {
         width: 600,
         height: this.isMobile() ? 190 : 170,
@@ -290,23 +317,39 @@ export class SalonStatsComponent implements OnInit {
     );
   });
 
-  readonly hoveredWeek = computed(() => {
+  readonly hoveredPoint = computed(() => {
     const index = this.hovered();
-    const timeline = this.timeline();
-    if (index === null || !timeline || index < 0 || index >= timeline.weeks.length) {
+    const points = this.timelinePoints();
+    if (index === null || index < 0 || index >= points.length) {
       return null;
     }
-    return timeline.weeks[index];
+    return points[index];
   });
 
-  readonly hoveredWeekLabel = computed(() => {
-    const week = this.hoveredWeek();
-    return week ? formatDate(week.start, 'dd.MM.yyyy', this.locale) : '';
+  readonly hoveredPointLabel = computed(() => {
+    const point = this.hoveredPoint();
+    if (!point) {
+      return '';
+    }
+    return this.activeTimelineInterval() === 'month'
+      ? formatDate(point.start, 'MM.yyyy', this.locale)
+      : formatDate(point.start, 'dd.MM.yyyy', this.locale);
+  });
+
+  readonly hoveredLabelKey = computed(() => {
+    switch (this.activeTimelineInterval()) {
+      case 'day':
+        return 'salon.dashboard.timeline.dayOf';
+      case 'month':
+        return 'salon.dashboard.timeline.monthOf';
+      default:
+        return 'salon.dashboard.timeline.weekOf';
+    }
   });
 
   onChartMove(event: MouseEvent, chart: LineChart | null): void {
-    const timeline = this.timeline();
-    if (!chart || !timeline || timeline.weeks.length === 0) {
+    const points = this.timelinePoints();
+    if (!chart || points.length === 0) {
       return;
     }
     const target = event.currentTarget as SVGGraphicsElement;
@@ -314,7 +357,7 @@ export class SalonStatsComponent implements OnInit {
     const ratio = rect.width > 0 ? (event.clientX - rect.left) / rect.width : 0;
     const x = ratio * chart.width;
     const span = chart.width - chart.left - chart.right;
-    const count = timeline.weeks.length;
+    const count = points.length;
     const raw = span > 0 ? ((x - chart.left) / span) * (count - 1) : 0;
     this.hovered.set(Math.max(0, Math.min(count - 1, Math.round(raw))));
   }
@@ -337,6 +380,15 @@ export class SalonStatsComponent implements OnInit {
       return 0;
     }
     return chart.points[index].y;
+  }
+
+  setTimelineInterval(interval: TimelineOption): void {
+    this.timelineIntervalOverride.set(interval);
+    this.hovered.set(null);
+  }
+
+  isTimelineIntervalActive(interval: TimelineOption): boolean {
+    return this.activeTimelineInterval() === interval;
   }
 
   // ── À traiter ───────────────────────────────────────────────────────────
@@ -559,5 +611,11 @@ export class SalonStatsComponent implements OnInit {
 
   trackId(_index: number, id: string): string {
     return id;
+  }
+
+  private defaultTimelineInterval(startDate: Date, endDate: Date): TimelineGranularity {
+    const oneMonthAfterStart = new Date(startDate);
+    oneMonthAfterStart.setMonth(oneMonthAfterStart.getMonth() + 1);
+    return endDate.getTime() < oneMonthAfterStart.getTime() ? 'day' : 'week';
   }
 }

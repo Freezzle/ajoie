@@ -192,11 +192,6 @@ export class ExhibitorComponent implements OnInit {
 
     readonly pageMenuItems = computed<MenuItem[]>(() => [
         {
-            label: this.translateService.instant('common.refresh') as string,
-            icon: 'pi pi-sync',
-            command: () => this.load()
-        },
-        {
             label: this.translateService.instant('exhibitor.copyNewsletter') as string,
             icon: 'pi pi-copy',
             command: () => this.clipboardNewsLetterExhibitors()

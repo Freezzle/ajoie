@@ -1,29 +1,12 @@
 import {inject} from '@angular/core';
-import {HttpResponse} from '@angular/common/http';
 import {ActivatedRouteSnapshot, Router} from '@angular/router';
-import {EMPTY, Observable, of} from 'rxjs';
-import {mergeMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 import {ISalon} from '../model/salon.interface';
 import {SalonService} from './salon.service';
+import {resolveEntityById} from '../../common/route/resolve-entity.util';
 
-const salonResolve = (route: ActivatedRouteSnapshot): Observable<null | ISalon> => {
-    const id = route.params['idSalon'];
-    if (id) {
-        return inject(SalonService)
-            .find(id)
-            .pipe(
-                mergeMap((salon: HttpResponse<ISalon>) => {
-                    if (salon.body) {
-                        return of(salon.body);
-                    } else {
-                        inject(Router).navigate(['404']);
-                        return EMPTY;
-                    }
-                })
-            );
-    }
-    return of(null);
-};
+const salonResolve = (route: ActivatedRouteSnapshot): Observable<null | ISalon> =>
+    resolveEntityById(route, 'idSalon', id => inject(SalonService).find(id), inject(Router));
 
 export default salonResolve;

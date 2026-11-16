@@ -1,29 +1,12 @@
 import {inject} from '@angular/core';
-import {HttpResponse} from '@angular/common/http';
 import {ActivatedRouteSnapshot, Router} from '@angular/router';
-import {EMPTY, Observable, of} from 'rxjs';
-import {mergeMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 import {IStand} from '../model/stand.interface';
 import {StandService} from './stand.service';
+import {resolveEntityById} from '../../common/route/resolve-entity.util';
 
-const standResolve = (route: ActivatedRouteSnapshot): Observable<null | IStand> => {
-    const id = route.params['idStand'];
-    if (id) {
-        return inject(StandService)
-            .find(id)
-            .pipe(
-                mergeMap((stand: HttpResponse<IStand>) => {
-                    if (stand.body) {
-                        return of(stand.body);
-                    } else {
-                        inject(Router).navigate(['404']);
-                        return EMPTY;
-                    }
-                })
-            );
-    }
-    return of(null);
-};
+const standResolve = (route: ActivatedRouteSnapshot): Observable<null | IStand> =>
+    resolveEntityById(route, 'idStand', id => inject(StandService).find(id), inject(Router));
 
 export default standResolve;

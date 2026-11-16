@@ -1,31 +1,12 @@
 import {inject} from '@angular/core';
-import {HttpResponse} from '@angular/common/http';
 import {ActivatedRouteSnapshot, Router} from '@angular/router';
-import {EMPTY, Observable, of} from 'rxjs';
-import {mergeMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 import {IConference} from '../model/conference.interface';
 import {ConferenceService} from './conference.service';
+import {resolveEntityById} from '../../common/route/resolve-entity.util';
 
-const conferenceResolve = (route: ActivatedRouteSnapshot): Observable<null | IConference> => {
-    const id = route.params['idConference'];
-    if (id) {
-        return inject(ConferenceService)
-            .find(id)
-            .pipe(
-                mergeMap((conference: HttpResponse<IConference>) => {
-                    if (conference.body) {
-                        return of(conference.body);
-                    } else {
-                        inject(Router).navigate(['404']);
-                        return EMPTY;
-                    }
-                })
-            );
-    }
-    return of(null);
-};
+const conferenceResolve = (route: ActivatedRouteSnapshot): Observable<null | IConference> =>
+    resolveEntityById(route, 'idConference', id => inject(ConferenceService).find(id), inject(Router));
 
 export default conferenceResolve;
-
-

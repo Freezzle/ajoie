@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, input, model} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, input, model, output, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
@@ -35,6 +35,16 @@ export class EntityListToolbarComponent {
 
     /** Masque le bouton « Grouper et trier » sur les écrans dont l'ordre est imposé. */
     readonly showGroupSort = input<boolean>(true);
+    readonly showRefresh = input<boolean>(false);
+    readonly refreshDisabled = input<boolean>(false);
+    readonly refreshLoading = input<boolean>(false);
+    readonly refreshRequested = output<void>();
+
+    private readonly userFilterVisibility = signal<boolean | null>(null);
+
+    readonly hasActiveFilters = computed(() => this.activeChips().length > 0);
+    readonly canToggleFilters = computed(() => this.chipGroups().some(group => group.chips.length > 0));
+    readonly shouldShowFilters = computed(() => this.userFilterVisibility() ?? this.hasActiveFilters());
 
     readonly visibleGroups = computed(() => this.chipGroups()
                                                 .map(group => ({
@@ -47,6 +57,20 @@ export class EntityListToolbarComponent {
 
     isActive(chip: FilterChip): boolean {
         return this.activeChips().includes(chip.key);
+    }
+
+    toggleFilters(): void {
+        if (!this.canToggleFilters()) {
+            return;
+        }
+        this.userFilterVisibility.set(!this.shouldShowFilters());
+    }
+
+    refresh(): void {
+        if (this.refreshDisabled()) {
+            return;
+        }
+        this.refreshRequested.emit();
     }
 
     toggleChip(chip: FilterChip): void {

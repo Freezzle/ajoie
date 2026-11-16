@@ -11,17 +11,39 @@
                    type="text"/>
         </p-iconfield>
 
-        @if (showGroupSort()) {
-            <entity-group-sort-menu [(groupBy)]="groupBy"
+       @if (showRefresh()) {
+           <button (click)="refresh()"
+                   [attr.aria-label]="'common.refresh' | translate"
+                   [disabled]="refreshDisabled()"
+                   [title]="'common.refresh' | translate"
+                   class="el-tool-button"
+                   type="button">
+               <i [class.pi-spin]="refreshLoading()" class="pi pi-refresh"></i>
+           </button>
+       }
+
+       @if (canToggleFilters()) {
+           <button (click)="toggleFilters()"
+                   [attr.aria-label]="'entityList.filterToggle' | translate"
+                   [class.el-tool-button--modified]="shouldShowFilters()"
+                   [title]="'entityList.filterToggle' | translate"
+                   class="el-tool-button"
+                   type="button">
+               <i class="pi pi-sliders-h"></i>
+           </button>
+       }
+
+       @if (showGroupSort()) {
+           <entity-group-sort-menu [(groupBy)]="groupBy"
                                     [(sort)]="sort"
                                     [groupOptions]="groupOptions()"
                                     [isDefault]="isDefault()"
                                     [sortOptions]="sortOptions()"/>
-        }
+       }
       <ng-content select="[toolbarEnd]"></ng-content>
     </div>
 
-    @if (visibleGroups().length > 0) {
+    @if (shouldShowFilters() && visibleGroups().length > 0) {
         <div class="el-chips">
             @for (group of visibleGroups(); track group.key; let first = $first) {
                 @if (!first) {

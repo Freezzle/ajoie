@@ -24,15 +24,17 @@ import {MetricVisual} from './salon-dashboard.metrics';
 // Chronologie (§3)
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Une semaine (lundi → dimanche) avec les valeurs cumulées d'inscriptions et de paiements. */
-export interface TimelineWeek {
+export type TimelineGranularity = 'day' | 'week' | 'month';
+
+/** Un point de chronologie avec les valeurs cumulées d'inscriptions et de paiements. */
+export interface TimelinePoint {
     start: Date;
     registrations: number;
     payments: number;
 }
 
 export interface TimelineModel {
-    weeks: TimelineWeek[];
+    series: Record<TimelineGranularity, TimelinePoint[]>;
     startDate: Date;
     endDate: Date;
     totalRegistrations: number;
@@ -56,10 +58,70 @@ export function startOfWeekMonday(value: Date): Date {
     return date;
 }
 
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+/** Jour (minuit local) d'une date. */
+export function startOfDay(value: Date): Date {
+    const date = new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    date.setHours(0, 0, 0, 0);
+    return date;
+}
+
+/** Premier jour du mois (minuit local) d'une date. */
+export function startOfMonth(value: Date): Date {
+    return new Date(value.getFullYear(), value.getMonth(), 1);
+}
+
+function addDays(value: Date, days: number): Date {
+    const date = new Date(value);
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+function addMonths(value: Date, months: number): Date {
+    return new Date(value.getFullYear(), value.getMonth() + months, 1);
+}
+
+function buildCumulativeSeries(
+    startDate: Date,
+    endDate: Date,
+    regDates: Date[],
+    payEntries: Array<{date: Date; amount: number}>,
+    startOf: (value: Date) => Date,
+    next: (value: Date) => Date
+): TimelinePoint[] {
+    const start = startOf(startDate);
+    const end = startOf(endDate);
+
+    const regByBucket = new Map<number, number>();
+    const payByBucket = new Map<number, number>();
+
+    for (const date of regDates) {
+        const key = startOf(date).getTime();
+        regByBucket.set(key, (regByBucket.get(key) ?? 0) + 1);
+    }
+    for (const entry of payEntries) {
+        const key = startOf(entry.date).getTime();
+        payByBucket.set(key, (payByBucket.get(key) ?? 0) + entry.amount);
+    }
+
+    const points: TimelinePoint[] = [];
+    let regCumulative = 0;
+    let payCumulative = 0;
+    for (let cursor = new Date(start); cursor.getTime() <= end.getTime(); cursor = next(cursor)) {
+        const key = cursor.getTime();
+        regCumulative += regByBucket.get(key) ?? 0;
+        payCumulative += payByBucket.get(key) ?? 0;
+        points.push({
+            start: new Date(cursor),
+            registrations: regCumulative,
+            payments: payCumulative
+        });
+    }
+
+    return points;
+}
 
 /**
- * Série hebdomadaire de la chronologie (§3.1). La période va de la plus ancienne à la plus
+ * Séries cumulées de la chronologie (§3.1). La période va de la plus ancienne à la plus
  * récente date — inscriptions et paiements confondus — et ne dépend jamais de la date du jour.
  * Renvoie `null` s'il n'y a aucune date.
  */
@@ -81,42 +143,16 @@ export function buildTimeline(
 
     const startDate = new Date(Math.min(...allTimes));
     const endDate = new Date(Math.max(...allTimes));
-    const firstWeek = startOfWeekMonday(startDate);
-    const lastWeek = startOfWeekMonday(endDate);
-    const count = Math.round((lastWeek.getTime() - firstWeek.getTime()) / WEEK_MS) + 1;
-
-    const regPerWeek = new Array<number>(count).fill(0);
-    const payPerWeek = new Array<number>(count).fill(0);
-    const weekIndex = (date: Date): number =>
-        Math.round((startOfWeekMonday(date).getTime() - firstWeek.getTime()) / WEEK_MS);
-
-    for (const date of regDates) {
-        const index = weekIndex(date);
-        if (index >= 0 && index < count) {
-            regPerWeek[index]++;
-        }
-    }
-    for (const entry of payEntries) {
-        const index = weekIndex(entry.date);
-        if (index >= 0 && index < count) {
-            payPerWeek[index] += entry.amount;
-        }
-    }
-
-    const weeks: TimelineWeek[] = [];
-    let regCumulative = 0;
-    let payCumulative = 0;
-    for (let i = 0; i < count; i++) {
-        regCumulative += regPerWeek[i];
-        payCumulative += payPerWeek[i];
-        weeks.push({
-            start: new Date(firstWeek.getTime() + i * WEEK_MS),
-            registrations: regCumulative,
-            payments: payCumulative
-        });
-    }
-
-    return {weeks, startDate, endDate, totalRegistrations: regDates.length};
+    return {
+        series: {
+            day: buildCumulativeSeries(startDate, endDate, regDates, payEntries, startOfDay, value => addDays(value, 1)),
+            week: buildCumulativeSeries(startDate, endDate, regDates, payEntries, startOfWeekMonday, value => addDays(value, 7)),
+            month: buildCumulativeSeries(startDate, endDate, regDates, payEntries, startOfMonth, value => addMonths(value, 1))
+        },
+        startDate,
+        endDate,
+        totalRegistrations: regDates.length
+    };
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -173,10 +209,9 @@ function formatTick(value: number, amount: boolean, locale: string): string {
 }
 
 /**
- * Construit un graphique en courbe cumulée à partir des semaines de la chronologie. Les deux
- * graphiques partagent le même axe X : mêmes marges, même nombre de semaines, donc même échelle.
+ * Construit un graphique en courbe cumulée à partir d'une série de la chronologie.
  */
-export function buildLineChart(weeks: TimelineWeek[], values: number[], options: LineChartOptions): LineChart {
+export function buildLineChart(pointsData: TimelinePoint[], values: number[], options: LineChartOptions): LineChart {
     const locale = options.locale ?? 'fr-CH';
     const width = options.width;
     const height = options.height;
@@ -210,19 +245,21 @@ export function buildLineChart(weeks: TimelineWeek[], values: number[], options:
     }
 
     const xLabels: {x: number; label: string}[] = [];
-    if (options.monthLabels && weeks.length > 0) {
-        const firstWeek = weeks[0].start;
-        const start = weeks[0].start;
-        const end = weeks[weeks.length - 1].start;
-        const cursor = new Date(start.getFullYear(), start.getMonth() + 1, 1);
-        while (cursor <= end) {
-            const index = Math.round((startOfWeekMonday(cursor).getTime() - firstWeek.getTime()) / WEEK_MS);
-            const clamped = Math.max(0, Math.min(count - 1, index));
-            xLabels.push({
-                x: xOf(clamped),
-                label: cursor.toLocaleDateString(locale, {month: 'short'})
-            });
-            cursor.setMonth(cursor.getMonth() + 1);
+    if (options.monthLabels && pointsData.length > 0) {
+        let previousMonth = -1;
+        let previousYear = -1;
+        for (let index = 0; index < pointsData.length; index++) {
+            const date = pointsData[index].start;
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            if (month !== previousMonth || year !== previousYear) {
+                xLabels.push({
+                    x: xOf(index),
+                    label: date.toLocaleDateString(locale, {month: 'short'})
+                });
+                previousMonth = month;
+                previousYear = year;
+            }
         }
     }
 

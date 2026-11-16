@@ -31,6 +31,7 @@ app-salon-stats {
     }
 
     // ── Chronologie ─────────────────────────────────────────────────────────────
+    .timeline-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; .seg { margin-left: auto; } }
     .chart-head { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; b { font-size: 13.5px; } }
     .line-chart { width: 100%; display: block; }
     .chart-wrap { position: relative; }

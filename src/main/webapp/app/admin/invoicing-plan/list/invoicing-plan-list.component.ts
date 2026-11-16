@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import {MenuItem} from 'primeng/api';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import dayjs from 'dayjs/esm';
 import {filter, Subscription, switchMap, tap, timer} from 'rxjs';
@@ -11,7 +10,6 @@ import SharedModule from 'app/shared/shared.module';
 import {AlertErrorComponent} from 'app/shared/alert/alert-error.component';
 import {ButtonBoxComponent} from 'app/shared/components/button-box/button-box.component';
 import {ContentPageComponent} from 'app/shared/components/content-page/content-page.component';
-import {MenuBoxComponent} from 'app/shared/components/menu-box/menu-box.component';
 import {
     applyChipFilters,
     compareAlpha,
@@ -74,7 +72,6 @@ const SAFETY_NET_DELAY_MS = 20_000;
                    ButtonBoxComponent,
                    ConfirmPopup,
                    ContentPageComponent,
-                   MenuBoxComponent,
                    EntityCountComponent,
                    EntityFootItemComponent,
                    EntityHighlightComponent,
@@ -304,14 +301,6 @@ export class InvoicingPlanListComponent implements OnInit {
 
         return idSalon ? ['/admin', 'salons', idSalon, 'invoicing-plans'] : [];
     });
-
-    readonly pageMenuItems = computed<MenuItem[]>(() => [
-        {
-            label: this.translateService.instant('common.refresh') as string,
-            icon: 'pi pi-sync',
-            command: () => this.load()
-        }
-    ]);
 
     constructor() {
         this.state.connectQueryParams(this.activatedRoute, this.router);

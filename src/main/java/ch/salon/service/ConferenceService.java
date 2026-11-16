@@ -104,7 +104,7 @@ public class ConferenceService {
             return conferenceRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
                                        .map(conferenceMapper::toDto).toList();
         } else {
-            throw new IllegalStateException("No filter given");
+            throw new BadRequestAlertException("A filter is required", ENTITY_NAME, "filter.required");
         }
     }
 

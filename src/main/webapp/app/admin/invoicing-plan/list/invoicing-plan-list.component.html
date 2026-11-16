@@ -29,10 +29,6 @@
                         type="secondary"/>
         }
 
-        <menu-box [buttonDisabled]="isLoading()"
-                  [items]="pageMenuItems()"
-                  buttonIcon="pi-ellipsis-h"
-                  type="secondary"/>
     </div>
 
     <app-alert-error></app-alert-error>
@@ -40,7 +36,11 @@
 
     <div class="el-list">
         <entity-list-toolbar [(activeChips)]="state.activeChips"
+                             (refreshRequested)="load()"
                              [(query)]="state.query"
+                             [refreshDisabled]="isLoading()"
+                             [refreshLoading]="isLoading()"
+                             [showRefresh]="true"
                              [(sort)]="state.sort"
                              (groupByChange)="state.setGroupBy($event)"
                              [chipGroups]="chipGroups()"

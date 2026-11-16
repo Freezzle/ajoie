@@ -1,8 +1,7 @@
 import {Component, computed, inject, OnInit} from '@angular/core';
-import {HttpResponse} from '@angular/common/http';
 import {ActivatedRoute} from '@angular/router';
 import {forkJoin, of} from 'rxjs';
-import {catchError, finalize, map} from 'rxjs/operators';
+import {finalize, map} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -37,6 +36,7 @@ import {CardComponent} from '../../../shared/components/card/card.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {ImageUploadBoxComponent} from '../../../shared/components/image-upload-box/image-upload-box.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
+import {loadParticipationOptions} from '../../common/participation/participation-options.util';
 
 @Component({
                selector: 'app-stand-update',
@@ -167,27 +167,18 @@ export class StandUpdateComponent implements OnInit {
     }
 
     protected loadRelationshipsOptions(eventId: string, participationId: string | null): void {
-        const participations$ =
-            this.participationService
-                .query(eventId)
-                .pipe(
-                    map((res: HttpResponse<IParticipation[]>) => res.body ?? []),
-                    map((participations) => {
-                        if (participationId) {
-                            this.editForm.get('participation')?.setValue(
-                                participations.find((p) => p.id === participationId) ?? null
-                            );
-                        }
-                        return participations;
-                    }),
-                    catchError(() => of([])));
+        const participations$ = loadParticipationOptions(
+            eventId,
+            participationId,
+            this.participationService,
+            participation => this.editForm.get('participation')?.setValue(participation)
+        );
 
         const dimensions$ =
             this.salonService
                 .getDimensionStands(eventId)
                 .pipe(
-                    map((dimensionStands) => sortPriceStandSalon(dimensionStands)),
-                    catchError(() => of([])));
+                    map((dimensionStands) => sortPriceStandSalon(dimensionStands)));
 
         forkJoin({participations: participations$, dimensions: dimensions$})
             .subscribe(({participations, dimensions}) => {

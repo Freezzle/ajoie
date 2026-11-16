@@ -76,7 +76,20 @@
             <div class="c8">
                 <app-card [showHeader]="false">
                     <div appCardBody>
-                        <div class="card-title">{{ 'salon.dashboard.timeline.title' | translate }}</div>
+                        <div class="timeline-head">
+                            <div class="card-title">{{ 'salon.dashboard.timeline.title' | translate }}</div>
+                            @if (timeline()) {
+                                <div class="seg" role="group" [attr.aria-label]="'salon.dashboard.timeline.intervalLabel' | translate">
+                                    @for (interval of timelineIntervals; track interval.value) {
+                                        <button type="button"
+                                                [attr.aria-pressed]="isTimelineIntervalActive(interval.value)"
+                                                (click)="setTimelineInterval(interval.value)">
+                                            {{ interval.key | translate }}
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
                         @if (timeline(); as tl) {
                             @if (timelineSub(); as sub) {
                                 <div class="sub-head">
@@ -412,12 +425,12 @@
             <circle [attr.cx]="hoverX(chart)" [attr.cy]="hoverY(chart)" r="3" [attr.fill]="chart.color"/>
         }
     </svg>
-    @if (hovered() !== null && hoveredWeek(); as week) {
+    @if (hovered() !== null && hoveredPoint(); as point) {
         <div class="chart-tip">
-            <b>{{ 'salon.dashboard.timeline.weekOf' | translate: {date: hoveredWeekLabel()} }}</b>
-            <span>{{ 'salon.dashboard.timeline.tooltipReg' | translate }} : <b>{{ week.registrations }}</b></span>
+            <b>{{ hoveredLabelKey() | translate: {date: hoveredPointLabel()} }}</b>
+            <span>{{ 'salon.dashboard.timeline.tooltipReg' | translate }} : <b>{{ point.registrations }}</b></span>
             @if (!navigationService.hideSensibleInformation()) {
-                <span>{{ 'salon.dashboard.timeline.tooltipPay' | translate }} : <b>{{ week.payments | currency: 'CHF' }}</b></span>
+                <span>{{ 'salon.dashboard.timeline.tooltipPay' | translate }} : <b>{{ point.payments | currency: 'CHF' }}</b></span>
             }
         </div>
     }

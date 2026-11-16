@@ -17,6 +17,7 @@ import ch.salon.utils.ResponseUtil;
 import ch.salon.utils.ResourceUtil;
 import ch.salon.web.rest.dto.InfoInvoice;
 import ch.salon.web.rest.dto.SalonStatistiques;
+import ch.salon.web.rest.errors.BadRequestAlertException;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -27,8 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -120,19 +120,18 @@ public class AdminSalonResource {
     @PostMapping("/{idSalon}/import-inscriptions")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<List<ParticipationDTO>> importation(@PathVariable(name = "idSalon", required = false) String idSalon,
-                                                              @RequestParam("file") MultipartFile file) throws URISyntaxException {
-        try {
-            if (file == null || file.isEmpty() || StringUtils.isEmpty(file.getOriginalFilename())) {
-                throw new IllegalArgumentException("No file");
-            }
+                                                              @RequestParam("file") MultipartFile file) {
+        if (file == null || file.isEmpty() || StringUtils.isEmpty(file.getOriginalFilename())) {
+            throw new BadRequestAlertException("No file", ENTITY_NAME, "import.file.missing");
+        }
+        if (!file.getOriginalFilename().contains("2026")) {
+            throw new BadRequestAlertException("Only 2026 file can be imported", ENTITY_NAME, "import.file.invalid-year");
+        }
 
-            if (file.getOriginalFilename().contains("2026")) {
-                return ResponseEntity.ok(importation2026Service.importData(idSalon, file.getInputStream()));
-            } else {
-                throw new IllegalStateException("Only 2026 file can be imported");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+        try {
+            return ResponseEntity.ok(importation2026Service.importData(idSalon, file.getInputStream()));
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read import file", e);
         }
     }
 

@@ -21,6 +21,7 @@
 
         <button-box (clickedEvent)="create()"
                     [isDisabled]="isLoading()"
+                    [showText]="false"
                     primeIcon="pi-plus"
                     translateKey="common.create"/>
     </div>
@@ -31,7 +32,11 @@
     @if (standardView()) {
         <div class="el-list">
             <entity-list-toolbar [(activeChips)]="state.activeChips"
+                                 (refreshRequested)="load()"
                                  [(query)]="state.query"
+                                 [refreshDisabled]="isLoading()"
+                                 [refreshLoading]="isLoading()"
+                                 [showRefresh]="true"
                                  [(sort)]="state.sort"
                                  (groupByChange)="state.setGroupBy($event)"
                                  [chipGroups]="chipGroups()"

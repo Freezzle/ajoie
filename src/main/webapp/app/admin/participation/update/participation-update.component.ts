@@ -2,7 +2,7 @@ import {Component, computed, inject, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {filter, Observable, of, switchMap, tap} from 'rxjs';
-import {catchError, finalize, map, shareReplay} from 'rxjs/operators';
+import {finalize, map, shareReplay} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -130,7 +130,6 @@ export class ParticipationUpdateComponent implements OnInit {
             const queryObject = {idParticipation: this.initialParticipation.id};
             this.stands$ = this.standService.query(queryObject).pipe(
                 map(res => res ?? []),
-                catchError(() => of([])),
                 shareReplay(1)
             );
         }
@@ -145,7 +144,6 @@ export class ParticipationUpdateComponent implements OnInit {
             const queryObject = {idParticipation: this.initialParticipation.id};
             this.conferences$ = this.conferenceService.query(queryObject).pipe(
                 map(res => res ?? []),
-                catchError(() => of([])),
                 shareReplay(1)
             );
         }
@@ -160,7 +158,6 @@ export class ParticipationUpdateComponent implements OnInit {
             const queryObject = {idParticipation: this.initialParticipation.id};
             this.workshops$ = this.workshopService.query(queryObject).pipe(
                 map(res => res ?? []),
-                catchError(() => of([])),
                 shareReplay(1)
             );
         }
@@ -310,9 +307,9 @@ export class ParticipationUpdateComponent implements OnInit {
                 // Modal dismissed
             });
         } else {
-            const targetElement = htmlElement || document.activeElement as HTMLElement;
+            const targetElement = htmlElement ?? (document.activeElement as HTMLElement);
 
-            const confirmMessageKey = action.confirmationKey || 'common.confirmAction.default';
+            const confirmMessageKey = action.confirmationKey ?? 'common.confirmAction.default';
 
             this.confirmDialogService.confirmAction(targetElement, confirmMessageKey, {
                 actionLabel: this.translateService.instant(action.labelKey)

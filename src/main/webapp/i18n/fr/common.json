@@ -104,6 +104,7 @@
   "entityList": {
     "search": "Rechercher",
     "groupSort": "Grouper et trier",
+    "filterToggle": "Afficher ou masquer les filtres",
     "groupBy": "Grouper par",
     "sortBy": "Trier par",
     "group": {

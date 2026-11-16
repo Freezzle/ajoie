@@ -212,11 +212,6 @@ export class StandComponent implements OnInit {
     });
 
     readonly pageMenuItems = computed<MenuItem[]>(() => [
-        {
-            label: this.translateService.instant('common.refresh') as string,
-            icon: 'pi pi-sync',
-            command: () => this.load()
-        },
         this.standardView()
         ? {
             label: this.translateService.instant('stand.viewClipboard') as string,

@@ -309,11 +309,6 @@ export class TaskFocusListComponent implements OnInit {
                 label: this.text('task.focusView.addTask'),
                 icon: 'pi pi-plus',
                 command: () => this.openAddTaskDialog()
-            },
-            {
-                label: this.text('common.refresh'),
-                icon: 'pi pi-sync',
-                command: () => this.load()
             }
         ];
 

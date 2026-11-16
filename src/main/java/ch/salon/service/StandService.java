@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static ch.salon.web.rest.errors.ErrorBusinessKey.ID_EXISTS;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.OBJ_NULL;
+import static ch.salon.web.rest.errors.ErrorBusinessKey.PARTICIPATION_LINK_NULL;
 import static ch.salon.web.rest.errors.ErrorBusinessKey.PARTICIPATION_NOTFOUND;
 
 @Service
@@ -37,11 +39,15 @@ public class StandService {
 
     public UUID create(StandDTO stand) {
         if (stand == null) {
-            throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, "id.exists");
+            throw new BadRequestAlertException("A stand must not be null", ENTITY_NAME, OBJ_NULL);
         }
 
         if (stand.getId() != null) {
             throw new BadRequestAlertException("A new stand cannot already have an ID", ENTITY_NAME, ID_EXISTS);
+        }
+        if (stand.getParticipation() == null || stand.getParticipation().getId() == null) {
+            throw new BadRequestAlertException("A stand must be attached to a participation", ENTITY_NAME,
+                    PARTICIPATION_LINK_NULL);
         }
         if (participationService.get(stand.getParticipation().getId()).isEmpty()) {
             throw new BadRequestAlertException("Participation does not exist", ENTITY_NAME, PARTICIPATION_NOTFOUND);
@@ -140,7 +146,7 @@ public class StandService {
             stands = standRepository.findByParticipationSalonIdOrderByRegistrationDateDesc(idSalon).stream()
                                     .map(standMapper::toDto).toList();
         } else {
-            throw new IllegalStateException("No filter given");
+            throw new BadRequestAlertException("A filter is required", ENTITY_NAME, "filter.required");
         }
 
         return withPictures(stands);

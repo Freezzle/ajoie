@@ -1,7 +1,6 @@
 package ch.salon.web.rest;
 
 import ch.salon.security.AuthoritiesConstants;
-import ch.salon.service.StandService;
 import ch.salon.service.WorkshopService;
 import ch.salon.service.dto.WorkshopDTO;
 import ch.salon.utils.ResourceUtil;
@@ -78,6 +77,6 @@ public class AdminWorkshopResource {
 
         workshopService.delete(idWorkshop);
 
-        return ResourceUtil.deleted(StandService.ENTITY_NAME, idWorkshop).build();
+        return ResourceUtil.deleted(ENTITY_NAME, idWorkshop).build();
     }
 }

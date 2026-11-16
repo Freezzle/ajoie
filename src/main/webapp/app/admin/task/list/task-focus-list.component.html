@@ -93,7 +93,11 @@
 
     <div class="el-list">
         <entity-list-toolbar [(activeChips)]="state.activeChips"
+                             (refreshRequested)="load()"
                              [(query)]="state.query"
+                             [refreshDisabled]="isLoading()"
+                             [refreshLoading]="isLoading()"
+                             [showRefresh]="true"
                              [(sort)]="state.sort"
                              (groupByChange)="state.setGroupBy($event)"
                              [chipGroups]="chipGroups()"

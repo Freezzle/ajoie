@@ -185,11 +185,17 @@ public class InvoicingPlanService {
         return nature == InvoiceNature.SERVICE ? absolute : -absolute;
     }
 
-    public void deleteInvoice(UUID idInvoicingPlan, UUID idInvoice) {        InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
+    public void deleteInvoice(UUID idInvoicingPlan, UUID idInvoice) {
+        if (idInvoicingPlan == null || idInvoice == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         Invoice invoiceFound =
                 invoicingPlan.getInvoices().stream().filter(invoice -> invoice.getId().equals(idInvoice)).findFirst()
-                        .orElseThrow();
+                        .orElseThrow(() -> new BadRequestAlertException("Entity not found", "invoice", "idnotfound"));
 
         invoicingPlan.getInvoices().remove(invoiceFound);
 
@@ -200,11 +206,16 @@ public class InvoicingPlanService {
     }
 
     public PaymentDTO createPayment(UUID idInvoicingPlan, PaymentDTO paymentDTO) {
+        if (idInvoicingPlan == null || paymentDTO == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
         if (paymentDTO.getId() != null) {
             throw new BadRequestAlertException("A new payment cannot already have an ID", ENTITY_NAME, "id.exists");
         }
 
-        InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
         Payment payment = paymentMapper.toEntity(paymentDTO);
         payment.setLabel(resolvePaymentLabel(paymentDTO.getPaymentMode(), paymentDTO.getLabel()));
         payment = this.paymentRepository.save(payment);
@@ -218,7 +229,7 @@ public class InvoicingPlanService {
     }
 
     public PaymentDTO updatePayment(final UUID idInvoicingPlan, final UUID idPayment, PaymentDTO paymentDTO) {
-        if (idPayment == null || paymentDTO == null) {
+        if (idInvoicingPlan == null || idPayment == null || paymentDTO == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
@@ -227,7 +238,7 @@ public class InvoicingPlanService {
 
         Payment paymentFound =
                 invoicingPlan.getPayments().stream().filter(payment -> payment.getId().equals(idPayment)).findFirst()
-                        .orElseThrow();
+                        .orElseThrow(() -> new BadRequestAlertException("Entity not found", "payment", "idnotfound"));
 
         if (!Objects.equals(paymentDTO.getAmount(), paymentFound.getAmount())) {
             this.eventLogService.eventFromSystem("Paiement modifié", EventType.PAYMENT, INVOICE_PLAN,
@@ -264,11 +275,16 @@ public class InvoicingPlanService {
     }
 
     public void deletePayment(UUID idInvoicingPlan, UUID idPayment) {
-        InvoicingPlan invoicingPlan = repository.getReferenceById(idInvoicingPlan);
+        if (idInvoicingPlan == null || idPayment == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         Payment paymentFound =
                 invoicingPlan.getPayments().stream().filter(payment -> payment.getId().equals(idPayment)).findFirst()
-                        .orElseThrow();
+                        .orElseThrow(() -> new BadRequestAlertException("Entity not found", "payment", "idnotfound"));
 
         invoicingPlan.getPayments().remove(paymentFound);
         this.repository.save(invoicingPlan);
@@ -293,14 +309,19 @@ public class InvoicingPlanService {
             return invoicingPlans.stream().map(invoicingPlanMapper::toDto).toList();
         }
 
-        throw new IllegalStateException("No filter given");
+        throw new BadRequestAlertException("A filter is required", ENTITY_NAME, "filter.required");
     }
 
     public boolean switchArrangement(UUID idInvoicingPlan) {
-        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
+        if (idInvoicingPlan == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         if (invoicingPlan.getState() != State.DRAFT && invoicingPlan.getState() != State.ISOLATED) {
-            throw new IllegalStateException("Invoicing plan must be in state Draft or Isolated to switch arrangment");
+            throw new BadRequestAlertException("Invoicing plan must be in state Draft or Isolated to switch arrangement",
+                    ENTITY_NAME, "state.invalid-for-arrangement");
         }
 
         invoicingPlan.setNeedArrangement(!invoicingPlan.getNeedArrangement());
@@ -319,10 +340,15 @@ public class InvoicingPlanService {
     }
 
     public String switchInvoiceSendingMethod(UUID idInvoicingPlan, InvoiceSendingMethod invoiceSendingMethod) {
-        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
+        if (idInvoicingPlan == null || invoiceSendingMethod == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         if (invoicingPlan.getState() != State.DRAFT && invoicingPlan.getState() != State.ISOLATED) {
-            throw new IllegalStateException("Invoicing plan must be in state Draft or Isolated to switch sending method");
+            throw new BadRequestAlertException("Invoicing plan must be in state Draft or Isolated to switch sending method",
+                    ENTITY_NAME, "state.invalid-for-sending-method");
         }
 
         if (invoicingPlan.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL &&
@@ -367,10 +393,15 @@ public class InvoicingPlanService {
 
     public void splitInvoicingPlan(UUID idInvoicingPlan, List<UUID> invoicesIds, boolean forceWithArrangment,
                                    boolean forceWithEmailMethod) {
-        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow();
+        if (idInvoicingPlan == null || invoicesIds == null || invoicesIds.isEmpty()) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        InvoicingPlan invoicingPlan = repository.findById(idInvoicingPlan).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
         if (!invoicingPlan.getState().isDraft()) {
-            throw new IllegalStateException("Invoicing plan must be in state Draft or Isolated to split invoices");
+            throw new BadRequestAlertException("Invoicing plan must be in state Draft or Isolated to split invoices",
+                    ENTITY_NAME, "state.invalid-for-split");
         }
 
         final InvoicingPlan lastPlan =
@@ -380,7 +411,7 @@ public class InvoicingPlanService {
         Participation participation =
                 participationRepository.findById(invoicingPlan.getParticipation().getId()).orElseThrow();
         if (participation.getStatus() == Status.CLOSED) {
-            return;
+            throw new BadRequestAlertException("Participation is closed", ENTITY_NAME, "participation.closed");
         }
 
         InvoicingPlan currentInvoicingPlan = new InvoicingPlan();
@@ -399,7 +430,7 @@ public class InvoicingPlanService {
                         .collect(Collectors.toSet());
 
         if (invoicesToMove.isEmpty()) {
-            throw new IllegalStateException("No invoices found to move.");
+            throw new BadRequestAlertException("No invoices found to move", ENTITY_NAME, "split.empty");
         }
 
         // Supprimer les factures du sourcePlan

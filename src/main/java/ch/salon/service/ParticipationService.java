@@ -197,7 +197,7 @@ public class ParticipationService {
             return participationRepository.findBySalonIdOrderByRegistrationDateDesc(idSalon);
         }
 
-        throw new IllegalStateException("No filter given");
+        throw new BadRequestAlertException("A filter is required", ENTITY_NAME, "filter.required");
     }
 
     /**

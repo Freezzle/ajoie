@@ -1,14 +1,12 @@
 import {ChangeDetectionStrategy, Component, computed, inject, input, output, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import {MenuItem} from 'primeng/api';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import SharedModule from 'app/shared/shared.module';
 import {AlertErrorComponent} from 'app/shared/alert/alert-error.component';
 import {ButtonBoxComponent} from 'app/shared/components/button-box/button-box.component';
 import {ContentPageComponent} from 'app/shared/components/content-page/content-page.component';
-import {MenuBoxComponent} from 'app/shared/components/menu-box/menu-box.component';
 import {
     applyChipFilters,
     buildStatusChipGroup,
@@ -57,7 +55,6 @@ const PAGE_SIZE = 150;
                    ButtonBoxComponent,
                    ConfirmPopup,
                    ContentPageComponent,
-                   MenuBoxComponent,
                    EntityFootItemComponent,
                    EntityHighlightComponent,
                    EntityListGroupComponent,
@@ -199,14 +196,6 @@ export class TalkListComponent {
 
         return `${count} ${this.translateService.instant(key) as string}`;
     });
-
-    readonly pageMenuItems = computed<MenuItem[]>(() => [
-        {
-            label: this.translateService.instant('common.refresh') as string,
-            icon: 'pi pi-sync',
-            command: () => this.refreshRequested.emit()
-        }
-    ]);
 
     constructor() {
         this.state.connectQueryParams(this.activatedRoute, this.router);
