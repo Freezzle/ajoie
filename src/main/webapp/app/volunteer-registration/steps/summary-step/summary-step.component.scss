@@ -1,18 +1,18 @@
 .step-intro {
-  color: var(--p-text-muted-color, #6b655d);
+  color: var(--app-text-muted);
   margin: 0 0 1rem;
 }
 
 .info-box {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.7rem 0.9rem;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--p-primary-color) 8%, transparent);
+  gap: var(--app-gap-xs);
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--app-radius-md);
+  background: color-mix(in srgb, var(--app-primary) 8%, transparent);
   font-size: 0.9rem;
 
   i {
-    color: var(--p-primary-color);
-    margin-top: 2px;
+    color: var(--app-primary);
+    margin-top: 0.125rem;
   }
 }

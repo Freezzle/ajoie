@@ -1,15 +1,15 @@
 .dc {
-  border: 1.5px solid var(--app-border, #e7e0d6);
-  border-radius: 14px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
   padding: 0.85rem;
-  background: var(--p-surface-0, #fff);
+  background: var(--app-surface);
 
   &.yes {
-    border-color: color-mix(in srgb, var(--p-primary-color) 45%, var(--app-border, #e7e0d6));
+    border-color: color-mix(in srgb, var(--app-primary) 45%, var(--app-border));
   }
 
   &.err {
-    border-color: var(--p-red-500, #d64545);
+    border-color: var(--app-danger);
   }
 }
 
@@ -20,27 +20,27 @@
 }
 
 .dc-date {
-  flex: 0 0 50px;
-  width: 50px;
+  flex: 0 0 3.125rem;
+  width: 3.125rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.3rem 0;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
-  color: var(--p-primary-color);
+  padding: 0.3125rem 0;
+  border-radius: var(--app-radius-md);
+  background: color-mix(in srgb, var(--app-primary) 12%, transparent);
+  color: var(--app-primary);
 }
 
 .dc-abbr {
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .dc-num {
-  font-size: 21px;
+  font-size: 1.3125rem;
   font-weight: 700;
   line-height: 1;
 }
@@ -53,7 +53,7 @@
 .dc-title {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: var(--app-gap-xs);
   font-weight: 600;
   flex-wrap: wrap;
 }
@@ -67,13 +67,13 @@
 .dc-desc {
   margin: 0.2rem 0 0;
   font-size: 0.88rem;
-  color: var(--p-text-muted-color, #6b655d);
+  color: var(--app-text-muted);
 }
 
 .dc-open {
   margin: 0.1rem 0 0;
   font-size: 0.82rem;
-  color: var(--p-text-muted-color, #6b655d);
+  color: var(--app-text-muted);
 }
 
 .dc-yn {
@@ -83,19 +83,19 @@
 .dc-error {
   margin: 0.5rem 0 0;
   font-size: 0.82rem;
-  color: var(--p-red-500, #d64545);
+  color: var(--app-danger);
 }
 
 .dc-body {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px dashed var(--app-border, #e7e0d6);
+  border-top: 1px dashed var(--app-border);
 }
 
 .dc-no {
   margin: 0.6rem 0 0;
   font-size: 0.88rem;
-  color: var(--p-text-muted-color, #6b655d);
+  color: var(--app-text-muted);
 }
 
 @media (max-width: 700px) {
@@ -105,6 +105,6 @@
 
   .dc-yn {
     flex: 1 1 100%;
-    margin-top: 0.3rem;
+    margin-top: var(--app-gap-2xs);
   }
 }

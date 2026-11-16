@@ -5,15 +5,15 @@
 
 .registration-page {
   min-height: 100dvh;
-  background: var(--p-surface-50, #fbfaf7);
+  background: var(--app-surface-muted);
   padding-bottom: 6rem;
 }
 
 .registration-shell {
-  max-width: 660px;
+  max-width: 47.125rem;
   margin: 0 auto;
   padding: 2rem;
-  border: 1px solid var(--app-border, #e7e0d6);
+  border: 1px solid var(--app-border);
   border-top: none;
 }
 
@@ -32,42 +32,42 @@
 
 .manage-subtitle {
   margin: 0;
-  color: var(--p-text-muted-color, #6b655d);
+  color: var(--app-text-muted);
 }
 
 .summary-card.changed {
-  border-color: color-mix(in srgb, var(--p-primary-color) 45%, var(--app-border, #e7e0d6)) !important;
+  border-color: color-mix(in srgb, var(--app-primary) 45%, var(--app-border)) !important;
 }
 
 .back-link,
 .unsub-link {
-  color: var(--p-primary-color);
+  color: var(--app-primary);
   cursor: pointer;
   text-decoration: none;
 }
 
 .unsub-link {
-  color: var(--p-red-500, #d64545);
+  color: var(--app-danger);
 }
 
 .pill-modified {
   font-size: 0.72rem;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
-  color: var(--p-primary-color);
+  padding: 0.0625rem 0.5rem;
+  border-radius: var(--app-radius-full);
+  background: color-mix(in srgb, var(--app-primary) 12%, transparent);
+  color: var(--app-primary);
   vertical-align: middle;
-  margin-left: 0.4rem;
+  margin-left: var(--app-gap-2xs);
 }
 
 .banner {
-  margin-top: 0.6rem;
-  padding: 0.6rem 0.85rem;
-  border-radius: 10px;
+  margin-top: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--app-radius-md);
   font-size: 0.9rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--app-gap-xs);
 
   &.ok {
     background: color-mix(in srgb, var(--p-green-600, #2f7d5b) 12%, transparent);
@@ -75,26 +75,26 @@
   }
 
   &.lock {
-    background: var(--p-surface-100, #f1ece3);
+    background: var(--app-surface-muted);
   }
 
   &.warn {
-    background: color-mix(in srgb, var(--p-red-500, #d64545) 10%, transparent);
-    color: var(--p-red-500, #d64545);
+    background: color-mix(in srgb, var(--app-danger) 10%, transparent);
+    color: var(--app-danger);
   }
 }
 
 .info-box {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--app-gap-xs);
   padding: 0.7rem 0.9rem;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--p-primary-color) 8%, transparent);
+  border-radius: var(--app-radius-md);
+  background: color-mix(in srgb, var(--app-primary) 8%, transparent);
   font-size: 0.9rem;
 
   i {
-    color: var(--p-primary-color);
-    margin-top: 2px;
+    color: var(--app-primary);
+    margin-top: 0.125rem;
   }
 }
 
@@ -111,7 +111,7 @@
   gap: 0.75rem;
   margin-top: 1rem;
   padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--p-surface-50, #fbfaf7) 86%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted) 86%, transparent);
   backdrop-filter: blur(6px);
 
   button-box:last-child {
@@ -122,17 +122,17 @@
 .send-bar {
   position: sticky;
   bottom: 0;
-  max-width: 660px;
+  max-width: 47.125rem;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-  background: var(--p-surface-0, #fff);
-  border: 1px solid color-mix(in srgb, var(--p-primary-color) 30%, transparent);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  background: var(--app-surface);
+  border: 1px solid color-mix(in srgb, var(--app-primary) 30%, transparent);
+  border-radius: var(--app-radius-lg);
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.12);
 }
 
 .send-text {
@@ -140,7 +140,7 @@
   flex-direction: column;
 
   small {
-    color: var(--p-text-muted-color, #6b655d);
+    color: var(--app-text-muted);
     font-size: 0.78rem;
   }
 }
@@ -156,7 +156,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--app-radius-lg) var(--app-radius-lg) 0 0;
     flex-direction: column;
     align-items: stretch;
   }

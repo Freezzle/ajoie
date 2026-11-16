@@ -1,19 +1,19 @@
 .yn {
   display: inline-flex;
-  gap: 0.5rem;
+  gap: var(--app-gap-xs);
 }
 
 .yn-opt {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  min-height: 44px;
-  padding: 0 0.9rem;
-  border: 1px solid var(--p-surface-300, #d6cdbf);
-  border-radius: 10px;
-  background: var(--p-surface-0, #fff);
-  color: var(--p-text-color);
+  gap: var(--app-gap-xs);
+  min-height: 2.75rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: var(--app-surface);
+  color: var(--app-text);
   font: inherit;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, color 0.15s;
@@ -23,13 +23,13 @@
   }
 
   &:hover:not(:disabled) {
-    border-color: var(--p-primary-color);
+    border-color: var(--app-primary);
   }
 
   &.on {
-    border-color: var(--p-primary-color);
-    background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
-    color: var(--p-primary-color);
+    border-color: var(--app-primary);
+    background: color-mix(in srgb, var(--app-primary) 12%, transparent);
+    color: var(--app-primary);
     font-weight: 600;
   }
 

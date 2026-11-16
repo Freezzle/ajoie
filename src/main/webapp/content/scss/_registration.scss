@@ -128,7 +128,7 @@
 .registration-summary {
   .summary-card {
     border: 1px solid var(--p-surface-200, #e7e0d6);
-    border-radius: 20px;
+    border-radius: var(--app-radius-xl);
     background: var(--p-surface-0, #fff);
     padding: 1.25rem;
     margin-bottom: 1.25rem;

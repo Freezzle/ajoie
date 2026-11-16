@@ -2,19 +2,19 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: color-mix(in srgb, var(--p-surface-0, #fff) 92%, transparent);
+  background: color-mix(in srgb, var(--app-surface) 92%, transparent);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--p-surface-200, #e7e0d6);
+  border-bottom: 1px solid var(--app-border);
   padding: 0.75rem 1rem 0.5rem;
 
   .step-progress-list {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
+    gap: var(--app-gap-sm);
     list-style: none;
     margin: 0 auto;
     padding: 0;
-    max-width: 660px;
+    max-width: 47.125rem;
   }
 
   .step-progress-item {
@@ -31,21 +31,21 @@
     padding: 0.25rem 0;
     text-align: left;
     cursor: pointer;
-    color: var(--p-text-muted-color, #6b655d);
+    color: var(--app-text-muted);
 
     &:focus-visible {
-      outline: 2px solid var(--p-primary-color);
-      outline-offset: 2px;
-      border-radius: 8px;
+      outline: 0.125rem solid var(--app-primary);
+      outline-offset: 0.125rem;
+      border-radius: var(--app-radius-sm);
     }
 
     &.is-current {
-      color: var(--p-primary-color);
+      color: var(--app-primary);
       font-weight: 600;
     }
 
     &.is-done {
-      color: var(--p-text-color, #1f1d1a);
+      color: var(--app-text);
     }
   }
 
@@ -62,25 +62,25 @@
 
   .step-progress-rail {
     display: block;
-    height: 7px;
-    border-radius: 999px;
-    background: var(--p-surface-200, #e7e0d6);
+    height: 0.4375rem;
+    border-radius: var(--app-radius-full);
+    background: var(--app-border);
     overflow: hidden;
   }
 
   .step-progress-rail-fill {
     display: block;
     height: 100%;
-    border-radius: 999px;
-    background: var(--p-primary-color);
+    border-radius: var(--app-radius-full);
+    background: var(--app-primary);
     transition: width 250ms ease;
   }
 
   .is-warn .step-progress-rail-fill {
     background: repeating-linear-gradient(
                     45deg,
-                    color-mix(in srgb, var(--p-primary-color) 35%, white) 0 6px,
-                    color-mix(in srgb, var(--p-primary-color) 15%, white) 6px 12px
+                    color-mix(in srgb, var(--app-primary) 35%, white) 0 6px,
+                    color-mix(in srgb, var(--app-primary) 15%, white) 6px 12px
     );
   }
 
@@ -102,7 +102,7 @@
     }
 
     .step-progress-title {
-      font-size: 11px;
+      font-size: 0.6875rem;
     }
 
     .step-progress-state {
@@ -115,7 +115,7 @@
       align-items: baseline;
       margin-top: 0.4rem;
       font-size: 0.8rem;
-      color: var(--p-text-muted-color, #6b655d);
+      color: var(--app-text-muted);
     }
   }
 }

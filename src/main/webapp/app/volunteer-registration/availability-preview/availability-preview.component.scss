@@ -1,6 +1,6 @@
 .prev {
   border: 1px solid var(--app-border, #e7e0d6);
-  border-radius: 12px;
+  border-radius: var(--app-radius-lg);
   padding: 0.85rem;
   background: var(--p-surface-0, #fff);
 }
@@ -110,14 +110,14 @@ $col: 96px;
   bottom: 3px;
   background: var(--p-surface-0, #fff);
   border: 1px solid var(--app-border, #e7e0d6);
-  border-radius: 5px;
+  border-radius: var(--app-radius-xs);
 }
 
 .prev-hatch {
   position: absolute;
   top: 3px;
   bottom: 3px;
-  border-radius: 5px;
+  border-radius: var(--app-radius-xs);
   background: repeating-linear-gradient(45deg,
       color-mix(in srgb, var(--p-text-muted-color, #6b655d) 18%, transparent) 0,
       color-mix(in srgb, var(--p-text-muted-color, #6b655d) 18%, transparent) 4px,
@@ -129,7 +129,7 @@ $col: 96px;
   top: 3px;
   bottom: 3px;
   background: var(--p-green-600, #2f7d5b);
-  border-radius: 5px;
+  border-radius: var(--app-radius-xs);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,7 +162,7 @@ $col: 96px;
   display: inline-block;
   width: 14px;
   height: 10px;
-  border-radius: 3px;
+  border-radius: var(--app-radius-xs);
 
   &.bar {
     background: var(--p-green-600, #2f7d5b);

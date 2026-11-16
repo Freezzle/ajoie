@@ -1,44 +1,42 @@
 :host {
-    --vp-accent: var(--p-primary-color, #325d88);
-    --vp-ok: var(--p-primary-color, #325d88);
+    --vp-accent: var(--app-primary);
+    --vp-ok: var(--app-primary);
     --vp-ok-bg: #ffffff;
     --vp-under: #d6336c;
     --vp-under-bg: #fdeaf0;
     --vp-over: #2b8a3e;
     --vp-over-bg: #e7f5ea;
     --vp-unav: #a3a8b1;
-    /* non défini globalement : fallback local, hérité par tous les sous-composants */
-    --app-text-muted: #9aa1ad;
 }
 
 .vp-page {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--app-gap-md);
 }
 
 .vp-kpis {
     display: flex;
-    gap: 8px;
+    gap: var(--app-gap-xs);
     flex-wrap: wrap;
 }
 
 .kpi {
     background: var(--app-surface);
     border: 1px solid var(--app-border);
-    border-radius: 9px;
-    padding: 6px 12px;
-    min-width: 110px;
+    border-radius: var(--app-radius-sm);
+    padding: 0.375rem 0.75rem;
+    min-width: 6.875rem;
 }
 
 .kpi small {
     display: block;
     color: var(--app-text-muted);
-    font-size: var(--app-fs-xs, 11px);
+    font-size: var(--app-fs-xs);
 }
 
 .kpi b {
-    font-size: 15px;
+    font-size: 0.9375rem;
 }
 
 .kpi.bad b {
@@ -52,24 +50,24 @@
 .vp-viewbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--app-gap-md);
     align-items: center;
 }
 
 .vhint {
     color: var(--app-text-muted);
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     display: inline-flex;
-    gap: 8px;
+    gap: var(--app-gap-xs);
     align-items: center;
 }
 
 .vhint .link {
     border: 1px solid var(--app-border);
     background: var(--app-surface);
-    border-radius: 7px;
-    padding: 3px 9px;
-    font-size: 12px;
+    border-radius: var(--app-radius-xs);
+    padding: 0.1875rem 0.5625rem;
+    font-size: 0.75rem;
     color: var(--app-text);
     cursor: pointer;
 }
