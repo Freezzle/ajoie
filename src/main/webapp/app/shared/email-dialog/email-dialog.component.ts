@@ -1,5 +1,5 @@
 import {Component, inject, Input, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
@@ -11,11 +11,12 @@ import {EmailAttachment} from './email-attachment';
 import {finalize} from 'rxjs/operators';
 import Quill from 'quill';
 import {ButtonBoxComponent} from '../components/button-box/button-box.component';
+import {ChipsBoxComponent} from '../components/chips-box/chips-box.component';
 
 @Component({
                templateUrl: './email-dialog.component.html',
                styleUrl: './email-dialog.component.scss',
-               imports: [SharedModule, FormsModule, EditorModule, ReactiveFormsModule, TextBoxComponent, Editor, ButtonBoxComponent]
+               imports: [SharedModule, FormsModule, EditorModule, ReactiveFormsModule, TextBoxComponent, ChipsBoxComponent, Editor, ButtonBoxComponent]
            })
 export class EmailDialogComponent implements OnInit {
 
@@ -29,8 +30,7 @@ export class EmailDialogComponent implements OnInit {
     private pendingHtml?: string;
 
     /**
-     * Les envois groupés n'ont pas de destinataire direct : la liste est calculée côté serveur
-     * et seul le nombre de destinataires en copie cachée est affiché.
+     * Les envois groupés n'ont pas de destinataire direct : les destinataires passent par la liste BCC.
      */
     get isBulkSending(): boolean {
         return this.template.recipientsCount != null;
@@ -47,6 +47,7 @@ export class EmailDialogComponent implements OnInit {
                                       }, [Validators.required, Validators.email]],
                                       to: [this.template.to,
                                            this.isBulkSending ? [] : [Validators.required, Validators.email]],
+                                      bcc: [this.normalizeBcc(this.template.bcc), [this.bccListValidator]],
                                       subject: [this.template.subject, Validators.required],
                                       body: [this.template.body, Validators.required],
                                       attachments: [this.template.attachments]
@@ -67,7 +68,22 @@ export class EmailDialogComponent implements OnInit {
 
     submit() {
         if (this.form.valid) {
-            this.activeModal.close(this.form.getRawValue() as EmailMessage);
+            const value = this.form.getRawValue();
+            const bcc = this.normalizeBcc(value.bcc);
+            const payload: EmailMessage = {
+                from: value.from,
+                to: value.to,
+                subject: value.subject,
+                body: value.body,
+                attachments: value.attachments,
+                recipientsCount: this.template.recipientsCount
+            };
+
+            if (this.isBulkSending || bcc.length > 0) {
+                payload.bcc = bcc;
+            }
+
+            this.activeModal.close(payload);
         }
     }
 
@@ -92,6 +108,29 @@ export class EmailDialogComponent implements OnInit {
 
     cancel() {
         this.activeModal.dismiss();
+    }
+
+    private readonly bccListValidator = (control: AbstractControl): ValidationErrors | null => {
+        const invalidEntries = this.normalizeBcc(control.value).filter(email => !this.isValidEmail(email));
+        if (invalidEntries.length === 0) {
+            return null;
+        }
+
+        return {invalidBccList: true};
+    };
+
+    private normalizeBcc(raw: unknown): string[] {
+        if (!Array.isArray(raw)) {
+            return [];
+        }
+        return raw
+            .filter((entry): entry is string => typeof entry === 'string')
+            .map(entry => entry.trim())
+            .filter(entry => entry.length > 0);
+    }
+
+    private isValidEmail(email: string): boolean {
+        return new FormControl(email, [Validators.email]).valid;
     }
 
     private getFilenameFromContentDisposition(cd: string): string | null {

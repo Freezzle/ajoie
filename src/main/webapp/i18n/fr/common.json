@@ -96,7 +96,8 @@
       "number": "Doit être un nombre",
       "pattern": "Doit suivre ce pattern {{pattern}}",
       "patternLogin": "Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.",
-      "required": "Ce champ est obligatoire"
+      "required": "Ce champ est obligatoire",
+      "invalidBccList": "Chaque adresse BCC doit être une adresse e-mail valide."
     },
     "view": "Détail"
   },

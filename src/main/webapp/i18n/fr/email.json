@@ -3,6 +3,7 @@
     "from": "Expéditeur",
     "subject": "Titre",
     "to": "Destinataire",
-    "recipientsBcc": "{{count}} destinataire(s) en copie cachée"
+    "bcc": "Copie cachée (BCC)",
+    "bccHelp": "Une adresse par ligne (ou séparées par virgule / point-virgule)."
   }
 }

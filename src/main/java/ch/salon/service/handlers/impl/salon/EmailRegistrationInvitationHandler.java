@@ -21,6 +21,7 @@ import ch.salon.utils.DateUtils;
 import ch.salon.utils.SalonProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
  * Envoi groupé d'une invitation à s'inscrire au salon, à destination de tous les clients
  * de l'annuaire inscrits à la newsletter, non bloqués et pas déjà inscrits à ce salon.
  * <p>
- * Les destinataires sont systématiquement recalculés côté serveur et placés en copie cachée,
+ * Les destinataires sont proposés côté serveur et envoyés en copie cachée,
  * par lots de {@value #BATCH_SIZE} adresses maximum.
  */
 @Component
@@ -56,6 +57,7 @@ public class EmailRegistrationInvitationHandler implements EmailActionHandler<Sa
     public static final int BATCH_SIZE = 50;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailRegistrationInvitationHandler.class);
+    private static final EmailValidator EMAIL_VALIDATOR = new EmailValidator();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final EmailCreator emailCreator;
@@ -87,6 +89,7 @@ public class EmailRegistrationInvitationHandler implements EmailActionHandler<Sa
     @Override
     public EmailMessage buildTemplate(Salon payload, Map<String, Object> context) {
         Locale locale = (Locale) context.getOrDefault("locale", Locale.FRENCH);
+        List<String> recipients = findRecipients(payload.getId());
 
         EmailMessage emailMessage = new EmailMessage();
         emailMessage.setFrom(senderEmail);
@@ -94,7 +97,8 @@ public class EmailRegistrationInvitationHandler implements EmailActionHandler<Sa
         emailMessage.setSubject(
                 this.emailCreator.getTranslatedText("email.salon-registration-invitation.title", locale,
                         payload.getPlace()));
-        emailMessage.setRecipientsCount(findRecipients(payload.getId()).size());
+        emailMessage.setRecipientsCount(recipients.size());
+        emailMessage.setBcc(new ArrayList<>(recipients));
 
         Context thymeleafCtxt = new Context(locale);
         thymeleafCtxt.setVariable("salon", payload.getPlace());
@@ -124,8 +128,7 @@ public class EmailRegistrationInvitationHandler implements EmailActionHandler<Sa
                 emailMessage = buildTemplate(payload, context);
             }
 
-            // Les destinataires ne proviennent jamais du client : ils sont recalculés ici.
-            List<String> recipients = findRecipients(payload.getId());
+            List<String> recipients = resolveRecipients(payload.getId(), emailMessage);
             if (recipients.isEmpty()) {
                 eventLogService.eventFromSystem("Invitation à s'inscrire : aucun destinataire", EventType.EMAIL,
                         EntityType.SALON, payload.getId(), null);
@@ -191,5 +194,27 @@ public class EmailRegistrationInvitationHandler implements EmailActionHandler<Sa
                                                   .map(email -> email.toLowerCase(Locale.ROOT))
                                                   .filter(email -> !alreadyRegistered.contains(email))
                                                   .collect(Collectors.toCollection(LinkedHashSet::new)));
+    }
+
+    private List<String> resolveRecipients(UUID salonId, EmailMessage emailMessage) {
+        if (emailMessage != null && emailMessage.getBcc() != null) {
+            return sanitizeRecipients(emailMessage.getBcc());
+        }
+        return findRecipients(salonId);
+    }
+
+    private List<String> sanitizeRecipients(List<String> recipients) {
+        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        for (String recipient : recipients) {
+            String email = StringUtils.trimToNull(recipient);
+            if (email == null) {
+                continue;
+            }
+            if (!EMAIL_VALIDATOR.isValid(email, null)) {
+                throw new IllegalArgumentException("Invalid BCC recipient: " + email);
+            }
+            normalized.add(email.toLowerCase(Locale.ROOT));
+        }
+        return new ArrayList<>(normalized);
     }
 }

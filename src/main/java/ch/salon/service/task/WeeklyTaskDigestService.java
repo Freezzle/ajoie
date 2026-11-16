@@ -18,6 +18,7 @@ import ch.salon.service.mail.EmailCreator;
 import ch.salon.utils.SalonProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,9 @@ public class WeeklyTaskDigestService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeeklyTaskDigestService.class);
     private static final ZoneId ZONE = ZoneId.of("Europe/Zurich");
+    private static final int BATCH_SIZE = 50;
     private static final Set<TaskStatus> EXCLUDED_STATUSES = EnumSet.of(TaskStatus.DONE, TaskStatus.CANCELLED);
+    private static final EmailValidator EMAIL_VALIDATOR = new EmailValidator();
 
     private final TenantRepository tenantRepository;
     private final SubtaskInstanceRepository subtaskInstanceRepository;
@@ -221,7 +224,9 @@ public class WeeklyTaskDigestService {
         emailMessage.setFrom(senderEmail);
         emailMessage.setTo("");
         emailMessage.setSubject(emailCreator.getTranslatedText("email.task-weekly-digest.title", locale, salon.getPlace()));
-        emailMessage.setRecipientsCount(countRecipientsForSalon(salonId));
+        List<String> recipients = findRecipientsForSalon(salonId);
+        emailMessage.setRecipientsCount(recipients.size());
+        emailMessage.setBcc(recipients);
 
         Context context = new Context(locale);
         context.setVariable("salon", salon.getPlace());
@@ -237,23 +242,19 @@ public class WeeklyTaskDigestService {
             return;
         }
 
-        List<User> recipients = transactionalOps.executeReadOnlyAndReturn(() ->
-            userRepository.findAllByActivatedIsTrueAndTenantMemberStatus("ACTIVE")
-        );
-
-        for (User user : recipients) {
-            if (user == null || StringUtils.isBlank(user.getEmail())) {
-                continue;
-            }
+        List<String> recipients = resolveRecipients(salonId, emailMessageTemplate.getBcc());
+        for (int start = 0; start < recipients.size(); start += BATCH_SIZE) {
+            List<String> batch = recipients.subList(start, Math.min(start + BATCH_SIZE, recipients.size()));
             try {
                 EmailMessage message = new EmailMessage();
                 message.setFrom(StringUtils.defaultIfBlank(emailMessageTemplate.getFrom(), senderEmail));
-                message.setTo(user.getEmail());
+                message.setTo("");
+                message.setBcc(new ArrayList<>(batch));
                 message.setSubject(StringUtils.defaultIfBlank(emailMessageTemplate.getSubject(), ""));
                 message.setBody(StringUtils.defaultIfBlank(emailMessageTemplate.getBody(), ""));
                 emailCreator.send(message);
             } catch (Exception e) {
-                LOGGER.error("Problem while sending manual weekly task digest to user {} for salon {}", user.getId(), salonId, e);
+                LOGGER.error("Problem while sending manual weekly task digest batch for salon {}", salonId, e);
             }
         }
     }
@@ -278,12 +279,36 @@ public class WeeklyTaskDigestService {
             && salonId.equals(subtask.getTaskInstance().getSalon().getId());
     }
 
-    private int countRecipientsForSalon(UUID salonId) {
+    private List<String> findRecipientsForSalon(UUID salonId) {
         return transactionalOps.executeReadOnlyAndReturn(() -> userRepository.findAllByActivatedIsTrueAndTenantMemberStatus("ACTIVE")
             .stream()
-            .filter(user -> user != null && StringUtils.isNotBlank(user.getEmail()))
-            .toList()
-            .size());
+            .map(user -> user == null ? null : StringUtils.trimToNull(user.getEmail()))
+            .filter(StringUtils::isNotBlank)
+            .map(email -> email.toLowerCase(Locale.ROOT))
+            .distinct()
+            .toList());
+    }
+
+    private List<String> resolveRecipients(UUID salonId, List<String> editedBccRecipients) {
+        if (editedBccRecipients != null) {
+            return sanitizeRecipients(editedBccRecipients);
+        }
+        return findRecipientsForSalon(salonId);
+    }
+
+    private List<String> sanitizeRecipients(List<String> recipients) {
+        List<String> normalized = new ArrayList<>();
+        for (String recipient : recipients) {
+            String email = StringUtils.trimToNull(recipient);
+            if (email == null) {
+                continue;
+            }
+            if (!EMAIL_VALIDATOR.isValid(email, null)) {
+                throw new IllegalArgumentException("Invalid BCC recipient: " + email);
+            }
+            normalized.add(email.toLowerCase(Locale.ROOT));
+        }
+        return normalized.stream().distinct().toList();
     }
 
     private void sendEmail(User user, Salon salon, List<SubtaskDigestItem> overdue, List<SubtaskDigestItem> week,

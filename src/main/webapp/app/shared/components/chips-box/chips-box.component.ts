@@ -46,7 +46,11 @@ export class ChipsBoxComponent implements ControlValueAccessor, OnInit, OnDestro
     ngOnInit(): void {
         // PrimeNG n'expose pas de limite native : on tronque la valeur dès qu'un élément de trop est
         // ajouté (saisie clavier, collage, données existantes).
-        this.valueSubscription = this.control?.valueChanges.subscribe(() => this.enforceMaxChips());
+        this.valueSubscription = this.control?.valueChanges.subscribe(() => {
+            this.refreshControlValue();
+            this.enforceMaxChips();
+            this.control.updateValueAndValidity({onlySelf: true, emitEvent: false});
+        });
         this.enforceMaxChips();
     }
 
@@ -89,5 +93,26 @@ export class ChipsBoxComponent implements ControlValueAccessor, OnInit, OnDestro
 
         // `emitEvent: false` évite de reboucler sur cette même souscription.
         this.control.setValue(current.slice(0, this.maxChips), {emitEvent: false});
+    }
+
+    private refreshControlValue(): void {
+        const current = this.control?.value;
+        if (!Array.isArray(current)) {
+            return;
+        }
+
+        // Recompose un tableau pour forcer Angular à recalculer proprement les erreurs custom
+        // quand PrimeNG modifie la liste de chips en place.
+        this.control.setValue([...current], {emitEvent: false});
+    }
+
+    syncValidationState(): void {
+        // Certains changements de puces (suppression d'un tag unique) peuvent muter le tableau
+        // sans déclencher valueChanges. On resynchronise sur le prochain tick UI.
+        setTimeout(() => {
+            this.refreshControlValue();
+            this.enforceMaxChips();
+            this.control.updateValueAndValidity({onlySelf: true, emitEvent: false});
+        });
     }
 }

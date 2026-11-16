@@ -1,49 +1,50 @@
 <form (ngSubmit)="submit()" [formGroup]="form">
-    <div class="modal-header">
-        <h4 class="modal-title" jhiTranslate="common.send">Envoyer</h4>
-    </div>
+  <div class="modal-header">
+    <h4 class="modal-title" jhiTranslate="common.send">Envoyer</h4>
+  </div>
 
-    <div class="modal-body">
-        <div class="row">
-            <div class="mt-4 col-12 col-sm-6">
-                <text-box fieldName="from" formControlName="from" translateKey="email.from"/>
-            </div>
-            <div class="mt-4 col-12 col-sm-6">
-                @if (isBulkSending) {
-                    <div class="fw-bold" jhiTranslate="email.to">Destinataire</div>
-                    <div>{{ 'email.recipientsBcc' | translate: {count: template.recipientsCount} }}</div>
-                } @else {
-                    <text-box fieldName="to" formControlName="to" translateKey="email.to"/>
-                }
-            </div>
-            <div class="mt-4 col-12">
-                <text-box fieldName="subject" formControlName="subject" translateKey="email.subject"/>
-            </div>
-            <div class="mt-4 col-12">
-                <div class="fw-bold">
-                    Attachements
-                </div>
-                <div class="d-flex w-100">
-                    @for (attachment of form.get('attachments')?.value; track attachment.id) {
-                        <a (click)="downloadAttachment(attachment)"
-                           class="underline text-primary"><small>{{ attachment.filename }}</small></a>
-                    } @empty {
-                        <small>Aucun</small>
-                    }
-                </div>
-            </div>
-            <div class="mt-4 col-12">
-                <p-editor (onInit)="onEditorInit($event)"
-                          [style]="{ height: '240px' }"
-                          formControlName="body"
-                />
-            </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="mt-4 {{isBulkSending ? 'col-12' : 'col-12 col-sm-6' }}">
+        <text-box fieldName="from" formControlName="from" translateKey="email.from" />
+      </div>
+      @if (isBulkSending) {
+        <div class="mt-4 col-12">
+          <chips-box fieldName="bcc" formControlName="bcc" translateKey="email.bcc" />
         </div>
+      } @else {
+        <div class="mt-4 col-12 col-sm-6">
+          <text-box fieldName="to" formControlName="to" translateKey="email.to" />
+        </div>
+      }
+      <div class="mt-4 col-12">
+        <text-box fieldName="subject" formControlName="subject" translateKey="email.subject" />
+      </div>
+      <div class="mt-4 col-12">
+        <div class="fw-bold">
+          Attachements
+        </div>
+        <div class="d-flex w-100">
+          @for (attachment of form.get('attachments')?.value; track attachment.id) {
+            <a (click)="downloadAttachment(attachment)"
+               class="underline text-primary"><small>{{ attachment.filename }}</small></a>
+          } @empty {
+            <small>Aucun</small>
+          }
+        </div>
+      </div>
+      <div class="mt-4 col-12">
+        <p-editor (onInit)="onEditorInit($event)"
+                  [style]="{ height: '240px' }"
+                  formControlName="body"
+        />
+      </div>
     </div>
+  </div>
 
-    <div class="modal-footer">
-        <button-box (clickedEvent)="cancel()" [showText]="true" translateKey="common.cancel" type="secondary"/>
+  <div class="modal-footer">
+    <button-box (clickedEvent)="cancel()" [showText]="true" translateKey="common.cancel" type="secondary" />
 
-        <button-box [isSubmit]="true" translateKey="common.send" type="primary"/>
-    </div>
+    <button-box [isSubmit]="true" translateKey="common.send" type="primary" />
+  </div>
 </form>
