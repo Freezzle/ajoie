@@ -6,8 +6,7 @@
 <div xmlns:th="http://www.thymeleaf.org" th:fragment="content">
   <div th:if="${salons != null and !#lists.isEmpty(salons)}">
     <p style="margin:0 0 12px 0; font-size:14px; line-height:22px; color:#2d2d2d;">
-      Bonjour <strong th:text="${firstName}">Prénom</strong> 👋<br />
-      Voici le résumé des sous-tâches à traiter pour les salons avec des éléments en retard ou cette semaine.
+      Voici le résumé des tâches de la semaine pour les salons.
     </p>
 
     <div th:each="salonSummary : ${salons}" style="margin:0 0 18px 0; padding:12px 0; border-top:1px solid #e7e7e7;">
@@ -18,41 +17,39 @@
         <tr>
           <td
             style="width:50%; padding:12px 12px; background:#fff5f5; border:1px solid #f1c7c7; border-radius:6px; color:#a12626;">
-            ⚠️ <strong th:text="${salonSummary.overdueCount}">0</strong> sous-tâches expirées
+            ⚠️ <strong th:text="${salonSummary.overdueCount}">0</strong> tâches expirées
           </td>
         </tr>
         <tr>
           <td
             style="width:50%; padding:12px 12px; background:#f6fbff; border:1px solid #cfe5f3; border-radius:6px; color:#1d4d7a;">
-            📅 <strong th:text="${salonSummary.weekCount}">0</strong> sous-tâches pour cette semaine
+            📅 <strong th:text="${salonSummary.weekCount}">0</strong> tâches
           </td>
         </tr>
       </table>
 
       <p style="margin:12px 0 0 0;">
-        👉 <a th:href="${salonSummary.tasksLink}" href="#" style="color:#004d40; font-weight:bold;">Voir la liste des
-        tâches</a>
+        <a th:href="${salonSummary.tasksLink}" href="#">Aller sur la liste des tâches</a>
       </p>
     </div>
   </div>
 
   <div th:unless="${salons != null and !#lists.isEmpty(salons)}">
     <p style="margin:0 0 12px 0; font-size:14px; line-height:22px; color:#2d2d2d;">
-      Voici le résumé <a th:href="${tasksLink}" href="#" style="color:#004d40; font-weight:bold;">des sous-tâches à
-      traiter</a> cette semaine pour le salon <strong th:text="${salon}">Nom du salon</strong>.
+      Voici le résumé <a th:href="${tasksLink}" href="#">des tâches</a> de cette semaine pour le salon <strong th:text="${salon}">Nom du salon</strong>.
     </p>
 
     <table role="presentation" style="width:100%; border-spacing:0; border-collapse:collapse; font-size:14px; line-height:22px; margin:0 0 16px 0;">
       <tr>
         <td
           style="width:50%; padding:12px 12px; background:#fff5f5; border:1px solid #f1c7c7; border-radius:6px; color:#a12626;">
-          ⚠️ <strong th:text="${#lists.size(overdue)}">0</strong> sous-tâches expirées
+          ⚠️ <strong th:text="${#lists.size(overdue)}">0</strong> tâches expirées
         </td>
       </tr>
       <tr>
         <td
           style="width:50%; padding:12px 12px; background:#f6fbff; border:1px solid #cfe5f3; border-radius:6px; color:#1d4d7a;">
-          📅 <strong th:text="${#lists.size(week)}">0</strong> sous-tâches pour cette semaine
+          📅 <strong th:text="${#lists.size(week)}">0</strong> tâches
         </td>
       </tr>
     </table>
