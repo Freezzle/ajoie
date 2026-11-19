@@ -7,7 +7,6 @@ import {
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
-import {PrimeIcons} from 'primeng/api';
 import {Rating} from 'primeng/rating';
 import {IftaLabel} from 'primeng/iftalabel';
 import SharedModule from '../shared.module';
@@ -27,7 +26,6 @@ export class RatingBoxComponent implements ControlValueAccessor, OnInit {
     isFormControlUsed: boolean = false; // Détecter l'utilisation du formControl
     disabled: boolean = false;
     protected readonly Validators = Validators;
-    protected readonly PrimeIcons = PrimeIcons;
 
     constructor(@Self() @Optional() public controlDir: NgControl) {
         if (this.controlDir) {

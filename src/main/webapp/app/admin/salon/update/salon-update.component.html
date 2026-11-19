@@ -1,349 +1,553 @@
-<form (ngSubmit)="save()" [formGroup]="editForm" name="editForm" novalidate>
-    <app-content-page>
-        <div appMenuBarStart>
-            @if (editForm.controls.id.value) {
-                <h3 jhiTranslate="salon.edit">Détail du salon</h3>
+<app-content-page [formGroup]="editForm">
+    <div appMenuBarStart>
+        <h3>{{ (isCreating ? 'salon.create' : 'salon.edit') | translate }}</h3>
+        <div class="el-subtitle">
+            @if (subtitle()) {
+                <b>{{ subtitle() }}</b>
             }
-            @if (!editForm.controls.id.value) {
-                <h3 jhiTranslate="salon.create">Nouveau salon</h3>
-            }
-            <div class="el-subtitle">
-                @if (subtitle()) {
-                    <b>{{ subtitle() }}</b>
+        </div>
+    </div>
+    <div appMenuBarEnd>
+        <button-box (clickedEvent)="previousState()"
+                    [isDisabled]="isLoading"
+                    [showText]="false"
+                    primeIcon="pi-arrow-left"
+                    translateKey="common.back"/>
+        @if (!isCreating) {
+            <menu-box [items]="menuCache"
+                      buttonIcon="pi-list"
+                      buttonTranslateKey="common.actions"/>
+        }
+    </div>
+
+    <app-alert-error/>
+    <p-confirmpopup/>
+
+    <div class="salon-detail-grid" [class.salon-detail-grid--single]="isCreating">
+        <div class="salon-main-column">
+            <!-- Facturation : N° de référence + coordonnées bancaires -->
+        <app-card [titleKey]="'salon.billing'"
+                  [editing]="isCreating || activeSection() === 'billing'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'billing'"
+                  [actions]="billingActions()">
+            <div appCardBody>
+                @if (isCreating || activeSection() === 'billing') {
+                    <div class="card-form-stack">
+                        <text-box [maxLength]="10" fieldName="referenceNumber" formControlName="referenceNumber" translateKey="salon.referenceNumber"/>
+                        @if (isReferenceLocked) {
+                            <small class="salon-locked-hint">{{ 'salon.referenceLockedHint' | translate }}</small>
+                        }
+                        <app-bank-account-form [required]="true" formControlName="bankAccount"/>
+                    </div>
+                } @else {
+                    <app-field-list>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.referenceNumber' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.referenceNumber.value || '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'bankAccount.iban' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.bankAccount.value?.iban || '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'bankAccount.accountHolder' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.bankAccount.value?.accountHolder || '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'bankAccount.bic' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.bankAccount.value?.bic || '—' }}</span>
+                        </app-field-row>
+                    </app-field-list>
                 }
             </div>
-        </div>
-        <div appMenuBarEnd>
-            <button-box (clickedEvent)="previousState()"
-                        [isDisabled]="isLoading"
-                        [showText]="false"
-                        primeIcon="pi-arrow-left"
-                        translateKey="common.back"/>
-            @if (isReadOnly) {
-                <button-box (clickedEvent)="activateEditMode()"
-                            [isDisabled]="isLoading"
-                            [showText]="false"
-                            primeIcon="pi-pencil"
-                            translateKey="common.edit"/>
-            }
-
-            @if (editForm.controls.id.value && !isReadOnly) {
-                <button-box (clickedEvent)="activateReadOnlyMode()"
-                            [isDisabled]="isLoading"
-                            [showText]="false"
-                            primeIcon="pi-ban"
-                            translateKey="common.cancel"
-                            type="secondary"/>
-            }
-
-            @if (!isReadOnly) {
-                <button-box (clickedEvent)="save()"
-                            [isDisabled]="editForm.invalid || isLoading"
-                            [isSubmit]="true"
-                            [showText]="false"
-                            primeIcon="pi-save"
-                            translateKey="common.save"/>
-            }
-
-            @if (isReadOnly && editForm.controls.id.value) {
-                <menu-box [items]="menuCache"
-                          buttonIcon="pi-list"
-                          buttonTranslateKey="common.actions"/>
-            }
-        </div>
-        <app-alert-error></app-alert-error>
-
-
-        <p-confirmpopup/>
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'common.info-basic' | translate }}</h4>
-            </div>
-            <div appCardBody>
-                <div class="row">
-                    <div class="mt-4 col-12">
-                        <text-box [maxLength]="50"
-                                  fieldName="place"
-                                  formControlName="place"
-                                  translateKey="salon.place"/>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'billing') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('billing')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('billing')" [isDisabled]="isLoading" translateKey="common.save"/>
                     </div>
-
-                    <div class="mt-4 col-12 col-lg-6">
-                        <text-box [maxLength]="10"
-                                  fieldName="referenceNumber"
-                                  formControlName="referenceNumber"
-                                  translateKey="salon.referenceNumber"/>
-                    </div>
-
-                    <div class="mt-4 col-6 col-lg-3">
-                        <date-box fieldName="startingDate"
-                                  formControlName="startingDate"
-                                  translateKey="salon.startingDate"/>
-                    </div>
-
-                    <div class="mt-4 col-6 col-lg-3">
-                        <date-box fieldName="endingDate" formControlName="endingDate" translateKey="salon.endingDate"/>
-                    </div>
-
-                    <div class="mt-4 col-12">
-                        <textarea-box fieldName="extraInformation"
-                                      formControlName="extraInformation"
-                                      translateKey="salon.extraInformation"/>
-                    </div>
-                </div>
-            </div>
+                }
+            </ng-container>
         </app-card>
 
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'salon.registration.title' | translate }}</h4>
-            </div>
+        <!-- Configuration des prix -->
+        <app-card [titleKey]="'salon.prices'"
+                  [editing]="isCreating || activeSection() === 'prices'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'prices'"
+                  [actions]="pricesActions()">
             <div appCardBody>
-                <div class="row">
-                    <div class="mt-4 col-12 col-lg-6">
-                        <checkbox-box fieldName="registrationEnabled"
-                                      formControlName="registrationEnabled"
-                                      translateKey="salon.registration.enabled"/>
+                @if (isCreating || activeSection() === 'prices') {
+                    <div class="salon-price-grid">
+                        <currency-box fieldName="priceConference" formControlName="priceConference" translateKey="salon.priceConference"/>
+                        <currency-box fieldName="priceWorkshop" formControlName="priceWorkshop" translateKey="salon.priceWorkshop"/>
+                        <currency-box fieldName="priceSharingStand" formControlName="priceSharingStand" translateKey="salon.priceSharingStand"/>
+                        <currency-box fieldName="priceMeal1" formControlName="priceMeal1" translateKey="salon.priceMeal1"/>
+                        <currency-box fieldName="priceMeal2" formControlName="priceMeal2" translateKey="salon.priceMeal2"/>
+                        <currency-box fieldName="priceMeal3" formControlName="priceMeal3" translateKey="salon.priceMeal3"/>
                     </div>
-                    <div class="mt-4 col-6 col-lg-3">
-                        <date-box fieldName="registrationOpeningDate"
-                                  formControlName="registrationOpeningDate"
-                                  translateKey="salon.registration.openingDate"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-3">
-                        <date-box fieldName="registrationClosingDate"
-                                  formControlName="registrationClosingDate"
-                                  translateKey="salon.registration.closingDate"/>
-                    </div>
-                    @if (editForm.controls.id.value) {
-                        <div class="mt-4 col-12">
-                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <code class="flex-grow-1">{{ registrationLink }}</code>
-                                <button-box (clickedEvent)="copyRegistrationLink()"
-                                            [showText]="true"
-                                            primeIcon="pi-copy"
-                                            translateKey="salon.registration.copyLink"
-                                            type="secondary"/>
-                            </div>
-                        </div>
-                    }
-                    <div class="mt-4 col-12">
-                        <text-box fieldName="registrationWelcomeTitle"
-                                  formControlName="registrationWelcomeTitle"
-                                  translateKey="salon.registration.welcomeTitle"/>
-                    </div>
-                    <div class="mt-4 col-12">
-                        <editor-box fieldName="registrationWelcomeText"
-                                    formControlName="registrationWelcomeText"
-                                    translateKey="salon.registration.welcomeText"/>
-                    </div>
-                    <div class="mt-4 col-12">
-                        <editor-box fieldName="registrationChartText"
-                                    formControlName="registrationChartText"
-                                    translateKey="salon.registration.chartText"/>
-                    </div>
-                    <div class="mt-4 col-12">
-                        <editor-box fieldName="registrationSalonChartText"
-                                    formControlName="registrationSalonChartText"
-                                    translateKey="salon.registration.salonChartText"/>
-                    </div>
-                </div>
+                } @else {
+                    <app-field-list>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.priceConference' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.priceConference.value | currency:'CHF' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.priceWorkshop' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.priceWorkshop.value | currency:'CHF' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.priceSharingStand' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.priceSharingStand.value | currency:'CHF' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.priceMeal1' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.priceMeal1.value | currency:'CHF' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.priceMeal2' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.priceMeal2.value | currency:'CHF' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.priceMeal3' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.priceMeal3.value | currency:'CHF' }}</span>
+                        </app-field-row>
+                    </app-field-list>
+                }
             </div>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'prices') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('prices')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('prices')" [isDisabled]="isLoading" translateKey="common.save"/>
+                    </div>
+                }
+            </ng-container>
         </app-card>
 
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'salon.volunteerRegistration.title' | translate }}</h4>
-            </div>
+        <!-- Configuration des dimensions de stands -->
+        <app-card [titleKey]="'salon.dimensions-prices'"
+                  [editing]="isCreating || activeSection() === 'dimensions'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'dimensions'"
+                  [actions]="dimensionsActions()">
             <div appCardBody>
-                <div class="row">
-                    <div class="mt-4 col-12 col-lg-6">
-                        <checkbox-box fieldName="volunteerRegistrationEnabled"
-                                      formControlName="volunteerRegistrationEnabled"
-                                      translateKey="salon.volunteerRegistration.enabled"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-3">
-                        <date-box fieldName="volunteerRegistrationOpeningDate"
-                                  formControlName="volunteerRegistrationOpeningDate"
-                                  translateKey="salon.volunteerRegistration.openingDate"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-3">
-                        <date-box fieldName="volunteerRegistrationClosingDate"
-                                  formControlName="volunteerRegistrationClosingDate"
-                                  translateKey="salon.volunteerRegistration.closingDate"/>
-                    </div>
-                    @if (editForm.controls.id.value) {
-                        <div class="mt-4 col-12">
-                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <code class="flex-grow-1">{{ volunteerRegistrationLink }}</code>
-                                <button-box (clickedEvent)="copyVolunteerRegistrationLink()"
-                                            [showText]="true"
-                                            primeIcon="pi-copy"
-                                            translateKey="salon.registration.copyLink"
-                                            type="secondary"/>
-                            </div>
-                        </div>
-                    }
-                    <div class="mt-4 col-12">
-                        <text-box fieldName="volunteerRegistrationWelcomeTitle"
-                                  formControlName="volunteerRegistrationWelcomeTitle"
-                                  translateKey="salon.volunteerRegistration.welcomeTitle"/>
-                    </div>
-                    <div class="mt-4 col-12">
-                        <editor-box fieldName="volunteerRegistrationWelcomeText"
-                                    formControlName="volunteerRegistrationWelcomeText"
-                                    translateKey="salon.volunteerRegistration.welcomeText"/>
-                    </div>
-                </div>
-            </div>
-        </app-card>
-
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'salon.headquartersAddress' | translate }}</h4>
-            </div>
-            <div appCardBody>
-                <app-address-form [required]="true" [showFormalFields]="false" formControlName="headquartersAddress"/>
-            </div>
-        </app-card>
-
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'salon.eventAddress' | translate }}</h4>
-            </div>
-            <div appCardBody>
-                <app-address-form [required]="true" [showFormalFields]="false" formControlName="eventAddress"/>
-            </div>
-        </app-card>
-
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'salon.bankAccount' | translate }}</h4>
-            </div>
-            <div appCardBody>
-                <app-bank-account-form [required]="true" formControlName="bankAccount"/>
-            </div>
-        </app-card>
-
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'salon.prices' | translate }}</h4>
-            </div>
-            <div appCardBody>
-                <div class="row">
-                    <div class="mt-4 col-6 col-lg-4">
-                        <currency-box fieldName="priceConference"
-                                      formControlName="priceConference"
-                                      translateKey="salon.priceConference"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-4">
-                        <currency-box fieldName="priceWorkshop"
-                                      formControlName="priceWorkshop"
-                                      translateKey="salon.priceWorkshop"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-4">
-                        <currency-box fieldName="priceSharingStand"
-                                      formControlName="priceSharingStand"
-                                      translateKey="salon.priceSharingStand"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-4">
-                        <currency-box fieldName="priceMeal1"
-                                      formControlName="priceMeal1"
-                                      translateKey="salon.priceMeal1"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-4">
-                        <currency-box fieldName="priceMeal2"
-                                      formControlName="priceMeal2"
-                                      translateKey="salon.priceMeal2"/>
-                    </div>
-                    <div class="mt-4 col-6 col-lg-4">
-                        <currency-box fieldName="priceMeal3"
-                                      formControlName="priceMeal3"
-                                      translateKey="salon.priceMeal3"/>
-                    </div>
-                </div>
-            </div>
-        </app-card>
-
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'salon.dimensions-prices' | translate }}</h4>
-            </div>
-            <div appCardBody>
-                <div class="row">
-                    <p-table #dt2
-                             [tableStyle]="{ 'min-width': '70rem' }"
-                             [value]="priceStandRows"
-                             class="mt-4">
-                        <!-- HEADER -->
+                @if (isCreating || activeSection() === 'dimensions') {
+                    <p-table [tableStyle]="{ 'min-width': '60rem' }" [value]="priceStandRows">
                         <ng-template #header>
                             <tr>
-                                <th>Libellé</th>
-                                <th>Longueur (m)</th>
-                                <th>Hauteur (m)</th>
-                                <th>Prix</th>
-                                @if (!isReadOnly) {
-                                    <th style="width: 10rem"></th>
-                                }
+                                <th>{{ 'salon.dimension.label' | translate }}</th>
+                                <th>{{ 'salon.dimension.width' | translate }}</th>
+                                <th>{{ 'salon.dimension.height' | translate }}</th>
+                                <th>{{ 'salon.dimension.price' | translate }}</th>
+                                <th style="width: 10rem"></th>
                             </tr>
                         </ng-template>
                         <ng-template #body let-dimensionStand let-rowIndex="rowIndex" let-last="last">
                             <tr [formGroup]="dimensionStand">
-                                <td>
-                                    <text-box fieldName="dimension" formControlName="dimension"></text-box>
+                                <td><text-box fieldName="dimension" formControlName="dimension"></text-box></td>
+                                <td><number-box [modeDecimal]="true" fieldName="widthMeter" formControlName="widthMeter"></number-box></td>
+                                <td><number-box [modeDecimal]="true" fieldName="heightMeter" formControlName="heightMeter"></number-box></td>
+                                <td><currency-box fieldName="price" formControlName="price"></currency-box></td>
+                                <td class="text-nowrap">
+                                    <button-box (clickedEvent)="movePriceStand(rowIndex, -1)" [isDisabled]="rowIndex === 0"
+                                                [showText]="false" primeIcon="pi-arrow-up" translateKey="common.moveUp" type="secondary"/>
+                                    <button-box (clickedEvent)="movePriceStand(rowIndex, 1)" [isDisabled]="last"
+                                                [showText]="false" primeIcon="pi-arrow-down" translateKey="common.moveDown" type="secondary"/>
+                                    <button-box (clickedEvent)="removePriceStand(rowIndex)"
+                                                [showText]="false" primeIcon="pi-trash" translateKey="common.delete" type="danger"/>
                                 </td>
-                                <td>
-                                    <number-box [modeDecimal]="true"
-                                                fieldName="widthMeter"
-                                                formControlName="widthMeter"></number-box>
-                                </td>
-                                <td>
-                                    <number-box [modeDecimal]="true"
-                                                fieldName="heightMeter"
-                                                formControlName="heightMeter"></number-box>
-                                </td>
-                                <td>
-                                    <currency-box fieldName="price" formControlName="price"></currency-box>
-                                </td>
-                                @if (!isReadOnly) {
-                                    <td class="text-nowrap">
-                                        <button-box (clickedEvent)="movePriceStand(rowIndex, -1)"
-                                                    [isDisabled]="rowIndex === 0"
-                                                    [showText]="false"
-                                                    primeIcon="pi-arrow-up"
-                                                    translateKey="common.moveUp"
-                                                    type="secondary"/>
-                                        <button-box (clickedEvent)="movePriceStand(rowIndex, 1)"
-                                                    [isDisabled]="last"
-                                                    [showText]="false"
-                                                    primeIcon="pi-arrow-down"
-                                                    translateKey="common.moveDown"
-                                                    type="secondary"/>
-                                        <button-box (clickedEvent)="removePriceStand(rowIndex)"
-                                                    [showText]="false"
-                                                    primeIcon="pi-trash"
-                                                    translateKey="common.delete"
-                                                    type="danger"/>
-                                    </td>
-                                }
                             </tr>
                         </ng-template>
-                        @if (!isReadOnly) {
-                            <ng-template #footer>
+                        <ng-template #footer>
+                            <tr>
+                                <td colspan="5">
+                                    <button-box (clickedEvent)="addPriceStand()" [showText]="true"
+                                                primeIcon="pi-plus" translateKey="common.create" type="success"/>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                } @else {
+                    @if (priceStandRows.length) {
+                        <p-table [value]="priceStandRows" [tableStyle]="{ 'min-width': '40rem' }">
+                            <ng-template #header>
                                 <tr>
-                                    <td colspan="5">
-                                        <button-box (clickedEvent)="addPriceStand()"
-                                                    [showText]="true"
-                                                    primeIcon="pi-plus"
-                                                    translateKey="common.create"
-                                                    type="success"/>
-                                    </td>
+                                    <th>{{ 'salon.dimension.label' | translate }}</th>
+                                    <th>{{ 'salon.dimension.width' | translate }}</th>
+                                    <th>{{ 'salon.dimension.height' | translate }}</th>
+                                    <th>{{ 'salon.dimension.price' | translate }}</th>
                                 </tr>
                             </ng-template>
-                        }
-                    </p-table>
-                </div>
+                            <ng-template #body let-row>
+                                <tr>
+                                    <td>{{ row.controls.dimension.value || '—' }}</td>
+                                    <td>{{ row.controls.widthMeter.value }}</td>
+                                    <td>{{ row.controls.heightMeter.value }}</td>
+                                    <td>{{ row.controls.price.value | currency:'CHF' }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'salon.dimensions-prices' | translate }}</span>
+                                <span fieldValue>—</span>
+                            </app-field-row>
+                        </app-field-list>
+                    }
+                }
             </div>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'dimensions') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('dimensions')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('dimensions')" [isDisabled]="isLoading" translateKey="common.save"/>
+                    </div>
+                }
+            </ng-container>
         </app-card>
-    </app-content-page>
-</form>
+
+        <!-- Inscription des exposants -->
+        <app-card [titleKey]="'salon.registration.title'"
+                  [editing]="isCreating || activeSection() === 'exhibitorRegistration'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'exhibitorRegistration'"
+                  [actions]="exhibitorRegistrationActions()">
+            <div appCardBody>
+                @if (isCreating || activeSection() === 'exhibitorRegistration') {
+                    <div class="card-form-stack">
+                        <checkbox-box fieldName="registrationEnabled" formControlName="registrationEnabled" translateKey="salon.registration.enabled"/>
+                        <div class="salon-field-grid">
+                            <date-box fieldName="registrationOpeningDate" formControlName="registrationOpeningDate" translateKey="salon.registration.openingDate"/>
+                            <date-box fieldName="registrationClosingDate" formControlName="registrationClosingDate" translateKey="salon.registration.closingDate"/>
+                        </div>
+                        @if (!isCreating) {
+                            <div class="salon-link-row">
+                                <code class="salon-link">{{ registrationLink }}</code>
+                                <button-box (clickedEvent)="copyRegistrationLink()" [showText]="true"
+                                            primeIcon="pi-copy" translateKey="salon.registration.copyLink" type="secondary"/>
+                            </div>
+                        }
+                        <text-box fieldName="registrationWelcomeTitle" formControlName="registrationWelcomeTitle" translateKey="salon.registration.welcomeTitle"/>
+                        <editor-box fieldName="registrationWelcomeText" formControlName="registrationWelcomeText" translateKey="salon.registration.welcomeText"/>
+                        <editor-box fieldName="registrationChartText" formControlName="registrationChartText" translateKey="salon.registration.chartText"/>
+                        <editor-box fieldName="registrationSalonChartText" formControlName="registrationSalonChartText" translateKey="salon.registration.salonChartText"/>
+                    </div>
+                } @else {
+                    <app-field-list>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.enabled' | translate }}</span>
+                            <span fieldValue><yes-no-icon [value]="editForm.controls.registrationEnabled.value"/></span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.openingDate' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.registrationOpeningDate.value ? (editForm.controls.registrationOpeningDate.value | date:'dd.MM.yyyy') : '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.closingDate' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.registrationClosingDate.value ? (editForm.controls.registrationClosingDate.value | date:'dd.MM.yyyy') : '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.copyLink' | translate }}</span>
+                            <span fieldValue>
+                                <span class="salon-link-row">
+                                    <code class="salon-link">{{ registrationLink }}</code>
+                                    <button-box (clickedEvent)="copyRegistrationLink()" [showText]="false"
+                                                primeIcon="pi-copy" translateKey="salon.registration.copyLink" type="secondary"/>
+                                </span>
+                            </span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.welcomeTitle' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.registrationWelcomeTitle.value || '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.welcomeText' | translate }}</span>
+                            <span fieldValue>
+                                @if (editForm.controls.registrationWelcomeText.value) {
+                                    <div class="salon-rich-preview" [class.is-expanded]="isRichTextExpanded('registrationWelcomeText')">
+                                        <span [innerHTML]="editForm.controls.registrationWelcomeText.value | richText"></span>
+                                    </div>
+                                    @if (hasExpandableRichText(editForm.controls.registrationWelcomeText.value)) {
+                                        <button type="button" class="salon-rich-toggle" (click)="toggleRichText('registrationWelcomeText')">
+                                            <i [class]="isRichTextExpanded('registrationWelcomeText') ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" aria-hidden="true"></i>
+                                            {{ (isRichTextExpanded('registrationWelcomeText') ? 'salon.richText.collapse' : 'salon.richText.expand') | translate }}
+                                        </button>
+                                    }
+                                } @else { — }
+                            </span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.chartText' | translate }}</span>
+                            <span fieldValue>
+                                @if (editForm.controls.registrationChartText.value) {
+                                    <div class="salon-rich-preview" [class.is-expanded]="isRichTextExpanded('registrationChartText')">
+                                        <span [innerHTML]="editForm.controls.registrationChartText.value | richText"></span>
+                                    </div>
+                                    @if (hasExpandableRichText(editForm.controls.registrationChartText.value)) {
+                                        <button type="button" class="salon-rich-toggle" (click)="toggleRichText('registrationChartText')">
+                                            <i [class]="isRichTextExpanded('registrationChartText') ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" aria-hidden="true"></i>
+                                            {{ (isRichTextExpanded('registrationChartText') ? 'salon.richText.collapse' : 'salon.richText.expand') | translate }}
+                                        </button>
+                                    }
+                                } @else { — }
+                            </span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.salonChartText' | translate }}</span>
+                            <span fieldValue>
+                                @if (editForm.controls.registrationSalonChartText.value) {
+                                    <div class="salon-rich-preview" [class.is-expanded]="isRichTextExpanded('registrationSalonChartText')">
+                                        <span [innerHTML]="editForm.controls.registrationSalonChartText.value | richText"></span>
+                                    </div>
+                                    @if (hasExpandableRichText(editForm.controls.registrationSalonChartText.value)) {
+                                        <button type="button" class="salon-rich-toggle" (click)="toggleRichText('registrationSalonChartText')">
+                                            <i [class]="isRichTextExpanded('registrationSalonChartText') ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" aria-hidden="true"></i>
+                                            {{ (isRichTextExpanded('registrationSalonChartText') ? 'salon.richText.collapse' : 'salon.richText.expand') | translate }}
+                                        </button>
+                                    }
+                                } @else { — }
+                            </span>
+                        </app-field-row>
+                    </app-field-list>
+                }
+            </div>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'exhibitorRegistration') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('exhibitorRegistration')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('exhibitorRegistration')" [isDisabled]="isLoading" translateKey="common.save"/>
+                    </div>
+                }
+            </ng-container>
+        </app-card>
+
+        <!-- Inscription des bénévoles -->
+        <app-card [titleKey]="'salon.volunteerRegistration.title'"
+                  [editing]="isCreating || activeSection() === 'volunteerRegistration'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'volunteerRegistration'"
+                  [actions]="volunteerRegistrationActions()">
+            <div appCardBody>
+                @if (isCreating || activeSection() === 'volunteerRegistration') {
+                    <div class="card-form-stack">
+                        <checkbox-box fieldName="volunteerRegistrationEnabled" formControlName="volunteerRegistrationEnabled" translateKey="salon.volunteerRegistration.enabled"/>
+                        <div class="salon-field-grid">
+                            <date-box fieldName="volunteerRegistrationOpeningDate" formControlName="volunteerRegistrationOpeningDate" translateKey="salon.volunteerRegistration.openingDate"/>
+                            <date-box fieldName="volunteerRegistrationClosingDate" formControlName="volunteerRegistrationClosingDate" translateKey="salon.volunteerRegistration.closingDate"/>
+                        </div>
+                        @if (!isCreating) {
+                            <div class="salon-link-row">
+                                <code class="salon-link">{{ volunteerRegistrationLink }}</code>
+                                <button-box (clickedEvent)="copyVolunteerRegistrationLink()" [showText]="true"
+                                            primeIcon="pi-copy" translateKey="salon.registration.copyLink" type="secondary"/>
+                            </div>
+                        }
+                        <text-box fieldName="volunteerRegistrationWelcomeTitle" formControlName="volunteerRegistrationWelcomeTitle" translateKey="salon.volunteerRegistration.welcomeTitle"/>
+                        <editor-box fieldName="volunteerRegistrationWelcomeText" formControlName="volunteerRegistrationWelcomeText" translateKey="salon.volunteerRegistration.welcomeText"/>
+                    </div>
+                } @else {
+                    <app-field-list>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.volunteerRegistration.enabled' | translate }}</span>
+                            <span fieldValue><yes-no-icon [value]="editForm.controls.volunteerRegistrationEnabled.value"/></span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.volunteerRegistration.openingDate' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.volunteerRegistrationOpeningDate.value ? (editForm.controls.volunteerRegistrationOpeningDate.value | date:'dd.MM.yyyy') : '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.volunteerRegistration.closingDate' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.volunteerRegistrationClosingDate.value ? (editForm.controls.volunteerRegistrationClosingDate.value | date:'dd.MM.yyyy') : '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.registration.copyLink' | translate }}</span>
+                            <span fieldValue>
+                                <span class="salon-link-row">
+                                    <code class="salon-link">{{ volunteerRegistrationLink }}</code>
+                                    <button-box (clickedEvent)="copyVolunteerRegistrationLink()" [showText]="false"
+                                                primeIcon="pi-copy" translateKey="salon.registration.copyLink" type="secondary"/>
+                                </span>
+                            </span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.volunteerRegistration.welcomeTitle' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.volunteerRegistrationWelcomeTitle.value || '—' }}</span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'salon.volunteerRegistration.welcomeText' | translate }}</span>
+                            <span fieldValue>
+                                @if (editForm.controls.volunteerRegistrationWelcomeText.value) {
+                                    <div class="salon-rich-preview" [class.is-expanded]="isRichTextExpanded('volunteerRegistrationWelcomeText')">
+                                        <span [innerHTML]="editForm.controls.volunteerRegistrationWelcomeText.value | richText"></span>
+                                    </div>
+                                    @if (hasExpandableRichText(editForm.controls.volunteerRegistrationWelcomeText.value)) {
+                                        <button type="button" class="salon-rich-toggle" (click)="toggleRichText('volunteerRegistrationWelcomeText')">
+                                            <i [class]="isRichTextExpanded('volunteerRegistrationWelcomeText') ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" aria-hidden="true"></i>
+                                            {{ (isRichTextExpanded('volunteerRegistrationWelcomeText') ? 'salon.richText.collapse' : 'salon.richText.expand') | translate }}
+                                        </button>
+                                    }
+                                } @else { — }
+                            </span>
+                        </app-field-row>
+                    </app-field-list>
+                }
+            </div>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'volunteerRegistration') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('volunteerRegistration')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('volunteerRegistration')" [isDisabled]="isLoading" translateKey="common.save"/>
+                    </div>
+                }
+            </ng-container>
+        </app-card>
+        </div>
+
+        <div class="salon-side-column">
+            <!-- Informations générales -->
+            <app-card [titleKey]="'salon.generalInfo'"
+                      [editing]="isCreating || activeSection() === 'general'"
+                      [dimmed]="!!activeSection() && activeSection() !== 'general'"
+                      [actions]="generalActions()">
+                <div appCardBody>
+                    @if (isCreating || activeSection() === 'general') {
+                        <div class="card-form-stack">
+                            <text-box [maxLength]="50" fieldName="place" formControlName="place" translateKey="salon.place"/>
+                            <div class="salon-field-grid">
+                                <date-box fieldName="startingDate" formControlName="startingDate" translateKey="salon.startingDate"/>
+                                <date-box fieldName="endingDate" formControlName="endingDate" translateKey="salon.endingDate"/>
+                            </div>
+                            <textarea-box fieldName="extraInformation" formControlName="extraInformation" translateKey="salon.extraInformation"/>
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'salon.place' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.place.value || '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'salon.startingDate' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.startingDate.value ? (editForm.controls.startingDate.value | date:'dd.MM.yyyy') : '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'salon.endingDate' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.endingDate.value ? (editForm.controls.endingDate.value | date:'dd.MM.yyyy') : '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'salon.extraInformation' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
+                            </app-field-row>
+                        </app-field-list>
+                    }
+                </div>
+                <ng-container appCardFooter>
+                    @if (!isCreating && activeSection() === 'general') {
+                        <div appCardFooterContent class="card-footer-actions">
+                            <button-box (clickedEvent)="cancelSection('general')" type="secondary" translateKey="common.cancel"/>
+                            <button-box (clickedEvent)="saveSection('general')" [isDisabled]="isLoading" translateKey="common.save"/>
+                        </div>
+                    }
+                </ng-container>
+            </app-card>
+
+        <!-- Adresse du siège social -->
+        <app-card [titleKey]="'salon.headquartersAddress'"
+                  [editing]="isCreating || activeSection() === 'headquartersAddress'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'headquartersAddress'"
+                  [actions]="headquartersAddressActions()">
+            <div appCardBody>
+                @if (isCreating || activeSection() === 'headquartersAddress') {
+                    <app-address-form [required]="true" [showFormalFields]="false" formControlName="headquartersAddress"/>
+                } @else {
+                    <ng-container [ngTemplateOutlet]="addressView"
+                                  [ngTemplateOutletContext]="{ $implicit: editForm.controls.headquartersAddress.value }"/>
+                }
+            </div>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'headquartersAddress') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('headquartersAddress')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('headquartersAddress')" [isDisabled]="isLoading" translateKey="common.save"/>
+                    </div>
+                }
+            </ng-container>
+        </app-card>
+
+        <!-- Adresse de l'évènement -->
+        <app-card [titleKey]="'salon.eventAddress'"
+                  [editing]="isCreating || activeSection() === 'eventAddress'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'eventAddress'"
+                  [actions]="eventAddressActions()">
+            <div appCardBody>
+                @if (isCreating || activeSection() === 'eventAddress') {
+                    <app-address-form [required]="true" [showFormalFields]="false" formControlName="eventAddress"/>
+                } @else {
+                    <ng-container [ngTemplateOutlet]="addressView"
+                                  [ngTemplateOutletContext]="{ $implicit: editForm.controls.eventAddress.value }"/>
+                }
+            </div>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'eventAddress') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('eventAddress')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('eventAddress')" [isDisabled]="isLoading" translateKey="common.save"/>
+                    </div>
+                }
+            </ng-container>
+        </app-card>
+        </div>
+    </div>
+
+    @if (isCreating) {
+        <div class="salon-create-actions">
+            <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading" type="secondary" translateKey="common.cancel"/>
+            <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" [isSubmit]="true" translateKey="common.save"/>
+        </div>
+    }
+</app-content-page>
+
+<ng-template #addressView let-addr>
+    <app-field-list>
+        @if (hasAddress(addr)) {
+            @if (addr?.formalLine) {
+                <app-field-row>
+                    <span fieldLabel>{{ 'address.formalLine' | translate }}</span>
+                    <span fieldValue>{{ addr.formalLine }}</span>
+                </app-field-row>
+            }
+            @if (addr?.fullName) {
+                <app-field-row>
+                    <span fieldLabel>{{ 'address.fullName' | translate }}</span>
+                    <span fieldValue>{{ addr.fullName }}</span>
+                </app-field-row>
+            }
+            @if (addr?.postalCase) {
+                <app-field-row>
+                    <span fieldLabel>{{ 'address.postalCase' | translate }}</span>
+                    <span fieldValue>{{ addr.postalCase }}</span>
+                </app-field-row>
+            }
+            <app-field-row>
+                <span fieldLabel>{{ 'address.street' | translate }}</span>
+                <span fieldValue>{{ addr?.street }} {{ addr?.houseNumber }}</span>
+            </app-field-row>
+            <app-field-row>
+                <span fieldLabel>{{ 'address.postalCode' | translate }}</span>
+                <span fieldValue>{{ addr?.postalCode }} {{ addr?.city }}</span>
+            </app-field-row>
+            <app-field-row>
+                <span fieldLabel>{{ 'address.country' | translate }}</span>
+                <span fieldValue>{{ addr?.isoCountry ? ('common.country.' + addr.isoCountry | translate) : '—' }}</span>
+            </app-field-row>
+            @if (addr?.extraLine) {
+                <app-field-row>
+                    <span fieldLabel>{{ 'address.extraLine' | translate }}</span>
+                    <span fieldValue>{{ addr.extraLine }}</span>
+                </app-field-row>
+            }
+        } @else {
+            <app-field-row>
+                <span fieldLabel>{{ 'address.street' | translate }}</span>
+                <span fieldValue>—</span>
+            </app-field-row>
+        }
+    </app-field-list>
+</ng-template>

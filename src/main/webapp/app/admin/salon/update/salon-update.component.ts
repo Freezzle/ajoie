@@ -6,8 +6,6 @@ import {FormArray, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/f
 import {ISalon} from '../model/salon.interface';
 import {SalonService} from '../service/salon.service';
 import {PriceStandGroup, SalonFormGroup, SalonFormService} from '../service/salon-form.service';
-import {State} from '../../enumerations/state.model';
-import {Status} from '../../enumerations/status.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {TextBoxComponent} from '../../../shared/components/text-box/text-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
@@ -20,15 +18,21 @@ import {NumberBoxComponent} from '../../../shared/components/number-box/number-b
 import {TableModule} from 'primeng/table';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {CardFooterContentDirective} from '../../../shared/components/card/card-footer.directive';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {AddressFormComponent} from '../../../shared/components/address-form/address-form.component';
 import {BankAccountFormComponent} from '../../../shared/components/bank-account-form/bank-account-form.component';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
+import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
+import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
+import {YesNoIconComponent} from '../../../shared/components/yes-no-icon/yes-no-icon.component';
+import RichTextPipe from '../../../shared/pipe/rich-text.pipe';
 import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 import {ActionsService} from '../../common/actions.service';
 import {AvailableAction} from '../../../shared/model/available-action';
+import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {TranslateService} from '@ngx-translate/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
@@ -37,9 +41,28 @@ import {EmailMessage} from '../../../shared/email-dialog/email-message';
 import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog.service';
 import {AlertService} from '../../../core/util/alert.service';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
+import {IAddress} from '../../common/address.model';
+import {InvoicingPlanService} from '../../invoicing-plan/service/invoicing-plan.service';
+
+const SECTION_CONTROLS: Record<string, string[]> = {
+    general: ['place', 'startingDate', 'endingDate', 'extraInformation'],
+    billing: ['referenceNumber', 'bankAccount'],
+    prices: ['priceConference', 'priceWorkshop', 'priceSharingStand', 'priceMeal1', 'priceMeal2', 'priceMeal3'],
+    dimensions: ['priceStandSalons'],
+    exhibitorRegistration: ['registrationEnabled', 'registrationOpeningDate', 'registrationClosingDate',
+                            'registrationWelcomeTitle', 'registrationWelcomeText', 'registrationChartText',
+                            'registrationSalonChartText'],
+    volunteerRegistration: ['volunteerRegistrationEnabled', 'volunteerRegistrationOpeningDate',
+                            'volunteerRegistrationClosingDate', 'volunteerRegistrationWelcomeTitle',
+                            'volunteerRegistrationWelcomeText'],
+    headquartersAddress: ['headquartersAddress'],
+    eventAddress: ['eventAddress']
+};
+
 @Component({
                selector: 'app-salon-update',
                templateUrl: './salon-update.component.html',
+               styleUrl: './salon-update.component.scss',
                imports: [
                    SharedModule,
                    RouterModule,
@@ -56,26 +79,33 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    TableModule,
                    ConfirmPopup,
                    CardComponent,
+                   CardFooterContentDirective,
                    CheckboxBoxComponent,
                    ContentPageComponent,
                    AddressFormComponent,
                    BankAccountFormComponent,
-                   MenuBoxComponent
+                   MenuBoxComponent,
+                   FieldListComponent,
+                   FieldRowComponent,
+                   YesNoIconComponent,
+                   RichTextPipe
                ]
            })
 export class SalonUpdateComponent implements OnInit {
     isLoading = false;
     initialSalon: ISalon | null = null;
-    isReadOnly = true;
     menuCache: AppMenuItem[] = [];
-    sourceSalon: ISalon | null = null;
+
+    readonly activeSection = signal<string | null>(null);
+    private sectionSnapshot: Record<string, unknown> = {};
+    /** Vrai si au moins une facture existe pour ce salon : verrouille le N° de référence. */
+    readonly hasInvoices = signal(false);
+    readonly expandedRichText = signal<Record<string, boolean>>({});
 
     protected salonService = inject(SalonService);
     protected salonFormService = inject(SalonFormService);
     editForm: FormGroup<SalonFormGroup> = this.salonFormService.createSalonFormGroup(null);
     protected activatedRoute = inject(ActivatedRoute);
-    protected readonly State = State;
-    protected readonly Status = Status;
     private readonly actionsService = inject(ActionsService);
     private readonly menuItemBuilderService = inject(MenuItemBuilderService);
     private readonly translateService = inject(TranslateService);
@@ -83,9 +113,23 @@ export class SalonUpdateComponent implements OnInit {
     private readonly confirmDialogService = inject(ConfirmDialogService);
     private readonly alertService = inject(AlertService);
     private readonly navigationStateService = inject(NavigationStateService);
+    private readonly invoicingPlanService = inject(InvoicingPlanService);
     private readonly idSalon = signal<string | null>(null);
     readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.idSalon()));
     priceStandRows: FormGroup<PriceStandGroup>[] = [];
+
+    readonly generalActions = computed<EntityAction[]>(() => this.sectionAction('general'));
+    readonly billingActions = computed<EntityAction[]>(() => this.sectionAction('billing'));
+    readonly pricesActions = computed<EntityAction[]>(() => this.sectionAction('prices'));
+    readonly dimensionsActions = computed<EntityAction[]>(() => this.sectionAction('dimensions'));
+    readonly exhibitorRegistrationActions = computed<EntityAction[]>(() => this.sectionAction('exhibitorRegistration'));
+    readonly volunteerRegistrationActions = computed<EntityAction[]>(() => this.sectionAction('volunteerRegistration'));
+    readonly headquartersAddressActions = computed<EntityAction[]>(() => this.sectionAction('headquartersAddress'));
+    readonly eventAddressActions = computed<EntityAction[]>(() => this.sectionAction('eventAddress'));
+
+    get isCreating(): boolean {
+        return !this.editForm.controls.id.value;
+    }
 
     get priceStandSalons(): FormArray<FormGroup<PriceStandGroup>> {
         return this.editForm.controls.priceStandSalons;
@@ -97,13 +141,7 @@ export class SalonUpdateComponent implements OnInit {
     }
 
     copyRegistrationLink(): void {
-        const link = this.registrationLink;
-        if (!link) {
-            return;
-        }
-        navigator.clipboard.writeText(link).then(
-            () => this.alertService.addAlert({type: 'success', translationKey: 'salon.registration.linkCopied'}),
-            () => this.alertService.addAlert({type: 'danger', translationKey: 'salon.registration.linkCopyFailed'}));
+        this.copyLink(this.registrationLink);
     }
 
     get volunteerRegistrationLink(): string {
@@ -112,7 +150,10 @@ export class SalonUpdateComponent implements OnInit {
     }
 
     copyVolunteerRegistrationLink(): void {
-        const link = this.volunteerRegistrationLink;
+        this.copyLink(this.volunteerRegistrationLink);
+    }
+
+    private copyLink(link: string): void {
         if (!link) {
             return;
         }
@@ -120,35 +161,123 @@ export class SalonUpdateComponent implements OnInit {
             () => this.alertService.addAlert({type: 'success', translationKey: 'salon.registration.linkCopied'}),
             () => this.alertService.addAlert({type: 'danger', translationKey: 'salon.registration.linkCopyFailed'}));
     }
-    ngOnInit(): void {
-        this.activateReadOnlyMode(false);
-        this.idSalon.set(this.activatedRoute.snapshot.paramMap.get('idSalon'));
-        this.activatedRoute.data
-            .subscribe((data) => {
-                this.initialSalon = data['salon'] as ISalon;
-                this.isReadOnly = data['readonly'];
-                this.processSalonData();
-                this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
-                this.refreshPriceStandRows();
-                if (this.isReadOnly) {
-                    this.activateReadOnlyMode();
-                } else {
-                    this.activateEditMode();
-                }
-                if (this.initialSalon?.id) {
-                    this.loadActions();
-                }
 
-                if (this.initialSalon?.sourceSalonId) {
-                    this.salonService.find(this.initialSalon.sourceSalonId).subscribe(res => {
-                        this.sourceSalon = res.body;
-                    });
-                }
-            });
+    ngOnInit(): void {
+        this.idSalon.set(this.activatedRoute.snapshot.paramMap.get('idSalon'));
+        this.activatedRoute.data.subscribe((data) => {
+            this.setupForm(data['salon'] ? {...(data['salon'] as ISalon)} : null);
+
+            if (this.initialSalon?.id) {
+                this.loadActions();
+                this.loadInvoices(this.initialSalon.id);
+            }
+        });
     }
+
+    private setupForm(salon: ISalon | null): void {
+        this.processSalonData(salon);
+        this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
+        this.refreshPriceStandRows();
+        if (this.isCreating) {
+            this.editForm.enable();
+        } else {
+            this.editForm.disable();
+        }
+        this.activeSection.set(null);
+    }
+
+    private loadInvoices(idSalon: string): void {
+        this.invoicingPlanService.queryBySalon(idSalon).subscribe(plans => {
+            this.hasInvoices.set((plans ?? []).length > 0);
+        });
+    }
+
+    /** N° de référence verrouillé après création dès qu'une facture existe. */
+    get isReferenceLocked(): boolean {
+        return !this.isCreating && this.hasInvoices();
+    }
+
+    isRichTextExpanded(fieldName: string): boolean {
+        return this.expandedRichText()[fieldName] ?? false;
+    }
+
+    toggleRichText(fieldName: string): void {
+        this.expandedRichText.update(state => ({...state, [fieldName]: !(state[fieldName] ?? false)}));
+    }
+
+    hasExpandableRichText(value: string | null | undefined): boolean {
+        if (!value) {
+            return false;
+        }
+        const text = value.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
+        return text.length > 180;
+    }
+
+    private sectionAction(section: string): EntityAction[] {
+        if (this.isCreating || this.activeSection()) {
+            return [];
+        }
+        return [{labelKey: 'common.edit', icon: 'pi pi-pencil', run: () => this.beginSection(section)}];
+    }
+
+    beginSection(section: string): void {
+        if (!this.initialSalon?.id || this.activeSection()) {
+            return;
+        }
+        this.activeSection.set(section);
+        this.sectionSnapshot = this.snapshot(section);
+        SECTION_CONTROLS[section].forEach(name => this.editForm.get(name)?.enable());
+        if (section === 'billing' && this.isReferenceLocked) {
+            this.editForm.controls.referenceNumber.disable();
+        }
+    }
+
+    cancelSection(section: string): void {
+        if (section === 'dimensions') {
+            this.setupForm(this.initialSalon);
+            return;
+        }
+        Object.entries(this.sectionSnapshot).forEach(([name, value]) => {
+            this.editForm.get(name)?.setValue(value);
+        });
+        this.resetSectionControls(section);
+        this.activeSection.set(null);
+    }
+
+    saveSection(section: string): void {
+        const names = SECTION_CONTROLS[section];
+        const invalid = names.some(name => this.editForm.get(name)?.invalid);
+        if (invalid) {
+            names.forEach(name => this.editForm.get(name)?.markAllAsTouched());
+            return;
+        }
+        this.isLoading = true;
+        const salon = this.salonFormService.getSalon(this.editForm);
+        this.salonService.update(salon)
+            .pipe(finalize(() => (this.isLoading = false)))
+            .subscribe(() => this.reloadSalon(this.initialSalon!.id));
+    }
+
+    private reloadSalon(id: string): void {
+        this.salonService.find(id).subscribe(response => {
+            this.setupForm(response.body ? {...response.body} : null);
+            this.loadInvoices(id);
+        });
+    }
+
+    private snapshot(section: string): Record<string, unknown> {
+        return Object.fromEntries(SECTION_CONTROLS[section].map(name => [name, this.editForm.get(name)?.value]));
+    }
+
+    private resetSectionControls(section: string): void {
+        SECTION_CONTROLS[section].forEach(name => this.editForm.get(name)?.disable());
+    }
+
     loadActions(): void {
         const salonId = this.initialSalon?.id;
-        if (!salonId) return;
+        if (!salonId) {
+            return;
+        }
         this.actionsService.getAvailableActions('salon', salonId, 'salon').subscribe(actions => {
             this.menuCache = this.menuItemBuilderService.buildMenuItemsFromActions(
                 actions,
@@ -156,6 +285,7 @@ export class SalonUpdateComponent implements OnInit {
             );
         });
     }
+
     clickAction(action: AvailableAction, htmlElement?: HTMLElement): void {
         if (action.type === 'BUSINESS') {
             this.handleBusinessAction(action, htmlElement);
@@ -187,9 +317,12 @@ export class SalonUpdateComponent implements OnInit {
             }).catch(() => { /* dismissed */ });
         });
     }
+
     private handleBusinessAction(action: AvailableAction, htmlElement?: HTMLElement): void {
         const salonId = this.initialSalon?.id;
-        if (!salonId) return;
+        if (!salonId) {
+            return;
+        }
         if (action.requiredFields && action.requiredFields.length > 0) {
             const modalRef = this.modalService.open(ActionFormDialogComponent, {size: 'lg'});
             modalRef.componentInstance.requiredFields = action.requiredFields;
@@ -200,8 +333,8 @@ export class SalonUpdateComponent implements OnInit {
                 }
             }).catch(() => { /* dismissed */ });
         } else {
-            const targetElement = htmlElement || document.activeElement as HTMLElement;
-            const confirmMessageKey = action.confirmationKey || 'common.confirmAction.default';
+            const targetElement = htmlElement ?? document.activeElement as HTMLElement;
+            const confirmMessageKey = action.confirmationKey ?? 'common.confirmAction.default';
             this.confirmDialogService.confirmAction(targetElement, confirmMessageKey, {
                 actionLabel: this.translateService.instant(action.labelKey)
             })
@@ -209,6 +342,7 @@ export class SalonUpdateComponent implements OnInit {
                 .subscribe(() => this.executeBusinessAction(action.contextCode, salonId));
         }
     }
+
     private executeBusinessAction(context: string, salonId: string, payload?: Map<string, any>): void {
         this.isLoading = true;
         this.actionsService.businessAction(context, salonId, payload)
@@ -217,21 +351,11 @@ export class SalonUpdateComponent implements OnInit {
                 this.loadActions();
             });
     }
-    activateReadOnlyMode(reset: boolean = true): void {
-        this.isReadOnly = true;
-        if (reset) {
-            this.editForm = this.salonFormService.createSalonFormGroup(this.initialSalon);
-            this.refreshPriceStandRows();
-        }
-        this.editForm.disable();
-    }
-    activateEditMode(): void {
-        this.isReadOnly = false;
-        this.editForm.enable();
-    }
+
     previousState(): void {
         window.history.back();
     }
+
     save(): void {
         if (this.editForm.invalid) {
             this.editForm.markAllAsTouched();
@@ -244,10 +368,12 @@ export class SalonUpdateComponent implements OnInit {
                               : this.salonService.create(salon);
         saveOperation.pipe(finalize(() => (this.isLoading = false))).subscribe(() => this.previousState());
     }
+
     addPriceStand(): void {
         this.editForm.controls['priceStandSalons'].push(this.salonFormService.createPriceStand(null));
         this.refreshPriceStandRows();
     }
+
     movePriceStand(index: number, offset: -1 | 1): void {
         const target = index + offset;
         const array = this.priceStandSalons;
@@ -267,15 +393,21 @@ export class SalonUpdateComponent implements OnInit {
         this.refreshPriceStandRows();
     }
 
+    hasAddress(address: IAddress | null | undefined): boolean {
+        return !!(address?.street ?? address?.postalCode ?? address?.city);
+    }
+
     private refreshPriceStandRows(): void {
         this.priceStandRows = [...this.priceStandSalons.controls];
     }
 
-    private processSalonData(): void {
-        if (!this.initialSalon) {
+    private processSalonData(salon: ISalon | null): void {
+        if (!salon) {
             this.initialSalon = {} as ISalon;
             this.initialSalon.priceStandSalons = [];
+            return;
         }
+        this.initialSalon = salon;
         sortPriceStandSalon(this.initialSalon.priceStandSalons ?? []);
     }
 }

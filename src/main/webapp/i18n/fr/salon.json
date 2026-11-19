@@ -215,8 +215,21 @@
     "delete": {
       "question": "Voulez-vous archiver le salon \"{{id}}\" ? Il ne sera plus visible dans la liste."
     },
+    "billing": "Facturation",
+    "generalInfo": "Informations générales",
+    "referenceLockedHint": "Le N° de référence n'est plus modifiable : des factures existent déjà pour ce salon.",
+    "richText": {
+      "expand": "Afficher plus",
+      "collapse": "Afficher moins"
+    },
     "duplicatedFrom": "Dupliqué depuis :",
     "dimensions-prices": "Configuration des dimensions de stands",
+    "dimension": {
+      "label": "Libellé",
+      "width": "Longueur (m)",
+      "height": "Hauteur (m)",
+      "price": "Prix"
+    },
     "edit": "Détail du salon",
     "endingDate": "Date de fin",
     "extraInformation": "Commentaire",
