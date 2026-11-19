@@ -109,7 +109,7 @@
                             </app-field-row>
                             <app-field-row>
                                 <span fieldLabel>{{ 'stand.needElectricity' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.needElectricity.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.needElectricity.value" /></span>
                             </app-field-row>
                         </app-field-list>
                     }
@@ -153,7 +153,7 @@
                         <app-field-list>
                             <app-field-row>
                                 <span fieldLabel>{{ 'stand.publishedOnWebsite' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.publishedOnWebsite.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.publishedOnWebsite.value" /></span>
                             </app-field-row>
                             @if (editForm.controls.publishedOnWebsite.value) {
                                 <app-field-row>
@@ -235,7 +235,7 @@
                         <app-field-list>
                             <app-field-row>
                                 <span fieldLabel>{{ 'stand.shared' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.shared.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.shared.value" /></span>
                             </app-field-row>
                             @if (editForm.controls.shared.value) {
                                 <app-field-row>
@@ -278,7 +278,7 @@
                                 </app-field-row>
                                 <app-field-row>
                                     <span fieldLabel>{{ 'stand.coExhibitor.publishedOnWebsite' | translate }}</span>
-                                    <span fieldValue>{{ (editForm.controls.sharedPublishedOnWebsite.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                    <span fieldValue><yes-no-icon [value]="editForm.controls.sharedPublishedOnWebsite.value" /></span>
                                 </app-field-row>
                                 @if (editForm.controls.sharedPublishedOnWebsite.value) {
                                     <app-field-row>

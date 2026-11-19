@@ -155,7 +155,7 @@
                             } @else {
                                 <app-field-row>
                                     <span fieldLabel>{{ 'exhibitor.differentBillingAddress' | translate }}</span>
-                                    <span fieldValue>{{ 'common.no' | translate }}</span>
+                                    <span fieldValue><yes-no-icon [value]="false" /></span>
                                 </app-field-row>
                             }
                         </app-field-list>
@@ -205,13 +205,13 @@
                                         <td [routerLink]="['/admin',  'salons',  participation.salon.id,  'participations',  participation.id,  'view']"
                                             class="clickable">
                                             <div>
-                                                <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingFriendliness" [disabled]="true" [stars]="6"/>
+                                                <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingFriendliness" [disabled]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/>
                                             </div>
                                             <div>
-                                                <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingPaymentSpeed" [disabled]="true" [stars]="6"/>
+                                                <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingPaymentSpeed" [disabled]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/>
                                             </div>
                                             <div>
-                                                <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingServiceQuality" [disabled]="true" [stars]="6"/>
+                                                <p-rating [ngModelOptions]="{ standalone: true }" [ngModel]="participation.ratingServiceQuality" [disabled]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/>
                                             </div>
                                         </td>
                                     }
@@ -257,7 +257,7 @@
                             </app-field-row>
                             <app-field-row>
                                 <span fieldLabel>{{ 'exhibitor.newsletter' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.newsletter.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.newsletter.value" /></span>
                             </app-field-row>
                         </app-field-list>
                     }
@@ -288,11 +288,11 @@
                         <app-field-list>
                             <app-field-row>
                                 <span fieldLabel>{{ 'exhibitor.redFlag' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.redFlag.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.redFlag.value" /></span>
                             </app-field-row>
                             <app-field-row>
                                 <span fieldLabel>{{ 'exhibitor.duplicateDetected' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.duplicateDetected.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.duplicateDetected.value" /></span>
                             </app-field-row>
                             <app-field-row>
                                 <span fieldLabel>{{ 'exhibitor.extraInformation' | translate }}</span>

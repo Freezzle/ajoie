@@ -58,18 +58,16 @@
                             <app-field-row>
                                 <span fieldLabel>{{ 'participation.documents' | translate }}</span>
                                 <span fieldValue>
-                                    @if (editForm.controls.acceptedChart.value || editForm.controls.acceptedContract.value) {
-                                        <span class="participation-tags">
-                                            @if (editForm.controls.acceptedChart.value) {
-                                                <span class="el-tag">{{ 'participation.documentChart' | translate }}</span>
-                                            }
-                                            @if (editForm.controls.acceptedContract.value) {
-                                                <span class="el-tag">{{ 'participation.documentContract' | translate }}</span>
-                                            }
+                                    <span class="participation-tags">
+                                        <span class="el-tag">
+                                            <yes-no-icon [value]="editForm.controls.acceptedChart.value" />
+                                            {{ 'participation.documentChart' | translate }}
                                         </span>
-                                    } @else {
-                                        —
-                                    }
+                                        <span class="el-tag">
+                                            <yes-no-icon [value]="editForm.controls.acceptedContract.value" />
+                                            {{ 'participation.documentContract' | translate }}
+                                        </span>
+                                    </span>
                                 </span>
                             </app-field-row>
                         </app-field-list>
@@ -129,7 +127,7 @@
                             </app-field-row>
                             <app-field-row>
                                 <span fieldLabel>{{ 'participation.needArrangement' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.needArrangement.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.needArrangement.value" /></span>
                             </app-field-row>
                         </app-field-list>
                     }
@@ -165,7 +163,7 @@
                         <app-field-list>
                             <app-field-row>
                                 <span fieldLabel>{{ 'participation.hasOffer' | translate }}</span>
-                                <span fieldValue>{{ (editForm.controls.hasOffer.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                <span fieldValue><yes-no-icon [value]="editForm.controls.hasOffer.value" /></span>
                             </app-field-row>
                             @if (editForm.controls.hasOffer.value) {
                                 <app-field-row>
@@ -393,36 +391,41 @@
                                 <textarea-box [rows]="3" fieldName="extraInformation" formControlName="extraInformation" translateKey="participation.extraInformation"/>
                             </div>
                         } @else {
-                            <div class="card-form-stack">
-                                <app-field-list>
-                                    <app-field-row>
-                                        <span fieldLabel>{{ 'participation.distinctions' | translate }}</span>
-                                        <span fieldValue>
-                                            @if (editForm.controls.crushOfHeart.value || editForm.controls.guestOfHonor.value) {
-                                                <span class="participation-tags">
-                                                    @if (editForm.controls.crushOfHeart.value) {
-                                                        <span class="el-tag">{{ 'participation.crushOfHeart' | translate }}</span>
-                                                    }
-                                                    @if (editForm.controls.guestOfHonor.value) {
-                                                        <span class="el-tag">{{ 'participation.guestOfHonor' | translate }}</span>
-                                                    }
-                                                </span>
-                                            } @else {
-                                                —
-                                            }
-                                        </span>
-                                    </app-field-row>
-                                </app-field-list>
-                                <rating-box fieldName="ratingFriendliness" formControlName="ratingFriendliness" translateKey="participation.ratingFriendliness"/>
-                                <rating-box fieldName="ratingPaymentSpeed" formControlName="ratingPaymentSpeed" translateKey="participation.ratingPaymentSpeed"/>
-                                <rating-box fieldName="ratingServiceQuality" formControlName="ratingServiceQuality" translateKey="participation.ratingServiceQuality"/>
-                                <app-field-list>
-                                    <app-field-row>
-                                        <span fieldLabel>{{ 'participation.extraInformation' | translate }}</span>
-                                        <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
-                                    </app-field-row>
-                                </app-field-list>
-                            </div>
+                            <app-field-list>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'participation.distinctions' | translate }}</span>
+                                    <span fieldValue>
+                                        @if (editForm.controls.crushOfHeart.value || editForm.controls.guestOfHonor.value) {
+                                            <span class="participation-tags">
+                                                @if (editForm.controls.crushOfHeart.value) {
+                                                    <span class="el-tag">{{ 'participation.crushOfHeart' | translate }}</span>
+                                                }
+                                                @if (editForm.controls.guestOfHonor.value) {
+                                                    <span class="el-tag">{{ 'participation.guestOfHonor' | translate }}</span>
+                                                }
+                                            </span>
+                                        } @else {
+                                            —
+                                        }
+                                    </span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'participation.ratingFriendliness' | translate }}</span>
+                                    <span fieldValue><p-rating [ngModel]="editForm.controls.ratingFriendliness.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'participation.ratingPaymentSpeed' | translate }}</span>
+                                    <span fieldValue><p-rating [ngModel]="editForm.controls.ratingPaymentSpeed.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'participation.ratingServiceQuality' | translate }}</span>
+                                    <span fieldValue><p-rating [ngModel]="editForm.controls.ratingServiceQuality.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'participation.extraInformation' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
+                                </app-field-row>
+                            </app-field-list>
                         }
                     </div>
                     <ng-container appCardFooter>

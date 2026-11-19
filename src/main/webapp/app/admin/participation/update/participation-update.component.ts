@@ -49,10 +49,12 @@ import {CardFooterContentDirective} from '../../../shared/components/card/card-f
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
 import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
+import {YesNoIconComponent} from '../../../shared/components/yes-no-icon/yes-no-icon.component';
 import {StatusTimelineComponent, StatusTimelineActionRequest} from '../../../shared/components/status-timeline/status-timeline.component';
 import {TranslateService} from '@ngx-translate/core';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.component';
+import {Rating} from 'primeng/rating';
 import {categoryColor, EntityAction, EntityFootItemComponent, EntityRowComponent, EntityStatusComponent, statusColor} from '../../../shared/components/entity-list';
 import {Category, formatterCategory} from '../../enumerations/category.model';
 
@@ -72,8 +74,8 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                          NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent,
                          AlertErrorComponent, ConfirmPopup, Tab, TabList, Tabs, TabPanels, TabPanel, Badge,
                          CardComponent, CardFooterContentDirective, ContentPageComponent, FieldListComponent,
-                         FieldRowComponent, StatusTimelineComponent, RatingBoxComponent,
-                         EntityRowComponent, EntityStatusComponent, EntityFootItemComponent]
+                         FieldRowComponent, StatusTimelineComponent, RatingBoxComponent, Rating,
+                         EntityRowComponent, EntityStatusComponent, EntityFootItemComponent, YesNoIconComponent]
            })
 export class ParticipationUpdateComponent implements OnInit {
     tabActive = '0';

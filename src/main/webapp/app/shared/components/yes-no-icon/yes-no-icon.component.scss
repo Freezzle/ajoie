@@ -1,0 +1,11 @@
+.yes-no-icon {
+  font-size: 1rem;
+
+  &--yes {
+    color: var(--app-status-validated);
+  }
+
+  &--no {
+    color: var(--app-status-refused);
+  }
+}

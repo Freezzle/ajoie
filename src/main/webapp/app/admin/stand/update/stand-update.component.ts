@@ -36,6 +36,7 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
 import {ImageUploadBoxComponent} from '../../../shared/components/image-upload-box/image-upload-box.component';
 import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
 import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
+import {YesNoIconComponent} from '../../../shared/components/yes-no-icon/yes-no-icon.component';
 import {StatusTimelineComponent, StatusTimelineActionRequest} from '../../../shared/components/status-timeline/status-timeline.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {loadParticipationOptions} from '../../common/participation/participation-options.util';
@@ -78,7 +79,8 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                    ContentPageComponent,
                    FieldListComponent,
                   FieldRowComponent,
-                  StatusTimelineComponent
+                  StatusTimelineComponent,
+                  YesNoIconComponent
                ]
            })
 export class StandUpdateComponent implements OnInit {

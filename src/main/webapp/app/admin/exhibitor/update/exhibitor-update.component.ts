@@ -32,6 +32,7 @@ import {AddressFormComponent} from '../../../shared/components/address-form/addr
 import {IAddress} from '../../common/address.model';
 import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
 import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
+import {YesNoIconComponent} from '../../../shared/components/yes-no-icon/yes-no-icon.component';
 import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
@@ -71,7 +72,8 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                    FieldListComponent,
                    FieldRowComponent,
                    Rating,
-                   AddressFormComponent
+                  AddressFormComponent,
+                  YesNoIconComponent
                ]
            })
 export class ExhibitorUpdateComponent implements OnInit {

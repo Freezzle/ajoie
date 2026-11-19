@@ -3,6 +3,8 @@
         <p-rating id="field_{{fieldName}}"
                   [formControl]="control"
                   [stars]="6"
+                  iconOnClass="pi pi-star-fill"
+                  iconOffClass="pi pi-star"
                   [invalid]="control!.invalid && control!.touched">
         </p-rating>
     </div>
