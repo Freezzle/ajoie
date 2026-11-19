@@ -1,0 +1,33 @@
+<div class="app-step-timeline-wrap">
+    <ol class="app-step-timeline"
+        [class.app-step-timeline-segments]="segments()"
+        [style.--app-step-count]="steps().length">
+        @for (step of steps(); track step.key; let i = $index) {
+            <li [class]="'is-' + step.state + ' ' + (segments() ? (step.segment ?? '') : '')"
+                [attr.title]="step.hint ?? null">
+                <span class="app-step-label">{{ step.label }}</span>
+                @if (step.sublabel) {
+                    <span class="app-step-sublabel">{{ step.sublabel }}</span>
+                } @else if (step.date !== undefined && step.date !== null) {
+                    <span class="app-step-date">{{ step.date }}</span>
+                }
+                <span class="app-step-dot" aria-hidden="true">
+                    <span class="app-step-marker">
+                        {{ step.state === 'done' ? '✓' : (step.state === 'error' ? '✕' : i + 1) }}
+                    </span>
+                </span>
+            </li>
+        }
+
+        @if (todayMarker(); as marker) {
+            <span class="app-step-progress"
+                  [class]="marker.styleClass ?? ''"
+                  [style.left.%]="marker.left - marker.width"
+                  [style.width.%]="marker.width"></span>
+            <span class="app-step-today"
+                  [attr.aria-label]="todayTitle()"
+                  [attr.title]="todayTitle()"
+                  [style.left.%]="marker.left"></span>
+        }
+    </ol>
+</div>

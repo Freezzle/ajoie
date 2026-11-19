@@ -35,6 +35,13 @@ export class ParticipationService {
                    .pipe(map(res => this.convertResponseFromServer(res)));
     }
 
+    patch(idParticipation: string, participation: IParticipation): Observable<HttpResponse<IParticipation>> {
+        const copy = this.convertDateFromClient(participation);
+        return this.http
+                   .patch<IParticipation>(`${this.resourceUrl}/${idParticipation}`, copy, {observe: 'response'})
+                   .pipe(map(res => this.convertResponseFromServer(res)));
+    }
+
     find(idParticipation: string): Observable<HttpResponse<IParticipation>> {
         return this.http
                    .get<IParticipation>(`${this.resourceUrl}/${idParticipation}`, {observe: 'response'})

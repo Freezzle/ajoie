@@ -1,5 +1,6 @@
 package ch.salon.repository;
 
+import ch.salon.aop.logging.RepositoryAction;
 import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.Status;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@RepositoryAction("workshop")
 public interface WorkshopRepository extends JpaRepository<Workshop, UUID> {
 
     @EntityGraph(attributePaths = {"participation", "participation.exhibitor", "participation.exhibitor.billingAddress"})

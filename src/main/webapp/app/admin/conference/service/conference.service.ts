@@ -19,6 +19,10 @@ export class ConferenceService {
         return this.http.put<IConference>(`${this.resourceUrl}/${this.getConferenceIdentifier(conference)}`, conference);
     }
 
+    patch(idConference: string, patch: Partial<IConference>): Observable<IConference> {
+        return this.http.patch<IConference>(`${this.resourceUrl}/${idConference}`, {...patch, id: idConference});
+    }
+
     find(idConference: string): Observable<HttpResponse<IConference>> {
         return this.http.get<IConference>(`${this.resourceUrl}/${idConference}`, {
             observe: 'response'

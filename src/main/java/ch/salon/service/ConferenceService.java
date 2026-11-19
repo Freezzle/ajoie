@@ -3,6 +3,7 @@ package ch.salon.service;
 import ch.salon.domain.Conference;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
 import ch.salon.service.dto.ConferenceDTO;
 import ch.salon.service.dto.ParticipationLightDTO;
@@ -55,6 +56,7 @@ public class ConferenceService {
         }
 
         Conference entity = conferenceMapper.toEntity(conference);
+        entity.setStatus(Status.IN_VERIFICATION);
         entity.setRegistrationDate(Instant.now());
         entity = conferenceRepository.save(entity);
 
@@ -80,20 +82,33 @@ public class ConferenceService {
         Conference conferenceExisting = this.conferenceRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
 
-        Conference conferenceToUpdate = conferenceMapper.toEntity(conference);
-
-        if (Conference.diffStatus(conferenceToUpdate, conferenceExisting)) {
-            this.eventLogService.eventFromSystem(
-                    "Le statut d'une conférence a changé en '" + conferenceToUpdate.getStatus().name().toLowerCase() +
-                            "'", EventType.EVENT, EntityType.PARTICIPATION,
-                    conferenceExisting.getParticipation().getId(),
-                    Map.of("old_status", conferenceExisting.getStatus().name()));
+        if (conference.getParticipation() == null || conference.getParticipation().getId() == null
+                || !Objects.equals(conference.getParticipation().getId(), conferenceExisting.getParticipation().getId())) {
+            throw new BadRequestAlertException("Participation is immutable", ENTITY_NAME, "participationimmutable");
         }
 
+        Conference conferenceToUpdate = conferenceMapper.toEntity(conference);
+        conferenceToUpdate.setStatus(conferenceExisting.getStatus());
+        conferenceToUpdate.setParticipation(conferenceExisting.getParticipation());
         conferenceToUpdate.setRegistrationDate(conferenceExisting.getRegistrationDate());
         conferenceToUpdate = conferenceRepository.save(conferenceToUpdate);
 
         return conferenceMapper.toDto(conferenceToUpdate);
+    }
+
+    public ConferenceDTO patch(final UUID id, ConferenceDTO conference) {
+        Conference conferenceExisting = this.conferenceRepository.findById(id).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
+
+        if (conference.getParticipation() != null && conference.getParticipation().getId() != null
+                && !Objects.equals(conference.getParticipation().getId(), conferenceExisting.getParticipation().getId())) {
+            throw new BadRequestAlertException("Participation is immutable", ENTITY_NAME, "participationimmutable");
+        }
+        if (conference.getTitle() != null) conferenceExisting.setTitle(conference.getTitle());
+        if (conference.getDescription() != null) conferenceExisting.setDescription(conference.getDescription());
+        if (conference.getExtraInformation() != null) conferenceExisting.setExtraInformation(conference.getExtraInformation());
+
+        return conferenceMapper.toDto(conferenceRepository.save(conferenceExisting));
     }
 
     public List<ConferenceDTO> findAll(UUID idSalon, UUID idParticipation) {

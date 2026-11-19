@@ -37,28 +37,11 @@
   </div>
 
   <!-- ── Frise des dates ─────────────────────────────────────────── -->
-  <div class="el-ip-timeline-wrap">
-    <ol class="el-ip-timeline" [style.--el-ip-steps]="timeline().length">
-      @for (step of timeline(); track step.key) {
-        <li [class]="'is-' + step.status + ' ' + step.segment" [attr.title]="step.hint ?? null">
-          <span class="el-ip-step-label">{{ step.label }}</span>
-          <span class="el-ip-dot"></span>
-          <span class="el-ip-step-date">{{ stepDate(step) }}</span>
-        </li>
-      }
-
-      @if (todayMarker(); as marker) {
-        <span class="el-ip-progress"
-              [class]="marker.styleClass"
-              [style.left.%]="marker.left - marker.width"
-              [style.width.%]="marker.width"></span>
-        <span class="el-ip-today"
-              [attr.aria-label]="todayTitle()"
-              [style.left.%]="marker.left"
-              [title]="todayTitle()"></span>
-      }
-    </ol>
-  </div>
+  <app-step-timeline
+      [steps]="visualTimeline()"
+      [todayMarker]="visualTodayMarker()"
+      [todayTitle]="todayTitle()"
+      [segments]="true" />
 
   @if (isLoading() && !plan()) {
     <div class="el-ip-empty">

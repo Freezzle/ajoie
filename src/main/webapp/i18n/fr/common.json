@@ -73,6 +73,8 @@
     "import": "Importer",
     "info-basic": "Information de base",
     "info-intern": "Information en interne",
+    "yes": "Oui",
+    "no": "Non",
     "open": "Ouvrir",
     "redo": "Rétablir",
     "refresh": "Rafraîchir",

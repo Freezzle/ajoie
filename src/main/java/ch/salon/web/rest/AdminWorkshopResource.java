@@ -53,6 +53,15 @@ public class AdminWorkshopResource {
         return ResourceUtil.updated(ENTITY_NAME, workshop.getId()).body(workshop);
     }
 
+    @PatchMapping("/{idWorkshop}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<WorkshopDTO> patchWorkshop(
+            @PathVariable UUID idWorkshop,
+            @Valid @RequestBody WorkshopDTO workshop) {
+        workshop = workshopService.patch(idWorkshop, workshop);
+        return ResourceUtil.updated(ENTITY_NAME, workshop.getId()).body(workshop);
+    }
+
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<WorkshopDTO> getAllWorkshops(@RequestParam(name = "idSalon", required = false) UUID idSalon,

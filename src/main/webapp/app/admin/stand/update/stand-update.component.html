@@ -1,276 +1,383 @@
 <app-content-page [formGroup]="editForm">
     <div appMenuBarStart>
-        @if (editForm.controls.id.value) {
-            <h3>{{ 'stand.edit' | translate }}</h3>
-        } @else {
-            <h3>{{ 'stand.create' | translate }}</h3>
+        <h3>{{ (isCreating ? 'stand.create' : 'stand.edit') | translate }}</h3>
+        @if (subtitle()) {
+            <div class="el-subtitle"><b>{{ subtitle() }}</b></div>
         }
-        <div class="el-subtitle">
-            @if (subtitle()) {
-                <b>{{ subtitle() }}</b>
-            }
-        </div>
     </div>
     <div appMenuBarEnd>
-        <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading"
-                    [showText]="false"
-                    primeIcon="pi-arrow-left"
-                    translateKey="common.back"/>
-        @if (isReadOnly) {
-            <button-box (clickedEvent)="edit()"
-                        [isDisabled]="isLoading"
-                        [showText]="false"
-                        primeIcon="pi-pencil"
-                        translateKey="common.edit"/>
-        }
-
-        @if (editForm.controls.id.value && !isReadOnly) {
-            <button-box (clickedEvent)="cancel()"
-                        [isDisabled]="isLoading"
-                        [showText]="false"
-                        primeIcon="pi-ban"
-                        translateKey="common.cancel"
-                        type="secondary"/>
-        }
-
-        @if (!isReadOnly) {
-            <button-box (clickedEvent)="save()"
-                        [isDisabled]="editForm.invalid || isLoading"
-                        [isSubmit]="true"
-                        [showText]="false"
-                        primeIcon="pi-save"
-                        translateKey="common.save"/>
-        }
+        <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading"
+                    [showText]="false" primeIcon="pi-arrow-left" translateKey="common.back"/>
     </div>
-    <app-alert-error></app-alert-error>
 
-
+    <app-alert-error/>
     <p-confirmpopup/>
-    <app-card>
-        <div appCardHeader>
-            <h4>{{ 'common.info-basic' | translate }}</h4>
-        </div>
-        <div appCardBody>
-            <div class="row">
-                <div class="mt-4 col-12">
-                    <textarea-box [maxLength]="500"
-                                  [rows]="6"
-                                  [showCounter]="true"
-                                  fieldName="description"
-                                  formControlName="description"
-                                  translateKey="stand.description"/>
-                </div>
-                <div class="mt-4 col-lg-6">
-                    <select-box [enableFilter]="true"
-                                [filterFields]="selectFilterDimension()"
-                                [formatterFunction]="formatterDimensionStand"
-                                [options]="dimensionsOptions"
-                                fieldName="dimension"
-                                formControlName="dimension"
-                                translateKey="stand.dimension"/>
-                </div>
-                <div class="mt-4 col-lg-6">
-                    <select-box [formatterFunction]="formatterCategory"
-                                [needTranslation]="true"
-                                [options]="categoryValues"
-                                fieldName="category"
-                                formControlName="category"
-                                translateKey="stand.category.label"/>
-                </div>
-                <div class="mt-4 col-12">
-                    <chips-box fieldName="subCategories"
-                               formControlName="subCategories"
-                               translateKey="stand.subCategories"/>
-                </div>
-                <div class="mt-4 col-6 col-lg-3">
-                    <number-box fieldName="nbTable" formControlName="nbTable" translateKey="stand.nbTable"/>
-                </div>
-                <div class="mt-4 col-6 col-lg-3">
-                    <number-box fieldName="nbChair" formControlName="nbChair" translateKey="stand.nbChair"/>
-                </div>
-                <div class="mt-4 col-6 col-lg-3">
-                    <checkbox-box fieldName="needElectricity"
-                                  formControlName="needElectricity"
-                                  translateKey="stand.needElectricity"/>
-                </div>
-                <div class="mt-4 col-6 col-lg-3">
-                    <checkbox-box fieldName="shared" formControlName="shared" translateKey="stand.shared"/>
-                </div>
-            </div>
-        </div>
-    </app-card>
 
-    <app-card>
-        <div appCardHeader>
-            <h4>{{ 'stand.card.socialNetwork' | translate }}</h4>
+    @if (!isCreating) {
+        <div class="stand-status">
+            <app-status-timeline [status]="initialStand?.status ?? null"
+                                 [availableActions]="availableActions()"
+                                 (actionRequested)="onStatusAction($event)"/>
         </div>
-        <div appCardBody>
-            <div class="row">
-                <div class="col-12">
-                    <checkbox-box fieldName="publishedOnWebsite"
-                                  formControlName="publishedOnWebsite"
-                                  translateKey="stand.publishedOnWebsite"/>
-                </div>
-            </div>
-            @if (editForm.controls.publishedOnWebsite.value) {
-                <div class="row">
-                    <div class="mt-4 col-lg-4">
-                        <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
-                    </div>
-                    <div class="mt-4 col-lg-4">
-                        <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
-                    </div>
-                    <div class="mt-4 col-lg-4">
-                        <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
-                    </div>
-                    <div class="mt-4 col-12">
-                        <image-upload-box [existingPictureUrl]="picturePreviewUrl"
-                                          [requiredField]="true"
-                                          (existingRemoved)="onPictureRemoved()"
-                                          fieldName="pictureUpload"
-                                          formControlName="pictureUpload"
-                                          translateKey="stand.picture"/>
-                        @if (initialStand?.urlPicture) {
-                            <div class="mt-2">
-                                <span class="me-2">{{ 'stand.urlPicture' | translate }} :</span>
-                                <a [href]="initialStand!.urlPicture" rel="noopener noreferrer" target="_blank">
-                                    {{ initialStand!.urlPicture }}
-                                </a>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-    </app-card>
-
-    @if (editForm.controls.shared.value) {
-        <app-card>
-            <div appCardHeader>
-                <h4>{{ 'stand.card.coExhibitor' | translate }}</h4>
-            </div>
-            <div appCardBody>
-                <div class="row">
-                    <div class="mt-4 col-lg-6">
-                      <text-box fieldName="sharedLastName"
-                                formControlName="sharedLastName"
-                                translateKey="stand.coExhibitor.lastName"/>
-                    </div>
-                    <div class="mt-4 col-lg-6">
-                        <text-box fieldName="sharedFirstName"
-                                  formControlName="sharedFirstName"
-                                  translateKey="stand.coExhibitor.firstName"/>
-                    </div>
-                    <div class="mt-4 col-lg-6">
-                        <text-box fieldName="sharedTherapistName"
-                                  formControlName="sharedTherapistName"
-                                  translateKey="stand.coExhibitor.therapistName"/>
-                    </div>
-                    <div class="mt-4 col-lg-6">
-                        <text-box fieldName="sharedEmail"
-                                  formControlName="sharedEmail"
-                                  translateKey="stand.coExhibitor.email"/>
-                    </div>
-                    <div class="mt-4 col-12">
-                        <textarea-box [maxLength]="500"
-                                      [rows]="6"
-                                      [showCounter]="true"
-                                      fieldName="sharedDescription"
-                                      formControlName="sharedDescription"
-                                      translateKey="stand.coExhibitor.description"/>
-                    </div>
-                    <div class="mt-4 col-lg-6">
-                        <select-box [formatterFunction]="formatterCategory"
-                                    [needTranslation]="true"
-                                    [options]="categoryValues"
-                                    fieldName="sharedCategory"
-                                    formControlName="sharedCategory"
-                                    translateKey="stand.coExhibitor.category"/>
-                    </div>
-                    <div class="mt-4 col-lg-6">
-                        <chips-box fieldName="sharedSubCategories"
-                                   formControlName="sharedSubCategories"
-                                   translateKey="stand.coExhibitor.subCategories"/>
-                    </div>
-                    <div class="mt-4 col-12">
-                        <checkbox-box fieldName="sharedPublishedOnWebsite"
-                                      formControlName="sharedPublishedOnWebsite"
-                                      translateKey="stand.coExhibitor.publishedOnWebsite"/>
-                    </div>
-                    @if (editForm.controls.sharedPublishedOnWebsite.value) {
-                        <div class="mt-4 col-lg-4">
-                            <text-box fieldName="sharedWebsite"
-                                      formControlName="sharedWebsite"
-                                      translateKey="stand.coExhibitor.website"/>
-                        </div>
-                        <div class="mt-4 col-lg-4">
-                            <text-box fieldName="sharedInstagram"
-                                      formControlName="sharedInstagram"
-                                      translateKey="stand.coExhibitor.instagram"/>
-                        </div>
-                        <div class="mt-4 col-lg-4">
-                            <text-box fieldName="sharedFacebook"
-                                      formControlName="sharedFacebook"
-                                      translateKey="stand.coExhibitor.facebook"/>
-                        </div>
-                        <div class="mt-4 col-12">
-                            <image-upload-box [existingPictureUrl]="sharedPicturePreviewUrl"
-                                              [requiredField]="true"
-                                              (existingRemoved)="onSharedPictureRemoved()"
-                                              fieldName="sharedPictureUpload"
-                                              formControlName="sharedPictureUpload"
-                                              translateKey="stand.coExhibitor.picture"/>
-                            @if (initialStand?.sharedUrlPicture) {
-                                <div class="mt-2">
-                                    <span class="me-2">{{ 'stand.coExhibitor.urlPicture' | translate }} :</span>
-                                    <a [href]="initialStand!.sharedUrlPicture" rel="noopener noreferrer"
-                                       target="_blank">
-                                        {{ initialStand!.sharedUrlPicture }}
-                                    </a>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </app-card>
     }
 
-    <app-card>
-        <div appCardHeader><h4>{{ 'common.info-intern' | translate }}</h4></div>
-        <div appCardBody>
-            <div class="row">
-                <div class="mt-4 col-lg-6 d-flex">
-                    <select-box [enableFilter]="true"
-                                [filterFields]="selectFilterParticipation()"
-                                [formatterFunction]="formatterParticipation"
-                                [options]="participationsOptions"
-                                class="w-100"
-                                fieldName="participation"
-                                formControlName="participation"
-                                translateKey="stand.participation"/>
-                    @if (isReadOnly) {
-                        <link-box [links]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '','view']"
-                                  [showText]="false"
-                                  class="align-content-center link-box-append"
-                                  primeIcon="pi-link"/>
+    <div class="stand-detail-grid">
+        <div class="stand-main-column">
+            <!-- Stand -->
+            <app-card [titleKey]="'stand.card.stand'"
+                      [editing]="isCreating || activeSection() === 'stand'"
+                      [dimmed]="!!activeSection() && activeSection() !== 'stand'"
+                      [actions]="standActions()">
+                <div appCardBody>
+                    @if (isCreating || activeSection() === 'stand') {
+                        <div class="card-form-stack">
+                            <textarea-box [maxLength]="500" [rows]="6" [showCounter]="true"
+                                          fieldName="description" formControlName="description"
+                                          translateKey="stand.description"/>
+                            <select-box [formatterFunction]="formatterCategory" [needTranslation]="true"
+                                        [options]="categoryValues" fieldName="category"
+                                        formControlName="category" translateKey="stand.category.label"/>
+                            <chips-box fieldName="subCategories" formControlName="subCategories"
+                                       translateKey="stand.subCategories"/>
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.description' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.description.value || '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.category.label' | translate }}</span>
+                                <span fieldValue>{{ ('stand.category.list.' + (editForm.controls.category.value || 'null')) | translate }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.subCategories' | translate }}</span>
+                                <span fieldValue>
+                                    @if (editForm.controls.subCategories.value?.length) {
+                                        <span class="stand-tags">
+                                            @for (tag of editForm.controls.subCategories.value; track tag) {
+                                                <span class="el-tag">{{ tag }}</span>
+                                            }
+                                        </span>
+                                    } @else {
+                                        —
+                                    }
+                                </span>
+                            </app-field-row>
+                        </app-field-list>
                     }
                 </div>
-                <div class="mt-4 col-lg-6">
-                    <select-box [formatterFunction]="formatterStatus"
-                                [needTranslation]="true"
-                                [options]="statusValues"
-                                fieldName="status"
-                                formControlName="status"
-                                translateKey="stand.status.label"/>
+                <ng-container appCardFooter>
+                    @if (!isCreating && activeSection() === 'stand') {
+                        <div appCardFooterContent class="card-footer-actions">
+                            <button-box (clickedEvent)="cancelSection('stand')" type="secondary" translateKey="common.cancel"/>
+                            <button-box (clickedEvent)="saveSection('stand')" [isDisabled]="isLoading" translateKey="common.save"/>
+                        </div>
+                    }
+                </ng-container>
+            </app-card>
+
+            <!-- Surface et équipement -->
+            <app-card [titleKey]="'stand.card.equipment'"
+                      [editing]="isCreating || activeSection() === 'equipment'"
+                      [dimmed]="!!activeSection() && activeSection() !== 'equipment'"
+                      [actions]="equipmentActions()">
+                <div appCardBody>
+                    @if (isCreating || activeSection() === 'equipment') {
+                        <div class="card-form-stack">
+                            <select-box [enableFilter]="true" [filterFields]="selectFilterDimension()"
+                                        [formatterFunction]="formatterDimensionStand" [options]="dimensionsOptions"
+                                        fieldName="dimension" formControlName="dimension" translateKey="stand.dimension"/>
+                            <number-box fieldName="nbTable" formControlName="nbTable" translateKey="stand.nbTable"/>
+                            <number-box fieldName="nbChair" formControlName="nbChair" translateKey="stand.nbChair"/>
+                            <checkbox-box fieldName="needElectricity" formControlName="needElectricity"
+                                          translateKey="stand.needElectricity"/>
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.dimension' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.dimension.value ? formatterDimensionStand(editForm.controls.dimension.value) : '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.nbTable' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.nbTable.value ?? '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.nbChair' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.nbChair.value ?? '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.needElectricity' | translate }}</span>
+                                <span fieldValue>{{ (editForm.controls.needElectricity.value ? 'common.yes' : 'common.no') | translate }}</span>
+                            </app-field-row>
+                        </app-field-list>
+                    }
                 </div>
-                <div class="mt-4 col-12">
-                    <textarea-box fieldName="extraInformation"
-                                  formControlName="extraInformation"
-                                  translateKey="stand.extraInformation"/>
+                <ng-container appCardFooter>
+                    @if (!isCreating && activeSection() === 'equipment') {
+                        <div appCardFooterContent class="card-footer-actions">
+                            <button-box (clickedEvent)="cancelSection('equipment')" type="secondary" translateKey="common.cancel"/>
+                            <button-box (clickedEvent)="saveSection('equipment')" [isDisabled]="isLoading" translateKey="common.save"/>
+                        </div>
+                    }
+                </ng-container>
+            </app-card>
+
+            <!-- Canaux de communication -->
+            <app-card [titleKey]="'stand.card.socialNetwork'"
+                      [editing]="isCreating || activeSection() === 'communication'"
+                      [dimmed]="!!activeSection() && activeSection() !== 'communication'"
+                      [actions]="communicationActions()">
+                <div appCardBody>
+                    @if (isCreating || activeSection() === 'communication') {
+                        <div class="card-form-stack">
+                            <checkbox-box fieldName="publishedOnWebsite" formControlName="publishedOnWebsite"
+                                          translateKey="stand.publishedOnWebsite"/>
+                            @if (editForm.controls.publishedOnWebsite.value) {
+                                <text-box fieldName="website" formControlName="website" translateKey="stand.website"/>
+                                <text-box fieldName="instagram" formControlName="instagram" translateKey="stand.instagram"/>
+                                <text-box fieldName="facebook" formControlName="facebook" translateKey="stand.facebook"/>
+                                <image-upload-box [existingPictureUrl]="picturePreviewUrl" [requiredField]="true"
+                                                  (existingRemoved)="onPictureRemoved()" fieldName="pictureUpload"
+                                                  formControlName="pictureUpload" translateKey="stand.picture"/>
+                                @if (initialStand?.urlPicture) {
+                                    <div>
+                                        <span class="me-2">{{ 'stand.urlPicture' | translate }} :</span>
+                                        <a [href]="initialStand!.urlPicture" rel="noopener noreferrer" target="_blank">{{ initialStand!.urlPicture }}</a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.publishedOnWebsite' | translate }}</span>
+                                <span fieldValue>{{ (editForm.controls.publishedOnWebsite.value ? 'common.yes' : 'common.no') | translate }}</span>
+                            </app-field-row>
+                            @if (editForm.controls.publishedOnWebsite.value) {
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.website' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.website.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.instagram' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.instagram.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.facebook' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.facebook.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.picture' | translate }}</span>
+                                    <span fieldValue>
+                                        @if (picturePreviewUrl) {
+                                            <img [src]="picturePreviewUrl" alt="" class="stand-picture-preview"/>
+                                        } @else {
+                                            —
+                                        }
+                                    </span>
+                                </app-field-row>
+                            }
+                        </app-field-list>
+                    }
                 </div>
-            </div>
+                <ng-container appCardFooter>
+                    @if (!isCreating && activeSection() === 'communication') {
+                        <div appCardFooterContent class="card-footer-actions">
+                            <button-box (clickedEvent)="cancelSection('communication')" type="secondary" translateKey="common.cancel"/>
+                            <button-box (clickedEvent)="saveSection('communication')" [isDisabled]="isLoading" translateKey="common.save"/>
+                        </div>
+                    }
+                </ng-container>
+            </app-card>
+
+            <!-- Co-exposant -->
+            <app-card [titleKey]="'stand.card.coExhibitor'"
+                      [editing]="isCreating || activeSection() === 'coexhibitor'"
+                      [dimmed]="!!activeSection() && activeSection() !== 'coexhibitor'"
+                      [actions]="coexhibitorActions()">
+                <div appCardBody>
+                    @if (isCreating || activeSection() === 'coexhibitor') {
+                        <div class="card-form-stack">
+                            <checkbox-box fieldName="shared" formControlName="shared" translateKey="stand.shared"/>
+                            @if (editForm.controls.shared.value) {
+                                <text-box fieldName="sharedLastName" formControlName="sharedLastName" translateKey="stand.coExhibitor.lastName"/>
+                                <text-box fieldName="sharedFirstName" formControlName="sharedFirstName" translateKey="stand.coExhibitor.firstName"/>
+                                <text-box fieldName="sharedTherapistName" formControlName="sharedTherapistName" translateKey="stand.coExhibitor.therapistName"/>
+                                <text-box fieldName="sharedEmail" formControlName="sharedEmail" translateKey="stand.coExhibitor.email"/>
+                                <textarea-box [maxLength]="500" [rows]="6" [showCounter]="true" fieldName="sharedDescription"
+                                              formControlName="sharedDescription" translateKey="stand.coExhibitor.description"/>
+                                <select-box [formatterFunction]="formatterCategory" [needTranslation]="true"
+                                            [options]="categoryValues" fieldName="sharedCategory"
+                                            formControlName="sharedCategory" translateKey="stand.coExhibitor.category"/>
+                                <chips-box fieldName="sharedSubCategories" formControlName="sharedSubCategories"
+                                           translateKey="stand.coExhibitor.subCategories"/>
+                                <checkbox-box fieldName="sharedPublishedOnWebsite" formControlName="sharedPublishedOnWebsite"
+                                              translateKey="stand.coExhibitor.publishedOnWebsite"/>
+                                @if (editForm.controls.sharedPublishedOnWebsite.value) {
+                                    <text-box fieldName="sharedWebsite" formControlName="sharedWebsite" translateKey="stand.coExhibitor.website"/>
+                                    <text-box fieldName="sharedInstagram" formControlName="sharedInstagram" translateKey="stand.coExhibitor.instagram"/>
+                                    <text-box fieldName="sharedFacebook" formControlName="sharedFacebook" translateKey="stand.coExhibitor.facebook"/>
+                                    <image-upload-box [existingPictureUrl]="sharedPicturePreviewUrl" [requiredField]="true"
+                                                      (existingRemoved)="onSharedPictureRemoved()" fieldName="sharedPictureUpload"
+                                                      formControlName="sharedPictureUpload" translateKey="stand.coExhibitor.picture"/>
+                                    @if (initialStand?.sharedUrlPicture) {
+                                        <div>
+                                            <span class="me-2">{{ 'stand.coExhibitor.urlPicture' | translate }} :</span>
+                                            <a [href]="initialStand!.sharedUrlPicture" rel="noopener noreferrer" target="_blank">{{ initialStand!.sharedUrlPicture }}</a>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.shared' | translate }}</span>
+                                <span fieldValue>{{ (editForm.controls.shared.value ? 'common.yes' : 'common.no') | translate }}</span>
+                            </app-field-row>
+                            @if (editForm.controls.shared.value) {
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.lastName' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.sharedLastName.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.firstName' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.sharedFirstName.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.therapistName' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.sharedTherapistName.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.email' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.sharedEmail.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.description' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.sharedDescription.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.category' | translate }}</span>
+                                    <span fieldValue>{{ ('stand.category.list.' + (editForm.controls.sharedCategory.value || 'null')) | translate }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.subCategories' | translate }}</span>
+                                    <span fieldValue>
+                                        @if (editForm.controls.sharedSubCategories.value?.length) {
+                                            <span class="stand-tags">
+                                                @for (tag of editForm.controls.sharedSubCategories.value; track tag) {
+                                                    <span class="el-tag">{{ tag }}</span>
+                                                }
+                                            </span>
+                                        } @else {
+                                            —
+                                        }
+                                    </span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'stand.coExhibitor.publishedOnWebsite' | translate }}</span>
+                                    <span fieldValue>{{ (editForm.controls.sharedPublishedOnWebsite.value ? 'common.yes' : 'common.no') | translate }}</span>
+                                </app-field-row>
+                                @if (editForm.controls.sharedPublishedOnWebsite.value) {
+                                    <app-field-row>
+                                        <span fieldLabel>{{ 'stand.coExhibitor.picture' | translate }}</span>
+                                        <span fieldValue>
+                                            @if (sharedPicturePreviewUrl) {
+                                                <img [src]="sharedPicturePreviewUrl" alt="" class="stand-picture-preview"/>
+                                            } @else {
+                                                —
+                                            }
+                                        </span>
+                                    </app-field-row>
+                                }
+                            }
+                        </app-field-list>
+                    }
+                </div>
+                <ng-container appCardFooter>
+                    @if (!isCreating && activeSection() === 'coexhibitor') {
+                        <div appCardFooterContent class="card-footer-actions">
+                            <button-box (clickedEvent)="cancelSection('coexhibitor')" type="secondary" translateKey="common.cancel"/>
+                            <button-box (clickedEvent)="saveSection('coexhibitor')" [isDisabled]="isLoading" translateKey="common.save"/>
+                        </div>
+                    }
+                </ng-container>
+            </app-card>
         </div>
-    </app-card>
+
+        <div class="stand-side-column">
+            <!-- Exposant -->
+            <app-card [titleKey]="'stand.card.exhibitor'">
+                <div appCardBody>
+                    @if (isCreating) {
+                        <select-box [enableFilter]="true" [filterFields]="selectFilterParticipation()"
+                                    [formatterFunction]="formatterParticipation" [options]="participationsOptions"
+                                    fieldName="participation" formControlName="participation"
+                                    translateKey="stand.participation"/>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.exhibitor' | translate }}</span>
+                                <span fieldValue>
+                                    <a class="clickable" [routerLink]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '', 'view']">
+                                        {{ getExhibitorFullName(editForm.controls.participation.value?.exhibitor) || '—' }}
+                                    </a>
+                                </span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.participationStatus' | translate }}</span>
+                                <span fieldValue>
+                                    @if (editForm.controls.participation.value?.status) {
+                                        <entity-status [color]="statusColor(editForm.controls.participation.value?.status)"
+                                                       [labelKey]="participationStatusLabelKey(editForm.controls.participation.value?.status)"/>
+                                    } @else {
+                                        —
+                                    }
+                                </span>
+                            </app-field-row>
+                        </app-field-list>
+                    }
+                </div>
+            </app-card>
+
+            <!-- Suivi interne -->
+            <app-card [titleKey]="'stand.card.internal'"
+                      [editing]="activeSection() === 'internal'"
+                      [dimmed]="!!activeSection() && activeSection() !== 'internal'"
+                      [actions]="internalActions()">
+                <div appCardBody>
+                    @if (isCreating || activeSection() === 'internal') {
+                        <div class="card-form-stack">
+                            <textarea-box [rows]="3" fieldName="extraInformation"
+                                          formControlName="extraInformation" translateKey="stand.extraInformation"/>
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'stand.extraInformation' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
+                            </app-field-row>
+                        </app-field-list>
+                    }
+                </div>
+                <ng-container appCardFooter>
+                    @if (!isCreating && activeSection() === 'internal') {
+                        <div appCardFooterContent class="card-footer-actions">
+                            <button-box (clickedEvent)="cancelSection('internal')" type="secondary" translateKey="common.cancel"/>
+                            <button-box (clickedEvent)="saveSection('internal')" [isDisabled]="isLoading" translateKey="common.save"/>
+                        </div>
+                    }
+                </ng-container>
+            </app-card>
+        </div>
+    </div>
+
+    @if (isCreating) {
+        <div class="stand-create-actions">
+            <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel"/>
+            <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" translateKey="common.save"/>
+        </div>
+    }
 </app-content-page>

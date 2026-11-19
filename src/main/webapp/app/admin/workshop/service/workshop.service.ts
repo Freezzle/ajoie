@@ -19,6 +19,10 @@ export class WorkshopService {
         return this.http.put<IWorkshop>(`${this.resourceUrl}/${this.getWorkshopIdentifier(workshop)}`, workshop);
     }
 
+    patch(idWorkshop: string, patch: Partial<IWorkshop>): Observable<IWorkshop> {
+        return this.http.patch<IWorkshop>(`${this.resourceUrl}/${idWorkshop}`, {...patch, id: idWorkshop});
+    }
+
     find(idWorkshop: string): Observable<HttpResponse<IWorkshop>> {
         return this.http.get<IWorkshop>(`${this.resourceUrl}/${idWorkshop}`, {
             observe: 'response'

@@ -36,6 +36,27 @@ public enum ContextActionType {
     PARTICIPATION_NEUTRAL_EMAIL("participation", "participation-neutral-email"),
     PARTICIPATION_MARK_AS_VALIDATED("participation", "participation-marked-as-validated"),
     PARTICIPATION_MARK_AS_CLOSED("participation", "participation-marked-as-closed"),
+    CONFERENCE_MARK_AS_VERIFICATION("conference", "conference-marked-as-verification"),
+    CONFERENCE_MARK_AS_ACCEPTED("conference", "conference-marked-as-accepted"),
+    CONFERENCE_MARK_AS_REFUSED("conference", "conference-marked-as-refused"),
+    CONFERENCE_MARK_AS_VALIDATED("conference", "conference-marked-as-validated"),
+    CONFERENCE_MARK_AS_CLOSED("conference", "conference-marked-as-closed"),
+    CONFERENCE_MARK_AS_CANCELLED("conference", "conference-marked-as-cancelled"),
+    CONFERENCE_MARK_AS_REOPENED("conference", "conference-marked-as-reopened"),
+    WORKSHOP_MARK_AS_VERIFICATION("workshop", "workshop-marked-as-verification"),
+    WORKSHOP_MARK_AS_ACCEPTED("workshop", "workshop-marked-as-accepted"),
+    WORKSHOP_MARK_AS_REFUSED("workshop", "workshop-marked-as-refused"),
+    WORKSHOP_MARK_AS_VALIDATED("workshop", "workshop-marked-as-validated"),
+    WORKSHOP_MARK_AS_CLOSED("workshop", "workshop-marked-as-closed"),
+    WORKSHOP_MARK_AS_CANCELLED("workshop", "workshop-marked-as-cancelled"),
+    WORKSHOP_MARK_AS_REOPENED("workshop", "workshop-marked-as-reopened"),
+    STAND_MARK_AS_VERIFICATION("stand", "stand-marked-as-verification"),
+    STAND_MARK_AS_ACCEPTED("stand", "stand-marked-as-accepted"),
+    STAND_MARK_AS_REFUSED("stand", "stand-marked-as-refused"),
+    STAND_MARK_AS_VALIDATED("stand", "stand-marked-as-validated"),
+    STAND_MARK_AS_CLOSED("stand", "stand-marked-as-closed"),
+    STAND_MARK_AS_CANCELLED("stand", "stand-marked-as-cancelled"),
+    STAND_MARK_AS_REOPENED("stand", "stand-marked-as-reopened"),
     TALKS_PLANNING_DOWNLOAD("salon", "talks-planning-download", "talks-planning"),
     STANDS_DETAIL_DOWNLOAD("salon", "stands-detail-download", "floor-plan"),
     VOLUNTEER_PLANNING_DOWNLOAD("salon", "volunteer-planning-download", "volunteer-planning"),
@@ -152,6 +173,8 @@ public enum ContextActionType {
 
             // === Actions destructives (irréversibles - toujours à la fin) ===
             case INVOICE_DELETE -> 95;                       // Supprimer la facture
+            // === Actions conference/atelier ===
+            default -> 18;
         };
     }
 

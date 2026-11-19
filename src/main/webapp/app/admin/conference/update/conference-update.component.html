@@ -1,110 +1,140 @@
-<app-content-page [formGroup]="editForm">
-    <div appMenuBarStart>
-        @if (editForm.controls.id.value) {
-            <h3>{{ 'conference.edit' | translate }}</h3>
-        } @else {
-            <h3>{{ 'conference.create' | translate }}</h3>
-        }
-        <div class="el-subtitle">
-            @if (subtitle()) {
-                <b>{{ subtitle() }}</b>
-            }
+<div [formGroup]="editForm">
+    <app-content-page>
+        <div appMenuBarStart>
+            <h3>{{ isCreating ? ('conference.create' | translate) : ('conference.edit' | translate) }}</h3>
+            @if (subtitle()) { <div class="el-subtitle"><b>{{ subtitle() }}</b></div> }
         </div>
-    </div>
-    <div appMenuBarEnd>
-        <button-box (clickedEvent)="previousState()"
-                    [isDisabled]="isLoading"
-                    [showText]="false"
-                    primeIcon="pi-arrow-left"
-                    translateKey="common.back"/>
-        @if (isReadOnly) {
-            <button-box (clickedEvent)="edit()"
-                        [isDisabled]="isLoading"
-                        [showText]="false"
-                        primeIcon="pi-pencil"
-                        translateKey="common.edit"/>
-        }
-
-        @if (editForm.controls.id.value && !isReadOnly) {
-            <button-box (clickedEvent)="cancel()"
-                        [isDisabled]="isLoading"
-                        [showText]="false"
-                        primeIcon="pi-ban"
-                        translateKey="common.cancel"
-                        type="secondary"/>
-        }
-
-        @if (!isReadOnly) {
-            <button-box (clickedEvent)="save()"
-                        [isDisabled]="editForm.invalid || isLoading"
-                        [isSubmit]="true"
-                        [showText]="false"
-                        primeIcon="pi-save"
-                        translateKey="common.save"/>
-        }
-    </div>
-    <app-alert-error></app-alert-error>
-
-
-    <p-confirmpopup/>
-    <app-card>
-        <div appCardHeader>
-            <h4>{{ 'common.info-basic' | translate }}</h4>
+        <div appMenuBarEnd>
+            <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading"
+                        [showText]="false" primeIcon="pi-arrow-left" translateKey="common.back" />
         </div>
-        <div appCardBody>
-            <div class="row">
-                <div class="mt-4 col-12">
-                    <text-box fieldName="title" formControlName="title" translateKey="conference.titleField"/>
-                </div>
-                <div class="mt-4 col-12">
-                    <textarea-box [maxLength]="500"
-                                  [rows]="6"
-                                  [showCounter]="true"
-                                  fieldName="description"
-                                  formControlName="description"
-                                  translateKey="conference.description"/>
-                </div>
+
+        <app-alert-error />
+        <p-confirmpopup />
+
+        @if (!isCreating) {
+            <div class="conference-status">
+                <app-status-timeline [status]="initialConference?.status ?? null"
+                                     [availableActions]="availableActions()"
+                                     (actionRequested)="onStatusAction($event)" />
+            </div>
+        }
+
+        <div class="conference-detail-grid">
+            <div class="conference-main-column">
+                <app-card [titleKey]="'conference.presentation'"
+                          [editing]="isCreating || activeSection() === 'presentation'"
+                          [dimmed]="!!activeSection() && activeSection() !== 'presentation'"
+                          [actions]="presentationActions()">
+                    <div appCardBody>
+                        @if (isCreating || activeSection() === 'presentation') {
+                            <div class="card-form-stack">
+                                <text-box fieldName="title" formControlName="title" translateKey="conference.titleField" />
+                                <textarea-box [maxLength]="500" [rows]="6" [showCounter]="true"
+                                              fieldName="description" formControlName="description"
+                                              translateKey="conference.description" />
+                            </div>
+                        } @else {
+                            <app-field-list>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'conference.titleField' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.title.value || '—' }}</span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'conference.description' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.description.value || '—' }}</span>
+                                </app-field-row>
+                            </app-field-list>
+                        }
+                    </div>
+                    <ng-container appCardFooter>
+                        @if (!isCreating && activeSection() === 'presentation') {
+                            <div appCardFooterContent class="card-footer-actions">
+                                <button-box (clickedEvent)="cancelSection('presentation')" type="secondary"
+                                            translateKey="common.cancel" />
+                                <button-box (clickedEvent)="saveSection('presentation')"
+                                            [isDisabled]="isLoading" translateKey="common.save" />
+                            </div>
+                        }
+                    </ng-container>
+                </app-card>
+            </div>
+
+            <div class="conference-side-column">
+                <app-card [titleKey]="'conference.intervenant'" [lock]="false">
+                    <div appCardBody>
+                        @if (isCreating) {
+                            <select-box [enableFilter]="true" [filterFields]="selectFilterParticipation()"
+                                        [formatterFunction]="formatterParticipation" [options]="participationsOptions"
+                                        fieldName="participation" formControlName="participation"
+                                        translateKey="conference.participation" />
+                        } @else {
+                            <app-field-list>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'conference.exhibitor' | translate }}</span>
+                                    <span fieldValue>
+                                        <a class="clickable" [routerLink]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '', 'view']">
+                                            {{ getExhibitorFullName(editForm.controls.participation.value?.exhibitor) || '—' }}
+                                        </a>
+                                    </span>
+                                </app-field-row>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'conference.participationStatus' | translate }}</span>
+                                    <span fieldValue>
+                                        @if (editForm.controls.participation.value?.status) {
+                                            <entity-status
+                                                [color]="statusColor(editForm.controls.participation.value?.status)"
+                                                [labelKey]="participationStatusLabelKey(editForm.controls.participation.value?.status)" />
+                                        } @else {
+                                            —
+                                        }
+                                    </span>
+                                </app-field-row>
+                            </app-field-list>
+                        }
+                    </div>
+                </app-card>
+
+                <app-card [titleKey]="'conference.internalFollowup'"
+                          [editing]="activeSection() === 'internal'"
+                          [dimmed]="!!activeSection() && activeSection() !== 'internal'"
+                          [actions]="internalActions()">
+                    <div appCardBody>
+                        @if (isCreating || activeSection() === 'internal') {
+                            <div class="card-form-stack">
+                                <textarea-box [rows]="3" fieldName="extraInformation"
+                                              formControlName="extraInformation" translateKey="conference.extraInformation" />
+                            </div>
+                        } @else {
+                            <app-field-list>
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'conference.extraInformation' | translate }}</span>
+                                    <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
+                                </app-field-row>
+                            </app-field-list>
+                        }
+                    </div>
+                    <ng-container appCardFooter>
+                        @if (!isCreating && activeSection() === 'internal') {
+                            <div appCardFooterContent class="card-footer-actions">
+                                <button-box (clickedEvent)="cancelSection('internal')" type="secondary"
+                                            translateKey="common.cancel" />
+                                <button-box (clickedEvent)="saveSection('internal')"
+                                            [isDisabled]="isLoading" translateKey="common.save" />
+                            </div>
+                        }
+                    </ng-container>
+                </app-card>
             </div>
         </div>
-    </app-card>
 
-    <app-card>
-        <div appCardHeader>
-            <h4>{{ 'common.info-intern' | translate }}</h4>
-        </div>
-        <div appCardBody>
-            <div class="row">
-                <div class="mt-4 col-sm-6 d-flex">
-                    <select-box [enableFilter]="true"
-                                [filterFields]="selectFilterParticipation()"
-                                [formatterFunction]="formatterParticipation"
-                                [options]="participationsOptions"
-                                class="w-100"
-                                fieldName="participation"
-                                formControlName="participation"
-                                translateKey="conference.participation"/>
-                    @if (isReadOnly) {
-                        <link-box [links]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '','view']"
-                                  [showText]="false"
-                                  class="align-content-center link-box-append"
-                                  primeIcon="pi-link"/>
-                    }
-                </div>
-                <div class="mt-4 col-sm-6">
-                    <select-box [formatterFunction]="formatterStatus"
-                                [needTranslation]="true"
-                                [options]="statusValues"
-                                fieldName="status"
-                                formControlName="status"
-                                translateKey="conference.status.label"/>
-                </div>
-                <div class="mt-4 col-12">
-                    <textarea-box [rows]="3"
-                                  fieldName="extraInformation"
-                                  formControlName="extraInformation"
-                                  translateKey="conference.extraInformation"/>
-                </div>
+        @if (isCreating) {
+            <div class="conference-create-actions">
+                <button-box (clickedEvent)="previousState()" type="secondary"
+                            translateKey="common.cancel" />
+                <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading"
+                            translateKey="common.save" />
             </div>
-        </div>
-    </app-card>
-</app-content-page>
+        }
+    </app-content-page>
+</div>

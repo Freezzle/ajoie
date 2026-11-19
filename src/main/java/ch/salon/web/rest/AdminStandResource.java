@@ -72,6 +72,17 @@ public class AdminStandResource {
         return ResourceUtil.updated(ENTITY_NAME, stand.getId()).body(stand);
     }
 
+    @PatchMapping("/{idStand}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<StandDTO> patchStand(@PathVariable UUID idStand,
+                                               @Valid @RequestBody StandDTO stand) {
+        log.debug("REST request to patch Stand : {}, {}", idStand, stand);
+
+        stand = standService.patch(idStand, stand);
+
+        return ResourceUtil.updated(ENTITY_NAME, stand.getId()).body(stand);
+    }
+
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<StandDTO> getAllStands(@RequestParam(name = "idSalon", required = false) UUID idSalon,

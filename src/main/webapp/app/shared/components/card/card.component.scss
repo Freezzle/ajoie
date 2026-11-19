@@ -1,0 +1,120 @@
+:host {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.app-card {
+  background: var(--app-surface, #fff);
+  border: 1px solid var(--app-border, #d9dee4);
+  border-radius: 4px;
+  transition: opacity 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.app-card--no-header .app-card-bd {
+  padding-top: 16px;
+}
+
+.app-card-hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--app-border, #d9dee4);
+  background: #fafbfc;
+}
+
+.app-card-lock {
+  color: var(--app-text-muted, #6b7280);
+  font-size: 13px;
+}
+
+.app-card-title {
+  margin: 0;
+  margin-right: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--app-text-secondary, #3e4c59);
+}
+
+.app-card-hd-r {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.app-card-bd {
+  padding: 14px 16px;
+}
+
+.app-card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 1px solid var(--app-border, #d9dee4);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--app-text-muted, #6b7280);
+  font-size: 11.5px;
+  font-weight: 400;
+}
+
+.app-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--app-border, #d1d5db);
+  border-radius: 4px;
+  background: var(--app-surface, #fff);
+  color: var(--app-text, #111827);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.app-card-action:hover:not(:disabled) {
+  background: #f7f8fa;
+}
+
+.app-card-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.app-card-ft {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--app-border-light, #e9edf1);
+  background: #fafbfc;
+}
+
+.app-card--editing {
+  border-color: var(--app-primary, #325d88);
+  box-shadow: 0 0 0 1px var(--app-primary, #325d88);
+}
+
+.app-card--editing .app-card-hd {
+  background: var(--app-primary-soft, #eef3f8);
+  border-bottom-color: var(--app-primary-line, #a8bfd6);
+}
+
+.app-card--dimmed {
+  opacity: 0.55;
+}
+
+@media (max-width: 640px) {
+  .app-card-hd {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .app-card-hd-r {
+    flex-wrap: wrap;
+  }
+}

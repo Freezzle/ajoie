@@ -3,6 +3,21 @@
     "acceptedChart": "Charte accepté ?",
     "acceptedContract": "Contrat accepté ?",
     "additionnalInformation": "Complément d'information",
+    "card": {
+      "registration": "Inscription",
+      "billing": "Repas et facturation",
+      "offer": "Offre et message",
+      "linkedServices": "Prestations souscrites",
+      "exhibitor": "Exposant",
+      "internalRating": "Suivi interne"
+    },
+    "definedAtCreation": "Défini à la création",
+    "documents": "Documents",
+    "documentChart": "Charte",
+    "documentContract": "Contrat",
+    "distinctions": "Distinctions",
+    "mealsUnit": "repas",
+    "offerProposed": "Offre proposée",
     "billing": {
       "details": "Détail de la participation",
       "events": "Evénements",

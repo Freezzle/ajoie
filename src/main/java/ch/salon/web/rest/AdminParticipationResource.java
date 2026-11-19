@@ -61,6 +61,18 @@ public class AdminParticipationResource {
         return ResourceUtil.updated(ENTITY_NAME, idParticipation).body(participation);
     }
 
+    @PatchMapping("/{idParticipation}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<Participation> patchParticipation(
+            @PathVariable(value = "idParticipation", required = false) final UUID idParticipation,
+            @RequestBody Participation participation) {
+        log.debug("REST request to patch Participation : {}, {}", idParticipation, participation);
+
+        participation = participationService.patch(idParticipation, participation);
+
+        return ResourceUtil.updated(ENTITY_NAME, idParticipation).body(participation);
+    }
+
     @GetMapping("/{idParticipation}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<Participation> getParticipation(@PathVariable("idParticipation") UUID idParticipation) {

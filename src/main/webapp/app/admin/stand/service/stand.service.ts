@@ -23,6 +23,10 @@ export class StandService {
             this.trimUploads(stand));
     }
 
+    patch(idStand: string, stand: IStand): Observable<IStand> {
+        return this.http.patch<IStand>(`${this.resourceUrl}/${idStand}`, this.trimUploads(stand));
+    }
+
     /**
      * L'aperçu local (`previewUrl`) est un doublon base64 de `dataBase64` : l'envoyer doublerait
      * inutilement la taille de la requête.

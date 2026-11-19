@@ -53,6 +53,15 @@ public class AdminConferenceResource {
         return ResourceUtil.updated(ENTITY_NAME, conference.getId()).body(conference);
     }
 
+    @PatchMapping("/{idConference}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<ConferenceDTO> patchConference(
+            @PathVariable UUID idConference,
+            @Valid @RequestBody ConferenceDTO conference) {
+        conference = conferenceService.patch(idConference, conference);
+        return ResourceUtil.updated(ENTITY_NAME, conference.getId()).body(conference);
+    }
+
     @GetMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<ConferenceDTO> getAllConferences(@RequestParam(name = "idSalon", required = false) UUID idSalon,

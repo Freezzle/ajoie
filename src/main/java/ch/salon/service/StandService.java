@@ -1,9 +1,11 @@
 package ch.salon.service;
 
+import ch.salon.domain.Participation;
 import ch.salon.domain.Stand;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
 import ch.salon.domain.enumeration.StandPictureType;
+import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.StandRepository;
 import ch.salon.service.dto.ImageMetadataDTO;
 import ch.salon.service.dto.ParticipationLightDTO;
@@ -54,6 +56,7 @@ public class StandService {
         }
 
         Stand entity = standMapper.toEntity(stand);
+        entity.setStatus(Status.IN_VERIFICATION);
         entity.setRegistrationDate(Instant.now());
         entity = standRepository.save(entity);
 
@@ -78,6 +81,16 @@ public class StandService {
         Stand standExisting = standRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
+        // La participation est définie à la création et ne peut plus changer.
+        if (stand.getParticipation() == null || stand.getParticipation().getId() == null
+                || !Objects.equals(stand.getParticipation().getId(), standExisting.getParticipation().getId())) {
+            throw new BadRequestAlertException("Participation is immutable", ENTITY_NAME, "participationimmutable");
+        }
+
+        // Le statut est piloté par les actions métier : il reste inchangé lors d'une mise à jour.
+        final Participation existingParticipation = standExisting.getParticipation();
+        final Status existingStatus = standExisting.getStatus();
+
         Stand standToUpdate = standMapper.toEntity(stand);
 
         if (Stand.diffDimension(standToUpdate, standExisting)) {
@@ -97,19 +110,25 @@ public class StandService {
             }
         }
 
-        if (Stand.diffStatus(standToUpdate, standExisting)) {
-            this.eventLogService.eventFromSystem(
-                    "Le statut d'un stand a changé en '" + standToUpdate.getStatus().name().toLowerCase() + "'",
-                    EventType.EVENT, EntityType.PARTICIPATION, standExisting.getParticipation().getId(),
-                    Map.of("old_status", standExisting.getStatus().name()));
-        }
-
         standMapper.updateEntityFromDto(stand, standExisting);
+
+        // On restaure les champs immuables que le mapper vient d'écraser.
+        standExisting.setParticipation(existingParticipation);
+        standExisting.setStatus(existingStatus);
 
         standPictureService.applyChanges(standExisting, stand.getPictureUpload(), stand.isRemovePicture(),
                 stand.getSharedPictureUpload(), stand.isRemoveSharedPicture());
 
         return withPictures(standMapper.toDto(standExisting));
+    }
+
+    /**
+     * Mise à jour partielle : le formulaire envoie l'état complet des champs éditables, la
+     * participation et le statut restent immuables (le statut est piloté par les actions métier).
+     */
+    public StandDTO patch(final UUID id, StandDTO stand) {
+        stand.setId(id);
+        return update(id, stand);
     }
 
     /**

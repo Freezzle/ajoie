@@ -1,10 +1,50 @@
-<p-card [class.pt-4]="!showHeader()" class="mb-4">
+<section class="app-card"
+         [class.app-card--editing]="editing()"
+         [class.app-card--dimmed]="dimmed()"
+         [class.app-card--no-header]="!showHeader()">
     @if (showHeader()) {
-        <ng-template #header pTemplate="header">
+        <div class="app-card-hd">
+            @if (lock()) {
+                <i class="pi pi-lock app-card-lock" aria-hidden="true"></i>
+            }
+            @if (resolvedTitle()) {
+                <h6 class="app-card-title">{{ resolvedTitle() }}</h6>
+            }
             <ng-content select="[appCardHeader]"></ng-content>
-        </ng-template>
+
+            <span class="app-card-hd-r">
+                <ng-content select="[appCardTag]"></ng-content>
+                @if (tag()) {
+                    <span class="app-card-tag">{{ tag() }}</span>
+                }
+
+                @if (!dimmed() && visibleActions().length === 1) {
+                    @let action = visibleActions()[0];
+                    <button class="app-card-action"
+                            type="button"
+                            [disabled]="action.disabled"
+                            [routerLink]="action.routerLink ?? null"
+                            (click)="runAction(action, $event)">
+                        @if (action.icon) {
+                            <i [class]="action.icon" aria-hidden="true"></i>
+                        }
+                        <span>{{ action.labelKey | translate: action.labelParams }}</span>
+                    </button>
+                } @else if (!dimmed() && visibleActions().length > 1) {
+                    <entity-actions-menu [actions]="visibleActions()" />
+                }
+            </span>
+        </div>
     }
 
-    <!-- Contenu -->
-    <ng-content select="[appCardBody]"></ng-content>
-</p-card>
+    <div class="app-card-bd">
+        <ng-content select="[appCardBody]"></ng-content>
+        <ng-content></ng-content>
+    </div>
+
+    @if (hasFooter()) {
+        <div class="app-card-ft">
+            <ng-content select="[appCardFooter]"></ng-content>
+        </div>
+    }
+</section>

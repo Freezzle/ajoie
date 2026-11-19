@@ -1,0 +1,37 @@
+<p-confirmpopup />
+
+<div class="app-statusbar" [class.app-statusbar--off]="isOffCycle()">
+    <div class="app-statusbar-sl">
+        <ol class="app-sline">
+            @for (step of steps(); track step.key; let i = $index) {
+                <li class="app-sline-s"
+                    [class.is-done]="step.state === 'done'"
+                    [class.is-cur]="step.state === 'current'"
+                    [class.is-x]="step.state === 'error'">
+                    <span class="app-sline-c">
+                        {{ step.state === 'done' ? '✓' : (step.state === 'error' ? '✕' : i + 1) }}
+                    </span>
+                    <span class="app-sline-label">{{ step.label }}</span>
+                    @if (step.sublabel) {
+                        <small class="app-sline-sub">{{ step.sublabel }}</small>
+                    }
+                </li>
+            }
+        </ol>
+    </div>
+
+    <aside class="app-statusbar-acts" aria-label="Actions">
+        <div class="app-statusbar-row">
+            @for (action of primaryAvailableActions(); track action.contextCode) {
+                <button-box [translateKey]="action.labelKey"
+                            [type]="actionSeverity(action)"
+                            [isDisabled]="action.disabled"
+                            (clickedEvent)="runPrimaryAction(action, $event)" />
+            }
+
+            @if (gearActions().length > 0) {
+                <entity-actions-menu [actions]="gearActions()" (opened)="opened.emit()" />
+            }
+        </div>
+    </aside>
+</div>

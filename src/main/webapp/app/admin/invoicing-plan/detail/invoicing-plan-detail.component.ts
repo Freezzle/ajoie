@@ -10,6 +10,7 @@ import {ButtonBoxComponent} from 'app/shared/components/button-box/button-box.co
 import {DialogBoxComponent} from 'app/shared/components/dialog-box/dialog-box.component';
 import {EntityActionsMenuComponent} from 'app/shared/components/entity-list/entity-actions-menu.component';
 import {EntityAction} from 'app/shared/components/entity-list/entity-list.model';
+import {StepTimelineComponent, StepTimelineStep, StepTimelineTodayMarker} from 'app/shared/components/step-timeline/step-timeline.component';
 import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.service';
 import {AvailableAction, RefreshScope} from 'app/shared/model/available-action';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
@@ -62,6 +63,7 @@ const TODAY_DEFAULT_RATIO = 0.35;
                    ButtonBoxComponent,
                    DialogBoxComponent,
                    EntityActionsMenuComponent,
+                   StepTimelineComponent,
                    InvoiceFormComponent,
                    PaymentFormComponent
                ],
@@ -359,6 +361,31 @@ export class InvoicingPlanDetailComponent implements OnInit {
 
         // Les étapes datées sont triées entre elles ; celles sans date gardent leur rang.
         return withSegments(steps, late, plan.expirationDate ?? null);
+    });
+
+    readonly visualTimeline = computed<StepTimelineStep[]>(() => this.timeline().map(step => ({
+        key: step.key,
+        label: step.label,
+        sublabel: this.stepDate(step),
+        state: step.status === 'ok'
+               ? 'done'
+               : step.status === 'now'
+                 ? 'current'
+                 : step.status === 'bad' || step.status === 'warn'
+                   ? 'error'
+                   : 'todo',
+        segment: step.segment,
+        hint: step.hint
+    })));
+
+    readonly visualTodayMarker = computed<StepTimelineTodayMarker | null>(() => {
+        const marker = this.todayMarker();
+
+        return marker ? {
+            left: marker.left,
+            width: marker.width,
+            styleClass: marker.styleClass as '' | 'is-late' | 'is-run'
+        } : null;
     });
 
     /** Position du point doré ; `null` quand il ne doit pas s'afficher. */

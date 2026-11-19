@@ -1,0 +1,36 @@
+.app-field-row {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  align-items: start;
+  gap: 5px;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--app-border, #e5e7eb);
+}
+
+.app-field-row:last-child {
+  border-bottom: none;
+}
+
+.app-field-label {
+  margin: 0;
+  padding-right: 1rem;
+  color: var(--app-text-muted);
+}
+
+.app-field-value {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (max-width: 640px) {
+  .app-field-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .app-field-label {
+    padding-right: 0;
+  }
+}

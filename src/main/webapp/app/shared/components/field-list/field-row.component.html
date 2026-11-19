@@ -1,0 +1,14 @@
+<div class="app-field-row">
+    <dt class="app-field-label">
+        <ng-content select="[fieldLabel]"></ng-content>
+    </dt>
+    <dd class="app-field-value">
+        @if (empty()) {
+            {{ null | appEmptyValue }}
+        } @else if (value() !== undefined) {
+            {{ value() | appEmptyValue }}
+        } @else {
+            <ng-content select="[fieldValue]"></ng-content>
+        }
+    </dd>
+</div>

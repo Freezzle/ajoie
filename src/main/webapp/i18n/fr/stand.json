@@ -1,9 +1,16 @@
 {
   "stand": {
     "card": {
+      "stand": "Stand",
+      "equipment": "Surface et équipement",
       "socialNetwork": "Canaux de communication",
-      "coExhibitor": "Co-exposant"
+      "coExhibitor": "Co-exposant",
+      "exhibitor": "Exposant",
+      "internal": "Suivi interne"
     },
+    "exhibitor": "Exposant",
+    "participationStatus": "Statut",
+    "definedAtCreation": "Défini à la création",
     "coExhibitor": {
       "category": "Catégorie du co-exposant",
       "description": "Description du co-stand",

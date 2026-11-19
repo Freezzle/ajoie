@@ -3,6 +3,7 @@ package ch.salon.service;
 import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.dto.ParticipationLightDTO;
 import ch.salon.service.dto.WorkshopDTO;
@@ -56,6 +57,7 @@ public class WorkshopService {
         }
 
         Workshop entity = workshopMapper.toEntity(workshop);
+        entity.setStatus(Status.IN_VERIFICATION);
         entity.setRegistrationDate(Instant.now());
         entity = workshopRepository.save(entity);
 
@@ -81,18 +83,35 @@ public class WorkshopService {
         Workshop workshopExisting = this.workshopRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
 
-        Workshop workshopToUpdate = workshopMapper.toEntity(workshop);
-
-        if (Workshop.diffStatus(workshopToUpdate, workshopExisting)) {
-            this.eventLogService.eventFromSystem(
-                    "Le statut d'un atelier a changé en '" + workshopToUpdate.getStatus().name().toLowerCase() +
-                            "'", EventType.EVENT, EntityType.PARTICIPATION, workshopExisting.getParticipation().getId(),
-                    Map.of("old_status", workshopExisting.getStatus().name()));
+        if (workshop.getParticipation() == null || workshop.getParticipation().getId() == null
+                || !Objects.equals(workshop.getParticipation().getId(), workshopExisting.getParticipation().getId())) {
+            throw new BadRequestAlertException("Participation is immutable", ENTITY_NAME, "participationimmutable");
         }
 
+        Status existingStatus = workshopExisting.getStatus();
         workshopMapper.updateEntityFromDto(workshop, workshopExisting);
+        workshopExisting.setStatus(existingStatus);
+        // Participation is an immutable reference after creation.
+        if (workshop.getParticipation() == null || workshop.getParticipation().getId() == null) {
+            workshopExisting.setParticipation(workshopExisting.getParticipation());
+        }
 
-        return workshopMapper.toDto(workshopExisting);
+        return workshopMapper.toDto(workshopRepository.save(workshopExisting));
+    }
+
+    public WorkshopDTO patch(final UUID id, WorkshopDTO workshop) {
+        Workshop workshopExisting = this.workshopRepository.findById(id).orElseThrow(
+                () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, ENTITY_NOTFOUND));
+
+        if (workshop.getParticipation() != null && workshop.getParticipation().getId() != null
+                && !Objects.equals(workshop.getParticipation().getId(), workshopExisting.getParticipation().getId())) {
+            throw new BadRequestAlertException("Participation is immutable", ENTITY_NAME, "participationimmutable");
+        }
+        if (workshop.getTitle() != null) workshopExisting.setTitle(workshop.getTitle());
+        if (workshop.getDescription() != null) workshopExisting.setDescription(workshop.getDescription());
+        if (workshop.getExtraInformation() != null) workshopExisting.setExtraInformation(workshop.getExtraInformation());
+
+        return workshopMapper.toDto(workshopRepository.save(workshopExisting));
     }
 
     public List<WorkshopDTO> findAll(UUID idSalon, UUID idParticipation) {

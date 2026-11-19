@@ -62,6 +62,8 @@ public class ParticipationService {
 
         String maxNumber = participationRepository.findMaxClientNumber(salonFound.getId());
         participation.setClientNumber(Participation.incrementClientNumber(maxNumber, salonFound.getReferenceNumber()));
+        // Le statut est piloté par les actions métier : une nouvelle participation démarre toujours en vérification.
+        participation.setStatus(Status.IN_VERIFICATION);
         UUID idParticipation = participationRepository.save(participation).getId();
 
         this.eventLogService.eventFromSystem("Participation crée", EventType.EVENT, EntityType.PARTICIPATION,
@@ -118,11 +120,10 @@ public class ParticipationService {
         Participation existingParticipation = participationRepository.findById(id).orElseThrow(
                 () -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
 
-        if (!existingParticipation.getExhibitor().getId().equals(participation.getExhibitor().getId())) {
-            if (participationRepository.findByExhibitorIdAndSalonId(participation.getExhibitor().getId(), participation.getSalon().getId()) != null) {
-                throw new BadRequestAlertException("You cannot change the exhibitor with one who already participates in this event", ENTITY_NAME,
-                        "exhibitor.event.exists");
-            }
+        // L'exposant est défini à la création et ne peut plus changer.
+        if (participation.getExhibitor() == null || participation.getExhibitor().getId() == null
+                || !Objects.equals(participation.getExhibitor().getId(), existingParticipation.getExhibitor().getId())) {
+            throw new BadRequestAlertException("Exhibitor is immutable", ENTITY_NAME, "exhibitorimmutable");
         }
 
         participation.setClientNumber(existingParticipation.getClientNumber());
@@ -131,6 +132,8 @@ public class ParticipationService {
         participation.setPublicRegistration(existingParticipation.isPublicRegistration());
         // Flag « en attente » géré uniquement via l'action dédiée : ne jamais l'écraser depuis le formulaire admin
         participation.setOnHold(existingParticipation.getOnHold());
+        // Le statut est piloté par les actions métier : il reste inchangé lors d'une mise à jour générique.
+        participation.setStatus(existingParticipation.getStatus());
 
         if (Participation.diffArrangement(participation, existingParticipation)) {
             if (participation.getNeedArrangement()) {
@@ -163,24 +166,16 @@ public class ParticipationService {
                             participation.getNbMeal3().toString()));
         }
 
-        if (Participation.diffStatus(participation, existingParticipation)) {
-            this.eventLogService.eventFromSystem(
-                    "Le statut de la participation a changé en '" + participation.getStatus().name().toLowerCase() +
-                            "'", EventType.EVENT, EntityType.PARTICIPATION, participation.getId(),
-                    Map.of("old_status", existingParticipation.getStatus().name().toLowerCase()));
-
-            // Le passage au statut REFUSED peut aussi se faire ici via la mise à jour générique du
-            // formulaire (en plus de l'action dédiée ActionRefuseHandler). On trace alors l'action
-            // « Participation refusée » comme les autres décisions (ActionAcceptHandler, ActionCancelHandler),
-            // notamment pour le calcul du délai de vérification.
-            if (participation.getStatus() == Status.REFUSED) {
-                this.eventLogService.eventFromSystem("Participation refusée", EventType.ACTION,
-                        EntityType.PARTICIPATION, participation.getId(),
-                        Map.of("old_status", existingParticipation.getStatus().name()));
-            }
-        }
-
         return participationRepository.save(participation);
+    }
+
+    /**
+     * Mise à jour partielle : le formulaire envoie l'état complet des champs éditables, l'exposant
+     * et le statut restent immuables (le statut est piloté par les actions métier).
+     */
+    public Participation patch(final UUID id, Participation participation) {
+        participation.setId(id);
+        return update(id, participation);
     }
 
     public List<ParticipationDTO> getParticipationsFromExhibitor(UUID idExhibitor) {

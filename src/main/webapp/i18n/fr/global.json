@@ -1,4 +1,21 @@
 {
+  "statusTimeline": {
+    "offCycle": "Hors cycle",
+    "status": {
+      "IN_VERIFICATION": "En vérification",
+      "ACCEPTED": "Accepté",
+      "VALIDATED": "Validé",
+      "CLOSED": "Clôturé",
+      "REFUSED": "Refusé",
+      "CANCELED": "Annulé"
+    }
+  },
+  "sectionCompleteness": {
+    "complete": "Complète",
+    "incomplete": "Incomplète",
+    "empty": "À remplir",
+    "invalid": "À corriger"
+  },
   "autocomplete": {
     "chips": {
       "suffix": "(Pressez TAB pour ajouter)",

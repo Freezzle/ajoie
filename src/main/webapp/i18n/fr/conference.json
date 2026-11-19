@@ -8,6 +8,12 @@
     "edit": "Détail de la conférence",
     "extraInformation": "Commentaire",
     "notFound": "Aucune conférence",
+    "presentation": "Présentation",
+    "intervenant": "Intervenant",
+    "internalFollowup": "Suivi interne",
+    "exhibitor": "Exposant",
+    "participationStatus": "Statut",
+    "definedAtCreation": "Défini à la création",
     "participation": "Participation",
     "status": {
       "label": "Statut",
