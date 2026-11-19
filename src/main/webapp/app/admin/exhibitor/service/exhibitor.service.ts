@@ -21,6 +21,14 @@ export class ExhibitorService {
         return this.http.put<IExhibitor>(`${this.resourceUrl}/${getExhibitorIdentifier(exhibitor)}`, exhibitor);
     }
 
+    patch(idExhibitor: string, exhibitor: IExhibitor): Observable<IExhibitor> {
+        return this.http.patch<IExhibitor>(`${this.resourceUrl}/${idExhibitor}`, exhibitor);
+    }
+
+    getEventLogs(idExhibitor: string): Observable<HttpResponse<any>> {
+        return this.http.get<any[]>(`${this.resourceUrl}/${idExhibitor}/events`, {observe: 'response'});
+    }
+
     find(idExhibitor: string): Observable<HttpResponse<IExhibitor>> {
         return this.http.get<IExhibitor>(`${this.resourceUrl}/${idExhibitor}`, {observe: 'response'});
     }

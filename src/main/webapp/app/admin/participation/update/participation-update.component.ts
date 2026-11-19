@@ -136,7 +136,7 @@ export class ParticipationUpdateComponent implements OnInit {
             actions.push({
                              labelKey: 'participation.billing.title',
                              icon: 'pi pi-file',
-                             run: () => this.router.navigate(['../invoicing-plans'], {relativeTo: this.activatedRoute})
+                             run: () => { void this.router.navigate(['../invoicing-plans'], {relativeTo: this.activatedRoute}); }
                          });
         }
         return actions;
@@ -228,12 +228,10 @@ export class ParticipationUpdateComponent implements OnInit {
         if (!this.initialParticipation?.id) {
             return of([]);
         }
-        if (!this.stands$) {
-            this.stands$ = this.standService.query({idParticipation: this.initialParticipation.id}).pipe(
-                map(res => res ?? []),
-                shareReplay(1)
-            );
-        }
+        this.stands$ ??= this.standService.query({idParticipation: this.initialParticipation.id}).pipe(
+            map(res => res ?? []),
+            shareReplay(1)
+        );
         return this.stands$;
     }
 
@@ -241,12 +239,10 @@ export class ParticipationUpdateComponent implements OnInit {
         if (!this.initialParticipation?.id) {
             return of([]);
         }
-        if (!this.conferences$) {
-            this.conferences$ = this.conferenceService.query({idParticipation: this.initialParticipation.id}).pipe(
-                map(res => res ?? []),
-                shareReplay(1)
-            );
-        }
+        this.conferences$ ??= this.conferenceService.query({idParticipation: this.initialParticipation.id}).pipe(
+            map(res => res ?? []),
+            shareReplay(1)
+        );
         return this.conferences$;
     }
 
@@ -254,12 +250,10 @@ export class ParticipationUpdateComponent implements OnInit {
         if (!this.initialParticipation?.id) {
             return of([]);
         }
-        if (!this.workshops$) {
-            this.workshops$ = this.workshopService.query({idParticipation: this.initialParticipation.id}).pipe(
-                map(res => res ?? []),
-                shareReplay(1)
-            );
-        }
+        this.workshops$ ??= this.workshopService.query({idParticipation: this.initialParticipation.id}).pipe(
+            map(res => res ?? []),
+            shareReplay(1)
+        );
         return this.workshops$;
     }
 

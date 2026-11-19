@@ -64,6 +64,18 @@ public class AdminExhibitorResource {
         return ResourceUtil.updated(ENTITY_NAME, exhibitor.getId()).body(exhibitor);
     }
 
+    @PatchMapping("/{idExhibitor}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public ResponseEntity<ExhibitorDTO> patchExhibitor(
+            @PathVariable(value = "idExhibitor", required = false) final UUID idExhibitor,
+            @RequestBody ExhibitorDTO exhibitor) {
+        log.debug("REST request to patch Exhibitor : {}, {}", idExhibitor, exhibitor);
+
+        exhibitor = exhibitorService.patch(idExhibitor, exhibitor);
+
+        return ResourceUtil.updated(ENTITY_NAME, exhibitor.getId()).body(exhibitor);
+    }
+
     @GetMapping("/{idExhibitor}/participations")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public ResponseEntity<List<ParticipationDTO>> getParticipationsFromExhibitor(

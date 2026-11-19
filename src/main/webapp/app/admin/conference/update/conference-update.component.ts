@@ -8,7 +8,7 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ConferenceService} from '../service/conference.service';
 import {IConference} from '../model/conference.interface';
 import {ConferenceFormGroup, ConferenceFormService} from '../service/conference-form.service';
-import {IParticipation, selectFilterParticipation} from '../../participation/model/participation.interface';
+import {IParticipation, selectFilterParticipation, getParticipationUsageName} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {TextareaBoxComponent} from '../../../shared/components/textarea-box/textarea-box.component';
@@ -21,8 +21,6 @@ import {CardFooterContentDirective} from '../../../shared/components/card/card-f
 import {ContentPageComponent} from 'app/shared/components/content-page/content-page.component';
 import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
 import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
-import {EntityStatusComponent} from '../../../shared/components/entity-list/entity-status.component';
-import {statusColor} from '../../../shared/components/entity-list/entity-list.model';
 import {StatusTimelineComponent, StatusTimelineActionRequest} from '../../../shared/components/status-timeline/status-timeline.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {loadParticipationOptions} from '../../common/participation/participation-options.util';
@@ -38,7 +36,7 @@ import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
                imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
                          TextareaBoxComponent, TextBoxComponent, SelectBoxComponent,
                          AlertErrorComponent, ConfirmPopup, CardComponent, CardFooterContentDirective, ContentPageComponent,
-                         FieldListComponent, FieldRowComponent, EntityStatusComponent, StatusTimelineComponent]
+                         FieldListComponent, FieldRowComponent, StatusTimelineComponent]
            })
 export class ConferenceUpdateComponent implements OnInit {
     isLoading = false;
@@ -60,6 +58,7 @@ export class ConferenceUpdateComponent implements OnInit {
     protected readonly formatterParticipation = formatterParticipation;
     protected readonly selectFilterParticipation = selectFilterParticipation;
     protected readonly getExhibitorFullName = getExhibitorFullName;
+    protected readonly getParticipationUsageName = getParticipationUsageName;
     readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.eventId));
 
     readonly presentationActions = computed<EntityAction[]>(() => {
@@ -202,11 +201,5 @@ export class ConferenceUpdateComponent implements OnInit {
             this.participationService,
             participation => this.editForm.get('participation')?.setValue(participation)
         ).subscribe((participations) => (this.participationsOptions = participations));
-    }
-
-    protected readonly statusColor = statusColor;
-
-    participationStatusLabelKey(status: string | null | undefined): string | null {
-        return status ? `participation.list.status.${status}` : null;
     }
 }

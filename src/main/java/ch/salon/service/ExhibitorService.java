@@ -66,6 +66,15 @@ public class ExhibitorService {
         return exhibitorMapper.toDto(exhibitorFound);
     }
 
+    /**
+     * Mise à jour partielle : le formulaire envoie l'état complet des champs éditables d'une carte.
+     * L'identité de l'exposant (id) reste immuable et l'opération délègue à {@link #update}.
+     */
+    public ExhibitorDTO patch(final UUID id, ExhibitorDTO exhibitor) {
+        exhibitor.setId(id);
+        return update(id, exhibitor);
+    }
+
     public List<ExhibitorDTO> findAll() {
         return exhibitorRepository.findByOrderByRegistrationDateDesc().stream().map(exhibitorMapper::toDto)
                                   .toList();

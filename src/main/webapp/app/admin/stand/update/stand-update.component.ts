@@ -9,7 +9,7 @@ import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {StandService} from '../service/stand.service';
 import {IStand} from '../model/stand.interface';
 import {StandFormGroup, StandFormService} from '../service/stand-form.service';
-import {IParticipation, selectFilterParticipation} from '../../participation/model/participation.interface';
+import {IParticipation, selectFilterParticipation, getParticipationUsageName} from '../../participation/model/participation.interface';
 import {formatterParticipation, ParticipationService} from '../../participation/service/participation.service';
 import {Category, formatterCategory} from '../../enumerations/category.model';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
@@ -36,8 +36,6 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
 import {ImageUploadBoxComponent} from '../../../shared/components/image-upload-box/image-upload-box.component';
 import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
 import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
-import {EntityStatusComponent} from '../../../shared/components/entity-list/entity-status.component';
-import {statusColor} from '../../../shared/components/entity-list/entity-list.model';
 import {StatusTimelineComponent, StatusTimelineActionRequest} from '../../../shared/components/status-timeline/status-timeline.component';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {loadParticipationOptions} from '../../common/participation/participation-options.util';
@@ -79,9 +77,8 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                    CardFooterContentDirective,
                    ContentPageComponent,
                    FieldListComponent,
-                   FieldRowComponent,
-                   EntityStatusComponent,
-                   StatusTimelineComponent
+                  FieldRowComponent,
+                  StatusTimelineComponent
                ]
            })
 export class StandUpdateComponent implements OnInit {
@@ -112,7 +109,7 @@ export class StandUpdateComponent implements OnInit {
     protected readonly selectFilterDimension = selectFilterDimension;
     protected readonly selectFilterParticipation = selectFilterParticipation;
     protected readonly getExhibitorFullName = getExhibitorFullName;
-    protected readonly statusColor = statusColor;
+    protected readonly getParticipationUsageName = getParticipationUsageName;
     readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.eventId));
 
     readonly standActions = computed<EntityAction[]>(() => this.sectionAction('stand'));
@@ -275,9 +272,5 @@ export class StandUpdateComponent implements OnInit {
                 this.participationsOptions = participations;
                 this.dimensionsOptions = dimensions;
             });
-    }
-
-    participationStatusLabelKey(status: string | null | undefined): string | null {
-        return status ? `participation.list.status.${status}` : null;
     }
 }

@@ -335,7 +335,7 @@
                     } @else {
                         <app-field-list>
                             <app-field-row>
-                                <span fieldLabel>{{ 'participation.exhibitor' | translate }}</span>
+                                <span fieldLabel>{{ 'common.client' | translate }}</span>
                                 <span fieldValue>
                                     <a class="clickable" [routerLink]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']">
                                         {{ getExhibitorFullName(editForm.controls.exhibitor.value) || '—' }}
@@ -350,6 +350,27 @@
                                 <span fieldLabel>{{ 'exhibitor.phoneNumber' | translate }}</span>
                                 <span fieldValue>{{ editForm.controls.exhibitor.value?.phoneNumber || '—' }}</span>
                             </app-field-row>
+                            @if (editForm.controls.exhibitor.value?.redFlag || editForm.controls.exhibitor.value?.duplicateDetected) {
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'common.alert' | translate }}</span>
+                                    <span fieldValue>
+                                        <span class="participation-tags">
+                                            @if (editForm.controls.exhibitor.value?.redFlag) {
+                                                <span class="el-alert" [style.--el-color]="'var(--app-danger)'">
+                                                    <fa-icon icon="flag"/>
+                                                    {{ 'exhibitor.list.signal.redFlag' | translate }}
+                                                </span>
+                                            }
+                                            @if (editForm.controls.exhibitor.value?.duplicateDetected) {
+                                                <span class="el-alert" [style.--el-color]="'var(--app-status-refused)'">
+                                                    <fa-icon icon="triangle-exclamation"/>
+                                                    {{ 'exhibitor.list.signal.duplicate' | translate }}
+                                                </span>
+                                            }
+                                        </span>
+                                    </span>
+                                </app-field-row>
+                            }
                         </app-field-list>
                     }
                 </div>

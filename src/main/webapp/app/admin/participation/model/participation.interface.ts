@@ -99,6 +99,16 @@ export function getFormattedParticipationName(participation: IParticipation | nu
     return `- (${exhibitorName})`;
 }
 
+/**
+ * Nom d'usage : nom de thérapeute/entreprise s'il existe, sinon le nom complet de l'exposant.
+ */
+export function getParticipationUsageName(participation: IParticipation | null | undefined): string {
+    if (!participation) {
+        return '';
+    }
+    return participation.therapistName?.trim() ? participation.therapistName : getExhibitorFullName(participation.exhibitor);
+}
+
 export function selectFilterParticipation(): string {
     return `therapistName,clientNumber,exhibitor.${selectFilterExhibitor().split(',').join(',exhibitor.')}`;
 }

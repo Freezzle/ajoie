@@ -319,28 +319,85 @@
                     } @else {
                         <app-field-list>
                             <app-field-row>
-                                <span fieldLabel>{{ 'stand.exhibitor' | translate }}</span>
+                                <span fieldLabel>{{ 'common.client' | translate }}</span>
                                 <span fieldValue>
-                                    <a class="clickable" [routerLink]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '', 'view']">
+                                    <a class="clickable" [routerLink]="['/admin', 'exhibitors', editForm.controls.participation.value?.exhibitor?.id ?? '', 'view']">
                                         {{ getExhibitorFullName(editForm.controls.participation.value?.exhibitor) || '—' }}
                                     </a>
                                 </span>
                             </app-field-row>
                             <app-field-row>
-                                <span fieldLabel>{{ 'stand.participationStatus' | translate }}</span>
+                                <span fieldLabel>{{ 'exhibitor.email' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.participation.value?.exhibitor?.email || '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'exhibitor.phoneNumber' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.participation.value?.exhibitor?.phoneNumber || '—' }}</span>
+                            </app-field-row>
+                            @if (editForm.controls.participation.value?.exhibitor?.redFlag || editForm.controls.participation.value?.exhibitor?.duplicateDetected) {
+                                <app-field-row>
+                                    <span fieldLabel>{{ 'common.alert' | translate }}</span>
+                                    <span fieldValue>
+                                        <span class="stand-tags">
+                                            @if (editForm.controls.participation.value?.exhibitor?.redFlag) {
+                                                <span class="el-alert" [style.--el-color]="'var(--app-danger)'">
+                                                    <fa-icon icon="flag"/>
+                                                    {{ 'exhibitor.list.signal.redFlag' | translate }}
+                                                </span>
+                                            }
+                                            @if (editForm.controls.participation.value?.exhibitor?.duplicateDetected) {
+                                                <span class="el-alert" [style.--el-color]="'var(--app-status-refused)'">
+                                                    <fa-icon icon="triangle-exclamation"/>
+                                                    {{ 'exhibitor.list.signal.duplicate' | translate }}
+                                                </span>
+                                            }
+                                        </span>
+                                    </span>
+                                </app-field-row>
+                            }
+                        </app-field-list>
+                    }
+                </div>
+            </app-card>
+
+            <!-- Participation -->
+            @if (!isCreating) {
+                <app-card [titleKey]="'common.participation'">
+                    <div appCardBody>
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'common.usageName' | translate }}</span>
                                 <span fieldValue>
-                                    @if (editForm.controls.participation.value?.status) {
-                                        <entity-status [color]="statusColor(editForm.controls.participation.value?.status)"
-                                                       [labelKey]="participationStatusLabelKey(editForm.controls.participation.value?.status)"/>
+                                    <a class="clickable" [routerLink]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '', 'view']">
+                                        {{ getParticipationUsageName(editForm.controls.participation.value) || '—' }}
+                                    </a>
+                                </span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'participation.registrationDate' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.participation.value?.registrationDate ? (editForm.controls.participation.value?.registrationDate | date:'dd.MM.yyyy') : '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'participation.distinctions' | translate }}</span>
+                                <span fieldValue>
+                                    @if (editForm.controls.participation.value?.crushOfHeart || editForm.controls.participation.value?.guestOfHonor) {
+                                        <span class="stand-tags">
+                                            @if (editForm.controls.participation.value?.crushOfHeart) {
+                                                <span class="el-tag">{{ 'entityList.signal.crushOfHeart' | translate }}</span>
+                                            }
+                                            @if (editForm.controls.participation.value?.guestOfHonor) {
+                                                <span class="el-tag">{{ 'entityList.signal.guestOfHonor' | translate }}</span>
+                                            }
+                                        </span>
                                     } @else {
                                         —
                                     }
                                 </span>
                             </app-field-row>
                         </app-field-list>
-                    }
-                </div>
-            </app-card>
+                    </div>
+                </app-card>
+            }
 
             <!-- Suivi interne -->
             <app-card [titleKey]="'stand.card.internal'"
