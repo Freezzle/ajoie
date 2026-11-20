@@ -57,6 +57,13 @@ import {RatingBoxComponent} from '../../../shared/rating-box/rating-box.componen
 import {Rating} from 'primeng/rating';
 import {categoryColor, EntityAction, EntityFootItemComponent, EntityRowComponent, EntityStatusComponent, statusColor} from '../../../shared/components/entity-list';
 import {Category, formatterCategory} from '../../enumerations/category.model';
+import {DetailPageLayoutComponent} from '../../../shared/components/detail-page-layout/detail-page-layout.component';
+import {
+    DetailCreateActionsDirective,
+    DetailMainDirective,
+    DetailSideDirective,
+    DetailStatusDirective
+} from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
     registration: ['therapistName', 'registrationDate', 'acceptedChart', 'acceptedContract'],
@@ -75,7 +82,9 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                          AlertErrorComponent, ConfirmPopup, Tab, TabList, Tabs, TabPanels, TabPanel, Badge,
                          CardComponent, CardFooterContentDirective, ContentPageComponent, FieldListComponent,
                          FieldRowComponent, StatusTimelineComponent, RatingBoxComponent, Rating,
-                         EntityRowComponent, EntityStatusComponent, EntityFootItemComponent, YesNoIconComponent]
+                         EntityRowComponent, EntityStatusComponent, EntityFootItemComponent, YesNoIconComponent,
+                         DetailPageLayoutComponent, DetailStatusDirective, DetailMainDirective,
+                         DetailSideDirective, DetailCreateActionsDirective]
            })
 export class ParticipationUpdateComponent implements OnInit {
     tabActive = '0';

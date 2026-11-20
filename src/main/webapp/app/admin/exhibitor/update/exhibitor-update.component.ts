@@ -36,6 +36,12 @@ import {YesNoIconComponent} from '../../../shared/components/yes-no-icon/yes-no-
 import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
+import {DetailPageLayoutComponent} from '../../../shared/components/detail-page-layout/detail-page-layout.component';
+import {
+    DetailCreateActionsDirective,
+    DetailMainDirective,
+    DetailSideDirective
+} from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
     identity: ['firstName', 'lastName', 'email', 'phoneNumber'],
@@ -73,7 +79,11 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                    FieldRowComponent,
                    Rating,
                   AddressFormComponent,
-                  YesNoIconComponent
+                  YesNoIconComponent,
+                  DetailPageLayoutComponent,
+                  DetailMainDirective,
+                  DetailSideDirective,
+                  DetailCreateActionsDirective
                ]
            })
 export class ExhibitorUpdateComponent implements OnInit {

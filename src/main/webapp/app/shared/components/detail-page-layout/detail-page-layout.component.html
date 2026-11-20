@@ -1,0 +1,14 @@
+<div class="detail-status"><ng-content select="[appDetailStatus]"></ng-content></div>
+
+<div class="detail-grid" [class.detail-grid--single]="singleColumn() || sides().length === 0">
+    <div class="detail-main-column">
+        <ng-content select="[appDetailMain]"></ng-content>
+    </div>
+    @if (sides().length > 0) {
+        <div class="detail-side-column">
+            <ng-content select="[appDetailSide]"></ng-content>
+        </div>
+    }
+</div>
+
+<div class="detail-create-actions"><ng-content select="[appDetailCreateActions]"></ng-content></div>

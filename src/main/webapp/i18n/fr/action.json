@@ -93,6 +93,8 @@
     "stand-marked-as-reopened": "Rouvrir",
     "stand-marked-as-reopened.help": "Rouvre.",
     "participation-marked-as-accepted.help": "Accepte la participation et tous les éléments associés (stands, conférences, ateliers) qui sont en cours de vérification. Cette étape confirme que la participation est candidat pour l'évènement.",
+    "participation-marked-as-accepted.condition.exhibitor-not-blocked": "Le client ne doit pas être signalé comme bloqué",
+    "participation-marked-as-accepted.condition.exhibitor-not-duplicated": "Le client ne doit pas être signalé comme un doublon",
     "participation-marked-as-refused": "Refuser",
     "participation-marked-as-refused.help": "Refuse la participation et tous les éléments associés (stands, conférences, ateliers) qui sont en cours de vérification. Cette décision écarte la participation de l'évènement.",
     "participation-marked-as-cancelled": "Annuler",

@@ -18,16 +18,16 @@
     <app-alert-error/>
     <p-confirmpopup/>
 
-    @if (!isCreating) {
-        <div class="participation-status">
-            <app-status-timeline [status]="initialParticipation?.status ?? null"
-                                 [availableActions]="availableActions()"
-                                 (actionRequested)="onStatusAction($event)"/>
-        </div>
-    }
+    <app-detail-page-layout>
+        <ng-container appDetailStatus>
+            @if (!isCreating) {
+                <app-status-timeline [status]="initialParticipation?.status ?? null"
+                                     [availableActions]="availableActions()"
+                                     (actionRequested)="onStatusAction($event)"/>
+            }
+        </ng-container>
 
-    <div class="participation-detail-grid">
-        <div class="participation-main-column">
+        <div appDetailMain>
             <!-- Inscription -->
             <app-card [titleKey]="'participation.card.registration'"
                       [editing]="isCreating || activeSection() === 'registration'"
@@ -321,7 +321,7 @@
             }
         </div>
 
-        <div class="participation-side-column">
+        <div appDetailSide>
             <!-- Exposant -->
             <app-card [titleKey]="'participation.card.exhibitor'">
                 <div appCardBody>
@@ -439,12 +439,11 @@
                 </app-card>
             }
         </div>
-    </div>
-
-    @if (isCreating) {
-        <div class="participation-create-actions">
-            <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel"/>
-            <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" translateKey="common.save"/>
-        </div>
-    }
+        <ng-container appDetailCreateActions>
+            @if (isCreating) {
+                <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel"/>
+                <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" translateKey="common.save"/>
+            }
+        </ng-container>
+    </app-detail-page-layout>
 </app-content-page>

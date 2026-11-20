@@ -17,7 +17,6 @@ import {SelectBoxComponent} from '../../../shared/components/select-box/select-b
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 import {CardComponent} from '../../../shared/components/card/card.component';
-import {CardFooterContentDirective} from '../../../shared/components/card/card-footer.directive';
 import {ContentPageComponent} from 'app/shared/components/content-page/content-page.component';
 import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
 import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
@@ -28,6 +27,14 @@ import {ActionsService} from '../../common/actions.service';
 import {AvailableAction} from '../../../shared/model/available-action';
 import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
+import {DetailPageLayoutComponent} from '../../../shared/components/detail-page-layout/detail-page-layout.component';
+import {
+    DetailCreateActionsDirective,
+    DetailMainDirective,
+    DetailSideDirective,
+    DetailStatusDirective
+} from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
+import {DetailSectionCardComponent} from '../../../shared/components/detail-section-card/detail-section-card.component';
 
 @Component({
                selector: 'app-workshop-update',
@@ -35,8 +42,10 @@ import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
                styleUrl: './workshop-update.component.scss',
                imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, ButtonBoxComponent,
                          TextareaBoxComponent, TextBoxComponent, SelectBoxComponent, AlertErrorComponent,
-                         ConfirmPopup, CardComponent, CardFooterContentDirective, ContentPageComponent,
-                         FieldListComponent, FieldRowComponent, StatusTimelineComponent]
+                         ConfirmPopup, CardComponent, ContentPageComponent,
+                         FieldListComponent, FieldRowComponent, StatusTimelineComponent,
+                         DetailPageLayoutComponent, DetailStatusDirective, DetailMainDirective,
+                         DetailSideDirective, DetailCreateActionsDirective, DetailSectionCardComponent]
            })
 export class WorkshopUpdateComponent implements OnInit {
     isLoading = false;

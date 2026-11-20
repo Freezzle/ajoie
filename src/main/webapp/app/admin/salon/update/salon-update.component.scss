@@ -2,24 +2,6 @@
   display: block;
 }
 
-.salon-detail-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 14px;
-  align-items: start;
-}
-
-.salon-detail-grid--single {
-  grid-template-columns: 1fr;
-}
-
-.salon-main-column,
-.salon-side-column {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
 .salon-rich-preview {
   display: -webkit-box;
   overflow: hidden;
@@ -72,13 +54,6 @@
   gap: 8px;
 }
 
-.salon-create-actions {
-  margin-top: 14px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
 .salon-link-row {
   display: flex;
   align-items: center;
@@ -93,12 +68,6 @@
 
 .salon-locked-hint {
   color: var(--app-text-muted, #8a8a8a);
-}
-
-@media (max-width: 980px) {
-  .salon-detail-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 768px) {

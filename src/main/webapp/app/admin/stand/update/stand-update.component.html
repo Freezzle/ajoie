@@ -13,16 +13,16 @@
     <app-alert-error/>
     <p-confirmpopup/>
 
-    @if (!isCreating) {
-        <div class="stand-status">
-            <app-status-timeline [status]="initialStand?.status ?? null"
-                                 [availableActions]="availableActions()"
-                                 (actionRequested)="onStatusAction($event)"/>
-        </div>
-    }
+    <app-detail-page-layout>
+        <ng-container appDetailStatus>
+            @if (!isCreating) {
+                <app-status-timeline [status]="initialStand?.status ?? null"
+                                     [availableActions]="availableActions()"
+                                     (actionRequested)="onStatusAction($event)"/>
+            }
+        </ng-container>
 
-    <div class="stand-detail-grid">
-        <div class="stand-main-column">
+        <div appDetailMain>
             <!-- Stand -->
             <app-card [titleKey]="'stand.card.stand'"
                       [editing]="isCreating || activeSection() === 'stand'"
@@ -307,7 +307,7 @@
             </app-card>
         </div>
 
-        <div class="stand-side-column">
+        <div appDetailSide>
             <!-- Exposant -->
             <app-card [titleKey]="'stand.card.exhibitor'">
                 <div appCardBody>
@@ -429,12 +429,11 @@
                 </ng-container>
             </app-card>
         </div>
-    </div>
-
-    @if (isCreating) {
-        <div class="stand-create-actions">
-            <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel"/>
-            <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" translateKey="common.save"/>
-        </div>
-    }
+        <ng-container appDetailCreateActions>
+            @if (isCreating) {
+                <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel"/>
+                <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" translateKey="common.save"/>
+            }
+        </ng-container>
+    </app-detail-page-layout>
 </app-content-page>

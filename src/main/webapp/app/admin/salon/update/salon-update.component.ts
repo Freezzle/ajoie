@@ -43,6 +43,12 @@ import {AlertService} from '../../../core/util/alert.service';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {IAddress} from '../../common/address.model';
 import {InvoicingPlanService} from '../../invoicing-plan/service/invoicing-plan.service';
+import {DetailPageLayoutComponent} from '../../../shared/components/detail-page-layout/detail-page-layout.component';
+import {
+    DetailCreateActionsDirective,
+    DetailMainDirective,
+    DetailSideDirective
+} from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
     general: ['place', 'startingDate', 'endingDate', 'extraInformation'],
@@ -88,7 +94,11 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                    FieldListComponent,
                    FieldRowComponent,
                    YesNoIconComponent,
-                   RichTextPipe
+                   RichTextPipe,
+                   DetailPageLayoutComponent,
+                   DetailMainDirective,
+                   DetailSideDirective,
+                   DetailCreateActionsDirective
                ]
            })
 export class SalonUpdateComponent implements OnInit {

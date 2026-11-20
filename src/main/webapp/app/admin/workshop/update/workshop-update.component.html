@@ -12,53 +12,47 @@
         <app-alert-error />
         <p-confirmpopup />
 
-        @if (!isCreating) {
-            <div class="workshop-status">
-                <app-status-timeline [status]="initialWorkshop?.status ?? null"
-                                     [availableActions]="availableActions()"
-                                     (actionRequested)="onStatusAction($event)" />
-            </div>
-        }
+        <app-detail-page-layout>
+            <ng-container appDetailStatus>
+                @if (!isCreating) {
+                    <app-status-timeline [status]="initialWorkshop?.status ?? null"
+                                         [availableActions]="availableActions()"
+                                         (actionRequested)="onStatusAction($event)" />
+                }
+            </ng-container>
 
-        <div class="workshop-detail-grid">
-            <div class="workshop-main-column">
-                <app-card [titleKey]="'workshop.presentation'"
-                          [editing]="isCreating || activeSection() === 'presentation'"
-                          [dimmed]="!!activeSection() && activeSection() !== 'presentation'"
-                          [actions]="presentationActions()">
-                    <div appCardBody>
-                        @if (isCreating || activeSection() === 'presentation') {
-                            <div class="card-form-stack">
-                                <text-box fieldName="title" formControlName="title" translateKey="workshop.titleField" />
-                                <textarea-box [maxLength]="500" [rows]="6" [showCounter]="true"
-                                              fieldName="description" formControlName="description"
-                                              translateKey="workshop.description" />
-                            </div>
-                        } @else {
-                            <app-field-list>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'workshop.titleField' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.title.value || '—' }}</span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'workshop.description' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.description.value || '—' }}</span>
-                                </app-field-row>
-                            </app-field-list>
-                        }
-                    </div>
-                    <ng-container appCardFooter>
-                        @if (!isCreating && activeSection() === 'presentation') {
-                            <div appCardFooterContent class="card-footer-actions">
-                                <button-box (clickedEvent)="cancelSection('presentation')" type="secondary" translateKey="common.cancel" />
-                                <button-box (clickedEvent)="saveSection('presentation')" [isDisabled]="isLoading" translateKey="common.save" />
-                            </div>
-                        }
-                    </ng-container>
-                </app-card>
+            <div appDetailMain>
+                <app-detail-section-card [titleKey]="'workshop.presentation'"
+                                         [editing]="isCreating || activeSection() === 'presentation'"
+                                         [dimmed]="!!activeSection() && activeSection() !== 'presentation'"
+                                         [actions]="presentationActions()"
+                                         [showFooterActions]="!isCreating && activeSection() === 'presentation'"
+                                         [saveDisabled]="isLoading"
+                                         (cancelRequested)="cancelSection('presentation')"
+                                         (saveRequested)="saveSection('presentation')">
+                    @if (isCreating || activeSection() === 'presentation') {
+                        <div class="card-form-stack">
+                            <text-box fieldName="title" formControlName="title" translateKey="workshop.titleField" />
+                            <textarea-box [maxLength]="500" [rows]="6" [showCounter]="true"
+                                          fieldName="description" formControlName="description"
+                                          translateKey="workshop.description" />
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'workshop.titleField' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.title.value || '—' }}</span>
+                            </app-field-row>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'workshop.description' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.description.value || '—' }}</span>
+                            </app-field-row>
+                        </app-field-list>
+                    }
+                </app-detail-section-card>
             </div>
 
-            <div class="workshop-side-column">
+            <div appDetailSide>
                 <app-card [titleKey]="'workshop.intervenant'">
                     <div appCardBody>
                         @if (isCreating) {
@@ -148,42 +142,36 @@
                     </app-card>
                 }
 
-                <app-card [titleKey]="'workshop.internalFollowup'"
-                          [editing]="activeSection() === 'internal'"
-                          [dimmed]="!!activeSection() && activeSection() !== 'internal'"
-                          [actions]="internalActions()">
-                    <div appCardBody>
-                        @if (isCreating || activeSection() === 'internal') {
-                            <div class="card-form-stack">
-                                <textarea-box [rows]="3" fieldName="extraInformation"
-                                              formControlName="extraInformation" translateKey="workshop.extraInformation" />
-                            </div>
-                        } @else {
-                            <app-field-list>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'workshop.extraInformation' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
-                                </app-field-row>
-                            </app-field-list>
-                        }
-                    </div>
-                    <ng-container appCardFooter>
-                        @if (!isCreating && activeSection() === 'internal') {
-                            <div appCardFooterContent class="card-footer-actions">
-                                <button-box (clickedEvent)="cancelSection('internal')" type="secondary" translateKey="common.cancel" />
-                                <button-box (clickedEvent)="saveSection('internal')" [isDisabled]="isLoading" translateKey="common.save" />
-                            </div>
-                        }
-                    </ng-container>
-                </app-card>
+                <app-detail-section-card [titleKey]="'workshop.internalFollowup'"
+                                         [editing]="activeSection() === 'internal'"
+                                         [dimmed]="!!activeSection() && activeSection() !== 'internal'"
+                                         [actions]="internalActions()"
+                                         [showFooterActions]="!isCreating && activeSection() === 'internal'"
+                                         [saveDisabled]="isLoading"
+                                         (cancelRequested)="cancelSection('internal')"
+                                         (saveRequested)="saveSection('internal')">
+                    @if (isCreating || activeSection() === 'internal') {
+                        <div class="card-form-stack">
+                            <textarea-box [rows]="3" fieldName="extraInformation"
+                                          formControlName="extraInformation" translateKey="workshop.extraInformation" />
+                        </div>
+                    } @else {
+                        <app-field-list>
+                            <app-field-row>
+                                <span fieldLabel>{{ 'workshop.extraInformation' | translate }}</span>
+                                <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
+                            </app-field-row>
+                        </app-field-list>
+                    }
+                </app-detail-section-card>
             </div>
-        </div>
 
-        @if (isCreating) {
-            <div class="workshop-create-actions">
-                <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel" />
-                <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" translateKey="common.save" />
-            </div>
-        }
+            <ng-container appDetailCreateActions>
+                @if (isCreating) {
+                    <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel" />
+                    <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" translateKey="common.save" />
+                }
+            </ng-container>
+        </app-detail-page-layout>
     </app-content-page>
 </div>

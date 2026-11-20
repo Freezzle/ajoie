@@ -44,6 +44,13 @@ import {ActionsService} from '../../common/actions.service';
 import {AvailableAction} from '../../../shared/model/available-action';
 import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {getExhibitorFullName} from '../../exhibitor/model/exhibitor.interface';
+import {DetailPageLayoutComponent} from '../../../shared/components/detail-page-layout/detail-page-layout.component';
+import {
+    DetailCreateActionsDirective,
+    DetailMainDirective,
+    DetailSideDirective,
+    DetailStatusDirective
+} from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
     stand: ['description', 'category', 'subCategories'],
@@ -80,7 +87,12 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                    FieldListComponent,
                   FieldRowComponent,
                   StatusTimelineComponent,
-                  YesNoIconComponent
+                  YesNoIconComponent,
+                  DetailPageLayoutComponent,
+                  DetailStatusDirective,
+                  DetailMainDirective,
+                  DetailSideDirective,
+                  DetailCreateActionsDirective
                ]
            })
 export class StandUpdateComponent implements OnInit {

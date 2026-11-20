@@ -1,0 +1,23 @@
+<app-card [titleKey]="titleKey()"
+          [title]="title()"
+          [lock]="lock()"
+          [tag]="tag()"
+          [editing]="editing()"
+          [dimmed]="dimmed()"
+          [actions]="actions()">
+    <div appCardBody>
+        <ng-content></ng-content>
+    </div>
+    <ng-container appCardFooter>
+        @if (showFooterActions()) {
+            <div appCardFooterContent class="detail-section-footer-actions">
+                <button-box (clickedEvent)="cancelRequested.emit()"
+                            type="secondary"
+                            [translateKey]="cancelLabelKey()" />
+                <button-box (clickedEvent)="saveRequested.emit()"
+                            [isDisabled]="saveDisabled()"
+                            [translateKey]="saveLabelKey()" />
+            </div>
+        }
+    </ng-container>
+</app-card>

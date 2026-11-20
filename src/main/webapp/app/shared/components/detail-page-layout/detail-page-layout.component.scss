@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+.detail-status {
+  margin-bottom: 14px;
+}
+.detail-status:empty {
+  display: none;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 14px;
+  align-items: start;
+}
+
+.detail-grid--single {
+  grid-template-columns: 1fr;
+}
+
+.detail-main-column,
+.detail-side-column {
+  min-width: 0;
+}
+
+.detail-create-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.detail-create-actions:empty {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

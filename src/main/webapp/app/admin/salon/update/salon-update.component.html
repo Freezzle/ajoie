@@ -23,8 +23,8 @@
     <app-alert-error/>
     <p-confirmpopup/>
 
-    <div class="salon-detail-grid" [class.salon-detail-grid--single]="isCreating">
-        <div class="salon-main-column">
+    <app-detail-page-layout [singleColumn]="isCreating">
+        <div appDetailMain>
             <!-- Facturation : N° de référence + coordonnées bancaires -->
         <app-card [titleKey]="'salon.billing'"
                   [editing]="isCreating || activeSection() === 'billing'"
@@ -401,7 +401,7 @@
         </app-card>
         </div>
 
-        <div class="salon-side-column">
+        <div appDetailSide>
             <!-- Informations générales -->
             <app-card [titleKey]="'salon.generalInfo'"
                       [editing]="isCreating || activeSection() === 'general'"
@@ -494,14 +494,13 @@
             </ng-container>
         </app-card>
         </div>
-    </div>
-
-    @if (isCreating) {
-        <div class="salon-create-actions">
-            <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading" type="secondary" translateKey="common.cancel"/>
-            <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" [isSubmit]="true" translateKey="common.save"/>
-        </div>
-    }
+        <ng-container appDetailCreateActions>
+            @if (isCreating) {
+                <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading" type="secondary" translateKey="common.cancel"/>
+                <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading" [isSubmit]="true" translateKey="common.save"/>
+            }
+        </ng-container>
+    </app-detail-page-layout>
 </app-content-page>
 
 <ng-template #addressView let-addr>

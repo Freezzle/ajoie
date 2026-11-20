@@ -2,22 +2,6 @@
   display: block;
 }
 
-.participation-status {
-  margin-bottom: 14px;
-}
-
-.participation-detail-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 14px;
-  align-items: start;
-}
-
-.participation-main-column,
-.participation-side-column {
-  min-width: 0;
-}
-
 .card-form-stack {
   display: flex;
   flex-direction: column;
@@ -31,21 +15,8 @@
   gap: 8px;
 }
 
-.participation-create-actions {
-  margin-top: 14px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
 .participation-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-}
-
-@media (max-width: 980px) {
-  .participation-detail-grid {
-    grid-template-columns: 1fr;
-  }
 }

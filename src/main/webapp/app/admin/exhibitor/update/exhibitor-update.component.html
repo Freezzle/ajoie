@@ -15,8 +15,8 @@
     <app-alert-error/>
     <p-confirmpopup/>
 
-    <div class="exhibitor-detail-grid">
-        <div class="exhibitor-main-column">
+    <app-detail-page-layout>
+        <div appDetailMain>
             <!-- Identité -->
             <app-card [titleKey]="'common.info-basic'"
                       [editing]="isCreating || activeSection() === 'identity'"
@@ -233,7 +233,7 @@
             }
         </div>
 
-        <div class="exhibitor-side-column">
+        <div appDetailSide>
             <!-- Préférences -->
             <app-card [titleKey]="'exhibitor.preferences'"
                       [editing]="isCreating || activeSection() === 'preferences'"
@@ -311,14 +311,13 @@
                 </ng-container>
             </app-card>
         </div>
-    </div>
-
-    @if (isCreating) {
-        <div class="exhibitor-create-actions">
-            <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading"
-                        type="secondary" translateKey="common.cancel"/>
-            <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading"
-                        [isSubmit]="true" translateKey="common.save"/>
-        </div>
-    }
+        <ng-container appDetailCreateActions>
+            @if (isCreating) {
+                <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading"
+                            type="secondary" translateKey="common.cancel"/>
+                <button-box (clickedEvent)="save()" [isDisabled]="editForm.invalid || isLoading"
+                            [isSubmit]="true" translateKey="common.save"/>
+            }
+        </ng-container>
+    </app-detail-page-layout>
 </app-content-page>
