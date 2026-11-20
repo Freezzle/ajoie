@@ -74,22 +74,21 @@
         <div class="dash-grid">
             <!-- Chronologie -->
             <div class="c8">
-                <app-card [showHeader]="false">
+                <app-card [titleKey]="'salon.dashboard.timeline.title'">
+                    <div appCardTag>
+                        @if (timeline()) {
+                            <div class="seg" role="group" [attr.aria-label]="'salon.dashboard.timeline.intervalLabel' | translate">
+                                @for (interval of timelineIntervals; track interval.value) {
+                                    <button type="button"
+                                            [attr.aria-pressed]="isTimelineIntervalActive(interval.value)"
+                                            (click)="setTimelineInterval(interval.value)">
+                                        {{ interval.key | translate }}
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
                     <div appCardBody>
-                        <div class="timeline-head">
-                            <div class="card-title">{{ 'salon.dashboard.timeline.title' | translate }}</div>
-                            @if (timeline()) {
-                                <div class="seg" role="group" [attr.aria-label]="'salon.dashboard.timeline.intervalLabel' | translate">
-                                    @for (interval of timelineIntervals; track interval.value) {
-                                        <button type="button"
-                                                [attr.aria-pressed]="isTimelineIntervalActive(interval.value)"
-                                                (click)="setTimelineInterval(interval.value)">
-                                            {{ interval.key | translate }}
-                                        </button>
-                                    }
-                                </div>
-                            }
-                        </div>
                         @if (timeline(); as tl) {
                             @if (timelineSub(); as sub) {
                                 <div class="sub-head">
@@ -148,9 +147,8 @@
 
             <!-- À traiter -->
             <div class="c4">
-                <app-card [showHeader]="false">
+                <app-card [titleKey]="'salon.dashboard.todo.title'">
                     <div appCardBody>
-                        <div class="card-title">{{ 'salon.dashboard.todo.title' | translate }}</div>
                         <div class="sub-head">{{ 'salon.dashboard.todo.subtitle' | translate }}</div>
 
                         @if (todo(); as t) {
@@ -234,50 +232,47 @@
             <!-- Mes indicateurs -->
             <div class="section-head">
                 <h3>{{ 'salon.dashboard.metrics.title' | translate }}</h3>
-                <span class="muted">{{ 'salon.dashboard.metrics.subtitle' | translate: {n: chosen().length} }}</span>
-                <button type="button" class="link" (click)="goToCatalogue()">
-                    {{ 'salon.dashboard.metrics.addOrRemove' | translate }} →
-                </button>
             </div>
 
             @if (hasChosen()) {
                 @for (zone of zones(); track zone.theme) {
-                    <div class="zone" [class.c6]="!zone.wide" [class.c12]="zone.wide">
-                        <div class="zone-head">
-                            <span class="zone-icon"><i class="fa fa-{{ themeIcon[zone.theme] }}"></i></span>
-                            <h4>{{ 'salon.dashboard.theme.' + zone.theme | translate }}</h4>
-                            <span class="count">{{ 'salon.dashboard.metrics.zoneCount' | translate: {n: zone.ids.length} }}</span>
-                            <button type="button" class="link" (click)="goToCatalogue(zone.theme)">
-                                {{ 'salon.dashboard.metrics.add' | translate }}
-                            </button>
-                        </div>
-                        <div class="zone-grid" [style.--cols]="zone.cols">
-                            @for (id of zone.ids; track trackId($index, id)) {
-                                @if (metric(id); as m) {
-                                    <div class="metric">
-                                        <button type="button" class="remove"
-                                                [attr.aria-label]="'salon.dashboard.metrics.remove' | translate: {title: ('salon.dashboard.metric.' + id + '.title' | translate)}"
-                                                (click)="removeMetric(id)">×</button>
-                                        <ng-container *ngTemplateOutlet="metricBody; context: {m: m, id: id}"/>
-                                    </div>
+                    <app-card class="zone-card" [class.c6]="!zone.wide" [class.c12]="zone.wide"
+                              [titleKey]="'salon.dashboard.theme.' + zone.theme">
+                        <span appCardTag class="zone-icon"><i class="fa fa-{{ themeIcon[zone.theme] }}"></i></span>
+                        <div appCardBody class="zone-body">
+                            <div class="zone-grid" [style.--cols]="zone.cols">
+                                @for (id of zone.ids; track trackId($index, id)) {
+                                    @if (metric(id); as m) {
+                                        <app-card class="metric-card" [titleKey]="'salon.dashboard.metric.' + id + '.title'">
+                                            <button appCardTag type="button" class="remove"
+                                                    [attr.aria-label]="'salon.dashboard.metrics.remove' | translate: {title: ('salon.dashboard.metric.' + id + '.title' | translate)}"
+                                                    (click)="removeMetric(id)">×</button>
+                                            <div appCardBody class="metric-body">
+                                                <ng-container *ngTemplateOutlet="metricBody; context: {m: m, id: id, hideTitle: true}"/>
+                                            </div>
+                                        </app-card>
+                                    }
                                 }
-                            }
+                            </div>
                         </div>
-                    </div>
+                    </app-card>
                 }
             } @else {
-                <button type="button" class="add-metric" (click)="goToCatalogue()">
-                    <b>{{ 'salon.dashboard.metrics.emptyAdd' | translate }}</b>
-                    <span>{{ 'salon.dashboard.metrics.emptyCount' | translate: {n: metricCount} }}</span>
-                </button>
+                <app-card class="c12">
+                    <div appCardBody class="empty">
+                        <b>{{ 'salon.dashboard.metrics.emptyAdd' | translate }}</b>
+                    </div>
+                </app-card>
             }
         </div>
     }
 </app-content-page>
 
 <!-- ═══════════ Gabarit : corps d'une carte de métrique ═══════════ -->
-<ng-template #metricBody let-m="m" let-id="id">
-    <h4>{{ 'salon.dashboard.metric.' + id + '.title' | translate }}</h4>
+<ng-template #metricBody let-m="m" let-id="id" let-hideTitle="hideTitle">
+    @if (!hideTitle) {
+        <h4>{{ 'salon.dashboard.metric.' + id + '.title' | translate }}</h4>
+    }
 
     <!-- Valeur principale -->
     @if (m.valueKind === 'amount') {

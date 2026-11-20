@@ -27,7 +27,6 @@ app-salon-stats {
     .section-head {
         grid-column: span 12; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 6px;
         h3 { margin: 0; font-size: 18px; }
-        .link { margin-left: auto; }
     }
 
     // ── Chronologie ─────────────────────────────────────────────────────────────
@@ -65,16 +64,8 @@ app-salon-stats {
     .clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
     // ── Zone d'un thème ─────────────────────────────────────────────────────────
-    .zone {
-        background: var(--app-surface-muted); border: 1px solid var(--app-line); border-radius: 16px;
-        padding: 12px; display: flex; flex-direction: column; gap: 10px;
-    }
-    .zone-head {
-        display: flex; align-items: center; gap: 8px; padding: 0 4px;
-        h4 { margin: 0; font-size: 14.5px; font-weight: 700; }
-        .count { color: var(--app-text-muted); font-size: 13px; }
-        .link { margin-left: auto; }
-    }
+    .zone-card { margin-bottom: 0; }
+    .zone-body { display: flex; flex-direction: column; gap: 10px; }
     .zone-icon {
         width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center;
         background: var(--app-surface); border: 1px solid var(--app-line); color: var(--app-accent); font-size: 13px;
@@ -82,17 +73,29 @@ app-salon-stats {
     .zone-grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 10px; flex: 1; }
 
     // ── Carte de métrique ───────────────────────────────────────────────────────
-    .metric {
-        position: relative; display: flex; flex-direction: column; gap: 6px; padding: 14px 16px;
-        background: var(--app-surface); border: 1px solid var(--app-line); border-radius: 12px;
-        h4 { margin: 0; padding-right: 26px; font-size: 14px; font-weight: 700; }
+    .metric-card {
+        margin-bottom: 0;
+        height: 100%;
+    }
+    .metric-card .app-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .metric-card .app-card .app-card-bd {
+        flex: 1;
+        display: flex;
+    }
+    .metric-body {
+        display: flex; flex-direction: column; gap: 6px; flex: 1;
+        h4 { margin: 0; font-size: 14px; font-weight: 700; }
         .value { font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; &.warn { color: var(--app-warn); } }
         .sub { font-size: 12.5px; color: var(--app-text-muted); }
-        .remove {
-            position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border: 0;
-            background: none; color: var(--app-text-muted); border-radius: 6px; cursor: pointer; font-size: 16px; line-height: 1;
-            &:hover { background: var(--app-surface-muted); color: var(--app-text); }
-        }
+    }
+    .metric-card .remove {
+        width: 22px; height: 22px; border: 0; padding: 0; min-height: 22px; min-width: 22px;
+        background: none; color: var(--app-text-muted); border-radius: 6px; cursor: pointer; font-size: 16px; line-height: 1;
+        &:hover { background: var(--app-surface-muted); color: var(--app-text); }
     }
     .metric-theme { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--app-text-muted); }
     .metric-shown { border-color: var(--app-accent); }
@@ -146,14 +149,6 @@ app-salon-stats {
         }
     }
     .seg-status { display: flex; margin-top: 8px; button { flex: 1; } }
-
-    // ── Carte « + Ajouter un indicateur » ───────────────────────────────────────
-    .add-metric {
-        grid-column: span 12; min-height: 120px; border: 1.5px dashed var(--app-border); border-radius: 12px;
-        background: none; color: var(--app-text-muted); display: flex; flex-direction: column;
-        align-items: center; justify-content: center; gap: 2px; cursor: pointer;
-        &:hover { border-color: var(--app-accent); color: var(--app-accent); }
-    }
 
     // ── Catalogue ───────────────────────────────────────────────────────────────
     .cat-head { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; h3 { margin: 0; font-size: 18px; } .seg { margin-left: auto; } }
