@@ -1,9 +1,11 @@
-import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input, output, signal, viewChild} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmPopup} from 'primeng/confirmpopup';
+import {Popover} from 'primeng/popover';
 
 import {ConfirmDialogService} from '../../delete-dialog/confirm-dialog.service';
 import {AvailableAction} from '../../model/available-action';
+import {ConditionalKey} from '../../model/conditional-key';
 import {SEVERITY} from '../../utils/severity';
 import {ButtonBoxComponent} from '../button-box/button-box.component';
 import {EntityActionsMenuComponent} from '../entity-list/entity-actions-menu.component';
@@ -27,7 +29,7 @@ const OFF_CYCLE = ['REFUSED', 'CANCELED'];
 @Component({
                selector: 'app-status-timeline',
                standalone: true,
-               imports: [ConfirmPopup, ButtonBoxComponent, EntityActionsMenuComponent],
+               imports: [ConfirmPopup, Popover, ButtonBoxComponent, EntityActionsMenuComponent],
                templateUrl: './status-timeline.component.html',
                styleUrl: './status-timeline.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush
@@ -44,6 +46,10 @@ export class StatusTimelineComponent {
 
     private readonly translateService = inject(TranslateService);
     private readonly confirmDialogService = inject(ConfirmDialogService);
+
+    protected currentHelpText = '';
+    protected currentConditionalKeys: ConditionalKey[] = [];
+    private readonly helpPopover = viewChild<Popover>('helpPopover');
 
     readonly isOffCycle = computed(() => OFF_CYCLE.includes(this.status()?.toUpperCase() ?? ''));
 
@@ -153,6 +159,24 @@ export class StatusTimelineComponent {
         } else {
             this.actionRequested.emit({action, target});
         }
+    }
+
+    get helpLabel(): string {
+        return this.translateService.instant('entityList.help') as string;
+    }
+
+    hasHelp(action: AvailableAction): boolean {
+        return !!action.helpKey || (action.conditionalKeys?.length ?? 0) > 0;
+    }
+
+    showHelp(event: Event, action: AvailableAction): void {
+        this.currentHelpText = action.helpKey ? this.translateService.instant(action.helpKey) as string : '';
+        this.currentConditionalKeys = action.conditionalKeys ?? [];
+        this.helpPopover()?.toggle(event);
+    }
+
+    translateCondition(key: string): string {
+        return this.translateService.instant(key) as string;
     }
 
     runPrimaryAction(action: AvailableAction, target: HTMLElement): void {

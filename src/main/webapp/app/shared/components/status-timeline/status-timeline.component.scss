@@ -173,3 +173,18 @@
     text-align: left;
   }
 }
+
+.app-statusbar-primary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-statusbar-primary button-box {
+  flex: 1;
+}
+
+.app-statusbar-primary .am-help {
+  margin-left: 0;
+}

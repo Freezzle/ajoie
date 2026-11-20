@@ -1,5 +1,26 @@
 <p-confirmpopup />
 
+<p-popover #helpPopover [baseZIndex]="9999" appendTo="body">
+    <div class="am-help-content">
+        @if (currentHelpText) {
+            <div class="am-help-text">{{ currentHelpText }}</div>
+        }
+        @if (currentConditionalKeys.length > 0) {
+            <ul class="am-conditions">
+                @for (condition of currentConditionalKeys; track condition.key) {
+                    <li [class.is-ko]="condition.state === 'NOK'"
+                        [class.is-ok]="condition.state === 'OK'">
+                        <i [class.pi-check]="condition.state === 'OK'"
+                           [class.pi-times]="condition.state === 'NOK'"
+                           class="pi"></i>
+                        <span>{{ translateCondition(condition.key) }}</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</p-popover>
+
 <div class="app-statusbar" [class.app-statusbar--off]="isOffCycle()">
     <div class="app-statusbar-sl">
         <ol class="app-sline">
@@ -23,10 +44,21 @@
     <aside class="app-statusbar-acts" aria-label="Actions">
         <div class="app-statusbar-row">
             @for (action of primaryAvailableActions(); track action.contextCode) {
-                <button-box [translateKey]="action.labelKey"
-                            [type]="actionSeverity(action)"
-                            [isDisabled]="action.disabled"
-                            (clickedEvent)="runPrimaryAction(action, $event)" />
+                <div class="app-statusbar-primary">
+                    <button-box [translateKey]="action.labelKey"
+                                [type]="actionSeverity(action)"
+                                [isDisabled]="action.disabled"
+                                (clickedEvent)="runPrimaryAction(action, $event)" />
+                    @if (hasHelp(action)) {
+                        <i (click)="showHelp($event, action)"
+                           [attr.aria-label]="helpLabel"
+                           [class.is-blocked]="action.disabled"
+                           [class.pi-exclamation-circle]="action.disabled"
+                           [class.pi-question-circle]="!action.disabled"
+                           [title]="helpLabel"
+                           class="pi am-help"></i>
+                    }
+                </div>
             }
 
             @if (gearActions().length > 0) {
