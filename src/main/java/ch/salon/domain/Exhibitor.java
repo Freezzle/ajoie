@@ -87,6 +87,9 @@ public class Exhibitor implements Serializable, TenantOwned {
     @Column(name = "duplicate_detected")
     private boolean duplicateDetected = false;
 
+    @Column(name = "duplicate_of_id")
+    private UUID duplicateOfId;
+
     public String getFullname() {
         return lastName + " " + firstName;
     }

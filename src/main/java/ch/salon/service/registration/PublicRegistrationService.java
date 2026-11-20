@@ -18,6 +18,7 @@ import ch.salon.repository.WorkshopRepository;
 import ch.salon.security.tenant.TenantContextHolder;
 import ch.salon.security.tenant.TransactionalTenantOperation;
 import ch.salon.service.EventLogService;
+import ch.salon.service.ExhibitorDuplicateService;
 import ch.salon.service.InvoicingPlanService;
 import ch.salon.service.RefreshInvoicingPlansService;
 import ch.salon.service.StandPictureService;
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -73,6 +73,7 @@ public class PublicRegistrationService {
     private final ParticipationRepository participationRepository;
     private final RefreshInvoicingPlansService refreshInvoicingPlansService;
     private final EventLogService eventLogService;
+    private final ExhibitorDuplicateService exhibitorDuplicateService;
     private final RegistrationEmailService registrationEmailService;
     private final StandPictureService standPictureService;
     private final TransactionalTenantOperation transactionalOps;
@@ -138,7 +139,7 @@ public class PublicRegistrationService {
         validateBusinessRules(request);
 
         String email = normalizeEmail(request.getExhibitor().getEmail());
-        if (participationRepository.findByExhibitorEmailAndSalonId(email, salonId) != null) {
+        if (participationRepository.findFirstByExhibitorEmailAndSalonId(email, salonId) != null) {
             throw new BadRequestAlertException("Une inscription existe déjà pour cet e-mail", ENTITY_NAME,
                     "registration.already-registered");
         }
@@ -497,9 +498,21 @@ public class PublicRegistrationService {
     // -------------------- ECRITURE --------------------
 
     private Exhibitor upsertExhibitor(RegistrationExhibitorDTO dto, String email, Instant now) {
+        String phone = sanitizePhoneNumber(dto.getPhoneNumber());
         Exhibitor exhibitor = exhibitorRepository.findByEmail(email);
 
         if (exhibitor != null) {
+            boolean forceManualDuplicate = exhibitorDuplicateService.shouldForceManualDuplicate(exhibitor, dto.getFirstName(),
+                    dto.getLastName(), email, phone, dto.getLanguage());
+            if (forceManualDuplicate) {
+                Exhibitor duplicate = new Exhibitor();
+                duplicate.setEmail(email);
+                duplicate.setRegistrationDate(now);
+                duplicate.setDuplicateDetected(true);
+                duplicate.setDuplicateOfId(exhibitor.getId());
+                applyExhibitor(duplicate, dto);
+                return exhibitorRepository.save(duplicate);
+            }
             // L'exposant existe déjà : on ne réécrit pas ses données depuis un endpoint anonyme.
             // Seule la modification via le lien signé (mode édition) peut les mettre à jour.
             return exhibitor;
@@ -508,9 +521,10 @@ public class PublicRegistrationService {
         exhibitor = new Exhibitor();
         exhibitor.setEmail(email);
         exhibitor.setRegistrationDate(now);
-        exhibitor.setDuplicateDetected(
-                hasPotentialDuplicate(sanitizePhoneNumber(dto.getPhoneNumber()), dto.getFirstName(),
-                        dto.getLastName()));
+        Optional<Exhibitor> candidate = exhibitorDuplicateService.findBestDuplicateCandidate(phone, dto.getFirstName(),
+                dto.getLastName(), null);
+        exhibitor.setDuplicateDetected(candidate.isPresent());
+        exhibitor.setDuplicateOfId(candidate.map(Exhibitor::getId).orElse(null));
 
         applyExhibitor(exhibitor, dto);
 
@@ -681,31 +695,6 @@ public class PublicRegistrationService {
             throw new BadRequestAlertException("Adresse de facturation requise", ENTITY_NAME,
                     "registration.billing-address-required");
         }
-    }
-
-    // -------------------- DOUBLONS --------------------
-
-    /**
-     * Détecte un doublon potentiel pour le <b>nouvel</b> exposant uniquement.
-     * Contrairement à l'import CSV (opération d'administration), l'endpoint public ne marque jamais
-     * les exposants existants : une requête anonyme ne doit pas pouvoir modifier des fiches en base.
-     */
-    private boolean hasPotentialDuplicate(String phone, String firstName, String lastName) {
-        String last6 = Optional.ofNullable(phone).filter(p -> p.length() >= 6).map(p -> p.substring(p.length() - 6))
-                               .orElse(null);
-
-        if (last6 != null && !Optional.ofNullable(exhibitorRepository.findAllByPhoneNumberIsEndingWithIgnoreCase(last6))
-                                      .orElseGet(List::of).isEmpty()) {
-            return true;
-        }
-
-        if (StringUtils.isNotBlank(firstName) && StringUtils.isNotBlank(lastName)) {
-            return !Optional.ofNullable(
-                    exhibitorRepository.findAllByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(firstName,
-                            lastName)).orElseGet(List::of).isEmpty();
-        }
-
-        return false;
     }
 
     // -------------------- UTILS --------------------

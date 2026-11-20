@@ -7,6 +7,55 @@ import {getFirstExhibitorName, IExhibitor} from '../model/exhibitor.interface';
 import {IParticipation} from '../../participation/model/participation.interface';
 import {removeAccents} from '../../../shared/utils/string.util';
 
+export type DuplicateMatchCriterion =
+    'SAME_EMAIL' | 'SAME_PHONE' | 'SAME_NAME' | 'SIMILAR_NAME' | 'SAME_ADDRESS' | 'SAME_STREET';
+
+export interface IDuplicateCandidate {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string | null;
+    homeCity: string | null;
+    homePostalCode: string | null;
+    registrationDate: string | null;
+    participationsCount: number;
+    suggested: boolean;
+    criteria: DuplicateMatchCriterion[];
+}
+
+export type DuplicatePreviewEffect = 'SAME' | 'UPDATED' | 'EMPTIED';
+
+export interface IDuplicatePreviewField {
+    group: string;
+    key: string;
+    label: string;
+    currentValue: string;
+    newValue: string;
+    effect: DuplicatePreviewEffect;
+}
+
+export interface IDuplicateMergeConflict {
+    salonId: string;
+    salonPlace: string;
+    salonStartingDate?: string;
+    duplicateParticipationId: string;
+    duplicateClientNumber?: string;
+    duplicateStatus: string;
+    targetParticipationId: string;
+    targetClientNumber?: string;
+    targetStatus: string;
+}
+
+export interface IDuplicatePreview {
+    duplicateExhibitorId: string;
+    targetExhibitorId: string;
+    differenceCount: number;
+    fields: IDuplicatePreviewField[];
+    mergeConflicts: IDuplicateMergeConflict[];
+    mergeBlocked: boolean;
+}
+
 @Injectable({providedIn: 'root'})
 export class ExhibitorService {
     protected http = inject(HttpClient);
@@ -48,6 +97,19 @@ export class ExhibitorService {
 
     getExhibitorsWithActiveNewsletter(): Observable<IExhibitor[]> {
         return this.http.get<IExhibitor[]>(`${this.resourceUrl}/newsletter`);
+    }
+
+    getDuplicateCandidates(idExhibitor: string): Observable<IDuplicateCandidate[]> {
+        return this.http.get<IDuplicateCandidate[]>(`${this.resourceUrl}/${idExhibitor}/duplicate-candidates`);
+    }
+
+    searchDuplicateCandidates(query: string): Observable<IDuplicateCandidate[]> {
+        return this.http.get<IDuplicateCandidate[]>(`${this.resourceUrl}/search`, {params: {q: query}});
+    }
+
+    getDuplicatePreview(idExhibitor: string, targetExhibitorId: string): Observable<IDuplicatePreview> {
+        return this.http.get<IDuplicatePreview>(`${this.resourceUrl}/${idExhibitor}/duplicate-preview`,
+                                                {params: {target: targetExhibitorId}});
     }
 }
 

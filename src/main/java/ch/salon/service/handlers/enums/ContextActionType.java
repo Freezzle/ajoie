@@ -36,6 +36,7 @@ public enum ContextActionType {
     PARTICIPATION_NEUTRAL_EMAIL("participation", "participation-neutral-email"),
     PARTICIPATION_MARK_AS_VALIDATED("participation", "participation-marked-as-validated"),
     PARTICIPATION_MARK_AS_CLOSED("participation", "participation-marked-as-closed"),
+    PARTICIPATION_RESOLVE_DUPLICATE("participation", "participation-resolve-duplicate"),
     CONFERENCE_MARK_AS_VERIFICATION("conference", "conference-marked-as-verification"),
     CONFERENCE_MARK_AS_ACCEPTED("conference", "conference-marked-as-accepted"),
     CONFERENCE_MARK_AS_REFUSED("conference", "conference-marked-as-refused"),
@@ -117,6 +118,7 @@ public enum ContextActionType {
             // === PARTICIPATION - Actions de progression du workflow ===
             case PARTICIPATION_MARK_AS_VERIFICATION -> 10;  // Mettre en vérification (début du processus)
             case PARTICIPATION_MARK_AS_ON_HOLD -> 16;        // Mettre la participation en attente (pendant la vérification)
+            case PARTICIPATION_RESOLVE_DUPLICATE -> 9;       // Résoudre un doublon bloquant
             case PARTICIPATION_MARK_AS_ACCEPTED -> 11;       // Accepter la participation
             case PARTICIPATION_MARK_AS_VALIDATED -> 12;      // Valider la participation
             case PARTICIPATION_MARK_AS_CLOSED -> 13;         // Clôturer la participation (fin du processus)

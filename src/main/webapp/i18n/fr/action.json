@@ -116,6 +116,8 @@
     "participation-marked-as-verification.help": "Met la participation en cours de vérification, car certains éléments sont manquants, en attente d'information ou doit être encore analysé.",
     "participation-marked-as-on-hold": "Mettre en attente",
     "participation-marked-as-on-hold.help": "Marque la participation comme « en attente » pendant la vérification, le temps d'étudier la candidature ou d'obtenir des informations. Ce marqueur est automatiquement retiré lorsque la participation est acceptée, refusée ou annulée.",
+    "participation-resolve-duplicate": "Gérer le doublon client",
+    "participation-resolve-duplicate.help": "Compare la fiche marquée comme doublon avec un client existant pour décider de fusionner, retirer l'alerte ou garder les fiches séparées.",
     "participation-acceptation-email": "Envoyer l'acceptation",
     "participation-acceptation-email.help": "Envoie un email d'acceptation au participant.",
     "participation-on-hold-email": "Envoyer la mise en attente",

@@ -104,6 +104,7 @@ public class Importation2026Service {
     private final RefreshInvoicingPlansService refreshInvoicingPlansService;
     private final EventLogService eventLogService;
     private final ParticipationMapper participationMapper;
+    private final ExhibitorDuplicateService exhibitorDuplicateService;
 
     @Transactional
     public List<ParticipationDTO> importData(String idSalon, InputStream file) {
@@ -132,7 +133,7 @@ public class Importation2026Service {
                     log.warn("Ignored line {} : empty email", r.getRecordNumber());
                     continue;
                 }
-                if (participationRepository.findByExhibitorEmailAndSalonId(email, currentSalon.getId()) != null) {
+                if (participationRepository.findFirstByExhibitorEmailAndSalonId(email, currentSalon.getId()) != null) {
                     log.info("Already imported: email={} salonId={}", email, currentSalon.getId());
                     continue;
                 }
@@ -279,10 +280,23 @@ public class Importation2026Service {
             String npaLocalite, String phone, boolean wantsNewsletter, Instant now) {
 
         Exhibitor current = exhibitorRepository.findByEmail(email);
+        boolean forceManualDuplicate = exhibitorDuplicateService.shouldForceManualDuplicate(current, firstName, lastName,
+                email, phone, LANG_FR);
 
-        if (current == null) {
+        if (current != null && forceManualDuplicate) {
+            Exhibitor duplicate = new Exhibitor();
+            duplicate.setEmail(sub100(email));
+            duplicate.setLanguage(LANG_FR);
+            duplicate.setRegistrationDate(now);
+            duplicate.setDuplicateDetected(true);
+            duplicate.setDuplicateOfId(current.getId());
+            current = duplicate;
+        } else if (current == null) {
             current = new Exhibitor();
-            current.setDuplicateDetected(detectAndFlagDuplicates(phone, firstName, lastName));
+            Optional<Exhibitor> candidate = exhibitorDuplicateService.findBestDuplicateCandidate(phone, firstName,
+                    lastName, null);
+            current.setDuplicateDetected(candidate.isPresent());
+            current.setDuplicateOfId(candidate.map(Exhibitor::getId).orElse(null));
             current.setEmail(sub100(email));
             current.setLanguage(LANG_FR);
             current.setRegistrationDate(now);
@@ -303,41 +317,6 @@ public class Importation2026Service {
         current.setNewsletter(wantsNewsletter);
 
         return exhibitorRepository.save(current);
-    }
-
-    private boolean detectAndFlagDuplicates(String phone, String firstName, String lastName) {
-        boolean duplicateDetected = false;
-
-        // 1) Match téléphone (6 derniers chiffres)
-        String last6 = Optional.ofNullable(phone).filter(p -> p.length() >= 6).map(p -> p.substring(p.length() - 6))
-                               .orElse(null);
-
-        if (last6 != null) {
-            List<Exhibitor> phoneMatches =
-                    Optional.ofNullable(exhibitorRepository.findAllByPhoneNumberIsEndingWithIgnoreCase(last6))
-                            .orElseGet(ArrayList::new);
-
-            if (!phoneMatches.isEmpty()) {
-                duplicateDetected = true;
-                phoneMatches.forEach(e -> e.setDuplicateDetected(true));
-                exhibitorRepository.saveAll(phoneMatches);
-            }
-        }
-
-        // 2) Match prénom + nom si pas déjà détecté
-        if (!duplicateDetected && StringUtils.isNotBlank(firstName) && StringUtils.isNotBlank(lastName)) {
-            List<Exhibitor> nameMatches = Optional.ofNullable(
-                    exhibitorRepository.findAllByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(firstName,
-                            lastName)).orElseGet(ArrayList::new);
-
-            if (!nameMatches.isEmpty()) {
-                duplicateDetected = true;
-                nameMatches.forEach(e -> e.setDuplicateDetected(true));
-                exhibitorRepository.saveAll(nameMatches);
-            }
-        }
-
-        return duplicateDetected;
     }
 
     // -------------------- DIMENSIONS --------------------

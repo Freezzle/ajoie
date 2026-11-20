@@ -16,6 +16,7 @@ public interface ExhibitorMapper {
     @Mapping(target = "address", ignore = true)
     @Mapping(target = "npaLocalite", ignore = true)
     @Mapping(target = "isoCountry", ignore = true)
+    @Mapping(target = "duplicateOfId", ignore = true)
     Exhibitor toEntity(ExhibitorDTO exhibitor);
 
     ExhibitorLightDTO toLightDto(Exhibitor exhibitor);
@@ -31,6 +32,7 @@ public interface ExhibitorMapper {
     @Mapping(target = "address", ignore = true)
     @Mapping(target = "npaLocalite", ignore = true)
     @Mapping(target = "isoCountry", ignore = true)
+    @Mapping(target = "duplicateOfId", ignore = true)
     void updateEntityFromDto(ExhibitorDTO exhibitorDTO, @MappingTarget Exhibitor exhibitor);
 
     @BeanMapping(ignoreByDefault = true)

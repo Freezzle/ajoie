@@ -119,6 +119,46 @@
         "null": " "
       }
     },
+    "duplicate": {
+      "title": "Doublon détecté",
+      "conflict": {
+        "title": "Participations en conflit",
+        "help": "Ce client est déjà inscrit dans ce salon avec une participation active. Annulez ou refusez l'une des deux participations avant de fusionner.",
+        "duplicateParticipation": "Doublon :",
+        "targetParticipation": "Client existant :"
+      },
+      "target": "Client existant candidat",
+      "selectTarget": "Sélectionner un candidat",
+      "onlyDifferences": "N'afficher que les différences",
+      "differences": "différences",
+      "field": "Champ",
+      "existing": "Existant",
+      "new": "Nouveau",
+      "result": "Après fusion",
+      "effect": {
+        "SAME": "Identique",
+        "UPDATED": "Mis à jour",
+        "EMPTIED": "Vidé (vide chez le nouveau)"
+      },
+      "criteria": {
+        "SAME_EMAIL": "même e-mail",
+        "SAME_PHONE": "même téléphone",
+        "SAME_NAME": "même nom",
+        "SIMILAR_NAME": "nom proche",
+        "SAME_ADDRESS": "même adresse",
+        "SAME_STREET": "même rue"
+      },
+      "decision": {
+        "merge": "Fusionner dans l'existant",
+        "notDuplicate": "Pas un doublon",
+        "keepSeparate": "Doublon, mais garder séparé"
+      },
+      "confirm": {
+        "merge": "La fusion mettra à jour l'existant avec les données du nouveau et supprimera la fiche doublon. Confirmer ?",
+        "notDuplicate": "Retirer l'alerte de doublon sans fusionner les fiches ?",
+        "keepSeparate": "Retirer l'alerte de doublon et garder les deux fiches séparées ?"
+      }
+    },
     "title": "Les participations",
     "type": {
       "list": {

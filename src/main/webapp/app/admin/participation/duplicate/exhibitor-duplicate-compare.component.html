@@ -1,0 +1,121 @@
+<div class="duplicate-modal">
+    <div class="duplicate-header">
+        <h3>{{ 'participation.duplicate.title' | translate }}</h3>
+        <button-box [showText]="false" primeIcon="pi-times" type="secondary" translateKey="common.close"
+                    (clickedEvent)="close()"/>
+    </div>
+
+    <app-card [titleKey]="'participation.duplicate.target'">
+        <div appCardBody>
+            <div class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <select class="form-select" [(ngModel)]="selectedTargetId" (ngModelChange)="onTargetChange()">
+                        <option [ngValue]="null">{{ 'participation.duplicate.selectTarget' | translate }}</option>
+                        @for (candidate of candidates; track candidate.id) {
+                            <option [ngValue]="candidate.id">
+                                {{ candidate.firstName }} {{ candidate.lastName }} - {{ candidate.email }}
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <input class="form-control" [(ngModel)]="searchQuery" (keydown.enter)="searchCandidates()"
+                           [placeholder]="'entityList.search' | translate"/>
+                </div>
+                <div class="col-md-1 d-flex">
+                    <button-box primeIcon="pi-search" [showText]="false" translateKey="entityList.search"
+                                (clickedEvent)="searchCandidates()"/>
+                </div>
+            </div>
+            @let selected = candidates.find(candidate => candidate.id === selectedTargetId);
+            @if (selected) {
+                <div class="candidate-meta">
+                    <span>{{ selected.email || '-' }}</span>
+                    <span>{{ selected.phoneNumber || '-' }}</span>
+                    <span>{{ selected.homePostalCode }} {{ selected.homeCity }}</span>
+                    <span>{{ selected.participationsCount }} {{ 'participation.list.countPlural' | translate }}</span>
+                    @for (criterion of selected.criteria; track criterion) {
+                        <span class="criterion">{{ criterionLabel(criterion) | translate }}</span>
+                    }
+                </div>
+            }
+        </div>
+    </app-card>
+
+    @if (preview) {
+        <div class="compare-bar">
+            <label class="form-check-label">
+                <input class="form-check-input me-2" type="checkbox" [(ngModel)]="onlyDifferences"/>
+                {{ 'participation.duplicate.onlyDifferences' | translate }}
+            </label>
+            <span>{{ preview.differenceCount }} {{ 'participation.duplicate.differences' | translate }}</span>
+        </div>
+
+        @for (group of groups(); track group.name) {
+            <app-card [title]="group.name">
+                <div appCardBody>
+                    <div class="compare-grid compare-head">
+                        <span></span>
+                        <span>{{ 'participation.duplicate.existing' | translate }}</span>
+                        <span>{{ 'participation.duplicate.new' | translate }}</span>
+                        <span>{{ 'participation.duplicate.result' | translate }}</span>
+                    </div>
+                    @for (row of group.fields; track row.key) {
+                        <div class="compare-grid compare-row">
+                            <span class="compare-label">{{ row.label }}</span>
+                            <span>{{ row.currentValue || '-' }}</span>
+                            <span>{{ row.newValue || '-' }}</span>
+                            <span [class.same]="row.effect === 'SAME'" [class.changed]="row.effect !== 'SAME'">
+                                {{ effectLabel(row.effect) | translate }}
+                            </span>
+                        </div>
+                    }
+                </div>
+            </app-card>
+        }
+    }
+
+    @if (preview?.mergeBlocked) {
+        <app-card [titleKey]="'participation.duplicate.conflict.title'">
+            <div appCardBody class="conflict-block">
+                <p class="conflict-help">{{ 'participation.duplicate.conflict.help' | translate }}</p>
+                @for (conflict of preview!.mergeConflicts; track conflict.duplicateParticipationId) {
+                    <div class="conflict-row">
+                        <strong>{{ conflict.salonPlace }}</strong>
+                        <a class="clickable" (click)="close()"
+                           [routerLink]="['/admin', 'salons', conflict.salonId, 'participations', conflict.duplicateParticipationId, 'view']">
+                            {{ 'participation.duplicate.conflict.duplicateParticipation' | translate }}
+                            {{ conflict.duplicateClientNumber }} ({{ 'participation.status.list.' + conflict.duplicateStatus | translate }})
+                        </a>
+                        <a class="clickable" (click)="close()"
+                           [routerLink]="['/admin', 'salons', conflict.salonId, 'participations', conflict.targetParticipationId, 'view']">
+                            {{ 'participation.duplicate.conflict.targetParticipation' | translate }}
+                            {{ conflict.targetClientNumber }} ({{ 'participation.status.list.' + conflict.targetStatus | translate }})
+                        </a>
+                    </div>
+                }
+            </div>
+        </app-card>
+    }
+
+    <div class="decision-bar">
+        @if (pendingDecision) {
+            <div class="confirm-panel" role="alertdialog">
+                <p>{{ confirmKey() | translate }}</p>
+                <div class="confirm-actions">
+                    <button-box type="secondary" translateKey="common.cancel" (clickedEvent)="cancelDecision()"/>
+                    <button-box [type]="pendingDecision === 'MERGE' ? 'danger' : 'primary'"
+                                translateKey="common.confirm" (clickedEvent)="applyDecision()"/>
+                </div>
+            </div>
+        } @else {
+            <button-box translateKey="participation.duplicate.decision.merge" type="danger"
+                        [isDisabled]="!selectedTargetId || isLoading || !!preview?.mergeBlocked"
+                        (clickedEvent)="askDecision('MERGE')"/>
+            <button-box translateKey="participation.duplicate.decision.notDuplicate" type="secondary"
+                        [isDisabled]="isLoading" (clickedEvent)="askDecision('NOT_DUPLICATE')"/>
+            <button-box translateKey="participation.duplicate.decision.keepSeparate" type="secondary"
+                        [isDisabled]="!selectedTargetId || isLoading" (clickedEvent)="askDecision('KEEP_SEPARATE')"/>
+        }
+    </div>
+</div>

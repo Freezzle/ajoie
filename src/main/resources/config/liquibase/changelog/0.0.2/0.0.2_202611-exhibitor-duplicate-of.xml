@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="0.0.2-202611-exhibitor-duplicate-of" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="exhibitor"/>
+            <not>
+                <columnExists tableName="exhibitor" columnName="duplicate_of_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="exhibitor">
+            <column name="duplicate_of_id" type="${uuidType}"/>
+        </addColumn>
+
+        <createIndex indexName="idx_exhibitor_duplicate_of_id" tableName="exhibitor">
+            <column name="duplicate_of_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex indexName="idx_exhibitor_duplicate_of_id" tableName="exhibitor"/>
+            <dropColumn tableName="exhibitor" columnName="duplicate_of_id"/>
+        </rollback>
+    </changeSet>
+
+    <!-- Plusieurs fiches peuvent partager un e-mail tant qu'un doublon n'est pas résolu. -->
+    <changeSet id="0.0.2-202611-exhibitor-email-not-unique" author="copilot" dbms="postgresql">
+        <sql>ALTER TABLE exhibitor DROP CONSTRAINT IF EXISTS exhibitor_email_key</sql>
+        <createIndex indexName="idx_exhibitor_email" tableName="exhibitor">
+            <column name="email"/>
+        </createIndex>
+        <rollback/>
+    </changeSet>
+
+</databaseChangeLog>

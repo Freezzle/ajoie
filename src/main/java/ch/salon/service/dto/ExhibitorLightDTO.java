@@ -14,4 +14,5 @@ public class ExhibitorLightDTO implements Serializable {
     private String lastName;
     private boolean redFlag;
     private boolean duplicateDetected;
+    private UUID duplicateOfId;
 }

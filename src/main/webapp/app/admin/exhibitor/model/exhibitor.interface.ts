@@ -12,6 +12,7 @@ export interface IExhibitor {
     newsletter: boolean;
     redFlag: boolean;
     duplicateDetected: boolean;
+    duplicateOfId?: string | null;
 
     phoneNumber: string | null;
     homeAddress: IAddress | null;

@@ -1,10 +1,12 @@
 package ch.salon.repository;
 
 import ch.salon.aop.logging.RepositoryAction;
+import ch.salon.domain.Exhibitor;
 import ch.salon.domain.Participation;
 import ch.salon.domain.enumeration.Status;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,7 +27,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
     @Query("SELECT MAX(p.clientNumber) FROM Participation p where p.salon.id = ?1")
     String findMaxClientNumber(UUID idSalon);
 
-    Participation findByExhibitorEmailAndSalonId(String email, UUID idSalon);
+    Participation findFirstByExhibitorEmailAndSalonId(String email, UUID idSalon);
     Participation findByExhibitorIdAndSalonId(UUID idExhibitor, UUID idSalon);
 
     @EntityGraph(attributePaths = {"exhibitor", "exhibitor.billingAddress"})
@@ -46,4 +48,10 @@ public interface ParticipationRepository extends JpaRepository<Participation, UU
     /** Salons des participations actives, par client : [idExposant, nom du salon, date de début]. */
     @Query("SELECT p.exhibitor.id, p.salon.place, p.salon.startingDate FROM Participation p WHERE p.status NOT IN :statuses")
     List<Object[]> findSalonsByExhibitorExcludingStatuses(@Param("statuses") List<Status> statuses);
+
+    long countByExhibitorId(UUID exhibitorId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Participation p SET p.exhibitor = :target WHERE p.exhibitor = :duplicate")
+    int reassignExhibitor(@Param("duplicate") Exhibitor duplicate, @Param("target") Exhibitor target);
 }

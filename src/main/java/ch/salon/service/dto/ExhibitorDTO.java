@@ -22,4 +22,5 @@ public class ExhibitorDTO implements Serializable {
     private boolean newsletter;
     private boolean redFlag = false;
     private boolean duplicateDetected = false;
+    private UUID duplicateOfId;
 }

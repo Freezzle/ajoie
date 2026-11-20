@@ -2,7 +2,10 @@ package ch.salon.web.rest;
 
 import ch.salon.security.AuthoritiesConstants;
 import ch.salon.service.ExhibitorService;
+import ch.salon.service.ExhibitorDuplicateService;
 import ch.salon.service.ParticipationService;
+import ch.salon.service.dto.DuplicateCandidateDTO;
+import ch.salon.service.dto.DuplicatePreviewDTO;
 import ch.salon.service.dto.EventLogDTO;
 import ch.salon.service.dto.ExhibitorDTO;
 import ch.salon.service.dto.ExhibitorLightDTO;
@@ -35,11 +38,14 @@ public class AdminExhibitorResource {
     private static final Logger log = LoggerFactory.getLogger(AdminExhibitorResource.class);
     private final ExhibitorService exhibitorService;
     private final ParticipationService participationService;
+    private final ExhibitorDuplicateService exhibitorDuplicateService;
 
 
-    public AdminExhibitorResource(ExhibitorService exhibitorService, ParticipationService participationService) {
+    public AdminExhibitorResource(ExhibitorService exhibitorService, ParticipationService participationService,
+            ExhibitorDuplicateService exhibitorDuplicateService) {
         this.exhibitorService = exhibitorService;
         this.participationService = participationService;
+        this.exhibitorDuplicateService = exhibitorDuplicateService;
     }
 
     @PostMapping("")
@@ -123,6 +129,25 @@ public class AdminExhibitorResource {
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
     public List<ExhibitorLightDTO> getExhibitorsWithActiveNewsletter() {
         return exhibitorService.getExhibitorsWithActiveNewsletter();
+    }
+
+    @GetMapping("/{idExhibitor}/duplicate-candidates")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public List<DuplicateCandidateDTO> getDuplicateCandidates(@PathVariable("idExhibitor") UUID idExhibitor) {
+        return exhibitorDuplicateService.getDuplicateCandidates(idExhibitor);
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public List<DuplicateCandidateDTO> searchExhibitors(@RequestParam("q") String q) {
+        return exhibitorDuplicateService.searchCandidates(q, 20);
+    }
+
+    @GetMapping("/{idExhibitor}/duplicate-preview")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN_BUSINESS + "\")")
+    public DuplicatePreviewDTO getDuplicatePreview(@PathVariable("idExhibitor") UUID idExhibitor,
+            @RequestParam("target") UUID targetExhibitorId) {
+        return exhibitorDuplicateService.buildPreview(idExhibitor, targetExhibitorId);
     }
 
 }

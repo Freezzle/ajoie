@@ -64,6 +64,7 @@ import {
     DetailSideDirective,
     DetailStatusDirective
 } from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
+import {ExhibitorDuplicateCompareComponent} from '../duplicate/exhibitor-duplicate-compare.component';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
     registration: ['therapistName', 'registrationDate', 'acceptedChart', 'acceptedContract'],
@@ -333,7 +334,9 @@ export class ParticipationUpdateComponent implements OnInit {
         }
 
         const action = request.action;
-        if (action.type === 'EMAIL') {
+        if (action.contextCode === 'participation-resolve-duplicate') {
+            this.openDuplicateResolver(action, participationId);
+        } else if (action.type === 'EMAIL') {
             this.openEmailPopup(action, participationId);
         } else if (action.type === 'DOWNLOAD') {
             this.downloadAction(action, participationId);
@@ -352,6 +355,25 @@ export class ParticipationUpdateComponent implements OnInit {
         } else {
             this.executeBusinessAction(action, participationId);
         }
+    }
+
+    private openDuplicateResolver(action: AvailableAction, participationId: string): void {
+        const duplicateExhibitor = this.initialParticipation?.exhibitor;
+        if (!duplicateExhibitor) {
+            return;
+        }
+
+        const modalRef = this.modalService.open(ExhibitorDuplicateCompareComponent, {size: 'xl'});
+        modalRef.componentInstance.participationId = participationId;
+        modalRef.componentInstance.duplicateExhibitor = duplicateExhibitor;
+
+        modalRef.result.then((payload: Map<string, any>) => {
+            if (payload) {
+                this.executeBusinessAction(action, participationId, payload);
+            }
+        }).catch(() => {
+            // Modal dismissed
+        });
     }
 
     private downloadAction(action: AvailableAction, participationId: string): void {
