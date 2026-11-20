@@ -12,6 +12,7 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {BottomSheetComponent} from '../../../shared/components/bottom-sheet/bottom-sheet.component';
 
@@ -85,6 +86,26 @@ export class TalksPlanningComponent implements OnInit {
 
     readonly configDialogVisible = signal(false);
     readonly mobileSheet = signal<MobileSheet>('NONE');
+    readonly cardActions = computed<EntityAction[]>(() => {
+        if (this.store.isReadOnly()) {
+            return this.store.menuItems().map(action => ({...action, disabled: action.disabled || this.store.isLoading()}));
+        }
+        return [
+            {
+                labelKey: 'planningTalks.config.title',
+                icon: 'pi pi-sliders-h',
+                disabled: this.store.isLoading(),
+                run: () => this.configDialogVisible.set(true)
+            },
+            {
+                labelKey: 'planningTalks.undo',
+                icon: 'pi pi-undo',
+                disabled: this.store.isLoading() || !this.store.canUndo(),
+                run: () => this.store.undo()
+            }
+        ];
+    });
+
     readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.idSalon()));
 
     constructor() {

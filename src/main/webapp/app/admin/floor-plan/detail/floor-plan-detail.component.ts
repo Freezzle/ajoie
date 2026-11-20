@@ -29,7 +29,6 @@ import SharedModule from '../../../shared/shared.module';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
-import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
@@ -94,7 +93,7 @@ import {FloorPlanSettingsService} from '../service/floor-plan-settings.service';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
 import {ActionsService} from '../../common/actions.service';
 import {AvailableAction} from '../../../shared/model/available-action';
-import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 import {getFormattedParticipationName} from '../../participation/model/participation.interface';
 import {getExhibitorFullName, selectFilterExhibitor} from '../../exhibitor/model/exhibitor.interface';
@@ -139,7 +138,6 @@ const MAX_PPM = 90;
                    ContentPageComponent,
                    CardComponent,
                    ButtonBoxComponent,
-                   MenuBoxComponent,
                    DialogBoxComponent,
                    SelectBoxComponent,
                    AlertErrorComponent,
@@ -191,7 +189,7 @@ export class FloorPlanDetailComponent {
 
     /** Repli manuel des panneaux, pour rendre de la largeur au plan. */
     readonly leftPanelCollapsed = signal(false);
-    readonly rightPanelCollapsed = signal(false);
+    readonly rightPanelCollapsed = signal(true);
 
     readonly pixelsPerMeter = signal(30);
     readonly displayTechnical = signal(false);
@@ -203,7 +201,20 @@ export class FloorPlanDetailComponent {
     readonly nextPosition = new FormControl<number | null>(1);
 
     readonly cursor = signal<Point | null>(null);
-    readonly menuCache = signal<AppMenuItem[]>([]);
+    readonly menuCache = signal<EntityAction[]>([]);
+    readonly cardActions = computed<EntityAction[]>(() => {
+        if (this.isReadOnly()) {
+            return this.menuCache().map(action => ({...action, disabled: action.disabled || this.isLoading()}));
+        }
+        return [
+            {
+                labelKey: 'floorPlan.settings.title',
+                icon: 'pi pi-sliders-h',
+                disabled: this.isLoading(),
+                run: () => this.openSettingsDialog()
+            }
+        ];
+    });
     readonly contextMenuItems = signal<MenuItem[]>([]);
 
     /** Sélecteur segmenté « Exposant / Technique », relocalisé au changement de langue. */
@@ -1324,8 +1335,8 @@ export class FloorPlanDetailComponent {
             .subscribe(actions => this.menuCache.set(this.buildActionsMenu(actions)));
     }
 
-    private buildActionsMenu(availableActions: AvailableAction[]): AppMenuItem[] {
-        return this.menuItemBuilderService.buildMenuItemsFromActions(
+    private buildActionsMenu(availableActions: AvailableAction[]): EntityAction[] {
+        return this.menuItemBuilderService.buildEntityActionsFromActions(
             availableActions,
             (action, htmlElement) => this.clickAction(action, htmlElement)
         );

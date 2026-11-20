@@ -23,6 +23,8 @@ export class CardComponent {
     readonly editing = input<boolean>(false);
     readonly dimmed = input<boolean>(false);
     readonly showHeader = input<boolean>(true);
+    /** Affiche toujours le rouage, même avec une seule action. */
+    readonly actionsAsMenu = input<boolean>(false);
 
     private readonly translateService = inject(TranslateService);
     private readonly footers = contentChildren(CardFooterContentDirective);

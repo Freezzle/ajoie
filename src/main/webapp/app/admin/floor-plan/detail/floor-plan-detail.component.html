@@ -7,7 +7,6 @@
             }
         </div>
     </div>
-
     <div appMenuBarEnd>
         @if (isReadOnly()) {
             <button-box (clickedEvent)="previousState()"
@@ -20,12 +19,6 @@
                         [showText]="false"
                         primeIcon="pi-pencil"
                         translateKey="common.edit"/>
-            @if (menuCache().length > 0) {
-                <menu-box [buttonDisabled]="isLoading()"
-                          [items]="menuCache()"
-                          buttonIcon="pi-list"
-                          buttonTranslateKey="common.actions"/>
-            }
         } @else {
             <button-box (clickedEvent)="activateReadOnlyMode()"
                         [isDisabled]="isLoading()"
@@ -45,7 +38,7 @@
     <app-alert-error></app-alert-error>
     <p-contextMenu #cm [model]="contextMenuItems()"/>
 
-    <app-card [showHeader]="false">
+    <app-card [titleKey]="'salon.floorPlan'" [actions]="cardActions()" [actionsAsMenu]="true">
         <div appCardBody>
             @if (activePlan(); as plan) {
                 <!-- ====================================== Barre du haut -->
@@ -179,14 +172,6 @@
                                         [type]="rightPanelCollapsed() ? 'secondary' : 'primary'"
                                         primeIcon="pi-list"
                                         translateKey="floorPlan.view.toggleInspector"/>
-
-                            @if (!isReadOnly()) {
-                                <button-box (clickedEvent)="openSettingsDialog()"
-                                            [showText]="false"
-                                            primeIcon="pi-sliders-h"
-                                            translateKey="floorPlan.settings.title"
-                                            type="secondary"/>
-                            }
                         </div>
                     </div>
                 </div>

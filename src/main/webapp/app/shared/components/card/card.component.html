@@ -18,7 +18,7 @@
                     <span class="app-card-tag">{{ tag() }}</span>
                 }
 
-                @if (!dimmed() && visibleActions().length === 1) {
+                @if (!dimmed() && visibleActions().length === 1 && !actionsAsMenu()) {
                     @let action = visibleActions()[0];
                     <button class="app-card-action"
                             type="button"
@@ -30,7 +30,7 @@
                         }
                         <span>{{ action.labelKey | translate: action.labelParams }}</span>
                     </button>
-                } @else if (!dimmed() && visibleActions().length > 1) {
+                } @else if (!dimmed() && visibleActions().length > 0) {
                     <entity-actions-menu [actions]="visibleActions()" />
                 }
             </span>

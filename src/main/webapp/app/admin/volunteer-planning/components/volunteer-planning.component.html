@@ -7,7 +7,6 @@
             }
         </div>
     </div>
-
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()"
                     [isDisabled]="store.isLoading()"
@@ -21,13 +20,6 @@
                         [showText]="false"
                         primeIcon="pi-pencil"
                         translateKey="common.edit"/>
-
-            @if (store.downloadMenuItems().length) {
-                <menu-box [items]="store.downloadMenuItems()"
-                          [appendTo]="'body'"
-                          buttonIcon="pi-cog"
-                          buttonTranslateKey="common.actions"/>
-            }
         }
 
         @if (!store.isReadOnly()) {
@@ -51,17 +43,8 @@
     <p-confirmpopup/>
     <p-toast position="bottom-center"/>
 
-    <app-card [showHeader]="false">
+    <app-card [titleKey]="'salon.volunteersPlanning'" [actions]="cardActions()" [actionsAsMenu]="true">
         <div appCardBody class="vp-page">
-            @if (!store.isReadOnly()) {
-                <div class="d-flex justify-content-end gap-2 align-items-center">
-                    <button-box (clickedEvent)="volunteersDialogVisible.set(true)"
-                                translateKey="planningVolunteers.manageVolunteers"/>
-                    <button-box (clickedEvent)="categoriesDialogVisible.set(true)"
-                                translateKey="planningVolunteers.manageCategories"/>
-                </div>
-            }
-
             @if (store.selectedDay() || !store.isReadOnly()) {
                 <p-tabs [value]="store.selectedDay()?.id" scrollable>
                     <p-tablist class="justify-content-center">

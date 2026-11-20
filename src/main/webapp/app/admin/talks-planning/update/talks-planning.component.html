@@ -35,11 +35,10 @@
                         translateKey="common.save"/>
         }
     </div>
-
     <app-alert-error/>
     <p-toast key="bottom-center" position="bottom-center"/>
 
-    <app-card [showHeader]="false">
+    <app-card [titleKey]="'salon.talksPlanning'" [actions]="cardActions()" [actionsAsMenu]="true">
         <div appCardBody class="tp-page" [class.is-mobile]="isMobile()">
 
             @if (!store.hasConfiguration()) {
@@ -56,16 +55,10 @@
                     </div>
                 }
             } @else {
-                <planning-day-bar [canUndo]="store.canUndo()"
-                                  [conflictsByDay]="store.conflictsByDay()"
+                <planning-day-bar [conflictsByDay]="store.conflictsByDay()"
                                   [days]="store.days()"
-                                  [isLoading]="store.isLoading()"
-                                  [isReadOnly]="store.isReadOnly()"
-                                  [menuItems]="store.menuItems()"
                                   [selectedDayId]="store.selectedDay()?.id ?? null"
-                                  (configRequested)="configDialogVisible.set(true)"
-                                  (daySelected)="store.selectDay($event)"
-                                  (undoRequested)="store.undo()"/>
+                                  (daySelected)="store.selectDay($event)"/>
 
                 @if (store.talkInHandValue()) {
                     <div class="alert alert-secondary d-flex align-items-center flex-wrap gap-2 py-2 px-3 mb-2 small"

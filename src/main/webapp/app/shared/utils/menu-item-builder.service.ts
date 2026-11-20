@@ -2,6 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {PrimeIcons} from 'primeng/api';
 import {AvailableAction} from '../model/available-action';
+import {EntityAction} from '../components/entity-list/entity-list.model';
 import {AppMenuItem} from './app-menu-item.model';
 
 @Injectable({
@@ -47,6 +48,21 @@ export class MenuItemBuilderService {
             });
         }
         return items;
+    }
+
+    /** Variante de {@link buildMenuItemsFromActions} pour le rouage d'un `app-card`. */
+    buildEntityActionsFromActions(
+        availableActions: AvailableAction[],
+        commandCallback: (action: AvailableAction, element: HTMLElement) => void
+    ): EntityAction[] {
+        return (availableActions ?? []).map(action => ({
+            labelKey: action.labelKey,
+            icon: this.getIconForActionType(action.type),
+            disabled: action.disabled,
+            helpText: action.helpKey ? this.translateService.instant(action.helpKey) as string : undefined,
+            conditionalKeys: action.conditionalKeys || [],
+            run: (element: HTMLElement) => commandCallback(action, element)
+        }));
     }
 
     /**

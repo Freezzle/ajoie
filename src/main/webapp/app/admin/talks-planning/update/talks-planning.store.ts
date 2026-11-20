@@ -8,7 +8,7 @@ import {WorkshopService} from '../../workshop/service/workshop.service';
 import {ActionsService} from '../../common/actions.service';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 import {AvailableAction} from '../../../shared/model/available-action';
-import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {Status} from '../../enumerations/status.model';
 
 import {
@@ -80,7 +80,7 @@ export class TalksPlanningStore {
     readonly panelFolded = signal<boolean>(false);
     readonly trayFilter = signal<TrayFilter>('ALL');
     readonly trayQuery = signal<string>('');
-    readonly menuItems = signal<AppMenuItem[]>([]);
+    readonly menuItems = signal<EntityAction[]>([]);
     readonly toast = signal<PlanningToast | null>(null);
 
     private readonly salonService = inject(SalonService);
@@ -245,7 +245,7 @@ export class TalksPlanningStore {
         }
         this.actionsService.getAvailableActions('salon', this.idSalon, 'talks-planning')
             .subscribe(actions => {
-                this.menuItems.set(this.menuItemBuilderService.buildMenuItemsFromActions(
+                this.menuItems.set(this.menuItemBuilderService.buildEntityActionsFromActions(
                     actions, (action, element) => this.clickAction(action, element)));
             });
     }

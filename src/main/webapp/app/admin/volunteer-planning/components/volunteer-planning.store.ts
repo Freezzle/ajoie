@@ -36,7 +36,7 @@ import {ActionsService} from '../../common/actions.service';
 import {AlertService} from '../../../core/util/alert.service';
 import {VolunteerRegistrationAdminService} from '../volunteer-registration-admin.service';
 import {AvailableAction} from '../../../shared/model/available-action';
-import {AppMenuItem} from '../../../shared/utils/app-menu-item.model';
+import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {MenuItemBuilderService} from '../../../shared/utils/menu-item-builder.service';
 
 export type ViewMode = 'both' | 'person' | 'zone';
@@ -69,7 +69,7 @@ export class VolunteerPlanningStore {
     readonly editMinimums = signal<boolean>(false);
     readonly mobilePaintMode = signal<boolean>(false);
     readonly history = signal<Day[]>([]);
-    readonly downloadMenuItems = signal<AppMenuItem[]>([]);
+    readonly downloadMenuItems = signal<EntityAction[]>([]);
     /** Ids (planningVolunteerId) des bénévoles inscrits en ligne : pour l'icône popin. */
     readonly onlineVolunteerIds = signal<Set<string>>(new Set());
     /** Bénévole dont la popin d'infos en ligne est ouverte (null = fermée). */
@@ -358,7 +358,7 @@ export class VolunteerPlanningStore {
         this.actionsService.getAvailableActions('salon', this.idSalon, 'volunteer-planning')
             .subscribe(actions => {
                 this.downloadMenuItems.set(
-                    this.menuItemBuilderService.buildMenuItemsFromActions(actions, action => this.clickDownloadAction(action))
+                    this.menuItemBuilderService.buildEntityActionsFromActions(actions, action => this.clickDownloadAction(action))
                 );
             });
     }

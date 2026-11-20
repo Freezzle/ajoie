@@ -15,6 +15,7 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
 import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {SwitchBoxComponent, SwitchBoxOption} from '../../../shared/components/switch-box/switch-box.component';
@@ -106,6 +107,24 @@ export class VolunteerPlanningComponent implements OnInit {
             return {day: this.store.createEmptyDay(this.manageDaySelectedDayId())};
         }
         return this.store.daySlice();
+    });
+
+    readonly cardActions = computed<EntityAction[]>(() => {
+        if (this.store.isReadOnly()) {
+            return this.store.downloadMenuItems().map(action => ({...action, disabled: action.disabled || this.store.isLoading()}));
+        }
+        return [
+            {
+                labelKey: 'planningVolunteers.manageVolunteers',
+                icon: 'pi pi-users',
+                run: () => this.volunteersDialogVisible.set(true)
+            },
+            {
+                labelKey: 'planningVolunteers.manageCategories',
+                icon: 'pi pi-tags',
+                run: () => this.categoriesDialogVisible.set(true)
+            }
+        ];
     });
 
     readonly dayMenus = computed(() => new Map(this.store.days().map(d => [d.id, this.dayActionItems()])));
