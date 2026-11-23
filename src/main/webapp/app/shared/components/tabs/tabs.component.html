@@ -1,0 +1,78 @@
+<div class="app-tabs" [class.app-tabs--framed]="hasPanels() || hasBody()">
+    <div class="app-tabs-list" role="tablist" [attr.aria-label]="ariaLabelKey() | translate" #list>
+        @for (t of visibleTabs(); track t.key) {
+            <button type="button" role="tab" class="app-tab"
+                    [attr.data-tab-key]="t.key"
+                    [id]="'tab-' + t.key" [attr.aria-controls]="'tp-' + t.key"
+                    [attr.aria-selected]="t.key === active()"
+                    [class.app-tab--active]="t.key === active()"
+                    [tabIndex]="t.key === active() ? 0 : -1"
+                    [disabled]="t.disabled" [hidden]="overflowKeys().has(t.key)"
+                    (click)="select(t)" (keydown)="onKey($event)">
+                @if (t.icon) {
+                    <i [class]="t.icon" aria-hidden="true"></i>
+                }
+                <span class="app-tab-label">
+                    @if (t.label) {
+                        {{ t.label }}
+                    } @else if (t.labelKey) {
+                        {{ t.labelKey | translate }}
+                    }
+                </span>
+                @if (t.badge && showNotifs()) {
+                    <app-notif-badge [notif]="t.badge"/>
+                }
+            </button>
+        }
+
+        <div class="app-tabs-more" [hidden]="!overflowKeys().size">
+            <button type="button" class="app-tab app-tabs-more-btn" aria-haspopup="menu"
+                    [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()">
+                <i class="pi pi-ellipsis-h" aria-hidden="true"></i>
+                <span class="app-tab-label">{{ 'global.more' | translate }}</span>
+                <app-notif-badge [notif]="moreBadge()"/>
+            </button>
+            @if (menuOpen()) {
+                <div class="app-tabs-menu" role="menu">
+                    @for (t of hiddenTabs(); track t.key) {
+                        <button type="button" role="menuitem" class="app-tabs-menu-item"
+                                [disabled]="t.disabled" (click)="select(t)">
+                            @if (t.icon) {
+                                <i [class]="t.icon" aria-hidden="true"></i>
+                            }
+                            <span>
+                                @if (t.label) {
+                                    {{ t.label }}
+                                } @else if (t.labelKey) {
+                                    {{ t.labelKey | translate }}
+                                }
+                            </span>
+                            @if (t.badge && showNotifs()) {
+                                <app-notif-badge [notif]="t.badge"/>
+                            }
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+
+        <span class="app-tabs-actions">
+            <ng-content select="[appTabsActions]"/>
+        </span>
+    </div>
+
+    @if (hasPanels()) {
+        <div class="app-tabs-panel" role="tabpanel" [id]="'tp-' + active()"
+             [attr.aria-labelledby]="'tab-' + active()" tabindex="0">
+            @if (activePanel(); as panel) {
+                <ng-container [ngTemplateOutlet]="panel.tpl"/>
+            }
+        </div>
+    } @else if (hasBody()) {
+        <div class="app-tabs-panel" [class.app-tabs-panel--flush]="flushBody()"
+             role="tabpanel" [id]="'tp-' + active()"
+             [attr.aria-labelledby]="'tab-' + active()" tabindex="0">
+            <ng-content select="[appTabsBody]"/>
+        </div>
+    }
+</div>

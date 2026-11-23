@@ -1,0 +1,55 @@
+<div class="app-side-rail" [style.--side-top.px]="sideTop()" [hidden]="!labels().length">
+    @for (label of labels(); track label.key()) {
+        <div class="app-side-item">
+            <button type="button" class="app-side-pill"
+                    [attr.data-pill-key]="label.key()"
+                    [class.is-open]="label.key() === open()"
+                    [attr.aria-expanded]="label.key() === open()"
+                    [attr.aria-controls]="'sl-panel-' + label.key()"
+                    [attr.aria-label]="label.labelKey() | translate"
+                    (click)="toggle(label.key())">
+                <i [class]="label.icon()" aria-hidden="true"></i>
+                @if (label.badge()) {
+                    <app-notif-badge [notif]="label.badge()"/>
+                }
+            </button>
+            <span class="app-side-tip" role="tooltip">
+                <span class="app-side-tip-label">{{ label.labelKey() | translate }}</span>
+                @if (label.hintKey()) {
+                    <span class="app-side-tip-sub">{{ label.hintKey()! | translate }}</span>
+                } @else if (label.summary()) {
+                    <span class="app-side-tip-sub">{{ label.summary() }}</span>
+                }
+            </span>
+        </div>
+    }
+</div>
+
+@if (openLabel(); as label) {
+    <div class="app-side-veil" (click)="close()"></div>
+
+    <div class="app-side-panel" role="dialog" [id]="'sl-panel-' + label.key()"
+         [attr.aria-labelledby]="'sl-title-' + label.key()" [style.--side-top.px]="sideTop()">
+        <div class="app-side-panel-hd">
+            <i [class]="label.icon() + ' app-side-panel-icon'" aria-hidden="true"></i>
+            <h6 class="app-side-panel-title" [id]="'sl-title-' + label.key()">{{ label.labelKey() | translate }}</h6>
+            <button type="button" class="app-side-close" (click)="close()"
+                    [attr.aria-label]="'common.close' | translate">
+                <i class="pi pi-times" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        @if (panelHint(); as hint) {
+            <div class="app-side-motif"
+                 [class.is-warning]="hint.type === 'warning'"
+                 [class.is-danger]="hint.type === 'danger'"
+                 [class.is-info]="hint.type === 'info'">
+                {{ hint.key | translate }}
+            </div>
+        }
+
+        <div class="app-side-panel-bd">
+            <ng-container [ngTemplateOutlet]="label.content()"/>
+        </div>
+    </div>
+}

@@ -1,0 +1,263 @@
+<app-tabs [tabs]="configTabs"
+          [active]="activeTab()"
+          (activeChange)="$event && activeTab.set($event)">
+
+    <!-- ════════════════════════ Onglet : Catégories ═════════════════════════ -->
+    <ng-template appTabPanel="categories">
+        <div class="row">
+
+            <!-- ── Catégories ──────────────────────────────────────────────── -->
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="small text-muted">{{ 'planningVolunteers.config.categories' | translate }}</div>
+                    <button-box (clickedEvent)="addCategory()"
+                                primeIcon="pi-plus"
+                                translateKey="planningVolunteers.config.addCategory"
+                                type="secondary"/>
+                </div>
+
+                @if (categories().length) {
+                    <p-table [value]="categories()" [rowHover]="true" [dataKey]="'id'">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>{{ 'planningVolunteers.config.icon' | translate }}</th>
+                                <th>{{ 'planningVolunteers.config.color' | translate }}</th>
+                                <th>{{ 'planningVolunteers.config.label' | translate }}</th>
+                                <th>{{ 'planningVolunteers.config.description' | translate }}</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-c>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (c.icon) {
+                                            <i [class]="c.icon"></i>
+                                        } @else {
+                                            <span class="w-1r"></span>
+                                        }
+                                        <p-select appendTo="body"
+                                                  [fluid]="true"
+                                                  [options]="iconOptions"
+                                                  optionLabel="label"
+                                                  optionValue="value"
+                                                  [ngModel]="c.icon ?? ''"
+                                                  (ngModelChange)="updateCategoryIcon(c.id, $event)"></p-select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <p-color-picker appendTo="body"
+                                                        [format]="'hex'"
+                                                        [ngModel]="c.color"
+                                                        (ngModelChange)="updateCategoryColor(c.id, $event)"/>
+                                        <span class="small text-muted">{{ c.color }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input pInputText
+                                           [fluid]="true"
+                                           [ngModel]="categoryLabel(c)"
+                                           (ngModelChange)="setCategoryLabelDraft(c.id, $event)"
+                                           (blur)="commitCategoryLabel(c.id)"
+                                           (keydown.enter)="commitCategoryLabel(c.id)"/>
+                                </td>
+                                <td>
+                                    <input pInputText
+                                           [fluid]="true"
+                                           [ngModel]="categoryDescription(c)"
+                                           (ngModelChange)="setCategoryDescriptionDraft(c.id, $event)"
+                                           (blur)="commitCategoryDescription(c.id)"
+                                           (keydown.enter)="commitCategoryDescription(c.id)"/>
+                                </td>
+                                <td class="text-end">
+                                    <button-box (clickedEvent)="deleteCategory(c.id)"
+                                                [showText]="false"
+                                                primeIcon="pi-times"
+                                                translateKey="common.delete"
+                                                type="danger"/>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                } @else {
+                    <div class="form-text">{{ 'planningVolunteers.config.noCategory' | translate }}</div>
+                }
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- ══════════════════════════ Onglet : Jours ════════════════════════════ -->
+    <ng-template appTabPanel="days">
+        <div class="row">
+
+            <!-- ── Jours ───────────────────────────────────────────────────── -->
+            <div class="col-12">
+                <div class="small text-muted mb-2">{{ 'planningVolunteers.config.days' | translate }}</div>
+
+                @for (day of days(); track day.id) {
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-end">
+                                <div class="col-12 col-sm">
+                                    <label class="form-label small">{{ 'planningVolunteers.config.dayLabel' | translate }}</label>
+                                    <input pInputText
+                                           [fluid]="true"
+                                           [ngModel]="dayLabel(day)"
+                                           (ngModelChange)="setDayLabelDraft(day.id, $event)"
+                                           (blur)="commitDayLabel(day.id)"
+                                           (keydown.enter)="commitDayLabel(day.id)"/>
+                                </div>
+                                <div class="col-12 col-sm-auto mt-3 mt-sm-0">
+                                    <label class="form-label small">{{ 'planningVolunteers.day.date' | translate }}</label>
+                                    <p-datepicker [fluid]="true"
+                                                  [ngModel]="dateValue(day)"
+                                                  (ngModelChange)="updateDate(day.id, $event)"
+                                                  dateFormat="dd.mm.yy"
+                                                  [showButtonBar]="true"
+                                                  appendTo="body"></p-datepicker>
+                                </div>
+                                <div class="col-auto mt-3 mt-sm-0">
+                                    <button-box (clickedEvent)="removeDay(day.id)"
+                                                [showText]="false"
+                                                primeIcon="pi-trash"
+                                                translateKey="common.delete"
+                                                type="danger"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label class="form-label small">{{ 'planningVolunteers.day.description' | translate }}</label>
+                                    <textarea pTextarea
+                                              [fluid]="true"
+                                              rows="2"
+                                              [ngModel]="dayDescription(day)"
+                                              (ngModelChange)="setDayDescriptionDraft(day.id, $event)"
+                                              (blur)="commitDayDescription(day.id)"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-6 col-sm-4">
+                                    <label class="form-label small">{{ 'planningVolunteers.config.from' | translate }}</label>
+                                    <p-datepicker [fluid]="true"
+                                                  [ngModel]="day.startTime"
+                                                  (ngModelChange)="updateStartTime(day.id, $event)"
+                                                  [timeOnly]="true"
+                                                  [showTime]="true"
+                                                  hourFormat="24"
+                                                  appendTo="body"
+                                                  [stepMinute]="day.intervalMinutes"></p-datepicker>
+                                </div>
+                                <div class="col-6 col-sm-4">
+                                    <label class="form-label small">{{ 'planningVolunteers.config.to' | translate }}</label>
+                                    <p-datepicker [fluid]="true"
+                                                  [ngModel]="day.endTime"
+                                                  (ngModelChange)="updateEndTime(day.id, $event)"
+                                                  [timeOnly]="true"
+                                                  [showTime]="true"
+                                                  hourFormat="24"
+                                                  appendTo="body"
+                                                  [stepMinute]="day.intervalMinutes"></p-datepicker>
+                                </div>
+                                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                    <label class="form-label small">{{ 'planningVolunteers.interval.label' | translate }}</label>
+                                    <p-select [fluid]="true"
+                                              [options]="intervalOptions()"
+                                              optionLabel="label"
+                                              optionValue="value"
+                                              [ngModel]="day.intervalMinutes"
+                                              (ngModelChange)="updateInterval(day.id, $event)"
+                                              appendTo="body"></p-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <button-box (clickedEvent)="addDay()"
+                            primeIcon="pi-plus"
+                            translateKey="planningVolunteers.config.addDay"
+                            type="secondary"/>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- ══════════════════ Onglet : Bénévoles et rattachement ═════════════════ -->
+    <ng-template appTabPanel="volunteers">
+        <div class="row">
+
+            <!-- ── Bénévoles ───────────────────────────────────────────────── -->
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="small text-muted">{{ 'planningVolunteers.config.volunteers' | translate }}</div>
+                    <button-box (clickedEvent)="addVolunteer()"
+                                primeIcon="pi-plus"
+                                translateKey="planningVolunteers.config.addVolunteer"
+                                type="secondary"/>
+                </div>
+
+                @if (volunteers().length) {
+                    <p-table [value]="volunteers()" [rowHover]="true" [dataKey]="'id'">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>{{ 'planningVolunteers.config.label' | translate }}</th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-v>
+                            <tr>
+                                <td>
+                                    <input pInputText
+                                           [fluid]="true"
+                                           [ngModel]="volunteerLabel(v)"
+                                           (ngModelChange)="setVolunteerLabelDraft(v.id, $event)"
+                                           (blur)="commitVolunteerLabel(v.id)"
+                                           (keydown.enter)="commitVolunteerLabel(v.id)"/>
+                                </td>
+                                <td class="text-end">
+                                    <button-box (clickedEvent)="deleteVolunteer(v.id)"
+                                                [showText]="false"
+                                                primeIcon="pi-times"
+                                                translateKey="common.delete"
+                                                type="danger"/>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                } @else {
+                    <div class="form-text">{{ 'planningVolunteers.config.noVolunteer' | translate }}</div>
+                }
+            </div>
+
+            <!-- ── Rattachement par jour ───────────────────────────────────── -->
+            <div class="col-12 mt-4">
+                <div class="small text-muted mb-2">{{ 'planningVolunteers.config.assignmentsByDay' | translate }}</div>
+
+                @if (days().length) {
+                    @for (day of days(); track day.id) {
+                        <div class="row align-items-center mt-3">
+                            <div class="col-12 col-sm-4">
+                                <label class="form-label small mb-0">{{ dayLabel(day) }}</label>
+                            </div>
+                            <div class="col-12 col-sm-8 mt-1 mt-sm-0">
+                                <p-multiSelect appendTo="body"
+                                               [fluid]="true"
+                                               [options]="volunteerOptions()"
+                                               [display]="'chip'"
+                                               [ngModel]="assignedIds(day)"
+                                               (ngModelChange)="setAssigned(day.id, $event)"
+                                               optionLabel="label"
+                                               optionValue="value"
+                                               [placeholder]="'planningVolunteers.config.assignmentPlaceholder' | translate"></p-multiSelect>
+                            </div>
+                        </div>
+                    }
+                } @else {
+                    <div class="form-text">{{ 'planningVolunteers.config.noDay' | translate }}</div>
+                }
+            </div>
+        </div>
+    </ng-template>
+</app-tabs>

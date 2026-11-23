@@ -1,0 +1,11 @@
+@if (notif(); as n) {
+    @if (isCount()) {
+        <span class="nb nb-count">{{ displayValue() }}</span>
+    } @else if (isDot()) {
+        <span class="nb nb-pill nb-dot" [class.nb-info]="n.type === 'info'"
+              [class.nb-warning]="n.type === 'warning'" [class.nb-danger]="n.type === 'danger'"></span>
+    } @else {
+        <span class="nb nb-pill" [class.nb-info]="n.type === 'info'"
+              [class.nb-warning]="n.type === 'warning'" [class.nb-danger]="n.type === 'danger'">{{ displayValue() }}</span>
+    }
+}

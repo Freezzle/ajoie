@@ -1,0 +1,233 @@
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
+.app-tabs {
+  display: block;
+}
+
+.app-tabs-list {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* ---- Onglet ------------------------------------------------------------- */
+.app-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--app-card-border, #d9dee4);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  box-shadow: inset 0 -1px 0 var(--app-card-border, #d9dee4);
+  background: var(--app-card-hd-bg, #fafbfc);
+  color: var(--app-card-title, #3e4c59);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.app-tab .app-tab-label {
+  font-size: var(--app-fs-sm, 0.82rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--app-card-title, #3e4c59);
+}
+
+.app-tab > i {
+  color: var(--app-text-muted, #8a8a8a);
+  font-size: 0.9rem;
+}
+
+.app-tab:hover:not(:disabled):not(.app-tab--active) {
+  background: var(--app-card-hover, #f7f8fa);
+}
+
+.app-tab:hover:not(:disabled):not(.app-tab--active) > i {
+  color: var(--app-primary, #325d88);
+}
+
+.app-tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.app-tab:focus-visible {
+  outline: 2px solid var(--app-primary-line, #a8bfd6);
+  outline-offset: -2px;
+}
+
+/* ---- Onglet actif ------------------------------------------------------- */
+.app-tab--active {
+  height: 41px;
+  background: var(--app-surface, #fff);
+  box-shadow: none;
+}
+
+.app-tab--active .app-tab-label,
+.app-tab--active > i {
+  color: var(--app-primary, #325d88);
+}
+
+/* Liseré haut de 2 px qui se déploie. */
+.app-tab--active::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 2px;
+  background: var(--app-primary, #325d88);
+  border-radius: 4px 4px 0 0;
+  transform: scaleX(1);
+  transform-origin: center;
+  transition: transform 0.15s ease;
+}
+
+/* Trait blanc qui recouvre la bordure haute du cadre : l'onglet se soude au contenu. */
+.app-tabs--framed .app-tab--active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--app-surface, #fff);
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-tab--active::before {
+    transition: none;
+  }
+}
+
+/* ---- Bouton « Plus » ---------------------------------------------------- */
+.app-tabs-more {
+  position: relative;
+  margin-left: auto;
+}
+
+.app-tabs-more[hidden] ~ .app-tabs-actions {
+  margin-left: auto;
+}
+
+.app-tabs-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  min-width: 220px;
+  margin-top: 2px;
+  padding: 4px;
+  border: 1px solid var(--app-card-border, #d9dee4);
+  border-radius: 4px;
+  background: var(--app-surface, #fff);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.14);
+}
+
+.app-tabs-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--app-text, #575757);
+  font-size: var(--app-fs-md, 0.875rem);
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-tabs-menu-item:hover:not(:disabled) {
+  background: var(--app-primary-soft, #e8eef5);
+}
+
+.app-tabs-menu-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.app-tabs-menu-item > span {
+  margin-right: auto;
+}
+
+.app-tabs-actions {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---- Cadre du contenu --------------------------------------------------- */
+.app-tabs-panel {
+  position: relative;
+  border: 1px solid var(--app-card-border, #d9dee4);
+  border-radius: 0 0 4px 4px;
+  padding: 14px 16px;
+  background: var(--app-surface, #fff);
+}
+
+.app-tabs-panel:focus {
+  outline: none;
+}
+
+.app-tabs .app-tabs-panel--flush {
+  padding: 0;
+}
+
+/* La dernière app-card injectée ne garde pas sa marge basse. */
+.app-tabs-panel ::ng-deep app-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Variante retenue du badge de compte sur l'onglet actif. */
+.app-tab--active ::ng-deep .nb-count {
+  background: var(--app-primary-soft, #e8eef5);
+  border-color: var(--app-primary-line, #a8bfd6);
+  color: var(--app-primary, #325d88);
+}
+
+/* ---- Box étroite -------------------------------------------------------- */
+@container (max-width: 640px) {
+  .app-tab {
+    padding: 0 9px;
+    letter-spacing: 0.02em;
+  }
+
+  .app-tabs-list {
+    gap: 5px;
+  }
+
+  .app-tab:not(.app-tab--active) > i {
+    display: none;
+  }
+
+  /* Les compteurs sont masqués ; les alertes deviennent des points de 8 px. */
+  .app-tab ::ng-deep .nb-count {
+    display: none;
+  }
+
+  .app-tab ::ng-deep .nb-pill {
+    width: 8px;
+    min-width: 8px;
+    height: 8px;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .app-tabs-more-btn .app-tab-label {
+    display: none;
+  }
+
+  .app-tabs-panel {
+    padding: 12px;
+  }
+}

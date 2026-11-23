@@ -1,0 +1,87 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.nb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Compteur — même langage que .app-card-tag */
+.nb-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 1px solid var(--app-card-border, #d9dee4);
+  border-radius: 3px;
+  background: var(--app-surface, #fff);
+  color: var(--app-text-muted, #8a8a8a);
+  font-size: var(--app-fs-xs, 0.72rem);
+  font-weight: 400;
+}
+
+/* Pastilles rondes info / warning / danger */
+.nb-pill {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--app-primary, #325d88);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.nb-pill.nb-warning {
+  background: var(--app-warning, #e89d0e);
+}
+
+.nb-pill.nb-danger {
+  background: var(--app-danger, #fd7658);
+}
+
+.nb-dot {
+  min-width: 9px;
+  width: 9px;
+  height: 9px;
+  padding: 0;
+}
+
+/* Battement doux (halo) sur les pastilles d'alerte uniquement */
+.nb-pill.nb-warning,
+.nb-pill.nb-danger {
+  position: relative;
+  animation: nb-pulse 2.4s ease-out infinite;
+}
+
+.nb-pill.nb-warning {
+  --nb-halo: color-mix(in srgb, var(--app-warning, #e89d0e) 55%, transparent);
+}
+
+.nb-pill.nb-danger {
+  --nb-halo: color-mix(in srgb, var(--app-danger, #fd7658) 55%, transparent);
+  animation-duration: 1.8s;
+}
+
+@keyframes nb-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--nb-halo, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-pill.nb-warning,
+  .nb-pill.nb-danger {
+    animation: none;
+  }
+}

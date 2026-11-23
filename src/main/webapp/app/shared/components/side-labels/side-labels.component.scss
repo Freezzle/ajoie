@@ -1,0 +1,257 @@
+:host {
+  display: contents;
+}
+
+/* ---- Colonne de pastilles ---------------------------------------------- */
+.app-side-rail {
+  position: absolute;
+  right: 0;
+  top: var(--side-top, 0);
+  width: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 5;
+}
+
+.app-side-item {
+  position: relative;
+}
+
+.app-side-pill {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--app-card-border, #d9dee4);
+  border-radius: 4px;
+  background: var(--app-card-hd-bg, #fafbfc);
+  color: var(--app-card-title, #3e4c59);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.app-side-pill > i {
+  font-size: 15px;
+}
+
+.app-side-pill:hover {
+  background: var(--app-card-hover, #f7f8fa);
+  border-color: var(--app-primary-line, #a8bfd6);
+  color: var(--app-primary, #325d88);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.1);
+}
+
+.app-side-pill app-notif-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--app-surface, #fff);
+}
+
+/* Pastille ouverte : se raccorde au panneau. */
+.app-side-pill.is-open {
+  width: 44px;
+  background: var(--app-surface, #fff);
+  border-left-color: transparent;
+  border-radius: 0 4px 4px 0;
+  transform: translateX(-8px);
+  color: var(--app-primary, #325d88);
+}
+
+.app-side-pill.is-open::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--app-primary, #325d88);
+}
+
+/* ---- Info-bulle --------------------------------------------------------- */
+.app-side-tip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 8px);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+  max-width: 240px;
+  padding: 7px 10px;
+  border-radius: 4px;
+  background: #1f2933;
+  color: #fff;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease 80ms, visibility 0s linear 80ms;
+  z-index: 6;
+}
+
+.app-side-tip-label {
+  font-size: var(--app-fs-sm, 0.82rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.app-side-tip-sub {
+  font-size: var(--app-fs-xs, 0.72rem);
+  color: #cbd2d9;
+}
+
+.app-side-item:hover .app-side-tip,
+.app-side-pill:focus-visible + .app-side-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.app-side-pill.is-open + .app-side-tip {
+  display: none;
+}
+
+/* ---- Voile -------------------------------------------------------------- */
+.app-side-veil {
+  position: absolute;
+  inset: 0 var(--side-rail, 48px) 0 0;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: 8;
+}
+
+/* ---- Panneau (= un app-card) ------------------------------------------- */
+.app-side-panel {
+  position: absolute;
+  top: var(--side-top, 0);
+  right: calc(var(--side-rail, 48px) - 4px);
+  width: min(400px, calc(100% - var(--side-rail, 48px) - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  border: 1px solid var(--app-card-border, #d9dee4);
+  border-radius: 4px;
+  background: var(--app-surface, #fff);
+  box-shadow: -8px 10px 30px rgba(16, 24, 40, 0.16);
+  z-index: 10;
+  animation: app-side-slide 0.2s ease;
+}
+
+@keyframes app-side-slide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-side-panel {
+    animation: none;
+  }
+}
+
+.app-side-panel-hd {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--app-card-border, #d9dee4);
+  background: var(--app-card-hd-bg, #fafbfc);
+}
+
+.app-side-panel-icon {
+  color: var(--app-primary, #325d88);
+  font-size: 15px;
+}
+
+.app-side-panel-title {
+  margin: 0;
+  margin-right: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--app-card-title, #3e4c59);
+}
+
+.app-side-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--app-card-action-border, #d1d5db);
+  border-radius: 4px;
+  background: var(--app-surface, #fff);
+  color: var(--app-text, #575757);
+  cursor: pointer;
+}
+
+.app-side-close:hover {
+  background: var(--app-card-hover, #f7f8fa);
+}
+
+.app-side-motif {
+  margin: 10px 16px 0;
+  padding: 7px 10px;
+  border-left: 3px solid var(--app-warn, #8a5d00);
+  border-radius: 3px;
+  font-size: var(--app-fs-sm, 0.82rem);
+  background: var(--app-warn-soft, #fbefd0);
+  color: var(--app-warn, #8a5d00);
+}
+
+.app-side-motif.is-danger {
+  border-left-color: var(--app-danger, #fd7658);
+  background: var(--app-danger-soft, #f9dedc);
+  color: var(--app-danger, #fd7658);
+}
+
+.app-side-motif.is-info {
+  border-left-color: var(--app-primary, #325d88);
+  background: var(--app-primary-soft, #e8eef5);
+  color: var(--app-primary, #325d88);
+}
+
+.app-side-panel-bd {
+  padding: 14px 16px;
+}
+
+.app-side-panel-bd ::ng-deep app-card:last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Box étroite -------------------------------------------------------- */
+@container (max-width: 640px) {
+  .app-side-rail {
+    width: 34px;
+  }
+
+  .app-side-pill {
+    width: 34px;
+    height: 34px;
+  }
+
+  .app-side-pill.is-open {
+    width: 40px;
+    transform: translateX(-6px);
+  }
+
+  .app-side-tip {
+    display: none;
+  }
+
+  .app-side-panel {
+    left: 0;
+    right: calc(var(--side-rail, 44px) - 2px);
+    width: auto;
+  }
+}
