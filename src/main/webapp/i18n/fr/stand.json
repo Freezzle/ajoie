@@ -2,6 +2,7 @@
   "stand": {
     "card": {
       "stand": "Stand",
+      "activity": "Activité",
       "equipment": "Surface et équipement",
       "socialNetwork": "Canaux de communication",
       "coExhibitor": "Co-exposant",

@@ -30,7 +30,6 @@ import {ActionsService} from '../../common/actions.service';
 import {AvailableAction, refreshScopeOf} from '../../../shared/model/available-action';
 import {EmailDialogComponent} from '../../../shared/email-dialog/email-dialog.component';
 import {EmailMessage} from '../../../shared/email-dialog/email-message';
-import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
 import {ActionFormDialogComponent} from '../../../shared/action-form-dialog/action-form-dialog.component';
 import {IWorkshop} from '../../workshop/model/workshop.interface';
 import {WorkshopService} from '../../workshop/service/workshop.service';
@@ -44,7 +43,12 @@ import {ConfirmPopup} from 'primeng/confirmpopup';
 
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {TabsComponent} from '../../../shared/components/tabs/tabs.component';
-import {TabPanelDirective} from '../../../shared/components/tabs/tab-panel.directive';
+import {TabPanelDirective, AppTab} from '../../../shared/components/tabs/tab-panel.directive';
+import {SideLabelsComponent} from '../../../shared/components/side-labels/side-labels.component';
+import {SideLabelComponent} from '../../../shared/components/side-labels/side-label.component';
+import {SideLabelHostDirective} from '../../../shared/components/side-labels/side-label-host.directive';
+import {EventLogListComponent} from '../../../shared/components/event-log-list/event-log-list.component';
+import {EventLog} from '../../../shared/event-modal/event.interface';
 import {Notif} from '../../../shared/components/notif-badge/notif.model';
 import {CardFooterContentDirective} from '../../../shared/components/card/card-footer.directive';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
@@ -68,10 +72,9 @@ import {
 import {ExhibitorDuplicateCompareComponent} from '../duplicate/exhibitor-duplicate-compare.component';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
-    registration: ['therapistName', 'registrationDate', 'acceptedChart', 'acceptedContract'],
-    billing: ['nbMeal1', 'nbMeal2', 'nbMeal3', 'modePaymentMeals', 'invoiceSendingMethod', 'needArrangement'],
-    offer: ['hasOffer', 'offer', 'additionnalInformation'],
-    rating: ['crushOfHeart', 'guestOfHonor', 'ratingFriendliness', 'ratingPaymentSpeed', 'ratingServiceQuality', 'extraInformation']
+    registration: ['therapistName', 'registrationDate', 'acceptedChart', 'acceptedContract', 'hasOffer', 'offer', 'additionnalInformation'],
+    billing: ['nbMeal1', 'nbMeal2', 'nbMeal3', 'modePaymentMeals', 'invoiceSendingMethod'],
+    rating: ['crushOfHeart', 'guestOfHonor', 'ratingFriendliness', 'ratingPaymentSpeed', 'ratingServiceQuality', 'extraInformation', 'needArrangement']
 };
 
 @Component({
@@ -86,10 +89,17 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                          FieldRowComponent, StatusTimelineComponent, RatingBoxComponent, Rating,
                          EntityRowComponent, EntityStatusComponent, EntityFootItemComponent, YesNoIconComponent,
                          DetailPageLayoutComponent, DetailStatusDirective, DetailMainDirective,
-                         DetailSideDirective, DetailCreateActionsDirective]
+                         DetailSideDirective, DetailCreateActionsDirective,
+                         SideLabelsComponent, SideLabelComponent, SideLabelHostDirective, EventLogListComponent]
            })
 export class ParticipationUpdateComponent implements OnInit {
     tabActive = 'stand';
+    viewTab = 'ess';
+    readonly side = signal<string | null>(null);
+    readonly viewTabs: AppTab[] = [
+        {key: 'ess', labelKey: 'global.tab.essential', icon: 'pi pi-star'},
+        {key: 'billing', labelKey: 'participation.card.billing', icon: 'pi pi-euro'}
+    ];
     isLoading = false;
     eventId!: string;
     initialParticipation: IParticipation | null = null;
@@ -99,6 +109,7 @@ export class ParticipationUpdateComponent implements OnInit {
     conferences$: Observable<IConference[]> | undefined;
     workshops$: Observable<IWorkshop[]> | undefined;
     stands$: Observable<IStand[]> | undefined;
+    eventLogs$: Observable<EventLog[]> | undefined;
 
     readonly activeSection = signal<string | null>(null);
     readonly availableActions = signal<AvailableAction[]>([]);
@@ -137,7 +148,6 @@ export class ParticipationUpdateComponent implements OnInit {
     private readonly workshopActionsCache = new Map<string, EntityAction[]>();
 
     readonly registrationActions = computed<EntityAction[]>(() => this.sectionAction('registration'));
-    readonly offerActions = computed<EntityAction[]>(() => this.sectionAction('offer'));
     readonly ratingActions = computed<EntityAction[]>(() => this.sectionAction('rating'));
 
     readonly billingActions = computed<EntityAction[]>(() => {
@@ -157,6 +167,28 @@ export class ParticipationUpdateComponent implements OnInit {
 
     get isCreating(): boolean {
         return !this.editForm.controls.id.value;
+    }
+
+    private get exhibitor() {
+        return this.editForm.controls.exhibitor.value;
+    }
+
+    get exhibitorBadge(): Notif | null {
+        const exhibitor = this.exhibitor;
+        const count = (exhibitor?.redFlag ? 1 : 0) + (exhibitor?.duplicateDetected ? 1 : 0);
+
+        return count > 0 ? {type: 'danger', value: count} : null;
+    }
+
+    get exhibitorHintKey(): string | null {
+        return this.exhibitorBadge ? 'common.exhibitorHasAlert' : null;
+    }
+
+    get internalBadge(): Notif | null {
+        const hasComment = !!this.editForm.controls.extraInformation.value;
+        const hasArrangement = !!this.editForm.controls.needArrangement.value;
+
+        return hasComment || hasArrangement ? {type: 'warning', dot: true} : null;
     }
 
     ngOnInit(): void {
@@ -440,11 +472,15 @@ export class ParticipationUpdateComponent implements OnInit {
         });
     }
 
-    openHistoryModal(): void {
-        this.participationService.getEventLogs(this.initialParticipation!.id).subscribe(events => {
-            const modalRef = this.modalService.open(EventModalComponent, {size: 'lg'});
-            modalRef.componentInstance.events = events.body ?? [];
-        });
+    loadEventLogsOnce(): Observable<EventLog[]> {
+        if (!this.initialParticipation?.id) {
+            return of([]);
+        }
+        this.eventLogs$ ??= this.participationService.getEventLogs(this.initialParticipation.id).pipe(
+            map(res => res.body ?? []),
+            shareReplay(1)
+        );
+        return this.eventLogs$;
     }
 
     protected loadRelationshipsOptions(): void {
@@ -466,6 +502,7 @@ export class ParticipationUpdateComponent implements OnInit {
         this.stands$ = undefined;
         this.conferences$ = undefined;
         this.workshops$ = undefined;
+        this.eventLogs$ = undefined;
         this.standActionsCache.clear();
         this.conferenceActionsCache.clear();
         this.workshopActionsCache.clear();

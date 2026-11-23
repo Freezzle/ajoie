@@ -12,7 +12,7 @@
         <app-alert-error />
         <p-confirmpopup />
 
-        <app-detail-page-layout>
+        <app-detail-page-layout [singleColumn]="!isCreating">
             <ng-container appDetailStatus>
                 @if (!isCreating) {
                     <app-status-timeline [status]="initialWorkshop?.status ?? null"
@@ -22,148 +22,39 @@
             </ng-container>
 
             <div appDetailMain>
-                <app-detail-section-card [titleKey]="'workshop.presentation'"
-                                         [editing]="isCreating || activeSection() === 'presentation'"
-                                         [dimmed]="!!activeSection() && activeSection() !== 'presentation'"
-                                         [actions]="presentationActions()"
-                                         [showFooterActions]="!isCreating && activeSection() === 'presentation'"
-                                         [saveDisabled]="isLoading"
-                                         (cancelRequested)="cancelSection('presentation')"
-                                         (saveRequested)="saveSection('presentation')">
-                    @if (isCreating || activeSection() === 'presentation') {
-                        <div class="card-form-stack">
-                            <text-box fieldName="title" formControlName="title" translateKey="workshop.titleField" />
-                            <textarea-box [maxLength]="500" [rows]="6" [showCounter]="true"
-                                          fieldName="description" formControlName="description"
-                                          translateKey="workshop.description" />
-                        </div>
-                    } @else {
-                        <app-field-list>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'workshop.titleField' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.title.value || '—' }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'workshop.description' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.description.value || '—' }}</span>
-                            </app-field-row>
-                        </app-field-list>
-                    }
-                </app-detail-section-card>
+                @if (isCreating) {
+                    <ng-container *ngTemplateOutlet="presentationCard" />
+                } @else {
+                    <div appSideLabelHost>
+                        <app-tabs #tabsRef [tabs]="viewTabs" [(active)]="viewTab">
+                            <ng-template appTabPanel="ess">
+                                <ng-container *ngTemplateOutlet="presentationCard" />
+                            </ng-template>
+                        </app-tabs>
+
+                        <app-side-labels [(open)]="side" [anchor]="tabsRef.panelElement">
+                            <app-side-label key="intervenant" icon="pi pi-user" labelKey="workshop.intervenant"
+                                            [badge]="intervenantBadge" [hintKey]="intervenantHintKey" hintType="danger">
+                                <ng-container *ngTemplateOutlet="intervenantCard" />
+                            </app-side-label>
+                            <app-side-label key="participation" icon="pi pi-id-card" labelKey="common.participation"
+                                            [badge]="participationBadge">
+                                <ng-container *ngTemplateOutlet="participationCard" />
+                            </app-side-label>
+                            <app-side-label key="internal" icon="pi pi-comment" labelKey="workshop.internalFollowup"
+                                            [badge]="internalBadge" hintType="info">
+                                <ng-container *ngTemplateOutlet="internalCard" />
+                            </app-side-label>
+                        </app-side-labels>
+                    </div>
+                }
             </div>
 
             <div appDetailSide>
-                <app-card [titleKey]="'workshop.intervenant'">
-                    <div appCardBody>
-                        @if (isCreating) {
-                            <select-box [enableFilter]="true" [filterFields]="selectFilterParticipation()"
-                                        [formatterFunction]="formatterParticipation" [options]="participationsOptions"
-                                        fieldName="participation" formControlName="participation"
-                                        translateKey="workshop.participation" />
-                        } @else {
-                            <app-field-list>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'common.client' | translate }}</span>
-                                    <span fieldValue>
-                                        <a class="clickable" [routerLink]="['/admin', 'exhibitors', editForm.controls.participation.value?.exhibitor?.id ?? '', 'view']">
-                                            {{ getExhibitorFullName(editForm.controls.participation.value?.exhibitor) || '—' }}
-                                        </a>
-                                    </span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'exhibitor.email' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.participation.value?.exhibitor?.email || '—' }}</span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'exhibitor.phoneNumber' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.participation.value?.exhibitor?.phoneNumber || '—' }}</span>
-                                </app-field-row>
-                                @if (editForm.controls.participation.value?.exhibitor?.redFlag || editForm.controls.participation.value?.exhibitor?.duplicateDetected) {
-                                    <app-field-row>
-                                        <span fieldLabel>{{ 'common.alert' | translate }}</span>
-                                        <span fieldValue>
-                                            <span class="workshop-tags">
-                                                @if (editForm.controls.participation.value?.exhibitor?.redFlag) {
-                                                    <span class="el-alert" [style.--el-color]="'var(--app-danger)'">
-                                                        <fa-icon icon="flag"/>
-                                                        {{ 'exhibitor.list.signal.redFlag' | translate }}
-                                                    </span>
-                                                }
-                                                @if (editForm.controls.participation.value?.exhibitor?.duplicateDetected) {
-                                                    <span class="el-alert" [style.--el-color]="'var(--app-status-refused)'">
-                                                        <fa-icon icon="triangle-exclamation"/>
-                                                        {{ 'exhibitor.list.signal.duplicate' | translate }}
-                                                    </span>
-                                                }
-                                            </span>
-                                        </span>
-                                    </app-field-row>
-                                }
-                            </app-field-list>
-                        }
-                    </div>
-                </app-card>
-
-                @if (!isCreating) {
-                    <app-card [titleKey]="'common.participation'">
-                        <div appCardBody>
-                            <app-field-list>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'common.usageName' | translate }}</span>
-                                    <span fieldValue>
-                                        <a class="clickable" [routerLink]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '', 'view']">
-                                            {{ getParticipationUsageName(editForm.controls.participation.value) || '—' }}
-                                        </a>
-                                    </span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.registrationDate' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.participation.value?.registrationDate ? (editForm.controls.participation.value?.registrationDate | date:'dd.MM.yyyy') : '—' }}</span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.distinctions' | translate }}</span>
-                                    <span fieldValue>
-                                        @if (editForm.controls.participation.value?.crushOfHeart || editForm.controls.participation.value?.guestOfHonor) {
-                                            <span class="workshop-tags">
-                                                @if (editForm.controls.participation.value?.crushOfHeart) {
-                                                    <span class="el-tag">{{ 'entityList.signal.crushOfHeart' | translate }}</span>
-                                                }
-                                                @if (editForm.controls.participation.value?.guestOfHonor) {
-                                                    <span class="el-tag">{{ 'entityList.signal.guestOfHonor' | translate }}</span>
-                                                }
-                                            </span>
-                                        } @else {
-                                            —
-                                        }
-                                    </span>
-                                </app-field-row>
-                            </app-field-list>
-                        </div>
-                    </app-card>
+                @if (isCreating) {
+                    <ng-container *ngTemplateOutlet="intervenantCard" />
+                    <ng-container *ngTemplateOutlet="internalCard" />
                 }
-
-                <app-detail-section-card [titleKey]="'workshop.internalFollowup'"
-                                         [editing]="activeSection() === 'internal'"
-                                         [dimmed]="!!activeSection() && activeSection() !== 'internal'"
-                                         [actions]="internalActions()"
-                                         [showFooterActions]="!isCreating && activeSection() === 'internal'"
-                                         [saveDisabled]="isLoading"
-                                         (cancelRequested)="cancelSection('internal')"
-                                         (saveRequested)="saveSection('internal')">
-                    @if (isCreating || activeSection() === 'internal') {
-                        <div class="card-form-stack">
-                            <textarea-box [rows]="3" fieldName="extraInformation"
-                                          formControlName="extraInformation" translateKey="workshop.extraInformation" />
-                        </div>
-                    } @else {
-                        <app-field-list>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'workshop.extraInformation' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
-                            </app-field-row>
-                        </app-field-list>
-                    }
-                </app-detail-section-card>
             </div>
 
             <ng-container appDetailCreateActions>
@@ -174,4 +65,153 @@
             </ng-container>
         </app-detail-page-layout>
     </app-content-page>
+
+<ng-template #presentationCard>
+    <app-detail-section-card [titleKey]="'workshop.presentation'"
+                             [editing]="isCreating || activeSection() === 'presentation'"
+                             [dimmed]="!!activeSection() && activeSection() !== 'presentation'"
+                             [actions]="presentationActions()"
+                             [showFooterActions]="!isCreating && activeSection() === 'presentation'"
+                             [saveDisabled]="isLoading"
+                             (cancelRequested)="cancelSection('presentation')"
+                             (saveRequested)="saveSection('presentation')">
+        @if (isCreating || activeSection() === 'presentation') {
+            <div class="card-form-stack">
+                <text-box fieldName="title" formControlName="title" translateKey="workshop.titleField" />
+                <textarea-box [maxLength]="500" [rows]="6" [showCounter]="true"
+                              fieldName="description" formControlName="description"
+                              translateKey="workshop.description" />
+            </div>
+        } @else {
+            <app-field-list>
+                <app-field-row>
+                    <span fieldLabel>{{ 'workshop.titleField' | translate }}</span>
+                    <span fieldValue>{{ editForm.controls.title.value || '—' }}</span>
+                </app-field-row>
+                <app-field-row>
+                    <span fieldLabel>{{ 'workshop.description' | translate }}</span>
+                    <span fieldValue>{{ editForm.controls.description.value || '—' }}</span>
+                </app-field-row>
+            </app-field-list>
+        }
+    </app-detail-section-card>
+</ng-template>
+
+<ng-template #intervenantCard>
+    <app-card [titleKey]="'workshop.intervenant'">
+        <div appCardBody>
+            @if (isCreating) {
+                <select-box [enableFilter]="true" [filterFields]="selectFilterParticipation()"
+                            [formatterFunction]="formatterParticipation" [options]="participationsOptions"
+                            fieldName="participation" formControlName="participation"
+                            translateKey="workshop.participation" />
+            } @else {
+                <app-field-list>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'common.client' | translate }}</span>
+                        <span fieldValue>
+                            <a class="clickable" [routerLink]="['/admin', 'exhibitors', editForm.controls.participation.value?.exhibitor?.id ?? '', 'view']">
+                                {{ getExhibitorFullName(editForm.controls.participation.value?.exhibitor) || '—' }}
+                            </a>
+                        </span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'exhibitor.email' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.participation.value?.exhibitor?.email || '—' }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'exhibitor.phoneNumber' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.participation.value?.exhibitor?.phoneNumber || '—' }}</span>
+                    </app-field-row>
+                    @if (editForm.controls.participation.value?.exhibitor?.redFlag || editForm.controls.participation.value?.exhibitor?.duplicateDetected) {
+                        <app-field-row>
+                            <span fieldLabel>{{ 'common.alert' | translate }}</span>
+                            <span fieldValue>
+                                <span class="workshop-tags">
+                                    @if (editForm.controls.participation.value?.exhibitor?.redFlag) {
+                                        <span class="el-alert" [style.--el-color]="'var(--app-danger)'">
+                                            <fa-icon icon="flag"/>
+                                            {{ 'exhibitor.list.signal.redFlag' | translate }}
+                                        </span>
+                                    }
+                                    @if (editForm.controls.participation.value?.exhibitor?.duplicateDetected) {
+                                        <span class="el-alert" [style.--el-color]="'var(--app-status-refused)'">
+                                            <fa-icon icon="triangle-exclamation"/>
+                                            {{ 'exhibitor.list.signal.duplicate' | translate }}
+                                        </span>
+                                    }
+                                </span>
+                            </span>
+                        </app-field-row>
+                    }
+                </app-field-list>
+            }
+        </div>
+    </app-card>
+</ng-template>
+
+<ng-template #participationCard>
+    @if (!isCreating) {
+        <app-card [titleKey]="'common.participation'">
+            <div appCardBody>
+                <app-field-list>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'common.usageName' | translate }}</span>
+                        <span fieldValue>
+                            <a class="clickable" [routerLink]="['/admin', 'salons', eventId, 'participations', editForm.controls.participation.value?.id ?? '', 'view']">
+                                {{ getParticipationUsageName(editForm.controls.participation.value) || '—' }}
+                            </a>
+                        </span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.registrationDate' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.participation.value?.registrationDate ? (editForm.controls.participation.value?.registrationDate | date:'dd.MM.yyyy') : '—' }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.distinctions' | translate }}</span>
+                        <span fieldValue>
+                            @if (editForm.controls.participation.value?.crushOfHeart || editForm.controls.participation.value?.guestOfHonor) {
+                                <span class="workshop-tags">
+                                    @if (editForm.controls.participation.value?.crushOfHeart) {
+                                        <span class="el-tag">{{ 'entityList.signal.crushOfHeart' | translate }}</span>
+                                    }
+                                    @if (editForm.controls.participation.value?.guestOfHonor) {
+                                        <span class="el-tag">{{ 'entityList.signal.guestOfHonor' | translate }}</span>
+                                    }
+                                </span>
+                            } @else {
+                                —
+                            }
+                        </span>
+                    </app-field-row>
+                </app-field-list>
+            </div>
+        </app-card>
+    }
+</ng-template>
+
+<ng-template #internalCard>
+    <app-detail-section-card [titleKey]="'workshop.internalFollowup'"
+                             [editing]="isCreating || activeSection() === 'internal'"
+                             [dimmed]="!!activeSection() && activeSection() !== 'internal'"
+                             [actions]="internalActions()"
+                             [showFooterActions]="!isCreating && activeSection() === 'internal'"
+                             [saveDisabled]="isLoading"
+                             (cancelRequested)="cancelSection('internal')"
+                             (saveRequested)="saveSection('internal')">
+        @if (isCreating || activeSection() === 'internal') {
+            <div class="card-form-stack">
+                <textarea-box [rows]="3" fieldName="extraInformation"
+                              formControlName="extraInformation" translateKey="workshop.extraInformation" />
+            </div>
+        } @else {
+            <app-field-list>
+                <app-field-row>
+                    <span fieldLabel>{{ 'workshop.extraInformation' | translate }}</span>
+                    <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
+                </app-field-row>
+            </app-field-list>
+        }
+    </app-detail-section-card>
+</ng-template>
 </div>

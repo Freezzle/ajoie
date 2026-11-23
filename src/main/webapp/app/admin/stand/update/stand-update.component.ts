@@ -51,6 +51,12 @@ import {
     DetailSideDirective,
     DetailStatusDirective
 } from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
+import {TabsComponent} from '../../../shared/components/tabs/tabs.component';
+import {TabPanelDirective, AppTab} from '../../../shared/components/tabs/tab-panel.directive';
+import {SideLabelsComponent} from '../../../shared/components/side-labels/side-labels.component';
+import {SideLabelComponent} from '../../../shared/components/side-labels/side-label.component';
+import {SideLabelHostDirective} from '../../../shared/components/side-labels/side-label-host.directive';
+import {Notif} from '../../../shared/components/notif-badge/notif.model';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
     stand: ['description', 'category', 'subCategories'],
@@ -92,7 +98,12 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                   DetailStatusDirective,
                   DetailMainDirective,
                   DetailSideDirective,
-                  DetailCreateActionsDirective
+                  DetailCreateActionsDirective,
+                  TabsComponent,
+                  TabPanelDirective,
+                  SideLabelsComponent,
+                  SideLabelComponent,
+                  SideLabelHostDirective
                ]
            })
 export class StandUpdateComponent implements OnInit {
@@ -104,6 +115,13 @@ export class StandUpdateComponent implements OnInit {
     dimensionsOptions: IPriceStandSalon[] = [];
     picturePreviewUrl: string | null = null;
     sharedPicturePreviewUrl: string | null = null;
+    viewTab = 'ess';
+    readonly side = signal<string | null>(null);
+    readonly viewTabs: AppTab[] = [
+        {key: 'ess', labelKey: 'global.tab.essential', icon: 'pi pi-star'},
+        {key: 'logistics', labelKey: 'global.tab.logistics', icon: 'pi pi-box'},
+        {key: 'communication', labelKey: 'stand.card.socialNetwork', icon: 'pi pi-share-alt'}
+    ];
 
     readonly activeSection = signal<string | null>(null);
     readonly availableActions = signal<AvailableAction[]>([]);
@@ -134,6 +152,32 @@ export class StandUpdateComponent implements OnInit {
 
     get isCreating(): boolean {
         return !this.editForm.controls.id.value;
+    }
+
+    private get exhibitor() {
+        return this.editForm.controls.participation.value?.exhibitor;
+    }
+
+    get exhibitorBadge(): Notif | null {
+        const exhibitor = this.exhibitor;
+        const count = (exhibitor?.redFlag ? 1 : 0) + (exhibitor?.duplicateDetected ? 1 : 0);
+
+        return count > 0 ? {type: 'danger', value: count} : null;
+    }
+
+    get exhibitorHintKey(): string | null {
+        return this.exhibitorBadge ? 'common.exhibitorHasAlert' : null;
+    }
+
+    get participationBadge(): Notif | null {
+        const participation = this.editForm.controls.participation.value;
+        const count = (participation?.crushOfHeart ? 1 : 0) + (participation?.guestOfHonor ? 1 : 0);
+
+        return count > 0 ? {type: 'warning', value: count} : null;
+    }
+
+    get internalBadge(): Notif | null {
+        return this.editForm.controls.extraInformation.value ? {type: 'warning', dot: true} : null;
     }
 
     ngOnInit(): void {

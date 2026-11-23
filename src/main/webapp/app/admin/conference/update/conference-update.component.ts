@@ -35,6 +35,12 @@ import {
     DetailStatusDirective
 } from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
 import {DetailSectionCardComponent} from '../../../shared/components/detail-section-card/detail-section-card.component';
+import {TabsComponent} from '../../../shared/components/tabs/tabs.component';
+import {TabPanelDirective, AppTab} from '../../../shared/components/tabs/tab-panel.directive';
+import {SideLabelsComponent} from '../../../shared/components/side-labels/side-labels.component';
+import {SideLabelComponent} from '../../../shared/components/side-labels/side-label.component';
+import {SideLabelHostDirective} from '../../../shared/components/side-labels/side-label-host.directive';
+import {Notif} from '../../../shared/components/notif-badge/notif.model';
 
 @Component({
                selector: 'app-conference-update',
@@ -45,7 +51,9 @@ import {DetailSectionCardComponent} from '../../../shared/components/detail-sect
                          AlertErrorComponent, ConfirmPopup, CardComponent, ContentPageComponent,
                          FieldListComponent, FieldRowComponent, StatusTimelineComponent,
                          DetailPageLayoutComponent, DetailStatusDirective, DetailMainDirective,
-                         DetailSideDirective, DetailCreateActionsDirective, DetailSectionCardComponent]
+                         DetailSideDirective, DetailCreateActionsDirective, DetailSectionCardComponent,
+                         TabsComponent, TabPanelDirective, SideLabelsComponent, SideLabelComponent,
+                         SideLabelHostDirective]
            })
 export class ConferenceUpdateComponent implements OnInit {
     isLoading = false;
@@ -53,6 +61,9 @@ export class ConferenceUpdateComponent implements OnInit {
     eventId!: string;
     initialConference: IConference | null = null;
     participationsOptions: IParticipation[] = [];
+    viewTab = 'ess';
+    readonly side = signal<string | null>(null);
+    readonly viewTabs: AppTab[] = [{key: 'ess', labelKey: 'global.tab.essential', icon: 'pi pi-star'}];
     readonly activeSection = signal<string | null>(null);
     readonly availableActions = signal<AvailableAction[]>([]);
     private sectionSnapshot: Record<string, unknown> = {};
@@ -86,6 +97,32 @@ export class ConferenceUpdateComponent implements OnInit {
 
     get isCreating(): boolean {
         return !this.editForm.controls.id.value;
+    }
+
+    private get exhibitor() {
+        return this.editForm.controls.participation.value?.exhibitor;
+    }
+
+    get intervenantBadge(): Notif | null {
+        const exhibitor = this.exhibitor;
+        const count = (exhibitor?.redFlag ? 1 : 0) + (exhibitor?.duplicateDetected ? 1 : 0);
+
+        return count > 0 ? {type: 'danger', value: count} : null;
+    }
+
+    get intervenantHintKey(): string | null {
+        return this.intervenantBadge ? 'common.exhibitorHasAlert' : null;
+    }
+
+    get participationBadge(): Notif | null {
+        const participation = this.editForm.controls.participation.value;
+        const count = (participation?.crushOfHeart ? 1 : 0) + (participation?.guestOfHonor ? 1 : 0);
+
+        return count > 0 ? {type: 'warning', value: count} : null;
+    }
+
+    get internalBadge(): Notif | null {
+        return this.editForm.controls.extraInformation.value ? {type: 'warning', dot: true} : null;
     }
 
     ngOnInit(): void {

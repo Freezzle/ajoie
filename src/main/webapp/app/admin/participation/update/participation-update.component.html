@@ -8,17 +8,12 @@
     <div appMenuBarEnd>
         <button-box (clickedEvent)="previousState()" [isDisabled]="isLoading"
                     [showText]="false" primeIcon="pi-arrow-left" translateKey="common.back"/>
-        @if (!isCreating) {
-            <button-box (clickedEvent)="openHistoryModal()" [isDisabled]="isLoading"
-                        [showText]="false" primeIcon="pi-history" translateKey="event.buttonTitle"
-                        type="secondary"/>
-        }
     </div>
 
     <app-alert-error/>
     <p-confirmpopup/>
 
-    <app-detail-page-layout>
+    <app-detail-page-layout [singleColumn]="!isCreating">
         <ng-container appDetailStatus>
             @if (!isCreating) {
                 <app-status-timeline [status]="initialParticipation?.status ?? null"
@@ -28,403 +23,49 @@
         </ng-container>
 
         <div appDetailMain>
-            <!-- Inscription -->
-            <app-card [titleKey]="'participation.card.registration'"
-                      [editing]="isCreating || activeSection() === 'registration'"
-                      [dimmed]="!!activeSection() && activeSection() !== 'registration'"
-                      [actions]="registrationActions()">
-                <div appCardBody>
-                    @if (isCreating || activeSection() === 'registration') {
-                        <div class="card-form-stack">
-                            <text-box fieldName="therapistName" formControlName="therapistName"
-                                      translateKey="exhibitor.therapistName"/>
-                            <date-box fieldName="registrationDate" formControlName="registrationDate"
-                                      translateKey="participation.registrationDate"/>
-                            <checkbox-box fieldName="acceptedChart" formControlName="acceptedChart"
-                                          translateKey="participation.acceptedChart"/>
-                            <checkbox-box fieldName="acceptedContract" formControlName="acceptedContract"
-                                          translateKey="participation.acceptedContract"/>
-                        </div>
-                    } @else {
-                        <app-field-list>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'exhibitor.therapistName' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.therapistName.value || '—' }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.registrationDate' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.registrationDate.value ? (editForm.controls.registrationDate.value | date:'dd.MM.yyyy') : '—' }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.documents' | translate }}</span>
-                                <span fieldValue>
-                                    <span class="participation-tags">
-                                        <span class="el-tag">
-                                            <yes-no-icon [value]="editForm.controls.acceptedChart.value" />
-                                            {{ 'participation.documentChart' | translate }}
-                                        </span>
-                                        <span class="el-tag">
-                                            <yes-no-icon [value]="editForm.controls.acceptedContract.value" />
-                                            {{ 'participation.documentContract' | translate }}
-                                        </span>
-                                    </span>
-                                </span>
-                            </app-field-row>
-                        </app-field-list>
-                    }
-                </div>
-                <ng-container appCardFooter>
-                    @if (!isCreating && activeSection() === 'registration') {
-                        <div appCardFooterContent class="card-footer-actions">
-                            <button-box (clickedEvent)="cancelSection('registration')" type="secondary" translateKey="common.cancel"/>
-                            <button-box (clickedEvent)="saveSection('registration')" [isDisabled]="isLoading" translateKey="common.save"/>
-                        </div>
-                    }
-                </ng-container>
-            </app-card>
+            @if (isCreating) {
+                <ng-container *ngTemplateOutlet="inscriptionCard" />
+                <ng-container *ngTemplateOutlet="billingCard" />
+            } @else {
+                <div appSideLabelHost>
+                    <app-tabs #tabsRef [tabs]="viewTabs" [(active)]="viewTab">
+                        <ng-template appTabPanel="ess">
+                            <ng-container *ngTemplateOutlet="inscriptionCard" />
+                            <ng-container *ngTemplateOutlet="standsCard" />
+                            <ng-container *ngTemplateOutlet="conferencesCard" />
+                            <ng-container *ngTemplateOutlet="workshopsCard" />
+                        </ng-template>
+                        <ng-template appTabPanel="billing">
+                            <ng-container *ngTemplateOutlet="billingCard" />
+                        </ng-template>
+                    </app-tabs>
 
-            <!-- Repas et facturation -->
-            <app-card [titleKey]="'participation.card.billing'"
-                      [editing]="isCreating || activeSection() === 'billing'"
-                      [dimmed]="!!activeSection() && activeSection() !== 'billing'"
-                      [actions]="billingActions()">
-                <div appCardBody>
-                    @if (isCreating || activeSection() === 'billing') {
-                        <div class="card-form-stack">
-                            <number-box fieldName="nbMeal1" formControlName="nbMeal1" translateKey="participation.nbMeal1"/>
-                            <number-box fieldName="nbMeal2" formControlName="nbMeal2" translateKey="participation.nbMeal2"/>
-                            <number-box fieldName="nbMeal3" formControlName="nbMeal3" translateKey="participation.nbMeal3"/>
-                            <select-box [formatterFunction]="formatterModePaymentMeals" [needTranslation]="true"
-                                        [options]="modePaymentMealsValues" fieldName="modePaymentMeals"
-                                        formControlName="modePaymentMeals" translateKey="participation.modePaymentMeals.label"/>
-                            <select-box [formatterFunction]="formatterInvoiceMethod" [needTranslation]="true"
-                                        [options]="invoiceSendingMethodValues" fieldName="invoiceSendingMethod"
-                                        formControlName="invoiceSendingMethod" translateKey="participation.invoiceSendingMethod.label"/>
-                            <checkbox-box fieldName="needArrangement" formControlName="needArrangement"
-                                          translateKey="participation.needArrangement"/>
-                        </div>
-                    } @else {
-                        <app-field-list>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.nbMeal1' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.nbMeal1.value ?? 0 }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.nbMeal2' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.nbMeal2.value ?? 0 }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.nbMeal3' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.nbMeal3.value ?? 0 }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.modePaymentMeals.label' | translate }}</span>
-                                <span fieldValue>{{ formatterModePaymentMeals(editForm.controls.modePaymentMeals.value) | translate }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.invoiceSendingMethod.label' | translate }}</span>
-                                <span fieldValue>{{ formatterInvoiceMethod(editForm.controls.invoiceSendingMethod.value) | translate }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.needArrangement' | translate }}</span>
-                                <span fieldValue><yes-no-icon [value]="editForm.controls.needArrangement.value" /></span>
-                            </app-field-row>
-                        </app-field-list>
-                    }
+                    <app-side-labels [(open)]="side" [anchor]="tabsRef.panelElement">
+                        <app-side-label key="exhibitor" icon="pi pi-user" labelKey="participation.card.exhibitor"
+                                        [badge]="exhibitorBadge" [hintKey]="exhibitorHintKey" hintType="danger">
+                            <ng-container *ngTemplateOutlet="exhibitorCard" />
+                        </app-side-label>
+                        @if (!stateService.hideSensibleInformation()) {
+                            <app-side-label key="internal" icon="pi pi-comment" labelKey="participation.card.internalRating"
+                                            [badge]="internalBadge" hintType="info">
+                                <ng-container *ngTemplateOutlet="internalCard" />
+                            </app-side-label>
+                        }
+                        <app-side-label key="history" icon="pi pi-history" labelKey="event.title">
+                            <ng-container *ngTemplateOutlet="historyContent" />
+                        </app-side-label>
+                    </app-side-labels>
                 </div>
-                <ng-container appCardFooter>
-                    @if (!isCreating && activeSection() === 'billing') {
-                        <div appCardFooterContent class="card-footer-actions">
-                            <button-box (clickedEvent)="cancelSection('billing')" type="secondary" translateKey="common.cancel"/>
-                            <button-box (clickedEvent)="saveSection('billing')" [isDisabled]="isLoading" translateKey="common.save"/>
-                        </div>
-                    }
-                </ng-container>
-            </app-card>
-
-            <!-- Offre et message -->
-            <app-card [titleKey]="'participation.card.offer'"
-                      [tag]="editForm.controls.hasOffer.value ? ('participation.offerProposed' | translate) : null"
-                      [editing]="isCreating || activeSection() === 'offer'"
-                      [dimmed]="!!activeSection() && activeSection() !== 'offer'"
-                      [actions]="offerActions()">
-                <div appCardBody>
-                    @if (isCreating || activeSection() === 'offer') {
-                        <div class="card-form-stack">
-                            <checkbox-box fieldName="hasOffer" formControlName="hasOffer" translateKey="participation.hasOffer"/>
-                            @if (editForm.controls.hasOffer.value) {
-                                <text-box fieldName="offer" formControlName="offer" translateKey="participation.offer"/>
-                            }
-                            <textarea-box [rows]="3" fieldName="additionnalInformation"
-                                          formControlName="additionnalInformation"
-                                          translateKey="participation.additionnalInformation"/>
-                        </div>
-                    } @else {
-                        <app-field-list>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.hasOffer' | translate }}</span>
-                                <span fieldValue><yes-no-icon [value]="editForm.controls.hasOffer.value" /></span>
-                            </app-field-row>
-                            @if (editForm.controls.hasOffer.value) {
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.offer' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.offer.value || '—' }}</span>
-                                </app-field-row>
-                            }
-                            <app-field-row>
-                                <span fieldLabel>{{ 'participation.additionnalInformation' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.additionnalInformation.value || '—' }}</span>
-                            </app-field-row>
-                        </app-field-list>
-                    }
-                </div>
-                <ng-container appCardFooter>
-                    @if (!isCreating && activeSection() === 'offer') {
-                        <div appCardFooterContent class="card-footer-actions">
-                            <button-box (clickedEvent)="cancelSection('offer')" type="secondary" translateKey="common.cancel"/>
-                            <button-box (clickedEvent)="saveSection('offer')" [isDisabled]="isLoading" translateKey="common.save"/>
-                        </div>
-                    }
-                </ng-container>
-            </app-card>
-
-            <!-- Prestations souscrites -->
-            @if (!isCreating) {
-                <app-card [titleKey]="'participation.card.linkedServices'">
-                    <div appCardBody>
-                        @let stands = (loadStandsOnce() | async) ?? [];
-                        @let conferences = (loadConferencesOnce() | async) ?? [];
-                        @let workshops = (loadWorkshopsOnce() | async) ?? [];
-                        @let prestationTabs = [
-                            {key: 'stand', labelKey: 'stand.title', badge: countBadge(stands.length)},
-                            {key: 'conference', labelKey: 'conference.title', badge: countBadge(conferences.length)},
-                            {key: 'workshop', labelKey: 'workshop.title', badge: countBadge(workshops.length)}
-                        ];
-                        <app-tabs [tabs]="prestationTabs" [(active)]="tabActive">
-                            <ng-template appTabPanel="stand">
-                                @if (stands.length === 0) {
-                                    <div class="el-empty"><b>{{ 'stand.notFound' | translate }}</b></div>
-                                } @else {
-                                    <div class="el-list mt-2">
-                                        @for (stand of stands; track stand.id) {
-                                            <entity-row [actions]="standActions(stand)"
-                                                        [link]="['../stands', stand.id, 'view']"
-                                                        [linkLabel]="'stand.list.open' | translate">
-                                                <span rowTitle>{{ stand.description }}</span>
-                                                <entity-status rowStatus [color]="statusColor(stand.status)"
-                                                               [labelKey]="statusLabelKey('stand', stand.status)"
-                                                               [strikethrough]="stand.status === Status.CANCELED"/>
-                                                <span rowSide class="el-category" [style.--el-color]="categoryColor(stand.category)">
-                                                    <i class="el-square"></i>{{ formatterCategory(stand.category) | translate }}
-                                                </span>
-                                                <ng-container rowFoot>
-                                                    @if (stand.dimension.dimension) {
-                                                        <entity-foot-item [label]="stand.dimension.dimension" [showLabel]="true" icon="ruler-combined"/>
-                                                    }
-                                                    @if (stand.shared) {
-                                                        <entity-foot-item color="var(--app-share)" icon="people-arrows" labelKey="stand.list.sharedWithCoExhibitor"/>
-                                                    }
-                                                    @if (stand.needElectricity) {
-                                                        <entity-foot-item color="var(--app-warn)" icon="bolt" labelKey="entityList.signal.electricity"/>
-                                                    }
-                                                    @if (stand.subCategories.length > 0) {
-                                                        <span class="el-foot-item">
-                                                            @for (subCategory of stand.subCategories; track subCategory) {
-                                                                <span class="el-tag">{{ subCategory }}</span>
-                                                            }
-                                                        </span>
-                                                    }
-                                                    @if (stand.extraInformation) {
-                                                        <entity-foot-item [detail]="stand.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
-                                                    }
-                                                </ng-container>
-                                            </entity-row>
-                                        }
-                                    </div>
-                                }
-                                <div class="mt-2">
-                                    <button-box [links]="['../stands/new']" [modeLink]="true" primeIcon="pi-plus"
-                                                translateKey="participation.newStand" type="success"/>
-                                </div>
-                            </ng-template>
-                            <ng-template appTabPanel="conference">
-                                @if (conferences.length === 0) {
-                                    <div class="el-empty"><b>{{ 'conference.notFound' | translate }}</b></div>
-                                } @else {
-                                    <div class="el-list mt-2">
-                                        @for (conference of conferences; track conference.id) {
-                                            <entity-row [actions]="conferenceActions(conference)"
-                                                        [link]="['../conferences', conference.id, 'view']"
-                                                        [linkLabel]="'conference.list.open' | translate">
-                                                <span rowTitle>{{ conference.title }}</span>
-                                                <entity-status rowStatus [color]="statusColor(conference.status)"
-                                                               [labelKey]="statusLabelKey('conference', conference.status)"
-                                                               [strikethrough]="conference.status === Status.CANCELED"/>
-                                                <ng-container rowFoot>
-                                                    @if (conference.extraInformation) {
-                                                        <entity-foot-item [detail]="conference.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
-                                                    }
-                                                </ng-container>
-                                            </entity-row>
-                                        }
-                                    </div>
-                                }
-                                <div class="mt-2">
-                                    <button-box [links]="['../conferences/new']" [modeLink]="true" primeIcon="pi-plus"
-                                                translateKey="participation.newConference" type="success"/>
-                                </div>
-                            </ng-template>
-                            <ng-template appTabPanel="workshop">
-                                @if (workshops.length === 0) {
-                                    <div class="el-empty"><b>{{ 'workshop.notFound' | translate }}</b></div>
-                                } @else {
-                                    <div class="el-list mt-2">
-                                        @for (workshop of workshops; track workshop.id) {
-                                            <entity-row [actions]="workshopActions(workshop)"
-                                                        [link]="['../workshops', workshop.id, 'view']"
-                                                        [linkLabel]="'workshop.list.open' | translate">
-                                                <span rowTitle>{{ workshop.title }}</span>
-                                                <entity-status rowStatus [color]="statusColor(workshop.status)"
-                                                               [labelKey]="statusLabelKey('workshop', workshop.status)"
-                                                               [strikethrough]="workshop.status === Status.CANCELED"/>
-                                                <ng-container rowFoot>
-                                                    @if (workshop.extraInformation) {
-                                                        <entity-foot-item [detail]="workshop.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
-                                                    }
-                                                </ng-container>
-                                            </entity-row>
-                                        }
-                                    </div>
-                                }
-                                <div class="mt-2">
-                                    <button-box [links]="['../workshops/new']" [modeLink]="true" primeIcon="pi-plus"
-                                                translateKey="participation.newWorkshop" type="success"/>
-                                </div>
-                            </ng-template>
-                        </app-tabs>
-                    </div>
-                </app-card>
             }
         </div>
 
         <div appDetailSide>
-            <!-- Exposant -->
-            <app-card [titleKey]="'participation.card.exhibitor'">
-                <div appCardBody>
-                    @if (isCreating) {
-                        <select-box [enableFilter]="true" [filterFields]="selectFilterExhibitor()"
-                                    [formatterFunction]="formatterExhibitor" [options]="exhibitorsOptions"
-                                    fieldName="exhibitor" formControlName="exhibitor"
-                                    translateKey="participation.exhibitor"/>
-                    } @else {
-                        <app-field-list>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'common.client' | translate }}</span>
-                                <span fieldValue>
-                                    <a class="clickable" [routerLink]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']">
-                                        {{ getExhibitorFullName(editForm.controls.exhibitor.value) || '—' }}
-                                    </a>
-                                </span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'exhibitor.email' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.exhibitor.value?.email || '—' }}</span>
-                            </app-field-row>
-                            <app-field-row>
-                                <span fieldLabel>{{ 'exhibitor.phoneNumber' | translate }}</span>
-                                <span fieldValue>{{ editForm.controls.exhibitor.value?.phoneNumber || '—' }}</span>
-                            </app-field-row>
-                            @if (editForm.controls.exhibitor.value?.redFlag || editForm.controls.exhibitor.value?.duplicateDetected) {
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'common.alert' | translate }}</span>
-                                    <span fieldValue>
-                                        <span class="participation-tags">
-                                            @if (editForm.controls.exhibitor.value?.redFlag) {
-                                                <span class="el-alert" [style.--el-color]="'var(--app-danger)'">
-                                                    <fa-icon icon="flag"/>
-                                                    {{ 'exhibitor.list.signal.redFlag' | translate }}
-                                                </span>
-                                            }
-                                            @if (editForm.controls.exhibitor.value?.duplicateDetected) {
-                                                <span class="el-alert" [style.--el-color]="'var(--app-status-refused)'">
-                                                    <fa-icon icon="triangle-exclamation"/>
-                                                    {{ 'exhibitor.list.signal.duplicate' | translate }}
-                                                </span>
-                                            }
-                                        </span>
-                                    </span>
-                                </app-field-row>
-                            }
-                        </app-field-list>
-                    }
-                </div>
-            </app-card>
-
-            <!-- Appréciation interne (sensible) -->
-            @if (!stateService.hideSensibleInformation() || isCreating) {
-                <app-card [titleKey]="'participation.card.internalRating'" [lock]="true"
-                          [editing]="isCreating || activeSection() === 'rating'"
-                          [dimmed]="!!activeSection() && activeSection() !== 'rating'"
-                          [actions]="ratingActions()">
-                    <div appCardBody>
-                        @if (isCreating || activeSection() === 'rating') {
-                            <div class="card-form-stack">
-                                <checkbox-box fieldName="crushOfHeart" formControlName="crushOfHeart" translateKey="participation.crushOfHeart"/>
-                                <checkbox-box fieldName="guestOfHonor" formControlName="guestOfHonor" translateKey="participation.guestOfHonor"/>
-                                <rating-box fieldName="ratingFriendliness" formControlName="ratingFriendliness" translateKey="participation.ratingFriendliness"/>
-                                <rating-box fieldName="ratingPaymentSpeed" formControlName="ratingPaymentSpeed" translateKey="participation.ratingPaymentSpeed"/>
-                                <rating-box fieldName="ratingServiceQuality" formControlName="ratingServiceQuality" translateKey="participation.ratingServiceQuality"/>
-                                <textarea-box [rows]="3" fieldName="extraInformation" formControlName="extraInformation" translateKey="participation.extraInformation"/>
-                            </div>
-                        } @else {
-                            <app-field-list>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.distinctions' | translate }}</span>
-                                    <span fieldValue>
-                                        @if (editForm.controls.crushOfHeart.value || editForm.controls.guestOfHonor.value) {
-                                            <span class="participation-tags">
-                                                @if (editForm.controls.crushOfHeart.value) {
-                                                    <span class="el-tag">{{ 'participation.crushOfHeart' | translate }}</span>
-                                                }
-                                                @if (editForm.controls.guestOfHonor.value) {
-                                                    <span class="el-tag">{{ 'participation.guestOfHonor' | translate }}</span>
-                                                }
-                                            </span>
-                                        } @else {
-                                            —
-                                        }
-                                    </span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.ratingFriendliness' | translate }}</span>
-                                    <span fieldValue><p-rating [ngModel]="editForm.controls.ratingFriendliness.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.ratingPaymentSpeed' | translate }}</span>
-                                    <span fieldValue><p-rating [ngModel]="editForm.controls.ratingPaymentSpeed.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.ratingServiceQuality' | translate }}</span>
-                                    <span fieldValue><p-rating [ngModel]="editForm.controls.ratingServiceQuality.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
-                                </app-field-row>
-                                <app-field-row>
-                                    <span fieldLabel>{{ 'participation.extraInformation' | translate }}</span>
-                                    <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
-                                </app-field-row>
-                            </app-field-list>
-                        }
-                    </div>
-                    <ng-container appCardFooter>
-                        @if (!isCreating && activeSection() === 'rating') {
-                            <div appCardFooterContent class="card-footer-actions">
-                                <button-box (clickedEvent)="cancelSection('rating')" type="secondary" translateKey="common.cancel"/>
-                                <button-box (clickedEvent)="saveSection('rating')" [isDisabled]="isLoading" translateKey="common.save"/>
-                            </div>
-                        }
-                    </ng-container>
-                </app-card>
+            @if (isCreating) {
+                <ng-container *ngTemplateOutlet="exhibitorCard" />
+                <ng-container *ngTemplateOutlet="internalCard" />
             }
         </div>
+
         <ng-container appDetailCreateActions>
             @if (isCreating) {
                 <button-box (clickedEvent)="previousState()" type="secondary" translateKey="common.cancel"/>
@@ -432,4 +73,384 @@
             }
         </ng-container>
     </app-detail-page-layout>
+
+<ng-template #inscriptionCard>
+    <app-card [titleKey]="'participation.card.registration'"
+              [tag]="editForm.controls.hasOffer.value ? ('participation.offerProposed' | translate) : null"
+              [editing]="isCreating || activeSection() === 'registration'"
+              [dimmed]="!!activeSection() && activeSection() !== 'registration'"
+              [actions]="registrationActions()">
+        <div appCardBody>
+            @if (isCreating || activeSection() === 'registration') {
+                <div class="card-form-stack">
+                    <text-box fieldName="therapistName" formControlName="therapistName"
+                              translateKey="exhibitor.therapistName"/>
+                    <date-box fieldName="registrationDate" formControlName="registrationDate"
+                              translateKey="participation.registrationDate"/>
+                    <checkbox-box fieldName="acceptedChart" formControlName="acceptedChart"
+                                  translateKey="participation.acceptedChart"/>
+                    <checkbox-box fieldName="acceptedContract" formControlName="acceptedContract"
+                                  translateKey="participation.acceptedContract"/>
+                    <checkbox-box fieldName="hasOffer" formControlName="hasOffer" translateKey="participation.hasOffer"/>
+                    @if (editForm.controls.hasOffer.value) {
+                        <text-box fieldName="offer" formControlName="offer" translateKey="participation.offer"/>
+                    }
+                    <textarea-box [rows]="3" fieldName="additionnalInformation"
+                                  formControlName="additionnalInformation"
+                                  translateKey="participation.additionnalInformation"/>
+                </div>
+            } @else {
+                <app-field-list>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'exhibitor.therapistName' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.therapistName.value || '—' }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.registrationDate' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.registrationDate.value ? (editForm.controls.registrationDate.value | date:'dd.MM.yyyy') : '—' }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.documents' | translate }}</span>
+                        <span fieldValue>
+                            <span class="participation-tags">
+                                <span class="el-tag">
+                                    <yes-no-icon [value]="editForm.controls.acceptedChart.value" />
+                                    {{ 'participation.documentChart' | translate }}
+                                </span>
+                                <span class="el-tag">
+                                    <yes-no-icon [value]="editForm.controls.acceptedContract.value" />
+                                    {{ 'participation.documentContract' | translate }}
+                                </span>
+                            </span>
+                        </span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.hasOffer' | translate }}</span>
+                        <span fieldValue><yes-no-icon [value]="editForm.controls.hasOffer.value" /></span>
+                    </app-field-row>
+                    @if (editForm.controls.hasOffer.value) {
+                        <app-field-row>
+                            <span fieldLabel>{{ 'participation.offer' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.offer.value || '—' }}</span>
+                        </app-field-row>
+                    }
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.additionnalInformation' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.additionnalInformation.value || '—' }}</span>
+                    </app-field-row>
+                </app-field-list>
+            }
+        </div>
+        <ng-container appCardFooter>
+            @if (!isCreating && activeSection() === 'registration') {
+                <div appCardFooterContent class="card-footer-actions">
+                    <button-box (clickedEvent)="cancelSection('registration')" type="secondary" translateKey="common.cancel"/>
+                    <button-box (clickedEvent)="saveSection('registration')" [isDisabled]="isLoading" translateKey="common.save"/>
+                </div>
+            }
+        </ng-container>
+    </app-card>
+</ng-template>
+
+<ng-template #billingCard>
+    <app-card [titleKey]="'participation.card.billing'"
+              [editing]="isCreating || activeSection() === 'billing'"
+              [dimmed]="!!activeSection() && activeSection() !== 'billing'"
+              [actions]="billingActions()">
+        <div appCardBody>
+            @if (isCreating || activeSection() === 'billing') {
+                <div class="card-form-stack">
+                    <number-box fieldName="nbMeal1" formControlName="nbMeal1" translateKey="participation.nbMeal1"/>
+                    <number-box fieldName="nbMeal2" formControlName="nbMeal2" translateKey="participation.nbMeal2"/>
+                    <number-box fieldName="nbMeal3" formControlName="nbMeal3" translateKey="participation.nbMeal3"/>
+                    <select-box [formatterFunction]="formatterModePaymentMeals" [needTranslation]="true"
+                                [options]="modePaymentMealsValues" fieldName="modePaymentMeals"
+                                formControlName="modePaymentMeals" translateKey="participation.modePaymentMeals.label"/>
+                    <select-box [formatterFunction]="formatterInvoiceMethod" [needTranslation]="true"
+                                [options]="invoiceSendingMethodValues" fieldName="invoiceSendingMethod"
+                                formControlName="invoiceSendingMethod" translateKey="participation.invoiceSendingMethod.label"/>
+                </div>
+            } @else {
+                <app-field-list>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.nbMeal1' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.nbMeal1.value ?? 0 }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.nbMeal2' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.nbMeal2.value ?? 0 }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.nbMeal3' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.nbMeal3.value ?? 0 }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.modePaymentMeals.label' | translate }}</span>
+                        <span fieldValue>{{ formatterModePaymentMeals(editForm.controls.modePaymentMeals.value) | translate }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'participation.invoiceSendingMethod.label' | translate }}</span>
+                        <span fieldValue>{{ formatterInvoiceMethod(editForm.controls.invoiceSendingMethod.value) | translate }}</span>
+                    </app-field-row>
+                </app-field-list>
+            }
+        </div>
+        <ng-container appCardFooter>
+            @if (!isCreating && activeSection() === 'billing') {
+                <div appCardFooterContent class="card-footer-actions">
+                    <button-box (clickedEvent)="cancelSection('billing')" type="secondary" translateKey="common.cancel"/>
+                    <button-box (clickedEvent)="saveSection('billing')" [isDisabled]="isLoading" translateKey="common.save"/>
+                </div>
+            }
+        </ng-container>
+    </app-card>
+</ng-template>
+
+<ng-template #standsCard>
+    <app-card [titleKey]="'participation.card.stands'">
+        <div appCardBody>
+            @let stands = (loadStandsOnce() | async) ?? [];
+            @if (stands.length === 0) {
+                <div class="el-empty"><b>{{ 'stand.notFound' | translate }}</b></div>
+            } @else {
+                <div class="el-list">
+                    @for (stand of stands; track stand.id) {
+                        <entity-row [actions]="standActions(stand)"
+                                    [link]="['../stands', stand.id, 'view']"
+                                    [linkLabel]="'stand.list.open' | translate">
+                            <span rowTitle>{{ stand.description }}</span>
+                            <entity-status rowStatus [color]="statusColor(stand.status)"
+                                           [labelKey]="statusLabelKey('stand', stand.status)"
+                                           [strikethrough]="stand.status === Status.CANCELED"/>
+                            <span rowSide class="el-category" [style.--el-color]="categoryColor(stand.category)">
+                                <i class="el-square"></i>{{ formatterCategory(stand.category) | translate }}
+                            </span>
+                            <ng-container rowFoot>
+                                @if (stand.dimension.dimension) {
+                                    <entity-foot-item [label]="stand.dimension.dimension" [showLabel]="true" icon="ruler-combined"/>
+                                }
+                                @if (stand.shared) {
+                                    <entity-foot-item color="var(--app-share)" icon="people-arrows" labelKey="stand.list.sharedWithCoExhibitor"/>
+                                }
+                                @if (stand.needElectricity) {
+                                    <entity-foot-item color="var(--app-warn)" icon="bolt" labelKey="entityList.signal.electricity"/>
+                                }
+                                @if (stand.subCategories.length > 0) {
+                                    <span class="el-foot-item">
+                                        @for (subCategory of stand.subCategories; track subCategory) {
+                                            <span class="el-tag">{{ subCategory }}</span>
+                                        }
+                                    </span>
+                                }
+                                @if (stand.extraInformation) {
+                                    <entity-foot-item [detail]="stand.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
+                                }
+                            </ng-container>
+                        </entity-row>
+                    }
+                </div>
+            }
+            <div class="mt-2">
+                <button-box [links]="['../stands/new']" [modeLink]="true" primeIcon="pi-plus"
+                            translateKey="participation.newStand" type="success"/>
+            </div>
+        </div>
+    </app-card>
+</ng-template>
+
+<ng-template #conferencesCard>
+    <app-card [titleKey]="'participation.card.conferences'">
+        <div appCardBody>
+            @let conferences = (loadConferencesOnce() | async) ?? [];
+            @if (conferences.length === 0) {
+                <div class="el-empty"><b>{{ 'conference.notFound' | translate }}</b></div>
+            } @else {
+                <div class="el-list">
+                    @for (conference of conferences; track conference.id) {
+                        <entity-row [actions]="conferenceActions(conference)"
+                                    [link]="['../conferences', conference.id, 'view']"
+                                    [linkLabel]="'conference.list.open' | translate">
+                            <span rowTitle>{{ conference.title }}</span>
+                            <entity-status rowStatus [color]="statusColor(conference.status)"
+                                           [labelKey]="statusLabelKey('conference', conference.status)"
+                                           [strikethrough]="conference.status === Status.CANCELED"/>
+                            <ng-container rowFoot>
+                                @if (conference.extraInformation) {
+                                    <entity-foot-item [detail]="conference.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
+                                }
+                            </ng-container>
+                        </entity-row>
+                    }
+                </div>
+            }
+            <div class="mt-2">
+                <button-box [links]="['../conferences/new']" [modeLink]="true" primeIcon="pi-plus"
+                            translateKey="participation.newConference" type="success"/>
+            </div>
+        </div>
+    </app-card>
+</ng-template>
+
+<ng-template #workshopsCard>
+    <app-card [titleKey]="'participation.card.workshops'">
+        <div appCardBody>
+            @let workshops = (loadWorkshopsOnce() | async) ?? [];
+            @if (workshops.length === 0) {
+                <div class="el-empty"><b>{{ 'workshop.notFound' | translate }}</b></div>
+            } @else {
+                <div class="el-list">
+                    @for (workshop of workshops; track workshop.id) {
+                        <entity-row [actions]="workshopActions(workshop)"
+                                    [link]="['../workshops', workshop.id, 'view']"
+                                    [linkLabel]="'workshop.list.open' | translate">
+                            <span rowTitle>{{ workshop.title }}</span>
+                            <entity-status rowStatus [color]="statusColor(workshop.status)"
+                                           [labelKey]="statusLabelKey('workshop', workshop.status)"
+                                           [strikethrough]="workshop.status === Status.CANCELED"/>
+                            <ng-container rowFoot>
+                                @if (workshop.extraInformation) {
+                                    <entity-foot-item [detail]="workshop.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
+                                }
+                            </ng-container>
+                        </entity-row>
+                    }
+                </div>
+            }
+            <div class="mt-2">
+                <button-box [links]="['../workshops/new']" [modeLink]="true" primeIcon="pi-plus"
+                            translateKey="participation.newWorkshop" type="success"/>
+            </div>
+        </div>
+    </app-card>
+</ng-template>
+
+<ng-template #exhibitorCard>
+    <app-card [titleKey]="'participation.card.exhibitor'">
+        <div appCardBody>
+            @if (isCreating) {
+                <select-box [enableFilter]="true" [filterFields]="selectFilterExhibitor()"
+                            [formatterFunction]="formatterExhibitor" [options]="exhibitorsOptions"
+                            fieldName="exhibitor" formControlName="exhibitor"
+                            translateKey="participation.exhibitor"/>
+            } @else {
+                <app-field-list>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'common.client' | translate }}</span>
+                        <span fieldValue>
+                            <a class="clickable" [routerLink]="['/admin', 'exhibitors', editForm.controls.exhibitor.value?.id ?? '', 'view']">
+                                {{ getExhibitorFullName(editForm.controls.exhibitor.value) || '—' }}
+                            </a>
+                        </span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'exhibitor.email' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.exhibitor.value?.email || '—' }}</span>
+                    </app-field-row>
+                    <app-field-row>
+                        <span fieldLabel>{{ 'exhibitor.phoneNumber' | translate }}</span>
+                        <span fieldValue>{{ editForm.controls.exhibitor.value?.phoneNumber || '—' }}</span>
+                    </app-field-row>
+                    @if (editForm.controls.exhibitor.value?.redFlag || editForm.controls.exhibitor.value?.duplicateDetected) {
+                        <app-field-row>
+                            <span fieldLabel>{{ 'common.alert' | translate }}</span>
+                            <span fieldValue>
+                                <span class="participation-tags">
+                                    @if (editForm.controls.exhibitor.value?.redFlag) {
+                                        <span class="el-alert" [style.--el-color]="'var(--app-danger)'">
+                                            <fa-icon icon="flag"/>
+                                            {{ 'exhibitor.list.signal.redFlag' | translate }}
+                                        </span>
+                                    }
+                                    @if (editForm.controls.exhibitor.value?.duplicateDetected) {
+                                        <span class="el-alert" [style.--el-color]="'var(--app-status-refused)'">
+                                            <fa-icon icon="triangle-exclamation"/>
+                                            {{ 'exhibitor.list.signal.duplicate' | translate }}
+                                        </span>
+                                    }
+                                </span>
+                            </span>
+                        </app-field-row>
+                    }
+                </app-field-list>
+            }
+        </div>
+    </app-card>
+</ng-template>
+
+<ng-template #internalCard>
+    @if (!stateService.hideSensibleInformation() || isCreating) {
+        <app-card [titleKey]="'participation.card.internalRating'" [lock]="true"
+                  [editing]="isCreating || activeSection() === 'rating'"
+                  [dimmed]="!!activeSection() && activeSection() !== 'rating'"
+                  [actions]="ratingActions()">
+            <div appCardBody>
+                @if (isCreating || activeSection() === 'rating') {
+                    <div class="card-form-stack">
+                        <checkbox-box fieldName="needArrangement" formControlName="needArrangement"
+                                      translateKey="participation.needArrangement"/>
+                        <checkbox-box fieldName="crushOfHeart" formControlName="crushOfHeart" translateKey="participation.crushOfHeart"/>
+                        <checkbox-box fieldName="guestOfHonor" formControlName="guestOfHonor" translateKey="participation.guestOfHonor"/>
+                        <rating-box fieldName="ratingFriendliness" formControlName="ratingFriendliness" translateKey="participation.ratingFriendliness"/>
+                        <rating-box fieldName="ratingPaymentSpeed" formControlName="ratingPaymentSpeed" translateKey="participation.ratingPaymentSpeed"/>
+                        <rating-box fieldName="ratingServiceQuality" formControlName="ratingServiceQuality" translateKey="participation.ratingServiceQuality"/>
+                        <textarea-box [rows]="3" fieldName="extraInformation" formControlName="extraInformation" translateKey="participation.extraInformation"/>
+                    </div>
+                } @else {
+                    <app-field-list>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'participation.needArrangement' | translate }}</span>
+                            <span fieldValue><yes-no-icon [value]="editForm.controls.needArrangement.value" /></span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'participation.distinctions' | translate }}</span>
+                            <span fieldValue>
+                                @if (editForm.controls.crushOfHeart.value || editForm.controls.guestOfHonor.value) {
+                                    <span class="participation-tags">
+                                        @if (editForm.controls.crushOfHeart.value) {
+                                            <span class="el-tag">{{ 'participation.crushOfHeart' | translate }}</span>
+                                        }
+                                        @if (editForm.controls.guestOfHonor.value) {
+                                            <span class="el-tag">{{ 'participation.guestOfHonor' | translate }}</span>
+                                        }
+                                    </span>
+                                } @else {
+                                    —
+                                }
+                            </span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'participation.ratingFriendliness' | translate }}</span>
+                            <span fieldValue><p-rating [ngModel]="editForm.controls.ratingFriendliness.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'participation.ratingPaymentSpeed' | translate }}</span>
+                            <span fieldValue><p-rating [ngModel]="editForm.controls.ratingPaymentSpeed.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'participation.ratingServiceQuality' | translate }}</span>
+                            <span fieldValue><p-rating [ngModel]="editForm.controls.ratingServiceQuality.value" [ngModelOptions]="{ standalone: true }" [readonly]="true" [stars]="6" iconOnClass="pi pi-star-fill" iconOffClass="pi pi-star"/></span>
+                        </app-field-row>
+                        <app-field-row>
+                            <span fieldLabel>{{ 'participation.extraInformation' | translate }}</span>
+                            <span fieldValue>{{ editForm.controls.extraInformation.value || '—' }}</span>
+                        </app-field-row>
+                    </app-field-list>
+                }
+            </div>
+            <ng-container appCardFooter>
+                @if (!isCreating && activeSection() === 'rating') {
+                    <div appCardFooterContent class="card-footer-actions">
+                        <button-box (clickedEvent)="cancelSection('rating')" type="secondary" translateKey="common.cancel"/>
+                        <button-box (clickedEvent)="saveSection('rating')" [isDisabled]="isLoading" translateKey="common.save"/>
+                    </div>
+                }
+            </ng-container>
+        </app-card>
+    }
+</ng-template>
+
+<ng-template #historyContent>
+    @let logs = (loadEventLogsOnce() | async) ?? [];
+    <app-event-log-list [events]="logs" />
+</ng-template>
 </app-content-page>

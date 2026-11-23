@@ -5,6 +5,7 @@ import {ApplicationConfigService} from 'app/core/config/application-config.servi
 import {createRequestOption} from 'app/core/request/request-util';
 import {getFirstExhibitorName, IExhibitor} from '../model/exhibitor.interface';
 import {IParticipation} from '../../participation/model/participation.interface';
+import {EventLog} from '../../../shared/event-modal/event.interface';
 import {removeAccents} from '../../../shared/utils/string.util';
 
 export type DuplicateMatchCriterion =
@@ -74,8 +75,8 @@ export class ExhibitorService {
         return this.http.patch<IExhibitor>(`${this.resourceUrl}/${idExhibitor}`, exhibitor);
     }
 
-    getEventLogs(idExhibitor: string): Observable<HttpResponse<any>> {
-        return this.http.get<any[]>(`${this.resourceUrl}/${idExhibitor}/events`, {observe: 'response'});
+    getEventLogs(idExhibitor: string): Observable<HttpResponse<EventLog[]>> {
+        return this.http.get<EventLog[]>(`${this.resourceUrl}/${idExhibitor}/events`, {observe: 'response'});
     }
 
     find(idExhibitor: string): Observable<HttpResponse<IExhibitor>> {

@@ -1,6 +1,4 @@
 {
-  "more": "Plus",
-  "sections": "Sections",
   "statusTimeline": {
     "offCycle": "Hors cycle",
     "status": {
@@ -75,6 +73,12 @@
   },
   "footer": "Ceci est votre pied de page",
   "global": {
+    "more": "Plus",
+    "sections": "Sections",
+    "tab": {
+      "essential": "L'essentiel",
+      "logistics": "Logistique"
+    },
     "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
   "image": {
     "alreadySent": "Image déjà envoyée",

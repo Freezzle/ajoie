@@ -63,7 +63,7 @@
 
     @if (hasPanels()) {
         <div class="app-tabs-panel" role="tabpanel" [id]="'tp-' + active()"
-             [attr.aria-labelledby]="'tab-' + active()" tabindex="0">
+             [attr.aria-labelledby]="'tab-' + active()" tabindex="0" #panel>
             @if (activePanel(); as panel) {
                 <ng-container [ngTemplateOutlet]="panel.tpl"/>
             }
@@ -71,7 +71,7 @@
     } @else if (hasBody()) {
         <div class="app-tabs-panel" [class.app-tabs-panel--flush]="flushBody()"
              role="tabpanel" [id]="'tp-' + active()"
-             [attr.aria-labelledby]="'tab-' + active()" tabindex="0">
+             [attr.aria-labelledby]="'tab-' + active()" tabindex="0" #panel>
             <ng-content select="[appTabsBody]"/>
         </div>
     }

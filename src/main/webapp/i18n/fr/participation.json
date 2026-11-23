@@ -8,6 +8,9 @@
       "billing": "Repas et facturation",
       "offer": "Offre et message",
       "linkedServices": "Prestations souscrites",
+      "stands": "Stands",
+      "conferences": "Conférences",
+      "workshops": "Ateliers",
       "exhibitor": "Exposant",
       "internalRating": "Suivi interne"
     },

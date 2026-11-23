@@ -44,6 +44,7 @@ export class TabsComponent {
     readonly flushBody = input<boolean>(false);
 
     private readonly listRef = viewChild<ElementRef<HTMLElement>>('list');
+    private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
 
     private readonly panels = contentChildren(TabPanelDirective);
     private readonly body = contentChild(TabBodyDirective);
@@ -56,6 +57,11 @@ export class TabsComponent {
     readonly menuOpen = signal(false);
 
     readonly visibleTabs = computed(() => this.tabs().filter(tab => !tab.hidden));
+
+    /** Élément du cadre de contenu, pour servir d'ancre aux pastilles latérales. */
+    get panelElement(): HTMLElement | null {
+        return this.panelRef()?.nativeElement ?? null;
+    }
 
     /** Mode cadre + panneaux si des templates appTabPanel sont fournis, sinon sélecteur simple. */
     readonly hasPanels = computed(() => this.panels().length > 0);

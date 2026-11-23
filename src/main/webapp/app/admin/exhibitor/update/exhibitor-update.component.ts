@@ -1,7 +1,7 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {Observable, of} from 'rxjs';
-import {finalize} from 'rxjs/operators';
+import {finalize, map, shareReplay} from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -34,8 +34,14 @@ import {FieldListComponent} from '../../../shared/components/field-list/field-li
 import {FieldRowComponent} from '../../../shared/components/field-list/field-row.component';
 import {YesNoIconComponent} from '../../../shared/components/yes-no-icon/yes-no-icon.component';
 import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {EventModalComponent} from '../../../shared/event-modal/event-modal.component';
+import {TabsComponent} from '../../../shared/components/tabs/tabs.component';
+import {TabPanelDirective, AppTab} from '../../../shared/components/tabs/tab-panel.directive';
+import {SideLabelsComponent} from '../../../shared/components/side-labels/side-labels.component';
+import {SideLabelComponent} from '../../../shared/components/side-labels/side-label.component';
+import {SideLabelHostDirective} from '../../../shared/components/side-labels/side-label-host.directive';
+import {EventLogListComponent} from '../../../shared/components/event-log-list/event-log-list.component';
+import {EventLog} from '../../../shared/event-modal/event.interface';
+import {Notif} from '../../../shared/components/notif-badge/notif.model';
 import {DetailPageLayoutComponent} from '../../../shared/components/detail-page-layout/detail-page-layout.component';
 import {
     DetailCreateActionsDirective,
@@ -44,10 +50,9 @@ import {
 } from '../../../shared/components/detail-page-layout/detail-page-layout-slots.directive';
 
 const SECTION_CONTROLS: Record<string, string[]> = {
-    identity: ['firstName', 'lastName', 'email', 'phoneNumber'],
+    identity: ['firstName', 'lastName', 'email', 'phoneNumber', 'language', 'newsletter'],
     homeAddress: ['homeAddress'],
     billing: ['differentBillingAddress', 'billingAddress'],
-    preferences: ['language', 'newsletter'],
     internal: ['redFlag', 'duplicateDetected', 'extraInformation']
 };
 
@@ -83,7 +88,13 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                   DetailPageLayoutComponent,
                   DetailMainDirective,
                   DetailSideDirective,
-                  DetailCreateActionsDirective
+                  DetailCreateActionsDirective,
+                  TabsComponent,
+                  TabPanelDirective,
+                  SideLabelsComponent,
+                  SideLabelComponent,
+                  SideLabelHostDirective,
+                  EventLogListComponent
                ]
            })
 export class ExhibitorUpdateComponent implements OnInit {
@@ -91,7 +102,15 @@ export class ExhibitorUpdateComponent implements OnInit {
     initialExhibitor: IExhibitor | null = null;
     languageValues = LANGUAGES;
     participations$: Observable<IParticipation[]> = of([]);
+    eventLogs$: Observable<EventLog[]> | undefined;
     private cachedBillingAddress: IAddress | null = null;
+
+    viewTab = 'ess';
+    readonly side = signal<string | null>(null);
+    readonly viewTabs: AppTab[] = [
+        {key: 'ess', labelKey: 'global.tab.essential', icon: 'pi pi-star'},
+        {key: 'addresses', labelKey: 'exhibitor.addresses', icon: 'pi pi-map-marker'}
+    ];
 
     readonly activeSection = signal<string | null>(null);
     private sectionSnapshot: Record<string, unknown> = {};
@@ -102,18 +121,28 @@ export class ExhibitorUpdateComponent implements OnInit {
     protected exhibitorFormService = inject(ExhibitorFormService);
     editForm: ExhibitorFormGroup = this.exhibitorFormService.createExhibitorFormGroup(null);
     protected activatedRoute = inject(ActivatedRoute);
-    protected modalService = inject(NgbModal);
     protected readonly formatterLanguage = formatterLanguage;
     protected readonly formatterCountry = formatterCountry;
 
     readonly identityActions = computed<EntityAction[]>(() => this.sectionAction('identity'));
     readonly homeAddressActions = computed<EntityAction[]>(() => this.sectionAction('homeAddress'));
     readonly billingActions = computed<EntityAction[]>(() => this.sectionAction('billing'));
-    readonly preferencesActions = computed<EntityAction[]>(() => this.sectionAction('preferences'));
     readonly internalActions = computed<EntityAction[]>(() => this.sectionAction('internal'));
 
     get isCreating(): boolean {
         return !this.editForm.controls.id.value;
+    }
+
+    get internalBadge(): Notif | null {
+        const count = (this.editForm.controls.redFlag.value ? 1 : 0)
+            + (this.editForm.controls.duplicateDetected.value ? 1 : 0);
+        if (count > 0) {
+            return {type: 'danger', value: count};
+        }
+        if (this.editForm.controls.extraInformation.value) {
+            return {type: 'warning', dot: true};
+        }
+        return null;
     }
 
     ngOnInit(): void {
@@ -193,19 +222,21 @@ export class ExhibitorUpdateComponent implements OnInit {
             .subscribe(() => this.previousState());
     }
 
-    openHistoryModal(): void {
+    loadEventLogsOnce(): Observable<EventLog[]> {
         if (!this.initialExhibitor?.id) {
-            return;
+            return of([]);
         }
-        this.exhibitorService.getEventLogs(this.initialExhibitor.id).subscribe(events => {
-            const modalRef = this.modalService.open(EventModalComponent, {size: 'lg'});
-            modalRef.componentInstance.events = events.body ?? [];
-        });
+        this.eventLogs$ ??= this.exhibitorService.getEventLogs(this.initialExhibitor.id).pipe(
+            map(res => res.body ?? []),
+            shareReplay(1)
+        );
+        return this.eventLogs$;
     }
 
     private reloadExhibitor(id: string): void {
         this.exhibitorService.find(id).subscribe(response => {
             this.initialExhibitor = response.body ? {...response.body} : null;
+            this.eventLogs$ = undefined;
             this.setupForm(this.initialExhibitor);
             this.activeSection.set(null);
         });

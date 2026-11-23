@@ -1,6 +1,7 @@
 {
   "exhibitor": {
     "address": "Rue et n°",
+    "addresses": "Adresses",
     "billingAddress": "Adresse de facturation",
     "copyNewsletter": "Emails (newsletter)",
     "country": "Pays",
