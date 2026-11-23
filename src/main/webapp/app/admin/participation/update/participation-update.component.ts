@@ -332,6 +332,16 @@ export class ParticipationUpdateComponent implements OnInit {
                                   () => this.deleteAction(target => this.deleteEntity(target, workshop, 'workshop')));
     }
 
+    readonly newStandAction: EntityAction[] = [
+        {labelKey: 'common.new', icon: 'pi pi-plus', routerLink: ['../stands/new']}
+    ];
+    readonly newConferenceAction: EntityAction[] = [
+        {labelKey: 'common.new', icon: 'pi pi-plus', routerLink: ['../conferences/new']}
+    ];
+    readonly newWorkshopAction: EntityAction[] = [
+        {labelKey: 'common.new', icon: 'pi pi-plus', routerLink: ['../workshops/new']}
+    ];
+
     statusLabelKey(type: 'conference' | 'stand' | 'workshop', status: Status): string {
         return `${type}.list.status.${status}`;
     }

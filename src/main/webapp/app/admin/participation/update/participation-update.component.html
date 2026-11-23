@@ -207,7 +207,7 @@
 </ng-template>
 
 <ng-template #standsCard>
-    <app-card [titleKey]="'participation.card.stands'">
+    <app-card [titleKey]="'participation.card.stands'" [actions]="newStandAction">
         <div appCardBody>
             @let stands = (loadStandsOnce() | async) ?? [];
             @if (stands.length === 0) {
@@ -250,16 +250,12 @@
                     }
                 </div>
             }
-            <div class="mt-2">
-                <button-box [links]="['../stands/new']" [modeLink]="true" primeIcon="pi-plus"
-                            translateKey="participation.newStand" type="success"/>
-            </div>
         </div>
     </app-card>
 </ng-template>
 
 <ng-template #conferencesCard>
-    <app-card [titleKey]="'participation.card.conferences'">
+    <app-card [titleKey]="'participation.card.conferences'" [actions]="newConferenceAction">
         <div appCardBody>
             @let conferences = (loadConferencesOnce() | async) ?? [];
             @if (conferences.length === 0) {
@@ -283,16 +279,12 @@
                     }
                 </div>
             }
-            <div class="mt-2">
-                <button-box [links]="['../conferences/new']" [modeLink]="true" primeIcon="pi-plus"
-                            translateKey="participation.newConference" type="success"/>
-            </div>
         </div>
     </app-card>
 </ng-template>
 
 <ng-template #workshopsCard>
-    <app-card [titleKey]="'participation.card.workshops'">
+    <app-card [titleKey]="'participation.card.workshops'" [actions]="newWorkshopAction">
         <div appCardBody>
             @let workshops = (loadWorkshopsOnce() | async) ?? [];
             @if (workshops.length === 0) {
@@ -316,10 +308,6 @@
                     }
                 </div>
             }
-            <div class="mt-2">
-                <button-box [links]="['../workshops/new']" [modeLink]="true" primeIcon="pi-plus"
-                            translateKey="participation.newWorkshop" type="success"/>
-            </div>
         </div>
     </app-card>
 </ng-template>
