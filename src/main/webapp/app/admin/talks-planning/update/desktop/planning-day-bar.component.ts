@@ -1,13 +1,13 @@
-import {ChangeDetectionStrategy, Component, input, output} from '@angular/core';
-import {Tab, TabList, Tabs} from 'primeng/tabs';
+import {ChangeDetectionStrategy, Component, computed, input, output} from '@angular/core';
 
+import {AppTab, TabBodyDirective, TabsComponent} from '../../../../shared/components/tabs';
 import {TimelineDay} from '../talks-planning-model';
 
 /** Onglets de jours du planning, avec leur nombre de conflits. */
 @Component({
                selector: 'planning-day-bar',
                standalone: true,
-               imports: [Tabs, TabList, Tab],
+               imports: [TabsComponent, TabBodyDirective],
                templateUrl: './planning-day-bar.component.html',
                changeDetection: ChangeDetectionStrategy.OnPush
            })
@@ -18,7 +18,13 @@ export class PlanningDayBarComponent {
 
     readonly daySelected = output<string>();
 
-    hasConflict(dayId: string): boolean {
-        return (this.conflictsByDay().get(dayId) ?? 0) > 0;
-    }
+    readonly dayTabs = computed<AppTab[]>(() => this.days().map(day => {
+        const conflicts = this.conflictsByDay().get(day.id) ?? 0;
+
+        return {
+            key: day.id,
+            label: day.label,
+            badge: conflicts > 0 ? {type: 'danger', value: conflicts} : null
+        };
+    }));
 }

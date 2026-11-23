@@ -604,3 +604,14 @@ p-iftalabel label {
   font-style: italic;
 }
 
+/* ==============================================================
+Hôte des pastilles latérales (app-side-labels)
+===============================================================*/
+.app-side-host {
+  position: relative;
+  container-type: inline-size;
+  --side-rail: 48px;
+  padding-right: var(--side-rail); // colonne réservée
+}
+
+

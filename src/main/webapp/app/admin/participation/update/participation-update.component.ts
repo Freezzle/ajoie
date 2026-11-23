@@ -42,9 +42,10 @@ import {ConfirmDialogService} from '../../../shared/delete-dialog/confirm-dialog
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmPopup} from 'primeng/confirmpopup';
 
-import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
-import {Badge} from 'primeng/badge';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {TabsComponent} from '../../../shared/components/tabs/tabs.component';
+import {TabPanelDirective} from '../../../shared/components/tabs/tab-panel.directive';
+import {Notif} from '../../../shared/components/notif-badge/notif.model';
 import {CardFooterContentDirective} from '../../../shared/components/card/card-footer.directive';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {FieldListComponent} from '../../../shared/components/field-list/field-list.component';
@@ -80,7 +81,7 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule,
                          ButtonBoxComponent, SelectBoxComponent, DateBoxComponent,
                          NumberBoxComponent, TextBoxComponent, TextareaBoxComponent, CheckboxBoxComponent,
-                         AlertErrorComponent, ConfirmPopup, Tab, TabList, Tabs, TabPanels, TabPanel, Badge,
+                         AlertErrorComponent, ConfirmPopup, TabsComponent, TabPanelDirective,
                          CardComponent, CardFooterContentDirective, ContentPageComponent, FieldListComponent,
                          FieldRowComponent, StatusTimelineComponent, RatingBoxComponent, Rating,
                          EntityRowComponent, EntityStatusComponent, EntityFootItemComponent, YesNoIconComponent,
@@ -88,7 +89,7 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                          DetailSideDirective, DetailCreateActionsDirective]
            })
 export class ParticipationUpdateComponent implements OnInit {
-    tabActive = '0';
+    tabActive = 'stand';
     isLoading = false;
     eventId!: string;
     initialParticipation: IParticipation | null = null;
@@ -301,6 +302,10 @@ export class ParticipationUpdateComponent implements OnInit {
 
     statusLabelKey(type: 'conference' | 'stand' | 'workshop', status: Status): string {
         return `${type}.list.status.${status}`;
+    }
+
+    countBadge(count: number): Notif | null {
+        return count > 0 ? {type: 'count', value: count} : null;
     }
 
     participationStatusLabelKey(status: string | null | undefined): string | null {

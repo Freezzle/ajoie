@@ -1,145 +1,134 @@
 <div class="fp-palette">
-    <p-tabs value="0">
-        <p-tablist>
-            <p-tab value="0">
-                <span jhiTranslate="floorPlan.palette.exhibitors"></span>
-                <span class="fp-palette-count">{{ toPlaceCount() }}</span>
-            </p-tab>
-            <p-tab value="1"><span jhiTranslate="floorPlan.palette.empty"></span></p-tab>
-            <p-tab value="2"><span jhiTranslate="floorPlan.palette.elements"></span></p-tab>
-        </p-tablist>
+    <app-tabs [tabs]="paletteTabs()">
+        <!-- Exposants à placer -->
+        <ng-template appTabPanel="exhibitors">
+            <input (input)="onFilterInput($event)"
+                   [attr.placeholder]="'floorPlan.palette.filter' | translate"
+                   [value]="filter()"
+                   class="form-control form-control-sm mb-2"
+                   type="search"/>
 
-        <p-tabpanels>
-            <!-- Exposants à placer -->
-            <p-tabpanel value="0">
-                <input (input)="onFilterInput($event)"
-                       [attr.placeholder]="'floorPlan.palette.filter' | translate"
-                       [value]="filter()"
-                       class="form-control form-control-sm mb-2"
-                       type="search"/>
+            <div cdkDropList cdkDropListSortingDisabled class="fp-drop-source">
+                @for (exhibitor of exhibitors(); track exhibitor.stand.id) {
+                    <div (cdkDragEnded)="onDragEnded($event, {kind: 'EXHIBITOR', stand: exhibitor.stand})"
+                         (cdkDragStarted)="onDragStarted({widthMeter: exhibitor.widthMeter, depthMeter: exhibitor.depthMeter})"
+                         [cdkDragConstrainPosition]="constrainPosition()"
+                         [cdkDragDisabled]="disabled()"
+                         cdkDrag
+                         class="fp-card">
+                        <span [style.background-color]="exhibitor.color" class="fp-card-swatch"></span>
+                        <span class="fp-card-body">
+                            <span class="fp-card-title text-ellipsis">{{ exhibitor.name }}</span>
+                            <span class="fp-card-meta text-ellipsis">{{ exhibitor.person }}</span>
+                            <span class="fp-card-meta">{{ exhibitor.categoryKey | translate }}</span>
+                        </span>
+                        <span class="fp-card-end">
+                            <span [style.background-color]="exhibitor.statusColor" class="fp-card-dot"></span>
+                            <span class="fp-card-meta">{{ exhibitor.dimensionLabel }}</span>
+                        </span>
 
-                <div cdkDropList cdkDropListSortingDisabled class="fp-drop-source">
-                    @for (exhibitor of exhibitors(); track exhibitor.stand.id) {
-                        <div (cdkDragEnded)="onDragEnded($event, {kind: 'EXHIBITOR', stand: exhibitor.stand})"
-                             (cdkDragStarted)="onDragStarted({widthMeter: exhibitor.widthMeter, depthMeter: exhibitor.depthMeter})"
-                             [cdkDragConstrainPosition]="constrainPosition()"
-                             [cdkDragDisabled]="disabled()"
-                             cdkDrag
-                             class="fp-card">
-                            <span [style.background-color]="exhibitor.color" class="fp-card-swatch"></span>
-                            <span class="fp-card-body">
-                                <span class="fp-card-title text-ellipsis">{{ exhibitor.name }}</span>
-                                <span class="fp-card-meta text-ellipsis">{{ exhibitor.person }}</span>
-                                <span class="fp-card-meta">{{ exhibitor.categoryKey | translate }}</span>
+                        <ng-container *cdkDragPreview>
+                            @let p = exhibitorPreview(exhibitor);
+                            <floor-plan-canvas [bare]="true"
+                                               [pixelsPerMeter]="pixelsPerMeter()"
+                                               [plan]="p.plan"
+                                               [readOnly]="true"
+                                               [settings]="settings()"
+                                               [standsById]="p.standsById"/>
+                        </ng-container>
+                    </div>
+                } @empty {
+                    <p class="text-desc" jhiTranslate="floorPlan.palette.noExhibitor"></p>
+                }
+            </div>
+        </ng-template>
+
+        <!-- Emplacements vides -->
+        <ng-template appTabPanel="empty">
+            <div cdkDropList cdkDropListSortingDisabled class="fp-drop-source">
+                @for (card of dimensionCards(); track card.dimension.id) {
+                    @let preview = previewSize(card.widthMeter, card.depthMeter);
+                    <div (cdkDragEnded)="onDragEnded($event, {kind: 'DIMENSION', dimension: card.dimension})"
+                         (cdkDragStarted)="onDragStarted({widthMeter: card.widthMeter, depthMeter: card.depthMeter})"
+                         [cdkDragConstrainPosition]="constrainPosition()"
+                         [cdkDragDisabled]="disabled()"
+                         cdkDrag
+                         class="fp-card">
+                        <span class="fp-card-preview">
+                            <span [style.height.px]="preview.height"
+                                  [style.width.px]="preview.width"
+                                  class="fp-preview-rect"></span>
+                        </span>
+                        <span class="fp-card-body">
+                            <span class="fp-card-title">{{ card.dimension.dimension }}</span>
+                            <span class="fp-card-meta">
+                                {{ 'floorPlan.palette.placed' | translate: {n: card.placed, need: card.needed} }}
                             </span>
+                            <span class="fp-progress">
+                                <span [style.width.%]="card.ratio * 100" class="fp-progress-value"></span>
+                            </span>
+                        </span>
+                        @if (card.missing > 0) {
                             <span class="fp-card-end">
-                                <span [style.background-color]="exhibitor.statusColor" class="fp-card-dot"></span>
-                                <span class="fp-card-meta">{{ exhibitor.dimensionLabel }}</span>
+                                <span class="fp-badge-missing">−{{ card.missing }}</span>
                             </span>
+                        }
 
-                            <ng-container *cdkDragPreview>
-                                @let p = exhibitorPreview(exhibitor);
-                                <floor-plan-canvas [bare]="true"
-                                                   [pixelsPerMeter]="pixelsPerMeter()"
-                                                   [plan]="p.plan"
-                                                   [readOnly]="true"
-                                                   [settings]="settings()"
-                                                   [standsById]="p.standsById"/>
-                            </ng-container>
-                        </div>
-                    } @empty {
-                        <p class="text-desc" jhiTranslate="floorPlan.palette.noExhibitor"></p>
-                    }
-                </div>
-            </p-tabpanel>
+                        <ng-container *cdkDragPreview>
+                            @let p = dimensionPreview(card);
+                            <floor-plan-canvas [bare]="true"
+                                               [pixelsPerMeter]="pixelsPerMeter()"
+                                               [plan]="p.plan"
+                                               [readOnly]="true"
+                                               [settings]="settings()"
+                                               [standsById]="p.standsById"/>
+                        </ng-container>
+                    </div>
+                }
+            </div>
+        </ng-template>
 
-            <!-- Emplacements vides -->
-            <p-tabpanel value="1">
-                <div cdkDropList cdkDropListSortingDisabled class="fp-drop-source">
-                    @for (card of dimensionCards(); track card.dimension.id) {
-                        @let preview = previewSize(card.widthMeter, card.depthMeter);
-                        <div (cdkDragEnded)="onDragEnded($event, {kind: 'DIMENSION', dimension: card.dimension})"
-                             (cdkDragStarted)="onDragStarted({widthMeter: card.widthMeter, depthMeter: card.depthMeter})"
-                             [cdkDragConstrainPosition]="constrainPosition()"
-                             [cdkDragDisabled]="disabled()"
-                             cdkDrag
-                             class="fp-card">
-                            <span class="fp-card-preview">
-                                <span [style.height.px]="preview.height"
-                                      [style.width.px]="preview.width"
-                                      class="fp-preview-rect"></span>
+        <!-- Éléments de salle -->
+        <ng-template appTabPanel="elements">
+            <div cdkDropList cdkDropListSortingDisabled class="fp-element-grid fp-drop-source">
+                @for (element of elements(); track element.type) {
+                    @let preview = previewSize(element.widthMeter, element.depthMeter);
+                    <div (cdkDragEnded)="onDragEnded($event, {kind: 'ELEMENT', type: element.type})"
+                         (cdkDragStarted)="onDragStarted({widthMeter: element.widthMeter, depthMeter: element.depthMeter})"
+                         [cdkDragConstrainPosition]="constrainPosition()"
+                         [cdkDragDisabled]="disabled()"
+                         cdkDrag
+                         class="fp-card fp-card-element">
+                        <span class="fp-card-preview">
+                            <span [class.non-blocking]="!element.blocking"
+                                  [style.height.px]="preview.height"
+                                  [style.width.px]="preview.width"
+                                  class="fp-preview-rect"></span>
+                        </span>
+                        <span class="fp-card-body">
+                            <span class="fp-card-title">{{ elementTypeKey(element.type) | translate }}</span>
+                            <span class="fp-card-meta">
+                                {{ formatSize(element.widthMeter, element.depthMeter) }} m
                             </span>
-                            <span class="fp-card-body">
-                                <span class="fp-card-title">{{ card.dimension.dimension }}</span>
-                                <span class="fp-card-meta">
-                                    {{ 'floorPlan.palette.placed' | translate: {n: card.placed, need: card.needed} }}
-                                </span>
-                                <span class="fp-progress">
-                                    <span [style.width.%]="card.ratio * 100" class="fp-progress-value"></span>
-                                </span>
+                            <span [class.blocking]="element.blocking" class="fp-badge-blocking">
+                                {{ (element.blocking ? 'floorPlan.palette.blocking' : 'floorPlan.palette.nonBlocking') | translate }}
                             </span>
-                            @if (card.missing > 0) {
-                                <span class="fp-card-end">
-                                    <span class="fp-badge-missing">−{{ card.missing }}</span>
-                                </span>
-                            }
+                        </span>
 
-                            <ng-container *cdkDragPreview>
-                                @let p = dimensionPreview(card);
-                                <floor-plan-canvas [bare]="true"
-                                                   [pixelsPerMeter]="pixelsPerMeter()"
-                                                   [plan]="p.plan"
-                                                   [readOnly]="true"
-                                                   [settings]="settings()"
-                                                   [standsById]="p.standsById"/>
-                            </ng-container>
-                        </div>
-                    }
-                </div>
-            </p-tabpanel>
-
-            <!-- Éléments de salle -->
-            <p-tabpanel value="2">
-                <div cdkDropList cdkDropListSortingDisabled class="fp-element-grid fp-drop-source">
-                    @for (element of elements(); track element.type) {
-                        @let preview = previewSize(element.widthMeter, element.depthMeter);
-                        <div (cdkDragEnded)="onDragEnded($event, {kind: 'ELEMENT', type: element.type})"
-                             (cdkDragStarted)="onDragStarted({widthMeter: element.widthMeter, depthMeter: element.depthMeter})"
-                             [cdkDragConstrainPosition]="constrainPosition()"
-                             [cdkDragDisabled]="disabled()"
-                             cdkDrag
-                             class="fp-card fp-card-element">
-                            <span class="fp-card-preview">
-                                <span [class.non-blocking]="!element.blocking"
-                                      [style.height.px]="preview.height"
-                                      [style.width.px]="preview.width"
-                                      class="fp-preview-rect"></span>
-                            </span>
-                            <span class="fp-card-body">
-                                <span class="fp-card-title">{{ elementTypeKey(element.type) | translate }}</span>
-                                <span class="fp-card-meta">
-                                    {{ formatSize(element.widthMeter, element.depthMeter) }} m
-                                </span>
-                                <span [class.blocking]="element.blocking" class="fp-badge-blocking">
-                                    {{ (element.blocking ? 'floorPlan.palette.blocking' : 'floorPlan.palette.nonBlocking') | translate }}
-                                </span>
-                            </span>
-
-                            <ng-container *cdkDragPreview>
-                                @let p = elementPreview(element);
-                                <floor-plan-canvas [bare]="true"
-                                                   [pixelsPerMeter]="pixelsPerMeter()"
-                                                   [plan]="p.plan"
-                                                   [readOnly]="true"
-                                                   [settings]="settings()"
-                                                   [standsById]="p.standsById"/>
-                            </ng-container>
-                        </div>
-                    }
-                </div>
-            </p-tabpanel>
-        </p-tabpanels>
-    </p-tabs>
+                        <ng-container *cdkDragPreview>
+                            @let p = elementPreview(element);
+                            <floor-plan-canvas [bare]="true"
+                                               [pixelsPerMeter]="pixelsPerMeter()"
+                                               [plan]="p.plan"
+                                               [readOnly]="true"
+                                               [settings]="settings()"
+                                               [standsById]="p.standsById"/>
+                        </ng-container>
+                    </div>
+                }
+            </div>
+        </ng-template>
+    </app-tabs>
 
     <!-- Angle des prochains posés -->
     <div class="fp-next-angle">

@@ -2,7 +2,8 @@ import {ChangeDetectionStrategy, Component, computed, input, output, signal} fro
 import {CdkDrag, CdkDragEnd, CdkDragPreview, CdkDropList, DragRef, Point} from '@angular/cdk/drag-drop';
 import SharedModule from '../../../../../shared/shared.module';
 import {ButtonBoxComponent} from '../../../../../shared/components/button-box/button-box.component';
-import {TabsModule} from 'primeng/tabs';
+import {TabsComponent} from '../../../../../shared/components/tabs/tabs.component';
+import {AppTab, TabPanelDirective} from '../../../../../shared/components/tabs/tab-panel.directive';
 
 import {
     DEFAULT_ELEMENT_TYPES,
@@ -88,7 +89,7 @@ export interface PaletteFootprint {
                templateUrl: './floor-plan-palette.component.html',
                styleUrl: './floor-plan-palette.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush,
-               imports: [SharedModule, ButtonBoxComponent, TabsModule, CdkDropList, CdkDrag, CdkDragPreview, FloorPlanCanvasComponent]
+               imports: [SharedModule, ButtonBoxComponent, TabsComponent, TabPanelDirective, CdkDropList, CdkDrag, CdkDragPreview, FloorPlanCanvasComponent]
            })
 export class FloorPlanPaletteComponent {
     readonly plans = input.required<IFloorPlan[]>();
@@ -175,6 +176,16 @@ export class FloorPlanPaletteComponent {
     });
 
     readonly toPlaceCount = computed(() => this.unassignedStands().length);
+
+    readonly paletteTabs = computed<AppTab[]>(() => [
+        {
+            key: 'exhibitors',
+            labelKey: 'floorPlan.palette.exhibitors',
+            badge: this.toPlaceCount() > 0 ? {type: 'count', value: this.toPlaceCount()} : null
+        },
+        {key: 'empty', labelKey: 'floorPlan.palette.empty'},
+        {key: 'elements', labelKey: 'floorPlan.palette.elements'}
+    ]);
 
     onDragStarted(footprint: PaletteFootprint): void {
         this.dragStarted.emit(footprint);

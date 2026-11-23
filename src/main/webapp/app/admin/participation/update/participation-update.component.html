@@ -195,127 +195,113 @@
                         @let stands = (loadStandsOnce() | async) ?? [];
                         @let conferences = (loadConferencesOnce() | async) ?? [];
                         @let workshops = (loadWorkshopsOnce() | async) ?? [];
-                        <p-tabs [(value)]="tabActive">
-                            <p-tablist>
-                                <p-tab value="0">{{ 'stand.title' | translate }}
-                                    @if (stands.length > 0) {
-                                        <p-badge [severity]="tabActive === '0' ? undefined : 'contrast'" [value]="stands.length"></p-badge>
-                                    }
-                                </p-tab>
-                                <p-tab value="1">{{ 'conference.title' | translate }}
-                                    @if (conferences.length > 0) {
-                                        <p-badge [severity]="tabActive === '1' ? undefined : 'contrast'" [value]="conferences.length"></p-badge>
-                                    }
-                                </p-tab>
-                                <p-tab value="2">{{ 'workshop.title' | translate }}
-                                    @if (workshops.length > 0) {
-                                        <p-badge [severity]="tabActive === '2' ? undefined : 'contrast'" [value]="workshops.length"></p-badge>
-                                    }
-                                </p-tab>
-                            </p-tablist>
-                            <p-tabpanels>
-                                <p-tabpanel value="0">
-                                    @if (stands.length === 0) {
-                                        <div class="el-empty"><b>{{ 'stand.notFound' | translate }}</b></div>
-                                    } @else {
-                                        <div class="el-list mt-2">
-                                            @for (stand of stands; track stand.id) {
-                                                <entity-row [actions]="standActions(stand)"
-                                                            [link]="['../stands', stand.id, 'view']"
-                                                            [linkLabel]="'stand.list.open' | translate">
-                                                    <span rowTitle>{{ stand.description }}</span>
-                                                    <entity-status rowStatus [color]="statusColor(stand.status)"
-                                                                   [labelKey]="statusLabelKey('stand', stand.status)"
-                                                                   [strikethrough]="stand.status === Status.CANCELED"/>
-                                                    <span rowSide class="el-category" [style.--el-color]="categoryColor(stand.category)">
-                                                        <i class="el-square"></i>{{ formatterCategory(stand.category) | translate }}
-                                                    </span>
-                                                    <ng-container rowFoot>
-                                                        @if (stand.dimension.dimension) {
-                                                            <entity-foot-item [label]="stand.dimension.dimension" [showLabel]="true" icon="ruler-combined"/>
-                                                        }
-                                                        @if (stand.shared) {
-                                                            <entity-foot-item color="var(--app-share)" icon="people-arrows" labelKey="stand.list.sharedWithCoExhibitor"/>
-                                                        }
-                                                        @if (stand.needElectricity) {
-                                                            <entity-foot-item color="var(--app-warn)" icon="bolt" labelKey="entityList.signal.electricity"/>
-                                                        }
-                                                        @if (stand.subCategories.length > 0) {
-                                                            <span class="el-foot-item">
-                                                                @for (subCategory of stand.subCategories; track subCategory) {
-                                                                    <span class="el-tag">{{ subCategory }}</span>
-                                                                }
-                                                            </span>
-                                                        }
-                                                        @if (stand.extraInformation) {
-                                                            <entity-foot-item [detail]="stand.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
-                                                        }
-                                                    </ng-container>
-                                                </entity-row>
-                                            }
-                                        </div>
-                                    }
-                                    <div class="mt-2">
-                                        <button-box [links]="['../stands/new']" [modeLink]="true" primeIcon="pi-plus"
-                                                    translateKey="participation.newStand" type="success"/>
+                        @let prestationTabs = [
+                            {key: 'stand', labelKey: 'stand.title', badge: countBadge(stands.length)},
+                            {key: 'conference', labelKey: 'conference.title', badge: countBadge(conferences.length)},
+                            {key: 'workshop', labelKey: 'workshop.title', badge: countBadge(workshops.length)}
+                        ];
+                        <app-tabs [tabs]="prestationTabs" [(active)]="tabActive">
+                            <ng-template appTabPanel="stand">
+                                @if (stands.length === 0) {
+                                    <div class="el-empty"><b>{{ 'stand.notFound' | translate }}</b></div>
+                                } @else {
+                                    <div class="el-list mt-2">
+                                        @for (stand of stands; track stand.id) {
+                                            <entity-row [actions]="standActions(stand)"
+                                                        [link]="['../stands', stand.id, 'view']"
+                                                        [linkLabel]="'stand.list.open' | translate">
+                                                <span rowTitle>{{ stand.description }}</span>
+                                                <entity-status rowStatus [color]="statusColor(stand.status)"
+                                                               [labelKey]="statusLabelKey('stand', stand.status)"
+                                                               [strikethrough]="stand.status === Status.CANCELED"/>
+                                                <span rowSide class="el-category" [style.--el-color]="categoryColor(stand.category)">
+                                                    <i class="el-square"></i>{{ formatterCategory(stand.category) | translate }}
+                                                </span>
+                                                <ng-container rowFoot>
+                                                    @if (stand.dimension.dimension) {
+                                                        <entity-foot-item [label]="stand.dimension.dimension" [showLabel]="true" icon="ruler-combined"/>
+                                                    }
+                                                    @if (stand.shared) {
+                                                        <entity-foot-item color="var(--app-share)" icon="people-arrows" labelKey="stand.list.sharedWithCoExhibitor"/>
+                                                    }
+                                                    @if (stand.needElectricity) {
+                                                        <entity-foot-item color="var(--app-warn)" icon="bolt" labelKey="entityList.signal.electricity"/>
+                                                    }
+                                                    @if (stand.subCategories.length > 0) {
+                                                        <span class="el-foot-item">
+                                                            @for (subCategory of stand.subCategories; track subCategory) {
+                                                                <span class="el-tag">{{ subCategory }}</span>
+                                                            }
+                                                        </span>
+                                                    }
+                                                    @if (stand.extraInformation) {
+                                                        <entity-foot-item [detail]="stand.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
+                                                    }
+                                                </ng-container>
+                                            </entity-row>
+                                        }
                                     </div>
-                                </p-tabpanel>
-                                <p-tabpanel value="1">
-                                    @if (conferences.length === 0) {
-                                        <div class="el-empty"><b>{{ 'conference.notFound' | translate }}</b></div>
-                                    } @else {
-                                        <div class="el-list mt-2">
-                                            @for (conference of conferences; track conference.id) {
-                                                <entity-row [actions]="conferenceActions(conference)"
-                                                            [link]="['../conferences', conference.id, 'view']"
-                                                            [linkLabel]="'conference.list.open' | translate">
-                                                    <span rowTitle>{{ conference.title }}</span>
-                                                    <entity-status rowStatus [color]="statusColor(conference.status)"
-                                                                   [labelKey]="statusLabelKey('conference', conference.status)"
-                                                                   [strikethrough]="conference.status === Status.CANCELED"/>
-                                                    <ng-container rowFoot>
-                                                        @if (conference.extraInformation) {
-                                                            <entity-foot-item [detail]="conference.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
-                                                        }
-                                                    </ng-container>
-                                                </entity-row>
-                                            }
-                                        </div>
-                                    }
-                                    <div class="mt-2">
-                                        <button-box [links]="['../conferences/new']" [modeLink]="true" primeIcon="pi-plus"
-                                                    translateKey="participation.newConference" type="success"/>
+                                }
+                                <div class="mt-2">
+                                    <button-box [links]="['../stands/new']" [modeLink]="true" primeIcon="pi-plus"
+                                                translateKey="participation.newStand" type="success"/>
+                                </div>
+                            </ng-template>
+                            <ng-template appTabPanel="conference">
+                                @if (conferences.length === 0) {
+                                    <div class="el-empty"><b>{{ 'conference.notFound' | translate }}</b></div>
+                                } @else {
+                                    <div class="el-list mt-2">
+                                        @for (conference of conferences; track conference.id) {
+                                            <entity-row [actions]="conferenceActions(conference)"
+                                                        [link]="['../conferences', conference.id, 'view']"
+                                                        [linkLabel]="'conference.list.open' | translate">
+                                                <span rowTitle>{{ conference.title }}</span>
+                                                <entity-status rowStatus [color]="statusColor(conference.status)"
+                                                               [labelKey]="statusLabelKey('conference', conference.status)"
+                                                               [strikethrough]="conference.status === Status.CANCELED"/>
+                                                <ng-container rowFoot>
+                                                    @if (conference.extraInformation) {
+                                                        <entity-foot-item [detail]="conference.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
+                                                    }
+                                                </ng-container>
+                                            </entity-row>
+                                        }
                                     </div>
-                                </p-tabpanel>
-                                <p-tabpanel value="2">
-                                    @if (workshops.length === 0) {
-                                        <div class="el-empty"><b>{{ 'workshop.notFound' | translate }}</b></div>
-                                    } @else {
-                                        <div class="el-list mt-2">
-                                            @for (workshop of workshops; track workshop.id) {
-                                                <entity-row [actions]="workshopActions(workshop)"
-                                                            [link]="['../workshops', workshop.id, 'view']"
-                                                            [linkLabel]="'workshop.list.open' | translate">
-                                                    <span rowTitle>{{ workshop.title }}</span>
-                                                    <entity-status rowStatus [color]="statusColor(workshop.status)"
-                                                                   [labelKey]="statusLabelKey('workshop', workshop.status)"
-                                                                   [strikethrough]="workshop.status === Status.CANCELED"/>
-                                                    <ng-container rowFoot>
-                                                        @if (workshop.extraInformation) {
-                                                            <entity-foot-item [detail]="workshop.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
-                                                        }
-                                                    </ng-container>
-                                                </entity-row>
-                                            }
-                                        </div>
-                                    }
-                                    <div class="mt-2">
-                                        <button-box [links]="['../workshops/new']" [modeLink]="true" primeIcon="pi-plus"
-                                                    translateKey="participation.newWorkshop" type="success"/>
+                                }
+                                <div class="mt-2">
+                                    <button-box [links]="['../conferences/new']" [modeLink]="true" primeIcon="pi-plus"
+                                                translateKey="participation.newConference" type="success"/>
+                                </div>
+                            </ng-template>
+                            <ng-template appTabPanel="workshop">
+                                @if (workshops.length === 0) {
+                                    <div class="el-empty"><b>{{ 'workshop.notFound' | translate }}</b></div>
+                                } @else {
+                                    <div class="el-list mt-2">
+                                        @for (workshop of workshops; track workshop.id) {
+                                            <entity-row [actions]="workshopActions(workshop)"
+                                                        [link]="['../workshops', workshop.id, 'view']"
+                                                        [linkLabel]="'workshop.list.open' | translate">
+                                                <span rowTitle>{{ workshop.title }}</span>
+                                                <entity-status rowStatus [color]="statusColor(workshop.status)"
+                                                               [labelKey]="statusLabelKey('workshop', workshop.status)"
+                                                               [strikethrough]="workshop.status === Status.CANCELED"/>
+                                                <ng-container rowFoot>
+                                                    @if (workshop.extraInformation) {
+                                                        <entity-foot-item [detail]="workshop.extraInformation" [showLabel]="true" icon="note-sticky" labelKey="entityList.internalComment"/>
+                                                    }
+                                                </ng-container>
+                                            </entity-row>
+                                        }
                                     </div>
-                                </p-tabpanel>
-                            </p-tabpanels>
-                        </p-tabs>
+                                }
+                                <div class="mt-2">
+                                    <button-box [links]="['../workshops/new']" [modeLink]="true" primeIcon="pi-plus"
+                                                translateKey="participation.newWorkshop" type="success"/>
+                                </div>
+                            </ng-template>
+                        </app-tabs>
                     </div>
                 </app-card>
             }

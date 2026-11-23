@@ -1,16 +1,6 @@
-<div class="mb-2">
-    <p-tabs [value]="selectedDayId() ?? undefined" scrollable>
-        <p-tablist>
-            @for (day of days(); track day.id) {
-                <p-tab (click)="daySelected.emit(day.id)" [value]="day.id">
-                    <div class="d-flex align-items-center gap-2 text-nowrap">
-                        <span>{{ day.label }}</span>
-                        @if (hasConflict(day.id)) {
-                            <span class="badge rounded-pill text-bg-danger">{{ conflictsByDay().get(day.id) }}</span>
-                        }
-                    </div>
-                </p-tab>
-            }
-        </p-tablist>
-    </p-tabs>
-</div>
+<app-tabs [tabs]="dayTabs()" [active]="selectedDayId() ?? undefined"
+          (activeChange)="$event && daySelected.emit($event)">
+    <div appTabsBody>
+        <ng-content/>
+    </div>
+</app-tabs>

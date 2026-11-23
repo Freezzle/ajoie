@@ -6,7 +6,6 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs';
 
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Tab, TabList, Tabs} from 'primeng/tabs';
 import {ToastModule} from 'primeng/toast';
 import {MenuItem, MessageService} from 'primeng/api';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
@@ -15,20 +14,16 @@ import {ContentPageComponent} from '../../../shared/components/content-page/cont
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {AlertErrorComponent} from '../../../shared/alert/alert-error.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {AppTab, TabBodyDirective, TabsComponent} from '../../../shared/components/tabs';
 import {EntityAction} from '../../../shared/components/entity-list/entity-list.model';
-import {MenuBoxComponent} from '../../../shared/components/menu-box/menu-box.component';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {SwitchBoxComponent, SwitchBoxOption} from '../../../shared/components/switch-box/switch-box.component';
 
-import {CategoryManagerComponent} from './category-manager/category-manager.component';
-import {SelectedDayAssignmentsComponent} from './selected-day-assignments/selected-day-assignments.component';
-import {VolunteerManagerComponent} from './volunteer-manager/volunteer-manager.component';
-import {SelectedDayEditorComponent} from './selected-day-editor/selected-day-editor.component';
+import {VolunteerConfigDialogComponent} from './volunteer-config-dialog/volunteer-config-dialog.component';
 import {PlanningLinkedViewComponent} from './linked-view/planning-linked-view.component';
 import {PlanningMobileComponent} from './mobile/planning-mobile.component';
 
-import {DayConfigSlice} from './volunteer-planning-slices';
-import {Day} from './volunteer-planning-model';
+import {Planning} from './volunteer-planning-model';
 import {deleteRun, formatHours} from './volunteer-planning-utils';
 import {ViewMode, VolunteerPlanningStore} from './volunteer-planning.store';
 import {NavigationStateService} from '../../../layouts/navbar/navigation-state.service';
@@ -40,25 +35,20 @@ import {NavigationStateService} from '../../../layouts/navbar/navigation-state.s
                    FormsModule,
                    ConfirmPopup,
                    ToastModule,
-                   Tabs,
-                   TabList,
-                   Tab,
+                   TabsComponent,
+                   TabBodyDirective,
                    TranslatePipe,
 
                    ContentPageComponent,
                    ButtonBoxComponent,
                    AlertErrorComponent,
                    CardComponent,
-                   MenuBoxComponent,
                    DialogBoxComponent,
                    SwitchBoxComponent,
 
-                   CategoryManagerComponent,
-                   SelectedDayAssignmentsComponent,
-                   VolunteerManagerComponent,
-                   SelectedDayEditorComponent,
-                   PlanningLinkedViewComponent,
-                   PlanningMobileComponent
+                  VolunteerConfigDialogComponent,
+                  PlanningLinkedViewComponent,
+                  PlanningMobileComponent
                ],
                providers: [VolunteerPlanningStore],
                templateUrl: './volunteer-planning.component.html',
@@ -81,13 +71,8 @@ export class VolunteerPlanningComponent implements OnInit {
         {initialValue: false}
     );
 
-    readonly dayDialogVisible = model(false);
-    readonly volunteersDialogVisible = model(false);
-    readonly assignmentsDialogVisible = model(false);
-    readonly categoriesDialogVisible = model(false);
+    readonly configDialogVisible = model(false);
     readonly showConfirmDeleteDay = signal(false);
-    readonly manageDayCreateMode = signal(false);
-    readonly manageDaySelectedDayId = signal<string>('');
 
     readonly viewOptions: SwitchBoxOption[] = [
         {value: 'both', icon: 'pi pi-window-maximize', labelKey: 'planningVolunteers.view.both'},
@@ -102,32 +87,21 @@ export class VolunteerPlanningComponent implements OnInit {
         return this.store.planning().volunteers.find(v => v.id === id)?.label ?? '';
     });
 
-    readonly daySlice = computed<DayConfigSlice>(() => {
-        if (this.manageDayCreateMode()) {
-            return {day: this.store.createEmptyDay(this.manageDaySelectedDayId())};
-        }
-        return this.store.daySlice();
-    });
-
     readonly cardActions = computed<EntityAction[]>(() => {
         if (this.store.isReadOnly()) {
             return this.store.downloadMenuItems().map(action => ({...action, disabled: action.disabled || this.store.isLoading()}));
         }
         return [
             {
-                labelKey: 'planningVolunteers.manageVolunteers',
-                icon: 'pi pi-users',
-                run: () => this.volunteersDialogVisible.set(true)
-            },
-            {
-                labelKey: 'planningVolunteers.manageCategories',
-                icon: 'pi pi-tags',
-                run: () => this.categoriesDialogVisible.set(true)
+                labelKey: 'planningVolunteers.manageDay',
+                icon: 'pi pi-cog',
+                run: () => this.openConfig()
             }
         ];
     });
 
     readonly dayMenus = computed(() => new Map(this.store.days().map(d => [d.id, this.dayActionItems()])));
+    readonly dayTabs = computed<AppTab[]>(() => this.store.dayOptions().map(d => ({key: d.id, label: d.label})));
     readonly subtitle = computed(() => this.navigationStateService.currentSalonPlace(this.idSalon()));
 
     ngOnInit(): void {
@@ -167,33 +141,13 @@ export class VolunteerPlanningComponent implements OnInit {
         this.store.selectDay(dayId);
     }
 
-    addNewDay(): void {
-        this.manageDayCreateMode.set(true);
-        this.manageDaySelectedDayId.set(generateUUID());
-        this.dayDialogVisible.set(true);
+    openConfig(): void {
+        this.configDialogVisible.set(true);
     }
 
-    onManageDayConfirm(slice: DayConfigSlice): void {
-        if (this.manageDayCreateMode()) {
-            const day: Day = {
-                ...slice.day,
-                cells: slice.day.cells ?? [],
-                unavailableCells: slice.day.unavailableCells ?? [],
-                needs: slice.day.needs ?? []
-            };
-            this.store.addDay(day);
-            this.manageDayCreateMode.set(false);
-            this.manageDaySelectedDayId.set('');
-        } else {
-            this.store.applyDaySlice(slice);
-        }
-        this.dayDialogVisible.set(false);
-    }
-
-    closeDayDialog(): void {
-        this.dayDialogVisible.set(false);
-        this.manageDayCreateMode.set(false);
-        this.manageDaySelectedDayId.set('');
+    onConfigConfirm(planning: Planning): void {
+        this.store.applyConfig(planning);
+        this.configDialogVisible.set(false);
     }
 
     openDeleteDayConfirm(): void {
@@ -229,9 +183,7 @@ export class VolunteerPlanningComponent implements OnInit {
         if (target?.closest?.('input, textarea, select, [contenteditable="true"], .p-dialog')) {
             return;
         }
-        if (this.dayDialogVisible() || this.volunteersDialogVisible()
-            || this.assignmentsDialogVisible() || this.categoriesDialogVisible()
-            || this.showConfirmDeleteDay()) {
+        if (this.configDialogVisible() || this.showConfirmDeleteDay()) {
             return;
         }
 
@@ -306,32 +258,16 @@ export class VolunteerPlanningComponent implements OnInit {
     private dayActionItems(): MenuItem[] {
         return [
             {
-                label: this.translate.instant('planningVolunteers.manageDay'),
-                icon: 'pi pi-calendar',
-                command: () => this.dayDialogVisible.set(true)
+                label: this.translate.instant('planningVolunteers.config.title'),
+                icon: 'pi pi-cog',
+                command: () => this.openConfig()
             },
             {
-                label: 'Assignement des bénévoles',
-                icon: 'pi pi-user',
-                command: () => this.assignmentsDialogVisible.set(true)
-            },
-            {
-                label: 'Supprimer le jour',
+                label: this.translate.instant('planningVolunteers.deleteDay'),
                 icon: 'pi pi-trash',
                 styleClass: 'p-menuitem-danger',
                 command: () => this.openDeleteDayConfirm()
             }
         ];
     }
-}
-
-function generateUUID(): string {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-        return crypto.randomUUID();
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.floor(Math.random() * 16);
-        const v = c === 'x' ? r : (r % 4) + 8;
-        return v.toString(16);
-    });
 }

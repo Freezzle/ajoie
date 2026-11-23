@@ -19,7 +19,6 @@ import {v4 as uuid} from 'uuid';
 import {MenuItem, MessageService, PrimeIcons} from 'primeng/api';
 import {TranslateService} from '@ngx-translate/core';
 import {ContextMenu} from 'primeng/contextmenu';
-import {TabsModule} from 'primeng/tabs';
 import {Textarea} from 'primeng/textarea';
 import {IftaLabel} from 'primeng/iftalabel';
 import {SelectButton} from 'primeng/selectbutton';
@@ -28,6 +27,7 @@ import {InputNumber} from 'primeng/inputnumber';
 import SharedModule from '../../../shared/shared.module';
 import {ContentPageComponent} from '../../../shared/components/content-page/content-page.component';
 import {CardComponent} from '../../../shared/components/card/card.component';
+import {AppTab, TabBodyDirective, TabsComponent} from '../../../shared/components/tabs';
 import {ButtonBoxComponent} from '../../../shared/components/button-box/button-box.component';
 import {DialogBoxComponent} from '../../../shared/components/dialog-box/dialog-box.component';
 import {SelectBoxComponent} from '../../../shared/components/select-box/select-box.component';
@@ -129,7 +129,8 @@ const MAX_PPM = 90;
                    RouterModule,
                    FormsModule,
                    ReactiveFormsModule,
-                   TabsModule,
+                   TabsComponent,
+                   TabBodyDirective,
                    SelectButton,
                    InputNumber,
                    ContextMenu,
@@ -297,6 +298,15 @@ export class FloorPlanDetailComponent {
         return this.floorPlans().map(plan =>
             new Set(computeConflicts(plan, settings).map(conflict => conflict.objectId)).size
         );
+    });
+
+    readonly planTabs = computed<AppTab[]>(() => {
+        const conflicts = this.conflictCountByPlan();
+        return this.floorPlans().map((plan, index) => ({
+            key: index.toString(),
+            label: plan.name,
+            badge: conflicts[index] > 0 ? {type: 'danger', value: conflicts[index]} : null
+        }));
     });
 
     readonly selectedObject = computed<FloorObject | null>(() => {

@@ -79,4 +79,15 @@
   --app-heart: #b4372f;
   --app-share: #1f4e8c;
   --app-offer: #7a3e8f;
+
+  // --- Carte / onglets / pastilles ------------------------------------------
+  // Jetons partagés par app-card, app-tabs et app-side-labels (anciennes valeurs
+  // en dur de card.component.scss).
+  --app-card-border: #d9dee4;        // bordure carte / onglets / pastilles
+  --app-card-hd-bg: #fafbfc;         // bande d'en-tête carte / onglets inactifs / pastilles
+  --app-card-title: #3e4c59;         // titre carte / libellé onglet
+  --app-card-line: #e9edf1;          // séparateurs internes (pied de carte, lignes)
+  --app-card-action-border: #d1d5db; // bouton d'action 26 px
+  --app-card-hover: #f7f8fa;         // survol bouton d'action / onglet / pastille
+  --app-card-radius: 4px;
 }

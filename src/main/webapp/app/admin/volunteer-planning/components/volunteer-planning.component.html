@@ -46,115 +46,59 @@
     <app-card [titleKey]="'salon.volunteersPlanning'" [actions]="cardActions()" [actionsAsMenu]="true">
         <div appCardBody class="vp-page">
             @if (store.selectedDay() || !store.isReadOnly()) {
-                <p-tabs [value]="store.selectedDay()?.id" scrollable>
-                    <p-tablist class="justify-content-center">
-                        @for (day of store.dayOptions(); track day.id) {
-                            <p-tab (click)="selectDay(day.id)" [value]="day.id">
-                                <div class="d-flex align-items-center justify-content-between gap-2">
-                                    <span>{{ day.label }}</span>
+                <app-tabs [tabs]="dayTabs()"
+                          [active]="store.selectedDay()?.id ?? undefined"
+                          (activeChange)="$event && selectDay($event)">
+                    <div appTabsBody>
+                        @if (store.selectedDay()) {
+                            <div class="vp-kpis">
+                                <div class="kpi" [class.good]="store.stats().coveragePct >= 95" [class.bad]="store.stats().coveragePct < 95">
+                                    <small>{{ 'planningVolunteers.kpi.coverage' | translate }}</small>
+                                    <b>{{ store.stats().coveragePct }} %</b>
+                                </div>
+                                <div class="kpi" [class.good]="!store.stats().missingPlaces" [class.bad]="store.stats().missingPlaces">
+                                    <small>{{ 'planningVolunteers.kpi.missing' | translate }}</small>
+                                    <b>{{ store.stats().missingPlaces }}</b>
+                                </div>
+                                <div class="kpi">
+                                    <small>{{ 'planningVolunteers.kpi.hours' | translate }}</small>
+                                    <b>{{ plannedHoursLabel() }}</b>
+                                </div>
+                            </div>
 
-                                    @if (!store.isReadOnly() && day.id === store.selectedDay()?.id) {
-                                        <menu-box [appendTo]="'body'"
-                                                  [items]="dayMenus().get(day.id)!"
-                                                  buttonIcon="pi-list"
-                                                  type="secondary"/>
+                            @if (!isMobile()) {
+                                <div class="vp-viewbar">
+                                    <switch-box [options]="viewOptions"
+                                                [value]="store.viewMode()"
+                                                (valueChange)="setViewMode($event)"/>
+
+                                    @if (store.focusVolunteerId()) {
+                                        <span class="vhint">
+                                            {{ 'planningVolunteers.focus.following' | translate: {name: focusedVolunteerLabel()} }}
+                                            <button type="button" class="link" (click)="clearFocus()">
+                                                {{ 'planningVolunteers.focus.clear' | translate }}
+                                            </button>
+                                        </span>
                                     }
                                 </div>
-                            </p-tab>
-                        }
 
-                        @if (!store.isReadOnly()) {
-                            <p-tab [value]="'__ADD__'">
-                                <button-box (clickedEvent)="addNewDay()"
-                                            [showText]="!store.days().length"
-                                            primeIcon="pi-plus"
-                                            translateKey="common.create"
-                                            type="secondary"/>
-                            </p-tab>
-                        }
-                    </p-tablist>
-                </p-tabs>
-            }
-
-            @if (store.selectedDay()) {
-                <div class="vp-kpis">
-                    <div class="kpi" [class.good]="store.stats().coveragePct >= 95" [class.bad]="store.stats().coveragePct < 95">
-                        <small>{{ 'planningVolunteers.kpi.coverage' | translate }}</small>
-                        <b>{{ store.stats().coveragePct }} %</b>
-                    </div>
-                    <div class="kpi" [class.good]="!store.stats().missingPlaces" [class.bad]="store.stats().missingPlaces">
-                        <small>{{ 'planningVolunteers.kpi.missing' | translate }}</small>
-                        <b>{{ store.stats().missingPlaces }}</b>
-                    </div>
-                    <div class="kpi">
-                        <small>{{ 'planningVolunteers.kpi.hours' | translate }}</small>
-                        <b>{{ plannedHoursLabel() }}</b>
-                    </div>
-                </div>
-
-                @if (!isMobile()) {
-                    <div class="vp-viewbar">
-                        <switch-box [options]="viewOptions"
-                                    [value]="store.viewMode()"
-                                    (valueChange)="setViewMode($event)"/>
-
-                        @if (store.focusVolunteerId()) {
-                            <span class="vhint">
-                                {{ 'planningVolunteers.focus.following' | translate: {name: focusedVolunteerLabel()} }}
-                                <button type="button" class="link" (click)="clearFocus()">
-                                    {{ 'planningVolunteers.focus.clear' | translate }}
-                                </button>
-                            </span>
+                                <planning-linked-view/>
+                            } @else {
+                                <planning-mobile/>
+                            }
                         }
                     </div>
-
-                    <planning-linked-view/>
-                } @else {
-                    <planning-mobile/>
-                }
+                </app-tabs>
             }
         </div>
 
-        @if (dayDialogVisible()) {
-            <dialog-box (cancel)="closeDayDialog()"
-                        (confirm)="onManageDayConfirm($event)"
-                        [(visible)]="dayDialogVisible"
-                        [header]="manageDayCreateMode() ? 'Créer un jour' : 'Configuration du jour'"
+        @if (configDialogVisible()) {
+            <dialog-box (cancel)="configDialogVisible.set(false)"
+                        (confirm)="onConfigConfirm($event)"
+                        [(visible)]="configDialogVisible"
+                        [header]="'planningVolunteers.config.title' | translate"
                         [mode]="'edit'">
-                <selected-day-editor [data]="daySlice()"/>
-            </dialog-box>
-        }
-
-        <!-- ================= DIALOG: BENEVOLES ================= -->
-        @if (volunteersDialogVisible()) {
-            <dialog-box (cancel)="volunteersDialogVisible.set(false)"
-                        (confirm)="store.applyVolunteers($event)"
-                        [(visible)]="volunteersDialogVisible"
-                        [header]="'Configuration des bénévoles'"
-                        [mode]="'edit'">
-                <volunteer-manager [data]="store.planning().volunteers"/>
-            </dialog-box>
-        }
-
-        <!-- ================= DIALOG: ASSIGNATIONS (jour selectionné) ================= -->
-        @if (assignmentsDialogVisible()) {
-            <dialog-box (cancel)="assignmentsDialogVisible.set(false)"
-                        (confirm)="store.applyAssignmentsSlice($event)"
-                        [(visible)]="assignmentsDialogVisible"
-                        [header]="'Assignations du jour'"
-                        [mode]="'edit'">
-                <selected-day-assignments [data]="store.assignmentsSlice()"/>
-            </dialog-box>
-        }
-
-        <!-- ================= DIALOG: CATEGORIES ================= -->
-        @if (categoriesDialogVisible()) {
-            <dialog-box (cancel)="categoriesDialogVisible.set(false)"
-                        (confirm)="store.applyCategories($event)"
-                        [(visible)]="categoriesDialogVisible"
-                        [header]="'Configuration des catégories'"
-                        [mode]="'edit'">
-                <category-manager [data]="store.categories()"/>
+                <volunteer-config-dialog [data]="store.planning()"/>
             </dialog-box>
         }
 

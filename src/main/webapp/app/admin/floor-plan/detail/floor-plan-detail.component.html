@@ -42,29 +42,19 @@
         <div appCardBody>
             @if (activePlan(); as plan) {
                 <!-- ====================================== Barre du haut -->
-                <div class="fp-topbar">
-                    <p-tabs [value]="activeIndex()">
-                        <p-tablist>
-                            @for (floorPlan of floorPlans(); track floorPlan.id ?? floorPlan.position; let index = $index) {
-                                <p-tab (click)="selectPlan(index)" [value]="index">
-                                    <span>{{ floorPlan.name }}</span>
-                                    @if (conflictCountByPlan()[index] > 0) {
-                                        <span class="fp-tab-conflicts">{{ conflictCountByPlan()[index] }}</span>
-                                    }
-                                </p-tab>
-                            }
-                            @if (!isReadOnly()) {
-                                <p-tab [value]="'__ADD__'">
-                                    <button-box (clickedEvent)="openSettingsDialog('Nouveau plan')"
-                                                [showText]="false"
-                                                primeIcon="pi-plus"
-                                                translateKey="floorPlan.addNew"
-                                                type="secondary"/>
-                                </p-tab>
-                            }
-                        </p-tablist>
-                    </p-tabs>
+                <app-tabs [flushBody]="true" [tabs]="planTabs()" [active]="activeIndex().toString()"
+                          (activeChange)="$event && selectPlan(+$event)">
+                    <ng-container appTabsActions>
+                        @if (!isReadOnly()) {
+                            <button-box (clickedEvent)="openSettingsDialog('Nouveau plan')"
+                                        [showText]="false"
+                                        primeIcon="pi-plus"
+                                        translateKey="floorPlan.addNew"
+                                        type="secondary"/>
+                        }
+                    </ng-container>
 
+                    <div appTabsBody>
                     <div class="fp-toolbar">
                         <!-- Affichage -->
                         <div class="fp-tool-group">
@@ -174,7 +164,6 @@
                                         translateKey="floorPlan.view.toggleInspector"/>
                         </div>
                     </div>
-                </div>
 
                 <!-- =========================================== Corps -->
                 <div [class.drawer-open]="drawerOpen()"
@@ -316,6 +305,8 @@
                                     type="danger"/>
                     </div>
                 }
+                    </div>
+                </app-tabs>
             } @else {
                 <p jhiTranslate="floorPlan.noFloorPlanFound"></p>
             }

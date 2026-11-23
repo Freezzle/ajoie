@@ -26,7 +26,6 @@ import {
     SLOT_WIDTH,
     volunteerHours
 } from './volunteer-planning-utils';
-import {AssignmentsSlice, DayConfigSlice} from './volunteer-planning-slices';
 import {
     PlanningVolunteersDto,
     VolunteerPlanningConfigurationDto,
@@ -281,21 +280,6 @@ export class VolunteerPlanningStore {
 
     readonly canUndo = computed(() => this.history().length > 0);
 
-    readonly daySlice = computed<DayConfigSlice>(() => {
-        const day = this.selectedDay();
-        return {day: day ?? this.createEmptyDay('')};
-    });
-
-    readonly assignmentsSlice = computed<AssignmentsSlice>(() => {
-        const day = this.selectedDay();
-        return {
-            dayId: day?.id ?? '',
-            dayLabel: day?.label ?? '',
-            volunteers: this.planning().volunteers,
-            assignedVolunteerIds: day?.assignedVolunteerIds ?? []
-        };
-    });
-
     // ---------- chargement / sauvegarde ----------
 
     load(idSalon: string, onLoaded?: () => void): void {
@@ -478,87 +462,52 @@ export class VolunteerPlanningStore {
         return day ? getNeed(day, categoryId, slot) : 0;
     }
 
-    // ---------- dialogs ----------
+    // ---------- configuration ----------
 
-    applyVolunteers(volunteers: Volunteer[]): void {
+    /**
+     * Applique en une seule fois l'ensemble de la configuration (bénévoles, catégories et
+     * jours avec leur attribution), depuis le dialogue de configuration unique.
+     * Purge de cohérence : cells / unavailable / needs / assignations sont filtrés sur les
+     * bénévoles et catégories conservés, ainsi que sur les créneaux encore valides.
+     */
+    applyConfig(planning: Planning): void {
         const current = this.planning();
-        const kept = new Set(volunteers.map(v => v.id));
-        const days = current.days.map(d => ({
-            ...d,
-            assignedVolunteerIds: d.assignedVolunteerIds.filter(id => kept.has(id)),
-            cells: d.cells.filter(c => kept.has(c.volunteerId)),
-            unavailableCells: (d.unavailableCells ?? []).filter(c => kept.has(c.volunteerId))
-        }));
-        this.planning.set({...current, volunteers, days});
-        this.resetTransientState();
-    }
+        const keptVolunteers = new Set(planning.volunteers.map(v => v.id));
+        const keptCategories = new Set(planning.categories.map(c => c.id));
 
-    applyCategories(categories: Category[]): void {
-        const current = this.planning();
-        const kept = new Set(categories.map(c => c.id));
-        const days = current.days.map(d => ({
-            ...d,
-            cells: d.cells.filter(cell => kept.has(cell.categoryId)),
-            needs: (d.needs ?? []).filter(n => kept.has(n.categoryId))
-        }));
-        this.planning.set({...current, categories, days});
+        const days = planning.days.map(day => {
+            const validSlotCount = computeTimeSlots(day.startTime, day.endTime, day.intervalMinutes).length;
+            const assigned = (day.assignedVolunteerIds ?? []).filter(id => keptVolunteers.has(id));
+            const assignedSet = new Set(assigned);
+            return {
+                ...day,
+                assignedVolunteerIds: assigned,
+                cells: (day.cells ?? []).filter(c =>
+                    assignedSet.has(c.volunteerId) && keptCategories.has(c.categoryId) && c.slotIndex < validSlotCount),
+                unavailableCells: (day.unavailableCells ?? []).filter(c =>
+                    assignedSet.has(c.volunteerId) && c.slotIndex < validSlotCount),
+                needs: (day.needs ?? []).filter(n =>
+                    keptCategories.has(n.categoryId) && n.slotIndex < validSlotCount)
+            };
+        });
+
+        this.planning.set({
+            version: current.version,
+            volunteers: planning.volunteers,
+            categories: planning.categories,
+            days
+        });
+
+        if (!days.some(d => d.id === this.selectedDayId())) {
+            this.selectedDayId.set(days[0]?.id ?? '');
+        }
+        this.history.set([]);
         this.resetTransientState();
 
         const tool = this.tool();
-        if (tool.kind === 'CATEGORY' && !kept.has(tool.categoryId)) {
+        if (tool.kind === 'CATEGORY' && !keptCategories.has(tool.categoryId)) {
             this.selectDefaultTool();
         }
-    }
-
-    applyDaySlice(slice: DayConfigSlice): void {
-        const current = this.planning();
-        const index = current.days.findIndex(d => d.id === slice.day.id);
-        if (index < 0) {
-            return;
-        }
-
-        const updated: Day = {
-            ...slice.day,
-            cells: [...(slice.day.cells ?? [])],
-            unavailableCells: [...(slice.day.unavailableCells ?? [])],
-            needs: [...(slice.day.needs ?? [])]
-        };
-        const validSlotCount = computeTimeSlots(updated.startTime, updated.endTime, updated.intervalMinutes).length;
-        updated.cells = updated.cells.filter(c => c.slotIndex < validSlotCount);
-        updated.unavailableCells = updated.unavailableCells.filter(c => c.slotIndex < validSlotCount);
-        updated.needs = updated.needs.filter(n => n.slotIndex < validSlotCount);
-
-        const days = [...current.days];
-        days[index] = updated;
-        this.planning.set({...current, days});
-        this.resetTransientState();
-    }
-
-    applyAssignmentsSlice(slice: AssignmentsSlice): void {
-        const current = this.planning();
-        const index = current.days.findIndex(d => d.id === slice.dayId);
-        if (index < 0) {
-            return;
-        }
-        const day = current.days[index];
-        const kept = new Set(slice.assignedVolunteerIds);
-        const days = [...current.days];
-        days[index] = {
-            ...day,
-            assignedVolunteerIds: [...kept],
-            cells: day.cells.filter(c => kept.has(c.volunteerId)),
-            unavailableCells: (day.unavailableCells ?? []).filter(c => kept.has(c.volunteerId))
-        };
-        this.planning.set({...current, days});
-        this.resetTransientState();
-    }
-
-    addDay(day: Day): void {
-        const current = this.planning();
-        this.planning.set({...current, days: [...current.days, day]});
-        this.selectedDayId.set(day.id);
-        this.history.set([]);
-        this.resetTransientState();
     }
 
     deleteSelectedDay(): void {
@@ -572,20 +521,6 @@ export class VolunteerPlanningStore {
         this.selectedDayId.set(days[0]?.id ?? '');
         this.history.set([]);
         this.resetTransientState();
-    }
-
-    createEmptyDay(id: string): Day {
-        return {
-            id,
-            label: '',
-            startTime: timeAt(8, 0),
-            endTime: timeAt(18, 0),
-            intervalMinutes: 60,
-            assignedVolunteerIds: [],
-            cells: [],
-            unavailableCells: [],
-            needs: []
-        };
     }
 
     // ---------- mapping DTO ----------
@@ -629,8 +564,3 @@ export class VolunteerPlanningStore {
     }
 }
 
-export function timeAt(h: number, m: number): Date {
-    const d = new Date();
-    d.setHours(h, m, 0, 0);
-    return d;
-}
