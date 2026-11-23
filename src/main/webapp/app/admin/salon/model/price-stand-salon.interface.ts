@@ -4,6 +4,7 @@ export interface IPriceStandSalon {
     dimension: string;
     heightMeter: number;
     widthMeter: number;
+    visiblePublic?: boolean;
     sortOrder?: number;
 }
 

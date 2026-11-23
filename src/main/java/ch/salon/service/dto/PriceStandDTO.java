@@ -13,5 +13,6 @@ public class PriceStandDTO implements Serializable {
     private String dimension;
     private Double widthMeter;
     private Double heightMeter;
+    private Boolean visiblePublic;
     private Integer sortOrder;
 }

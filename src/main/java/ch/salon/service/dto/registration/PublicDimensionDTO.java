@@ -21,4 +21,5 @@ public class PublicDimensionDTO implements Serializable {
     private Double widthMeter;
     private Double heightMeter;
     private Double price;
+    private Boolean visiblePublic;
 }

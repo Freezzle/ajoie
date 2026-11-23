@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="0.0.2-202611-price-stand-visible-public" author="freezzle">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="price_stand_salon"/>
+            <not>
+                <columnExists tableName="price_stand_salon" columnName="visible_public"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="price_stand_salon">
+            <column name="visible_public" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="price_stand_salon" columnName="visible_public"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

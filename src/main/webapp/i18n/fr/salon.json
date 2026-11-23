@@ -228,7 +228,8 @@
       "label": "Libellé",
       "width": "Longueur (m)",
       "height": "Hauteur (m)",
-      "price": "Prix"
+      "price": "Prix",
+      "visiblePublic": "Visible au public"
     },
     "edit": "Détail du salon",
     "endingDate": "Date de fin",

@@ -17,6 +17,7 @@ import {CurrencyBoxComponent} from '../../../shared/components/currency-box/curr
 import {NumberBoxComponent} from '../../../shared/components/number-box/number-box.component';
 import {TableModule} from 'primeng/table';
 import {ConfirmPopup} from 'primeng/confirmpopup';
+import {ToggleSwitch} from 'primeng/toggleswitch';
 import {CardComponent} from '../../../shared/components/card/card.component';
 import {CardFooterContentDirective} from '../../../shared/components/card/card-footer.directive';
 import {CheckboxBoxComponent} from '../../../shared/components/checkbox-box/checkbox-box.component';
@@ -98,7 +99,8 @@ const SECTION_CONTROLS: Record<string, string[]> = {
                    DetailPageLayoutComponent,
                    DetailMainDirective,
                    DetailSideDirective,
-                   DetailCreateActionsDirective
+                   DetailCreateActionsDirective,
+                   ToggleSwitch
                ]
            })
 export class SalonUpdateComponent implements OnInit {

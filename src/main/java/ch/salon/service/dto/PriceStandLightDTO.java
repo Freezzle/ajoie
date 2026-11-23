@@ -13,4 +13,5 @@ public class PriceStandLightDTO implements Serializable {
     private String dimension;
     private Double widthMeter;
     private Double heightMeter;
+    private Boolean visiblePublic;
 }

@@ -89,7 +89,7 @@
                         <app-exhibitor-step [emailReadOnly]="editMode()" [form]="form.controls.exhibitor"/>
                     }
                     @case (1) {
-                        <app-services-step [dimensions]="dimensions"
+                        <app-services-step [dimensions]="dimensionOptions"
                                            [form]="form.controls.services"
                                            [prices]="prices"
                                            [showErrors]="showStepErrors()"/>

@@ -9,6 +9,7 @@ export type PriceStandGroup = {
     dimension: FormControl<IPriceStandSalon['dimension'] | null>;
     heightMeter: FormControl<IPriceStandSalon['heightMeter'] | null>;
     widthMeter: FormControl<IPriceStandSalon['widthMeter'] | null>;
+    visiblePublic: FormControl<IPriceStandSalon['visiblePublic'] | null>;
     sortOrder: FormControl<IPriceStandSalon['sortOrder'] | null>;
 };
 
@@ -115,6 +116,7 @@ export class SalonFormService {
                                                   dimension: new FormControl(raw.dimension, Validators.required),
                                                   widthMeter: new FormControl(raw.widthMeter, Validators.required),
                                                   heightMeter: new FormControl(raw.heightMeter, Validators.required),
+                                                  visiblePublic: new FormControl(raw.visiblePublic ?? true),
                                                   sortOrder: new FormControl(raw.sortOrder ?? 0)
                                               });
     }
@@ -136,10 +138,11 @@ export class SalonFormService {
     }
 
     private getDefaultPriceDimensionFormValue(): Pick<IPriceStandSalon,
-        'widthMeter' | 'heightMeter'> {
+        'widthMeter' | 'heightMeter' | 'visiblePublic'> {
         return {
             widthMeter: 0,
-            heightMeter: 0
+            heightMeter: 0,
+            visiblePublic: true
         };
     }
 }

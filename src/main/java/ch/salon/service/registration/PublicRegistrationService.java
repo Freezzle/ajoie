@@ -46,7 +46,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -164,7 +166,7 @@ public class PublicRegistrationService {
         applyParticipation(participation, request.getParticipation(), exhibitor);
         participation = participationRepository.save(participation);
 
-        createServices(participation, request, now, StandCarryOver.empty());
+        createServices(participation, request, now, StandCarryOver.empty(), Set.of());
 
         eventLogService.eventFromSystem("Inscription en ligne reçue", EventType.EVENT, EntityType.PARTICIPATION,
                 participation.getId(), null);
@@ -197,6 +199,12 @@ public class PublicRegistrationService {
         // Les prestations sont supprimées puis recréées : on met de côté ce que le public ne peut pas
         // modifier (lien historique Google Drive) ainsi que les images déjà envoyées.
         StandCarryOver carryOver = captureCarryOver(existingStands);
+        Set<UUID> allowedHiddenDimensionIds = existingStands.stream()
+                .map(Stand::getDimension)
+                .filter(Objects::nonNull)
+                .filter(dimension -> Boolean.FALSE.equals(dimension.getVisiblePublic()))
+                .map(PriceStandSalon::getId)
+                .collect(java.util.stream.Collectors.toSet());
 
         standRepository.deleteAll(existingStands);
         conferenceRepository.deleteAll(
@@ -207,7 +215,7 @@ public class PublicRegistrationService {
         conferenceRepository.flush();
         workshopRepository.flush();
 
-        createServices(participation, request, Instant.now(), carryOver);
+        createServices(participation, request, Instant.now(), carryOver, allowedHiddenDimensionIds);
 
         eventLogService.eventFromSystem("Inscription en ligne modifiée par l'exposant", EventType.EVENT,
                 EntityType.PARTICIPATION, participation.getId(), null);
@@ -289,7 +297,7 @@ public class PublicRegistrationService {
         dto.setDimensions(salon.getPriceStandSalons().stream()
                                .sorted(PriceStandSalon.DISPLAY_ORDER)
                                .map(d -> new PublicDimensionDTO(d.getId(), d.getDimension(), d.getWidthMeter(),
-                                       d.getHeightMeter(), d.getPrice()))
+                                       d.getHeightMeter(), d.getPrice(), d.getVisiblePublic()))
                                .toList());
 
         PublicPricesDTO prices = new PublicPricesDTO();
@@ -577,13 +585,14 @@ public class PublicRegistrationService {
     }
 
     private void createServices(Participation participation, RegistrationRequestDTO request, Instant now,
-            StandCarryOver carryOver) {
+            StandCarryOver carryOver, Set<UUID> allowedHiddenDimensionIds) {
         for (RegistrationStandDTO standDTO : request.getStands()) {
             Stand stand = new Stand();
             stand.setRegistrationDate(now);
             stand.setParticipation(participation);
             stand.setDescription(sub(standDTO.getDescription(), 500));
-            stand.setDimension(resolveDimension(participation.getSalon(), standDTO.getDimensionId()));
+            stand.setDimension(resolveDimension(participation.getSalon(), standDTO.getDimensionId(),
+                    allowedHiddenDimensionIds));
             stand.setCategory(standDTO.getCategory());
             stand.setSubCategories(
                     standDTO.getSubCategories() != null ? new LinkedHashSet<>(standDTO.getSubCategories()) :
@@ -635,10 +644,20 @@ public class PublicRegistrationService {
         }
     }
 
-    private PriceStandSalon resolveDimension(Salon salon, UUID dimensionId) {
-        return salon.getPriceStandSalons().stream().filter(d -> d.getId().equals(dimensionId)).findFirst().orElseThrow(
-                () -> new BadRequestAlertException("Dimension de stand inconnue", ENTITY_NAME,
+    private PriceStandSalon resolveDimension(Salon salon, UUID dimensionId, Set<UUID> allowedHiddenDimensionIds) {
+        PriceStandSalon dimension = salon.getPriceStandSalons().stream()
+                .filter(d -> d.getId().equals(dimensionId))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestAlertException("Dimension de stand inconnue", ENTITY_NAME,
                         "registration.dimension-invalid"));
+
+        if (Boolean.FALSE.equals(dimension.getVisiblePublic()) &&
+                !allowedHiddenDimensionIds.contains(dimension.getId())) {
+            throw new BadRequestAlertException("Dimension de stand non disponible publiquement", ENTITY_NAME,
+                    "registration.dimension-not-public");
+        }
+
+        return dimension;
     }
 
     // -------------------- REGLES METIER --------------------

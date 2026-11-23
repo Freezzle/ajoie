@@ -48,6 +48,10 @@ public class PriceStandSalon implements Serializable, TenantOwned {
     private Double heightMeter;
 
     @NotNull
+    @Column(name = "visible_public", nullable = false)
+    private Boolean visiblePublic = true;
+
+    @NotNull
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;
 

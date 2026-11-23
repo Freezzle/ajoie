@@ -131,23 +131,30 @@
                   [actions]="dimensionsActions()">
             <div appCardBody>
                 @if (isCreating || activeSection() === 'dimensions') {
-                    <p-table [tableStyle]="{ 'min-width': '60rem' }" [value]="priceStandRows">
+                    <p-table [tableStyle]="{ 'min-width': '60rem' }" [value]="priceStandRows" styleClass="salon-dimensions-table">
                         <ng-template #header>
                             <tr>
                                 <th>{{ 'salon.dimension.label' | translate }}</th>
                                 <th>{{ 'salon.dimension.width' | translate }}</th>
                                 <th>{{ 'salon.dimension.height' | translate }}</th>
                                 <th>{{ 'salon.dimension.price' | translate }}</th>
+                                <th>{{ 'salon.dimension.visiblePublic' | translate }}</th>
                                 <th style="width: 10rem"></th>
                             </tr>
                         </ng-template>
                         <ng-template #body let-dimensionStand let-rowIndex="rowIndex" let-last="last">
-                            <tr [formGroup]="dimensionStand">
-                                <td><text-box fieldName="dimension" formControlName="dimension"></text-box></td>
-                                <td><number-box [modeDecimal]="true" fieldName="widthMeter" formControlName="widthMeter"></number-box></td>
-                                <td><number-box [modeDecimal]="true" fieldName="heightMeter" formControlName="heightMeter"></number-box></td>
-                                <td><currency-box fieldName="price" formControlName="price"></currency-box></td>
-                                <td class="text-nowrap">
+                            <tr [formGroup]="dimensionStand" class="salon-dimensions-row">
+                                <td class="salon-dimension-cell-label"><text-box fieldName="dimension" formControlName="dimension"></text-box></td>
+                                <td class="salon-dimension-cell-width"><number-box [modeDecimal]="true" fieldName="widthMeter" formControlName="widthMeter"></number-box></td>
+                                <td class="salon-dimension-cell-height"><number-box [modeDecimal]="true" fieldName="heightMeter" formControlName="heightMeter"></number-box></td>
+                                <td class="salon-dimension-cell-price"><currency-box fieldName="price" formControlName="price"></currency-box></td>
+                                <td class="salon-dimension-cell-visible">
+                                    <div class="salon-dimension-toggle-only">
+                                        <p-toggleswitch [formControl]="dimensionStand.controls.visiblePublic"
+                                                       [inputId]="'field_visiblePublic_' + rowIndex"></p-toggleswitch>
+                                    </div>
+                                </td>
+                                <td class="text-nowrap salon-dimension-cell-actions">
                                     <button-box (clickedEvent)="movePriceStand(rowIndex, -1)" [isDisabled]="rowIndex === 0"
                                                 [showText]="false" primeIcon="pi-arrow-up" translateKey="common.moveUp" type="secondary"/>
                                     <button-box (clickedEvent)="movePriceStand(rowIndex, 1)" [isDisabled]="last"
@@ -159,7 +166,7 @@
                         </ng-template>
                         <ng-template #footer>
                             <tr>
-                                <td colspan="5">
+                                <td colspan="6">
                                     <button-box (clickedEvent)="addPriceStand()" [showText]="true"
                                                 primeIcon="pi-plus" translateKey="common.create" type="success"/>
                                 </td>
@@ -175,6 +182,7 @@
                                     <th>{{ 'salon.dimension.width' | translate }}</th>
                                     <th>{{ 'salon.dimension.height' | translate }}</th>
                                     <th>{{ 'salon.dimension.price' | translate }}</th>
+                                    <th>{{ 'salon.dimension.visiblePublic' | translate }}</th>
                                 </tr>
                             </ng-template>
                             <ng-template #body let-row>
@@ -183,6 +191,7 @@
                                     <td>{{ row.controls.widthMeter.value }}</td>
                                     <td>{{ row.controls.heightMeter.value }}</td>
                                     <td>{{ row.controls.price.value | currency:'CHF' }}</td>
+                                    <td><yes-no-icon [value]="row.controls.visiblePublic.value !== false"/></td>
                                 </tr>
                             </ng-template>
                         </p-table>

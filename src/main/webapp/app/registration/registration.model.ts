@@ -17,6 +17,7 @@ export interface IPublicDimension {
     widthMeter: number | null;
     heightMeter: number | null;
     price: number | null;
+    visiblePublic: boolean;
 }
 
 export interface IRegistrationPrices {

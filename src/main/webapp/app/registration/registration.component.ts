@@ -116,6 +116,17 @@ export default class RegistrationComponent implements OnInit {
         return this.salonInfo()?.dimensions ?? [];
     }
 
+    get dimensionOptions(): IPublicDimension[] {
+        const visibleDimensions = this.dimensions.filter(dimension => dimension.visiblePublic !== false);
+        const selected = this.form?.controls.services.controls.stand.controls.dimension.value as IPublicDimension | null;
+
+        if (selected?.visiblePublic === false &&
+            !visibleDimensions.some(dimension => dimension.id === selected.id)) {
+            return [selected, ...visibleDimensions];
+        }
+        return visibleDimensions;
+    }
+
     get prices(): IRegistrationPrices | null {
         return this.salonInfo()?.prices ?? null;
     }
@@ -159,6 +170,9 @@ export default class RegistrationComponent implements OnInit {
         this.form = this.formService.createForm();
         this.form.valueChanges.subscribe(() => this.refreshStates());
         this.form.valueChanges.pipe(debounceTime(300)).subscribe(() => this.saveDraft());
+        this.form.controls.services.controls.wantStand.valueChanges.subscribe(() => this.applyPublicDimensionLock());
+        this.form.controls.services.controls.stand.controls.dimension.valueChanges.subscribe(
+            () => this.applyPublicDimensionLock());
 
         const params = this.route.snapshot.paramMap;
         this.salonId = params.get('salonId') ?? '';
@@ -460,6 +474,7 @@ export default class RegistrationComponent implements OnInit {
                                    this.form.disable({emitEvent: false});
                                } else {
                                    this.form.controls.exhibitor.controls.email.disable();
+                                   this.applyPublicDimensionLock();
                                }
 
                                this.currentStep.set(STEPS.length - 1);
@@ -472,6 +487,25 @@ export default class RegistrationComponent implements OnInit {
                                this.loading.set(false);
                            }
                        });
+    }
+
+    private applyPublicDimensionLock(): void {
+        if (!this.editMode() || this.readOnly()) {
+            return;
+        }
+        const services = this.form.controls.services;
+        const dimensionControl = services.controls.stand.controls.dimension;
+        const selected = dimensionControl.value as IPublicDimension | null;
+        const mustLock = services.controls.wantStand.value === true && selected?.visiblePublic === false;
+
+        if (mustLock) {
+            dimensionControl.disable({emitEvent: false});
+            return;
+        }
+
+        if (services.controls.stand.enabled && services.controls.wantStand.value === true && dimensionControl.disabled) {
+            dimensionControl.enable({emitEvent: false});
+        }
     }
 
     submit(): void {

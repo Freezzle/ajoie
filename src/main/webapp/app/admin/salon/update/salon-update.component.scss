@@ -61,6 +61,21 @@
   flex-wrap: wrap;
 }
 
+:host ::ng-deep .salon-dimensions-table .salon-dimension-cell-width,
+:host ::ng-deep .salon-dimensions-table .salon-dimension-cell-height {
+  width: 7.5rem;
+  min-width: 7.5rem;
+}
+
+:host ::ng-deep .salon-dimensions-table .salon-dimension-cell-actions {
+  white-space: nowrap;
+}
+
+.salon-dimension-toggle-only {
+  display: flex;
+  justify-content: center;
+}
+
 .salon-link {
   flex: 1 1 auto;
   overflow-wrap: anywhere;
