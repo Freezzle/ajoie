@@ -88,11 +88,11 @@ export class PlanningTimelineComponent implements OnDestroy {
     }
 
     blockLeft(run: Run): number {
-        return run.start * this.slotW() + 2;
+        return run.start * this.slotW();
     }
 
     blockWidth(run: Run): number {
-        return (run.end - run.start) * this.slotW() - 4;
+        return (run.end - run.start) * this.slotW();
     }
 
     blockLabel(run: Run): string {
@@ -420,8 +420,8 @@ export class PlanningTimelineComponent implements OnDestroy {
     private positionGhost(start: number, end: number, top: number): void {
         const ghost = this.ghostRef().nativeElement;
         const w = this.slotW();
-        ghost.style.left = `${this.nameWidth + start * w + 2}px`;
-        ghost.style.width = `${(end - start) * w - 4}px`;
+        ghost.style.left = `${this.nameWidth + start * w}px`;
+        ghost.style.width = `${(end - start) * w}px`;
         ghost.style.top = `${top + 6}px`;
     }
 

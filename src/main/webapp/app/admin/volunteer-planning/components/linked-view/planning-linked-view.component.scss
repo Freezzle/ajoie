@@ -68,8 +68,12 @@
     top: 7px;
     font-size: 11px;
     color: var(--app-text-muted);
-    transform: translateX(4px);
+    transform: translateX(-50%);
     font-weight: 600;
+}
+
+.ticks span.first {
+    transform: translateX(4px);
 }
 
 .zones-dock {

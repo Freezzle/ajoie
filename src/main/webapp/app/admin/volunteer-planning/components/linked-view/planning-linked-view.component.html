@@ -53,8 +53,8 @@
                             {{ (showPersons() ? 'planningVolunteers.view.persons' : 'planningVolunteers.view.zones') | translate }}
                         </div>
                         <div class="ticks" [style.width.px]="trackWidth()">
-                            @for (tick of ticks(); track tick.index) {
-                                <span [style.left.px]="tick.left">{{ tick.label }}</span>
+                            @for (tick of ticks(); track tick.index; let isFirst = $first) {
+                                <span [style.left.px]="tick.left" [class.first]="isFirst">{{ tick.label }}</span>
                             }
                         </div>
                     </div>
