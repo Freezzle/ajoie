@@ -11,13 +11,13 @@
     overflow: hidden;
     background: var(--app-surface);
     border: 1px solid var(--app-border);
-    border-radius: 10px;
+    border-radius: 4px;
 }
 
 .m-seg {
     display: flex;
     background: var(--app-surface-muted);
-    border-radius: 10px;
+    border-radius: 4px;
     padding: 3px;
     margin: 8px 10px;
     flex: none;

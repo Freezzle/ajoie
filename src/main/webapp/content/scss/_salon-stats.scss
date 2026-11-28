@@ -44,7 +44,7 @@ app-salon-stats {
     }
     .masked {
         display: flex; flex-direction: column; gap: 2px; padding: 16px; margin-top: 12px;
-        background: var(--app-surface-muted); border: 1px dashed var(--app-border); border-radius: 10px;
+        background: var(--app-surface-muted); border: 1px dashed var(--app-border); border-radius: 4px;
     }
     .figures { display: flex; gap: 18px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--app-line); }
     .fig { display: flex; flex-direction: column; b { font-size: 20px; font-variant-numeric: tabular-nums; } }
@@ -53,7 +53,7 @@ app-salon-stats {
     .todo-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
     .todo-row {
         display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center;
-        padding: 10px 12px; border: 1px solid var(--app-line); border-radius: 10px;
+        padding: 10px 12px; border: 1px solid var(--app-line); border-radius: 4px;
         background: var(--app-surface); text-decoration: none; color: var(--app-text);
         &:hover { border-color: var(--app-accent); }
         &.critical { border-color: var(--app-danger); }

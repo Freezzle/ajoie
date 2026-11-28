@@ -233,7 +233,7 @@ h2 {
 .landing-module-card {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-lg);
+  border-radius: var(--app-radius-sm);
   padding: 1.5rem;
   transition: border-color 0.2s, box-shadow 0.3s;
 
@@ -291,7 +291,7 @@ h2 {
 // ---------- 4.5 Pour qui ? ----------
 .landing-audience-card {
   background: var(--app-primary-soft);
-  border-radius: var(--app-radius-lg);
+  border-radius: var(--app-radius-sm);
   padding: 1.5rem;
 
   h3 {

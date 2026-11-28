@@ -150,7 +150,7 @@
     overflow-x: auto;
     margin-bottom: 8px;
     padding: 8px 10px;
-    border-radius: 10px;
+    border-radius: 4px;
 }
 
 .cal-tray--late {
@@ -218,7 +218,7 @@
     margin-top: 12px;
     padding: 40px 16px;
     border: 1px dashed var(--app-border);
-    border-radius: 10px;
+    border-radius: 4px;
     text-align: center;
     color: var(--app-text-muted);
 }
@@ -227,7 +227,7 @@
 .cal-tray-m {
     margin-bottom: 8px;
     padding: 9px 12px;
-    border-radius: 10px;
+    border-radius: 4px;
 
     summary {
         display: flex;
@@ -311,7 +311,7 @@
     width: 50px;
     padding: 6px 0 5px;
     border: 1px solid var(--app-border);
-    border-radius: 12px;
+    border-radius: 4px;
     background: var(--app-surface);
     scroll-snap-align: start;
     cursor: pointer;
@@ -399,7 +399,7 @@
 
 .cal-ag-empty {
     padding: 22px 10px;
-    border-radius: 10px;
+    border-radius: 4px;
     background: var(--app-surface-muted);
     text-align: center;
     font-size: 13px;
@@ -412,7 +412,7 @@
     margin-top: 10px;
     padding: 10px;
     border: 1px dashed var(--app-primary);
-    border-radius: 10px;
+    border-radius: 4px;
     background: transparent;
     font-size: 16px; /* évite le zoom automatique d'iOS */
     font-weight: 700;
