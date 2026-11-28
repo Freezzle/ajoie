@@ -1,13 +1,11 @@
-import {ChangeDetectionStrategy, Component, computed, inject, input, output, signal, viewChild} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {ConfirmPopup} from 'primeng/confirmpopup';
-import {Popover} from 'primeng/popover';
 
 import {ConfirmDialogService} from '../../delete-dialog/confirm-dialog.service';
 import {AvailableAction} from '../../model/available-action';
-import {ConditionalKey} from '../../model/conditional-key';
 import {SEVERITY} from '../../utils/severity';
-import {ButtonBoxComponent} from '../button-box/button-box.component';
+import {ButtonWithHelpBoxComponent} from '../button-with-help-box/button-with-help-box.component';
 import {EntityActionsMenuComponent} from '../entity-list/entity-actions-menu.component';
 import {EntityAction} from '../entity-list/entity-list.model';
 
@@ -23,13 +21,14 @@ export interface StatusTimelineStep {
     state: 'done' | 'current' | 'todo' | 'error';
 }
 
-const STATUS_CYCLE = ['IN_VERIFICATION', 'ACCEPTED', 'VALIDATED', 'CLOSED'] as const;
-const OFF_CYCLE = ['REFUSED', 'CANCELED'];
+const DEFAULT_STATUS_CYCLE = ['IN_VERIFICATION', 'ACCEPTED', 'VALIDATED', 'CLOSED'];
+const DEFAULT_OFF_CYCLE = ['REFUSED', 'CANCELED'];
+const DEFAULT_FULLY_DONE_STATUSES = ['CLOSED'];
 
 @Component({
                selector: 'app-status-timeline',
                standalone: true,
-               imports: [ConfirmPopup, Popover, ButtonBoxComponent, EntityActionsMenuComponent],
+               imports: [ConfirmPopup, TranslatePipe, ButtonWithHelpBoxComponent, EntityActionsMenuComponent],
                templateUrl: './status-timeline.component.html',
                styleUrl: './status-timeline.component.scss',
                changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,9 +36,14 @@ const OFF_CYCLE = ['REFUSED', 'CANCELED'];
 export class StatusTimelineComponent {
     readonly status = input<string | null>(null);
     readonly availableActions = input<AvailableAction[]>([]);
+    readonly primaryActions = input<AvailableAction[] | null>(null);
     readonly actions = input<EntityAction[]>([]);
     readonly hint = input<string | null>(null);
     readonly labelKeyPrefix = input<string>('statusTimeline.status');
+    readonly statusCycle = input<string[]>(DEFAULT_STATUS_CYCLE);
+    readonly offCycleStatuses = input<string[]>(DEFAULT_OFF_CYCLE);
+    readonly fullyDoneStatuses = input<string[]>(DEFAULT_FULLY_DONE_STATUSES);
+    readonly actionSeverityByContextCode = input<Record<string, SEVERITY>>({});
 
     readonly actionRequested = output<StatusTimelineActionRequest>();
     readonly opened = output<void>();
@@ -47,23 +51,24 @@ export class StatusTimelineComponent {
     private readonly translateService = inject(TranslateService);
     private readonly confirmDialogService = inject(ConfirmDialogService);
 
-    protected currentHelpText = '';
-    protected currentConditionalKeys: ConditionalKey[] = [];
-    private readonly helpPopover = viewChild<Popover>('helpPopover');
-
-    readonly isOffCycle = computed(() => OFF_CYCLE.includes(this.status()?.toUpperCase() ?? ''));
+    readonly isOffCycle = computed(() => this.offCycleSet().has(this.currentStatus()));
+    private readonly currentStatus = computed(() => this.status()?.toUpperCase() ?? '');
+    private readonly cycleStatuses = computed(() => this.statusCycle().map(status => status.toUpperCase()));
+    private readonly offCycleSet = computed(() => new Set(this.offCycleStatuses().map(status => status.toUpperCase())));
+    private readonly fullyDoneSet = computed(() => new Set(this.fullyDoneStatuses().map(status => status.toUpperCase())));
 
     readonly steps = computed<StatusTimelineStep[]>(() => {
-        const status = this.status()?.toUpperCase() ?? '';
-        const off = OFF_CYCLE.includes(status);
-        const currentIndex = STATUS_CYCLE.indexOf(status as typeof STATUS_CYCLE[number]);
+        const status = this.currentStatus();
+        const off = this.offCycleSet().has(status);
+        const cycle = this.cycleStatuses();
+        const currentIndex = cycle.indexOf(status);
 
-        const cycleSteps: StatusTimelineStep[] = STATUS_CYCLE.map((cycleStatus, index) => {
+        const cycleSteps: StatusTimelineStep[] = cycle.map((cycleStatus, index) => {
             let state: 'done' | 'current' | 'todo' = 'todo';
 
             if (off) {
                 state = index === 0 ? 'done' : 'todo';
-            } else if (status === 'CLOSED') {
+            } else if (this.fullyDoneSet().has(status)) {
                 state = 'done';
             } else if (currentIndex >= 0) {
                 if (index < currentIndex) {
@@ -81,19 +86,26 @@ export class StatusTimelineComponent {
         });
 
         if (off) {
-            cycleSteps.push({
-                                key: status,
-                                label: this.statusLabel(status),
-                                sublabel: this.translateService.instant('statusTimeline.offCycle') as string,
-                                state: 'error'
-                            });
+            const lastDoneIndex = cycleSteps.reduce((lastIndex, step, index) => (step.state === 'done' ? index : lastIndex), -1);
+            const insertionIndex = Math.max(lastDoneIndex + 1, 1);
+            cycleSteps.splice(insertionIndex, 0, {
+                key: status,
+                label: this.statusLabel(status),
+                sublabel: this.translateService.instant('statusTimeline.offCycle') as string,
+                state: 'error'
+            });
         }
 
         return cycleSteps;
     });
 
     readonly primaryAvailableActions = computed(() => {
-        const status = this.status()?.toUpperCase() ?? '';
+        const override = this.primaryActions();
+        if (override) {
+            return this.pickDistinct(override);
+        }
+
+        const status = this.currentStatus();
         const actions = this.availableActions();
 
         if (status === 'IN_VERIFICATION') {
@@ -119,6 +131,20 @@ export class StatusTimelineComponent {
         const primary = new Set(this.primaryAvailableActions().map(action => action.contextCode));
 
         return this.availableActions().filter(action => !primary.has(action.contextCode));
+    });
+
+    readonly actionSlotIndex = computed(() => {
+        const steps = this.steps();
+        if (this.primaryAvailableActions().length === 0) {
+            return -1;
+        }
+
+        if (this.isOffCycle()) {
+            return steps.findIndex(step => step.state === 'error') - 1;
+        }
+
+        const currentIndex = steps.findIndex(step => step.state === 'current');
+        return currentIndex >= 0 && currentIndex < steps.length - 1 ? currentIndex : -1;
     });
 
     readonly gearActions = computed<EntityAction[]>(() => {
@@ -161,29 +187,18 @@ export class StatusTimelineComponent {
         }
     }
 
-    get helpLabel(): string {
-        return this.translateService.instant('entityList.help') as string;
-    }
-
-    hasHelp(action: AvailableAction): boolean {
-        return !!action.helpKey || (action.conditionalKeys?.length ?? 0) > 0;
-    }
-
-    showHelp(event: Event, action: AvailableAction): void {
-        this.currentHelpText = action.helpKey ? this.translateService.instant(action.helpKey) as string : '';
-        this.currentConditionalKeys = action.conditionalKeys ?? [];
-        this.helpPopover()?.toggle(event);
-    }
-
-    translateCondition(key: string): string {
-        return this.translateService.instant(key) as string;
-    }
-
     runPrimaryAction(action: AvailableAction, target: HTMLElement): void {
         this.runAvailableAction(action, target);
     }
 
     actionSeverity(action: AvailableAction): SEVERITY {
+        const severityOverride = this.actionSeverityByContextCode()[action.contextCode];
+        if (severityOverride) {
+            return severityOverride;
+        }
+        if (this.isReopenAction(action)) {
+            return 'secondary';
+        }
         return this.isDangerAction(action) ? 'danger' : 'primary';
     }
 
@@ -196,7 +211,7 @@ export class StatusTimelineComponent {
         return normalized.find(({text}) => patterns.some(pattern => text.includes(pattern)))?.action ?? null;
     }
 
-    private pickDistinct(actions: Array<AvailableAction | null>): AvailableAction[] {
+    private pickDistinct(actions: Array<AvailableAction | null | undefined>): AvailableAction[] {
         const seen = new Set<string>();
 
         return actions
@@ -219,6 +234,12 @@ export class StatusTimelineComponent {
             || text.includes('reject')
             || text.includes('cancel')
             || text.includes('annul');
+    }
+
+    private isReopenAction(action: AvailableAction): boolean {
+        const text = `${action.contextCode} ${action.labelKey}`.toLowerCase();
+
+        return text.includes('reopen') || text.includes('rouvr') || text.includes('retabl') || text.includes('rétabl');
     }
 }
 

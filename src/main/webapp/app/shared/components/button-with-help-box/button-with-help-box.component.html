@@ -1,0 +1,38 @@
+<span class="bwh"
+      [class.bwh--primary]="type() === 'primary'"
+      [class.bwh--secondary]="type() === 'secondary'"
+      [class.bwh--danger]="type() === 'danger'"
+      [class.bwh--success]="type() === 'success'"
+      [class.bwh--warning]="type() === 'warning'"
+      [class.bwh--blocked]="isDisabled()"
+      [class.bwh--full]="fullWidth()">
+
+    <button #actionBtn
+            (click)="onAction($event)"
+            [disabled]="isDisabled() || loading()"
+            [attr.title]="translateKey() | translate"
+            class="bwh-action"
+            type="button">
+        @if (loading()) {
+            <i class="pi pi-spin pi-spinner"></i>
+        } @else if (primeIcon()) {
+            <i [class]="'pi ' + primeIcon()"></i>
+        }
+        <span>{{ translateKey() | translate }}</span>
+    </button>
+
+    @if (hasHelp()) {
+        <button (click)="toggleHelp($event)"
+                [attr.aria-label]="helpAriaLabel()"
+                [title]="helpLabel()"
+                aria-haspopup="dialog"
+                class="bwh-help"
+                type="button">
+            <i class="pi"
+               [class.pi-exclamation-circle]="isDisabled()"
+               [class.pi-question-circle]="!isDisabled()"></i>
+        </button>
+    }
+</span>
+
+<action-help-popover #helpPopover [helpText]="helpText()" [conditionalKeys]="conditionalKeys()"/>

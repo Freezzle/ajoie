@@ -6,13 +6,13 @@ import {filter, switchMap, tap} from 'rxjs';
 import SharedModule from 'app/shared/shared.module';
 import {FormatMediumDatePipe} from 'app/shared/date';
 import {ActionIconBoxComponent} from 'app/shared/components/action-icon-box/action-icon-box.component';
-import {ButtonBoxComponent} from 'app/shared/components/button-box/button-box.component';
 import {DialogBoxComponent} from 'app/shared/components/dialog-box/dialog-box.component';
-import {EntityActionsMenuComponent} from 'app/shared/components/entity-list/entity-actions-menu.component';
 import {EntityAction} from 'app/shared/components/entity-list/entity-list.model';
-import {StepTimelineComponent, StepTimelineStep, StepTimelineTodayMarker} from 'app/shared/components/step-timeline/step-timeline.component';
+import {StatusTimelineComponent} from 'app/shared/components/status-timeline/status-timeline.component';
+import {StepTimelineStep, StepTimelineTodayMarker} from 'app/shared/components/step-timeline/step-timeline.component';
 import {ConfirmDialogService} from 'app/shared/delete-dialog/confirm-dialog.service';
 import {AvailableAction, RefreshScope} from 'app/shared/model/available-action';
+import {SEVERITY} from 'app/shared/utils/severity';
 import {InvoiceSendingMethod} from '../../enumerations/invoice-sending-method.model';
 import {formatterInvoiceNature, InvoiceNature, isNegativeNature} from '../../enumerations/invoice-nature.model';
 import {formatterPaymentMode} from '../../enumerations/mode.model';
@@ -60,10 +60,8 @@ const TODAY_DEFAULT_RATIO = 0.35;
                    SharedModule,
                    FormatMediumDatePipe,
                    ActionIconBoxComponent,
-                   ButtonBoxComponent,
                    DialogBoxComponent,
-                   EntityActionsMenuComponent,
-                   StepTimelineComponent,
+                   StatusTimelineComponent,
                    InvoiceFormComponent,
                    PaymentFormComponent
                ],
@@ -98,6 +96,13 @@ export class InvoicingPlanDetailComponent implements OnInit {
     private readonly helper = inject(InvoicingPlanHelperService);
 
     protected readonly State = State;
+    protected readonly invoiceStatusCycle = [State.DRAFT, State.IS_ISSUING, State.ISSUED, State.PAID, State.CANCELLED];
+    protected readonly invoiceDoneStatuses = [State.PAID, State.CANCELLED];
+    protected readonly invoiceActionSeverityByCode: Record<string, SEVERITY> = {
+        [ACTION_REMINDER]: 'danger',
+        [ACTION_DOWNLOAD]: 'secondary',
+        [ACTION_RECEIPT_DOWNLOAD]: 'secondary'
+    };
 
     constructor() {
         // La liste remplace l'objet `summary` quand la facture est rafraîchie (notamment à la
@@ -174,6 +179,15 @@ export class InvoicingPlanDetailComponent implements OnInit {
 
         return codes.map(code => this.availableAction(code)).filter((action): action is AvailableAction => !!action);
     });
+    readonly timelineExtraActions = computed<EntityAction[]>(() => this.actions().filter(action => action.routerLink
+        || action.labelKey === 'event.buttonTitle'
+        || action.labelKey === 'invoicingPlan.list.action.onlyThisParticipation'
+        || action.labelKey === 'entityList.action.participation'
+        || action.labelKey === 'entityList.action.client'));
+    readonly timelineStatus = computed<string | null>(() => this.summary().state === State.ISOLATED
+        ? State.DRAFT
+        : this.summary().state ?? null);
+    readonly timelineAvailableActions = computed<AvailableAction[]>(() => this.actionsService.actionsOf(this.planId()) ?? []);
 
     readonly canSeePayments = computed(() => this.summary().state !== State.IS_ISSUING && !this.helper.isDraft(this.summary().state));
 
@@ -609,7 +623,7 @@ export class InvoicingPlanDetailComponent implements OnInit {
     private availableAction(code: string): AvailableAction | null {
         const actions = this.actionsService.actionsOf(this.planId());
 
-        return actions?.find(action => action.contextCode === code && !action.disabled) ?? null;
+        return actions?.find(action => action.contextCode === code) ?? null;
     }
 
     private mainActionCodes(plan: IInvoicingPlanList): string[] {

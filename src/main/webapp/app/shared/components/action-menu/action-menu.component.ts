@@ -2,10 +2,10 @@ import {ChangeDetectionStrategy, Component, inject, input, viewChild} from '@ang
 import {RouterLink} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Menu, MenuModule} from 'primeng/menu';
-import {Popover} from 'primeng/popover';
 
 import {ConditionalKey} from '../../model/conditional-key';
 import {AppMenuItem} from '../../utils/app-menu-item.model';
+import {ActionHelpPopoverComponent} from '../action-help-popover/action-help-popover.component';
 
 /**
  * Menu popup d'actions commun au bouton « Actions » d'un détail et au rouage d'une ligne.
@@ -18,7 +18,7 @@ import {AppMenuItem} from '../../utils/app-menu-item.model';
  */
 @Component({
                selector: 'action-menu',
-               imports: [MenuModule, Popover, RouterLink],
+               imports: [MenuModule, RouterLink, ActionHelpPopoverComponent],
                templateUrl: './action-menu.component.html',
                changeDetection: ChangeDetectionStrategy.OnPush
            })
@@ -31,7 +31,7 @@ export class ActionMenuComponent {
 
     private readonly translateService = inject(TranslateService);
     private readonly menu = viewChild<Menu>('menu');
-    private readonly helpPopover = viewChild<Popover>('helpPopover');
+    private readonly helpPopover = viewChild<ActionHelpPopoverComponent>('helpPopover');
 
     get helpLabel(): string {
         return this.translateService.instant('entityList.help') as string;
@@ -51,9 +51,5 @@ export class ActionMenuComponent {
         this.currentHelpText = item.helpText ?? '';
         this.currentConditionalKeys = item.conditionalKeys ?? [];
         this.helpPopover()?.toggle(event);
-    }
-
-    translateCondition(key: string): string {
-        return this.translateService.instant(key) as string;
     }
 }

@@ -1,47 +1,17 @@
 <div class="el-ip-detail">
-  <!-- ── Bande d'actions ─────────────────────────────────────────── -->
-  <div class="el-ip-band">
-    <b class="el-ip-next" [class]="nextStepClass()">
-      @if (isWaiting()) {
-        <fa-icon animation="spin" icon="spinner"></fa-icon>
-      }
-      {{ 'invoicingPlan.detail.next.' + nextStepKey() | translate }}
-    </b>
-
-    <span class="el-ip-band-actions">
-            @for (action of mainActions(); track action.contextCode) {
-              <button-box (clickedEvent)="runAction(action, $event)"
-                          [isDisabled]="isWaiting()"
-                          [translateKey]="action.labelKey"
-                          [type]="actionType(action)" />
-            }
-
-      @if (canAddInvoiceLine()) {
-        <button-box (clickedEvent)="addInvoiceLine()"
-                    [isDisabled]="isWaiting()"
-                    primeIcon="pi-plus"
-                    translateKey="invoicingPlan.list.action.addInvoiceLine"
-                    type="secondary" />
-      }
-
-      @if (canAddPayment()) {
-        <button-box (clickedEvent)="addPayment()"
-                    [isDisabled]="isWaiting()"
-                    primeIcon="pi-plus"
-                    translateKey="invoicingPlan.list.action.addPayment"
-                    type="secondary" />
-      }
-
-      <entity-actions-menu (opened)="menuOpened.emit()" [actions]="actions()" />
-        </span>
+  <div>
+    <app-status-timeline [status]="timelineStatus()"
+                         [statusCycle]="invoiceStatusCycle"
+                         [offCycleStatuses]="[]"
+                         [fullyDoneStatuses]="invoiceDoneStatuses"
+                         [labelKeyPrefix]="'invoicingPlan.state'"
+                         [availableActions]="timelineAvailableActions()"
+                         [primaryActions]="mainActions()"
+                         [actionSeverityByContextCode]="invoiceActionSeverityByCode"
+                         [actions]="timelineExtraActions()"
+                         (actionRequested)="runAction($event.action, $event.target)"
+                         (opened)="menuOpened.emit()"/>
   </div>
-
-  <!-- ── Frise des dates ─────────────────────────────────────────── -->
-  <app-step-timeline
-      [steps]="visualTimeline()"
-      [todayMarker]="visualTodayMarker()"
-      [todayTitle]="todayTitle()"
-      [segments]="true" />
 
   @if (isLoading() && !plan()) {
     <div class="el-ip-empty">
@@ -51,8 +21,19 @@
     <!-- ── Lignes de facture ───────────────────────────────────── -->
     <section class="el-ip-card">
       <header>
-        <strong>{{ 'invoicingPlan.invoices.label' | translate }}</strong>
-        <span class="el-ip-count">{{ invoices().length }}</span>
+        <span class="el-ip-card-hd-l">
+          <strong>{{ 'invoicingPlan.invoices.label' | translate }}</strong>
+          <span class="el-ip-count">{{ invoices().length }}</span>
+        </span>
+        @if (canAddInvoiceLine()) {
+          <button (click)="addInvoiceLine()"
+                  [disabled]="isWaiting()"
+                  class="el-ip-card-action"
+                  type="button">
+            <i class="pi pi-plus"></i>
+            <span>{{ 'invoicingPlan.list.action.addInvoiceLine' | translate }}</span>
+          </button>
+        }
       </header>
 
       @if (invoices().length === 0) {
@@ -87,8 +68,19 @@
       <!-- ── Paiements ───────────────────────────────────────────── -->
       <section class="el-ip-card">
         <header>
-          <strong>{{ 'invoicingPlan.payments.label' | translate }}</strong>
-          <span class="el-ip-count">{{ payments().length }}</span>
+          <span class="el-ip-card-hd-l">
+            <strong>{{ 'invoicingPlan.payments.label' | translate }}</strong>
+            <span class="el-ip-count">{{ payments().length }}</span>
+          </span>
+          @if (canAddPayment()) {
+            <button (click)="addPayment()"
+                    [disabled]="isWaiting()"
+                    class="el-ip-card-action"
+                    type="button">
+              <i class="pi pi-plus"></i>
+              <span>{{ 'invoicingPlan.list.action.addPayment' | translate }}</span>
+            </button>
+          }
         </header>
 
         @if (payments().length === 0) {

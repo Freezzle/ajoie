@@ -16,7 +16,6 @@
   overflow-x: auto;
 }
 
-/* ----- Frise horizontale ----- */
 .app-sline {
   display: flex;
   align-items: flex-start;
@@ -37,17 +36,27 @@
   min-width: 70px;
 }
 
-.app-sline-s::before {
+.app-sline-s::before,
+.app-sline-s::after {
   content: '';
   position: absolute;
   top: 10px;
-  left: -50%;
-  right: 50%;
   height: 2px;
   background: #d9dee4;
 }
 
-.app-sline-s:first-child::before {
+.app-sline-s::before {
+  left: 0;
+  right: 50%;
+}
+
+.app-sline-s::after {
+  left: 50%;
+  right: 0;
+}
+
+.app-sline-s:first-child::before,
+.app-sline-s:last-child::after {
   display: none;
 }
 
@@ -89,11 +98,6 @@
   color: #fff;
 }
 
-.app-sline-s.is-done::before,
-.app-sline-s.is-cur::before {
-  background: var(--app-primary, #325d88);
-}
-
 .app-sline-s.is-cur {
   color: var(--app-primary, #325d88);
   font-weight: 600;
@@ -116,41 +120,59 @@
   color: #fff;
 }
 
-/* ----- Colonne d'actions ----- */
+.app-sline-s.is-done::after,
+.app-sline-s.is-done + .app-sline-s::before {
+  background: var(--app-primary, #325d88);
+}
+
+.app-sline-s.has-slot-after::after,
+.app-sline-s.has-slot-before::before,
+.app-sline-a::before {
+  background: repeating-linear-gradient(90deg, #a8bfd6 0 5px, transparent 5px 9px);
+}
+
+.app-sline-a {
+  flex: none;
+  position: relative;
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.app-sline-a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  height: 2px;
+}
+
+.app-sline-a.is-back::before {
+  background: repeating-linear-gradient(90deg, #f0b3a8 0 5px, transparent 5px 9px);
+}
+
+.app-sline-a button-with-help-box {
+  position: relative;
+  z-index: 1;
+  margin-top: -5px;
+}
+
 .app-statusbar-acts {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
-  min-width: 270px;
-  padding: 10px 16px;
+  min-width: 72px;
+  padding: 10px 12px;
   border-left: 1px solid var(--app-border-light, #e9edf1);
 }
 
 .app-statusbar-row {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-}
-
-.app-statusbar-row button-box {
-  flex: 1;
-}
-
-.app-statusbar-row button-box ::ng-deep .p-button {
-  width: 100%;
   justify-content: center;
-}
-
-.app-statusbar-row entity-actions-menu {
-  flex: none;
-}
-
-.app-statusbar-hint {
-  color: var(--app-text-muted, #6b7280);
-  font-size: 11.5px;
-  text-align: right;
 }
 
 @media (max-width: 760px) {
@@ -158,33 +180,84 @@
     flex-direction: column;
   }
 
+  .app-statusbar-sl {
+    overflow-x: visible;
+  }
+
+  .app-sline {
+    flex-direction: column;
+    padding: 12px 10px;
+    gap: 0.5rem;
+  }
+
+  .app-sline-s {
+    align-items: flex-start;
+    text-align: left;
+    padding-left: 34px;
+    min-width: 0;
+  }
+
+  .app-sline-s::before,
+  .app-sline-s::after {
+    left: 10px;
+    right: auto;
+    width: 2px;
+    background: #d9dee4;
+  }
+
+  .app-sline-s::before {
+    top: -8px;
+    bottom: 50%;
+    height: auto;
+  }
+
+  .app-sline-s::after {
+    top: 50%;
+    bottom: -8px;
+    height: auto;
+  }
+
+  .app-sline-s:first-child::before,
+  .app-sline-s:last-child::after {
+    display: none;
+  }
+
+  .app-sline-c {
+    position: absolute;
+    left: 0;
+    margin: 0;
+  }
+
+  .app-sline-a {
+    width: 100%;
+    padding: 0 0 0 34px;
+    align-items: stretch;
+  }
+
+  .app-sline-a::before {
+    left: 10px;
+    right: auto;
+    width: 2px;
+    top: -8px;
+    bottom: -8px;
+    height: auto;
+    background: repeating-linear-gradient(180deg, #a8bfd6 0 5px, transparent 5px 9px);
+  }
+
+  .app-sline-a.is-back::before {
+    background: repeating-linear-gradient(180deg, #f0b3a8 0 5px, transparent 5px 9px);
+  }
+
+  .app-sline-a button-with-help-box {
+    width: 100%;
+    margin-top: 0;
+  }
+
   .app-statusbar-acts {
     border-top: 1px solid var(--app-border-light, #e9edf1);
     border-left: 0;
     min-width: 0;
+    width: 100%;
+    align-items: flex-end;
   }
-
-  .app-statusbar-row {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .app-statusbar-hint {
-    text-align: left;
-  }
-}
-
-.app-statusbar-primary {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.app-statusbar-primary button-box {
-  flex: 1;
-}
-
-.app-statusbar-primary .am-help {
-  margin-left: 0;
 }

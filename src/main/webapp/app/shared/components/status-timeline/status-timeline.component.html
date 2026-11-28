@@ -1,25 +1,4 @@
-<p-confirmpopup />
-
-<p-popover #helpPopover [baseZIndex]="9999" appendTo="body">
-    <div class="am-help-content">
-        @if (currentHelpText) {
-            <div class="am-help-text">{{ currentHelpText }}</div>
-        }
-        @if (currentConditionalKeys.length > 0) {
-            <ul class="am-conditions">
-                @for (condition of currentConditionalKeys; track condition.key) {
-                    <li [class.is-ko]="condition.state === 'NOK'"
-                        [class.is-ok]="condition.state === 'OK'">
-                        <i [class.pi-check]="condition.state === 'OK'"
-                           [class.pi-times]="condition.state === 'NOK'"
-                           class="pi"></i>
-                        <span>{{ translateCondition(condition.key) }}</span>
-                    </li>
-                }
-            </ul>
-        }
-    </div>
-</p-popover>
+<p-confirmpopup/>
 
 <div class="app-statusbar" [class.app-statusbar--off]="isOffCycle()">
     <div class="app-statusbar-sl">
@@ -28,7 +7,9 @@
                 <li class="app-sline-s"
                     [class.is-done]="step.state === 'done'"
                     [class.is-cur]="step.state === 'current'"
-                    [class.is-x]="step.state === 'error'">
+                    [class.is-x]="step.state === 'error'"
+                    [class.has-slot-after]="i === actionSlotIndex()"
+                    [class.has-slot-before]="i === actionSlotIndex() + 1">
                     <span class="app-sline-c">
                         {{ step.state === 'done' ? '✓' : (step.state === 'error' ? '✕' : i + 1) }}
                     </span>
@@ -37,33 +18,28 @@
                         <small class="app-sline-sub">{{ step.sublabel }}</small>
                     }
                 </li>
+
+                @if (i === actionSlotIndex()) {
+                    <li class="app-sline-a" [class.is-back]="isOffCycle()" aria-label="Actions d'état">
+                        @for (action of primaryAvailableActions(); track action.contextCode) {
+                            <button-with-help-box [translateKey]="action.labelKey"
+                                                  [type]="actionSeverity(action)"
+                                                  [isDisabled]="action.disabled"
+                                                  [helpText]="action.helpKey ? (action.helpKey | translate) : undefined"
+                                                  [conditionalKeys]="action.conditionalKeys"
+                                                  (clickedEvent)="runPrimaryAction(action, $event)"/>
+                        }
+                    </li>
+                }
             }
         </ol>
     </div>
 
-    <aside class="app-statusbar-acts" aria-label="Actions">
-        <div class="app-statusbar-row">
-            @for (action of primaryAvailableActions(); track action.contextCode) {
-                <div class="app-statusbar-primary">
-                    <button-box [translateKey]="action.labelKey"
-                                [type]="actionSeverity(action)"
-                                [isDisabled]="action.disabled"
-                                (clickedEvent)="runPrimaryAction(action, $event)" />
-                    @if (hasHelp(action)) {
-                        <i (click)="showHelp($event, action)"
-                           [attr.aria-label]="helpLabel"
-                           [class.is-blocked]="action.disabled"
-                           [class.pi-exclamation-circle]="action.disabled"
-                           [class.pi-question-circle]="!action.disabled"
-                           [title]="helpLabel"
-                           class="pi am-help"></i>
-                    }
-                </div>
-            }
-
-            @if (gearActions().length > 0) {
-                <entity-actions-menu [actions]="gearActions()" (opened)="opened.emit()" />
-            }
-        </div>
-    </aside>
+    @if (gearActions().length > 0) {
+        <aside class="app-statusbar-acts" aria-label="Actions">
+            <div class="app-statusbar-row">
+                <entity-actions-menu [actions]="gearActions()" (opened)="opened.emit()"/>
+            </div>
+        </aside>
+    }
 </div>

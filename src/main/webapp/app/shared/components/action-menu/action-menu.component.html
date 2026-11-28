@@ -32,23 +32,4 @@
     </ng-template>
 </p-menu>
 
-<p-popover #helpPopover [baseZIndex]="9999" appendTo="body">
-    <div class="am-help-content">
-        @if (currentHelpText) {
-            <div class="am-help-text">{{ currentHelpText }}</div>
-        }
-        @if (currentConditionalKeys.length > 0) {
-            <ul class="am-conditions">
-                @for (condition of currentConditionalKeys; track condition.key) {
-                    <li [class.is-ko]="condition.state === 'NOK'"
-                        [class.is-ok]="condition.state === 'OK'">
-                        <i [class.pi-check]="condition.state === 'OK'"
-                           [class.pi-times]="condition.state === 'NOK'"
-                           class="pi"></i>
-                        <span>{{ translateCondition(condition.key) }}</span>
-                    </li>
-                }
-            </ul>
-        }
-    </div>
-</p-popover>
+<action-help-popover #helpPopover [helpText]="currentHelpText" [conditionalKeys]="currentConditionalKeys"/>

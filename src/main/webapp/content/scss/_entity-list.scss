@@ -776,46 +776,6 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   gap: 12px;
 }
 
-/* Bande d'actions, collée aux bords du détail. */
-.el-ip-band {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  margin: -12px -14px 0;
-  padding: 9px 14px;
-  background: var(--app-surface);
-  border-bottom: 1px solid var(--app-border);
-}
-
-.el-ip-next {
-  font-size: var(--app-fs-sm);
-  font-weight: 700;
-  color: var(--app-text);
-
-  &.is-late {
-    color: var(--app-danger);
-  }
-
-  &.is-done {
-    color: var(--app-status-validated);
-  }
-}
-
-.el-ip-band-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-
-  /* Le rouage repris de la ligne se range simplement après les actions. */
-  .el-gear {
-    margin-left: 0;
-    align-self: center;
-  }
-}
-
 /* ── Frise des dates ────────────────────────────────────────── */
 .el-ip-timeline-wrap {
   overflow-x: auto;
@@ -967,7 +927,7 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
 .el-ip-card {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
-  border-radius: 12px;
+  border-radius: 4px;
   overflow: hidden;
 
   /* En-tête et pied se distinguent du corps par leur teinte et leur trait tireté. */
@@ -1003,6 +963,36 @@ l'encapsulation de styles d'Angular ne couvrirait pas.
   background: var(--app-surface);
   border-radius: 999px;
   padding: 0 7px;
+}
+
+.el-ip-card-hd-l {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.el-ip-card-action {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 26px;
+  padding: 3px 8px;
+  border: 1px solid var(--app-card-action-border, #d1d5db);
+  border-radius: 4px;
+  background: var(--app-surface, #fff);
+  color: var(--app-text, #111827);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.el-ip-card-action:hover:not(:disabled) {
+  background: var(--app-card-hover, #f7f8fa);
+}
+
+.el-ip-card-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .el-ip-rows {
@@ -1237,24 +1227,8 @@ button.el-ip-item {
 }
 
 @container el (max-width: 520px) {
-  .el-ip-next {
-    width: 100%;
-  }
-
-  .el-ip-band-actions {
+  .el-ip-card-action {
     margin-left: 0;
     width: 100%;
-
-    > * {
-      flex: 1;
-    }
-
-    > .el-gear {
-      flex: none;
-    }
-  }
-
-  .el-ip-timeline {
-    --el-ip-step-min: 54px;
   }
 }

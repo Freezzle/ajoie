@@ -1,0 +1,20 @@
+<p-popover #helpPopover [baseZIndex]="9999" appendTo="body">
+    <div class="am-help-content">
+        @if (helpText()) {
+            <div class="am-help-text">{{ helpText() }}</div>
+        }
+        @if (conditionalKeys().length > 0) {
+            <ul class="am-conditions">
+                @for (condition of conditionalKeys(); track condition.key) {
+                    <li [class.is-ko]="condition.state === 'NOK'"
+                        [class.is-ok]="condition.state === 'OK'">
+                        <i [class.pi-check]="condition.state === 'OK'"
+                           [class.pi-times]="condition.state === 'NOK'"
+                           class="pi"></i>
+                        <span>{{ translateCondition(condition.key) }}</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</p-popover>
