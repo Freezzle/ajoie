@@ -5,7 +5,7 @@
 
 .app-card {
   background: var(--app-surface, #fff);
-  border: 1px solid var(--app-card-border, #d9dee4);
+  border: 1px solid var(--app-border, #d9dee4);
   border-radius: var(--app-card-radius, 4px);
   transition: opacity 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -19,7 +19,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--app-card-border, #d9dee4);
+  border-bottom: 1px solid var(--app-border, #d9dee4);
   background: var(--app-card-hd-bg, #fafbfc);
 }
 
@@ -54,7 +54,7 @@
   gap: 5px;
   min-height: 24px;
   padding: 2px 8px;
-  border: 1px solid var(--app-card-border, #d9dee4);
+  border: 1px solid var(--app-border, #d9dee4);
   border-radius: 3px;
   background: #fff;
   color: var(--app-text-muted, #6b7280);

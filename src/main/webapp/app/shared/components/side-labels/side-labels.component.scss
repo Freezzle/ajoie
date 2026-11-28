@@ -25,7 +25,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--app-card-border, #d9dee4);
+  border: 1px solid var(--app-border, #d9dee4);
   border-radius: 4px;
   background: var(--app-card-hd-bg, #fafbfc);
   color: var(--app-card-title, #3e4c59);
@@ -132,7 +132,7 @@
   width: min(400px, calc(100% - var(--side-rail, 48px) - 24px));
   max-height: calc(100vh - 24px);
   overflow: auto;
-  border: 1px solid var(--app-card-border, #d9dee4);
+  border: 1px solid var(--app-border, #d9dee4);
   border-radius: 4px;
   background: var(--app-surface, #fff);
   box-shadow: -8px 10px 30px rgba(16, 24, 40, 0.16);
@@ -165,7 +165,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--app-card-border, #d9dee4);
+  border-bottom: 1px solid var(--app-border, #d9dee4);
   background: var(--app-card-hd-bg, #fafbfc);
 }
 
