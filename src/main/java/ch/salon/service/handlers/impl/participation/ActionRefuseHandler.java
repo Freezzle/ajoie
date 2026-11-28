@@ -1,19 +1,23 @@
 package ch.salon.service.handlers.impl.participation;
 
 import ch.salon.domain.Conference;
+import ch.salon.domain.InvoicingPlan;
 import ch.salon.domain.Participation;
 import ch.salon.domain.Stand;
 import ch.salon.domain.Workshop;
 import ch.salon.domain.enumeration.EntityType;
 import ch.salon.domain.enumeration.EventType;
+import ch.salon.domain.enumeration.State;
 import ch.salon.domain.enumeration.Status;
 import ch.salon.repository.ConferenceRepository;
+import ch.salon.repository.InvoicingPlanRepository;
 import ch.salon.repository.StandRepository;
 import ch.salon.repository.WorkshopRepository;
 import ch.salon.service.EventLogService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.enums.ContextActionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -28,14 +32,22 @@ public class ActionRefuseHandler implements BusinessActionHandler<Participation>
     private final ConferenceRepository conferenceRepository;
     private final WorkshopRepository workshopRepository;
     private final StandRepository standRepository;
+    private final InvoicingPlanRepository planRepository;
     private final EventLogService eventLogService;
 
     @Override
     public ActionSupport supports(Participation payload, Map<String, Object> context) {
-        if (payload != null && payload.getStatus() == Status.IN_VERIFICATION) {
-            return ActionSupport.allowed("action.participation-marked-as-refused.help");
+        if (payload == null || payload.getStatus() != Status.IN_VERIFICATION) {
+            return ActionSupport.rejected();
         }
-        return ActionSupport.rejected();
+
+        List<InvoicingPlan> plans = this.planRepository.findByParticipationIdOrderByBillingNumberDesc(payload.getId());
+        boolean invoicesSettled = plans.stream().noneMatch(plan ->
+                plan.getState().isDraft() || plan.getState() == State.ISSUED || plan.getState() == State.IS_ISSUING
+        );
+
+        return ActionSupport.fromConditions("action.participation-marked-as-refused.help",
+                ConditionalKey.of(invoicesSettled, "action.participation-marked-as-refused.condition.invoices-settled"));
     }
 
     @Override

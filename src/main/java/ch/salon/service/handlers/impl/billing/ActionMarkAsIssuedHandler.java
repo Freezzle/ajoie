@@ -24,10 +24,16 @@ public class ActionMarkAsIssuedHandler implements BusinessActionHandler<Invoicin
 
     @Override
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
-        if (payload != null && (payload.getState().isDraft() || payload.getState() == State.IS_ISSUING)) {
-            return ActionSupport.allowed("action.invoice-marked-as-issued.help");
+        if (payload == null || (!payload.getState().isDraft() && payload.getState() != State.IS_ISSUING)) {
+            return ActionSupport.rejected();
         }
-        return ActionSupport.rejected();
+
+        boolean hasLines = payload.getInvoices() != null && !payload.getInvoices().isEmpty();
+        boolean hasPositiveTotal = payload.getInvoicesTotal() > 0.0d;
+
+        return ActionSupport.fromConditions("action.invoice-marked-as-issued.help",
+                ConditionalKey.of(hasLines, "action.invoice-marked-as-issued.condition.has-lines"),
+                ConditionalKey.of(hasPositiveTotal, "action.invoice-marked-as-issued.condition.has-positive-total"));
     }
 
     @Override

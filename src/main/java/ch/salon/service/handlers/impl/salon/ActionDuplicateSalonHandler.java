@@ -5,6 +5,7 @@ import ch.salon.service.SalonService;
 import ch.salon.service.handlers.ActionMetadataProvider;
 import ch.salon.service.handlers.ActionSupport;
 import ch.salon.service.handlers.BusinessActionHandler;
+import ch.salon.service.handlers.ConditionalKey;
 import ch.salon.service.handlers.RequiredField;
 import ch.salon.service.handlers.enums.ContextActionType;
 import ch.salon.service.handlers.enums.FieldType;
@@ -26,7 +27,10 @@ public class ActionDuplicateSalonHandler implements BusinessActionHandler<Salon>
         if (payload == null) {
             return ActionSupport.rejected();
         }
-        return ActionSupport.allowed("action.salon-duplicate.help");
+        boolean sourceReadyForDuplication = payload.isArchived()
+                || (payload.getEndingDate() != null && payload.getEndingDate().isBefore(Instant.now()));
+        return ActionSupport.fromConditions("action.salon-duplicate.help",
+                ConditionalKey.of(sourceReadyForDuplication, "action.salon-duplicate.condition.source-ready-for-duplication"));
     }
 
     @Override

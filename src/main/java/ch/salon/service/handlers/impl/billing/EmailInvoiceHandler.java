@@ -15,6 +15,7 @@ import ch.salon.service.mail.EmailCreator;
 import ch.salon.service.websocket.EntityChangeNotifier;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,17 @@ public class EmailInvoiceHandler implements EmailActionHandler<InvoicingPlan>, A
             return ActionSupport.rejected();
         }
 
+        String recipientEmail = payload.getParticipation() != null && payload.getParticipation().getExhibitor() != null
+                ? payload.getParticipation().getExhibitor().getEmail()
+                : null;
+        boolean hasRecipientEmail = StringUtils.isNotBlank(recipientEmail) && recipientEmail.contains("@");
+        boolean hasPositiveBalance = payload.getInvoicesTotal() > 0.0d;
+
         if (payload.getState().isDraft() && payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL) {
-            return ActionSupport.allowed("action.invoice-send.help",
-                ConditionalKey.ok("action.invoice-send.condition.email-method"));
+            return ActionSupport.fromConditions("action.invoice-send.help",
+                ConditionalKey.ok("action.invoice-send.condition.email-method"),
+                ConditionalKey.of(hasRecipientEmail, "action.invoice-send.condition.has-recipient-email"),
+                ConditionalKey.of(hasPositiveBalance, "action.invoice-send.condition.has-positive-balance"));
         }
 
         if (payload.getInvoiceSendingMethod() == InvoiceSendingMethod.POSTAL) {

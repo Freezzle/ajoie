@@ -41,11 +41,15 @@ public class ActionValidateHandler implements BusinessActionHandler<Participatio
         boolean standsOk = !this.standRepository.existsStandByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
         boolean conferencesOk = !this.conferenceRepository.existsConferenceByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
         boolean workshopsOk = !this.workshopRepository.existsWorkshopByParticipationIdAndStatusIn(payload.getId(), Status.IN_VERIFICATION);
+        boolean clientEligible = payload.getExhibitor() != null
+                && !payload.getExhibitor().isRedFlag()
+                && !payload.getExhibitor().isDuplicateDetected();
 
         //TODO: Later, we can only validate if (accepted && arrangement) or (accepted && !arrangement && invoicing plan paid)
 
         // Nouvelle API simplifiée avec fromConditions
         return ActionSupport.fromConditions("action.participation-marked-as-validated.help",
+            ConditionalKey.of(clientEligible, "action.participation-marked-as-validated.condition.client-eligible"),
             ConditionalKey.of(standsOk, "action.participation-marked-as-validated.condition.stands-verified"),
             ConditionalKey.of(conferencesOk, "action.participation-marked-as-validated.condition.conferences-verified"),
             ConditionalKey.of(workshopsOk, "action.participation-marked-as-validated.condition.workshops-verified")

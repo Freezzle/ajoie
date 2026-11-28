@@ -15,6 +15,7 @@ import ch.salon.service.mail.EmailCreator;
 import ch.salon.service.websocket.EntityChangeNotifier;
 import ch.salon.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +59,16 @@ public class EmailInvoiceAgainHandler implements EmailActionHandler<InvoicingPla
     public ActionSupport supports(InvoicingPlan payload, Map<String, Object> context) {
         if (payload != null && payload.getState() == State.ISSUED) {
             boolean isEmail = payload.getInvoiceSendingMethod() == InvoiceSendingMethod.EMAIL;
+            String recipientEmail = payload.getParticipation() != null && payload.getParticipation().getExhibitor() != null
+                    ? payload.getParticipation().getExhibitor().getEmail()
+                    : null;
+            boolean hasRecipientEmail = StringUtils.isNotBlank(recipientEmail) && recipientEmail.contains("@");
+            boolean hasPositiveBalance = payload.getTotal() > 0.0d;
 
             return ActionSupport.fromConditions("action.invoice-send-again.help",
-                ConditionalKey.of(isEmail, "action.invoice-send-again.condition.email-method")
+                ConditionalKey.of(isEmail, "action.invoice-send-again.condition.email-method"),
+                ConditionalKey.of(hasRecipientEmail, "action.invoice-send-again.condition.has-recipient-email"),
+                ConditionalKey.of(hasPositiveBalance, "action.invoice-send-again.condition.has-positive-balance")
             );
         }
         return ActionSupport.rejected();

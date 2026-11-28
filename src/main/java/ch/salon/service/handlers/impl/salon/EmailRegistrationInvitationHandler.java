@@ -80,10 +80,13 @@ public class EmailRegistrationInvitationHandler implements EmailActionHandler<Sa
         if (payload == null) {
             return ActionSupport.rejected();
         }
+        boolean hasEligibleRecipients = !findRecipients(payload.getId()).isEmpty();
 
         return ActionSupport.fromConditions("action.salon-registration-invitation-email.help",
                 ConditionalKey.of(payload.isRegistrationEnabled(),
-                        "action.salon-registration-invitation-email.condition.registration-enabled"));
+                        "action.salon-registration-invitation-email.condition.registration-enabled"),
+                ConditionalKey.of(hasEligibleRecipients,
+                        "action.salon-registration-invitation-email.condition.has-eligible-recipients"));
     }
 
     @Override

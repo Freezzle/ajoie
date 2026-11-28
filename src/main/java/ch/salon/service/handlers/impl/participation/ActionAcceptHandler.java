@@ -34,9 +34,12 @@ public class ActionAcceptHandler implements BusinessActionHandler<Participation>
     @Override
     public ActionSupport supports(Participation payload, Map<String, Object> context) {
         if (payload != null && payload.getStatus() == Status.IN_VERIFICATION) {
+            boolean clientEligible = payload.getExhibitor() != null
+                    && !payload.getExhibitor().isRedFlag()
+                    && !payload.getExhibitor().isDuplicateDetected();
+
             return ActionSupport.fromConditions("action.participation-marked-as-accepted.help",
-                    ConditionalKey.of(!payload.getExhibitor().isRedFlag(), "action.participation-marked-as-accepted.condition.exhibitor-not-blocked"),
-                    ConditionalKey.of(!payload.getExhibitor().isDuplicateDetected(), "action.participation-marked-as-accepted.condition.exhibitor-not-duplicated"));
+                    ConditionalKey.of(clientEligible, "action.participation-marked-as-accepted.condition.client-eligible"));
         }
         return ActionSupport.rejected();
     }

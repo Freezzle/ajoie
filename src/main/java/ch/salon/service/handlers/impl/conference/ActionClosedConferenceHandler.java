@@ -8,9 +8,16 @@ import ch.salon.service.handlers.enums.ContextActionType;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 
+import static ch.salon.service.handlers.impl.common.ParentParticipationSupport.supportsWhenParentActive;
+
 @Component
 public class ActionClosedConferenceHandler implements BusinessActionHandler<Conference> {
-    @Override public ActionSupport supports(Conference payload, Map<String, Object> context) { return payload != null && payload.getStatus() == Status.VALIDATED ? ActionSupport.allowed("action.conference-marked-as-closed.help") : ActionSupport.rejected(); }
+    @Override
+    public ActionSupport supports(Conference payload, Map<String, Object> context) {
+        return supportsWhenParentActive(payload, payload != null && payload.getStatus() == Status.VALIDATED,
+                "action.conference-marked-as-closed.help", "action.conference.condition.parent-participation-active",
+                Conference::getParticipation);
+    }
     @Override public void execute(Conference payload, Map<String, Object> context) { payload.setStatus(Status.CLOSED); }
     @Override public ContextActionType getActionType() { return ContextActionType.CONFERENCE_MARK_AS_CLOSED; }
 }

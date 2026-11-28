@@ -28,10 +28,10 @@ public class ActionCloseHandler implements BusinessActionHandler<InvoicingPlan>,
             return ActionSupport.rejected();
         }
 
-        boolean hasBalance = BigDecimal.valueOf(payload.getTotal()).compareTo(BigDecimal.ZERO) != 0;
+        boolean hasRemainingPositiveBalance = BigDecimal.valueOf(payload.getTotal()).compareTo(new BigDecimal("0.01")) >= 0;
 
         return ActionSupport.fromConditions("action.invoice-marked-as-paid.help",
-            ConditionalKey.of(!hasBalance, "action.invoice-marked-as-paid.condition.balance-zero")
+            ConditionalKey.of(!hasRemainingPositiveBalance, "action.invoice-marked-as-paid.condition.balance-zero")
         );
     }
 
